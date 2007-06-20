@@ -1,0 +1,14 @@
+lib:
+	RCMD SHLIB --output=surveillance surveillance.c
+
+liblinux:
+	R CMD SHLIB surveillance.c
+
+plain:
+	gcc surveillance.c -lm
+
+test:
+	R --vanilla < fast_glr.R	
+
+clean:
+	rm surveillance.d surveillance.o surveillance.dll surveillance.so surveillance.exe surveillance_res.rc

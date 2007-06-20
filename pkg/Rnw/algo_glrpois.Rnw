@@ -1,0 +1,224 @@
+%Rnw file 
+\name{algo.glrpois}
+\alias{algo.glrpois}
+\title{Poisson regression charts}
+\description{
+ Poisson regression charts for the monitoring of surveillance time series
+}
+\usage{
+algo.glrpois(disProgObj,control = list(range=range,c.ARL=5, S=1,
+         mu0=NULL, Mtilde=1, M=-1, change="intercept",theta=NULL))
+}
+\arguments{
+  \item{disProgObj}{object of class \code{disProg} to do surveillance
+  for}
+  \item{control}{A list controlling the behaviour of the algorithm.
+                 \describe{
+		 \item{range}{vector of indices in the observed vector
+		 to monitor (should be consecutive)}
+		 \item{S}{number of harmonics to include. Note:
+		 Atm. only S=1 is supported.}
+		 \item{beta}{A vector of regression coefficients to
+		 use in the seasonal Poisson model. If \code{NULL} the
+		 observed values in \code{1:min(range)} are used to
+		 estimate beta through a generalized linear model.}
+		 \item{c.ARL}{threshold in the GLR test,
+		 i.e. \eqn{c_gamma}{c_{\gamma}}}
+                 \item{Mtilde}{number of observations needed before we
+		   have a full rank the typical setup for the
+		   "intercept" and "epi" charts is Mtilde=1}
+		 \item{M}{Number of time instances back in time in the
+		 window-limited approach, i.e. the last value
+		 considered is \eqn{\max{1,n-M}}. To always look back
+		 until the first observation use \code{M=-1}.}
+		 \item{change}{A string specifying the type of the
+		 alternative. Currently the two choices are
+		 \code{intercept} and \code{epi}. See the SFB
+		 Discussion Paper 500 for details.}
+		 \item{theta}{If \code{NULL} then the GLR scheme is
+                 used. If not \code{NULL} the prespecified value for
+                 \eqn{\kappa} or \eqn{lambda} is used in a recursive
+                 LR scheme, which is faster.  }
+		 }
+  }
+}
+\value{
+\item{survRes}{ \code{algo.prc} returns a list of class \code{survRes}
+    (surveillance result), which includes the alarm value for
+    recognizing an outbreak (1 for alarm, 0 for no alarm), the
+    threshold value for recognizing the alarm and the input object of
+    class disProg. The \code{upperbound} slot of the object are filled
+    with the current \eqn{GLR(n)} value.  } 
+}
+%
+\details{ 
+%
+  This function implements the seasonal Poisson charts based on
+  generalized likelihood ratio (GLR) as described in the SFB
+  Discussion Paper 500. A moving-window generalized likelihood ratio
+  detector is used, i.e. the detector has the form
+%
+\deqn{N = inf(... >= c_gamma)}{N = \inf\left\{ n : \max_{1\leq k \leq
+      n} \left[ \sum_{t=k}^n \log \left\{
+        \frac{f_{\theta_1}(x_t|z_t)}{f_{\theta_0}(x_t|z_t)} \right\}
+    \right] \geq c_\gamma \right\} }
+%
+where instead of \eqn{1<= k <= n}{1\leq k \leq n} the GLR statistic is computed
+for all \eqn{k \in \{n-M, \ldots, n-\tilde{M}+1\}}. To achieve the
+typical behaviour from \eqn{1\leq k\leq n} use \code{Mtilde=1} and \code{M=-1}.
+
+At the moment, window limited ``intercept'' charts have not been
+tested and are atm not supported. As speed is not an issue here this
+doesn't bother too much. Therefore, a value of \code{M=-1} is always
+in the intercept charts.
+
+}
+\seealso{
+\code{\link{algo.rkiLatestTimepoint}}
+}
+\author{M. Hoehle}
+\examples{
+##Simulate data and apply the algorithm
+S <- 1 ; t <- 1:120 ; m <- length(t)
+beta <- c(1.5,0.6,0.6)
+omega <- 2*pi/52
+#log mu_{0,t}
+base <- beta[1] + beta[2] * cos(omega*t) + beta[3] * sin(omega*t) 
+#Generate example data with changepoint and tau=tau
+tau <- 100
+kappa <- 0.4
+mu0 <- exp(base)
+mu1 <- exp(base  + kappa) 
+
+#Generate data
+set.seed(42)
+x <- rpois(length(t),mu0*(exp(kappa)^(t>=tau)))
+s.ts <- create.disProg(week=1:length(t),observed=x,state=(t>=tau))
+
+#Plot the data
+plot(s.ts,legend=NULL,xaxis.years=FALSE)
+
+#Run 
+cntrl = list(range=t,c.ARL=5, S=1,Mtilde=1, mu0=mu0,change="intercept")
+glr.ts <- algo.glrpois(s.ts,control=cntrl)
+lr.ts  <- algo.glrpois(s.ts,control=c(cntrl,theta=0.4))
+
+x11()
+plot(glr.ts,xaxis.years=FALSE)
+
+}
+
+\keyword{}
+\source{
+Poisson regression charts for the monitoring of surveillance time
+series (2006), Höhle, M., SFB386 Discussion Paper 500.
+}
+
+<<echo=F>>=
+
+######################################################################
+# 
+# Implementation of GLR -- documentation converted to Rd format.
+#
+# Author: Michael Höhle
+# Date:   27 Nov 2006
+#
+######################################################################
+
+algo.glrpois <- function(disProgObj, 
+                         control = list(range=range,c.ARL=5, S=1,
+                           mu0=NULL, Mtilde=1, M=-1, change="intercept",theta=NULL)){
+  
+  # Set the default values if not yet set
+  if(is.null(control$c.ARL))
+    control$c.ARL <- 5
+  if(is.null(control$change))
+    control$change <- "intercept" #nothing else handles atm.
+  if(is.null(control$Mtilde))
+    control$Mtilde <- 1
+  if(is.null(control$M))
+    control$M <- -1
+  if(is.null(control$S)) {
+    control$S <- 1
+  } else {
+    if(control$S>1) cat("Error: Only S=1 is handled atm.\n")
+  }
+
+  #Extract the important parts from the arguments
+  observed <- disProgObj$observed
+  timePoint <- control$range[1] #optimize on this
+  t <- control$range
+  #The period
+  p <- disProgObj$freq
+
+  # Estimate m (the expected number of cases), i.e. parameter lambda of a
+  # poisson distribution based on time points 1:t-1
+  if(is.null(control$mu)) {
+    #Perform an estimation based on all observations before timePoint
+    #NOT DONE YET -- if S>1
+    t <- 1:(timePoint-1)
+    data <- data.frame(x=disProgObj$observed[t],t=t)
+    #different model!
+    m <- glm(x ~ 1 + cos(2*pi/p*t)+ sin(2*pi/p*t),family=poisson(),data=data)
+    beta <- coef(m)
+
+    #Compute mu_{0,t}
+    omega <- 2*pi/disProgObj$freq
+    base <- rep(beta[1],length(t))
+    base <- for (s in 1:control$S) {
+      base <- base + beta[2*s] * cos(omega*t*s) + beta[2*s+1]*sin(omega*t*s)
+    }
+    mu0 <- exp(base)
+  }
+  
+  #The counts
+  x <- observed[control$range]
+
+  #Reserve space for the results
+  # start with cusum[timePoint -1] = 0, i.e. set cusum[1] = 0
+  alarm <- matrix(data = 0, nrow = length(t), ncol = 1)
+
+  #Call the C-interface -- this should depend on the type
+  #Force computations until the end
+  if (control$change == "intercept") {
+    if (is.null(control$theta)) {
+      res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(1e5),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
+    } else {
+      res <- .C("lr_cusum",as.integer(x),as.double(mu0),length(x),as.double(control$theta),as.double(1e5),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
+    }
+  } else {
+    ########################## Epidemic chart #######################
+    if (control$change == "epi") {
+      res <- .C("glr_epi_window",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.integer(control$M),as.double(1e5),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
+    }
+  }
+  
+  #Retrieve results -- this should also include some val's!
+  #print(res$N)
+  #N <- res$N + min(t) -1 ; alarm[res$N] <- 1
+  alarm <- res$val > control$c.ARL
+  
+
+  #upperbound <- rep(0,length(time))
+  upperbound <- res$val
+  # ensure upper bound is positive and not NaN
+  upperbound[is.na(upperbound)] <- 0
+  upperbound[upperbound < 0] <- 0
+    
+  
+  #Add name and data name to control object.
+  control$name <- paste("seaspois:", control$change)
+  control$data <- paste(deparse(substitute(disProgObj)))
+  control$m    <- m
+  
+  # return alarm and upperbound vectors
+  result <- list(alarm = alarm, upperbound = upperbound, disProgObj=disProgObj,control=control)
+
+  class(result) = "survRes" # for surveillance system result
+  return(result)
+}
+
+
+
+
+

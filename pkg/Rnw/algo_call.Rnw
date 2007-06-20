@@ -1,0 +1,478 @@
+@
+
+\name{algo.quality}
+\alias{algo.quality}
+\title{Computation of Quality Values for a Surveillance System Result}
+\description{Computation of the quality values for a surveillance System output.
+}
+\usage{
+    algo.quality(survResObj, penalty = 20)
+}
+\arguments{
+\item{survResObj}{object of class survRes, which includes the state chain and
+    the computed alarm chain}
+\item{penalty}{the maximal penalty for the lag}
+}
+\value{
+        \item{list of quality values}{
+                \itemize{
+                        \item TP: Number of correct found outbreaks.
+                        \item FP: Number of false found outbreaks.
+                        \item TN: Number of correct found non outbreaks.
+                        \item FN: Number of false found non outbreaks.
+                        \item sens: True positive rate, meaning TP/(FN + TP).
+                        \item spec: True negative rate, meaning TN/(TN + FP).
+                        \item dist: Euclidean distance between (1-spec, sens) to (0,1).
+                        \item lag: Lag of the outbreak recognizing by the system.
+                }
+        }
+}
+\details{
+        The lag is defined as follows:
+                In the state chain just the beginnings of an outbreak chain (outbreaks directly
+                following each other) are considered. In the alarm chain, the range from the beginning
+                of an outbreak until \eqn{min(next outbreak beginning,\code{penalty})} timepoints is considered. The \code{penalty} timepoints were
+                chosen, to provide an upper bound on the penalty for not discovering an outbreak. Now the difference between the first alarm by the system and the defined beginning is denoted ``the lag'' Additionally outbreaks found by the system are not
+                punished. At the end, the mean of the lags for every outbreak chain is returned
+                as summary lag.
+}
+\seealso{\code{\link{algo.compare}}}
+\examples{
+    # Create a test object
+    disProgObj <- sim.pointSource(p = 0.99, r = 0.5, length = 200, A = 1,
+                                        alpha = 1, beta = 0, phi = 0,
+                                        frequency = 1, state = NULL, K = 1.7)
+
+    # Let this object be tested from rki1
+    survResObj <- algo.rki1(disProgObj, control = list(range = 50:200))
+
+    # Compute the quality values
+    algo.quality(survResObj)
+}
+
+\keyword{}
+
+<<echo=F>>=
+
+
+# 'algo.quality' calculates quality values
+# like specifity, sensitivity for a surveillance method
+#
+# Parameters:
+#      survResObj: object of class survRes, which includes the state chain and
+#                               the computed alarm chain
+
+algo.quality <- function(survResObj, penalty = 20){
+
+        state <- survResObj$disProgObj$state[survResObj$control$range]
+        alarm <- survResObj$alarm
+
+        # go sure to get a complete confusion matrix
+        state <- factor(state, levels = c(0,1))
+        alarm <- factor(alarm, levels = c(0,1))
+        # create a confusion matrix
+        confusionTable <- table(state, alarm)
+
+        # compute Sensitiviy (TP rate) and Specifity (TN rate)
+        sens = confusionTable[2,2]/(confusionTable[2,2] + confusionTable[2,1])
+        spec = confusionTable[1,1]/(confusionTable[1,2] + confusionTable[1,1])
+
+        # get the TP, FN, TN, FP value
+        TP = confusionTable[2,2]
+        FN = confusionTable[2,1]
+        TN = confusionTable[1,1]
+        FP = confusionTable[1,2]
+
+        # compute the Euclidean distance between (1-spec, sens) to (0,1)
+        dist = sqrt(((1-spec) - 0)^2 + (sens - 1)^2)
+
+        # compute the lag
+        # match gets the first position of a symbol
+
+        # check if the state vector contains at least one outbreak
+        if( !(is.element(1,state)) ){
+                lag = 0
+        }
+        else{
+                lag <- c()
+
+                # outbreakbeginnings
+                outbegins <- c()
+                # find outbreakpositions
+                varA <- which(state == 1)
+                outbegins <- c(outbegins, varA[1])
+                # Are there more than one outbreak ? ;-)
+                if(length(varA) > 1){
+                        # get just the beginnings of the outbreakserieses
+                        #varB <- varA[2:length(varA)] - varA[1:(length(varA)-1)
+                        varB <- diff(varA)
+                        outbegins <- c(outbegins,varA[which(varB != 1)+1])
+                }
+
+                count <- 1
+                for(i in outbegins){
+                        # decide if it's the last outbreak
+                        if(count < length(outbegins)){
+                                # check if the outbreak was found by the system before the
+                                # next outbreak took place
+                                pos <- match(1,alarm[i:min(i+penalty,(outbegins[count+1]-1))])
+
+                                if (is.na(pos)){
+                                        # give a penalty if the outbreak wasn't found
+                                        lag <- c(lag, penalty)
+                                }
+                                else{
+                                        # compute the lag for the current outbreak
+                                        lag <- c(lag, pos-1)
+                                }
+                        }
+                        else{
+                                # check if the outbreak was found by the system
+                                pos <- match(1, alarm[i:min(i+penalty, length(alarm))])
+                                if (is.na(pos)){
+                                        # give a penalty if the outbreak wasn't found
+                                        lag <- c(lag, penalty)
+                                }
+                                else{
+                                        # compute the lag for the current outbreak
+                                        lag <- c(lag, pos-1)
+                                }
+                        }
+                        count <- count + 1
+                }
+                lag <- mean(lag)
+        }
+
+        result <- list(TP = TP, FP = FP, TN = TN,
+                FN = FN, sens = sens, spec = spec, dist = dist, mlag =lag)
+        class(result) <- "algoQV"
+        return(result)
+}
+
+@
+
+\name{print.algoQV}
+\alias{print.algoQV}
+\title{Print quality value object}
+\description{Print a single qualitity value object in a nicely formatted way}
+\usage{
+print.algoQV(x,...)
+}
+\arguments{
+\item{x}{Quality Values object generated with \code{quality}}
+\item{...}{Further arguments (not reall used)}
+}
+\keyword{}
+\examples{
+    # Create a test object
+    disProgObj <- sim.pointSource(p = 0.99, r = 0.5, length = 200, A = 1,
+                                        alpha = 1, beta = 0, phi = 0,
+                                        frequency = 1, state = NULL, K = 1.7)
+
+    # Let this object be tested from rki1
+    survResObj <- algo.rki1(disProgObj, control = list(range = 50:200))
+
+    # Compute the quality values in a nice formatted way
+    algo.quality(survResObj) 
+
+}
+
+
+<<echo=F>>=
+
+print.algoQV <- function(x,...) {
+  qualityValues <- c("TP", "FP", "TN", "FN", "Sens", "Spec", "dist", "mlag" )
+  class(x) <- "list"
+  result <- t(as.matrix(x))
+  #Give the result matrix names
+  dimnames(result)[[2]] <- qualityValues
+  #Print to screen
+  print(result)
+  invisible()
+}
+
+@
+
+\name{xtable.algoQV}
+\alias{xtable.algoQV}
+\title{Xtable quality value object}
+\description{Xtable a single qualitity value object in a nicely formatted way}
+\arguments{
+\item{x}{Quality Values object generated with \code{quality}}
+        \item{caption}{See \code{\link[xtable]{xtable}}}
+        \item{label}{See \code{\link[xtable]{xtable}}}
+        \item{align}{See \code{\link[xtable]{xtable}}}
+        \item{digits}{See \code{\link[xtable]{xtable}}}
+        \item{display}{See \code{\link[xtable]{xtable}}}
+        \item{...}{Further arguments (see \code{\link[xtable]{xtable})}}
+}
+\usage{
+xtable.algoQV(x,caption = NULL, label = NULL, align = NULL, digits = NULL, display = NULL, ...)
+}
+\keyword{}
+\seealso{ \code{\link[xtable]{xtable}}}
+\examples{
+    # Create a test object
+    disProgObj <- sim.pointSource(p = 0.99, r = 0.5, length = 200, A = 1,
+                                        alpha = 1, beta = 0, phi = 0,
+                                        frequency = 1, state = NULL, K = 1.7)
+
+    # Let this object be tested from rki1
+    survResObj <- algo.rki1(disProgObj, control = list(range = 50:200))
+
+    # Compute the quality values in a nice formatted way
+    library(xtable)
+    xtable(algo.quality(survResObj))
+
+}
+
+<<echo=F>>=
+xtable.algoQV <- function(x, caption = NULL, label = NULL, align = NULL,  
+    digits = NULL, display = NULL, ...)  {
+
+  n <- names(x)
+  x <- matrix(x,nrow=1)
+  dimnames(x)[[2]] <- n
+  xtable(x,caption, label, align, digits, display, ...)
+}
+@
+
+\name{algo.call}
+\alias{algo.call}
+\title{Query Transmission to Specified Surveillance Systems}
+\description{Transmission of a object of class disProg to the specified surveillance systems.
+}
+\usage{
+    algo.call(disProgObj, control = list(
+                     list(funcName = "rki1", range = range),
+                     list(funcName = "rki", range = range,
+                          b = 2, w = 4, actY = TRUE),
+                     list(funcName = "rki", range = range,
+                          b = 2, w = 5, actY = TRUE)))
+}
+\arguments{
+        \item{disProgObj}{object of class disProg, which includes the state chain and the observed.}
+        \item{control}{specifies which surveillance systems should be used with their parameters.
+                The parameter \code{funcName} and \code{range} must be specified where funcName must be
+                the apropriate method function (without 'algo.'). \code{range} defines
+                the timepoints to be evaluated by the actual system. If \code{control} includes \code{name}
+                this name is used in the survRes Object as name.}
+}
+\value{
+        \item{list of survRes Objects}{generated by the specified surveillance systems.
+        }
+}
+\seealso{\code{\link{algo.rki}}, \code{\link{algo.bayes}}, \code{\link{algo.farrington}}}
+\examples{
+    # Create a test object
+    disProgObj <- sim.pointSource(p = 0.99, r = 0.5, length = 400, A = 1,
+                                    alpha = 1, beta = 0, phi = 0,
+                                    frequency = 1, state = NULL, K = 1.7)
+
+    # Let this object be tested from any methods in range = 200:400
+    range <- 200:400
+    survRes <- algo.call(disProgObj,
+                  control = list(
+                            list(funcName = "rki1", range = range),
+                            list(funcName = "rki2", range = range),
+                            list(funcName = "rki3", range = range),
+                            list(funcName = "rki", range = range,
+                                 b = 3, w = 2, actY = FALSE),
+                            list(funcName = "rki", range = range,
+                                 b = 2, w = 9, actY = TRUE),
+                            list(funcName = "bayes1", range = range),
+                            list(funcName = "bayes2", range = range),
+                            list(funcName = "bayes3", range = range),
+                            list(funcName = "bayes", name = "myBayes",
+                                 range = range, b = 1, w = 5, actY = TRUE,alpha=0.05)
+                             ) )
+    # this are some survResObjects
+    survRes$rki1
+    survRes$myBayes
+}
+
+\keyword{}
+
+<<echo=F>>=
+
+# 'algo.call' calls the defined surveillance algorithms for
+# a specified observed vector.
+#
+# Parameter
+#       disProgObj: object of class survRes, which includes the state chain, the observed
+#       control: specifies which surveillance systems should be used with their parameters.
+#                The parameter funcName and range must be specified where funcName must be
+#                the apropriate function (without 'algo.')
+#       range (in control): positions in observed which should be computed
+
+
+algo.call <- function(disProgObj, control = list( list(funcName = "rki1", range = range),
+                                                   list(funcName = "rki", range = range, b = 2, w = 4, actY = TRUE),
+                                                   list(funcName = "rki", range = range, b = 2, w = 5, actY = TRUE) ) ) {
+  #Function to apply one algorithm to the disProgObj
+  onecall <- function(i) {
+    do.call(paste("algo.",control[[i]]$funcName, sep=""), 
+            list(disProgObj = disProgObj, control = control[[i]]))
+  }
+
+  #Apply each algorithm in the control list to the disProgObj
+  survResults <- lapply(1:length(control),onecall)
+
+  #Create some fancy naming..
+  names(survResults) <- lapply(survResults,function(survObj) {survObj$control$name})  
+
+  #Done
+  return(survResults)
+}
+@
+
+\name{algo.compare}
+\alias{algo.compare}
+\title{Comparison of Specified Surveillance Systems using Quality Values}
+\description{Comparison of specified surveillance systems using quality values.
+}
+\usage{
+    algo.compare(survResList)
+}
+\arguments{
+        \item{survResList}{a list of survRes objects to compare via quality values.}
+}
+\value{
+        \item{matrix}{Matrix with values from \code{\link{algo.quality}}, i.e. quality values for every surveillance system found in \code{survResults}.}
+}
+\seealso{\code{\link{algo.quality}}
+}
+\examples{
+    # Create a test object
+    disProgObj <- sim.pointSource(p = 0.99, r = 0.5, length = 400,
+                                A = 1, alpha = 1, beta = 0, phi = 0,
+                                frequency = 1, state = NULL, K = 1.7)
+
+    # Let this object be tested from any methods in range = 200:400
+    range <- 200:400
+    survRes <- algo.call(disProgObj,
+                        control = list(
+                            list(funcName = "rki1", range = range),
+                            list(funcName = "rki2", range = range),
+                            list(funcName = "rki3", range = range),
+                            list(funcName = "rki", range = range,
+                                        b = 3, w = 2, actY = FALSE),
+                            list(funcName = "rki", range = range,
+                                        b = 2, w = 9, actY = TRUE),
+                            list(funcName = "bayes1", range = range),
+                            list(funcName = "bayes2", range = range),
+                            list(funcName = "bayes3", range = range),
+                            list(funcName = "bayes", name = "myBayes",
+                            range = range, b = 1, w = 5, actY = TRUE,alpha=0.05)
+                        ) )
+    algo.compare(survRes)
+}
+
+\keyword{}
+
+<<echo=F>>=
+
+algo.compare <- function(survResList){
+  return(t(sapply(survResList,algo.quality)))
+}
+
+
+@
+
+\name{algo.summary}
+\alias{algo.summary}
+\title{Summary Table Generation for Several Disease Chains}
+\description{Summary table generation for several disease chains.
+}
+\usage{
+        algo.summary(compMatrices)
+}
+\arguments{
+        \item{compMatrices}{list of matrices constructed by algo.compare.}
+}
+\value{
+        \item{matrix}{summing up the singular input matrices
+        }
+}
+\details{As lag the mean of all single lags is returned. TP values, FN values,
+        TN values and FP values are summed up. \code{dist}, \code{sens} and
+        \code{spec} are new computed on the basis of the new TP value, FN value,
+        TN value and FP value.
+
+}
+\seealso{\code{\link{algo.compare}}, \code{\link{algo.quality}}
+}
+\examples{
+    # Create a test object
+    disProgObj1 <- sim.pointSource(p = 0.99, r = 0.5, length = 400,
+                            A = 1, alpha = 1, beta = 0, phi = 0,
+                            frequency = 1, state = NULL, K = 1.7)
+    disProgObj2 <- sim.pointSource(p = 0.99, r = 0.5, length = 400,
+                            A = 1, alpha = 1, beta = 0, phi = 0,
+                            frequency = 1, state = NULL, K = 5)
+    disProgObj3 <- sim.pointSource(p = 0.99, r = 0.5, length = 400,
+                            A = 1, alpha = 1, beta = 0, phi = 0,
+                            frequency = 1, state = NULL, K = 17)
+
+    # Let this object be tested from any methods in range = 200:400
+    range <- 200:400
+    control <- list( list(funcName = "rki1", range = range),
+                    list(funcName = "rki2", range = range),
+                    list(funcName = "rki3", range = range)
+                )
+
+    compMatrix1 <- algo.compare(algo.call(disProgObj1, control=control))
+    compMatrix2 <- algo.compare(algo.call(disProgObj2, control=control))
+    compMatrix3 <- algo.compare(algo.call(disProgObj3, control=control))
+
+    algo.summary( list(a=compMatrix1, b=compMatrix2, c=compMatrix3) )
+}
+
+\keyword{}
+
+<<echo=F>>=
+
+algo.summary <- function(compMatrices){
+
+  # check if the input is large enough for summing
+  if(length(compMatrices) < 1){
+        stop("It's an empty list !")
+  }
+  if(length(compMatrices) == 1){
+        return(compMatrices[[1]])
+  }
+
+ #Stupid conversion...
+  compMatrices <- lapply(compMatrices,function(one) {
+    n <- dimnames(one)
+    one <- matrix(as.numeric(one),nrow=dim(one)[[1]])
+    dimnames(one) <- n
+    return(one)
+  })
+
+  # Compute the whole result
+  wholeResult = compMatrices[[1]]
+  lag = matrix(0,length(compMatrices),length(wholeResult[,1]))
+  lag[1,] = wholeResult[,8]
+
+  for(i in 2:length(compMatrices)){
+    wholeResult = wholeResult + compMatrices[[i]]
+    lag[i,] = compMatrices[[i]][,8]
+  }
+
+  # Sens (TP)
+  wholeResult[,5] = wholeResult[,1]/(wholeResult[,1]+wholeResult[,4])
+  # Spec (TN/(TN+FP))
+  wholeResult[,6] = wholeResult[,3]/(wholeResult[,2]+wholeResult[,3])
+  # dist
+  wholeResult[,7] = sqrt((wholeResult[,6]-1)^2 + (wholeResult[,5]-1)^2)
+  # median(lag)
+  for(i in 1:length(wholeResult[,1])){
+    wholeResult[i,8] = mean(lag[,i])
+  }
+
+  #class(wholeResult) <- "compMatrix" # comparison matrix
+  return(wholeResult)
+}
+
+
