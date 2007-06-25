@@ -102,7 +102,6 @@ cntrl = list(range=t,c.ARL=5, S=1,Mtilde=1, mu0=mu0,change="intercept")
 glr.ts <- algo.glrpois(s.ts,control=cntrl)
 lr.ts  <- algo.glrpois(s.ts,control=c(cntrl,theta=0.4))
 
-x11()
 plot(glr.ts,xaxis.years=FALSE)
 
 }
@@ -110,6 +109,6 @@ plot(glr.ts,xaxis.years=FALSE)
 \keyword{}
 \source{
 Poisson regression charts for the monitoring of surveillance time
-series (2006), Höhle, M., SFB386 Discussion Paper 500.
+series (2006), HÃ¶hle, M., SFB386 Discussion Paper 500.
 }
 

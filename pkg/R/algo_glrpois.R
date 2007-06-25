@@ -6,7 +6,7 @@
 # 
 # Implementation of GLR -- documentation converted to Rd format.
 #
-# Author: Michael H{\"o}hle
+# Author: Michael Höhle
 # Date:   27 Nov 2006
 #
 ######################################################################

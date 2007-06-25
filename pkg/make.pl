@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use Getopt::Long;
 
-my $basePath = "../surveillance/";
+#my $basePath = "../surveillance/";
+my $basePath = "../pkg/";
 my $manPath  = "$basePath/man/";
 my $RPath = "$basePath/R/";
 
