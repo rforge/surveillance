@@ -1,6 +1,8 @@
 \name{algo.cdc}
 \alias{algo.cdcLatestTimepoint}
 \alias{algo.cdc}
+\encoding{latin1}
+
 \title{The CDC Algorithm}
 \description{
         Surveillance using the CDC Algorithm

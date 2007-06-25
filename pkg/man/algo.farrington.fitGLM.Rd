@@ -1,5 +1,7 @@
 \name{algo.farrington.fitGLM}
 \alias{algo.farrington.fitGLM}
+\encoding{latin1}
+
 \title{Fit the Poisson GLM of the Farrington procedure for a single
   time point}
 \description{

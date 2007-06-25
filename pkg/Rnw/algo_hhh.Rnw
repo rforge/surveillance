@@ -3,6 +3,7 @@
 \name{algo.hhh}
 \alias{algo.hhh}
 \alias{print.ah}
+\encoding{latin1}
 \title{Model fit based on the Held, Höhle, Hofmann paper}
 \description{
         Fits a Poisson/Negative Binomial model with mean \eqn{\mu_{it}} 
@@ -258,6 +259,7 @@ print.ah <- function(x,digits = max(3, getOption("digits") - 3), ...){
 % predict.ah
 \name{predict.ah}
 \alias{predict.ah}
+\encoding{latin1}
 \title{Predictions from a HHH model}
 \description{
   Use a \code{ah} object for prediction.
@@ -330,6 +332,7 @@ predict.ah<-function(object,newdata=NULL, type=c("response","endemic"),...) {
 \name{algo.hhh.grid}
 \alias{algo.hhh.grid}
 \alias{print.ahg}
+\encoding{latin1}
 \title{Function to try multiple starting values}}
 \description{
         Tries multiple starting values in \code{algo.hhh}. 
@@ -516,6 +519,7 @@ print.ahg <- function(x, digits = max(3, getOption("digits") - 3),...){
 % create.grid
 \name{create.grid}
 \alias{create.grid}
+\encoding{latin1}
 \title{Computes a matrix of initial values}
 \description{
        For a given list of parameters specified as \code{param = c(lower,upper,length)}
@@ -639,6 +643,7 @@ create.grid <- function(params=list(lambda=c(0.1,0.9,5), phi=c(0.1,0.9,5), psi=c
 % loglikelihood
 \name{loglikelihood}
 \alias{loglikelihood}
+\encoding{latin1}
 \title{Calculation of the loglikelihood needed in algo.hhh}
 \description{
         Calculates the loglikelihood according to the model specified in \code{designRes}.
@@ -692,6 +697,7 @@ loglikelihood <- function(theta, designRes){
 % meanResponse
 \name{meanResponse}
 \alias{meanResponse}
+\encoding{latin1}
 \title{Calculate mean response needed in algo.hhh}
 \description{
         Calculates the mean response for the model specified in designRes 
@@ -814,6 +820,7 @@ meanResponse <- function(theta, designRes){
 % make.design
 \name{make.design}
 \alias{make.design}
+\encoding{latin1}
 \title{Create the design matrices}
 \description{
         Creates the design matrices needed for \code{meanResponse}

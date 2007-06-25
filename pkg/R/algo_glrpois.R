@@ -6,7 +6,7 @@
 # 
 # Implementation of GLR -- documentation converted to Rd format.
 #
-# Author: Michael Höhle
+# Author: Michael Hoehle
 # Date:   27 Nov 2006
 #
 ######################################################################
@@ -103,10 +103,6 @@ algo.glrpois <- function(disProgObj,
   class(result) = "survRes" # for surveillance system result
   return(result)
 }
-
-
-
-
 
 
 

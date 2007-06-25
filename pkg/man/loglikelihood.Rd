@@ -1,5 +1,6 @@
 \name{loglikelihood}
 \alias{loglikelihood}
+\encoding{latin1}
 \title{Calculation of the loglikelihood needed in algo.hhh}
 \description{
         Calculates the loglikelihood according to the model specified in \code{designRes}.

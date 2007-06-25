@@ -1,5 +1,7 @@
 \name{primeFactors}
 \alias{primeFactors}
+\encoding{latin1}
+
 \title{Prime number factorization}
 \description{
        Computes prime number factorization of an integer x. 

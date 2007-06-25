@@ -1,5 +1,7 @@
 \name{anscombe.residuals}
 \alias{anscombe.residuals}
+\encoding{latin1}
+
 \title{Compute Anscombe residuals}
 \description{
   The residuals of \code{m} are transformed to form Anscombe residuals.

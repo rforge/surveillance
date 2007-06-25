@@ -1,6 +1,8 @@
 \name{plot.survRes}
 \alias{plot.survRes}
 \alias{plot.survRes.one}
+\encoding{latin1}
+
 \title{Plot a survRes object}
 \description{Plotting of a (multivariate) \code{survRes} object. The function \code{plot.survRes.one} is used as a helper function to plot a univariate time series.}
 }

@@ -1,6 +1,8 @@
 %Rnw file 
 \name{algo.glrpois}
 \alias{algo.glrpois}
+\encoding{latin1}
+
 \title{Poisson regression charts}
 \description{
  Poisson regression charts for the monitoring of surveillance time series
@@ -119,7 +121,7 @@ series (2006), Höhle, M., SFB386 Discussion Paper 500.
 # 
 # Implementation of GLR -- documentation converted to Rd format.
 #
-# Author: Michael Höhle
+# Author: Michael Hoehle
 # Date:   27 Nov 2006
 #
 ######################################################################
@@ -217,6 +219,7 @@ algo.glrpois <- function(disProgObj,
   return(result)
 }
 
+@ 
 
 
 

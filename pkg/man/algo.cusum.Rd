@@ -1,6 +1,7 @@
 \name{algo.cusum}
 \alias{algo.cusum}
 \title{CUSUM method}
+\encoding{latin1}
 \description{ 
         Approximate one-side CUSUM method for a Poisson variate based on the 
         cumulative sum of the deviation between a reference value k and the 

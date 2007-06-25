@@ -1,5 +1,6 @@
 \name{make.design}
 \alias{make.design}
+\encoding{latin1}
 \title{Create the design matrices}
 \description{
         Creates the design matrices needed for \code{meanResponse}

@@ -4,6 +4,8 @@
 \alias{algo.bayes1}
 \alias{algo.bayes2}
 \alias{algo.bayes3}
+\encoding{latin1}
+
 \title{The Bayes System}
 \description{
         Evaluation of timepoints with the Bayes subsystem

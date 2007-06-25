@@ -1,5 +1,7 @@
 \name{compMatrix.writeTable}
 \alias{compMatrix.writeTable}
+\encoding{latin1}
+
 \title{Latex Table Generation}
 \description{generates a latex table
 }

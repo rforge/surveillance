@@ -4,6 +4,8 @@
 
 \name{anscombe.residuals}
 \alias{anscombe.residuals}
+\encoding{latin1}
+
 \title{Compute Anscombe residuals}
 \description{
   The residuals of \code{m} are transformed to form Anscombe residuals.
@@ -39,6 +41,8 @@ anscombe.residuals <- function(m,phi) {
 
 \name{algo.farrington.assign.weights}
 \alias{algo.farrington.assign.weights}
+\encoding{latin1}
+
 \title{Assign weights to base counts}
 \description{
   Weights are assigned according to the Anscombe residuals
@@ -66,6 +70,8 @@ algo.farrington.assign.weights <- function(s) {
 
 \name{algo.farrington.fitGLM}
 \alias{algo.farrington.fitGLM}
+\encoding{latin1}
+
 \title{Fit the Poisson GLM of the Farrington procedure for a single
   time point}
 \description{
@@ -148,6 +154,8 @@ algo.farrington.fitGLM <- function(response,wtime,timeTrend=TRUE,reweight=TRUE) 
 
 \name{algo.farrington.threshold}
 \alias{algo.farrington.threshold}
+\encoding{latin1}
+
 \title{Threshold computations using a two sided confidence interval}
 \description{
 Depending on the current transformation \eqn{h(y)= \{y, \sqrt{y}, y^{2/3}\}},
@@ -200,6 +208,8 @@ algo.farrington.threshold <- function(pred,phi,alpha=0.01,skewness.transform="no
 
 \name{algo.farrington}
 \alias{algo.farrington}
+\encoding{latin1}
+
 \title{Surveillance for a time series using the Farrington procedure.}
 \description{
   The function takes \code{range} values of the time series \code{counts} and for each uses a GLM to predict the number of counts according to the procedure by Farrington et. al. This is then compared to the observed number of counts and in case an exceedance of the confidence interval calculated is seen an alarm is raised. 

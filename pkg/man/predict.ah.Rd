@@ -1,5 +1,6 @@
 \name{predict.ah}
 \alias{predict.ah}
+\encoding{latin1}
 \title{Predictions from a HHH model}
 \description{
   Use a \code{ah} object for prediction.

@@ -1,5 +1,7 @@
 \name{create.disProg}
 \alias{create.disProg}
+\encoding{latin1}
+
 \title{Creating an object of class disProg}
 \description{
   Creates an object of class \code{disProg} from a vector with the weeknumber

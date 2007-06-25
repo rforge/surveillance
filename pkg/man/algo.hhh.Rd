@@ -1,6 +1,7 @@
 \name{algo.hhh}
 \alias{algo.hhh}
 \alias{print.ah}
+\encoding{latin1}
 \title{Model fit based on the Held, Höhle, Hofmann paper}
 \description{
         Fits a Poisson/Negative Binomial model with mean \eqn{\mu_{it}} 

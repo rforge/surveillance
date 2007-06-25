@@ -1,5 +1,6 @@
 \name{meanResponse}
 \alias{meanResponse}
+\encoding{latin1}
 \title{Calculate mean response needed in algo.hhh}
 \description{
         Calculates the mean response for the model specified in designRes 

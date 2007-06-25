@@ -1,6 +1,8 @@
 \name{test}
 \alias{test}
+\encoding{latin1}
 \title{Print xtable for several diseases and the summary}
+
 \description{Just a test method
 }
 \usage{

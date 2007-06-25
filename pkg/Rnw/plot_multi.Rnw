@@ -4,6 +4,8 @@
 
 \name{create.disProg}
 \alias{create.disProg}
+\encoding{latin1}
+
 \title{Creating an object of class disProg}
 \description{
   Creates an object of class \code{disProg} from a vector with the weeknumber
@@ -184,6 +186,8 @@ aggregate.disProg <- function(x,...){
 \name{plot.disProg}
 \alias{plot.disProg}
 \alias{plot.disProg.one}
+\encoding{latin1}
+
 \title{Plot Generation of the Observed and the defined Outbreak States of a 
   (multivariate) time series}
 \description{Plotting of a disProg object.
@@ -430,6 +434,8 @@ plot.disProg <- function(x, title = "", xaxis.years=TRUE, startyear = 2001, firs
 \name{plot.survRes}
 \alias{plot.survRes}
 \alias{plot.survRes.one}
+\encoding{latin1}
+
 \title{Plot a survRes object}
 \description{Plotting of a (multivariate) \code{survRes} object. The function \code{plot.survRes.one} is used as a helper function to plot a univariate time series.}
 }
@@ -667,6 +673,8 @@ plot.survRes <- function(x, method=x$control$name, disease=x$control$data, xaxis
 % magic.dim
 \name{magic.dim}
 \alias{magic.dim}
+\encoding{latin1}
+
 \title{Returns a suitable k1 x k2 for plotting the disProgObj}
 \description{
        For a given number k \code{magic.dim} provides a vector 
@@ -720,6 +728,8 @@ magic.dim <- function(k){
 % primeFactors
 \name{primeFactors}
 \alias{primeFactors}
+\encoding{latin1}
+
 \title{Prime number factorization}
 \description{
        Computes prime number factorization of an integer x. 
@@ -764,6 +774,8 @@ primeFactors <- function(x){
 % bestCombination
 \name{bestCombination}
 \alias{bestCombination}
+\encoding{latin1}
+
 \title{Partition of a number into two factors}
 \description{
        Given a prime number factorization \code{x}, \code{best combination}

@@ -5,7 +5,7 @@
 # Simulates multivariate count data based on the model described in Held et.al (2005)
 # Note: trend is omitted
 ######################################
-simHHH.default <- function(model=NULL,control=list(coefs=list(alpha, gamma=0, delta=0, lambda=0,
+simHHH.default <- function(model=NULL,control=list(coefs=list(alpha=1, gamma=0, delta=0, lambda=0,
                                          phi=NULL,psi=NULL,period=52),
                            neighbourhood=NULL,population=NULL,start=NULL),
                            length){

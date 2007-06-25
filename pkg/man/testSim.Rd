@@ -1,5 +1,6 @@
 \name{testSim}
 \alias{testSim}
+\encoding{latin1}
 \title{Print xtable for a Simulated Disease and the Summary}
 \description{Just a test method.
 }

@@ -6,6 +6,7 @@
 \alias{algo.rki1}
 \alias{algo.rki2}
 \alias{algo.rki3}
+\encoding{latin1}
 \title{The system used at the RKI}
 \description{
         Evaluation of timepoints with the detection algorithms used by the RKI

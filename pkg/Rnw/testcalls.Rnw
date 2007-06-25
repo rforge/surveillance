@@ -2,7 +2,9 @@
 
 \name{test}
 \alias{test}
+\encoding{latin1}
 \title{Print xtable for several diseases and the summary}
+
 \description{Just a test method
 }
 \usage{
@@ -53,6 +55,7 @@ test <- function(data = c("k1", "m5"), range = 157:339){
 
 \name{testSim}
 \alias{testSim}
+\encoding{latin1}
 \title{Print xtable for a Simulated Disease and the Summary}
 \description{Just a test method.
 }
@@ -116,6 +119,8 @@ testSim <- function(p = 0.99, r = 0.01, length = 400, A = 1, alpha = 1, beta = 0
 
 \name{makePlot}
 \alias{makePlot}
+\encoding{latin1}
+
 \title{Plot Generation}
 \description{Just a test method.
 }

@@ -1,5 +1,7 @@
 \name{algo.glrpois}
 \alias{algo.glrpois}
+\encoding{latin1}
+
 \title{Poisson regression charts}
 \description{
  Poisson regression charts for the monitoring of surveillance time series
@@ -109,6 +111,10 @@ plot(glr.ts,xaxis.years=FALSE)
 \keyword{}
 \source{
 Poisson regression charts for the monitoring of surveillance time
-series (2006), HÃ¶hle, M., SFB386 Discussion Paper 500.
+series (2006), Höhle, M., SFB386 Discussion Paper 500.
 }
+
+
+
+
 

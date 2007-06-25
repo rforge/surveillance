@@ -8,7 +8,7 @@
 ######################################################################
 
 rd:
-	perl-cygwin make.pl Rnw/*.Rnw	
+	perl-cygwin make.pl Rnw/*.Rnw 
 
 check:
 	R CMD check .

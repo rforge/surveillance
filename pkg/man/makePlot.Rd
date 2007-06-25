@@ -1,5 +1,7 @@
 \name{makePlot}
 \alias{makePlot}
+\encoding{latin1}
+
 \title{Plot Generation}
 \description{Just a test method.
 }

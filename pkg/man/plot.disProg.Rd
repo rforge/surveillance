@@ -1,6 +1,8 @@
 \name{plot.disProg}
 \alias{plot.disProg}
 \alias{plot.disProg.one}
+\encoding{latin1}
+
 \title{Plot Generation of the Observed and the defined Outbreak States of a 
   (multivariate) time series}
 \description{Plotting of a disProg object.

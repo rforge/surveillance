@@ -1,6 +1,7 @@
 \name{algo.hhh.grid}
 \alias{algo.hhh.grid}
 \alias{print.ahg}
+\encoding{latin1}
 \title{Function to try multiple starting values}}
 \description{
         Tries multiple starting values in \code{algo.hhh}. 

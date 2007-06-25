@@ -1,5 +1,6 @@
 \name{create.grid}
 \alias{create.grid}
+\encoding{latin1}
 \title{Computes a matrix of initial values}
 \description{
        For a given list of parameters specified as \code{param = c(lower,upper,length)}

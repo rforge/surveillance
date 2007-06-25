@@ -1,5 +1,7 @@
 \name{algo.farrington}
 \alias{algo.farrington}
+\encoding{latin1}
+
 \title{Surveillance for a time series using the Farrington procedure.}
 \description{
   The function takes \code{range} values of the time series \code{counts} and for each uses a GLM to predict the number of counts according to the procedure by Farrington et. al. This is then compared to the observed number of counts and in case an exceedance of the confidence interval calculated is seen an alarm is raised. 

@@ -7,7 +7,7 @@
 \alias{farrington}
 \alias{glrpois}
 \alias{rogerson}
-
+\encoding{latin1}
 
 \title{Multivariate Surveillance through independent univariate algorithms}
 \description{
