@@ -32,7 +32,7 @@
 
 \title{The R-Package 'surveillance'}
 \author{
-Michael Höhle\thanks{Author of correspondance: Department of Statistics, University of Munich, Ludwigstr.\ 33, 80539 München, Germany, Email: \texttt{hoehle@stat.uni-muenchen.de}}$\>\>$, Andrea Riebler and Michaela Paul\\
+Michael H{\"o}hle\thanks{Author of correspondance: Department of Statistics, University of Munich, Ludwigstr.\ 33, 80539 M{\"u}nchen, Germany, Email: \texttt{hoehle@stat.uni-muenchen.de}}$\>\>$, Andrea Riebler and Michaela Paul\\
 Department of Statistics\\
 University of Munich\\
 Germany } \date{\today}
