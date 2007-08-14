@@ -1,9 +1,9 @@
 Package: surveillance
 Title: Outbreak detection algorithms for surveillance data
-Version: 0.9-6
-Date: 2007-25-06
+Version: 0.9-7
+Date: 2007-21-08
 Author: M. Höhle with contributions from C. Lang, M. Paul and A. Riebler
-Depends: methods,utils,xtable,spc,sp,maptools,vcd
+Depends: methods,utils,xtable,spc,sp,maptools,vcd,msm
 Suggests:
 Description: A framework for the development and the evaluation
 	of outbreak detection algorithms in univariate and multivariate

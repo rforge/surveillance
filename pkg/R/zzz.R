@@ -6,6 +6,7 @@
   #Load the necessary packages
   library(spc)
   library(maptools)
+  library(msm)
 
   #Load the CIdata thing
   data(CIdata, package=pkgname)
