@@ -79,6 +79,12 @@ rki <- function(sts, control = list(range = range, b = 2, w = 4, actY = FALSE)) 
   wrap.algo(sts,algo="algo.rki",control=control)
 }
 
+#HMM wrapper
+hmm <- function(sts, control=list(range=NULL, noStates=2, trend=TRUE, noHarmonics=1,covEffectEqual=FALSE)) {
+  wrap.algo(sts,algo="algo.hmm",control=control)
+}
+
+
 #Cusum wrapper
 cusum <- function(sts,  control = list(range=range, k=1.04, h=2.26, m=NULL, trans="standard",alpha=NULL)) {
   wrap.algo(sts,algo="algo.cusum",control=control)

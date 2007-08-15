@@ -106,8 +106,9 @@ algo.hmm <- function(disProgObj, control = list(range=range, noStates=2, trend=T
   if(is.null(control$covEffectEqual)){ control$covEffectEqual <- FALSE }
 
   #Initialize some often used vectors
-  observed <- disProgObj$observed
   t <- control$range
+  observed <- disProgObj$observed[t]
+
 
   #Init data
   counts <- data.frame(observed, t)

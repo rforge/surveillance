@@ -84,7 +84,7 @@ aggregate.disProg <- function(x,...){
   state[state > 1] <- 1
   
   #create univariate disProg object
-  x <- create.disProg(week=x$week, observed=observed, state=state, freq=x$freq)
+  x <- create.disProg(week=x$week, observed=observed, state=state, freq=x$freq,start=x$start)
   return(x)
 }
 
@@ -93,7 +93,7 @@ aggregate.disProg <- function(x,...){
 ### chunk number 4: 
 ###################################################
 
-plot.disProg.one <- function(x, title = "", xaxis.years=TRUE, startyear = 2001, firstweek = 1, ylim=NULL, xlab="time", ylab="No. infected",type="hh",lty=c(1,1),col=c(1,1), outbreak.symbol = list(pch=3, col=3),legend.opts=list(x="top", legend=c("Infected", "Outbreak"),lty=NULL,pch=NULL,col=NULL), ...) {
+plot.disProg.one <- function(x, title = "", xaxis.years=TRUE, startyear = x$start[1], firstweek = x$start[2], ylim=NULL, xlab="time", ylab="No. infected",type="hh",lty=c(1,1),col=c(1,1), outbreak.symbol = list(pch=3, col=3),legend.opts=list(x="top", legend=c("Infected", "Outbreak"),lty=NULL,pch=NULL,col=NULL), quarters=TRUE,...) {
 
 
   observed <- x$observed
@@ -133,22 +133,29 @@ plot.disProg.one <- function(x, title = "", xaxis.years=TRUE, startyear = 2001, 
   #Label of x-axis 
   if(xaxis.years){        
     # get the number of quarters lying in range for getting the year and quarter order
-    myat.week <- seq(ceiling((52-firstweek+1)/13) * 13 + 1, length(observed)+(floor((52-firstweek + 1)/13) * 13 +1), by=13)
+    obsPerYear <- x$freq
+    obsPerQuarter <- x$freq/4
+    myat.week <- seq(ceiling((obsPerYear-firstweek+1)/obsPerQuarter) * obsPerQuarter + 1, length(observed)+(floor((obsPerYear-firstweek + 1)/obsPerQuarter) * obsPerQuarter +1), by=obsPerQuarter)
     # get the right year order
-    year <- (myat.week - 52) %/% 52 + startyear
+    year <- (myat.week - obsPerYear) %/% obsPerYear + startyear
     # function to define the quarter order
     quarterFunc <- function(i) { switch(i+1,"I","II","III","IV")}
     # get the right number and order of quarter labels
-    quarter <- sapply( (myat.week-1) %/% 13 %% 4, quarterFunc)
+    quarter <- sapply( (myat.week-1) %/% obsPerQuarter %% 4, quarterFunc)
     # get the positions for the axis labels
-    myat.week <- myat.week - (52 - firstweek + 1)
+    myat.week <- myat.week - (obsPerYear - firstweek + 1)
 
     # construct the computed axis labels
-    if (cex == 1) {
-      mylabels.week <- paste(year,"\n\n",quarter,sep="")
+    if (quarters) {
+      if (cex == 1) {
+        mylabels.week <- paste(year,"\n\n",quarter,sep="")
+      } else {
+        mylabels.week <- paste(year,"\n",quarter,sep="")
+      }
     } else {
-      mylabels.week <- paste(year,"\n",quarter,sep="")
+      mylabels.week <- paste(year,sep="")
     }
+      
         
     axis( at=myat.week , labels=mylabels.week , side=1, line = 1 )
     axis( side=2 )
@@ -170,7 +177,7 @@ plot.disProg.one <- function(x, title = "", xaxis.years=TRUE, startyear = 2001, 
   invisible()
 }
 
-plot.disProg <- function(x, title = "", xaxis.years=TRUE, startyear = 2001, firstweek = 1, as.one=TRUE, same.scale=TRUE, ...){
+plot.disProg <- function(x, title = "", xaxis.years=TRUE, startyear = x$start[1], firstweek = x$start[2], as.one=TRUE, same.scale=TRUE, ...){
   observed <- x$observed
   state    <- x$state
   
@@ -242,7 +249,7 @@ plot.disProg <- function(x, title = "", xaxis.years=TRUE, startyear = 2001, firs
       #plot areas
       k <- 1:nAreas
       sapply(k, function(k) {
-         plot.disProg.one(create.disProg(x$week, observed[,k], state[,k]), 
+         plot.disProg.one(create.disProg(x$week, observed[,k], state[,k], freq=x$freq,start=x$start), 
                           title = "", startyear = startyear, firstweek = firstweek, 
                           xaxis.years=xaxis.years, ylim=ylim, legend.opts=NULL, ... )   
          mtext(colnames(observed)[k],line=-1.3)     
@@ -378,7 +385,7 @@ plot.survRes <- function(x, method=x$control$name, disease=x$control$data, xaxis
   observed <- x$disProgObj$observed
   state <- x$disProgObj$state
   alarm <- x$alarm
-  
+
   #univariate timeseries ?
   if(is.vector(observed))
     observed <- matrix(observed,ncol=1)
@@ -405,7 +412,7 @@ plot.survRes <- function(x, method=x$control$name, disease=x$control$data, xaxis
       k <- 1:nAreas
       sapply(k, function(k) {
         #Create the survRes
-        dP <- create.disProg(x$disProgObj$week, observed[,k], state[,k])
+        dP <- create.disProg(x$disProgObj$week, observed[,k], state[,k],start=x$start)
         obj <- list(alarm=alarm[,k],disProgObj=dP,control=x$control,upperbound=x$upperbound[,k])
         class(obj) <- "survRes"
         plot.survRes.one(obj,startyear = startyear, firstweek = firstweek, 
