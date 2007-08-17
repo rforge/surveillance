@@ -231,6 +231,7 @@ algo.farrington.threshold <- function(pred,phi,alpha=0.01,skewness.transform="no
         the results). If \code{false} then NO trend is fit.}
     \item{verbose}{show extra debugging information}
     \item{plot}{shows the final GLM model fit graphically (use History|Recording to see all pictures)}
+    \item{powertrans}{Power transformation to apply to the data. Use either "2/3" for skewness correction (Default), "1/2" for variance stabilizing transformation or "none" for no transformation}
     \item{alpha}{An approximate (two-sided) \eqn{(1-\alpha)\%}\ confidence interval is calculated}
     \item{limit54}{to avoid alarms in scenarios going from zero to 1-2 cases the algorithm uses the following criterion (see Section 3.8 of the Farrington paper): no alarm is sounded if fewer than \eqn{cases=5} reports were received in the past \eqn{period=4} weeks. \code{o54=c(cases,perior)} is a vector allowing the user to change these numbers}
     }}
@@ -271,7 +272,7 @@ plot(res,disease="Salmonella Agona",method="Farrington")
 \keyword{}
 \source{A statistical algorithm for the early detection of outbreaks of infectious disease, Farrington, C.P., Andrews, N.J, Beale A.D. and Catchpole, M.A. (1996). , J. R. Statist. Soc. A, 159, 547-563.}
 <<echo=F>>=
-algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, reweight=TRUE, verbose=FALSE,alpha=0.01)) { 
+algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, reweight=TRUE, verbose=FALSE,alpha=0.01,powertrans="2/3")) { 
   #Fetch observed
   observed <- disProgObj$observed
   freq <- disProgObj$freq
@@ -290,6 +291,7 @@ algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, rewei
   if (is.null(control$trend))    {control$trend=TRUE}
   if (is.null(control$plot))     {control$plot=FALSE}
   if (is.null(control$limit54))  {control$limit54=c(5,4)}
+  if (is.null(control$powertrans)){control$powertrans="2/3"}
 
   #check options
   if (!((control$limit54[1] >= 0) &  (control$limit54[2] > 0))) {
@@ -381,7 +383,7 @@ algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, rewei
     pred <- predict.glm(model,data.frame(wtime=c(k)),dispersion=model$phi,
                         type="response",se.fit=TRUE)
     #Calculate lower and upper threshold
-    lu <- algo.farrington.threshold(pred,model$phi,skewness.transform="2/3",alpha=control$alpha)
+    lu <- algo.farrington.threshold(pred,model$phi,skewness.transform=control$powertrans,alpha=control$alpha)
 
     ######################################################################
     # If requested show a plot of the fit.
