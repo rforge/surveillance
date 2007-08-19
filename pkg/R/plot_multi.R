@@ -93,7 +93,7 @@ aggregate.disProg <- function(x,...){
 ### chunk number 4: 
 ###################################################
 
-plot.disProg.one <- function(x, title = "", xaxis.years=TRUE, startyear = x$start[1], firstweek = x$start[2], ylim=NULL, xlab="time", ylab="No. infected",type="hh",lty=c(1,1),col=c(1,1), outbreak.symbol = list(pch=3, col=3),legend.opts=list(x="top", legend=c("Infected", "Outbreak"),lty=NULL,pch=NULL,col=NULL), quarters=TRUE,...) {
+plot.disProg.one <- function(x, title = "", xaxis.years=TRUE, quarters=TRUE, startyear = x$start[1], firstweek = x$start[2], ylim=NULL, xlab="time", ylab="No. infected",type="hh",lty=c(1,1),col=c(1,1), outbreak.symbol = list(pch=3, col=3),legend.opts=list(x="top", legend=c("Infected", "Outbreak"),lty=NULL,pch=NULL,col=NULL),...) {
 
 
   observed <- x$observed

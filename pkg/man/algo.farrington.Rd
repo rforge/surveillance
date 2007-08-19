@@ -8,7 +8,7 @@
 }
 \usage{
   algo.farrington(disProgObj, control=list(range=NULL, b=3, w=3,
-  reweight=TRUE,verbose=FALSE,alpha=0.01))
+  reweight=TRUE,verbose=FALSE,alpha=0.01,powertrans="2/3"))
 }
 \arguments{
 \item{disProgObj}{object of class disProgObj (including the observed and the state chain)}
@@ -23,6 +23,7 @@
         the results). If \code{false} then NO trend is fit.}
     \item{verbose}{show extra debugging information}
     \item{plot}{shows the final GLM model fit graphically (use History|Recording to see all pictures)}
+    \item{powertrans}{Power transformation to apply to the data. Use either "2/3" for skewness correction (Default), "1/2" for variance stabilizing transformation or "none" for no transformation}
     \item{alpha}{An approximate (two-sided) \eqn{(1-\alpha)\%}\ confidence interval is calculated}
     \item{limit54}{to avoid alarms in scenarios going from zero to 1-2 cases the algorithm uses the following criterion (see Section 3.8 of the Farrington paper): no alarm is sounded if fewer than \eqn{cases=5} reports were received in the past \eqn{period=4} weeks. \code{o54=c(cases,perior)} is a vector allowing the user to change these numbers}
     }}

@@ -3,6 +3,7 @@
 \alias{bayes}
 \alias{cdc}
 \alias{rki}
+\alias{hmm}
 \alias{cusum}
 \alias{farrington}
 \alias{glrpois}
