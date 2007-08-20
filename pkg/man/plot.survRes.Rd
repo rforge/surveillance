@@ -39,7 +39,7 @@
                 used.}  
             }
             
-            An further arguments to the \code{legend} function are
+            Any further arguments to the \code{legend} function are
             just provided as additional elements of this list,
             e.g. \code{horiz=TRUE}.  
           }
