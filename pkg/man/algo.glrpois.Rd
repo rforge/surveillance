@@ -7,40 +7,45 @@
  Poisson regression charts for the monitoring of surveillance time series
 }
 \usage{
-algo.glrpois(disProgObj,control = list(range=range,c.ARL=5, S=1,
+algo.glrpois(disProgObj,control = list(range=range,c.ARL=5, 
          mu0=NULL, Mtilde=1, M=-1, change="intercept",theta=NULL))
 }
 \arguments{
-  \item{disProgObj}{object of class \code{disProg} to do surveillance
-  for}
-  \item{control}{A list controlling the behaviour of the algorithm.
-                 \describe{
-		 \item{range}{vector of indices in the observed vector
-		 to monitor (should be consecutive)}
-		 \item{S}{number of harmonics to include. Note:
-		 Atm. only S=1 is supported.}
-		 \item{beta}{A vector of regression coefficients to
-		 use in the seasonal Poisson model. If \code{NULL} the
-		 observed values in \code{1:min(range)} are used to
-		 estimate beta through a generalized linear model.}
-		 \item{c.ARL}{threshold in the GLR test,
-		 i.e. \eqn{c_gamma}{c_{\gamma}}}
-                 \item{Mtilde}{number of observations needed before we
-		   have a full rank the typical setup for the
-		   "intercept" and "epi" charts is Mtilde=1}
-		 \item{M}{Number of time instances back in time in the
-		 window-limited approach, i.e. the last value
-		 considered is \eqn{\max{1,n-M}}. To always look back
-		 until the first observation use \code{M=-1}.}
-		 \item{change}{A string specifying the type of the
-		 alternative. Currently the two choices are
-		 \code{intercept} and \code{epi}. See the SFB
-		 Discussion Paper 500 for details.}
-		 \item{theta}{If \code{NULL} then the GLR scheme is
-                 used. If not \code{NULL} the prespecified value for
-                 \eqn{\kappa} or \eqn{lambda} is used in a recursive
-                 LR scheme, which is faster.  }
-		 }
+\item{disProgObj}{object of class \code{disProg} to do surveillance
+    for}
+\item{control}{A list controlling the behaviour of the algorithm.
+    \describe{
+    \item{range}{vector of indices in the observed vector
+        to monitor (should be consecutive)}
+   
+    \item{mu0}{A vector of in-control values of the Poisson
+        distribution with the same length as \code{range}. If
+        \code{NULL} the observed values in \code{1:(min(range)-1)} are
+        used to estimate beta through a generalized linear model. To
+        fine-tune the model one can instead specify \code{mu0} as a
+        list with two components:
+        \describe{
+        \item{S}{number of harmonics to include. }
+        \item{trend}{Include a term \code{t} in the GLM model}
+        }}
+    \item{c.ARL}{threshold in the GLR test,
+        i.e. \eqn{c_gamma}{c_{\gamma}}}
+    \item{Mtilde}{number of observations needed before we
+        have a full rank the typical setup for the
+        "intercept" and "epi" charts is Mtilde=1}
+    \item{M}{Number of time instances back in time in the
+        window-limited approach, i.e. the last value
+        considered is \eqn{\max{1,n-M}}. To always look back
+        until the first observation use \code{M=-1}.}
+    \item{change}{A string specifying the type of the
+        alternative. Currently the two choices are
+        \code{intercept} and \code{epi}. See the SFB
+        Discussion Paper 500 for details.}
+    \item{theta}{If \code{NULL} then the GLR scheme is
+        used. If not \code{NULL} the prespecified value for
+        \eqn{\kappa} or \eqn{lambda} is used in a recursive
+        LR scheme, which is faster.  }
+    }
   }
 }
 \value{
@@ -100,7 +105,7 @@ s.ts <- create.disProg(week=1:length(t),observed=x,state=(t>=tau))
 plot(s.ts,legend=NULL,xaxis.years=FALSE)
 
 #Run 
-cntrl = list(range=t,c.ARL=5, S=1,Mtilde=1, mu0=mu0,change="intercept")
+cntrl = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0,change="intercept")
 glr.ts <- algo.glrpois(s.ts,control=cntrl)
 lr.ts  <- algo.glrpois(s.ts,control=c(cntrl,theta=0.4))
 

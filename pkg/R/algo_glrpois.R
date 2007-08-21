@@ -12,7 +12,7 @@
 ######################################################################
 
 algo.glrpois <- function(disProgObj, 
-                         control = list(range=range,c.ARL=5, S=1,
+                         control = list(range=range,c.ARL=5, 
                            mu0=NULL, Mtilde=1, M=-1, change="intercept",theta=NULL)){
   
   # Set the default values if not yet set
@@ -24,11 +24,6 @@ algo.glrpois <- function(disProgObj,
     control$Mtilde <- 1
   if(is.null(control$M))
     control$M <- -1
-  if(is.null(control$S)) {
-    control$S <- 1
-  } else {
-    if(control$S>1) cat("Error: Only S=1 is handled atm.\n")
-  }
 
   #Extract the important parts from the arguments
   observed <- disProgObj$observed
@@ -39,22 +34,27 @@ algo.glrpois <- function(disProgObj,
 
   # Estimate m (the expected number of cases), i.e. parameter lambda of a
   # poisson distribution based on time points 1:t-1
-  if(is.null(control$mu)) {
+  if (is.null(control$mu) | is.list(control$mu)) {
+    #Initialize
+    if (is.null(control$mu)) control$mu <- list()
+    if (is.null(control$mu$S)) control$mu$S <- 1
+    if (is.null(control$mu$trend)) control$mu$trend <- FALSE
+
     #Perform an estimation based on all observations before timePoint
     #NOT DONE YET -- if S>1
     t <- 1:(timePoint-1)
     data <- data.frame(x=disProgObj$observed[t],t=t)
-    #different model!
-    m <- glm(x ~ 1 + cos(2*pi/p*t)+ sin(2*pi/p*t),family=poisson(),data=data)
-    beta <- coef(m)
-
-    #Compute mu_{0,t}
-    omega <- 2*pi/disProgObj$freq
-    base <- rep(beta[1],length(t))
-    base <- for (s in 1:control$S) {
-      base <- base + beta[2*s] * cos(omega*t*s) + beta[2*s+1]*sin(omega*t*s)
+    #Build the model equation
+    formula <- "x ~ 1 "
+    if (control$mu$trend) { formula <- paste(formula," + t",sep="") }
+    for (s in 1:control$mu$S) {
+      formula <- paste(formula,"+cos(2*",s,"*pi/p*t)+ sin(2*",s,"*pi/p*t)",sep="")
     }
-    mu0 <- exp(base)
+    #Fit the GLM
+    m <- eval(substitute(glm(form,family=poisson(),data=data),list(form=as.formula(formula))))
+
+    #Predict mu_{0,t}
+    mu0 <- as.numeric(predict(m,newdata=data.frame(t=control$range),type="response"))
   }
   
   #The counts
@@ -93,7 +93,7 @@ algo.glrpois <- function(disProgObj,
     
   
   #Add name and data name to control object.
-  control$name <- paste("seaspois:", control$change)
+  control$name <- paste("glrpois:", control$change)
   control$data <- paste(deparse(substitute(disProgObj)))
   control$m    <- m
   

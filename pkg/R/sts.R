@@ -270,10 +270,10 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
   alarm      <- x@alarm[,k]
   upperbound <- x@upperbound[,k]
   hasAlarm   <- all(!is.na(alarm))
-  startyear <- x@start[1]
-  firstweek <- x@start[2]
-  method <- x@control$name
-  disease <- x@control$data
+  startyear <-  x@start[1]
+  firstweek <-  x@start[2]
+  method <-     x@control$name
+  disease <-    x@control$data
   
    ##### Handle the NULL arguments ######################################
   if (is.null(main)) {
@@ -361,6 +361,7 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
       myat.unit <- seq(firstweek,length.out=length(observed) )
 
       # get the right year order
+      month <- (myat.unit-1) %% x@freq + 1
       year <- (myat.unit - 1) %/% x@freq + startyear
       #construct the computed axis labels -- add quarters if xaxis.units is requested
       if (xaxis.units) {
@@ -369,7 +370,8 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
         mylabels.unit <- paste(year,sep="")
       }
       #Add axis
-      axis( at=1:length(observed)  , labels=mylabels.unit , side=1, line = 1 ,cex=cex)
+      axis( at=(1:length(observed))  , labels=NA, side=1, line = 1 ,cex=cex)
+      axis( at=(1:length(observed))[month==1]  , labels=mylabels.unit[month==1] , side=1, line = 1 ,cex=cex)
       #Bigger tick marks at the first unit
       at <- (1:length(observed))[(myat.unit - 1) %% x@freq == 0]
       axis( at=at  , labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
