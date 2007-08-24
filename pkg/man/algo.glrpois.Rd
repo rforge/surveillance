@@ -69,14 +69,25 @@ algo.glrpois(disProgObj,control = list(range=range,c.ARL=5,
         \frac{f_{\theta_1}(x_t|z_t)}{f_{\theta_0}(x_t|z_t)} \right\}
     \right] \geq c_\gamma \right\} }
 %
-where instead of \eqn{1<= k <= n}{1\leq k \leq n} the GLR statistic is computed
-for all \eqn{k \in \{n-M, \ldots, n-\tilde{M}+1\}}. To achieve the
-typical behaviour from \eqn{1\leq k\leq n} use \code{Mtilde=1} and \code{M=-1}.
+where instead of \eqn{1<= k <= n}{1\leq k \leq n} the GLR statistic is
+computed for all \eqn{k \in \{n-M, \ldots, n-\tilde{M}+1\}}. To
+achieve the typical behaviour from \eqn{1\leq k\leq n} use
+\code{Mtilde=1} and \code{M=-1}.
+
+So \eqn{N} is the time point where the GLR statistic is above the
+threshold the first time: An alarm is given and the surveillance is
+resetted starting from time \eqn{N+1}. Note that the same
+\code{c.gamma} as before is used, but if \code{mu0} is different at
+\eqn{N+1,N+2,\ldots} compared to time {1,2,\ldots} the run length
+properties differ. Because \code{c.gamma} to obtain a specific ARL can
+only be obtained my Monte Carlo simulation there is no good way to
+update \code{c.gamma} automatically at the moment. Also, FIR GLR-detectors
+might be worth considering.
 
 At the moment, window limited ``intercept'' charts have not been
-tested and are atm not supported. As speed is not an issue here this
-doesn't bother too much. Therefore, a value of \code{M=-1} is always
-in the intercept charts.
+extensively tested and are atm not supported. As speed is not an issue
+here this doesn't bother too much. Therefore, a value of \code{M=-1}
+is always in the intercept charts.
 
 }
 \seealso{

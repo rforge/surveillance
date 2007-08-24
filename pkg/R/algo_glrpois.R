@@ -41,7 +41,8 @@ algo.glrpois <- function(disProgObj,
     if (is.null(control$mu$trend)) control$mu$trend <- FALSE
 
     #Perform an estimation based on all observations before timePoint
-    #NOT DONE YET -- if S>1
+    #Event better - don't do this at all in the algorithm - force
+    #user to do it himself - coz its a model selection problem
     t <- 1:(timePoint-1)
     data <- data.frame(x=disProgObj$observed[t],t=t)
     #Build the model equation
@@ -54,39 +55,50 @@ algo.glrpois <- function(disProgObj,
     m <- eval(substitute(glm(form,family=poisson(),data=data),list(form=as.formula(formula))))
 
     #Predict mu_{0,t}
-    mu0 <- as.numeric(predict(m,newdata=data.frame(t=control$range),type="response"))
-  }
+    control$mu0 <- as.numeric(predict(m,newdata=data.frame(t=control$range),type="response"))
+  } 
   
   #The counts
   x <- observed[control$range]
+  mu0 <- control$mu0
 
   #Reserve space for the results
   # start with cusum[timePoint -1] = 0, i.e. set cusum[1] = 0
   alarm <- matrix(data = 0, nrow = length(t), ncol = 1)
+  upperbound <- matrix(data = 0, nrow = length(t), ncol = 1)
 
-  #Call the C-interface -- this should depend on the type
-  #Force computations until the end
-  if (control$change == "intercept") {
-    if (is.null(control$theta)) {
-      res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(1e5),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
+  #Setup counters for the progress
+  doneidx <- 0
+  N <- 1
+  noOfTimePoints <- length(t)
+  #Loop as long as we are not through the sequence
+  while (doneidx < noOfTimePoints) {
+    cat("Doneidx === ",doneidx,"\n")
+    #Call the C-interface -- this should depend on the type
+    if (control$change == "intercept") {
+      if (is.null(control$theta)) {
+        res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
+      } else {
+        res <- .C("lr_cusum",as.integer(x),as.double(mu0),length(x),as.double(control$theta),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
+      }
     } else {
-      res <- .C("lr_cusum",as.integer(x),as.double(mu0),length(x),as.double(control$theta),as.double(1e5),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
+      ########################## Epidemic chart #######################
+      if (control$change == "epi") {
+        res <- .C("glr_epi_window",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.integer(control$M),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
+      }
     }
-  } else {
-    ########################## Epidemic chart #######################
-    if (control$change == "epi") {
-      res <- .C("glr_epi_window",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.integer(control$M),as.double(1e5),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
-    }
-  }
-  
-  #Retrieve results -- this should also include some val's!
-  #print(res$N)
-  #N <- res$N + min(t) -1 ; alarm[res$N] <- 1
-  alarm <- res$val > control$c.ARL
-  
 
-  #upperbound <- rep(0,length(time))
-  upperbound <- res$val
+    #In case an alarm found log this and reset the chart at res$N+1
+    if (res$N < length(x)) {
+      upperbound[1:res$N + doneidx] <- res$val[1:res$N]
+      alarm[res$N + doneidx] <- TRUE
+
+      #Chop & get ready for next round
+      x <- x[-(1:res$N)] ; t <- t[-(1:res$N)] ;  mu0 <- mu0[-(1:res$N)]
+    }
+    doneidx <- doneidx + res$N
+  }
+
   # ensure upper bound is positive and not NaN
   upperbound[is.na(upperbound)] <- 0
   upperbound[upperbound < 0] <- 0
