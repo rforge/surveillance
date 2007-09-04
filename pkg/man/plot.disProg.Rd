@@ -68,13 +68,13 @@
     plot(disProgObj, title = title, xaxis.years=TRUE,
             startyear = 1999, firstweek = 14)
     
-    # Plotting of measels data
-    data(measels.weser)
+    # Plotting of measles data
+    data(measles.weser)
     # one plot
-    plot(measels.weser, title = "measels cases in the district Weser-Ems",
+    plot(measles.weser, title = "measles cases in the district Weser-Ems",
             xaxis.years=TRUE, startyear= 2001, firstweek=1)
     # plot cases for each "Kreis" 
-    plot(measels.weser, same.scale=TRUE, as.one=FALSE)
+    plot(measles.weser, same.scale=TRUE, as.one=FALSE)
 }
 
 \keyword{}

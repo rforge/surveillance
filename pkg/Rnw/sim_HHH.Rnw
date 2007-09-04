@@ -175,7 +175,7 @@ simHHH.default <- function(model=NULL,control=list(coefs=list(alpha=1, gamma=0, 
     season <- model.frame(formula=formulaSeason(S=S,period=control$coefs$period),
                            data=data.frame("t"=1:length))
     #rearrange the sinus and cosinus parts
-    season[,c(seq(1,2*S,by=2),seq(2,2*S,by=2))]
+    season <- season[,c(seq(1,2*S,by=2),seq(2,2*S,by=2))]
     # this computes \sum_{s=1}^S [gamma_s*sin(omega_s*t) + delta_s*cos(omega_s*t) ]
     season<- as.matrix(season)%*%c(control$coefs$gamma,control$coefs$delta)
 

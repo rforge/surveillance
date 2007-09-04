@@ -30,14 +30,12 @@
 \value{\item{disProg}{object of class \code{disProg}  
   }
 }
-\details{}
-\seealso{}
 \author{M. Paul}
 \examples{
 
   # create an univariate disProg object for the salmonella.agona data
   data(salmonella.agona)
-  week <- nrow(salmonella.agona)
+  week <- 1:length(salmonella.agona$observed)
   salmonellaDisProg <- create.disProg(week=week, observed=salmonella.agona$observed,
   state=salmonella.agona$state)
   

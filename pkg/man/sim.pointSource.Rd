@@ -4,7 +4,7 @@
 
 \title{Generation of Simulated Point Source Epidemy}
 \description{Simulation of epidemies which were introduced by point sources.
-        The basis of this proagramme is a combination of a Hidden Markov Modell
+        The basis of this programme is a combination of a Hidden Markov Modell
         (to get random timepoints for outbreaks) and a simple model
         (compare \code{\link{sim.seasonalNoise}}) to simulate the epidemy.
 }

@@ -3,13 +3,15 @@
 ###################################################
 create.disProg <- function(week, observed, state, start=c(2001,1), freq=52, neighbourhood=NULL, populationFrac=NULL){
   namesObs <-colnames(observed)
-  namesState <- colnames(observed)
   
   #univariate timeseries ?
-  if(is.vector(observed))
+  if(is.vector(observed)){
     observed <- matrix(observed,ncol=1)
+    namesObs <- deparse(quote(observed))
+  }
   if(is.vector(state))
     state <- matrix(state,ncol=1)
+  
     
   #check number of columns of observed and state
   nAreas <- ncol(observed)
@@ -25,9 +27,16 @@ create.disProg <- function(week, observed, state, start=c(2001,1), freq=52, neig
   }
   
   #check neighbourhood matrix
-  if(!is.null(neighbourhood) & (any(dim(neighbourhood) != nAreas))) {
-    cat('wrong dimensions of neighbourhood matrix \n')
-    return(NULL)
+  # neighbourhood can be a matrix or an array of dimension c(nAreas,nAreas, nrow(observed))
+  if(!is.null(neighbourhood) ) {
+    dimNhood <- dim(neighbourhood)
+    if(length(dimNhood)==2 & any(dimNhood != nAreas)) {
+      cat('wrong dimensions of neighbourhood matrix \n')
+      return(NULL)
+    } else if (length(dimNhood)==3 & (any(dimNhood[1:2] != nAreas) | (dimNhood[3] != nrow(observed)) )){
+      cat('wrong dimensions of neighbourhood matrix \n')
+      return(NULL)
+    }
   }
   
   #if(is.null(populationFrac)) 
@@ -40,17 +49,18 @@ create.disProg <- function(week, observed, state, start=c(2001,1), freq=52, neig
   
   #labels for observed and state
   if(is.null(namesObs)){
-    namesObs <- paste("observed", 1:nAreas, sep="")       
-    namesState <- paste("state", 1:nAreas, sep="")  
+    namesObs <- paste(deparse(quote(observed)),1:nAreas,sep="")
+
   }
- 
-  dimnames(observed) <- list(NULL,namesObs)
-  dimnames(state) <- list(NULL,namesState)
+  
+  colnames(observed) <- namesObs
+  colnames(state) <- namesObs
   
   res <- list("week"=week, "observed"=observed, "state"=state, "start"=start, "freq"=freq,  "neighbourhood"=neighbourhood, "populationFrac"=populationFrac)
   class(res) <- "disProg"
   return(res)
 }
+
 
 
 ###################################################
