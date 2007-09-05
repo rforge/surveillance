@@ -204,7 +204,7 @@ algo.glrpois <- function(disProgObj,
   noOfTimePoints <- length(t)
   #Loop as long as we are not through the sequence
   while (doneidx < noOfTimePoints) {
-    cat("Doneidx === ",doneidx,"\n")
+    #cat("Doneidx === ",doneidx,"\n")
     #Call the C-interface -- this should depend on the type
     if (control$change == "intercept") {
       if (is.null(control$theta)) {

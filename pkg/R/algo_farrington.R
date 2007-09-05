@@ -239,15 +239,14 @@ algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, rewei
     ######################################################################
 
     #Compute exceedance score unless less than 5 reports during last 4 weeks.
-    enoughCases <- (sum(observed[(k-control$limit54[2]):(k-1)])>=control$limit54[1])
+    #enoughCases <- (sum(observed[(k-control$limit54[2]):(k-1)])>=control$limit54[1])
+    #Changed in version 0.9-7 - current week is included now
+    enoughCases <- (sum(observed[(k-control$limit54[2]+1):k])>=control$limit54[1])
 
     #18 May 2006: Bug/unexpected feature found by Y. Le Strat. 
     #the okHistory variable meant to protect against zero count problems,
     #but instead it resulted in exceedance score == 0 for low counts. 
     #Now removed to be concordant with the Farrington 1996 paper.
-    #REMOVEDokHistory <- (pred$fit>1)
-    #X <- ifelse(enoughCases && okHistory,
-    #            (observed[k] - pred$fit) / (max(lu) - pred$fit),0)
     X <- ifelse(enoughCases,(observed[k] - pred$fit) / (max(lu) - pred$fit),0)
 
     #Do we have an alarm -- i.e. is observation beyond CI??

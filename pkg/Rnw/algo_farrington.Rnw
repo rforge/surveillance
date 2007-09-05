@@ -233,7 +233,7 @@ algo.farrington.threshold <- function(pred,phi,alpha=0.01,skewness.transform="no
     \item{plot}{shows the final GLM model fit graphically (use History|Recording to see all pictures)}
     \item{powertrans}{Power transformation to apply to the data. Use either "2/3" for skewness correction (Default), "1/2" for variance stabilizing transformation or "none" for no transformation}
     \item{alpha}{An approximate (two-sided) \eqn{(1-\alpha)\%}\ confidence interval is calculated}
-    \item{limit54}{to avoid alarms in scenarios going from zero to 1-2 cases the algorithm uses the following criterion (see Section 3.8 of the Farrington paper): no alarm is sounded if fewer than \eqn{cases=5} reports were received in the past \eqn{period=4} weeks. \code{o54=c(cases,perior)} is a vector allowing the user to change these numbers}
+    \item{limit54}{to avoid alarms in scenarios going from zero to 1-2 cases the algorithm uses the following criterion (see Section 3.8 of the Farrington paper): no alarm is sounded if fewer than \eqn{cases=5} reports were received in the past \eqn{period=4} weeks. \code{limit54=c(cases,period)} is a vector allowing the user to change these numbers. Note: As of version 0.9-7 The term "last" period of weeks includes the current week - otherwise no alarm is sounded for horrible large numbers if the four weeks before that are too low.}
     }}
 }
 \details{
@@ -409,15 +409,14 @@ algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, rewei
     ######################################################################
 
     #Compute exceedance score unless less than 5 reports during last 4 weeks.
-    enoughCases <- (sum(observed[(k-control$limit54[2]):(k-1)])>=control$limit54[1])
+    #enoughCases <- (sum(observed[(k-control$limit54[2]):(k-1)])>=control$limit54[1])
+    #Changed in version 0.9-7 - current week is included now
+    enoughCases <- (sum(observed[(k-control$limit54[2]+1):k])>=control$limit54[1])
 
     #18 May 2006: Bug/unexpected feature found by Y. Le Strat. 
     #the okHistory variable meant to protect against zero count problems,
     #but instead it resulted in exceedance score == 0 for low counts. 
     #Now removed to be concordant with the Farrington 1996 paper.
-    #REMOVEDokHistory <- (pred$fit>1)
-    #X <- ifelse(enoughCases && okHistory,
-    #            (observed[k] - pred$fit) / (max(lu) - pred$fit),0)
     X <- ifelse(enoughCases,(observed[k] - pred$fit) / (max(lu) - pred$fit),0)
 
     #Do we have an alarm -- i.e. is observation beyond CI??
