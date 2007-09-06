@@ -383,8 +383,8 @@ if (compute) {
 
 <<fig=T,width=13,height=6>>=
 par(mfcol=c(1,2))
-plot(sts.cdc, legend=F)
-plot(sts.farrington, legend=F)
+plot(sts.cdc, legend.opts=NULL)
+plot(sts.farrington, legend.opts=NULL)
 @ 
 
 
@@ -553,7 +553,7 @@ by~\citet{held2005} is currently available. In the near future the
 surveillance algorithms will also be extended to handle these
 multivariate data.
 
-For example, consider the weekly counts of new measels cases for each
+For example, consider the weekly counts of new measles cases for each
 ``Kreis'' (area) of the administrative district ``Weser-Ems'' in Lower
 Saxony, Germany, in 2001 and
 2002~\citep{survstat}. Figure~\ref{fig:map} shows a map of the $m=15$
@@ -567,21 +567,21 @@ elements 1 if two areas share a common border and is 0 otherwise.
   \label{fig:map}
 \end{figure}
 
-In the package \texttt{surveillance} the measels data are already available
+In the package \texttt{surveillance} the measles data are already available
 in the form of a \texttt{disProg}-object.
 
 <<fig=T,width=13,height=6>>=
-data(measels.weser)
-plot(measels.weser, title="Measels in Weser-Ems 2001-2002", xaxis.years=TRUE, startyear= 2001, firstweek=1)
+data(measles.weser)
+plot(measles.weser, title="measles in Weser-Ems 2001-2002", xaxis.years=TRUE, startyear= 2001, firstweek=1)
 @
 
 The number of counts for each area can also be looked at and plotted
 as individual time series.
 Here, the x-axis is the week number since 1st of January 2001 and the 
-y-axis is the number of measels cases.
+y-axis is the number of measles cases.
 
 <<fig=T,width=13,height=9>>=
-plot(measels.weser,as.one=FALSE,xaxis.years=FALSE)
+plot(measles.weser,as.one=FALSE,xaxis.years=FALSE)
 @
 \vspace{1em}
 
@@ -601,24 +601,24 @@ $\log \nu_{it} = \alpha_i + \beta t + \sum_{s=1}^{S}\big(\gamma_s sin(\omega_s t
 
 <<echo=F,eval=T,results=hide>>=
 #####################################################
-# measels
+# measles
 if(compute){
   # algo.hhh
-  cntrl <- list(linear=TRUE, nseason=1, period=52, neighbours=FALSE, negbin=TRUE, lambda=TRUE)
-  measels.hhh.neF <- algo.hhh(measels.weser,control=cntrl)
+  cntrl <- list(linear=TRUE, season=list(nseason=1), neighbours=FALSE, negbin="single", lambda=TRUE)
+  measles.hhh.neF <- algo.hhh(measles.weser,control=cntrl)
 
   cntrl$neighbours <- TRUE
-  measels.hhh <-algo.hhh(measels.weser,cntrl)
+  measles.hhh <-algo.hhh(measles.weser,cntrl)
 
   # algo.hhh.grid
-  cntrl <- list(linear=TRUE, nseason=1, period=52, neighbours=TRUE, negbin=TRUE, lambda=TRUE)
-  grid <- create.grid(params=list(beta=c(lower=-0.5,upper=0.5,length=3), gammaDelta=c(-0.5,0.5,3), nseason=1, phi=c(0.1,0.9,5),  psi=c(0.3,12,5), lambda=c(0.1,0.9,5)))
+  cntrl <- list(linear=TRUE, season=list(nseason=1), neighbours=TRUE, negbin="single", lambda=TRUE)
+  grid <- create.grid(measles.weser, cntrl, params=list(endemic=c(lower=-0.5,upper=0.5,length=3), epidemic=c(0.1,0.9,5),  negbin=c(0.3,12,5)))
   cat("running a grid search for up to 900 seconds.\n")
-  measels.hhh.grid <- algo.hhh.grid(measels.weser, control=cntrl, thetastartMatrix=grid, maxTime=10)#,verbose=T)
+  measles.hhh.grid <- algo.hhh.grid(measles.weser, control=cntrl, thetastartMatrix=grid, maxTime=900)#,verbose=T)
 }
 @
 
-For the weekly measels data $\omega_s=2s\pi/52$ (i.e.\ \texttt{period}=52).
+For the weekly measles data $\omega_s=2s\pi/52$ (i.e.\ \texttt{period}=52).
 In the following, the model specified in \texttt{cntrl}
 is fitted to the data. The counts are assumed to be negative binomial distributed
 with mean $\mu_{it}$ and variance $\mu_{it} +\mu_{it}^2/\psi$.
@@ -631,8 +631,8 @@ In case of a Poisson model, the number of parameters reduces by one
 as the overdispersion parameter $\psi$ is omitted.
 
 <<echo=T,eval=F>>=
-cntrl <- list(linear=TRUE, nseason=1, period=52, neighbours=TRUE, negbin=TRUE, lambda=TRUE)
-measels.hhh <- algo.hhh(measels.weser,control=cntrl)
+cntrl <- list(linear=TRUE, season=list(nseason=1), neighbours=TRUE, negbin="single", lambda=TRUE)
+measles.hhh <- algo.hhh(measles.weser,control=cntrl)
 @
 
 Depending on the inital values for the parameters, the optimization algorithm
@@ -652,17 +652,18 @@ is exceeded. The result with the highest likelihood is returned.
 
 %algo.hhh.grid
 <<echo=T,eval=F>>=
-cntrl <- list(linear=TRUE, nseason=1, period=52, neighbours=TRUE, negbin=TRUE, lambda=TRUE)
-grid <- create.grid(list(beta=c(-0.5,0.5,3), nseason=1, gammaDelta=c(-0.5, 0.5, 3), phi=c(0.1, 0.9, 5),  psi=c(0.3, 12, 5), lambda=c(0.1, 0.9, 5)))
-algo.hhh.grid(measels.weser, control=cntrl, thetastartMatrix=grid, maxTime=1800)#,verbose=T)
+cntrl <- list(linear=TRUE, season=list(nseason=1), neighbours=TRUE, negbin="single", lambda=TRUE)
+grid <- create.grid(measles.weser, cntrl, 
+   params = list(endemic = c(lower = -0.5, upper = 0.5, length = 3), epidemic = c(0.1, 0.9, 5),  negbin = c(0.3,12,5)))
+algo.hhh.grid(measles.weser, control=cntrl, thetastartMatrix=grid, maxTime=900)#,verbose=T)
 @
 <<echo=F>>=
-print(measels.hhh.grid,3)
+print(measles.hhh.grid,3)
 @
 
 <<echo=F>>=
 #save computed results
-save(list=c("sts.cdc","sts.farrington","acall","res","res.survstat","control","ten.surv",ls(pattern="measels")),file=".Rresults")
+save(list=c("sts.cdc","sts.farrington","acall","res","res.survstat","control","ten.surv",ls(pattern="measles")),file=".Rresults")
 @
 
 

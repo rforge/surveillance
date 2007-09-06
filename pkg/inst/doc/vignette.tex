@@ -37,7 +37,7 @@ Department of Statistics\\
 University of Munich\\
 Germany } \date{\today}
 
-\usepackage{d:/Programme/R/R-2.5.1/share/texmf/Sweave}
+\usepackage{/usr/share/R/share/texmf/Sweave}
 \begin{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Sweave 
@@ -126,7 +126,7 @@ mainly originating from the SurvStat@RKI database at
 \href{http://www3.rki.de/SurvStat/}{http://www3.rki.de/SurvStat/}
 maintained by the Robert Koch Institute, Germany~\citep{survstat}.
 For example the object \texttt{k1} describes Kryptosporidosis
-surveillance data for the German federal state Baden-Württemberg
+surveillance data for the German federal state Baden-WÃ¼rttemberg
 2001-2005. The peak in 2001 is due to an outbreak of Kryptosporidosis
 among a group of army-soldiers in boot-camp~\citep{bulletin3901}. In
 \surveillance\ the \texttt{readData} function is used to bring the
@@ -374,8 +374,8 @@ each week are shown as circles in the plot.
 \begin{Schunk}
 \begin{Sinput}
 > par(mfcol = c(1, 2))
-> plot(sts.cdc, legend = F)
-> plot(sts.farrington, legend = F)
+> plot(sts.cdc, legend.opts = NULL)
+> plot(sts.farrington, legend.opts = NULL)
 \end{Sinput}
 \end{Schunk}
 \includegraphics{figs/vignette-007}
@@ -572,7 +572,7 @@ by~\citet{held2005} is currently available. In the near future the
 surveillance algorithms will also be extended to handle these
 multivariate data.
 
-For example, consider the weekly counts of new measels cases for each
+For example, consider the weekly counts of new measles cases for each
 ``Kreis'' (area) of the administrative district ``Weser-Ems'' in Lower
 Saxony, Germany, in 2001 and
 2002~\citep{survstat}. Figure~\ref{fig:map} shows a map of the $m=15$
@@ -586,13 +586,13 @@ elements 1 if two areas share a common border and is 0 otherwise.
   \label{fig:map}
 \end{figure}
 
-In the package \texttt{surveillance} the measels data are already available
+In the package \texttt{surveillance} the measles data are already available
 in the form of a \texttt{disProg}-object.
 
 \begin{Schunk}
 \begin{Sinput}
-> data(measels.weser)
-> plot(measels.weser, title = "Measels in Weser-Ems 2001-2002", 
+> data(measles.weser)
+> plot(measles.weser, title = "measles in Weser-Ems 2001-2002", 
 +     xaxis.years = TRUE, startyear = 2001, firstweek = 1)
 \end{Sinput}
 \end{Schunk}
@@ -601,11 +601,11 @@ in the form of a \texttt{disProg}-object.
 The number of counts for each area can also be looked at and plotted
 as individual time series.
 Here, the x-axis is the week number since 1st of January 2001 and the 
-y-axis is the number of measels cases.
+y-axis is the number of measles cases.
 
 \begin{Schunk}
 \begin{Sinput}
-> plot(measels.weser, as.one = FALSE, xaxis.years = FALSE)
+> plot(measles.weser, as.one = FALSE, xaxis.years = FALSE)
 \end{Sinput}
 \end{Schunk}
 \includegraphics{figs/vignette-021}
@@ -626,7 +626,7 @@ $\log \nu_{it} = \alpha_i + \beta t + \sum_{s=1}^{S}\big(\gamma_s sin(\omega_s t
 + \delta_s cos(\omega_s t)\big)$ with Fourier frequencies $\omega_s$.
 
 
-For the weekly measels data $\omega_s=2s\pi/52$ (i.e.\ \texttt{period}=52).
+For the weekly measles data $\omega_s=2s\pi/52$ (i.e.\ \texttt{period}=52).
 In the following, the model specified in \texttt{cntrl}
 is fitted to the data. The counts are assumed to be negative binomial distributed
 with mean $\mu_{it}$ and variance $\mu_{it} +\mu_{it}^2/\psi$.
@@ -640,9 +640,9 @@ as the overdispersion parameter $\psi$ is omitted.
 
 \begin{Schunk}
 \begin{Sinput}
-> cntrl <- list(linear = TRUE, nseason = 1, period = 52, 
-+     neighbours = TRUE, negbin = TRUE, lambda = TRUE)
-> measels.hhh <- algo.hhh(measels.weser, control = cntrl)
+> cntrl <- list(linear = TRUE, season = list(nseason = 1), 
++     neighbours = TRUE, negbin = "single", lambda = TRUE)
+> measles.hhh <- algo.hhh(measles.weser, control = cntrl)
 \end{Sinput}
 \end{Schunk}
 
@@ -664,24 +664,52 @@ is exceeded. The result with the highest likelihood is returned.
 %algo.hhh.grid
 \begin{Schunk}
 \begin{Sinput}
-> cntrl <- list(linear = TRUE, nseason = 1, period = 52, 
-+     neighbours = TRUE, negbin = TRUE, lambda = TRUE)
-> grid <- create.grid(list(beta = c(-0.5, 0.5, 3), nseason = 1, 
-+     gammaDelta = c(-0.5, 0.5, 3), phi = c(0.1, 0.9, 5), 
-+     psi = c(0.3, 12, 5), lambda = c(0.1, 0.9, 5)))
-> algo.hhh.grid(measels.weser, control = cntrl, thetastartMatrix = grid, 
-+     maxTime = 1800)
+> cntrl <- list(linear = TRUE, season = list(nseason = 1), 
++     neighbours = TRUE, negbin = "single", lambda = TRUE)
+> grid <- create.grid(measles.weser, cntrl, params = list(endemic = c(lower = -0.5, 
++     upper = 0.5, length = 3), epidemic = c(0.1, 0.9, 
++     5), negbin = c(0.3, 12, 5)))
+> algo.hhh.grid(measles.weser, control = cntrl, thetastartMatrix = grid, 
++     maxTime = 900)
 \end{Sinput}
 \end{Schunk}
 \begin{Schunk}
 \begin{Soutput}
-size of grid:  1125 
-grid search stopped after 3 iterations 
-convergences:  0 
-time needed (in seconds) 
+size of grid:  375 
+convergences:  60 
+time needed (in seconds) 169.09 
 
+values of log-likelihood:
+-910 
+  60 
 
-Algorithms did not converge, please try different starting values! 
+Estimated parameters and standard errors: 
+
+                  Estimates  Std.Error
+3402                  2.048      0.335
+3403                 -0.481      0.411
+3404                 -1.914      0.652
+3451                 -1.216      0.708
+3452                  0.742      0.339
+3453                 -0.197      0.448
+3454                  0.071      0.332
+3455                 -2.165      1.274
+3456                 -2.101      0.766
+3457                  2.254      0.277
+3458                 -0.812      0.482
+3459                 -0.596      0.374
+3460                 -1.263      0.542
+3461                  0.315      0.391
+3462                 -0.662      0.612
+lambda                0.498      0.074
+phi                   0.001      0.003
+t                     0.012      0.004
+A(2 * pi * t/52)      1.447      0.163
+s(2 * pi * t/52)     -0.419      0.089
+psi                   0.575      0.075
+
+log-likelihood:	 -910.3 
+AIC:		 1862.5 
 \end{Soutput}
 \end{Schunk}
 
