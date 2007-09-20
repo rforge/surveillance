@@ -7,7 +7,7 @@
        of \code{surveillance} will also allow for time aggregations etc. 
 }
 \usage{
-  aggregate.disProg(x,...)
+  \method{aggregate}{disProg}(x,...)
 }
 \arguments{
         \item{x}{Object of class \code{disProg}}

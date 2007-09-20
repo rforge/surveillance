@@ -3,7 +3,7 @@
 \title{Print quality value object}
 \description{Print a single qualitity value object in a nicely formatted way}
 \usage{
-print.algoQV(x,...)
+  \method{print}{algoQV}(x,...)
 }
 \arguments{
 \item{x}{Quality Values object generated with \code{quality}}

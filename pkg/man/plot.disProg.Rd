@@ -8,8 +8,8 @@
 \description{Plotting of a disProg object.
 }
 \usage{
-  plot.disProg(x, title = "", xaxis.years=TRUE, startyear = x$start[1], firstweek = x$start[2], as.one=TRUE, same.scale=TRUE, ...)
-  plot.disProg.one(x, title = "", xaxis.years=TRUE, quarters=TRUE, startyear =  x$start[1], firstweek = x$start[2], ylim=NULL, xlab="time", ylab="No. infected",type="hh",lty=c(1,1),col=c(1,1), outbreak.symbol = list(pch=3, col=3), legend.opts=list(x="top", legend=c("Infected", "Outbreak"),lty=NULL,pch=NULL,col=NULL), ...)
+  \method{plot}{disProg}(x, title = "", xaxis.years=TRUE, startyear = x$start[1], firstweek = x$start[2], as.one=TRUE, same.scale=TRUE, ...)
+  \method{plot}{disProg.one}(x, title = "", xaxis.years=TRUE, quarters=TRUE, startyear =  x$start[1], firstweek = x$start[2], ylim=NULL, xlab="time", ylab="No. infected",type="hh",lty=c(1,1),col=c(1,1), outbreak.symbol = list(pch=3, col=3), legend.opts=list(x="top", legend=c("Infected", "Outbreak"),lty=NULL,pch=NULL,col=NULL), ...)
 }
 \arguments{
         \item{x}{Object of class \code{disProg}}

@@ -27,7 +27,7 @@
 %
 \details{Compute weights from an initial fit and rescale using
   Anscombe based residuals as described in the
-  \code{\link{anscombe.residuals}} function.}  }
+  \code{\link{anscombe.residuals}} function.}
 %
 \value{An object of class GLM with additional fields \code{wtime},
   \code{response} and \code{phi}. If the \code{glm} returns without

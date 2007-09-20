@@ -156,7 +156,7 @@ algo.quality <- function(survResObj, penalty = 20){
 \title{Print quality value object}
 \description{Print a single qualitity value object in a nicely formatted way}
 \usage{
-print.algoQV(x,...)
+  \method{print}{algoQV}(x,...)
 }
 \arguments{
 \item{x}{Quality Values object generated with \code{quality}}
@@ -207,7 +207,7 @@ print.algoQV <- function(x,...) {
         \item{...}{Further arguments (see \code{\link[xtable]{xtable})}}
 }
 \usage{
-xtable.algoQV(x,caption = NULL, label = NULL, align = NULL, digits = NULL, display = NULL, ...)
+  \method{xtable}{algoQV}(x,caption = NULL, label = NULL, align = NULL, digits = NULL, display = NULL, ...)
 }
 \keyword{}
 \seealso{ \code{\link[xtable]{xtable}}}
