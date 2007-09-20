@@ -153,9 +153,9 @@ Appear in Computational Statistics</li>
 <li>Read the package <a href="vignette.pdf"><span
 style="text-decoration: underline;">vignette</span></a> containing
 examples on how to use the package and its features.</li>
-<li><a href="../../pubs/compstat2006-presentation.pdf">CompStat2006
+<li><a href="http://www.stat.uni-muenchen.de/~hoehle/pubs/compstat2006-presentation.pdf">CompStat2006
 talk</a> about the package</li>
-<li>A <a href="../../pubs/geomed2005-hoehle.pdf">poster</a>
+<li>A <a href="http://www.stat.uni-muenchen.de/~hoehle/pubs/geomed2005-hoehle.pdf">poster</a>
 presentation about the package from the <a
 href="http://www.geomed2005.org">Geomed2005</a> conference.</li>
 </ul>
