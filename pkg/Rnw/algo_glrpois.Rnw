@@ -162,14 +162,16 @@ algo.glrpois <- function(disProgObj,
   t <- control$range
   #The period
   p <- disProgObj$freq
+  #GLM (only filled if estimated)
+  m <- NULL
 
   # Estimate m (the expected number of cases), i.e. parameter lambda of a
   # poisson distribution based on time points 1:t-1
-  if (is.null(control$mu) | is.list(control$mu)) {
+  if (is.null(control$mu0) | is.list(control$mu0)) {
     #Initialize
-    if (is.null(control$mu)) control$mu <- list()
-    if (is.null(control$mu$S)) control$mu$S <- 1
-    if (is.null(control$mu$trend)) control$mu$trend <- FALSE
+    if (is.null(control$mu0)) control$mu0 <- list()
+    if (is.null(control$mu0$S)) control$mu0$S <- 1
+    if (is.null(control$mu0$trend)) control$mu0$trend <- FALSE
 
     #Perform an estimation based on all observations before timePoint
     #Event better - don't do this at all in the algorithm - force
@@ -178,8 +180,8 @@ algo.glrpois <- function(disProgObj,
     data <- data.frame(x=disProgObj$observed[t],t=t)
     #Build the model equation
     formula <- "x ~ 1 "
-    if (control$mu$trend) { formula <- paste(formula," + t",sep="") }
-    for (s in 1:control$mu$S) {
+    if (control$mu0$trend) { formula <- paste(formula," + t",sep="") }
+    for (s in 1:control$mu0$S) {
       formula <- paste(formula,"+cos(2*",s,"*pi/p*t)+ sin(2*",s,"*pi/p*t)",sep="")
     }
     #Fit the GLM
