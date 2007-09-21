@@ -10,14 +10,11 @@
 rd:
 	perl-cygwin make.pl Rnw/*.Rnw 
 
-check:
+check: clean
 	R CMD check .
 
-install:
+install: 
 	perl-cygwin make.pl --install
-
-web:
-	rsync -avauz surveillance_0.9* ua341cf@sun1.lrz-muenchen.de:~/webserver/webdata/software/surveillance/
 
 build:
 	R CMD build --force --docs=normal --no-vignettes ../surveillance
@@ -34,6 +31,9 @@ manual:
 
 clean:
 	rm src/*.o src/*.so rm src/*.dll
+
+macsrc:
+	cd src ; gcc-4.0 -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -no-cpp-precomp -I/Library/Frameworks/R.framework/Resources/include -I/Library/Frameworks/R.framework/Resources/include/i386  -msse3  -D__NO_MATH_INLINES  -fPIC  -g -O2 -Wall -pedantic -c surveillance.c -o surveillance.o
 
 #mingw:
 #export PATH=/d/Programme/R/R-2.4.0/bin:/d/Programme/Rtools/bin:/d/Programme/MinGW/bin:d:/c/Perl/bin;/c/texmf/miktex/bin
