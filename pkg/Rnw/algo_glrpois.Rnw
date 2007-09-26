@@ -203,6 +203,7 @@ algo.glrpois <- function(disProgObj,
   #Setup counters for the progress
   doneidx <- 0
   N <- 1
+  xm10 <- 0
   noOfTimePoints <- length(t)
   #Loop as long as we are not through the sequence
   while (doneidx < noOfTimePoints) {
@@ -217,7 +218,7 @@ algo.glrpois <- function(disProgObj,
     } else {
       ########################## Epidemic chart #######################
       if (control$change == "epi") {
-        res <- .C("glr_epi_window",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.integer(control$M),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
+        res <- .C("glr_epi_window",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.integer(control$M),as.double(xm10),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
       }
     }
 
@@ -227,6 +228,7 @@ algo.glrpois <- function(disProgObj,
       alarm[res$N + doneidx] <- TRUE
 
       #Chop & get ready for next round
+      xm10 <- x[res$N] #put start value x_0 to last value
       x <- x[-(1:res$N)] ; t <- t[-(1:res$N)] ;  mu0 <- mu0[-(1:res$N)]
     }
     doneidx <- doneidx + res$N

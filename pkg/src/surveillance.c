@@ -416,16 +416,17 @@ inline double fisher(double phi,int *x,double *xm1, double *mu0, int k,int n,dou
   lx -- length of x
   Mtilde_R -- number of obs needed to get good estimate (typically 1)
   M        -- Mtilde < M
+  xm10 -- observed value of x_0 (0 for initialization, but known if >1st round)
   c_ARL_R -- constant determining when to signal alarm
   ret_N -- the return value
   ret_lr --- GLR value for each n to be returned
 **********************************************************************/
 
-void glr_epi_window(int* x,double* mu0, int *lx_R, int *Mtilde_R, int *M_R, double *c_ARL_R,int *ret_N, double *ret_glr) {
+void glr_epi_window(int* x,double* mu0, int *lx_R, int *Mtilde_R, int *M_R, double *xm10, double *c_ARL_R,int *ret_N, double *ret_glr) {
   /* printf("====> begin glr_epi\n"); */
 
   /* Pointers to something useful */
-  int lx = *lx_R;
+  int lx = *lx_R; /* length of x */
   int Mtilde = *Mtilde_R;
   int M = *M_R;
   double c_ARL = *c_ARL_R;
@@ -434,13 +435,13 @@ void glr_epi_window(int* x,double* mu0, int *lx_R, int *Mtilde_R, int *M_R, doub
   register int n, k,i;
 
   /* Init return values up to the first position */
-  int n0 = fmax(Mtilde-1,1);
+  int n0 = fmax(Mtilde-1,0); /*hoehle: 25.9: changepoint can happen at position one: fmax(Mtilde-1,1);*/
   for (n=0; n<n0; n++) { ret_glr[n] = 0; }
   n=n0;
 
   /* Compute x_{t-1} */
   double xm1[lx];
-  xm1[0] = 0;
+  xm1[0] = *xm10; /* used to be 0 */
   for (i=1; i<lx; i++) { xm1[i] = x[i-1]; }
 
   /* Declare variables */
