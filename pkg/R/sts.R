@@ -116,6 +116,15 @@ disProg2sts <- function(disProgObj, map=NULL) {
   return(sts)
 }
 
+#The reverse action
+sts2disProg <- function(sts) {
+  disProgObj <- create.disProg(week=sts@week, start=sts@start, freq=sts@freq,
+                               observed=sts@observed, state=sts@state, neighbourhood=sts@neighbourhood,
+                               populationFrac=sts@populationFrac)
+  #For survRes: alarm=sts@alarm, upperbound=sts@upperbound)
+  return(disProgObj)
+}
+
 
 ###########################################################################
 #Method to aggregate over all units, either the time series is aggregated

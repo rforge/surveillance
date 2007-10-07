@@ -101,7 +101,10 @@ algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
    negbin=c("none", "single", "multiple"), 
    proportion=c("none", "single", "multiple")),
                thetastart=NULL, verbose=TRUE){
-               
+        
+  #Convert sts objects
+  if (class(disProgObj) == "sts") disProgObj <- sts2disProg(disProgObj)
+
   #set default values (if not provided in control)
   if(is.null(control$linear))
     control$linear <- FALSE
@@ -358,6 +361,9 @@ algo.hhh.grid <- function(disProgObj, control=list(lambda=TRUE,neighbours=FALSE,
                proportion=c("none", "single", "multiple")), 
                thetastartMatrix, maxTime=1800, verbose=FALSE){
 
+  #convert disProgObj if necessary
+  if (class(disProgObj) == "sts") disProgObj <- sts2disProg(disProgObj)
+
   #set default values (if not provided in control)
   if(is.null(control$linear))
     control$linear <- FALSE
@@ -543,6 +549,9 @@ grid2 <- create.grid(disProgObj, cntrl2, params = list(epidemic=c(0.1,0.9,5),
 create.grid <- function(disProgObj, control, params = list(epidemic = c(0.1, 0.9, 5),
                  endemic=c(-0.5,0.5,3), negbin = c(0.3, 12, 10))) {
   
+  #convert S4 sts to S3 if necessary
+  if (class(disProgObj) == "sts") disProgObj <- sts2disProg(disProgObj)
+
   designRes <- make.design(disProgObj, control)
   control <- designRes$control
   dimParams <- designRes$dimTheta
