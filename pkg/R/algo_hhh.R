@@ -6,7 +6,10 @@ algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
    negbin=c("none", "single", "multiple"), 
    proportion=c("none", "single", "multiple")),
                thetastart=NULL, verbose=TRUE){
-               
+        
+  #Convert sts objects
+  if (class(disProgObj) == "sts") disProgObj <- sts2disProg(disProgObj)
+
   #set default values (if not provided in control)
   if(is.null(control$linear))
     control$linear <- FALSE
@@ -154,6 +157,9 @@ algo.hhh.grid <- function(disProgObj, control=list(lambda=TRUE,neighbours=FALSE,
                proportion=c("none", "single", "multiple")), 
                thetastartMatrix, maxTime=1800, verbose=FALSE){
 
+  #convert disProgObj if necessary
+  if (class(disProgObj) == "sts") disProgObj <- sts2disProg(disProgObj)
+
   #set default values (if not provided in control)
   if(is.null(control$linear))
     control$linear <- FALSE
@@ -283,6 +289,9 @@ algo.hhh.grid <- function(disProgObj, control=list(lambda=TRUE,neighbours=FALSE,
 create.grid <- function(disProgObj, control, params = list(epidemic = c(0.1, 0.9, 5),
                  endemic=c(-0.5,0.5,3), negbin = c(0.3, 12, 10))) {
   
+  #convert S4 sts to S3 if necessary
+  if (class(disProgObj) == "sts") disProgObj <- sts2disProg(disProgObj)
+
   designRes <- make.design(disProgObj, control)
   control <- designRes$control
   dimParams <- designRes$dimTheta
@@ -739,76 +748,6 @@ print.ahg <- function (x, digits = max(3, getOption("digits") - 3), amplitudeShi
     }
 }
 
-# print.ah <- function(x,digits = max(3, getOption("digits") - 3), amplitudeShift=TRUE, ...){
-#   if(!x$convergence)
-#     cat('Results are not reliable! Try different starting values. \n')
-#   else {
-#     if(!is.null(x$call)){
-#       cat("Call: \n")
-#       print(x$call)
-#     }
-#     
-#     cat('\nEstimated parameters: \n')
-#     print(coefficients(x, amplitudeShift=amplitudeShift),digits=digits,print.gap=2)
-# #    cat('\ndeviance:\t',round(deviance(x),digits=digits-2),'\t')
-#     cat('\nlog-likelihood:\t',round(x$loglik,digits=digits-2),'\t')  
-#     cat('AIC:\t',round(-2*x$loglik,digits=digits-2)+2*length(coef(x)),'\n\n')
-#   }
-# 
-# }
-# 
-# print.ahg <- function (x, digits = max(3, getOption("digits") - 3), amplitudeShift=TRUE, ...){
-#     cat("\nsize of grid: ", x$gridSize, "\n")
-#     if (x$gridSize != x$gridUsed)
-#         cat("grid search stopped after", x$gridUsed, "iterations \n")
-#     cat("convergences: ",sum(!is.na(x$all)),"\n \n")
-#     if (!x$convergence)
-#         cat("\nAlgorithms did not converge, please try different starting values! \n")
-#     else {
-#         x$best$call <- NULL
-#         print.ah(x$best, digits = digits, amplitudeShift=amplitudeShift)
-#     }
-# }
-# 
-# summary.ah <- function(x,digits = max(3, getOption("digits") - 3), amplitudeShift=TRUE,...){
-#   if(!x$convergence)
-#     cat('Results are not reliable! Try different starting values. \n')
-#   else {
-#     if(!is.null(x$call)){
-#       cat("Call: \n")
-#       print(x$call)
-#     }
-#         
-#     cat('\nEstimated parameters and standard errors: \n\n')
-#     coefs <- coefficients(x, se=TRUE, amplitudeShift=amplitudeShift)
-#     #formatC(lambda,digits=digits,format="g")
-#     
-#     print(round(cbind("Estimates"=coefs[,"Estimates"],
-#                  "Std.Error"=coefs[,"Std. Error"]),digits=digits),print.gap=2)
-# 
-# #    cat('\ndeviance:',round(deviance(x),digits=digits-2),'\n\n')
-#     cat('\nlog-likelihood:\t',round(x$loglik,digits=digits-2),'\n')  
-#     cat('AIC:\t\t',round(-2*x$loglik,digits=digits-2)+2*length(coef(x)),'\n\n')
-#   }
-# 
-# }
-# 
-# summary.ahg <- function (x, digits = max(3, getOption("digits") - 3), amplitudeShift=TRUE, ...){
-#     cat("\nsize of grid: ", x$gridSize, "\n")
-#     if (x$gridSize != x$gridUsed)
-#         cat("grid search stopped after", x$gridUsed, "iterations \n")
-#     cat("convergences: ",sum(!is.na(x$all)),"\n")
-#     cat("time needed (in seconds)",x$time,"\n\n")
-#     if (!x$convergence)
-#         cat("\nAlgorithms did not converge, please try different starting values! \n")
-#     else {
-#       x$best$call <- NULL
-#       cat("values of log-likelihood:")
-#       print(table(round(x$all,0)))
-# #      cat("\n")
-#       summary.ah(x$best, digits = digits, amplitudeShift=amplitudeShift)
-#     }
-# }
 
 
 ###################################################
