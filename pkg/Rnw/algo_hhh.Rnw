@@ -1214,7 +1214,7 @@ print.ahg <- function (x, digits = max(3, getOption("digits") - 3), amplitudeShi
     cat("\nsize of grid: ", x$gridSize, "\n")
     if (x$gridSize != x$gridUsed)
         cat("grid search stopped after", x$gridUsed, "iterations \n")
-    cat("convergences: ",sum(!is.na(x$all)),"\n")
+    cat("convergences: ",sum(!is.na(x$all[,1])),"\n")
     cat("time needed (in seconds)",x$time,"\n\n")
     if (!x$convergence)
         cat("\nAlgorithms did not converge, please try different starting values! \n")
