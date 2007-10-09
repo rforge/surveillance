@@ -13,7 +13,7 @@
 }
 \usage{
 algo.hhh.grid(disProgObj, control=list(lambda=TRUE, neighbours=FALSE, 
-   linear=FALSE, season = list(nseason=0, period=disProgObj$freq),
+   linear=FALSE, nseason=0,
    negbin=c("none", "single", "multiple"), 
    proportion=c("none", "single", "multiple")), 
    thetastartMatrix, maxTime=1800, verbose=FALSE)
@@ -31,8 +31,7 @@ algo.hhh.grid(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
               \item{linear}{a \code{logical} (or a vector of logicals) indicating wether a linear 
                     trend \eqn{\beta} (or a linear trend \eqn{\beta_i} for each unit)
                     is included}
-              \item{season}{\code{list} with integer number of Fourier frequencies \code{nseason} 
-                    and period length \code{period} as elements. If \code{nseason} is a vector
+              \item{nseason}{integer number of Fourier frequencies; if \code{nseason} is a vector
                     of integers, each unit \eqn{i} gets its own seasonal parameters }
               \item{negbin}{if \code{"single"} negative binomial rather than poisson is used,
                     if \code{"multiple"} unit-specific overdispersion parameters are used.}
@@ -74,7 +73,7 @@ algo.hhh.grid(meningo.age, control=model1, thetastartMatrix=grid1,
 
 # specify model
 model2 <- list(lambda=TRUE, neighbours=TRUE, negbin="single",
-               season=list(nseason=1, period=12))
+               nseason=1)
 grid2 <- create.grid(meningo.age, model2, 
                      params = list(epidemic=c(0.1,0.9,3), 
                                    endemic=c(-0.5,0.5,3), 
@@ -93,7 +92,7 @@ data(influMen)
 #  and  nu_men,t = lambda_men * y_men,t-1 + phi_men*y_flu,t-1 )
 # and S=(3,1) Fourier frequencies
 model <- list(lambda=c(TRUE,TRUE), neighbours=c(FALSE,TRUE),
-              linear=FALSE,season=list(nseason=c(3,1)),negbin="multiple")
+              linear=FALSE, nseason=c(3,1),negbin="multiple")
               
 # create grid of initial values
 grid <- create.grid(influMen,model, list(epidemic=c(.1,.9,3),

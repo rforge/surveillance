@@ -2,7 +2,7 @@
 ### chunk number 1: 
 ###################################################
 algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE, 
-   linear=FALSE, season = list(nseason=0, period=disProgObj$freq),
+   linear=FALSE, nseason=0,
    negbin=c("none", "single", "multiple"), 
    proportion=c("none", "single", "multiple")),
                thetastart=NULL, verbose=TRUE){
@@ -14,10 +14,8 @@ algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
   if(is.null(control$linear))
     control$linear <- FALSE
     
-  if(is.null(control$season$nseason))
-    control$season$nseason <- 0
-  if(is.null(control$season$period))
-    control$season$period <- disProgObj$freq
+  if(is.null(control$nseason))
+    control$nseason <- 0
     
   if(is.null(control$neighbours))
     control$neighbours <- FALSE
@@ -42,7 +40,7 @@ algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
     control$neighbours <- FALSE
     control$proportion <- "none"
     
-    control$season$nseason <- control$season$nseason[1]
+    control$nseason <- control$nseason[1]
   }
 
   # model with (lambda, pi) ?
@@ -51,6 +49,13 @@ algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
     if(sum(control$lambda) == 0 | sum(control$lambda)!= nareas)
       control$lambda <- TRUE
   }
+  
+  # check neighbourhood matrix if neighbours=T or proportion!="none"
+  if(sum(control$neighbours)>0 | control$proportion != "none"){
+    if(any(is.na(disProgObj$neighbourhood)))
+    stop("No correct neighbourhood matrix given\n")
+  }
+
 
 
   #make "design" matrices
@@ -62,7 +67,7 @@ algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
   if(!is.null(thetastart)){
     #check dimension of thetastart
     if(length(thetastart) != (dimtheta-nareas)){
-      cat('thetastart must be of dimension',dimtheta-nareas,'\n')
+      cat('thetastart must be of length',dimtheta-nareas,'\n')
      return(NULL)
     }
     theta  <- thetastart
@@ -77,6 +82,11 @@ algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
   #starting values for intercepts
   areastart <- log(apply(designRes$Y, 2, sum)/designRes$populationFrac[1,]/(n-1))
   theta <- c(areastart,theta)
+
+  #check if initial values are valid
+  mu<-meanResponse(theta,designRes)$mean
+  if(any(mu==0) | any(!is.finite(mu)))
+    stop("invalid initial values\n")
 
   # maximize loglikelihood
   mycontrol <- list(fnscale=-1, type=3, maxit=1000)
@@ -152,7 +162,7 @@ algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
 ### chunk number 2: 
 ###################################################
 algo.hhh.grid <- function(disProgObj, control=list(lambda=TRUE,neighbours=FALSE, 
-               linear=FALSE, season=list(nseason=0, period=disProgObj$freq), 
+               linear=FALSE, nseason=0, 
                negbin=c("none", "single", "multiple"), 
                proportion=c("none", "single", "multiple")), 
                thetastartMatrix, maxTime=1800, verbose=FALSE){
@@ -164,10 +174,8 @@ algo.hhh.grid <- function(disProgObj, control=list(lambda=TRUE,neighbours=FALSE,
   if(is.null(control$linear))
     control$linear <- FALSE
     
-  if(is.null(control$season$nseason))
-    control$season$nseason <- 0
-  if(is.null(control$season$period))
-    control$season$period <- disProgObj$freq
+  if(is.null(control$nseason))
+    control$nseason <- 0
     
   if(is.null(control$neighbours))
     control$neighbours <- FALSE
@@ -194,7 +202,7 @@ algo.hhh.grid <- function(disProgObj, control=list(lambda=TRUE,neighbours=FALSE,
     control$neighbours <- FALSE
     control$proportion <- "none"
     
-    control$season$nseason <- control$season$nseason[1]
+    control$nseason <- control$nseason[1]
   }
 
   # model with (lambda, pi) ?
@@ -203,6 +211,13 @@ algo.hhh.grid <- function(disProgObj, control=list(lambda=TRUE,neighbours=FALSE,
     if(sum(control$lambda) == 0 | sum(control$lambda)!=nareas)
       control$lambda <- TRUE
   }
+  
+  # check neighbourhood matrix 
+  if(sum(control$neighbours)>0 | control$proportion != "none"){
+    if(any(is.na(disProgObj$neighbourhood)))
+    stop("No correct neighbourhood matrix given\n")
+  }
+
 
   designRes<- make.design(disProgObj=disProgObj, control=control)
 
@@ -232,7 +247,7 @@ algo.hhh.grid <- function(disProgObj, control=list(lambda=TRUE,neighbours=FALSE,
   if(verbose) cat('The size of grid is', nOfIter, '\n')
   
   bestLoglik <- list(loglikelihood = -1e99)
-  allLoglik <- matrix(NA,nrow=nOfIter,ncol=1)
+  allLoglik <- matrix(NA,nrow=nOfIter,ncol=designRes$dimTheta$dim+1)
   time <- maxTime
   
   while((time > 0) & (i < nOfIter)){
@@ -243,14 +258,17 @@ algo.hhh.grid <- function(disProgObj, control=list(lambda=TRUE,neighbours=FALSE,
     time <- time - time.i
     
     #print progress information
-    if(verbose)
-      print(c(niter=i,timeLeft=time,loglik=res$loglikelihood))
+    if(verbose){
+      if(class(res)== "try-error")
+        print(c(niter=i,timeLeft=time,loglik=NULL))
+      else print(c(niter=i,timeLeft=time,loglik=res$loglikelihood))
+    }
 
     
     #don't consider "useless" results for the search of the best loglikelihood
     if(class(res)!= "try-error" && res$convergence){ 
       #save loglik
-      allLoglik[i] <- res$loglikelihood 
+      allLoglik[i,] <- c(res$loglikelihood,coef(res))
       #keep it as bestLoglik if loglikelihood improved  
       if(res$loglikelihood > bestLoglik$loglikelihood){
         bestLoglik <- res
@@ -260,7 +278,7 @@ algo.hhh.grid <- function(disProgObj, control=list(lambda=TRUE,neighbours=FALSE,
   
   if(time < 0){
     if(verbose) cat('Time limit exceeded, grid search stopped after', i, 'iterations. \n')
-    allLoglik <- as.matrix(allLoglik[1:i])
+    allLoglik <- as.matrix(allLoglik[1:i,])
     gridUsed <- i
   }
   
@@ -272,7 +290,9 @@ algo.hhh.grid <- function(disProgObj, control=list(lambda=TRUE,neighbours=FALSE,
     #convergence <- FALSE
     #cat('Algorithms did not converge, please try different starting values! \n')
     bestLoglik <- list(loglikelihood=NULL,convergence=FALSE)
-    #return(NULL)
+  } else{
+  #give names to all Loglik-matrix
+  colnames(allLoglik) <- c("loglik",names(coef(bestLoglik)))
   }
   
   result <- list(best = bestLoglik, allLoglik = allLoglik,gridSize=nOfIter,gridUsed=gridUsed, time=timeUsed,convergence=bestLoglik$convergence)
@@ -312,27 +332,49 @@ create.grid <- function(disProgObj, control, params = list(epidemic = c(0.1, 0.9
   if((dimNegbin > 0) & is.null(params$negbin))
     stop("Please provide initial values for the dispersion parameter psi \n")
   
+  # check if initial values are specified correctly
+  if(!is.null(params$epidemic)){
+   if( params$epidemic[3]%%1 !=0 | params$epidemic[3]<1 | sign(params$epidemic[3])== -1)
+    stop("Last component of params$epidemic must be a positive integer\n")
+  }
+  if(!is.null(params$endemic)){ 
+   if( params$endemic[3]%%1 !=0 | params$endemic[3]<1 | sign(params$endemic[3])== -1)
+    stop("Last component of params$endemic must be a positive integer\n")
+  }
+  if(!is.null(params$negbin)){ 
+   if( params$negbin[3]%%1 !=0 | params$negbin[3]<1 | sign(params$negbin[3])== -1)
+    stop("Last component of params$negbin must be a positive integer\n")
+  }
+    
   grid <- list()
 
   if(dimNegbin >0){
     psi <- seq(params$negbin[1], params$negbin[2], length = params$negbin[3])
+    if(any(psi<=0))
+      stop("Initial values for psi must be positive\n")
     log.psi <- log(psi[psi >0])
     grid$psi <- log.psi
   }
   
   if(dimLambda >0){
     epidemic <- seq(params$epidemic[1], params$epidemic[2], length = params$epidemic[3])
+    if(any(epidemic<=0))
+      stop("Iinitial values for lambda must be positive\n")
     log.lambda <-  log(epidemic[epidemic >0])
     grid$lambda <- log.lambda
   }
   
   if(dimPhi >0){
     epidemic <- seq(params$epidemic[1], params$epidemic[2], length = params$epidemic[3])
+    if(any(epidemic<=0))
+      stop("Initial values for phi must be positive\n")
     log.lambda <-  log(epidemic[epidemic >0])
     grid$phi <- log.lambda
   }
   
   if(dimProp >0){
+    if(any(epidemic<=0 | epidemic >=1))
+      stop("initial values for pi must be in (0,1)\n")
     logit.prop <- log(epidemic[epidemic > 0 & epidemic < 1]) - log(1-epidemic[epidemic > 0 & epidemic < 1])
     grid$prop <- logit.prop
   }
@@ -416,7 +458,7 @@ meanResponse <- function(theta, designRes){
 
   #check dimension of theta
   if(designRes$dimTheta$dim != length(theta)){
-    cat('theta must be of dimension',designRes$dimTheta$dim,'\n')
+    cat('theta must be of length',designRes$dimTheta$dim,'\n')
     return(NULL)
   }
 
@@ -503,7 +545,7 @@ meanResponse <- function(theta, designRes){
   ################
   
   #trend and seasonal components
-  nSeason <- designRes$control$season$nseason
+  nSeason <- designRes$control$nseason
   dimSeason <- designRes$dimTheta$season
   dimTrend <- designRes$dimTheta$trend
   
@@ -564,7 +606,7 @@ meanResponse <- function(theta, designRes){
 ### chunk number 6: 
 ###################################################
 make.design <- function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE, 
-        linear=FALSE, season=list(nseason=0,period=disProgObj$freq),
+        linear=FALSE, nseason=0,
          negbin=c("none", "single", "multiple"), 
          proportion=c("none", "single", "multiple")) ){
 
@@ -572,11 +614,9 @@ make.design <- function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
   if(is.null(control$linear))
     control$linear <- FALSE
     
-  if(is.null(control$season$nseason))
-    control$season$nseason <- 0
-  if(is.null(control$season$period))
-    control$season$period <- disProgObj$freq
-    
+  if(is.null(control$nseason))
+    control$nseason <- 0
+  
   if(is.null(control$neighbours))
     control$neighbours <- FALSE
     
@@ -611,11 +651,11 @@ make.design <- function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
     control$neighbours <- FALSE
     control$proportion <- "none"
     
-    control$season$nseason <- control$season$nseason[1]
+    control$nseason <- control$nseason[1]
   }
 
   # maximum number of seasonal Fourier frequencies
-  maxSeason <- max(control$season$nseason)
+  maxSeason <- max(control$nseason)
 
   # model with (lambda, pi) ?
   if(control$proportion != "none"){
@@ -635,7 +675,7 @@ make.design <- function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
 
   dimTrend <-  sum(control$linear)
   
-  dimSeason <- sum(2*control$season$nseason)
+  dimSeason <- sum(2*control$nseason)
   
   dimIntercept <- nareas
 
@@ -683,7 +723,7 @@ make.design <- function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
   #t <- t - mean(t)
 
   form<-function(mod=ifelse(dimTrend == 0,"~-1","~-1+t"),
-                 S=maxSeason, period=control$season$period){
+                 S=maxSeason, period=disProgObj$freq){
     if(S>0){
       for(i in 1:S){
         mod <- paste(mod,"+sin(",2*i,"*pi*t/",period,")+cos(",2*i,"*pi*t/",period,")",sep="")
@@ -742,7 +782,7 @@ print.ahg <- function (x, digits = max(3, getOption("digits") - 3), amplitudeShi
     else {
       x$best$call <- NULL
       cat("values of log-likelihood:")
-      print(table(round(x$all,0)))
+      print(table(round(x$all[,1],0)))
 #      cat("\n")
       print.ah(x$best, digits = digits, amplitudeShift=amplitudeShift)
     }
@@ -825,7 +865,7 @@ residuals.ah <- function (object, type = c("deviance", "pearson"), ...){
   # fitted values
   mean<- object$fitted.values
   #discard 1st observation (to obtain same dimension as mean)
-  y <- object$disProgObj$observed[-1,]
+  y <- as.matrix(object$disProgObj$observed[-1,])
     
   # poisson or negbin model
   if(object$control$negbin!="none"){
@@ -865,7 +905,7 @@ coef.ah <- function(object,se=FALSE, amplitudeShift=FALSE,...){
   coefs <- object$coefficients
   stdErr <- object$se
 
-  if(amplitudeShift & max(object$control$season$nseason)>0){
+  if(amplitudeShift & max(object$control$nseason)>0){
     #extract sin, cos coefficients
     index <- grep(" pi ",names(coefs))
     sinCos.names <- names(coefs)[index]
@@ -1211,15 +1251,15 @@ gradient <- function(theta,designRes){
   if(designRes$dimTheta$season >0){
 
     ## single or multiple seasonal params
-    if(length(control$season$nseason)==1){
+    if(length(control$nseason)==1){
     
       for (i in ((designRes$dimTheta$trend>0) +1):ncol(designRes$X.trendSeason) ){
         grSeason <- c(grSeason, sum(derivHHH(endemic*designRes$X.trendSeason[,i])))
       }  
       
-    } else if(length(control$season$nseason)==nareas){
+    } else if(length(control$nseason)==nareas){
       #maximum number of Fourier frequencies S.max=max_i{S_i}
-      maxSeason <- 2*max(control$season$nseason)
+      maxSeason <- 2*max(control$nseason)
       
       grSeason <- matrix(NA,nrow=maxSeason,ncol=ncol(Y))
       
@@ -1227,7 +1267,7 @@ gradient <- function(theta,designRes){
         # compute derivatives of gamma_{ij}, j= 1, ..., 2*S.max
         grSeason[j-(designRes$dimTheta$trend>0),] <- colSums(derivHHH(endemic*designRes$X.trendSeason[,j]))
         # set gradients for gamma_{ij} to NA if  j > S_i
-        grSeason[j-(designRes$dimTheta$trend>0),(j > 2*control$season$nseason)] <- NA
+        grSeason[j-(designRes$dimTheta$trend>0),(j > 2*control$nseason)] <- NA
       }  
       # gradient now is in order sin(omega_1)_A, sin(omega_1)_B, sin(omega_1)_C, ...  
       #									cos(omega_1)_A, cos(omega_1)_B, cos(omega_1)_C, ...
@@ -1283,6 +1323,10 @@ weightedSumNeighbours <- function(disProgObj){
   
   nhood <- disProgObj$neighbourhood
   
+  #check neighbourhood
+  if(any(is.na(nhood)))
+    stop("No correct neighbourhood matrix given\n")
+  
   ## constant neighbourhood (over time)?
   if(length(dim(nhood))==2){
     # ensure only neighouring areas are summed up
@@ -1330,7 +1374,7 @@ jacobian <- function(thetahat, designRes){
   dimTrend <- designRes$dimTheta$trend
   dimPsi <- designRes$dimTheta$negbin
   dimSeason <-designRes$dimTheta$season
-  nseason <- designRes$control$season$nseason
+  nseason <- designRes$control$nseason
   
   alpha <- colnames(designRes$disProgObj$observed)
   thetaNames <- c(thetaNames, alpha)

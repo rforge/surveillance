@@ -7,7 +7,7 @@
 }
 \usage{
 make.design(disProgObj, control=list(lambda=TRUE, neighbours=FALSE, 
-   linear=FALSE, season = list(nseason=0, period=disProgObj$freq),
+   linear=FALSE, nseason=0,
    negbin=c("none", "single", "multiple"), 
    proportion=c("none", "single", "multiple")) )
 }
@@ -24,8 +24,7 @@ make.design(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
               \item{linear}{a \code{logical} (or a vector of logicals) indicating wether a linear 
                     trend \eqn{\beta} (or a linear trend \eqn{\beta_i} for each unit)
                     is included}
-              \item{season}{\code{list} with integer number of Fourier frequencies \code{nseason} 
-                    and period length \code{period} as elements. If \code{nseason} is a vector
+              \item{nseason}{integer number of Fourier frequencies \code{nseason}; if \code{nseason} is a vector
                     of integers, each unit \eqn{i} gets its own seasonal parameters }
               \item{negbin}{if \code{"single"} negative binomial rather than poisson is used,
                     if \code{"multiple"} unit-specific overdispersion parameters are used.}

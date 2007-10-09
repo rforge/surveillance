@@ -11,7 +11,7 @@
 }
 \usage{
 algo.hhh(disProgObj, control=list(lambda=TRUE, neighbours=FALSE, 
-   linear=FALSE, season = list(nseason=0, period=disProgObj$freq),
+   linear=FALSE, nseason = 0,
    negbin=c("none", "single", "multiple"), 
    proportion=c("none", "single", "multiple")), 
    thetastart=NULL, verbose=TRUE)
@@ -29,8 +29,7 @@ algo.hhh(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
               \item{\code{linear}}{a \code{logical} (or a vector of logicals) indicating wether a linear 
                     trend \eqn{\beta} (or a linear trend \eqn{\beta_i} for each unit)
                     is included}
-              \item{\code{season}}{\code{list} with integer number of Fourier frequencies \code{nseason} 
-                    and period length \code{period} as elements. If \code{nseason} is a vector
+              \item{\code{nseason}}{Integer number of Fourier frequencies; if \code{nseason} is a vector
                     of integers, each unit \eqn{i} gets its own seasonal parameters }
               \item{\code{negbin}}{if \code{"single"} negative binomial rather than poisson is used,
                     if \code{"multiple"} unit-specific overdispersion parameters are used.}
@@ -63,7 +62,7 @@ salmonella <- create.disProg(week=1:length(salmonella.agona$observed),
                              state=salmonella.agona$state)
 
 model1 <- list(lambda=TRUE, linear=TRUE, 
-               season=list(nseason=1), negbin="single")
+               nseason=1, negbin="single")
 					
 algo.hhh(salmonella, control=model1)
 
@@ -82,10 +81,24 @@ algo.hhh(measles.weser, control=model1,
 
 # include autoregressive parameter phi for adjacent "Kreise"
 model2 <- list(lambda=TRUE, neighbours=TRUE, 
-               linear=FALSE, season=list(nseason=1), 
+               linear=FALSE, nseason=1, 
                negbin="single")
 algo.hhh(measles.weser, control=model2)
                   
+## weekly counts of influenza and meningococcal infections in Germany, 2001-2006
+data(influMen)
+
+# specify model with two autoregressive parameters lambda_i, overdispersion
+# parameters psi_i, an autoregressive parameter phi for meningococcal infections
+# (i.e. nu_flu,t = lambda_flu * y_flu,t-1  
+#  and  nu_men,t = lambda_men * y_men,t-1 + phi_men*y_flu,t-1 )
+# and S=(3,1) Fourier frequencies
+model <- list(lambda=c(TRUE,TRUE), neighbours=c(FALSE,TRUE),
+              linear=FALSE,nseason=c(3,1),negbin="multiple")
+              
+# run algo.hhh.grid, search time is limited to 30 sec
+algo.hhh(influMen, control=model)
+
 }
 \keyword{}
 \source{Held, L., Höhle, M., Hofmann, M. (2005) A statistical framework for the 

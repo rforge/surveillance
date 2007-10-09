@@ -42,7 +42,7 @@ disProgObj <- simHHH(control = list(coefs = list(alpha =-0.5, gamma = 0.4,
 
 # consider the model specified in a control object for algo.hhh.grid
 cntrl1 <- list(lambda=TRUE, neighbours=TRUE, 
-               linear=TRUE, season=list(nseason=1))
+               linear=TRUE, nseason=1)
 cntrl2 <- list(lambda=TRUE, negbin="single")
 
 # create a grid of initial values for respective parameters
