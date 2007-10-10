@@ -544,8 +544,9 @@ plot.survRes.one <- function(x, method=x$control$name, disease=x$control$data, d
   if (is.null(ylim)) {
     max <- max(max(observed), max(survResObj$upperbound))
     ylim <- c(-1/20 * max, max)
-  } else
-  max <- ylim[2]
+  } else {
+    max <- ylim[2]
+  }
   
   #ensure that there is enough space for the alarm/outbreak symbols   
   if(ylim[1]>=0)

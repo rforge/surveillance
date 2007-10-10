@@ -444,7 +444,7 @@ plot.sts.time <- function(x, type, method=x@control$name, disease=x@control$data
       #plot areas
       k <- 1:nAreas
       sapply(k, function(k) {
-        plot.sts.time.one(x, k=k, domany=TRUE, ylim=ylim, legend=NULL, ... )   
+        plot.sts.time.one(x, k=k, domany=TRUE, ylim=ylim,legend=NULL, ... )   
         mtext(colnames(observed)[k],line=-1.3)     
       })
       #reset graphical params

@@ -38,6 +38,8 @@ glrpois(sts, control = list(range=range,c.ARL=5, S=1,beta=NULL, Mtilde=1, M=-1, 
   \item{control.hook}{This is a function for handling multivariate
     objects. This argument is a function function of integer k, which
     returns the appropriate control object for region k}
+  \item{verbose}{Boolean, if true textual information about the
+    process are given}
   \item{...}{Additional arguments sent to the \code{algo} function.}
 }
 \value{
