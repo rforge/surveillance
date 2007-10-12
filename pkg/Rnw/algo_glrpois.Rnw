@@ -44,7 +44,7 @@ algo.glrpois(disProgObj,control = list(range=range,c.ARL=5,
         Discussion Paper 500 for details.}
     \item{theta}{If \code{NULL} then the GLR scheme is
         used. If not \code{NULL} the prespecified value for
-        \eqn{\kappa} or \eqn{lambda} is used in a recursive
+        \eqn{\kappa} or \eqn{\lambda} is used in a recursive
         LR scheme, which is faster.  }
     }
   }
@@ -65,10 +65,10 @@ algo.glrpois(disProgObj,control = list(range=range,c.ARL=5,
   Discussion Paper 500. A moving-window generalized likelihood ratio
   detector is used, i.e. the detector has the form
 %
-\deqn{N = inf(... >= c_gamma)}{N = \inf\left\{ n : \max_{1\leq k \leq
+\deqn{N = \inf\left\{ n : \max_{1\leq k \leq
       n} \left[ \sum_{t=k}^n \log \left\{
         \frac{f_{\theta_1}(x_t|z_t)}{f_{\theta_0}(x_t|z_t)} \right\}
-    \right] \geq c_\gamma \right\} }
+    \right] \geq c_\gamma \right\} }{N = inf(... >= c_gamma)}
 %
 where instead of \eqn{1<= k <= n}{1\leq k \leq n} the GLR statistic is
 computed for all \eqn{k \in \{n-M, \ldots, n-\tilde{M}+1\}}. To
