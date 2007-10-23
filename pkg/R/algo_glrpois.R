@@ -19,20 +19,20 @@ algo.glrpois <- function(disProgObj,
   if(is.null(control$c.ARL))
     control$c.ARL <- 5
   if(is.null(control$change))
-    control$change <- "intercept" #nothing else handles atm.
+    control$change <- "intercept" 
   if(is.null(control$Mtilde))
     control$Mtilde <- 1
   if(is.null(control$M))
     control$M <- -1
 
-  #Extract the important parts from the arguments
-  observed <- disProgObj$observed
-  timePoint <- control$range[1] #optimize on this
-  t <- control$range
-  #The period
-  p <- disProgObj$freq
   #GLM (only filled if estimated)
   m <- NULL
+
+  #Extract the important parts from the arguments
+  observed <- disProgObj$observed
+  t <- control$range
+  control$mu0Model <- NULL
+  range <- control$range
 
   # Estimate m (the expected number of cases), i.e. parameter lambda of a
   # poisson distribution based on time points 1:t-1
@@ -41,23 +41,11 @@ algo.glrpois <- function(disProgObj,
     if (is.null(control$mu0)) control$mu0 <- list()
     if (is.null(control$mu0$S)) control$mu0$S <- 1
     if (is.null(control$mu0$trend)) control$mu0$trend <- FALSE
+    if (is.null(control$mu0$refit)) control$m0$refit <- FALSE
+    control$mu0Model <- control$mu0
 
-    #Perform an estimation based on all observations before timePoint
-    #Event better - don't do this at all in the algorithm - force
-    #user to do it himself - coz its a model selection problem
-    t <- 1:(timePoint-1)
-    data <- data.frame(x=disProgObj$observed[t],t=t)
-    #Build the model equation
-    formula <- "x ~ 1 "
-    if (control$mu0$trend) { formula <- paste(formula," + t",sep="") }
-    for (s in 1:control$mu0$S) {
-      formula <- paste(formula,"+cos(2*",s,"*pi/p*t)+ sin(2*",s,"*pi/p*t)",sep="")
-    }
-    #Fit the GLM
-    m <- eval(substitute(glm(form,family=poisson(),data=data),list(form=as.formula(formula))))
-
-    #Predict mu_{0,t}
-    control$mu0 <- as.numeric(predict(m,newdata=data.frame(t=control$range),type="response"))
+    #Estimate using a hook function (lazy evaluation)
+    control$mu0 <- estimateGLRPoisHook()
   } 
   
   #The counts
@@ -98,7 +86,18 @@ algo.glrpois <- function(disProgObj,
 
       #Chop & get ready for next round
       xm10 <- x[res$N] #put start value x_0 to last value
-      x <- x[-(1:res$N)] ; t <- t[-(1:res$N)] ;  mu0 <- mu0[-(1:res$N)]
+      x <- x[-(1:res$N)] ; t <- t[-(1:res$N)] 
+      #If no refitting is to be done things are easy
+      if (!is.list(control$mu0Model) || (control$mu0Model$refit == FALSE)) { 
+        mu0 <- mu0[-(1:res$N)]
+      } else {
+        #Update the range (how to change back??)
+        range <- range[-(1:res$N)]
+        mu0 <- estimateGLRPoisHook()
+        control$mu0[(doneidx + res$N + 1):length(control$mu0)] <- mu0
+      }
+
+      
     }
     doneidx <- doneidx + res$N
   }
@@ -120,5 +119,38 @@ algo.glrpois <- function(disProgObj,
   return(result)
 }
 
+
+
+###################################################
+### chunk number 2: 
+###################################################
+estimateGLRPoisHook <- function() {
+  #Fetch control object from parent
+  control <- parent.frame()$control
+  #The period
+  p <- parent.frame()$disProgObj$freq
+  #Current range to perform surveillance on
+  range <- parent.frame()$range
+
+  #Define training & test data set (the rest)
+  train <- 1:(range[1]-1)
+  test <- range
+  
+  #Perform an estimation based on all observations before timePoint
+  #Event better - don't do this at all in the algorithm - force
+  #user to do it himself - coz its a model selection problem
+  data <- data.frame(y=parent.frame()$disProgObj$observed[t],t=train)
+  #Build the model equation
+  formula <- "y ~ 1 "
+  if (control$mu0Model$trend) { formula <- paste(formula," + t",sep="") }
+  for (s in 1:control$mu0Model$S) {
+    formula <- paste(formula,"+cos(2*",s,"*pi/p*t)+ sin(2*",s,"*pi/p*t)",sep="")
+  }
+  #Fit the GLM
+  m <- eval(substitute(glm(form,family=poisson(),data=data),list(form=as.formula(formula))))
+
+  #Predict mu_{0,t}
+  return(as.numeric(predict(m,newdata=data.frame(t=range),type="response")))
+}
 
 

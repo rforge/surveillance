@@ -85,9 +85,9 @@ update \code{c.gamma} automatically at the moment. Also, FIR GLR-detectors
 might be worth considering.
 
 At the moment, window limited ``intercept'' charts have not been
-extensively tested and are atm not supported. As speed is not an issue
-here this doesn't bother too much. Therefore, a value of \code{M=-1}
-is always in the intercept charts.
+extensively tested and are at the moment not supported. As speed is
+not an issue here this doesn't bother too much. Therefore, a value of
+\code{M=-1} is always used in the intercept charts.
 
 }
 \seealso{
@@ -121,6 +121,7 @@ glr.ts <- algo.glrpois(s.ts,control=cntrl)
 lr.ts  <- algo.glrpois(s.ts,control=c(cntrl,theta=0.4))
 
 plot(glr.ts,xaxis.years=FALSE)
+plot(lr.ts,xaxis.years=FALSE)
 
 }
 
@@ -132,5 +133,4 @@ series (2006), Höhle, M., SFB386 Discussion Paper 500.
 
 
 
-
-
+%Rnw file 
