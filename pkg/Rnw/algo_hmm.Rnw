@@ -5,7 +5,7 @@
 \description{ 
   %
   This function implements on-line HMM detection of outbreaks based on
-  the retrospective procedure described in LeStrat and Carret (1999).
+  the retrospective procedure described in Le Strat and Carret (1999).
   Using the function \code{msm} (library \code{msm}) a specified HMM
   is estimated, the decoding problem, i.e. the most probable state
   configuration, is found by the Viterbi algorithm and the most
@@ -19,7 +19,7 @@
              noStates=2, trend=TRUE, noHarmonics=1,covEffectEqual=FALSE))
 }
 \arguments{
-        \item{disProgObj}{object of class disProg (including the observed and the state chain).}
+        \item{disProgObj}{object of class disProg (including the observed and the state chain)}
         \item{control}{control object: 
             \describe{
             \item{\code{range}}{determines the desired time points
@@ -39,9 +39,9 @@
                 such that the \code{noState}'th state is the one
                 having the highest rate. I.e. this state is considered
                 the outbreak state.}
-            \item{\code{trend}}{Boolean stating whether a linear time trend exists, i.e. if \code{TRUE} (default) then \eqn{beta_j != 0}.}
-            \item{\code{noHarmonics}}{Number of harmonic waves to include in the linear predictor. Default is 1.}
-            \item{\code{covEffectEqual}}{See details.}
+            \item{\code{trend}}{Boolean stating whether a linear time trend exists, i.e. if \code{TRUE} (default) then \eqn{\beta_j \neq 0}{\beta != 0}}
+            \item{\code{noHarmonics}}{number of harmonic waves to include in the linear predictor. Default is 1.}
+            \item{\code{covEffectEqual}}{see details}
             }
           }
 }
@@ -61,14 +61,14 @@
 
   A \code{noState}-State Hidden Markov Model (HMM) is used based on
   the Poisson distribution with linear predictor on the log-link
-  scale. I.e.  \deqn{Y_t | X_t = j \sim Po(\mu_t^j)}{Y_t|X_t = j ~
-    Po(\mu_t^j)}, where \deqn{\log(\mu_t^j) = \alpha_j + \beta_j\cdot
+  scale. I.e.  \deqn{Y_t | X_t = j \sim Po(\mu_t^j),}{Y_t|X_t = j ~
+    Po(\mu_t^j),} where \deqn{\log(\mu_t^j) = \alpha_j + \beta_j\cdot
     t + \sum_{i=1}^{nH} \gamma_j^i \cos(2i\pi/freq\cdot (t-1)) +
     \delta_j^i \sin(2i\pi/freq\cdot (t-1))}{%
     log(mu_t^j) = alpha_j + beta_j t + \sum_{i=1}^{nH} gamma_j^i
     \cos(2*i*pi/freq * (t-1)) + delta_j^i sin(2*i*pi/freq * (t-1)) }
 %
-  and \eqn{nH=noHarmonics} and \eqn{freq=12,52} depending on the
+  and \eqn{nH=}\code{noHarmonics} and \eqn{freq=12,52} depending on the
   sampling frequency of the surveillance data. In the above \eqn{t-1} is
   used, because the first week is always saved as \code{t=1}, i.e. we
   want to ensure that the first observation corresponds to cos(0) and
