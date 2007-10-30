@@ -15,7 +15,7 @@
              m = NULL, trans = "standard", alpha = NULL))
 }
 \arguments{
-        \item{disProgObj}{object of class disProg (including the observed and the state chain).}
+        \item{disProgObj}{object of class disProg (including the observed and the state chain)}
         \item{control}{control object: 
             \describe{
             \item{\code{range}}{determines the desired time points which should be evaluated}
@@ -33,8 +33,8 @@
                     the first \code{range} value.}
                 \item{\code{"glm"}}{ A GLM of the form \deqn{\log(m_t)
                       = \alpha + \beta t + \sum_{s=1}^S (\gamma_s
-                      \sin(\omega_s t) + \delta_s \cos(\omega_s t))},
-                    where \eqn{\omega_s = \frac{2\pi}{52}s} are the
+                      \sin(\omega_s t) + \delta_s \cos(\omega_s t)),}
+                    where \eqn{\omega_s = \frac{2\pi}{52}s}{\omega_s = 2\pi/52 s} are the
                     Fourier frequencies is fitted. Then this model is
                     used to predict the \code{range} values.}
                 }}
@@ -49,7 +49,7 @@
                 \item{\code{none}}{ no transformation}
                 }
               }
-              \item{\code{alpha}}{parameter of the negative binomial distribution, s.t. the variance is \eqn{m+alpha*m^2}}
+              \item{\code{alpha}}{parameter of the negative binomial distribution, s.t. the variance is \eqn{m+\alpha *m^2} }
         }
       }
 }
@@ -66,7 +66,7 @@
     signals occurs until the CUSUM statistic again returns below the threshold.
 
     The \code{control$m.glm} entry contains the fitted glm object, if
-    the original argument was "glm".
+    the original argument was "\code{glm}".
 
   }
 }

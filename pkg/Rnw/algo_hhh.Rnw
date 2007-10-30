@@ -164,10 +164,30 @@ algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
     stop("No correct neighbourhood matrix given\n")
   }
 
-
-
   #make "design" matrices
   designRes<- make.design(disProgObj=disProgObj, control=control)
+
+  # check if there are neighbours
+  if(designRes$dim$phi > 0){
+    nOfNeighbours <- designRes$nOfNeighbours
+    
+    if((designRes$dim$phi==1) & (sum(nOfNeighbours)==0))
+      stop("Specified model is not in line with neighbourhood matrix\n")
+      
+    if((designRes$dim$phi==nareas) & (any(nOfNeighbours[control$neighbours]==0)))
+      stop("Specified model is not in line with neighbourhood matrix\n")
+      
+  } else if(designRes$dim$proportion > 0){
+    nOfNeighbours <- designRes$nOfNeighbours
+    
+    if((designRes$dim$proportion==1) & (sum(nOfNeighbours)==0))
+      stop("Specified model is not in line with neighbourhood matrix\n")
+      
+    if((designRes$dim$proportion==nareas) & (any(nOfNeighbours[control$proportion]==0)))
+      stop("Specified model is not in line with neighbourhood matrix\n")
+      
+  }
+
 
   dimtheta <- designRes$dimTheta$dim
 
@@ -436,6 +456,27 @@ algo.hhh.grid <- function(disProgObj, control=list(lambda=TRUE,neighbours=FALSE,
 
 
   designRes<- make.design(disProgObj=disProgObj, control=control)
+
+  # check if there are neighbours
+  if(designRes$dim$phi > 0){
+    nOfNeighbours <- designRes$nOfNeighbours
+    
+    if((designRes$dim$phi==1) & (sum(nOfNeighbours)==0))
+      stop("Specified model is not in line with neighbourhood matrix\n")
+      
+    if((designRes$dim$phi==nareas) & (any(nOfNeighbours[control$neighbours]==0)))
+      stop("Specified model is not in line with neighbourhood matrix\n")
+      
+  } else if(designRes$dim$proportion > 0){
+    nOfNeighbours <- designRes$nOfNeighbours
+    
+    if((designRes$dim$proportion==1) & (sum(nOfNeighbours)==0))
+      stop("Specified model is not in line with neighbourhood matrix\n")
+      
+    if((designRes$dim$proportion==nareas) & (any(nOfNeighbours[control$proportion]==0)))
+      stop("Specified model is not in line with neighbourhood matrix\n")
+      
+  }
 
   
   dimthetaStart <- designRes$dimTheta$dim -nareas
@@ -1818,7 +1859,7 @@ weightedSumNeighbours <- function(disProgObj){
   if(length(dim(nhood))==2){
     # ensure only neighouring areas are summed up
     diag(nhood) <- 0
-    nhood <- array(disProgObj$neighbourhood,c(narea,narea,ntime))
+    nhood <- array(nhood,c(narea,narea,ntime))
   
   } else if(length(dim(nhood))==3){
     if(any(dim(nhood)[1:2]!= narea) | dim(nhood)[3] != ntime) 

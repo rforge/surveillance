@@ -278,7 +278,7 @@ plot.disProg <- function(x, title = "", xaxis.years=TRUE, startyear = x$start[1]
 ### chunk number 5: 
 ###################################################
 
-plot.survRes.one <- function(x, method=x$control$name, disease=x$control$data, domany=FALSE,ylim=NULL,xaxis.years=TRUE,startyear = 2001, firstweek = 1, xlab="time", ylab="No. infected", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4), outbreak.symbol = list(pch=3, col=3),alarm.symbol=list(pch=24, col=2),legend.opts=list(x="top",legend=c("Infected", "Threshold", "Alarm", "Outbreak"),lty=NULL,col=NULL,pch=NULL), ...) {
+plot.survRes.one <- function(x, method=x$control$name, disease=x$control$data, domany=FALSE,ylim=NULL,xaxis.years=TRUE,startyear = 2001, firstweek = 1, xlab="time", ylab="No. infected", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4), outbreak.symbol = list(pch=3, col=3),alarm.symbol=list(pch=24, col=2),legend.opts=list(x="top",legend=c("Infected", "Upperbound", "Alarm", "Outbreak"),lty=NULL,col=NULL,pch=NULL), ...) {
 
   ################## Handle the NULL arguments ########################################################
   if (is.null(main)) main = paste("Analysis of ", as.character(disease), " using ", as.character(method),sep="") 
@@ -310,8 +310,9 @@ plot.survRes.one <- function(x, method=x$control$name, disease=x$control$data, d
   if (is.null(ylim)) {
     max <- max(max(observed), max(survResObj$upperbound))
     ylim <- c(-1/20 * max, max)
-  } else
-  max <- ylim[2]
+  } else {
+    max <- ylim[2]
+  }
   
   #ensure that there is enough space for the alarm/outbreak symbols   
   if(ylim[1]>=0)
@@ -380,7 +381,7 @@ plot.survRes.one <- function(x, method=x$control$name, disease=x$control$data, d
     if (is.null(legend.opts$pch)) legend.opts$pch = c(NA,NA,alarm.symbol$pch,outbreak.symbol$pch)
     if (is.null(legend.opts$x))   legend.opts$x = "top"
     if (is.null(legend.opts$legend)) 
-      legend.opts$legend = c("Infected", "Threshold", "Alarm", "Outbreak")
+      legend.opts$legend = c("Infected", "Upperbound", "Alarm", "Outbreak")
 
     do.call("legend",legend.opts)
   }

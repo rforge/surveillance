@@ -21,14 +21,14 @@
   algo.bayes3(disProgObj, control = list(range = range))
 }
 \arguments{
-        \item{disProgObj}{object of class disProg (including the observed and the state chain).}
+        \item{disProgObj}{object of class disProg (including the observed and the state chain)}
         \item{timePoint}{time point which shoud be evaluated in \code{algo.rkiLatestTimepoint}. The
-                default is to use the latest timepoint.}
+                default is to use the latest timepoint}
         \item{control}{control object: \code{range} determines the desired
                 timepoints which should be evaluated, \code{b} describes the number of years to go
                 back for the reference values, \code{w} is the half window width for the reference
                 values around the appropriate timepoint and \code{actY} is a boolean to decide if
-                the year of \code{timePoint} also spend \code{w} reference values of the past. The parameter \code{alpha} is the \eqn{1-alpha}-quantile to use in order to calculate the upper threshold.
+                the year of \code{timePoint} also spend \code{w} reference values of the past. The parameter \code{alpha} is the \eqn{1-\alpha}-quantile to use in order to calculate the upper threshold.
                 As default \code{b}, \code{w}, \code{actY} are set for the Bayes 1 system with \code{alpha}=0.05.
         }
 }
@@ -66,29 +66,29 @@
         }
 }
 \seealso{
-        \code{\link{algo.rkiLatestTimepoint}} and \code{\link{algo.rki}} for
+        \code{\link{algo.call}}, \code{\link{algo.rkiLatestTimepoint}} and \code{\link{algo.rki}} for
         the RKI system.
 }
 \author{M. Höhle, A. Riebler, C. Lang}
 \examples{
-    disProgObj <- sim.pointSource(p = 0.99, r = 0.5, length = 208, A = 1,
+    disProg <- sim.pointSource(p = 0.99, r = 0.5, length = 208, A = 1,
                                     alpha = 1, beta = 0, phi = 0,
                                     frequency = 1, state = NULL, K = 1.7)
 
     # Test for bayes 1 the latest timepoint
-    algo.bayesLatestTimepoint(disProgObj)
+    algo.bayesLatestTimepoint(disProg)
 
     # Test week 200 to 208 for outbreaks with a selfdefined bayes
-    algo.bayes(disProgObj, control = list(range = 200:208, b = 1,
+    algo.bayes(disProg, control = list(range = 200:208, b = 1,
                                                 w = 5, actY = TRUE,alpha=0.05))
     # The same for bayes 1 to bayes 3
-    algo.bayes1(disProgObj, control = list(range = 200:208,alpha=0.05))
-    algo.bayes2(disProgObj, control = list(range = 200:208,alpha=0.05))
-    algo.bayes3(disProgObj, control = list(range = 200:208,alpha=0.05))
+    algo.bayes1(disProg, control = list(range = 200:208,alpha=0.05))
+    algo.bayes2(disProg, control = list(range = 200:208,alpha=0.05))
+    algo.bayes3(disProg, control = list(range = 200:208,alpha=0.05))
 }
 
 \keyword{}
 \source{
-Riebler, A. (2004). Empirischer Vergleich von statistischen Methoden zur
-Ausbruchserkennung bei Surveillance Daten. Bachelor's thesis.
+Riebler, A. (2004), Empirischer Vergleich von statistischen Methoden zur
+Ausbruchserkennung bei Surveillance Daten, Bachelor's thesis.
 }
