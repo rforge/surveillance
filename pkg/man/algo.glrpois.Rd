@@ -8,7 +8,7 @@
 }
 \usage{
 algo.glrpois(disProgObj,control = list(range=range,c.ARL=5, 
-         mu0=NULL, Mtilde=1, M=-1, change="intercept",theta=NULL))
+         mu0=NULL, Mtilde=1, M=-1, change="intercept",theta=NULL,dir="inc"))
 }
 \arguments{
 \item{disProgObj}{object of class \code{disProg} to do surveillance
@@ -45,6 +45,7 @@ algo.glrpois(disProgObj,control = list(range=range,c.ARL=5,
         used. If not \code{NULL} the prespecified value for
         \eqn{\kappa} or \eqn{\lambda} is used in a recursive
         LR scheme, which is faster.  }
+    \item{\code{dir}}{a string specifying the direction of testing in GLR scheme. With \code{"inc"} only increases in \eqn{x} are considered in the GLR-statistic, with \code{"dec"} decreases are regarded. }
     }
   }
 }
@@ -116,7 +117,7 @@ s.ts <- create.disProg(week=1:length(t),observed=x,state=(t>=tau))
 plot(s.ts,legend=NULL,xaxis.years=FALSE)
 
 #Run 
-cntrl = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0,change="intercept")
+cntrl = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0,change="intercept",dir="inc")
 glr.ts <- algo.glrpois(s.ts,control=cntrl)
 lr.ts  <- algo.glrpois(s.ts,control=c(cntrl,theta=0.4))
 

@@ -104,10 +104,11 @@ void lr_cusum(int* x,double* mu0, int *lx_R, double *kappa_R, double *c_ARL_R,in
   ret_glr- GLR value for each n to be returned
 **********************************************************************/
 
-void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *ret_N, double *ret_glr) {
+void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *ret_N, double *ret_glr, int *dir) {
   /* Pointers to something useful */
   int lx = *lx_R;
   int n0 = *n0_R;
+  int dir = *dir_R;
   double c_ARL = *c_ARL_R;
   
   /* Loop variables */
@@ -144,7 +145,7 @@ void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *re
       sumx += x[k];
       summu0 += mu0[k];
       /* Calculate MLE of kappa */
-      double kappa_ml = fmax(0,log(sumx/summu0));
+      double kappa_ml = dir*fmax(0,dir*log(sumx/summu0));
 
       /* Calculate sum of likelihood ratios (See deriv (1) on 20.9.2006 sheet)*/
       /* 
