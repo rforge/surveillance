@@ -104,7 +104,7 @@ void lr_cusum(int* x,double* mu0, int *lx_R, double *kappa_R, double *c_ARL_R,in
   ret_glr- GLR value for each n to be returned
 **********************************************************************/
 
-void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *ret_N, double *ret_glr, int *dir) {
+void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *ret_N, double *ret_glr, int *dir_R) {
   /* Pointers to something useful */
   int lx = *lx_R;
   int n0 = *n0_R;
@@ -595,7 +595,8 @@ int main( int argc, char *argv[] ) {
   int i;
   double c_ARL = 5.0;
   double val[150];
-  glr_cusum(x,mu0,&lx,&n0,&c_ARL,&N,val);
+  int dir=1;
+  glr_cusum(x,mu0,&lx,&n0,&c_ARL,&N,val,&dir);
   for (i=0;i<150;i++) printf("val[%d]=%f\n",i,val[i]);
   int M = 50;
   int Mtilde = 5;
