@@ -1,5 +1,5 @@
-\name{measles.weser}
-\alias{measles.weser}
+\name{measels.weser}
+\alias{measels.weser}
 \docType{data}
 \title{Measles epidemics in Lower Saxony in 2001-2002}
 \description{
@@ -8,7 +8,7 @@
   All in all there are 15 "Kreise", two "Kreise" have been omitted %due to ?
   
   }
-\usage{data(measles.weser)}
+\usage{data(measels.weser)}
 \format{
   An multivariate object of class disProg with 104 observations for each one of the 15 Kreise.
   \describe{

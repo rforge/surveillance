@@ -237,7 +237,8 @@ setMethod("plot", signature(x="sts", y="missing"), function(x, y, type,...) {
   if (missing(type)) type = observed ~ time | unit
   
   #Parse the formula, i.e. extract components
-  obsOk <- type[[2]] == "observed"
+  obsOk <- (type[[2]] == "observed")
+  alarmOk <- (type[[2]] == "alarm")
   map   <- (length(type[[3]])==3) && (type[[3]][[1]] == "|") && (type[[3]][[2]] == "1")
   time  <- pmatch("time",type[[3]]) > 0
 
@@ -248,7 +249,7 @@ setMethod("plot", signature(x="sts", y="missing"), function(x, y, type,...) {
   #No unit dimenstion?
   justTime <- type[[3]] == "time"
   
-  if (!obsOk | !valid) {
+  if (!(obsOk | alarmOk) | !valid) {
     stop("Not a valid plot type.")
   }
 
@@ -260,9 +261,14 @@ setMethod("plot", signature(x="sts", y="missing"), function(x, y, type,...) {
   }
   #time plots
   if (time) {
-    #In case observed ~ time, the units are aggregated
-    plot.sts.time( if(justTime) aggregate(x,by="unit") else x,type,...)
-    return(invisible())
+    if (obsOk) {
+      #In case observed ~ time, the units are aggregated
+      plot.sts.time( if(justTime) aggregate(x,by="unit") else x,type,...)
+      return(invisible())
+    }
+    if (alarmOk) {
+      plot.sts.alarm(x,...)
+    }
   }
 })
 
@@ -404,7 +410,7 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
 }
 
 
-plot.sts.alarm <- function(x, lvl, ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, xlab="time", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,cex.yaxis=1,...) {
+plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, xlab="time", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,cex.yaxis=1,...) {
 
   k <- 1
   #Extract slots -- depending on the algorithms: x@control$range
