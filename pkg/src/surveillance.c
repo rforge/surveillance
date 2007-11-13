@@ -102,10 +102,12 @@ void lr_cusum(int* x,double* mu0, int *lx_R, double *kappa_R, double *c_ARL_R,in
   c_ARL- when to sound alarm threshold
   ret_N- here the return value is stored
   ret_glr- GLR value for each n to be returned
+  dir  - direction of testing
 **********************************************************************/
 
 void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *ret_N, double *ret_glr, int *dir_R) {
   /* Pointers to something useful */
+  
   int lx = *lx_R;
   int n0 = *n0_R;
   int dir = *dir_R;
@@ -138,6 +140,7 @@ void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *re
     /* For the recursive computation of kappa_ml */
     double sumx = 0;
     double summu0 = 0;
+    
 
     /* Loop over all k */
     for (k=n; k>=0; k--) { /* Backwards loop makes calculations faster */
@@ -146,6 +149,8 @@ void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *re
       summu0 += mu0[k];
       /* Calculate MLE of kappa */
       double kappa_ml = dir*fmax(0,dir*log(sumx/summu0));
+      
+      
 
       /* Calculate sum of likelihood ratios (See deriv (1) on 20.9.2006 sheet)*/
       /* 
@@ -192,7 +197,6 @@ void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *re
   /* Return value (add 1 for R/SPlus array compability */
   *ret_N = N+1;
 }
-
 
 /**********************************************************************
   Fast C implementation of the sequential GLR test without windowing
@@ -593,9 +597,9 @@ int main( int argc, char *argv[] ) {
   int n0 = 10;
   int lx = 150;
   int i;
+  int dir=1;
   double c_ARL = 5.0;
   double val[150];
-  int dir=1;
   glr_cusum(x,mu0,&lx,&n0,&c_ARL,&N,val,&dir);
   for (i=0;i<150;i++) printf("val[%d]=%f\n",i,val[i]);
   int M = 50;

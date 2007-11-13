@@ -13,7 +13,7 @@
 
 algo.glrpois <- function(disProgObj, 
                          control = list(range=range,c.ARL=5, 
-                           mu0=NULL, Mtilde=1, M=-1, change="intercept",theta=NULL)){
+                           mu0=NULL, Mtilde=1, M=-1, change="intercept",theta=NULL,dir="inc")){
   
   # Set the default values if not yet set
   if(is.null(control$c.ARL))
@@ -24,6 +24,8 @@ algo.glrpois <- function(disProgObj,
     control$Mtilde <- 1
   if(is.null(control$M))
     control$M <- -1
+  if(is.null(control$dir))
+    control$dir <- "inc"
 
   #GLM (only filled if estimated)
   m <- NULL
@@ -33,6 +35,7 @@ algo.glrpois <- function(disProgObj,
   t <- control$range
   control$mu0Model <- NULL
   range <- control$range
+  dir <- ifelse(control$dir=="inc",1,-1)
 
   # Estimate m (the expected number of cases), i.e. parameter lambda of a
   # poisson distribution based on time points 1:t-1
@@ -61,6 +64,7 @@ algo.glrpois <- function(disProgObj,
   doneidx <- 0
   N <- 1
   xm10 <- 0
+  noofalarms <- 0
   noOfTimePoints <- length(t)
   #Loop as long as we are not through the sequence
   while (doneidx < noOfTimePoints) {
@@ -68,7 +72,7 @@ algo.glrpois <- function(disProgObj,
     #Call the C-interface -- this should depend on the type
     if (control$change == "intercept") {
       if (is.null(control$theta)) {
-        res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
+        res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),as.integer(dir),PACKAGE="surveillance")
       } else {
         res <- .C("lr_cusum",as.integer(x),as.double(mu0),length(x),as.double(control$theta),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
       }
@@ -96,11 +100,15 @@ algo.glrpois <- function(disProgObj,
         mu0 <- estimateGLRPoisHook()
         control$mu0[(doneidx + res$N + 1):length(control$mu0)] <- mu0
       }
-
+      
+			 noofalarms <- noofalarms + 1
       
     }
     doneidx <- doneidx + res$N
   }
+
+	# fix of the problem that no upperbound-statistic was returned in case of no alarm
+	if (noofalarms==0) upperbound <- res$val 
 
   # ensure upper bound is positive and not NaN
   upperbound[is.na(upperbound)] <- 0
