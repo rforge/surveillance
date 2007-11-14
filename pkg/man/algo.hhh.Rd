@@ -96,7 +96,7 @@ data(influMen)
 model <- list(lambda=c(TRUE,TRUE), neighbours=c(FALSE,TRUE),
               linear=FALSE,nseason=c(3,1),negbin="multiple")
               
-# run algo.hhh.grid, search time is limited to 30 sec
+# run algo.hhh
 algo.hhh(influMen, control=model)
 
 }

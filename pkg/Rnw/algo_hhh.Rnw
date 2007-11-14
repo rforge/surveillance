@@ -98,7 +98,7 @@ data(influMen)
 model <- list(lambda=c(TRUE,TRUE), neighbours=c(FALSE,TRUE),
               linear=FALSE,nseason=c(3,1),negbin="multiple")
               
-# run algo.hhh.grid, search time is limited to 30 sec
+# run algo.hhh
 algo.hhh(influMen, control=model)
 
 }
@@ -1176,12 +1176,12 @@ make.design <- function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
   #Y, Ym1, Ym1.neighbours and population are (nOfobs)x(nOfareas) matrices
   #where nOfobs = n-1 and nOfareas is the number of areas/units
 
-  Y <- as.matrix(data[2:n,])
+  Y <- matrix(data[2:n,],nrow=(n-1),ncol=nareas)
   
   # population sizes n_{i,t} 
-  population <- as.matrix(disProgObj$populationFrac[2:n,])
+  population <- matrix(disProgObj$populationFrac[2:n,],nrow=(n-1),ncol=nareas)
 
-  Ym1 <- as.matrix(data[1:(n-1),])
+  Ym1 <- matrix(data[1:(n-1),],nrow=(n-1),ncol=nareas)
 
   Ym1.neighbours <- matrix(0,nrow=(n-1),ncol=nareas)
   nOfNeighbours <- 0
@@ -1791,11 +1791,11 @@ gradient <- function(theta,designRes){
       
       grSeason <- matrix(NA,nrow=maxSeason,ncol=ncol(Y))
       
-      for (j in ((designRes$dimTheta$trend>0) +1):maxSeason ){ 
+      for (j in ((designRes$dimTheta$trend>0) +1):(maxSeason+(designRes$dimTheta$trend>0) ) ){ 
         # compute derivatives of gamma_{ij}, j= 1, ..., 2*S.max
         grSeason[j-(designRes$dimTheta$trend>0),] <- colSums(derivHHH(endemic*designRes$X.trendSeason[,j]))
         # set gradients for gamma_{ij} to NA if  j > S_i
-        grSeason[j-(designRes$dimTheta$trend>0),(j > 2*control$nseason)] <- NA
+        grSeason[j-(designRes$dimTheta$trend>0),(j > (2*control$nseason)+(designRes$dimTheta$trend>0))] <- NA
       }  
       # gradient now is in order sin(omega_1)_A, sin(omega_1)_B, sin(omega_1)_C, ...  
       #									cos(omega_1)_A, cos(omega_1)_B, cos(omega_1)_C, ...
