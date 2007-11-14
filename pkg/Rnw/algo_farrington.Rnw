@@ -20,7 +20,7 @@ anscombe.residuals(m, phi)
 }
 \value{Standardized Anscombe residuals of \code{m}}
 \references{McCullagh & Nelder, Generalized Linear Models, 1989}
-\keyword{}
+%\keyword{}
 
 <<echo=F>>=
 anscombe.residuals <- function(m,phi) {
@@ -55,7 +55,7 @@ algo.farrington.assign.weights(s)
 }
 \value{Weights according to the residuals}
 \seealso{See Also as \code{\link{anscombe.residuals}}}
-\keyword{}
+%\keyword{}
 
 <<echo=F>>=
 algo.farrington.assign.weights <- function(s) {
@@ -104,7 +104,7 @@ algo.farrington.assign.weights <- function(s) {
   convergence \code{NULL} is returned.}
 %
 \seealso{\code{\link{anscombe.residuals}}}
-\keyword{}
+%\keyword{}
 
 <<echo=F>>=
 algo.farrington.fitGLM <- function(response,wtime,timeTrend=TRUE,reweight=TRUE) {
@@ -181,7 +181,7 @@ algo.farrington.threshold(pred,phi,alpha=0.01,skewness.transform="none")
         Vector of length 2 with lower and upper bounds of an \eqn{(1-\alpha)\%} confidence interval.
         }
 }
-\keyword{}
+%\keyword{}
 
 <<echo=F>>=
 
@@ -269,7 +269,7 @@ plot(res,disease="Salmonella Agona",method="Farrington")
 }
 \author{M. Höhle}
 \seealso{\code{\link{algo.farrington.fitGLM}},\code{\link{algo.farrington.threshold}}}
-\keyword{}
+%\keyword{}
 \source{A statistical algorithm for the early detection of outbreaks of infectious disease, Farrington, C.P., Andrews, N.J, Beale A.D. and Catchpole, M.A. (1996). , J. R. Statist. Soc. A, 159, 547-563.}
 <<echo=F>>=
 algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, reweight=TRUE, verbose=FALSE,alpha=0.01,powertrans="2/3")) { 

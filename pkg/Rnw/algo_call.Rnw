@@ -50,7 +50,7 @@
     algo.quality(survResObj)
 }
 
-\keyword{}
+%\keyword{}
 
 <<echo=F>>=
 
@@ -162,7 +162,7 @@ algo.quality <- function(survResObj, penalty = 20){
 \item{x}{Quality Values object generated with \code{quality}}
 \item{...}{Further arguments (not reall used)}
 }
-\keyword{}
+%\keyword{}
 \examples{
     # Create a test object
     disProgObj <- sim.pointSource(p = 0.99, r = 0.5, length = 200, A = 1,
@@ -209,7 +209,7 @@ print.algoQV <- function(x,...) {
 \usage{
   \method{xtable}{algoQV}(x,caption = NULL, label = NULL, align = NULL, digits = NULL, display = NULL, ...)
 }
-\keyword{}
+%\keyword{}
 \seealso{ \code{\link[xtable]{xtable}}}
 \examples{
     # Create a test object
@@ -291,7 +291,7 @@ xtable.algoQV <- function(x, caption = NULL, label = NULL, align = NULL,
     survRes$myBayes
 }
 
-\keyword{}
+%\keyword{}
 
 <<echo=F>>=
 
@@ -368,7 +368,7 @@ algo.call <- function(disProgObj, control = list( list(funcName = "rki1", range 
     algo.compare(survRes)
 }
 
-\keyword{}
+%\keyword{}
 
 <<echo=F>>=
 
@@ -428,7 +428,7 @@ algo.compare <- function(survResList){
     algo.summary( list(a=compMatrix1, b=compMatrix2, c=compMatrix3) )
 }
 
-\keyword{}
+%\keyword{}
 
 <<echo=F>>=
 

@@ -4,7 +4,7 @@
 \encoding{latin1}
 
 \title{Plot a survRes object}
-\description{Plotting of a (multivariate) \code{survRes} object. The function \code{plot.survRes.one} is used as a helper function to plot a univariate time series.}
+\description{Plotting of a (multivariate) \code{survRes} object. The function \code{plot.survRes.one} is used as a helper function to plot a univariate time series.
 }
 \usage{
   \method{plot}{survRes}(x, method=x$control$name, disease=x$control$data, 
@@ -65,7 +65,7 @@ ctrl <- list(range = 209:290, b = 2, w = 6, alpha = 0.005)
 plot(algo.bayes(aggregate(ha), control = ctrl))
 }
 
-\keyword{}
+%\keyword{}
 
 
 

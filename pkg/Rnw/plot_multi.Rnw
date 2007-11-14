@@ -45,10 +45,10 @@
   
   # plot salmonella cases
   title <- "Salmonella Agona cases in the UK"
-  plot(salmonellaDisProg, title = title, xaxis.years=TRUE, legend=FALSE,
+  plot(salmonellaDisProg, title = title, xaxis.years=TRUE, legend.opts=NULL,
         startyear = 1990, firstweek = 1)
 }
-\keyword{}
+%\keyword{}
 
 
 <<echo=FALSE>>=
@@ -131,7 +131,7 @@ create.disProg <- function(week, observed, state, start=c(2001,1), freq=52, neig
 }
 \value{matrix of dimension \eqn{n \times m}{n x m}
 }
-\keyword{}
+%\keyword{}
 
 <<echo=FALSE>>=
 sumNeighbours <- function(disProgObj){
@@ -170,7 +170,7 @@ sumNeighbours <- function(disProgObj){
 \value{\item{x}{univariate \code{disProg} object with aggregated 
      counts and respective states for each time point.}
 }
-\keyword{}
+%\keyword{}
 \examples{
 data(ha)
 plot(aggregate(ha))
@@ -275,7 +275,7 @@ aggregate.disProg <- function(x,...){
     plot(measles.weser, same.scale=TRUE, as.one=FALSE)
 }
 
-\keyword{}
+%\keyword{}
 
 <<echo=FALSE>>=
 
@@ -348,7 +348,7 @@ plot.disProg.one <- function(x, title = "", xaxis.years=TRUE, quarters=TRUE, sta
   }
         
   #should there be a legend? 
-  if(!is.null(legend.opts)) {
+  if(!is.null(legend.opts) && (class(legend.opts) == "list")) {
     #Fill empty (mandatory) slots in legend.opts list
     if (is.null(legend.opts$lty)) legend.opts$lty = c(lty[1],NA)
     if (is.null(legend.opts$col)) legend.opts$col = c(col[1],outbreak.symbol$col)
@@ -458,7 +458,7 @@ plot.disProg <- function(x, title = "", xaxis.years=TRUE, startyear = x$start[1]
 \encoding{latin1}
 
 \title{Plot a survRes object}
-\description{Plotting of a (multivariate) \code{survRes} object. The function \code{plot.survRes.one} is used as a helper function to plot a univariate time series.}
+\description{Plotting of a (multivariate) \code{survRes} object. The function \code{plot.survRes.one} is used as a helper function to plot a univariate time series.
 }
 \usage{
   \method{plot}{survRes}(x, method=x$control$name, disease=x$control$data, 
@@ -519,7 +519,7 @@ ctrl <- list(range = 209:290, b = 2, w = 6, alpha = 0.005)
 plot(algo.bayes(aggregate(ha), control = ctrl))
 }
 
-\keyword{}
+%\keyword{}
 
 <<echo=F>>=
 
@@ -619,7 +619,7 @@ plot.survRes.one <- function(x, method=x$control$name, disease=x$control$data, d
     axis( side=2 )
   }
   
-  if(!is.null(legend.opts)) {
+  if(!is.null(legend.opts) && (class(legend.opts) == "list")) {
     #Fill empty (mandatory) slots in legend.opts list
     if (is.null(legend.opts$lty)) legend.opts$lty = c(lty[1],lty[3],NA,NA)
     if (is.null(legend.opts$col)) legend.opts$col = c(col[1],col[3],alarm.symbol$col,outbreak.symbol$col)
@@ -717,7 +717,7 @@ plot.survRes <- function(x, method=x$control$name, disease=x$control$data, xaxis
       \item{k}{an integer}
 }
 \value{vector with two elements}
-\keyword{}
+%\keyword{}
 
 <<echo=FALSE>>=
 magic.dim <- function(k){
@@ -769,7 +769,7 @@ magic.dim <- function(k){
       \item{x}{an integer}
 }
 \value{vector with prime number factorization of x}
-\keyword{}
+%\keyword{}
 
 <<echo=FALSE>>=
 primeFactors <- function(x){
@@ -819,7 +819,7 @@ primeFactors <- function(x){
 }
 \value{Returns a vector c(prod(set1),prod(set2))
       }
-\keyword{}
+%\keyword{}
 <<echo=FALSE>>=
 ######################################################################
 # Given a prime number factorization of a number, e.g. 36

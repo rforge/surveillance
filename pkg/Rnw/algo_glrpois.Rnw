@@ -127,7 +127,7 @@ plot(lr.ts,xaxis.years=FALSE)
 
 }
 
-\keyword{}
+%\keyword{}
 \source{
 Poisson regression charts for the monitoring of surveillance time
 series (2006), Höhle, M., SFB386 Discussion Paper 500.
@@ -275,14 +275,14 @@ algo.glrpois <- function(disProgObj,
 \usage{
 estimateGLRPoisHook()
 }
-\arguments{
-}
+%\arguments{
+%}
 \value{
   A vector of length as \code{range} containing the predicted values.
 }
 %
 \details{ 
-%
+ This hook function allows the user to customize the behaviour of the algorithm.
 }
 \seealso{
 \code{\link{algo.glrpois}}
@@ -321,8 +321,8 @@ estimateGLRPoisHook <- function() {
 }
 }
 
-\keyword{}
-\source{}
+%\keyword{}
+%\source{}
 
 
 <<echo=FALSE>>=

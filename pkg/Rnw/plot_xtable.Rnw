@@ -57,7 +57,7 @@
     compMatrix.writeTable(sumCompMatrix)
 }
 
-\keyword{}
+%\keyword{}
 
 <<echo=F>>=
 

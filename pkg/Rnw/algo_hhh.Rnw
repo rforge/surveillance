@@ -102,7 +102,7 @@ model <- list(lambda=c(TRUE,TRUE), neighbours=c(FALSE,TRUE),
 algo.hhh(influMen, control=model)
 
 }
-\keyword{}
+%\keyword{}
 \source{Held, L., Höhle, M., Hofmann, M. (2005) A statistical framework for the 
     analysis of multivariate infectious disease surveillance counts. 
     \emph{Statistical Modelling}, \bold{5}, p. 187--199.}
@@ -391,7 +391,7 @@ algo.hhh.grid(influMen, control=model, thetastartMatrix=grid, maxTime=30)
 
 
 }
-\keyword{}
+%\keyword{}
 \source{Held, L., Höhle, M., Hofmann, M. (2005) A statistical framework for the 
     analysis of multivariate infectious disease surveillance counts. 
     \emph{Statistical Modelling}, \bold{5}, p. 187--199.}
@@ -615,7 +615,7 @@ grid2 <- create.grid(disProgObj, cntrl2, params = list(epidemic=c(0.1,0.9,5),
                      negbin=c(0.3,12,10)))
 
 }
-\keyword{}
+%\keyword{}
 
 
 <<echo=FALSE>>=
@@ -743,7 +743,7 @@ loglikelihood(theta, designRes)
 }
 \seealso{\code{\link{meanResponse}}}
 \author{M. Paul, L. Held}
-\keyword{}
+%\keyword{}
 
 <<echo=FALSE>>=
 loglikelihood <- function(theta, designRes){
@@ -864,7 +864,7 @@ meanResponse(theta, designRes)
 
 \author{M. Paul, L. Held}
 
-\keyword{}
+%\keyword{}
 
 \source{Held, L., Höhle, M., Hofmann, M. (2005) A statistical framework for the 
     analysis of multivariate infectious disease surveillance counts. 
@@ -1084,7 +1084,7 @@ make.design(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
     }}
 }
 \author{M.Paul, L. Held}
-\keyword{}
+%\keyword{}
 
 <<echo=FALSE>>=                
 make.design <- function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE, 
@@ -1386,7 +1386,7 @@ predict.ahg <- function(object, newdata=NULL, type=c("response","endemic","epi.o
   and time point. 
 }
 \details{this function is still experimental}
-\keyword{}
+%\keyword{}
 
 
 <<echo=FALSE>>=

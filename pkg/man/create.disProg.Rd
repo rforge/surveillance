@@ -41,10 +41,10 @@
   
   # plot salmonella cases
   title <- "Salmonella Agona cases in the UK"
-  plot(salmonellaDisProg, title = title, xaxis.years=TRUE, legend=FALSE,
+  plot(salmonellaDisProg, title = title, xaxis.years=TRUE, legend.opts=NULL,
         startyear = 1990, firstweek = 1)
 }
-\keyword{}
+%\keyword{}
 
 
 

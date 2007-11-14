@@ -9,14 +9,14 @@
 \usage{
 estimateGLRPoisHook()
 }
-\arguments{
-}
+%\arguments{
+%}
 \value{
   A vector of length as \code{range} containing the predicted values.
 }
 %
 \details{ 
-%
+ This hook function allows the user to customize the behaviour of the algorithm.
 }
 \seealso{
 \code{\link{algo.glrpois}}
@@ -55,7 +55,7 @@ estimateGLRPoisHook <- function() {
 }
 }
 
-\keyword{}
-\source{}
+%\keyword{}
+%\source{}
 
 

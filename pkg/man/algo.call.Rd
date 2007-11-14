@@ -52,6 +52,6 @@
     survRes$myBayes
 }
 
-\keyword{}
+%\keyword{}
 
 

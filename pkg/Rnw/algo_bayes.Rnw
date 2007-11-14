@@ -49,23 +49,22 @@
   }
 }
 \details{
-        Using the reference values for calculating an upper limit (threshold) via the negative
-        binomial distribution, alarm is given if the actual value is bigger or equal than this threshold.
-        \code{algo.bayes} calls \code{algo.bayesLatestTimepoint} for the values specified
-        in \code{range} and for the system specified in \code{control}.
-        \code{algo.bayes1}, \code{algo.bayes2}, \code{algo.bayes3} call
-        \code{algo.bayesLatestTimepoint} for the values specified
-        in \code{range} for the Bayes 1 system, Bayes 2 system or Bayes 3 system.
-        \itemize{
-                \item \code{"Bayes 1"} reference values from 6 weeks ago and alpha=0.05 fixed.
-                \item \code{"Bayes 2"} reference values from 6 weeks ago and
-                                13 weeks of the year ago (symmetrical around the
-                                comparable week). Alpha is fixed at 0.05.
-                \item \code{"Bayes 3"}  18 reference values. 9 from the year ago
-                                and 9 from two years ago (also symmetrical around the
-                                comparable week). Alpha is fixed at 0.05.
-                }
-        }
+  Using the reference values for calculating an upper limit (threshold) via the negative
+  binomial distribution, alarm is given if the actual value is bigger or equal than this threshold.
+  \code{algo.bayes} calls \code{algo.bayesLatestTimepoint} for the values specified
+  in \code{range} and for the system specified in \code{control}.
+  \code{algo.bayes1}, \code{algo.bayes2}, \code{algo.bayes3} call
+  \code{algo.bayesLatestTimepoint} for the values specified
+  in \code{range} for the Bayes 1 system, Bayes 2 system or Bayes 3 system.
+  \itemize{
+  \item \code{"Bayes 1"} reference values from 6 weeks ago and alpha=0.05 fixed.
+  \item \code{"Bayes 2"} reference values from 6 weeks ago and
+    13 weeks of the year ago (symmetrical around the
+    comparable week). Alpha is fixed at 0.05.
+  \item \code{"Bayes 3"}  18 reference values. 9 from the year ago
+    and 9 from two years ago (also symmetrical around the
+    comparable week). Alpha is fixed at 0.05.
+  }
 }
 \seealso{
         \code{\link{algo.call}}, \code{\link{algo.rkiLatestTimepoint}} and \code{\link{algo.rki}} for
@@ -89,7 +88,7 @@
     algo.bayes3(disProg, control = list(range = 200:208,alpha=0.05))
 }
 
-\keyword{}
+%\keyword{}
 \source{
 Riebler, A. (2004), Empirischer Vergleich von statistischen Methoden zur
 Ausbruchserkennung bei Surveillance Daten, Bachelor's thesis.

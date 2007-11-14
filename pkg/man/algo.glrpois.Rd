@@ -126,7 +126,7 @@ plot(lr.ts,xaxis.years=FALSE)
 
 }
 
-\keyword{}
+%\keyword{}
 \source{
 Poisson regression charts for the monitoring of surveillance time
 series (2006), Höhle, M., SFB386 Discussion Paper 500.

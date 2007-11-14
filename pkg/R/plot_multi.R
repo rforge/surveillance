@@ -172,7 +172,7 @@ plot.disProg.one <- function(x, title = "", xaxis.years=TRUE, quarters=TRUE, sta
   }
         
   #should there be a legend? 
-  if(!is.null(legend.opts)) {
+  if(!is.null(legend.opts) && (class(legend.opts) == "list")) {
     #Fill empty (mandatory) slots in legend.opts list
     if (is.null(legend.opts$lty)) legend.opts$lty = c(lty[1],NA)
     if (is.null(legend.opts$col)) legend.opts$col = c(col[1],outbreak.symbol$col)
@@ -374,7 +374,7 @@ plot.survRes.one <- function(x, method=x$control$name, disease=x$control$data, d
     axis( side=2 )
   }
   
-  if(!is.null(legend.opts)) {
+  if(!is.null(legend.opts) && (class(legend.opts) == "list")) {
     #Fill empty (mandatory) slots in legend.opts list
     if (is.null(legend.opts$lty)) legend.opts$lty = c(lty[1],lty[3],NA,NA)
     if (is.null(legend.opts$col)) legend.opts$col = c(col[1],col[3],alarm.symbol$col,outbreak.symbol$col)

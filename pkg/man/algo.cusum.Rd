@@ -71,7 +71,7 @@
   }
 }
 \details{This implementation is still experimental}
-\seealso{}
+%\seealso{}
 \author{M. Paul and M. Höhle}
 \examples{
 
@@ -98,8 +98,8 @@
   D. A. Pierce and D. W. Schafer (1986), Residuals in Generalized Linear Models, Journal of the American Statistical Association, 81, 977--986
 }
 
-\keyword{}
-\source{}
+%\keyword{}
+%\source{}
 
 
 
