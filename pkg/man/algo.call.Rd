@@ -48,8 +48,8 @@
                                  range = range, b = 1, w = 5, actY = TRUE,alpha=0.05)
                              ) )
     # this are some survResObjects
-    survRes$rki1
-    survRes$myBayes
+    survRes[["rki(6,6,0)"]]
+    survRes[["bayes(5,5,1)"]]
 }
 
 %\keyword{}

@@ -3,7 +3,7 @@
 \docType{data}
 \title{Influenza and meningococcal infections in Germany, 2001-2006}
 \description{
-  Weekly counts of new influenza and menigococcal infections in Germany 2001-2006. 
+  Weekly counts of new influenza and meningococcal infections in Germany 2001-2006. 
 }
 \usage{data(influMen)}
 \format{
