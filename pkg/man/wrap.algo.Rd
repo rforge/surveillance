@@ -54,8 +54,8 @@ glrpois(sts, control = list(range=range,c.ARL=5, S=1,beta=NULL, Mtilde=1, M=-1, 
   for the exact form of the \code{control} object.
 }
 \author{M. Höhle}
-\examples{
-}
+%\examples{
+%}
 
-\keyword{}
+%\keyword{}
 

@@ -1,4 +1,7 @@
-vignette:
+nothing:
+	echo "Doing nothing, to compile the vignette use make vignette" 
+
+vignette: sweave
 	pdflatex vignette.tex
 	bibtex vignette
 	pdflatex vignette.tex
