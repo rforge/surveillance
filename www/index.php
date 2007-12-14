@@ -98,7 +98,7 @@ under the GPL conditions.</li>
 <b>Download:</b>
 <blockquote>
 <blockquote>
-<blockquote> The <tt>surveillance</tt> package (version 0.9-6) is
+<blockquote> The <tt>surveillance</tt> package (version 0.9-7) is
 available for download from <a
 href="http://cran.r-project.org/src/contrib/Descriptions/surveillance.html">CRAN</a>.<br>
 Package development, help-forum and bugtracking is hosted through
@@ -113,6 +113,7 @@ available.<br>
 <br>
 New features:<br>
 <ul>
+<li>(0.9-7) Improved <tt>algo.hhh</tt> and improvements on the <tt>algo.glrpois</tt> routine. 
 <li>(0.9-6) The surveillance algorithms for time varying
 Poisson mean charts by Rogerson and Yamada has been implemented.<br>
 </li>
