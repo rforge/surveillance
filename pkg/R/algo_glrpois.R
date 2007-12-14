@@ -12,12 +12,14 @@
 ######################################################################
 
 algo.glrpois <- function(disProgObj, 
-                         control = list(range=range,c.ARL=5, 
+                         control = list(range=range,c.ARL=5, restart=TRUE,
                            mu0=NULL, Mtilde=1, M=-1, change="intercept",theta=NULL,dir="inc")){
   
   # Set the default values if not yet set
   if(is.null(control$c.ARL))
     control$c.ARL <- 5
+  if(is.null(control$restart))
+    control$restart <- TRUE
   if(is.null(control$change))
     control$change <- "intercept" 
   if(is.null(control$Mtilde))
@@ -59,6 +61,10 @@ algo.glrpois <- function(disProgObj,
   # start with cusum[timePoint -1] = 0, i.e. set cusum[1] = 0
   alarm <- matrix(data = 0, nrow = length(t), ncol = 1)
   upperbound <- matrix(data = 0, nrow = length(t), ncol = 1)
+
+  #If no restarting set threshold to infinity and compute alarms manually
+  #afterwards
+  if (!control$restart) { c.ARL.saved <- control$c.ARL ; control$c.ARL <- 1e99}
 
   #Setup counters for the progress
   doneidx <- 0
@@ -109,6 +115,9 @@ algo.glrpois <- function(disProgObj,
 
 	# fix of the problem that no upperbound-statistic was returned in case of no alarm
 	if (noofalarms==0) upperbound <- res$val 
+
+  #Manually generate the alarms
+  if (!control$restart) { alarm <- upperbound > c.ARL.saved}
 
   # ensure upper bound is positive and not NaN
   upperbound[is.na(upperbound)] <- 0

@@ -7,7 +7,7 @@
  Poisson regression charts for the monitoring of surveillance time series.
 }
 \usage{
-algo.glrpois(disProgObj,control = list(range=range,c.ARL=5, 
+algo.glrpois(disProgObj,control = list(range=range,c.ARL=5, restart=TRUE,
          mu0=NULL, Mtilde=1, M=-1, change="intercept",theta=NULL,dir="inc"))
 }
 \arguments{
@@ -30,6 +30,9 @@ algo.glrpois(disProgObj,control = list(range=range,c.ARL=5,
         }}
     \item{\code{c.ARL}}{threshold in the GLR test,
         i.e. \eqn{c_{\gamma}}{c_gamma}}
+    \item{\code{restart}}{Restart the surveillance after an alarm has
+        been generated or continue as if nothing has happened to spawn
+        consecutive alarms}
     \item{\code{Mtilde}}{number of observations needed before we
         have a full rank the typical setup for the
         "\code{intercept}" and "\code{epi}" charts is \code{Mtilde=1}}
@@ -126,7 +129,7 @@ plot(lr.ts,xaxis.years=FALSE)
 
 }
 
-%\keyword{}
+\keyword{classif}
 \source{
 Poisson regression charts for the monitoring of surveillance time
 series (2006), Höhle, M., SFB386 Discussion Paper 500.

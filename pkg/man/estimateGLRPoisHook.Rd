@@ -55,7 +55,7 @@ estimateGLRPoisHook <- function() {
 }
 }
 
-%\keyword{}
+\keyword{regression}
 %\source{}
 
 

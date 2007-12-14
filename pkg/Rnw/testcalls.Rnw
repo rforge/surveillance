@@ -28,7 +28,7 @@
                         "s2", "s3", "k1", "n1", "n2", "h1_nrwrp"))
 }
 
-%\keyword{}
+\keyword{misc}
 
 <<echo=F>>=
 
@@ -97,7 +97,7 @@ test <- function(data = c("k1", "m5"), range = 157:339){
     testSim(r = 0.5, K = 5)
 }
 
-%\keyword{}
+\keyword{misc}
 
 <<echo=F>>=
 
@@ -148,7 +148,7 @@ testSim <- function(p = 0.99, r = 0.01, length = 400, A = 1, alpha = 1, beta = 0
     makePlot("./", "k1", "rki2", "RKI 2", "Kryptosporidiose")
 }
 
-%\keyword{}
+\keyword{misc}
 
 <<echo=F>>=
 

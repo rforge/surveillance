@@ -36,7 +36,7 @@ CUSUM scheme with reference value \code{k}, decision interval \code{h} for
   \item{FIR.ARL}{one-sided ARL of the FIR CUSUM scheme with head start
                \eqn{\frac{\code{h}}{2}} }
 }
-%\keyword{}
+\keyword{models}
 \source{Based on the FORTRAN code of
 
 Hawkins, D. M. (1992). Evaluation of Average Run Lengths of Cumulative
@@ -191,7 +191,7 @@ findK(theta0, theta1, distr = c("poisson", "binomial"),
 \value{
   Returns reference value \code{k}.
 }
-%\keyword{ }
+\keyword{models}
 
 <<echo=F>>=
 #################################################################
@@ -287,7 +287,7 @@ for a Poisson variate \eqn{X \sim Po(\lambda)}
 \deqn{\theta_1 = \frac{s \pi_0}{1+(s-1) \pi_0} }
 for a Binomial variate \eqn{X \sim Bin(n, \pi) }
 }
-%\keyword{}
+\keyword{models}
 
 <<echo=F>>=
 ##################################################################
@@ -596,7 +596,7 @@ Consist of Small Regional Counts. Morbidity and Mortality Weekly Report, 2004,
 %1983, 78, 389-395
  }
 \seealso{\code{\link{hValues}}}
-%\keyword{ }
+\keyword{classif}
 
 <<echo=FALSE>>=
 #  control - list with

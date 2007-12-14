@@ -52,7 +52,7 @@
     plot(disProgObj)
 }
 
-%\keyword{}
+\keyword{datagen}
 
 <<echo=F>>=
 

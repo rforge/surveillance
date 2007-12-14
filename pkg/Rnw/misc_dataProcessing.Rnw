@@ -37,7 +37,7 @@
 
 }
 
-%\keyword{}
+\keyword{misc}
 
 <<echo=F>>=
 
@@ -107,7 +107,7 @@ readData <- function(abb,week53to52=TRUE,sysPath=TRUE){
     mydisProgObj <- readData("./simulation",sysPath=FALSE)
 }
 
-%\keyword{}
+\keyword{file}
 
 <<echo=F>>=
 
@@ -161,7 +161,7 @@ toFileDisProg <- function(disProgObj, toFile){
                                       # entry is the first week of the year
 }
 
-%\keyword{}
+\keyword{utilities}
 
 <<echo=F>>=
 
@@ -263,7 +263,7 @@ correct53to52 <- function(disProgObj, firstweek = 1){
     enlargeData(obj, 33:36, 10) # enlarge 10 times with part 33:36
 }
 
-%\keyword{}
+\keyword{utilities}
 
 <<echo=F>>=
 

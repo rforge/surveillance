@@ -20,6 +20,6 @@ Robert Koch Institut, Epidemiologisches Bulletin 31/2006.
 data(shadar)
 plot(shadar)
 }
-%\keyword{}
+\keyword{datasets}
 
 

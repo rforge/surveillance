@@ -39,7 +39,7 @@
     plot(survResults[[1]], "RKI 1", "Simulation", firstweek = 14)
 }
 
-%\keyword{}
+\keyword{hplot}
 
 <<echo=F>>=
 

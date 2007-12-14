@@ -100,7 +100,7 @@
   D. A. Pierce and D. W. Schafer (1986), Residuals in Generalized Linear Models, Journal of the American Statistical Association, 81, 977--986
 }
 
-%\keyword{}
+\keyword{classif}
 %\source{}
 
 <<echo=F>>=
@@ -306,7 +306,7 @@ anscombeNB <- function(y,mu,alpha=0.1) {
     find.kh(ARLa=500,ARLr=7,sided="one")
     find.kh(ARLa=500,ARLr=3,sided="one")
 }
-%\keyword{}
+\keyword{models}
 %\source{}
 
 <<echo=F>>=

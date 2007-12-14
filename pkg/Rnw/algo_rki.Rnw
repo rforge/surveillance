@@ -91,7 +91,7 @@
     algo.rkiLatestTimepoint(disProgObj)
 }
 
-%\keyword{}
+\keyword{classif}
 
 <<echo=F>>=
 
