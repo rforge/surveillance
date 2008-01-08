@@ -1,13 +1,14 @@
-\name{estimateGLRPoisHook}
-\alias{estimateGLRPoisHook}
+\name{estimateGLRNbHook}
+\alias{estimateGLRNbHook}
 \encoding{latin1}
 
 \title{Hook function for in-control mean estimation}
 \description{
  Allows the user to specify his own estimation routine for the in-control mean of \code{algo.glrpois}
+ Needs to work for GLRNbHook
 }
 \usage{
-estimateGLRPoisHook()
+estimateGLRNbHook()
 }
 %\arguments{
 %}
@@ -24,7 +25,7 @@ estimateGLRPoisHook()
 \author{M. Hoehle}
 \examples{
 \dontrun{
-estimateGLRPoisHook <- function() {
+estimateGLRNbHook <- function() {
   #Fetch control object from parent
   control <- parent.frame()$control
   #The period
@@ -47,7 +48,7 @@ estimateGLRPoisHook <- function() {
     formula <- paste(formula,"+cos(2*",s,"*pi/p*t)+ sin(2*",s,"*pi/p*t)",sep="")
   }
   #Fit the GLM
-  m <- eval(substitute(glm(form,family=poisson(),data=data),list(form=as.formula(formula))))
+  m <- eval(substitute(glm.nb(form,data=data),list(form=as.formula(formula))))
 
   #Predict mu_{0,t}
   return(as.numeric(predict(m,newdata=data.frame(t=range),type="response")))

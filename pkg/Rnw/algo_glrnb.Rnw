@@ -1,15 +1,15 @@
 %Rnw file 
-\name{algo.glrpois}
-\alias{algo.glrpois}
+\name{algo.glrnb}
+\alias{algo.glrnb}
 \encoding{latin1}
 
-\title{Poisson regression charts}
+\title{Cound data regression charts}
 \description{
- Poisson regression charts for the monitoring of surveillance time series.
+ Count data regression charts for the monitoring of surveillance time series.
 }
 \usage{
-algo.glrpois(disProgObj,control = list(range=range,c.ARL=5, 
-         mu0=NULL, Mtilde=1, M=-1, change="intercept",theta=NULL,dir=c("inc","dec"),ret=c("cases","value")))
+algo.glrnb(disProgObj,control = list(range=range,c.ARL=5, 
+         mu0=NULL, alpha=0, Mtilde=1, M=-1, change="intercept",theta=NULL,dir=c("inc","dec"),ret=c("cases","value")))
 }
 \arguments{
 \item{disProgObj}{object of class \code{disProg} to do surveillance
@@ -19,7 +19,7 @@ algo.glrpois(disProgObj,control = list(range=range,c.ARL=5,
     \item{\code{range}}{vector of indices in the observed vector
         to monitor (should be consecutive)}
    
-    \item{\code{mu0}}{A vector of in-control values of the Poisson
+    \item{\code{mu0}}{A vector of in-control values of the mean of the negative binomial 
         distribution with the same length as \code{range}. If
         \code{NULL} the observed values in \code{1:(min(range)-1)} are
         used to estimate beta through a generalized linear model. To
@@ -29,6 +29,11 @@ algo.glrpois(disProgObj,control = list(range=range,c.ARL=5,
         \item{\code{S}}{number of harmonics to include}
         \item{\code{trend}}{include a term \code{t} in the GLM model}
         }}
+    \item{\code{alpha}}{The (known) dispersion parameter of the
+        negative binomial distribution. If \code{alpha=0} then the negative
+        binomial distribution boils down to the Poisson distribution
+        and a call of \code{algo.glrnb} is equivalent to a call to
+        \code{algo.glrpois}.}
     \item{\code{c.ARL}}{threshold in the GLR test,
         i.e. \eqn{c_{\gamma}}{c_gamma}}
     \item{\code{Mtilde}}{number of observations needed before we
@@ -59,7 +64,7 @@ algo.glrpois(disProgObj,control = list(range=range,c.ARL=5,
   } 
 } 
 \value{
-\item{survRes}{ \code{algo.glrpois} returns a list of class
+\item{survRes}{ \code{algo.glrnb} returns a list of class
     \code{survRes} (surveillance result), which includes the alarm
     value for recognizing an outbreak (1 for alarm, 0 for no alarm),
     the threshold value for recognizing the alarm and the input object
@@ -72,9 +77,9 @@ algo.glrpois(disProgObj,control = list(range=range,c.ARL=5,
 % 
 \details{ 
 %
-  This function implements the seasonal Poisson charts based on
+  This function implements the seasonal cound data chart based on
   generalized likelihood ratio (GLR) as described in the SFB
-  Discussion Paper 500. A moving-window generalized likelihood ratio
+  Discussion Paper 500 (the paper covers only the Poisson case). A moving-window generalized likelihood ratio
   detector is used, i.e. the detector has the form
 %
 \deqn{N = \inf\left\{ n : \max_{1\leq k \leq
@@ -106,7 +111,7 @@ not an issue here this doesn't bother too much. Therefore, a value of
 \seealso{
 \code{\link{algo.rkiLatestTimepoint}}
 }
-\author{M. Hoehle with contributions by V. Wimmer}
+\author{M. Hoehle}
 \examples{
 ##Simulate data and apply the algorithm
 S <- 1 ; t <- 1:120 ; m <- length(t)
@@ -129,12 +134,9 @@ s.ts <- create.disProg(week=1:length(t),observed=x,state=(t>=tau))
 plot(s.ts,legend=NULL,xaxis.years=FALSE)
 
 #Run 
-cntrl = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0,change="intercept",ret="value",dir="inc")
-glr.ts <- algo.glrpois(s.ts,control=c(cntrl))
-lr.ts  <- algo.glrpois(s.ts,control=c(cntrl,theta=0.4))
-
+cntrl = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0, alpha=0.2, change="intercept",ret="value",dir="inc")
+glr.ts <- algo.glrnb(s.ts,control=c(cntrl))
 plot(glr.ts,xaxis.years=FALSE)
-plot(lr.ts,xaxis.years=FALSE)
 
 }
 
@@ -150,172 +152,184 @@ series (2006), Höhle, M., SFB386 Discussion Paper 500.
 #
 # Implementation of GLR -- documentation converted to Rd format.
 #
-# Author: Michael Hoehle (with contributions by Valentin Wimmer)
+# Author: Michael Hoehle (modified by Valentin Wimmer)
 # Date:   8 Jan 2008
 #
 ######################################################################
 
-algo.glrpois <- function(disProgObj,
-                         control = list(range=range,c.ARL=5,
-                           mu0=NULL, Mtilde=1, M=-1, change="intercept",
-                           theta=NULL,dir=c("inc","dec"),
-                           ret=c("cases","value"))) {
+algo.glrnb <- function(disProgObj,
+                       control = list(range=range,c.ARL=5,
+                         mu0=NULL, alpha=0, Mtilde=1, M=-1, change="intercept",
+                         theta=NULL,dir=c("inc","dec"),
+                         ret=c("cases","value"))) {
+
+  #Small helper function
+  either <- function(cond, whenTrue, whenFalse) { if (cond) return(whenTrue) else return(whenFalse) }
   
-  control$alpha <- 0
-  return(algo.glrnb(disProgObj, control))
+  # Set the default values if not yet set
+  if(is.null(control$c.ARL))
+    control$c.ARL <- 5
+  if(is.null(control$change))
+    control$change <- "intercept"
+  if(is.null(control$Mtilde))
+    control$Mtilde <- 1
+  if(is.null(control$M))
+    control$M <- -1
+  if(is.null(control$dir))
+    control$dir <- "inc"
+  if(is.null(control$ret))
+  	control$ret <- "value"
+  if(is.null(control$alpha))
+      control$alpha <- 0
 
-##   # Set the default values if not yet set
-##   if(is.null(control$c.ARL))
-##     control$c.ARL <- 5
-##   if(is.null(control$change))
-##     control$change <- "intercept"
-##   if(is.null(control$Mtilde))
-##     control$Mtilde <- 1
-##   if(is.null(control$M))
-##     control$M <- -1
-##   if(is.null(control$dir))
-##     control$dir <- "inc"
-##   if(is.null(control$ret))
-##   	control$ret <- "value"
+  #GLM (only filled if estimated)
+  m <- NULL
 
-##   #GLM (only filled if estimated)
-##   m <- NULL
-
-##   #Extract the important parts from the arguments
-##   observed <- disProgObj$observed
-##   t <- control$range
-##   control$mu0Model <- NULL
-##   range <- control$range
-##   control$dir <- match.arg(control$dir, c("inc","dec"))
-##   dir <- ifelse(control$dir=="inc",1,-1)
-##   control$ret <- match.arg(control$ret, c("value","cases"))
-##   ret <- pmatch(control$ret,c("value","cases"))
+  #Extract the important parts from the arguments
+  observed <- disProgObj$observed
+  t <- control$range
+  control$mu0Model <- NULL
+  range <- control$range
+  control$dir <- match.arg(control$dir, c("inc","dec"))
+  dir <- ifelse(control$dir=="inc",1,-1)
+  control$ret <- match.arg(control$ret, c("value","cases"))
+  ret <- pmatch(control$ret,c("value","cases"))
   
+  #Postprocess
+  if ((control$alpha>0) & (control$ret == "cases")) {
+    stop("Return of cases is currently not implemented for the negative binomial distribution!")
+  }
 
-##   # Estimate m (the expected number of cases), i.e. parameter lambda of a
-##   # poisson distribution based on time points 1:t-1
-##   if (is.null(control$mu0) | is.list(control$mu0)) {
-##     #Initialize
-##     if (is.null(control$mu0)) control$mu0 <- list()
-##     if (is.null(control$mu0$S)) control$mu0$S <- 1
-##     if (is.null(control$mu0$trend)) control$mu0$trend <- FALSE
-##     if (is.null(control$mu0$refit)) control$m0$refit <- FALSE
-##     control$mu0Model <- control$mu0
+  # Estimate m (the expected number of cases), i.e. parameter lambda of a
+  # poisson distribution based on time points 1:t-1
+  if (is.null(control$mu0) | is.list(control$mu0)) {
+    #Initialize
+    if (is.null(control$mu0)) control$mu0 <- list()
+    if (is.null(control$mu0$S)) control$mu0$S <- 1
+    if (is.null(control$mu0$trend)) control$mu0$trend <- FALSE
+    if (is.null(control$mu0$refit)) control$m0$refit <- FALSE
+    control$mu0Model <- control$mu0
 
-##     #Estimate using a hook function (lazy evaluation)
-##     control$mu0 <- estimateGLRPoisHook()
-##   }
+    #Estimate using a hook function (lazy evaluation)
+    control$mu0 <- estimateGLRNbHook()
+  }
 
-##   #The counts
-##   x <- observed[control$range]
-##   mu0 <- control$mu0
+  #The counts
+  x <- observed[control$range]
+  mu0 <- control$mu0
 
-##   #Reserve space for the results
-##   # start with cusum[timePoint -1] = 0, i.e. set cusum[1] = 0
-##   alarm <- matrix(data = 0, nrow = length(t), ncol = 1)
-##   upperbound <- matrix(data = 0, nrow = length(t), ncol = 1)
+  #Reserve space for the results
+  # start with cusum[timePoint -1] = 0, i.e. set cusum[1] = 0
+  alarm <- matrix(data = 0, nrow = length(t), ncol = 1)
+  upperbound <- matrix(data = 0, nrow = length(t), ncol = 1)
   
-##   #If no restarting set threshold to infinity and compute alarms manually
-##   #afterwards
-##   if (!control$restart) { c.ARL.saved <- control$c.ARL ; control$c.ARL <- 1e99}
-
-##    #Setup counters for the progress
-##   doneidx <- 0
-##   N <- 1
-##   xm10 <- 0
-##   noofalarms <- 0
-##   noOfTimePoints <- length(t)
-##   #Loop as long as we are not through the sequence
-##   while (doneidx < noOfTimePoints) {
-##     #cat("Doneidx === ",doneidx,"\n")
-##     #Call the C-interface -- this should depend on the type and the distribution
+  
+   #Setup counters for the progress
+  doneidx <- 0
+  N <- 1
+  xm10 <- 0
+  noofalarms <- 0
+  noOfTimePoints <- length(t)
+  #Loop as long as we are not through the sequence
+  while (doneidx < noOfTimePoints) {
+    #cat("Doneidx === ",doneidx,"\n")
+    #Call the C-interface -- this should depend on the type
+    if (control$change == "intercept") {
+      if (is.null(control$theta)) {
+        if (control$alpha == 0) { #poisson
+          res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),cases=as.double(x),as.integer(dir),as.integer(ret),PACKAGE="surveillance")
+        } else { #negbin
+          res <- .C("glr_nb_window",x=as.integer(x),mu0=as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(x),dir=as.integer(dir),PACKAGE="surveillance")
+        }
+      } else {
+        if (control$alpha == 0) { #poisson
+          res <- .C("lr_cusum",as.integer(x),as.double(mu0),length(x),as.double(control$theta),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),cases=as.double(x),PACKAGE="surveillance")
+        } else { #negbin
+          stop("The LR feature of the negative binomial distribution is currently not implemented!")
+        }
+      }
+    } else { ################### Epidemic chart #######################
+      if (control$change == "epi") {
+        if (control$alpha == 0) { #pois
+          res <- .C("glr_epi_window",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.integer(control$M),as.double(xm10),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
+        } else {
+          .res <- C("glr_nbgeneral_window",as.integer(x),as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),xm10=as.double(xm10),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(x),dir=as.integer(dir),PACKAGE="surveillance")
+        }
+      }
+    }
     
-##     ######################################################################
-##     # Poisson
-##     ######################################################################
-##     if (control$change == "intercept") {
-##       if (is.null(control$theta)) {
-##         res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),cases=as.integer(x),as.integer(dir),as.integer(ret),PACKAGE="surveillance")
-##       } else {
-##         res <- .C("lr_cusum",as.integer(x),as.double(mu0),length(x),as.double(control$theta),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),cases=as.double(x),PACKAGE="surveillance")
-##       }
-##     } else { ################### Epidemic chart #######################
-##       if (control$change == "epi") {
-##         res <- .C("glr_epi_window",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.integer(control$M),as.double(xm10),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
-##       }
-##     }
+    
+    #In case an alarm found log this and reset the chart at res$N+1
+    if (res$N < length(x)) {
+      #Put appropriate value in upperbound
+      upperbound[1:res$N + doneidx]  <- either(ret == 1, res$val[1:res$N] ,res$cases[1:res$N])
+      alarm[res$N + doneidx] <- TRUE
 
-##     #In case an alarm found log this and reset the chart at res$N+1
-##     if (res$N < length(x)) {
-##       #Put appropriate value in upperbound
-##       upperbound[1:res$N + doneidx] <- ifelse(ret==1, res$val[1:res$N], res$cases[1:res$N])
-##       alarm[res$N + doneidx] <- TRUE
+      #Chop & get ready for next round
+      xm10 <- x[res$N] #put start value x_0 to last value
+      x <- x[-(1:res$N)] ; t <- t[-(1:res$N)]
+      #If no refitting is to be done things are easy
+      if (!is.list(control$mu0Model) || (control$mu0Model$refit == FALSE)) {
+        mu0 <- mu0[-(1:res$N)]
+      } else {
+        #Update the range (how to change back??)
+        range <- range[-(1:res$N)]
+        mu0 <- estimateGLRNbHook()
+        control$mu0[(doneidx + res$N + 1):length(control$mu0)] <- mu0
+      }
 
-##       #Chop & get ready for next round
-##       xm10 <- x[res$N] #put start value x_0 to last value
-##       x <- x[-(1:res$N)] ; t <- t[-(1:res$N)]
-##       #If no refitting is to be done things are easy
-##       if (!is.list(control$mu0Model) || (control$mu0Model$refit == FALSE)) {
-##         mu0 <- mu0[-(1:res$N)]
-##       } else {
-##         #Update the range (how to change back??)
-##         range <- range[-(1:res$N)]
-##         mu0 <- estimateGLRPoisHook()
-##         control$mu0[(doneidx + res$N + 1):length(control$mu0)] <- mu0
-##       }
+      noofalarms <- noofalarms + 1
 
-##       noofalarms <- noofalarms + 1
+    }
+    doneidx <- doneidx + res$N
+  }
 
-##     }
-##     doneidx <- doneidx + res$N
-##   }
+
+
+  # fix of the problem that no upperbound-statistic is returned after 
+  #last alarm
+  upperbound[(doneidx-res$N+1):length(range)] <- either(ret == 1, res$val, res$cases)
   
-##   # fix of the problem that no upperbound-statistic is returned after 
-##   #last alarm
-##   upperbound[(doneidx-res$N+1):length(range)] <- ifelse (ret==1,  res$val, res$cases)
-  
-##   #fix of the problem that no upperbound-statistic ss returned 
-##   #in case of no alarm
-##   if (noofalarms == 0) {
-##     upperbound <- ifelse( ret == 1, res$val, res$cases)
-##   }
+  #fix of the problem that no upperbound-statistic ss returned 
+  #in case of no alarm
+  if (noofalarms == 0) {
+    upperbound <- either(ret==1, res$val, res$cases)
+  }
 
-##   #Manually generate the alarms
-##   if (!control$restart) { alarm <- upperbound > c.ARL.saved}
-
-##   # ensure upper bound is positive and not NaN
-##   upperbound[is.na(upperbound)] <- 0
-##   upperbound[upperbound < 0] <- 0
+  # ensure upper bound is positive and not NaN
+  upperbound[is.na(upperbound)] <- 0
+  upperbound[upperbound < 0] <- 0
 
 
-##   #Add name and data name to control object.
-##   control$name <- paste("glrpois: ", control$change)
-##   control$data <- paste(deparse(substitute(disProgObj)))
-##   control$m    <- m
+  #Add name and data name to control object.
+  algoName <- either(control$alpha == 0, "glrpois:", "glrnb:")
+  control$name <- paste(algoName, control$change)
+  control$data <- paste(deparse(substitute(disProgObj)))
+  control$m    <- m
 
+  # return alarm and upperbound vectors
+  result <- list(alarm = alarm, upperbound = upperbound, 
+                 disProgObj=disProgObj,control=control)
 
-##   # return alarm and upperbound vectors
-##   result <- list(alarm = alarm, upperbound = upperbound, 
-##                  disProgObj=disProgObj,control=control)
-
-##   class(result) = "survRes" # for surveillance system result
-##   return(result)
+  class(result) = "survRes" # for surveillance system result
+  return(result)
 }
 @ 
 
 % Hook
 
 %Rnw file 
-\name{estimateGLRPoisHook}
-\alias{estimateGLRPoisHook}
+\name{estimateGLRNbHook}
+\alias{estimateGLRNbHook}
 \encoding{latin1}
 
 \title{Hook function for in-control mean estimation}
 \description{
  Allows the user to specify his own estimation routine for the in-control mean of \code{algo.glrpois}
+ Needs to work for GLRNbHook
 }
 \usage{
-estimateGLRPoisHook()
+estimateGLRNbHook()
 }
 %\arguments{
 %}
@@ -332,7 +346,7 @@ estimateGLRPoisHook()
 \author{M. Hoehle}
 \examples{
 \dontrun{
-estimateGLRPoisHook <- function() {
+estimateGLRNbHook <- function() {
   #Fetch control object from parent
   control <- parent.frame()$control
   #The period
@@ -355,7 +369,7 @@ estimateGLRPoisHook <- function() {
     formula <- paste(formula,"+cos(2*",s,"*pi/p*t)+ sin(2*",s,"*pi/p*t)",sep="")
   }
   #Fit the GLM
-  m <- eval(substitute(glm(form,family=poisson(),data=data),list(form=as.formula(formula))))
+  m <- eval(substitute(glm.nb(form,data=data),list(form=as.formula(formula))))
 
   #Predict mu_{0,t}
   return(as.numeric(predict(m,newdata=data.frame(t=range),type="response")))
@@ -368,7 +382,7 @@ estimateGLRPoisHook <- function() {
 
 
 <<echo=FALSE>>=
-estimateGLRPoisHook <- function() {
+estimateGLRNbHook <- function() {
   #Fetch control object from parent
   control <- parent.frame()$control
   #The period
@@ -391,7 +405,7 @@ estimateGLRPoisHook <- function() {
     formula <- paste(formula,"+cos(2*",s,"*pi/p*t)+ sin(2*",s,"*pi/p*t)",sep="")
   }
   #Fit the GLM
-  m <- eval(substitute(glm(form,family=poisson(),data=data),list(form=as.formula(formula))))
+  m <- eval(substitute(glm.nb(form,data=data),list(form=as.formula(formula))))
 
   #Predict mu_{0,t}
   return(as.numeric(predict(m,newdata=data.frame(t=range),type="response")))

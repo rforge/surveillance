@@ -1,0 +1,7 @@
+0.9-8
+=====
+
+* The algo_glrpois function now has an additional "ret" arguments,
+  where one specifies the return type. The arguments of the underlying
+  c functions have been changed to include an additional direction and
+  return type value arguments.
