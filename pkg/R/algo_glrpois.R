@@ -17,7 +17,13 @@ algo.glrpois <- function(disProgObj,
                            theta=NULL,dir=c("inc","dec"),
                            ret=c("cases","value"))) {
   
-  control$alpha <- 0
+  if (is.null(control$alpha)) {
+    control$alpha <- 0
+  } else {
+    if (control$alpha != 0) {
+      stop("Error: algo.glrpois has to operate with control$alpha = 0.")
+    }
+  }
   return(algo.glrnb(disProgObj, control))
 
 ##   # Set the default values if not yet set

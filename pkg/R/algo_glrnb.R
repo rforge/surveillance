@@ -107,7 +107,7 @@ algo.glrnb <- function(disProgObj,
         if (control$alpha == 0) { #pois
           res <- .C("glr_epi_window",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.integer(control$M),as.double(xm10),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
         } else {
-          .res <- C("glr_nbgeneral_window",as.integer(x),as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),xm10=as.double(xm10),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(x),dir=as.integer(dir),PACKAGE="surveillance")
+          res <- .C("glr_nbgeneral_window",as.integer(x),as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),xm10=as.double(xm10),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(x),dir=as.integer(dir),PACKAGE="surveillance")
         }
       }
     }
