@@ -75,12 +75,10 @@ void lr_cusum(int* x,double* mu0, int *lx_R, double *kappa_R, double *c_ARL_R,in
 
     /* Add up */
     if (n==0) {
-      /*ret_lr[n] = zn;*/
       ret_lr[n] = fmax(0,zn);
       ret_cases[n] = (c_ARL + mu0[n]*(kappa-1))/kappa ;
     } 
     else {
-      /*ret_lr[n] = zn + fmax(0,ret_lr[n-1]);*/
       ret_lr[n] = fmax(0,ret_lr[n-1] + zn);
       ret_cases[n] = (c_ARL - ret_lr[n-1] + mu0[n]*(exp(kappa)-1))/kappa ;
     }

@@ -91,13 +91,13 @@ algo.glrnb <- function(disProgObj,
     if (control$change == "intercept") {
       if (is.null(control$theta)) {
         if (control$alpha == 0) { #poisson
-          res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),cases=as.double(x),as.integer(dir),as.integer(ret),PACKAGE="surveillance")
+          res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(dir),as.integer(ret),PACKAGE="surveillance")
         } else { #negbin
-          res <- .C("glr_nb_window",x=as.integer(x),mu0=as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(x),dir=as.integer(dir),PACKAGE="surveillance")
+          res <- .C("glr_nb_window",x=as.integer(x),mu0=as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),dir=as.integer(dir),PACKAGE="surveillance")
         }
       } else {
         if (control$alpha == 0) { #poisson
-          res <- .C("lr_cusum",as.integer(x),as.double(mu0),length(x),as.double(control$theta),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),cases=as.double(x),PACKAGE="surveillance")
+          res <- .C("lr_cusum",as.integer(x),as.double(mu0),length(x),as.double(control$theta),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),PACKAGE="surveillance")
         } else { #negbin
           stop("The LR feature of the negative binomial distribution is currently not implemented!")
         }
@@ -105,9 +105,9 @@ algo.glrnb <- function(disProgObj,
     } else { ################### Epidemic chart #######################
       if (control$change == "epi") {
         if (control$alpha == 0) { #pois
-          res <- .C("glr_epi_window",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.integer(control$M),as.double(xm10),as.double(control$c.ARL),N=as.integer(0),val=as.double(x),PACKAGE="surveillance")
+          res <- .C("glr_epi_window",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.integer(control$M),as.double(xm10),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),PACKAGE="surveillance")
         } else {
-          res <- .C("glr_nbgeneral_window",as.integer(x),as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),xm10=as.double(xm10),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(x),dir=as.integer(dir),PACKAGE="surveillance")
+          res <- .C("glr_nbgeneral_window",as.integer(x),as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),xm10=as.double(xm10),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),dir=as.integer(dir),PACKAGE="surveillance")
         }
       }
     }
@@ -142,7 +142,7 @@ algo.glrnb <- function(disProgObj,
 
   # fix of the problem that no upperbound-statistic is returned after 
   #last alarm
-  upperbound[(doneidx-res$N+1):length(range)] <- either(ret == 1, res$val, res$cases)
+  upperbound[(doneidx-res$N+1):nrow(upperbound)] <- either(ret == 1, res$val, res$cases)
   
   #fix of the problem that no upperbound-statistic ss returned 
   #in case of no alarm
