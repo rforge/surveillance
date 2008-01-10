@@ -40,28 +40,36 @@ cntrl = list(range=test,mu0=mu0.hadar, alpha=alpha.hat, c.ARL=1e99, Mtilde=1, M=
 
 i <- 0
 #This might take a while!
-glr.val <- replicate(10000,one(mu0=mu0.hadar,t=test,control=cntrl))
+#glr.val <- replicate(10000,one(mu0=mu0.hadar,t=test,control=cntrl))
+#save(file="glr.RData",list=c("glr.val"))
+load("glr.RData")
 monitor <- algo.glrnb(shadar, cntrl)
 p <- c(seq(0,0.99,length=100),0.999,0.9999,0.99999, 1)
 qs <- apply(glr.val, MARGIN=1, quantile, p=p)
 
-matplot(test,t(qs),type="n",xlab="time",ylab="GLR(n)")
-ramp <- colorRamp(c("green", "yellow", "red"),bias=0.01)#, bias=0.1)
-col <-  rgb( ramp(p), max=255)
+
+######################################################################
+# Ampelplot
+######################################################################
+matplot(test,t(qs),type="n",xlab="n",ylab="GLR(n)")
+#ramp1 <- colorRamp(c("green", "yellow", "red"),bias=0.01)#, bias=0.1)
+ramp1 <- colorRamp(c("green", "yellow"))
+ramp2 <- colorRamp(c("yellow", "red"))
+col <-  c(rgb( ramp1(p[1:95]), max=255),rgb( ramp2( seq(0,1,length=length(96:length(p)))), max=255))
 
 for (i in 2:nrow(qs)) {
   polygon(c(test,rev(test)),c(qs[i-1,],rev(qs[i,])),col=col[i-1],border=FALSE)
 }
-matlines(test,t(apply(glr.val, MARGIN=1, quantile, p=c(0.9,0.99,0.999))),type="l",xlab="time",col=1)
+matlines(test,t(apply(glr.val, MARGIN=1, quantile, p=c(0.9,0.99,0.999,0.9999))),type="l",xlab="time",col=1)
 lines(test, monitor$upperbound,lwd=3)
-legend(x="topleft",paste("<",sprintf("%.2f",c(0.9,0.99,0.999)*100),"%",sep=""),col=1,horiz=TRUE,lty=1:3,bg="white")
+legend(x="topleft",paste("<",sprintf("%.2f",c(0.9,0.99,0.999,0.9999)*100),"%",sep=""),col=1,horiz=TRUE,lty=1:4,bg="white")
 
 ######################################################################
 #P value plot
 ######################################################################
 a <- matrix(monitor$upperbound, nrow=nrow(glr.val), ncol=ncol(glr.val),byrow=FALSE)
 pval <- apply(glr.val > a, MARGIN=1, mean)
-matplot(test,t(qs),type="n",xlab="time",ylab="p-value",ylim=c(0,1))
+matplot(test,t(qs),type="n",xlab="time",ylab="MC p-value",ylim=c(0,1))
 lines(test, pval)
 
 

@@ -27,10 +27,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <R.h>
 
 /* header */
 /* void lr_cusum(int* ,double* , int *, double *, double *,int *, double *) ;
 void glr_cusum(int* ,double* , int *, int *, double *,int *, double *, int *, int *, int *) ; */
+
+/* Helper function for x^2 */
+static R_INLINE double sqr(double x) {
+  return(x*x);
+}
+
 
 /*======================================================================
   Poisson GLR detector
@@ -207,7 +214,7 @@ void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *re
       if (ret == 2){
         /* change the value at timepoint n as long as an alarm is produced */
         
-        int xnnew;
+        int xnnew = 0;
         /* if an increase should be detected (dir=1), start with 0 */
         if (dir == 1) xnnew = -1 ;
         /* if an decrease should be detected (dir=-1) start with x[n] */
@@ -366,7 +373,7 @@ void glr_cusum_window(int* x,double* mu0, int *lx_R, int *M_R, int *Mtilde_R, do
 /*Helper functions*/
 
 /* Score function */
-inline double score(double phi, int *x, double *xm1, double *mu0, int k, int n) {
+static R_INLINE double score(double phi, int *x, double *xm1, double *mu0, int k, int n) {
   register int i;
   double sum = 0;
   /*printf("[1] ");*/
@@ -377,12 +384,8 @@ inline double score(double phi, int *x, double *xm1, double *mu0, int k, int n) 
   return(exp(phi)*sum);
 }
 
-inline double sqr(double x) {
-  return(x*x);
-}
-
 /*fisher information*/
-inline double fisher(double phi,int *x,double *xm1, double *mu0, int k,int n,double scorephi) {
+static R_INLINE double fisher(double phi,int *x,double *xm1, double *mu0, int k,int n,double scorephi) {
   register int i;
   double sum = 0;
   for (i=k; i<=n; i++) {
@@ -534,7 +537,7 @@ void glr_epi_window(int* x,double* mu0, int *lx_R, int *Mtilde_R, int *M_R, doub
 */
 
 /* Score function for intercept chart*/
-inline double nbScore(double kappa, int *x, double *mu0, double alpha, int k, int n) {
+static R_INLINE double nbScore(double kappa, int *x, double *mu0, double alpha, int k, int n) {
   register int i;
   double sum = 0;
   /*printf("[1] ");*/
@@ -545,13 +548,9 @@ inline double nbScore(double kappa, int *x, double *mu0, double alpha, int k, in
   return(sum);
 }
 
-/* Helper function for x^2 */
-inline double sqr(double x) {
-  return(x*x);
-}
 
 /*fisher information for intercept chart -- its minus the hesse */
-inline double nbFisher(double kappa,int *x, double *mu0, double alpha, int k,int n) {
+static R_INLINE double nbFisher(double kappa,int *x, double *mu0, double alpha, int k,int n) {
   register int i;
   double sum = 0;
   for (i=k; i<=n; i++) {
@@ -561,7 +560,7 @@ inline double nbFisher(double kappa,int *x, double *mu0, double alpha, int k,int
 }
 
 /* Formula to compute a single l_{n,k} for the intercept chart */
-inline double nblnk(double kappa,int *x, double *mu0, double alpha, int k,int n) {
+static R_INLINE double nblnk(double kappa,int *x, double *mu0, double alpha, int k,int n) {
   register int i;
   double lnk = 0;
 
@@ -598,6 +597,7 @@ void glr_nb_window(int* x,double* mu0, double* alpha_R, int *lx_R, int *Mtilde_R
   int M = *M_R;
   double c_ARL = *c_ARL_R;
   double alpha = *alpha_R;
+  int dir = *dir_R;
 
   /* Loop variables */
   register int n, k,i;
@@ -666,7 +666,7 @@ void glr_nb_window(int* x,double* mu0, double* alpha_R, int *lx_R, int *Mtilde_R
 	printf("diff = %f\n",fabs(exp(kappa_new) - exp(kappa_old))); */
       }
       /*Compute the MLE */
-      kappa_ml = fmax(0,kappa_new);
+      kappa_ml = dir*fmax(0,dir*kappa_new);
 
       /*Compute l_{n,k} */
       lnk = nblnk(kappa_ml, x,mu0,alpha, k, n);
@@ -717,15 +717,15 @@ void glr_nb_window(int* x,double* mu0, double* alpha_R, int *lx_R, int *Mtilde_R
 /********** Epidemic Chart ***********/
    
 /* alternative \mu_{1,t}(theta) */
-inline double mu1(int i, double theta, double *mu0, double *xm1) {
+static R_INLINE double mu1(int i, double theta, double *mu0, double *xm1) {
   return( mu0[i] + exp(theta) * xm1[i]);
 }
 /* first derivative */
-inline double d1mu1(int i, double theta, double *mu0, double *xm1) {
+static R_INLINE double d1mu1(int i, double theta, double *mu0, double *xm1) {
   return( exp(theta) * xm1[i]);
 }
 /* second derivative */
-inline double d2mu1(int i, double theta, double *mu0, double *xm1) {
+static R_INLINE double d2mu1(int i, double theta, double *mu0, double *xm1) {
   return( exp(theta) * xm1[i]);
 }
 
@@ -734,30 +734,30 @@ inline double d2mu1(int i, double theta, double *mu0, double *xm1) {
 /********** Intercept Chart (only upwards) ***********/
    
 /* /\* alternative \mu_{1,t}(theta) *\/ */
-/* inline double mu1(int i, double theta, double *mu0, double *xm1) { */
+/* static R_INLINE double mu1(int i, double theta, double *mu0, double *xm1) { */
 /*   return( mu0[i] * exp(exp(theta))) ; */
 /* } */
 /* /\* first derivative *\/ */
-/* inline double d1mu1(int i, double theta, double *mu0, double *xm1) { */
+/* static R_INLINE double d1mu1(int i, double theta, double *mu0, double *xm1) { */
 /*   return( mu0[i] * exp(theta + exp(theta))); */
 /* } */
 /* /\* second derivative *\/ */
-/* inline double d2mu1(int i, double theta, double *mu0, double *xm1) { */
+/* static R_INLINE double d2mu1(int i, double theta, double *mu0, double *xm1) { */
 /*   return( mu0[i] * ( exp(theta + exp(theta)) + exp(2*theta + exp(theta)))); */
 /* } */
 
 /********** Intercept Chart (only upwards) regular parameterization requiring a fmax***********/
    
 /* alternative \mu_{1,t}(theta) */
-/* inline double mu1(int i, double theta, double *mu0, double *xm1) { */
+/* static R_INLINE double mu1(int i, double theta, double *mu0, double *xm1) { */
 /*   return( mu0[i] * exp(theta)) ; */
 /* } */
 /* /\* first derivative *\/ */
-/* inline double d1mu1(int i, double theta, double *mu0, double *xm1) { */
+/* static R_INLINE double d1mu1(int i, double theta, double *mu0, double *xm1) { */
 /*   return( mu0[i] * exp(theta)); */
 /* } */
 /* /\* second derivative *\/ */
-/* inline double d2mu1(int i, double theta, double *mu0, double *xm1) { */
+/* static R_INLINE double d2mu1(int i, double theta, double *mu0, double *xm1) { */
 /*   return( mu0[i] * exp(theta)); */
 /* } */
 
@@ -766,7 +766,7 @@ inline double d2mu1(int i, double theta, double *mu0, double *xm1) {
 
 
 /* Score function for the general negative binomial chart*/
-inline double nbGeneralScore(double theta, int *x, double *xm1, double *mu0, double alpha, int k, int n) {
+static R_INLINE double nbGeneralScore(double theta, int *x, double *xm1, double *mu0, double alpha, int k, int n) {
   register int i;
   double sum = 0;
   double mu1i = 0, d1mu1i = 0;
@@ -779,7 +779,7 @@ inline double nbGeneralScore(double theta, int *x, double *xm1, double *mu0, dou
 }
 
 /*fisher information for the general chart -- its minus the hesse */
-inline double nbGeneralFisher(double theta,int *x, double *xm1, double *mu0, double alpha, int k,int n) {
+static R_INLINE double nbGeneralFisher(double theta,int *x, double *xm1, double *mu0, double alpha, int k,int n) {
   register int i;
   double sum = 0;
   double mu1i = 0, d1mu1i = 0, d2mu1i;
@@ -795,7 +795,7 @@ inline double nbGeneralFisher(double theta,int *x, double *xm1, double *mu0, dou
 }
 
 /* Formula to compute a single l_{n,k} for the general chart */
-inline double nbGeneralLnk(double theta,int *x, double *xm1,  double *mu0, double alpha, int k,int n) {
+static R_INLINE double nbGeneralLnk(double theta,int *x, double *xm1,  double *mu0, double alpha, int k,int n) {
   register int i;
   double lnk = 0, mu1i=0;
 
@@ -836,7 +836,7 @@ void glr_nbgeneral_window(int* x,double* mu0, double* alpha_R, int *lx_R, int *M
   int M = *M_R;
   double c_ARL = *c_ARL_R;
   double alpha = *alpha_R;
-  int dir = *dir_R;
+  /* int dir = *dir_R; -- currently direction is not supported?? */
 
   /* Loop variables */
   register int n, k,i;
@@ -954,6 +954,7 @@ void glr_nbgeneral_window(int* x,double* mu0, double* alpha_R, int *lx_R, int *M
 
 
 /* Test purposes */
+/*
 int main( int argc, char *argv[] ) {
   int x[] = { 5,10,10,11,11,8,12,8,13,8,7,7,7,6,4,2,4,7,5,7,6,1,3,2,2,2,1,3,1,1,6,3,2,2,1,2,1,2,3,2,2,4,1,3,5,5,3,6,6,9,5,11,12,4,8,3,8,10,14,12,10,5,8,10,12,7,4,6,4,8,4,3,2,6,1,5,1,1,1,2,1,0,1,3,0,2,1,1,1,1,1,1,2,0,4,1,8,2,3,13,15,8,13,21,12,11,12,10,15,16,20,23,14,15,14,13,9,8,20,10,8,8,6,4,3,6,4,2,6,3,5,3,4,2,2,4,2,3,1,2,3,3,4,1,8,1,7,6,5,9,10,17,6,13,13,12,11,10,12,12,8,8,6,14,7,5,4,7,5,8,4,4,3,5,2,0,1,1,1,2,3,1,2,2,3,2,0,4,3,1,4,2,3,9,4,3,3,7,12,7,10,9,14,12,10,10,8,8,10,19,9,4,9,11,8,6,6,5,5,9,6,5,3,3,2,4,4,3,2,5,1,2,3,2,0,2,1,1,6,2,2,6,3,2,9,4,6,8,6,8};
 
@@ -1028,7 +1029,7 @@ int main( int argc, char *argv[] ) {
 
   return(0);
 }
-
+*/
 
 /*Stupid tester */
 void foo(double *x) {
