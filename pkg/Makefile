@@ -17,7 +17,8 @@ install:
 	perl-cygwin make.pl --install
 
 build:
-	R CMD build --force --docs=normal --no-vignettes ../surveillance
+#	R CMD build --force docs=normal --no-vignettes ../surveillance
+	R CMD build --no-vignettes --force .
 
 winbin:
 	Rcmd build --binary --no-vignettes --force --docs=normal ../surveillance
