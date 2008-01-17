@@ -117,6 +117,7 @@ S <- 1 ; t <- 1:120 ; m <- length(t)
 beta <- c(1.5,0.6,0.6)
 omega <- 2*pi/52
 #log mu_{0,t}
+alpha <- 0.2
 base <- beta[1] + beta[2] * cos(omega*t) + beta[3] * sin(omega*t) 
 #Generate example data with changepoint and tau=tau
 tau <- 100
@@ -126,14 +127,14 @@ mu1 <- exp(base  + kappa)
 
 #Generate data
 set.seed(42)
-x <- rpois(length(t),mu0*(exp(kappa)^(t>=tau)))
+x <- rnbinom(length(t),mu=mu0*(exp(kappa)^(t>=tau)),size=1/alpha)
 s.ts <- create.disProg(week=1:length(t),observed=x,state=(t>=tau))
 
 #Plot the data
 plot(s.ts,legend=NULL,xaxis.years=FALSE)
 
 #Run 
-cntrl = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0, alpha=0.2, change="intercept",ret="value",dir="inc")
+cntrl = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0, alpha=alpha, change="intercept",ret="value",dir="inc")
 glr.ts <- algo.glrnb(s.ts,control=c(cntrl))
 plot(glr.ts,xaxis.years=FALSE)
 

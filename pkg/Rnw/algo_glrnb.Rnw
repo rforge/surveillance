@@ -118,6 +118,7 @@ S <- 1 ; t <- 1:120 ; m <- length(t)
 beta <- c(1.5,0.6,0.6)
 omega <- 2*pi/52
 #log mu_{0,t}
+alpha <- 0.2
 base <- beta[1] + beta[2] * cos(omega*t) + beta[3] * sin(omega*t) 
 #Generate example data with changepoint and tau=tau
 tau <- 100
@@ -127,14 +128,14 @@ mu1 <- exp(base  + kappa)
 
 #Generate data
 set.seed(42)
-x <- rpois(length(t),mu0*(exp(kappa)^(t>=tau)))
+x <- rnbinom(length(t),mu=mu0*(exp(kappa)^(t>=tau)),size=1/alpha)
 s.ts <- create.disProg(week=1:length(t),observed=x,state=(t>=tau))
 
 #Plot the data
 plot(s.ts,legend=NULL,xaxis.years=FALSE)
 
 #Run 
-cntrl = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0, alpha=0.2, change="intercept",ret="value",dir="inc")
+cntrl = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0, alpha=alpha, change="intercept",ret="value",dir="inc")
 glr.ts <- algo.glrnb(s.ts,control=c(cntrl))
 plot(glr.ts,xaxis.years=FALSE)
 
@@ -168,19 +169,19 @@ algo.glrnb <- function(disProgObj,
   either <- function(cond, whenTrue, whenFalse) { if (cond) return(whenTrue) else return(whenFalse) }
   
   # Set the default values if not yet set
-  if(is.null(control$c.ARL))
+  if(is.null(control[["c.ARL"]]))
     control$c.ARL <- 5
-  if(is.null(control$change))
+  if(is.null(control[["change"]]))
     control$change <- "intercept"
-  if(is.null(control$Mtilde))
+  if(is.null(control[["Mtilde"]]))
     control$Mtilde <- 1
-  if(is.null(control$M))
+  if(is.null(control[["M"]]))
     control$M <- -1
-  if(is.null(control$dir))
+  if(is.null(control[["dir"]]))
     control$dir <- "inc"
-  if(is.null(control$ret))
+  if(is.null(control[["ret"]]))
   	control$ret <- "value"
-  if(is.null(control$alpha))
+  if(is.null(control[["alpha"]]))
       control$alpha <- 0
   
 
@@ -204,12 +205,12 @@ algo.glrnb <- function(disProgObj,
 
   # Estimate m (the expected number of cases), i.e. parameter lambda of a
   # poisson distribution based on time points 1:t-1
-  if (is.null(control$mu0) | is.list(control$mu0)) {
+  if (is.null(control[["mu0"]]) | is.list(control[["mu0"]])) {
     #Initialize
-    if (is.null(control$mu0)) control$mu0 <- list()
-    if (is.null(control$mu0$S)) control$mu0$S <- 1
-    if (is.null(control$mu0$trend)) control$mu0$trend <- FALSE
-    if (is.null(control$mu0$refit)) control$m0$refit <- FALSE
+    if (is.null(control[["mu0"]])) control$mu0 <- list()
+    if (is.null(control[["mu0"]][["S"]])) control$mu0$S <- 1
+    if (is.null(control[["mu0"]][["trend"]])) control$mu0$trend <- FALSE
+    if (is.null(control[["mu0"]][["refit"]])) control$m0$refit <- FALSE
     control$mu0Model <- control$mu0
 
     #Estimate using a hook function (lazy evaluation)
@@ -239,7 +240,7 @@ algo.glrnb <- function(disProgObj,
     # cat("Doneidx === ",doneidx,"\n")
     # Call the C-interface -- this should depend on the type
     if (control$change == "intercept") {
-      if (is.null(control$theta)) {
+      if (is.null(control[["theta"]])) {
         if (control$alpha == 0) { #poisson
 
           if (control$M > 0 ){ # window limited
