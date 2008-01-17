@@ -152,7 +152,7 @@ series (2006), Höhle, M., SFB386 Discussion Paper 500.
 #
 # Implementation of GLR -- documentation converted to Rd format.
 #
-# Author: Michael Hoehle (modified by Valentin Wimmer)
+# Author: Michael Hoehle (with contributions by Valentin Wimmer)
 # Date:   8 Jan 2008
 #
 ######################################################################
@@ -162,11 +162,6 @@ algo.glrnb <- function(disProgObj,
                          mu0=NULL, alpha=0, Mtilde=1, M=-1, change="intercept",
                          theta=NULL,dir=c("inc","dec"),
                          ret=c("cases","value"))) {
-
-
-	## For test purposes:
-	 dyn.load("C:\\Arbeiten\\Surveillance\\working\\pkg\\src\\surveillance.dll")
-			
 
 
   #Small helper function
@@ -249,20 +244,20 @@ algo.glrnb <- function(disProgObj,
 
           if (control$M > 0 ){ # window limited
           
-          	res <- .C("glr_cusum_window",as.integer(x),as.double(mu0),length(x),as.integer(control$M),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(dir),as.integer(ret))
+          	res <- .C("glr_cusum_window",as.integer(x),as.double(mu0),length(x),as.integer(control$M),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(dir),as.integer(ret),PACKAGE="surveillance")
         } 
         	else { # standard
         
-        	res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(dir),as.integer(ret))
+        	res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(dir),as.integer(ret),PACKAGE="surveillance")
 
         	}
         }else { #negbin
-          res <- .C("glr_nb_window",x=as.integer(x),mu0=as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),dir=as.integer(dir))
+          res <- .C("glr_nb_window",x=as.integer(x),mu0=as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),dir=as.integer(dir),PACKAGE="surveillance")
         }
       } else {
         if (control$alpha == 0) { #poisson
 
-          res <- .C("lr_cusum",as.integer(x),as.double(mu0),length(x),as.double(control$theta),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(ret)) # ,PACKAGE="surveillance"
+          res <- .C("lr_cusum",as.integer(x),as.double(mu0),length(x),as.double(control$theta),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(ret),PACKAGE="surveillance")
 
         } else { #negbin
           stop("The LR feature of the negative binomial distribution is currently not implemented!")

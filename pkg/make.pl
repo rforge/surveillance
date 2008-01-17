@@ -4,10 +4,17 @@ use strict;
 use warnings;
 use Getopt::Long;
 
-#my $basePath = "../surveillance/";
-my $basePath = "../pkg/";
+#Modified script so baseName now is the name of the dir where
+#the script is started
+my $pwd =`pwd`;
+my $baseName = `basename $pwd`;
+chomp($baseName);
+my $basePath = "../" . $baseName . "/";
 my $manPath  = "$basePath/man/";
 my $RPath = "$basePath/R/";
+
+print("Using basePath = ");
+print($basePath . "\n");
 
 my $R_HOME = "";
 my $R_LIBS = "";
@@ -18,8 +25,6 @@ my $InstallCall = "";
 my $ManualCall = "";
 my $BinaryCallWin = "";
 my $BinaryCallLin = "";
-
-print "$^0\n";
 
 #If Unix or DOS
 if($^O eq "linux"){
