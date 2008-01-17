@@ -59,13 +59,15 @@ static R_INLINE double sqr(double x) {
   ret_N- here the return value is stored
   ret_lr- GLR value for each n to be returned
   ret_cases - The number of cases to be returned 
+  ret - what should be returned (value of lr-statistic, cases)?
 **********************************************************************/
 
-void lr_cusum(int* x,double* mu0, int *lx_R, double *kappa_R, double *c_ARL_R,int *ret_N, double *ret_lr, double *ret_cases) {
+void lr_cusum(int* x,double* mu0, int *lx_R, double *kappa_R, double *c_ARL_R,int *ret_N, double *ret_lr, double *ret_cases, int *ret_R) {
   /* Pointers to something useful */
   int lx = *lx_R;
   double c_ARL = *c_ARL_R;
   double kappa = *kappa_R;
+  int ret = *ret_R;
   
   /* Loop variables */
   register int n=0; 
@@ -83,11 +85,11 @@ void lr_cusum(int* x,double* mu0, int *lx_R, double *kappa_R, double *c_ARL_R,in
     /* Add up */
     if (n==0) {
       ret_lr[n] = fmax(0,zn);
-      ret_cases[n] = (c_ARL + mu0[n]*(kappa-1))/kappa ;
+      if (ret==2) ret_cases[n] = (c_ARL + mu0[n]*(kappa-1))/kappa ;
     } 
     else {
       ret_lr[n] = fmax(0,ret_lr[n-1] + zn);
-      ret_cases[n] = (c_ARL - ret_lr[n-1] + mu0[n]*(exp(kappa)-1))/kappa ;
+      if (ret==2) ret_cases[n] = (c_ARL - ret_lr[n-1] + mu0[n]*(exp(kappa)-1))/kappa ;
     }
 
     /* Find the first time that the GLR increases c_ARL there we stop */
@@ -154,6 +156,58 @@ double glr (int n, int x[], double mu0[], int dir){
 }
 
 
+/***********************************************************************
+ Function for the computation of the window-limited glr-statistic with time-varying 
+ in-control value 
+ 
+ Params  
+ n   - timepoint n where the glr-statistic should be computed
+ x   - array with observations
+ mu0 - array with estimated in-comtrol parameters
+ dir - direction of testing (up (1) or down (-1)
+ M - max time to go back in time from N
+ Mtilde  - number of vals we will need to estimate a detection
+
+ the function returns max(0,n-M) <= k <= n-Mtilde sup_theta sum_t=k^n log f_theta(x_t)/f_theta0(x_t)
+
+************************************************************************/
+
+double glr_window (int n, int x[], double mu0[], int dir, int M, int Mtilde){
+
+/* Define max of the GLR stats */
+    double maxGLR = -1e99;
+    
+    /* Loop variable */
+    register int k,l;
+
+    /* For the recursive computation of kappa_ml compute for (n-Mtilde+1):n */
+    double sumx = 0;
+    double summu0 = 0;
+    for (l=n-Mtilde+1; l<=n; l++) {
+      sumx += x[l];
+      summu0 += mu0[l];
+    }
+
+    /* Loop over all max(0,n-M) <= k <= n-Mtilde -- do this backwards */
+    /* for (k=max(0,n-M); k<= (n-Mtilde); k++) { */
+    for (k=n-Mtilde; k>=fmax(0,n-M); k--) {
+
+      /* Recursive update of the kappa.ml quantitities */
+      sumx += x[k];
+      summu0 += mu0[k];
+      double kappa_ml = dir*fmax(0,dir*log(sumx/summu0));;
+
+      /*Calculate sum of likelihood ratios using recursive updating (fast!)*/
+      double sum = kappa_ml * sumx + (1-exp(kappa_ml))*summu0;
+
+      /* Save the max value */
+      if (sum > maxGLR) { maxGLR = sum;}
+    }
+
+    return(maxGLR);
+}
+
+
 /**********************************************************************
   Fast C implementation of the sequential GLR test without windowing
   for Poisson distributed variables, this function can test in both 
@@ -214,22 +268,19 @@ void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *re
       if (ret == 2){
         /* change the value at timepoint n as long as an alarm is produced */
         
-        int xnnew = 0;
-        /* if an increase should be detected (dir=1), start with 0 */
-        if (dir == 1) xnnew = -1 ;
-        /* if an decrease should be detected (dir=-1) start with x[n] */
-        if (dir == -1) xnnew = 10*x[n];
-        /* glr-statistic for the new x value */
-        double glrnew = 0;
+        int xnnew = -1;
+            
+        /* glr-statistic for the new x value, initialize it so, that the loop starts */
+        double glrnew = c_ARL - dir;
+                
         /* save the old value of x */
         int xnold = x[n];
         
-  
         /* increase/decrease xnnew as long the glr-statistic with the new x is >= c_ARL */    
-        while ((glrnew < c_ARL)){
+        while ((dir*glrnew < c_ARL*dir)){
           
           /* increase/decrease xnnew */
-          xnnew = xnnew + dir;
+          xnnew = xnnew + 1;
           /* put this value in vector x at timepoint n */
           x[n] = xnnew;
           
@@ -274,15 +325,17 @@ void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *re
   c_ARL- when to sound alarm threshold
 **********************************************************************/
 
-void glr_cusum_window(int* x,double* mu0, int *lx_R, int *M_R, int *Mtilde_R, double *c_ARL_R,int *ret_N) {
+void glr_cusum_window(int* x,double* mu0, int *lx_R, int *M_R, int *Mtilde_R, double *c_ARL_R,int *ret_N, double *ret_glr, double *ret_cases, int *dir_R, int *ret_R) {
   /* Pointers to something useful */
   int lx = *lx_R;
   int M = *M_R;
   int Mtilde = *Mtilde_R;
+  int dir = *dir_R;
+  int ret = *ret_R;
   double c_ARL = *c_ARL_R;
 
   /* Loop variables (n>Mtilde, so we start with n=Mtilde (due to -1 in index) */
-  register int n = Mtilde, k,l;
+  register int n = Mtilde,l;
   int stop = 0;
   int N = lx;
 
@@ -294,67 +347,58 @@ void glr_cusum_window(int* x,double* mu0, int *lx_R, int *M_R, int *Mtilde_R, do
   /* for (l=0;l<lx;l++) {printf("logmu0[%d] = log(%f) = %f\n",l,mu0[l],logmu0[l]); } */
 
   
-  /* Loop over all Mtilde <= n <= length(x) */
+  /* Loop over all n0 <= n <= length(x) */
   while ((n < lx)) {
     /* Compute for one n */
-    /* printf("n=%d\n",n);*/
-
-    /* Define max of the GLR stats */
-    double maxGLR = -1e99;
-
-    /* For the recursive computation of kappa_ml compute for (n-Mtilde+1):n */
-    double sumx = 0;
-    double summu0 = 0;
-    for (l=n-Mtilde+1; l<=n; l++) {
-      sumx += x[l];
-      summu0 += mu0[l];
-    }
-
-    /* Loop over all max(0,n-M) <= k <= n-Mtilde -- do this backwards */
-    /* for (k=max(0,n-M); k<= (n-Mtilde); k++) { */
-    for (k=n-Mtilde; k>=fmax(0,n-M); k--) {
-
-      /* Recursive update of the kappa.ml quantitities */
-      sumx += x[k];
-      summu0 += mu0[k];
-      double kappa_ml = fmax(0,log(sumx/summu0));
-
-      /* Calculate sum of likelihood ratios */
-      /* 
-	 double sum = 0;
-	 for (l=k; l<=n; l++) {
- 	sum += x[l]*kappa_ml + mu0[l]*(1-exp(kappa_ml));
-	}
-      */
-
-      /*Calculate sum of likelihood ratios using recursive updating (fast!)*/
-      double sum = kappa_ml * sumx + (1-exp(kappa_ml))*summu0;
-
-      /*
-	if (sum- sum2 > 1e-6) {
-	printf("For n=%d, k=%d we have one.k = %f\n",n,k,sum);
-	printf("fast impl %f\n",sum2);
-      }
-      */
     
-
-      /* Debug */
-      /* printf("For n=%d, k=%d we have one.k = %f\n",n,k,sum);*/
-
-      /* Save the max value */
-      if (sum > maxGLR) { maxGLR = sum;}
-    }
+    
+      /* to compute the glr-statistic with helper function (see above) */
+     ret_glr[n] = glr_window(n,x,mu0,dir,M,Mtilde);
+      
+      
+      /* to find the number of cases that are necassary to produce an alarm */
+      /* optionally, if ret == 2*/
+      if (ret == 2){
+        /* change the value at timepoint n as long as an alarm is produced */
+        
+        int xnnew = -1;
+            
+        /* glr-statistic for the new x value, initialize it so, that the loop starts */
+        double glrnew = c_ARL - dir;
+        
+        /* save the old value of x */
+        int xnold = x[n];
+        
+  
+        /* increase/decrease xnnew as long the glr-statistic with the new x is >= c_ARL */    
+        while ((dir*glrnew < c_ARL*dir)){
+          
+          /* increase/decrease xnnew */
+          xnnew = xnnew + 1;
+          /* put this value in vector x at timepoint n */
+          x[n] = xnnew;
+          
+          /* compute the glr-statistic */
+          glrnew = glr_window(n,x,mu0,dir,M,Mtilde);  
+        }
+       
+       /* save the value */
+       ret_cases[n] = xnnew;
+       /* set x[n] back to original value so that we can go to next n*/
+       x[n] = xnold;
+        
+      } 
 
     /* Debug*/
     /* printf("For n=%d the best GLR value is %f\n",n,maxGLR);*/
 
     /* Find the first time that the GLR increases c_ARL there we stop */
-    if ((maxGLR > c_ARL) && !stop) {
-      N = n;
-      stop = 1;
-      break;
-    }
-  
+    if ((ret_glr[n] >= c_ARL) && !stop) {
+        N = n;
+        stop = 1;
+        break;
+      }
+      
     /* Advance counter */
     n++;
   }

@@ -17,6 +17,12 @@ algo.glrnb <- function(disProgObj,
                          theta=NULL,dir=c("inc","dec"),
                          ret=c("cases","value"))) {
 
+
+	## For test purposes:
+	 dyn.load("C:\\Arbeiten\\Surveillance\\working\\pkg\\src\\surveillance.dll")
+			
+
+
   #Small helper function
   either <- function(cond, whenTrue, whenFalse) { if (cond) return(whenTrue) else return(whenFalse) }
   
@@ -35,6 +41,7 @@ algo.glrnb <- function(disProgObj,
   	control$ret <- "value"
   if(is.null(control$alpha))
       control$alpha <- 0
+  
 
   #GLM (only filled if estimated)
   m <- NULL
@@ -67,7 +74,9 @@ algo.glrnb <- function(disProgObj,
     #Estimate using a hook function (lazy evaluation)
     control$mu0 <- estimateGLRNbHook()
   }
-
+	
+	
+	
   #The counts
   x <- observed[control$range]
   mu0 <- control$mu0
@@ -86,18 +95,29 @@ algo.glrnb <- function(disProgObj,
   noOfTimePoints <- length(t)
   #Loop as long as we are not through the sequence
   while (doneidx < noOfTimePoints) {
-    #cat("Doneidx === ",doneidx,"\n")
-    #Call the C-interface -- this should depend on the type
+    # cat("Doneidx === ",doneidx,"\n")
+    # Call the C-interface -- this should depend on the type
     if (control$change == "intercept") {
       if (is.null(control$theta)) {
         if (control$alpha == 0) { #poisson
-          res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(dir),as.integer(ret),PACKAGE="surveillance")
-        } else { #negbin
-          res <- .C("glr_nb_window",x=as.integer(x),mu0=as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),dir=as.integer(dir),PACKAGE="surveillance")
+
+          if (control$M > 0 ){ # window limited
+          
+          	res <- .C("glr_cusum_window",as.integer(x),as.double(mu0),length(x),as.integer(control$M),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(dir),as.integer(ret))
+        } 
+        	else { # standard
+        
+        	res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(dir),as.integer(ret))
+
+        	}
+        }else { #negbin
+          res <- .C("glr_nb_window",x=as.integer(x),mu0=as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),dir=as.integer(dir))
         }
       } else {
         if (control$alpha == 0) { #poisson
-          res <- .C("lr_cusum",as.integer(x),as.double(mu0),length(x),as.double(control$theta),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),PACKAGE="surveillance")
+
+          res <- .C("lr_cusum",as.integer(x),as.double(mu0),length(x),as.double(control$theta),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(ret)) # ,PACKAGE="surveillance"
+
         } else { #negbin
           stop("The LR feature of the negative binomial distribution is currently not implemented!")
         }
@@ -112,8 +132,7 @@ algo.glrnb <- function(disProgObj,
       }
     }
     
-    
-    #In case an alarm found log this and reset the chart at res$N+1
+     #In case an alarm found log this and reset the chart at res$N+1
     if (res$N < length(x)) {
       #Put appropriate value in upperbound
       upperbound[1:res$N + doneidx]  <- either(ret == 1, res$val[1:res$N] ,res$cases[1:res$N])
@@ -153,9 +172,10 @@ algo.glrnb <- function(disProgObj,
   # ensure upper bound is positive and not NaN
   upperbound[is.na(upperbound)] <- 0
   upperbound[upperbound < 0] <- 0
-
-
-  #Add name and data name to control object.
+  
+ 
+  # Add name and data name to control object
+  
   algoName <- either(control$alpha == 0, "glrpois:", "glrnb:")
   control$name <- paste(algoName, control$change)
   control$data <- paste(deparse(substitute(disProgObj)))
@@ -188,7 +208,7 @@ estimateGLRNbHook <- function() {
   #Perform an estimation based on all observations before timePoint
   #Event better - don't do this at all in the algorithm - force
   #user to do it himself - coz its a model selection problem
-  data <- data.frame(y=parent.frame()$disProgObj$observed[t],t=train)
+  data <- data.frame(y=parent.frame()$disProgObj$observed[train],t=train)
   #Build the model equation
   formula <- "y ~ 1 "
   if (control$mu0Model$trend) { formula <- paste(formula," + t",sep="") }

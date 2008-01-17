@@ -25,8 +25,8 @@
 /c   { newpath 0 360 arc } def
 /r   { 4 2 roll moveto 1 copy 3 -1 roll exch 0 exch rlineto 0 rlineto -1 mul 0 exch rlineto closepath } def
 /p1  { stroke } def
-/p2  { gsave bg fill grestore newpath } def
-/p3  { gsave bg fill grestore stroke } def
+/p2  { gsave bg setrgbcolor fill grestore newpath } def
+/p3  { gsave bg setrgbcolor fill grestore stroke } def
 /t   { 6 -2 roll moveto gsave rotate
        ps mul neg 0 2 1 roll rmoveto
        1 index stringwidth pop
@@ -37,11 +37,48 @@
 /rgb { setrgbcolor } def
 /s   { scalefont setfont } def
 % end   .ps.prolog
+% begin encoding
+/WinAnsiEncoding [
+ /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+ /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+ /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+ /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+ /space /exclam /quotedbl /numbersign /dollar /percent /ampersand /quoteright
+ /parenleft /parenright /asterisk /plus /comma /minus /period /slash
+ /zero /one /two /three /four /five /six /seven
+ /eight /nine /colon /semicolon /less /equal /greater /question
+ /at /A /B /C /D /E /F /G
+ /H /I /J /K /L /M /N /O
+ /P /Q /R /S /T /U /V /W
+ /X /Y /Z /bracketleft /backslash /bracketright /asciicircum /underscore
+ /grave /a /b /c /d /e /f /g
+ /h /i /j /k /l /m /n /o
+ /p /q /r /s /t /u /v /w
+ /x /y /z /braceleft /bar /braceright /asciitilde /.notdef
+ /Euro /.notdef /quotesinglbase /florin /quotedblbase /ellipsis /dagger /daggerdbl
+ /circumflex /perthousand /Scaron /guilsinglleft /OE /.notdef /Zcaron /.notdef
+ /.notdef /quoteleft /quoteright /quotedblleft /quotedblright /bullet /endash /emdash
+ /tilde /trademark /scaron /guilsinglright /oe /.notdef /zcaron /Ydieresis
+ /space /exclamdown /cent /sterling /currency /yen /brokenbar /section
+ /dieresis /copyright /ordfeminine /guillemotleft /logicalnot /hyphen /registered /macron
+ /degree /plusminus /twosuperior /threesuperior /acute /mu /paragraph /periodcentered
+ /cedilla /onesuperior /ordmasculine /guillemotright /onequarter /onehalf /threequarters /questiondown
+ /Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla
+ /Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis
+ /Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply
+ /Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls
+ /agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla
+ /egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis
+ /eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide
+ /oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis
+]
+ def
+% end encoding
 %%IncludeResource: font Helvetica
 /Helvetica findfont
 dup length dict begin
   {1 index /FID ne {def} {pop pop} ifelse} forall
-  /Encoding ISOLatin1Encoding def
+  /Encoding WinAnsiEncoding def
   currentdict
   end
 /Font1 exch definefont pop
@@ -49,7 +86,7 @@ dup length dict begin
 /Helvetica-Bold findfont
 dup length dict begin
   {1 index /FID ne {def} {pop pop} ifelse} forall
-  /Encoding ISOLatin1Encoding def
+  /Encoding WinAnsiEncoding def
   currentdict
   end
 /Font2 exch definefont pop
@@ -57,7 +94,7 @@ dup length dict begin
 /Helvetica-Oblique findfont
 dup length dict begin
   {1 index /FID ne {def} {pop pop} ifelse} forall
-  /Encoding ISOLatin1Encoding def
+  /Encoding WinAnsiEncoding def
   currentdict
   end
 /Font3 exch definefont pop
@@ -65,7 +102,7 @@ dup length dict begin
 /Helvetica-BoldOblique findfont
 dup length dict begin
   {1 index /FID ne {def} {pop pop} ifelse} forall
-  /Encoding ISOLatin1Encoding def
+  /Encoding WinAnsiEncoding def
   currentdict
   end
 /Font4 exch definefont pop
@@ -80,7 +117,7 @@ dup length dict begin
 %%Page: 1 1
 bp
 57.60 72.00 936.00 374.40 cl
-0 setgray
+0 0 0 rgb
 0.75 setlinewidth
 [] 0 setdash
 1 setlinecap
@@ -194,7 +231,7 @@ np
 o
 0.00 0.00 936.00 432.00 cl
 /ps 18 def /Font1 findfont 18 s
-0 setgray
+0 0 0 rgb
 496.80 17.28 (time) .5 0 0 t
 11.52 223.20 (No. of Infected) .5 0 90 t
 57.60 72.00 936.00 374.40 cl
@@ -855,7 +892,7 @@ np
 7.90 0 l
 7.90 0 l
 o
-0.7451 setgray
+0.7451 0.7451 0.7451 rgb
 0.75 setlinewidth
 [ 3.00 5.00] 0 setdash
 np
@@ -964,7 +1001,7 @@ np
 7.90 0 l
 7.90 0 l
 o
-0 setgray
+0 0 0 rgb
 0.75 setlinewidth
 [ 0.00 4.00] 0 setdash
 np
@@ -1727,7 +1764,7 @@ np
 7.90 0 l
 7.90 0 l
 o
-0 setgray
+0 0 0 rgb
 0.75 setlinewidth
 [] 0 setdash
 np
@@ -1776,14 +1813,14 @@ np
 208.18 360.00 m
 21.60 0 l
 o
-0.7451 setgray
+0.7451 0.7451 0.7451 rgb
 0.75 setlinewidth
 [ 3.00 5.00] 0 setdash
 np
 208.18 345.60 m
 21.60 0 l
 o
-0 setgray
+0 0 0 rgb
 0.75 setlinewidth
 [ 0.00 4.00] 0 setdash
 np
@@ -1833,7 +1870,7 @@ np
 21.60 0 l
 o
 /ps 12 def /Font1 findfont 12 s
-0 setgray
+0 0 0 rgb
 100.80 355.69 (3402) 0 0 0 t
 100.80 341.29 (3403) 0 0 0 t
 100.80 326.89 (3404) 0 0 0 t
@@ -1851,10 +1888,10 @@ o
 380.35 326.89 (3462) 0 0 0 t
 0.00 0.00 936.00 432.00 cl
 /ps 18 def /Font2 findfont 18 s
-0 setgray
+0 0 0 rgb
 496.80 396.74 (measles in Weser-Ems 2001-2002) .5 0 0 t
 0.00 0.00 936.00 432.00 cl
-0 setgray
+0 0 0 rgb
 0.75 setlinewidth
 [] 0 setdash
 1 setlinecap

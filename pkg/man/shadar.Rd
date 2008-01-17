@@ -1,6 +1,6 @@
 \name{shadar}
 \alias{shadar}
-\title{Salonella Hadar cases in Germany 2001-2006}
+\title{Salmonella Hadar cases in Germany 2001-2006}
 \description{Number of salmonella hadar cases in
   Germany 2001-2006. An increase is seen during 2006
 }
