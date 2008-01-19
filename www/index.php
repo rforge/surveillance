@@ -98,7 +98,7 @@ under the GPL conditions.</li>
 <b>Download:</b>
 <blockquote>
 <blockquote>
-<blockquote> The <tt>surveillance</tt> package (version 0.9-7) is
+<blockquote> The <tt>surveillance</tt> package (version 0.9-8) is
 available for download from <a
 href="http://cran.r-project.org/src/contrib/Descriptions/surveillance.html">CRAN</a>.<br>
 Package development, help-forum and bugtracking is hosted through
@@ -113,6 +113,7 @@ available.<br>
 <br>
 New features:<br>
 <ul>
+<li>(0.9-8) The <tt>algo.glrpois</tt> function can now both increases and decreases. Furthermore, a companion function <tt>algo.glrnb</tt> has been wirrten, which handles negative binomial data with fixed dispersion parameter (this function is still experimental). For further details see the file NEWS in the distribution.
 <li>(0.9-7) Improved <tt>algo.hhh</tt> and improvements on the <tt>algo.glrpois</tt> routine. 
 <li>(0.9-6) The surveillance algorithms for time varying
 Poisson mean charts by Rogerson and Yamada has been implemented.<br>
@@ -141,24 +142,33 @@ by Rossi et al. (1999)</li>
 </blockquote>
 </blockquote>
 </blockquote>
-<hr>
-<b>Documentation:</b>
+<hr><b>Documentation:</b>
 <blockquote>
 <blockquote>
 <ul>
-<li>A good introduction to the paper is provided in the paper <a
+<li>A good introduction to the package is provided in the paper <a
 href="http://dx.doi.org/10.1007/s00180-007-0074-8"><span
 style="font-family: monospace;">surveillance</span>:
-An R package for the surveillance of infectious diseases</a> to
-Appear in Computational Statistics</li>
-<li>Read the package <a href="vignette.pdf"><span
-style="text-decoration: underline;">vignette</span></a> containing
-examples on how to use the package and its features.</li>
+					An R package for the surveillance of infectious diseases</a>, Computational Statistics (2007), 22(4), pp. 571-582.</li>
+<li>Use of the package in veterinary public health surveillance can be found in <a href="http://epub.ub.uni-muenchen.de/2093/">Statistical approaches to the surveillance of infectious diseases for veterinary public health</a>
+<li>Read the package vignette
 <li><a href="http://www.stat.uni-muenchen.de/~hoehle/pubs/compstat2006-presentation.pdf">CompStat2006
 talk</a> about the package</li>
 <li>A <a href="http://www.stat.uni-muenchen.de/~hoehle/pubs/geomed2005-hoehle.pdf">poster</a>
 presentation about the package from the <a
 href="http://www.geomed2005.org">Geomed2005</a> conference.</li>
+</ul>
+</blockquote>
+</blockquote>
+
+<hr><b>Developers:</b>
+<blockquote>
+<blockquote>
+<ul>
+<li><a href="http://www.stat.uni-muenchen.de/~hoehle">Michael H&ouml;hle</a>, Department of Statistics, University of Munich, Germany</li>
+<li><a href="http://www.biostat.uzh.ch/aboutus/people/mpaul.html">Michaela Paul</a>, Institute of Social and Preventive Medicine, University of Zurich, Switzerland</li>
+<li>Current student programmers: Valentin Wimmer</li>
+<li>Former student programmers: C. Lang, Andrea Riebler</li>
 </ul>
 </blockquote>
 </blockquote>
