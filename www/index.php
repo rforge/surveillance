@@ -113,7 +113,7 @@ available.<br>
 <br>
 New features:<br>
 <ul>
-<li>(0.9-8) The <tt>algo.glrpois</tt> function can now both increases and decreases. Furthermore, a companion function <tt>algo.glrnb</tt> has been wirrten, which handles negative binomial data with fixed dispersion parameter (this function is still experimental). For further details see the file NEWS in the distribution.
+<li>(0.9-8) The <tt>algo.glrpois</tt> function now handles both increases and decreases. Furthermore, a companion function <tt>algo.glrnb</tt> has been written, which handles negative binomial time series with fixed dispersion parameter (this function is still experimental). For further details see the file NEWS in the distribution.
 <li>(0.9-7) Improved <tt>algo.hhh</tt> and improvements on the <tt>algo.glrpois</tt> routine. 
 <li>(0.9-6) The surveillance algorithms for time varying
 Poisson mean charts by Rogerson and Yamada has been implemented.<br>
@@ -157,6 +157,8 @@ talk</a> about the package</li>
 <li>A <a href="http://www.stat.uni-muenchen.de/~hoehle/pubs/geomed2005-hoehle.pdf">poster</a>
 presentation about the package from the <a
 href="http://www.geomed2005.org">Geomed2005</a> conference.</li>
+<li>Sometimes one picture says more than 1000 words:</li>
+<img src="survlr.png" align="center">
 </ul>
 </blockquote>
 </blockquote>
@@ -165,9 +167,9 @@ href="http://www.geomed2005.org">Geomed2005</a> conference.</li>
 <blockquote>
 <blockquote>
 <ul>
-<li><a href="http://www.stat.uni-muenchen.de/~hoehle">Michael H&ouml;hle</a>, Department of Statistics, University of Munich, Germany</li>
+<li><a href="http://www.stat.uni-muenchen.de/~hoehle">Michael H&ouml;hle</a>, Department of Statistics, University of Munich, Germany (Project Admin)</li>
 <li><a href="http://www.biostat.uzh.ch/aboutus/people/mpaul.html">Michaela Paul</a>, Institute of Social and Preventive Medicine, University of Zurich, Switzerland</li>
-<li>Current student programmers: Valentin Wimmer</li>
+<li>Current student programmer: Valentin Wimmer</li>
 <li>Former student programmers: C. Lang, Andrea Riebler</li>
 </ul>
 </blockquote>
