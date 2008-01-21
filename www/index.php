@@ -66,6 +66,8 @@ Institute (RKI), Germany. <br>
 <li>A Bayesian predictive posterior approach documented in
 H&ouml;hle (2007)<br>
 </li>
+<li>An online version of the Hidden Markov Model approach by
+(Le Strat and Carrat (1999)
 <li>Surveillance for time varying Poisson means as documented
 in Rogerson and Yamada (2004)<br>
 </li>
