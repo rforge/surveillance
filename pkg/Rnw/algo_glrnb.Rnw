@@ -210,7 +210,7 @@ algo.glrnb <- function(disProgObj,
     if (is.null(control[["mu0",exact=TRUE]])) control$mu0 <- list()
     if (is.null(control[["mu0",exact=TRUE]][["S"]])) control$mu0$S <- 1
     if (is.null(control[["mu0",exact=TRUE]][["trend"]])) control$mu0$trend <- FALSE
-    if (is.null(control[["mu0",exact=TRUE]][["refit"]])) control$m0$refit <- FALSE
+    if (is.null(control[["mu0",exact=TRUE]][["refit"]])) control$mu0$refit <- FALSE
     control$mu0Model <- control$mu0
 
     #Estimate using a hook function (lazy evaluation)
