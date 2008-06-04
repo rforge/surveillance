@@ -24,6 +24,10 @@
 \alias{jacobian}
 \alias{sinCos2amplitudeShift}
 \alias{jacobianAmplitudeShift}
+\alias{getLambda}
+\alias{expAlpha.mm}
+\alias{logLik.ah}
+\alias{logLik.ahg}
 %
 \title{Internal surveillance Functions}
 \description{
