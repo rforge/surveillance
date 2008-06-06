@@ -32,7 +32,7 @@ algo.glrnb(disProgObj,control = list(range=range,c.ARL=5,
         negative binomial distribution. If \code{alpha=0} then the negative
         binomial distribution boils down to the Poisson distribution
         and a call of \code{algo.glrnb} is equivalent to a call to
-        \code{algo.glrpois}.}
+        \code{algo.glrpois}. If \code{alpha=NULL} the parameter is calculated as part of the in-control estimation.}
     \item{\code{c.ARL}}{threshold in the GLR test,
         i.e. \eqn{c_{\gamma}}{c_gamma}}
     \item{\code{Mtilde}}{number of observations needed before we
@@ -145,6 +145,7 @@ plot(glr.ts,xaxis.years=FALSE)
 Poisson regression charts for the monitoring of surveillance time
 series (2006), Höhle, M., SFB386 Discussion Paper 500.
 }
+
 
 
 % Hook

@@ -34,9 +34,8 @@ algo.glrnb <- function(disProgObj,
     control$dir <- "inc"
   if(is.null(control[["ret",exact=TRUE]]))
   	control$ret <- "value"
-  if(is.null(control[["alpha",exact=TRUE]]))
-      control$alpha <- 0
-  
+  #if(is.null(control[["alpha",exact=TRUE]]))
+  #    control$alpha <- 0
 
   #GLM (only filled if estimated)
   m <- NULL
@@ -50,11 +49,9 @@ algo.glrnb <- function(disProgObj,
   dir <- ifelse(control$dir=="inc",1,-1)
   control$ret <- match.arg(control$ret, c("value","cases"))
   ret <- pmatch(control$ret,c("value","cases"))
+  mod <- list()
   
-  #Postprocess
-  if ((control$alpha>0) & (control$ret == "cases")) {
-    stop("Return of cases is currently not implemented for the negative binomial distribution!")
-  }
+ 
 
   # Estimate m (the expected number of cases), i.e. parameter lambda of a
   # poisson distribution based on time points 1:t-1
@@ -67,7 +64,17 @@ algo.glrnb <- function(disProgObj,
     control$mu0Model <- control$mu0
 
     #Estimate using a hook function (lazy evaluation)
-    control$mu0 <- estimateGLRNbHook()
+    control$mu0 <- estimateGLRNbHook()$pred
+    
+    mod[[1]] <- estimateGLRNbHook()$mod
+    
+    # if it is necessary to estimate alpha
+    if(is.null(control[["alpha",exact=TRUE]])) control$alpha <- mod[[1]]$theta
+  }
+  
+   #Postprocess
+  if ((control$alpha>0) & (control$ret == "cases")) {
+    stop("Return of cases is currently not implemented for the negative binomial distribution!")
   }
 	
 	
@@ -142,7 +149,8 @@ algo.glrnb <- function(disProgObj,
       } else {
         #Update the range (how to change back??)
         range <- range[-(1:res$N)]
-        mu0 <- estimateGLRNbHook()
+        mu0 <- estimateGLRNbHook()$pred
+        mod[[noofalarms+2]] <-  estimateGLRNbHook()$mod 
         control$mu0[(doneidx + res$N + 1):length(control$mu0)] <- mu0
       }
 
@@ -175,6 +183,7 @@ algo.glrnb <- function(disProgObj,
   control$name <- paste(algoName, control$change)
   control$data <- paste(deparse(substitute(disProgObj)))
   control$m    <- m
+  control$mu0Model$fitted <- mod
 
   # return alarm and upperbound vectors
   result <- list(alarm = alarm, upperbound = upperbound, 
@@ -214,7 +223,7 @@ estimateGLRNbHook <- function() {
   m <- eval(substitute(glm.nb(form,data=data),list(form=as.formula(formula))))
 
   #Predict mu_{0,t}
-  return(as.numeric(predict(m,newdata=data.frame(t=range),type="response")))
+  return(list(mod=m,pred=as.numeric(predict(m,newdata=data.frame(t=range),type="response"))))
 }
 
 
