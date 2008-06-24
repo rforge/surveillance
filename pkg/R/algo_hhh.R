@@ -1100,6 +1100,9 @@ coef.ah <- function(object,se=FALSE, amplitudeShift=FALSE, reparamPsi=FALSE,...)
     return(coefs)
 }
 
+coef.ahg <- function(object,se=FALSE, amplitudeShift=FALSE, reparamPsi=FALSE,...){
+  return(coef(object$best,se=se, amplitudeShift=amplitudeShift,reparamPsi=reparamPsi))
+}
 
 
 
