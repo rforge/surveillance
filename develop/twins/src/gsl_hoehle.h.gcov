@@ -1,0 +1,88 @@
+        -:    0:Source:gsl_hoehle.h
+        -:    0:Object:estimateI3.bb
+        -:    1://Assorted stuff to overwrite misbehaviour in GSL functions.
+        -:    2:
+        -:    3:#include <math.h>
+        -:    4:#include <gsl/gsl_sf_gamma.h>
+        -:    5:#include <gsl/gsl_rng.h>
+        -:    6:#include <gsl/gsl_randist.h>
+        -:    7:
+        -:    8:
+        -:    9:
+        -:   10://hoehle: The original function assumes mu>0, which needs not be the case!
+        -:   11://This version handles that part. This is the log version.
+        -:   12:
+        -:   13:double
+        -:   14:gsl_ran_poisson_log_pdf (const unsigned int k, const double mu)
+    #####:   15:{
+    #####:   16:  double p;
+    #####:   17:  if (mu==0) {
+Zweig  0 niemals ausgef"uhrt
+Zweig  1 niemals ausgef"uhrt
+    #####:   18:    return(log(k == 0));
+Zweig  0 niemals ausgef"uhrt
+Zweig  1 niemals ausgef"uhrt
+Aufruf  2 niemals ausgef"uhrt
+Zweig  3 niemals ausgef"uhrt
+        -:   19:  } else {
+    #####:   20:    double lf = gsl_sf_lnfact (k); 
+Aufruf  0 niemals ausgef"uhrt
+        -:   21:
+    #####:   22:    p = k*log(mu) - lf - mu;
+Aufruf  0 niemals ausgef"uhrt
+    #####:   23:    return p;
+        -:   24:  }
+        -:   25:}
+        -:   26:
+        -:   27:/**********************************************************************
+        -:   28: * Log version of the Gamma pdf with mean a*b and variance a*b^2.
+        -:   29: *
+        -:   30: **********************************************************************/
+        -:   31:
+        -:   32:double
+        -:   33:gsl_ran_gamma_log_pdf (const double x, const double a, const double b)
+ 18720000:   34:{
+ 18720000:   35:  if (x < 0)
+Zweig  0 genommen 0%
+Zweig  1 genommen 100%
+        -:   36:    {
+        -:   37:      //This is problematic!
+    #####:   38:      return log(0) ;
+Aufruf  0 niemals ausgef"uhrt
+Zweig  1 niemals ausgef"uhrt
+        -:   39:    }
+ 18720000:   40:  else if (x == 0)
+Zweig  0 genommen 0%
+Zweig  1 genommen 100%
+        -:   41:    {
+    #####:   42:      if (a == 1)
+Zweig  0 niemals ausgef"uhrt
+Zweig  1 niemals ausgef"uhrt
+    #####:   43:        return log(1/b) ;
+Aufruf  0 niemals ausgef"uhrt
+Zweig  1 niemals ausgef"uhrt
+        -:   44:      else
+    #####:   45:        return log(0) ;
+Aufruf  0 niemals ausgef"uhrt
+Zweig  1 niemals ausgef"uhrt
+        -:   46:    }
+ 18720000:   47:  else if (a == 1)
+Zweig  0 genommen 1%
+Zweig  1 genommen 100%
+        -:   48:    {
+    70000:   49:      return -x/b - log(b) ;
+Aufruf  0 gibt 100% zur"uck
+Zweig  1 genommen 100%
+        -:   50:    }
+        -:   51:  else 
+        -:   52:    {
+ 18650000:   53:      double p;
+ 18650000:   54:      double lngamma = gsl_sf_lngamma (a);
+Aufruf  0 gibt 100% zur"uck
+ 18650000:   55:      p = (a-1)*log(x) - x/b - lngamma - a*log(b);
+Aufruf  0 gibt 100% zur"uck
+Aufruf  1 gibt 100% zur"uck
+ 18650000:   56:      return p;
+        -:   57:    }
+        -:   58:}
+        -:   59:
