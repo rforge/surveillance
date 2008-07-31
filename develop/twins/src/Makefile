@@ -74,8 +74,11 @@ fortran.o : fortran.f
 acm582.o : acm582.f
 	$(FC) -c $(CCCFLAGS) -o acm582.o acm582.f
 
+#estim:
+#	./estimate-multi  ${DATA}/hepatitisA.txt  ${DATA}/hepatitisA-xi.txt ../output/hepatitisA.log ../output/hepatitisA2.log 1000 10 1000 1000 1 0.25 lambda 1 1 nu 1 1 psi 1 0.1 1 1 1 1 1 1 1 0.000001 52 1 0 1 0 0 1 0 0 1 1 0 0 1 1 1 0 1 0.1 1 1
+
 estim:
-	estimate  ${DATA}/hepatitisA.txt  ${DATA}/hepatitisA-xi.txt ../output/hepatitisA.log ../output/hepatitisA2.log 1000 10 1000 1000 1 0.25 lambda 1 1 nu 1 1 psi 1 0.1 1 1 1 1 1 1 1 0.000001 52 1 0 1 0 0 1 0 0 1 1 0 0 1 1 1 0 1 0.1 1 1
+	./estimate-multi twins.ini
 
 profile:
 	gcov -b -f estimateI3.cc
