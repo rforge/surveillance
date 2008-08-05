@@ -17,11 +17,14 @@
 //#include <iostream.h>
 #include <iostream.h>
 #include <fstream.h>
+//#include "twins.hh"
+
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
 
+/* removing GSL code
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_rng.h>
@@ -32,11 +35,121 @@
 
 #define PI 3.141592654
 
+//The random generator
+gsl_rng *r;
+
+*/
+
+/* Replaced GSL library with R internal functions */
+#include <R.h>
+#include <Rmath.h>
+
 //////////////////////////////////
 //Globals
 /////////////////////////////////
-//The random generator
-gsl_rng *r;
+
+
+/* new definitions to replace GSL code */
+int r;
+
+double gsl_rng_uniform (int RNG) {
+  GetRNGstate();
+  double res = runif(0,1);
+  PutRNGstate();
+  return(res);
+}
+
+double gsl_ran_gaussian(int RNG, double sigma) {
+  GetRNGstate();
+  double res = rnorm(0.0,sigma);
+  PutRNGstate();
+  return(res);
+}
+
+double gsl_ran_gamma(int RNG, double a, double b) {
+  GetRNGstate();
+  double res = rgamma(a,b);
+  PutRNGstate();
+  return(res);
+}
+
+double gsl_ran_poisson(int RNG, double lambda) {
+  GetRNGstate();
+  double res = rpois(lambda);
+  PutRNGstate();
+  return(res);
+}
+
+
+double gsl_ran_binomial(int RNG, double p, unsigned int n) {
+  GetRNGstate();
+  double res = rbinom(n,p);
+  PutRNGstate();
+  return(res);
+}
+
+//hoehle: The original function assumes mu>0, which needs not be the case!
+//This version handles that part. This is the log version.
+
+double
+gsl_ran_poisson_log_pdf (const unsigned int k, const double mu)
+{
+  double p;
+  if (mu==0) {
+    return(log(k == 0));
+  } else {
+    double lf = lgammafn(k+1); /*gsl2R: gsl_sf_lnfact(k) */
+
+    p = k*log(mu) - lf - mu;
+    return p;
+  }
+}
+
+double gsl_sf_lngamma(double x) {
+  return(lgammafn(x));
+}
+
+double gsl_ran_beta_pdf (double x, double a, double b) {
+  return(dbeta(x,a,b,0));
+}
+
+/**********************************************************************
+ * Log version of the Gamma pdf with mean a*b and variance a*b^2.
+ *
+ **********************************************************************/
+
+double
+gsl_ran_gamma_log_pdf (const double x, const double a, const double b)
+{
+  if (x < 0)
+    {
+      //This is problematic!
+      return log(0) ;
+    }
+  else if (x == 0)
+    {
+      if (a == 1)
+        return log(1/b) ;
+      else
+        return log(0) ;
+    }
+  else if (a == 1)
+    {
+      return -x/b - log(b) ;
+    }
+  else 
+    {
+      double p;
+      /*gsl2R:      double lngamma = gsl_sf_lngamma (a);*/
+      double lngamma = lgammafn(a);
+      p = (a-1)*log(x) - x/b - lngamma - a*log(b);
+      return p;
+    }
+}
+
+
+
+
 
 //Setup params
 long seed;
@@ -3492,7 +3605,11 @@ else{
   double accratebr = 0;
   double accratepsi = 0;
 	
-  double tuneSampleSize = 1000<?burnin; 
+  /*hoehle: min/mac is deprecated
+    double tuneSampleSize = 1000<?burnin; 
+  */
+  double tuneSampleSize = MIN(1000,burnin);
+
   double need = 0; 
   double tunex = 0; 
   double tunepsi = 0; 
@@ -4122,7 +4239,205 @@ if(overdispersion){acclog << "psi\t" <<  psiRWSigma << "\t" << (double)acceptedP
 
   }//funktion
 
+/* hoehle: interface for calling twins from R */
  
+//Twins::Twins(char *iniFile,  long burnin, long filter,  long sampleSize, long seed, float arg_alpha_xi,  float arg_beta_xi, int T, int nfreq, float arg_psiRWSigma, float arg_alpha_psi, float arg_beta_psi) {
+
+
+  //void Twins_main (char *iniFile,  long burnin, long filter,  long sampleSize, long seed, float arg_alpha_xi,  float arg_beta_xi, int T, int nfreq, float arg_psiRWSigma, float arg_alpha_psi, float arg_beta_psi) {
+  //  void Twins_main (char *iniFile, long burnin) {
+//Twins::Twins(long burnin) {
+
+extern "C" { 
+  void Twins_main (char **iniFile_ptr, long *burnin_ptr, long *filter_ptr,  long *sampleSize_ptr, long *seed_ptr, float *alpha_xi_ptr,  float *beta_xi_ptr, int *T_ptr, int *nfreq_ptr, float *psiRWSigma_ptr, float *alpha_psi_ptr, float *beta_psi_ptr) {
+
+
+  //Splash screen
+  cout << "MCMC Estimation in BPLE Model v1.0 (with R interface). " << endl;
+  char *iniFile = new char[80];
+  iniFile = *iniFile_ptr;
+
+
+  cout << "The .ini file is: " << **iniFile_ptr << endl; 
+  cout << "Burnin: " << *burnin_ptr << endl;
+
+  char* dataFile;
+  char* dataFile2;
+  char* logFile;
+  char* logFile2;
+  
+
+
+  overdispersion = 1;
+  alpha_lambda = 1;
+  beta_lambda = 1;
+  alpha_nu = 1;
+  beta_nu = 1;
+  xRWSigma = 1;
+  varnu = 1;
+  alpha_a = 1;
+  alpha_b = 1;
+  beta_a = 1;
+  beta_b = 1;
+  int rw = 0;
+  la_rev = 1;
+  nu_trend = 0;
+  theta_pred_estim = 0;
+  xi_estim = 1;
+  delta_rev = 0;
+  xi_estim_delta = 0;
+  delta_a = 1;
+  delta_b = 1;
+  epsilon_rev = 0;
+  xi_estim_epsilon = 0;
+  epsilon_a = 1;
+  epsilon_b = 1;
+  la_estim = 1;
+  xi_estim_psi = 0;
+  K_geom = 0;
+  p_K = 0;
+  gamma_a = 1;
+  gamma_b = 0.000001;
+
+
+  char line[200];
+  ifstream iniIn(iniFile);
+
+  if (!iniIn.is_open())
+    { cout << "Error opening .ini file" << iniFile << endl; exit (1); }
+
+  char line2[200];
+  iniIn.getline(line,200,':');
+  iniIn.getline(line2,200,'\r');
+  dataFile = line2;
+
+  dataFile2 = dataFile;
+
+  char line3[200];
+  iniIn.getline(line,200,':');
+  iniIn.getline(line3,200,'\r');
+  logFile = line3;
+
+  char line4[200];
+  iniIn.getline(line,200,':');
+  iniIn.getline(line4,200,'\r');
+  logFile2 = line4;
+
+
+  /* hoehle -- new code  if called through interface */
+
+  long burnin = *burnin_ptr;
+  long filter = *filter_ptr;
+  long sampleSize = *sampleSize_ptr;
+  int T = *T_ptr;
+  int nfreq = *nfreq_ptr;
+
+  alpha_xi = *alpha_xi_ptr;
+  beta_xi = *beta_xi_ptr;
+  psiRWSigma = *psiRWSigma_ptr;
+  alpha_psi = *alpha_psi_ptr;
+  beta_psi = *beta_psi_ptr;
+  
+  /*
+
+  iniIn.getline(line,200,':');
+  iniIn.getline(line,200,'\r');
+  burnin = atol(line);
+
+  iniIn.getline(line,200,':');
+  iniIn.getline(line,200,'\r');
+  filter = atol(line);
+
+  iniIn.getline(line,200,':');
+  iniIn.getline(line,200,'\r');
+  sampleSize = atol(line);
+
+  iniIn.getline(line,200,':');
+  iniIn.getline(line,200,'\r');
+  seed = atol(line);
+
+  iniIn.getline(line,200,':');
+  iniIn.getline(line,200,'\r');
+  alpha_xi = atof(line);
+
+  iniIn.getline(line,200,':');
+  iniIn.getline(line,200,'\r');
+  beta_xi = atof(line);
+
+  iniIn.getline(line,200,':');
+  iniIn.getline(line,200,'\r');
+  T = atoi(line);
+
+  iniIn.getline(line,200,':');
+  iniIn.getline(line,200,'\r');
+  nfreq = atoi(line);
+
+
+  iniIn.getline(line,200,':');
+  iniIn.getline(line,200,'\r');
+  psiRWSigma = atof(line);
+
+  iniIn.getline(line,200,':');
+  iniIn.getline(line,200,'\r');
+  alpha_psi = atof(line);
+
+  iniIn.getline(line,200,':');
+  iniIn.getline(line,200,'\r');
+  beta_psi = atof(line);
+
+  cout << beta_psi << endl;
+
+  iniIn.close();
+  */
+
+
+  //////////////////////////////////////////////////////////////////////
+  //Log file
+  ofstream logfile,logfile2,accfile;
+  char *accFile = new char[200];
+  sprintf(accFile,"%s.acc",logFile);
+  logfile.open(logFile);
+  logfile2.open(logFile2);
+  accfile.open(accFile);
+  if (!logfile) { cerr << "Error opening the log file." << endl;exit(-1);}
+  if (!accfile) { cerr << "Error opening the acc file." << endl;exit(-1);}
+  //////////////////////////////////////////////////////////////////////
+
+
+  //Allocate a random number generator (we shall use a MT19937).
+  /*hoehle: moving from GSL to R */
+  /*r = gsl_rng_alloc(gsl_rng_mt19937);*/
+  r = 0;
+  
+  //Fix seed of generator to reproduce results.
+  /* gsl_rng_set(r,seed); */
+
+  //Read Data
+  long I;
+  long n;
+  long **Z;
+  double *xi= new double[1];
+
+	
+  Z = readData(dataFile,&n,&I);
+
+  //xi = readData(dataFile2,I);
+  xi[1] = 1;  
+  //cout << xi[1] << endl;
+
+  //Do the MCMC estimation, results are written to log.txt
+  bplem_estimate(0,logfile,logfile2,accfile,Z,xi,n,I,T,nfreq,burnin,filter,sampleSize, rw);
+  //cout <<"done"<<endl;
+  logfile.close();
+  logfile2.close();
+  accfile.close();
+  cout << "\nDone." << endl;
+  cout << "logfile is in \"" << logFile << "\"." << endl;
+  cout << "logfile2 is in \"" << logFile2 << "\"." << endl;
+}
+/* end of twins */
+
+}
 
 int main(int argc, char *argv[]) {
   //Splash screen
@@ -4287,10 +4602,12 @@ int main(int argc, char *argv[]) {
 
 
   //Allocate a random number generator (we shall use a MT19937).
-  r = gsl_rng_alloc(gsl_rng_mt19937);
+  /*hoehle: moving from GSL to R */
+  /*r = gsl_rng_alloc(gsl_rng_mt19937);*/
+  r = 0;
   
   //Fix seed of generator to reproduce results.
-  gsl_rng_set(r,seed);
+  /* gsl_rng_set(r,seed); */
 
   //Read Data
   long I;
