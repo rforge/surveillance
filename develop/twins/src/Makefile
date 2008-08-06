@@ -54,11 +54,13 @@ profile:
 profile2:
 	gprof estimateI3.exe gmon.out >profile.txt
 
+clean:
+	rm *.o estimate-multi
 
 shlib:
 #	R CMD SHLIB -c twins.cc twins_main.cc acm582.f fortran.f 
 #	R CMD SHLIB -c -o twins.so twins2.cc twins_main.cc acm582.f fortran.f 
 #	R CMD SHLIB -c twins.cc acm582.f fortran.f 
 	R CMD SHLIB -c twins.cc acm582.f fortran.f 
-clean:
-	rm *.o estimate-multi
+#	R CMD SHLIB -c twins2.cc
+#	R CMD SHLIB -c twins3.c
