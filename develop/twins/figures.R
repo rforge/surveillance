@@ -2,7 +2,7 @@
 
 #The following variables have to be set
 
-twinsPath <- "c:/Programme/twins/"
+twinsPath <- "/Users/hoehle/Surveillance/surveillance/develop/twins/"
 #path of the folder with the log files
 projPath <- paste(twinsPath,"output/hepatitisA/",sep="")
 #path of the folder where the figures are stored
@@ -83,7 +83,7 @@ wrapPlot <- function(expr, file="Rfigure",pre.par=NULL,
   #PDF THING
   pdf(file=full.path.pdf,width=width,height=height,
              onefile=onefile,family=wrapPlot.options$family,pointsize=pointsize,
-             paper=paper,horizontal=horizontal)
+             paper=paper)
   eval(pre.par)
   par(cex=1.5,mex=0.6,cex.axis=1,mar=c(4.2, 4.8,1.4,0.5),bty=wrapPlot.options$bty)
   eval(expr)
