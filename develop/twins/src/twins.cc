@@ -1,6 +1,6 @@
 /*******************************************************************
- * Author: Michael Höhle <hoehle@stat.uni-muenchen.de>
- *         Mathias Hofmann
+ * Author: Mathias Hofmann
+ *         Michael Höhle <hoehle@stat.uni-muenchen.de>
  *         Volker Schmid
  * Date:   April 2005 *
  *

@@ -102,7 +102,7 @@ pois.plot <- function(m.results,xlab="") {
        ylim=c(0,ymax),xlab=xlab,ylab="No. of cases",lwd=lwd[1])
 
   for (i in 2:length(plotorder)) {
-    lines(1:(m.results$n-1),m.results[[paste(plotorder[i])]][2:n],type="s",col=plotcols[i],lwd=lwd[i])
+    lines(1:(m.results$n-1),m.results[[paste(plotorder[i])]][2:m.results$n],type="s",col=plotcols[i],lwd=lwd[i])
   }
   legend(0,ymax,paste(plotorder),lwd=lwd,col=plotcols,horiz=T,y.intersp=0)
 }
