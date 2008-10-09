@@ -391,7 +391,7 @@ As seen, the function \verb+algo.glrnb+ allows many possibilities for doing surv
 
 
 
-% \include{extensions}
+%\include{extensions}
 
 %\renewcommand{\bibsection}{\section{REFERENCES}}
 \bibliography{references}
