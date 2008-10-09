@@ -1,0 +1,379 @@
+<<echo=F,results=hide>>=
+library(surveillance)
+library(xtable)
+options(SweaveHooks=list(fig=function() par(mar=c(5,4,4,0),cex.axis=1.5,cex.lab=1.5,cex.main=1.5)))
+options(width=70)
+set.seed(247)
+######################################################################
+#Do we need to compute or can we just fetch results
+######################################################################
+compute <- !file.exists(".Rresults")
+#compute <- TRUE
+#load computed results
+if(!compute) load(".Rresults")
+print(paste("Doing computations: ",compute,sep=""))
+@
+
+
+\section{Extensions}\label{sec:extensions}
+
+
+
+
+An important aspect of surveillance methods is the issue of their performance, measured e.g.\ by the sensitivity and the specificity. In \citet{kleinmannAbrams} a Receiver Operating Characteristic (ROC)-curve approach is proposed which gives special attention to the timeliness of the algorithm. The basic aim of their approach is to find a characteristic for choosing the threshold $c_{\gamma}$. 
+
+\subsection{Idea}
+
+The presented approach for computing the quality of surveillance algorithms is based on Monte-Carlo simulation. Time series of counts are simulated and for some of them events are injected. An event is a time point where a change from the in-control situation to the out-of-control situation has occurred. In the follow-up of an event an increase in the number of cases is taking place for several time points. 
+
+Now surveillance is done for all simulated time series and for those with event the fraction with a correct alarm and for those without event the fraction with no alarm is considered. Additionally the mean of the lag between an event and the next alarm is computed. By these measurements the quality of the surveillance algorithm is judged. 
+
+
+
+\subsection{Notation}
+
+Consider the case that we have $N$ time series of length $m$. The time series are simulated with $y_t$ $\sim$ Po($\mu_{0,t}$) where $\log(\mu_{0t})$ has the form of a seasonal model as in equation \ref{mu0}. For every time point $1 \leq t \leq m$ the GLR-statistic $GLR^r(t)$ is computed for every time series $r=1,...,N$. An alarm $A_r$ is given in time series $r$ at time point $t$, if $GLR^r(t) \geq c$, where $c$ is the threshold value. The time point of the first alarm in every time series $r$ is denoted by T($A_r$).
+
+For those $N_1$ time series with an injected event, randomly one time point $t$ (with $1 \leq t \leq m-a$) is chosen and some cases are added by multiplying the counts $y_t$,...,$y_{t+a}$ with a factor $\delta$ for time points $t$,...,$t+a$, where $a$ is the duration of an event. The starting point of the event in time series $r$ is denoted by T($E_r$). This corresponds to an additive increase on log-scale. The other $N_2=N-N_1$ are simulated without an event.
+
+
+  
+
+%The notation used in the following treatment is similar to \citet{kleinmannAbrams}.
+%Consider the case that surveillance is done for a time series of length $n$. The methods generates a value (e.g.\ the GLR-statistic $GLR(t)$) for every time point $1\leq t \leq n$ which is compared with a threshold $c$. If $GLR(t)>c$, a signal (alarm) at time point $t$ is generated. All $M_c$ signals generated at threshold $c$ are labeled as $s_{m,c}$, $m=1,...,M_c$. The corresponding time at wich the $m$'th signal is given, is denoted by $T(s_{m,c})$ and its duration as $d(s_{m,c})$. The $n-M_c$ time points which are no signals are labeled as $\bar{s}_{m,c}$, $m=1,...,n-M_c$.  
+
+%During these $n$ time points $V$ outbreaks have occured. Note that in real data, these time periods are unknown (in fact they are the target of our detection), but in simulated data they would be known. These outbreaks (events) are labeled by $e_1,...,e_V$. The time at which the outbreak $e_v$ began is $T(e_v)$ and its duration is $d(e_v)$.
+
+%It is desirable that we have a big intersection between the generated alarms and real events. If the duration of a true positive signal overlaps with the duration of an outbreak. So a signal $s_{m,c}$ is a hit for event $e_v$, if 
+%\begin{equation}\label{truepossignal}
+%\left( [T(s_{m,c})-d(s_{m,c}),T(s_{m,c})] \cap [T(e_v),T(e_v)+d(e_v) ]\right) \neq \emptyset.
+%\end{equation}
+
+%If $s_{m,c}$ is a hit for an event $e_v$ at threshold $c$, then $H(s_{m,c})=1$ and 0 otherwise. Similarly if $H(e_{v,c})=1$, this event is hit by any signal and 0 if the event is not detected.
+%The true positive rate (sensitivity) is computed as 
+%\begin{equation}\label{TP}
+%TP(c)= \sum_{v=1}^V H(e_{v,c})/V,
+%\end{equation}
+%the false positive rate (1 less the specificity) is the proportion of signals that are no hits.
+%\begin{equation}\label{FP}
+%FP(c_{\gamma})= \sum_{m=1}^{M_{c_{\gamma}}} H(s_{m,c_{\gamma}}|\text{signal no hit})/M_{c_{\gamma}}.
+%\end{equation}
+
+%Beside the sensitivity and the specificity the timeliness is an important aspect of surveillance. The time difference function is defined as in \citet{kleinmannAbrams} as $\text{TD}(a,b)=T(a)-T(b)$. The lag between an event $e_v$ and the correspondig signal $s_{m,c}$ is TD($s_{m,c},e_v$). Usually the lag between an event and the next signals is measured.
+
+\subsection{Computing the quality measures}
+
+Now quality measures out of the $N$ simulated time series are computed as follows. The number of correct alarms (true positive ($TP$) counts) is 
+
+$$ TP = \sum_{r=1}^{N_1} \text{I}(\text{T}(A_r) \in \left[\text{T}(E_r),\text{T}(E_r) + d \right]) , $$
+
+where I() is the indicator function and $d$ is the allowed lag for the algorithm to detect the event. This is necessary, because CUSUM-charts have to collect data, until a change from the in-control to the out-of-control situation can be discovered. On the other hand the number of events that where not hit by an alarm (false negative counts) is
+
+$$ FN = \sum_{r=1}^{N_1} \text{I}(\text{T}(A_r) \notin \left[\text{T}(E_r),\text{T}(E_r) + d \right]) = N_1 - TP . $$
+
+For those $N_2$ time series the number of false positive counts is 
+
+$$ FP = \sum_{r=1}^{N_2} \text{I}(\text{T}(A_r) \in [1,m]) , $$
+
+which is the total number of time series with alarm but no event. The number of correct classified time series (true negative counts) is  
+
+$$ TN = \sum_{r=1}^{N_2} \text{I}(\text{T}(A_r) \notin [1,m]) , $$
+
+which means that no alarm is given during the $m$ time points under surveillance. Now the sensitivity is
+
+$$ \text{sens} = \frac{TP}{TP+FN} $$ and the specificity is
+
+$$ \text{spec} = \frac{FP}{FP+TN}. $$ The timeliness is measured by the mean of the lag in those time series where the alarm hits the event:
+
+$$ \text{mlag} = \frac{1}{TP} \sum_{r=1}^{N_1} (T(A_r)-T(E_r)|(T(A_r)-T(E_r)) \in [0,d]). $$ 
+
+The condition is necessary, because if the $T(A_r)-T(E_r) < 0$ the alarm is given before the event and so a false positive alarm is given and if $T(A_r)-T(E_r) > 0$ holds, the alarm was to late to hit the event. It is reasonable to use only the lag of the correct alarms to judge the timeliness.  
+
+
+%A signal hits an event if its duration overlaps with the time points being part of any event. The duration of a signal $d(s_{m,c})$ can be interpreted as the allowed lag for detecting an event. It is assumed, that this lag is the same for every signal $s_{m,c}$, $m=1,...,M_c$ and denoted by $d_1$. Usually this will be some lag from once an event occurs until the algorithm collects enough data to generate a signal. With this knowledge we can define the true postive rate of the algorithm. For the $M_c$ signals at threshold $c$ the number of true positves TP($c$) is computed as
+
+%\begin{equation} \label{TP}
+%\text{TP}(c) = \sum_{m=1}^{M_c} \text{I}(([T(e_v), T(e_v) + d(e_v)],v=1,...,V) \cap [T(s_{m,c})-d_1,T(s_{m,c})] \neq \emptyset), 
+%\end{equation}
+
+%where I() denotes the indicator funtion which is 1, if the condition is fulfilled an 0 otherwise. The number of false postive (FP) signals is the number of signals that hit no events:
+
+%\begin{equation} \label{FP}
+%\text{FP}(c) = M_c - \text{TP}(c). 
+%\end{equation}
+
+%On the other hand there can be an event $e_v$ that is not hit by any signal. The false negative (FN) count is the number of non-signals $\bar{s}_{m,c}$, $m=1,...,n-M_c$ that hit an event. Here also a lag $d_0$ is introduced, which can be different from $d_1$. So the number of the negative counts at threshold $c$ is  
+
+%\begin{equation} \label{FN}
+%\text{FN}(c) = \sum_{m=1}^{n-M_c} \text{I}(([T(e_v), T(e_v) + d(e_v)],v=1,...,V) \cap [T(\bar{s}_{m,c})-d_0,T(\bar{s}_{m,c})] \neq \emptyset). 
+%\end{equation}
+
+%The number of time points which are no signals and hit no event is the number of true negative (TN) counts and is computed as
+
+%\begin{equation} \label{TN}
+%\text{TN}(c) = n- M_c - \text{FN}(c). 
+%\end{equation}
+
+%The LR and GLR-charts collect data as long as the null hypothesis is not rejected. The advantage of defining the lags $d_0$ and $d_1$ is, that the fact, that the timeliness of the algorithms is considered. 
+
+%From the values of TP($c$), TN($c$), FP($c$) and FN($c$) the sensitivity (sens) and the specifity (spec)  for a threshold $c$ can be computed:
+
+%\begin{equation} \label{sens_spec}
+%\text{sens}(c) = \frac{TP(c)}{FN(c) + TP(c)} \text{ and }  \text{spec(c)} = \frac{TN(c)}{FP(c) + TN(c)}.
+%\end{equation}
+
+%In the next section a simultaneous examination of these two measurements is performed.
+
+
+\subsection{ROC-curves}
+
+These measures can be combined in a ROC-curve. A small value for $c$ will result in a large value for the sensitivity but results in a small specificity and vice versa. A tool for showing the performance of a classifier independent of threshold is the ROC-curve 
+$$ \text{ROC}(.)= \{(1-\text{spec}(c),\text{sens}(c)), c \in (- \infty,\infty)\} .$$
+Once a ROC-curve has been constructed it can also be used to determine an optimal threshold. The result is a monotone step function from point (0,0) at $c=\infty$ to the point (1,1) at $c=0$. An optimal value would be in point (0,1). For more details on ROC-curves see \citet{Pepe}.
+
+Additionally the timeliness can be considered if the mean of the time difference between the events an the next signal and can be plotted in the third dimension for every threshold $c$.
+
+
+
+\subsection{Implementation}
+
+The computation for simulated time series of counts can be done with the function \verb+quality2+ and plots of ROC-curves can be done with the function \verb+ROC.plotter+ (see help-files for more information on these functions).
+
+<<echo=F,eval=T>>=
+quality2 <- function(mod,N=100,m=100,rho=0.5,delta=1.5,c=5,a=d,d=5){
+set.seed(247)
+data <- matrix(NA,N,m)
+
+# simulate the data
+for (i in 1:N){
+data[i,] <- rpois(m,lambda=predict(mod,newdata=data.frame(t=1:m)))
+}
+
+# design the control object
+# choose a big value for c, this is changed later anyway
+control <- list(range=1:m,c.ARL=5, Mtilde=1, mu0=predict(mod,newdata=data.frame(t=1:m)),c.ARL=999, alpha=0, change="intercept",ret="value",dir="inc")
+
+# add some events
+
+# choose the time series which get an event
+events <- sample(1:N,size=round(rho*N))
+Nevents <- length(events)
+
+# sample time point of event, not at end of time series
+# to give the algorithm a chance to detect it
+timeOfEvent <- sample(1:(m-a),size=Nevents,replace=TRUE)
+
+# add the additional cases:
+for (i in 1: Nevents){
+data[events[i],timeOfEvent[i]:(timeOfEvent[i]+ a)] <- data[events[i],timeOfEvent[i]:(timeOfEvent[i]+ d)] *delta
+}
+
+
+
+# create disProgObjects and perform surveillance for the N time series
+# save the GLR-statistic for further computations
+GLR <- matrix(NA,N,m)
+for (i in 1:N){
+state <- rep(0,m)
+# if there was an event
+# if (i %in% events) state[timeOfEvent[i]:(timeOfEvent[i] + d)] <- 1
+disProg <- create.disProg(week=1:m,observed=data[i,],state=state)
+SurvRes <- algo.glrnb(disProg,control=control)
+GLR[i,] <- SurvRes$upperbound
+}
+
+# if no values for c are given, use the GLR-values as threshold,
+# so a ROC-curve can be designed
+if (is.null(c)){
+# in samples without outbreak only the maximum value is of interest
+maxGLR <- apply(GLR[-events,],1,max)
+# in samples with outbreak the maximum value before and after the outbreak is or interest
+for (i in 1:Nevents){
+maxBefore <- max(GLR[events,][i,1:(timeOfEvent[i]-1)])
+maxAfter <-  max(GLR[events,][i,timeOfEvent[i]:m])
+maxGLR <- c(maxGLR,maxBefore,maxAfter)
+}
+
+# only take the unique values and sort the threshold <- vector
+c <- sort(unique(maxGLR))
+}
+
+# initialize the values
+TP <- TN <- FP <- FN <- sens <- spec <- mlag <- rep(NA,length(c))
+
+# now compute the quality for every threshold c
+
+for (i in 1:length(c)){
+# the time series without event give the number of FP
+FP[i] <- sum((apply(GLR[-events,],1,max))>=c[i])
+
+# compute the time difference between the event and the signal
+timeOfAlarm <- rep(NA,Nevents)
+# get the timepoint of the first alarm
+suppressWarnings(for (j in 1:Nevents) timeOfAlarm[j] <- min(which(GLR[events,][j,]>=c[i])))
+# compute the lag as the time difference between signal and event
+lag <- timeOfAlarm - timeOfEvent
+
+# compute the quality measures
+TP[i] <- sum(lag %in% c(0:d))
+FP[i] <- FP[i] + sum(lag < 0)
+FN[i] <- sum(lag > d)
+TN[i] <- N - TP[i] - FP[i] - FN[i]
+sens[i] <- TP[i]/(FN[i]+TP[i])
+spec[i] <- TN[i]/(FP[i]+TN[i])
+mlag[i]  <- mean(lag[lag %in% c(0:d)])
+}
+
+# return the values
+result <- data.frame(c=c,TP=TP,FP=FP,FN=FN,TN=TN,sens,spec,mlag=mlag)
+#return(list(mlag=mean(lag[lag %in% c(0:d)]),TP=TP,FP=FP,FN=FN,TN=TN,sens=TP/(FN+TP),spec=TN/(FP+TN)))
+return(result)
+}
+
+
+
+
+
+
+ROC.plotter <- function(quality,ROC.type="2D",...){
+ library(scatterplot3d)
+ library(rgl)
+ 
+ sens <- quality$sens
+ spec <- quality$spec
+
+if (ROC.type == "2D"){
+  plot(sens~c(1-spec),type="l",ylim=c(0,1),xlim=c(0,1),ylab="sensitivity",xlab="1-specificity")
+  lines(x=c(max(1-spec),1), y=c(max(sens),1))
+  lines(x=c(min(1-spec),0), y=c(min(sens),0))
+}
+
+if (ROC.type == "3D"){
+x <- c(1-quality$spec)
+y <- c(quality$sens)
+z <- c(quality$mlag)
+scatterplot3d(x,y,z,type="l",pch=16,angle=25,xlab="1-Spezifität",ylab="Sensitivität",zlab="mlag",...)-> plotobj 
+scatterplot3d(x,y,z,type="l",pch=16,angle=25,xlab="1-Spezifität",ylab="Sensitivität",zlab="mlag",...)
+plotobj$points3d(x,y,rep(0,times=length(x)),type="l",col="grey")
+#plot3d(x,y,z,type="l",xlab="1-specificity",ylab="sensitivity",zlab="mlag")
+} 
+}
+@
+%Describtion of the parameters:
+
+%\begin{itemize}
+%\item \texttt{SurvRes}: Object of class SurvRes
+%\item \texttt{d0}:   admissible lag between an outbreak an the next alarm ($L_0$)
+%           if TD > d0, the event is not detected by any signal (-> FN),
+%           otherwise an TN is counted
+%\item  \texttt{d1}:   admissible time dance between an alarm and the event that caused it
+%           if TD > d1, the signal has no connection to an event and so a false
+%           postive is recognized, otherwise a true positive   
+%\item  \texttt{state}:   (optionally) if no object of class survRes is commited, the state chain
+%           can be specified instead
+%\item  \texttt{alarm}:   see state
+%\item  \texttt{c.ARL}:   threshold $c$ for judging the quality, usually the threshold from the
+%           call of the surveillance algorithm is used, can be changed, so that no rerun
+%           of the surveillance method is necessary 
+
+%\item \texttt{Return Value}:
+% a list containing the number of TP, TN, FP and FN
+%\end{itemize}
+
+\subsection{Results} 
+
+
+
+%The proposed metrics are now applied to a simulated data set. In the first step surveillance is done with the function \verb+alog.glrnb+.
+
+%<<echo=F,eval=T>>=
+%# for the computation of mu0
+%control = list(range=150:300)
+%surv.sim <- algo.glrnb(simData,control=control)
+%mu0.known <- rep(surv.sim$control$mu0,2)
+%@
+
+%<<echo=T,eval=T>>=
+%control = list(range=1:300,mu0=mu0.known,c.ARL=5,alpha=0)
+%surv.sim2 <- algo.glrnb(simData,control=control)
+%@
+
+%<<fig=T,echo=F,width=13,height=6>>=
+%plot(surv.sim2,startyear=2001)
+%@
+
+%Now the result is analysed with ROC-curves and diffrent choices for $d_0$ and $d_1$. 
+
+%<<fig=T,echo=F,width=13,height=10>>=
+%par(mfrow=c(2,2))
+%plot.ROC(surv.sim,d0=0,d1=0)
+%plot.ROC(surv.sim,d0=3,d1=0)
+%plot.ROC(surv.sim,d0=0,d1=3)
+%plot.ROC(surv.sim,d0=3,d1=3)
+%par(mfrow=c(1,1))
+%@
+
+
+%\subsection{Open Issues}
+
+%\begin{itemize}
+%\item how to handle with outbreak with length $>1$ ?
+%\item how to choice $L_0$ and $L_1$ ?
+%\item use max(timepoint of last alarm,$L_0$) instead of $L_0$ (note: in this case, no strict increasing ROC-curve can be garanted)
+%\item include timeliness 
+%\end{itemize} 
+
+
+<<echo=F,eval=T>>=
+S <- 1 ; t <- 1:120 ; m <- length(t)
+beta <- c(1.5,0.6,0.6)
+omega <- 2*pi/52
+#log mu_{0,t}
+alpha <- 0.2
+base <- beta[1] + beta[2] * cos(omega*t) + beta[3] * sin(omega*t) 
+#Generate example data with change point and tau=tau
+tau <- 100
+kappa <- 0.4
+mu0 <- exp(base)
+mu1 <- exp(base  + kappa) 
+
+#Generate data
+set.seed(42)
+x <- rnbinom(length(t),mu=mu0*(exp(kappa)^(t>=tau)),size=1/alpha)
+s.ts <- create.disProg(week=1:length(t),observed=x,state=(t>=tau))
+
+#Run 
+cntrl = list(range=50:120,c.ARL=5, Mtilde=1, mu0=NULL, alpha=alpha, change="intercept",ret="value",dir="inc")
+glr.ts <- algo.glrnb(s.ts,control=c(cntrl))
+
+
+
+mod <- glr.ts$control$mu0Model$fitted[[1]]
+@
+
+
+Now the quality measures are computed by 1000 Monte-Carlo simulations (500 with injected event) of time series of length 100 for 8 different threshold values. The following seasonal model is used for the simulation of the in-control mean.
+
+<<echo=T,eval=T>>=
+mod
+@
+
+The fife in-control values after an injected event are multiplied with the factor 3.4 to get the out-of-control situation. The function \verb+quality2+ now gives the following result:
+
+<<echo=T,eval=T>>=
+quality2(mod,1000,100,delta=3.4,c=2:9)
+@
+
+The values of sensitivity and specificity can be combined in a ROC-curve, which can be found in the following plot. Note that here all different GLR-statistics $GLR^r(t)$ have be used as threshold values an not only the values from above.
+
+<<fig=T,echo=F,width=13,height=10>>=
+qa <- quality2(mod,100,100,delta=4.4,c=NULL)
+ROC.plotter(qa,"2D")
+@
+
+<<fig=T,echo=F,width=13,height=10>>=
+ROC.plotter(qa,"3D")
+@
+
+%\section{Discussion and Future work}
+
