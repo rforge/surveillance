@@ -29,6 +29,12 @@
 \alias{logLik.ah}
 \alias{logLik.ahg}
 %
+%twins function not documented
+\alias{make.nu}
+\alias{make.pois}
+\alias{pois.plot}
+\alias{tms.plot}
+
 \title{Internal surveillance Functions}
 \description{
   Undocumented internal \code{surveillance} functions. If you really

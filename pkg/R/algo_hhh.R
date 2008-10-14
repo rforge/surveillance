@@ -1743,14 +1743,13 @@ getLambda <- function(theta.epidemic, designRes, t.weights=1){
 
   } else { #todo: check
     return(NULL)
-    lambdaMatrix <- matrix(lambda,ncol=nareas,nrow=nareas,byrow=TRUE)
-    nOfNeighbours <- rowSums(nhood)
-    piMatrix <- matrix((1-prop)/nOfNeighbours,ncol=nareas,nrow=nareas,byrow=TRUE)
-    piMatrix[nhood==0] <-0
-    diag(piMatrix)<-prop
-  
-    Lambda <- lambdaMatrix*piMatrix
-    
+#hoehle 14 Oct 2008 - commented, coz it contains warnings for R CMD check
+#    lambdaMatrix <- matrix(lambda,ncol=nareas,nrow=nareas,byrow=TRUE)
+#    nOfNeighbours <- rowSums(nhood)
+#    piMatrix <- matrix((1-prop)/nOfNeighbours,ncol=nareas,nrow=nareas,byrow=TRUE)
+#    piMatrix[nhood==0] <-0
+#    diag(piMatrix)<-prop
+#    Lambda <- lambdaMatrix*piMatrix
   }
   return(Lambda)
 }
