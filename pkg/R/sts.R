@@ -193,6 +193,14 @@ setMethod("nrow", "sts", function(x) return(nrow(x@observed)))
 setMethod("ncol", "sts", function(x) return(ncol(x@observed)))
 setMethod("dim", "sts", function(x) return(dim(x@observed)))
 setMethod("colnames", signature=c(x="sts",do.NULL="missing",prefix="missing"), function(x,do.NULL, prefix) return(colnames(x@observed)))
+#Extract the corresponding year for each observation using
+#the sts@start information
+setGeneric("year", function(x, ...) standardGeneric("year"));
+setMethod("year", "sts", function(x,...) return((x@week-1) %/% x@freq + x@start[1]))
+#Extract which observation within year we have
+setGeneric("obsinyear", function(x, ...) standardGeneric("obsinyear"));
+setMethod("obsinyear", "sts", function(x,...) return( (sts@week-1 + sts@start[2]-1) %% sts@freq + 1))
+
 
 #####################################################################
 #[-method for accessing the observed, alarm, etc. objects
@@ -836,6 +844,5 @@ setMethod( "show", "sts", function( object ){
   cat("\nhead of neighbourhood:\n")
   print( head(object@neighbourhood,n))
 } )
-
 
 

@@ -4,9 +4,7 @@
 \encoding{latin1}
 \title{Model fit based on a two-component epidemic model} 
 \description{
-        Fits a Poisson/negative binomial model with mean \eqn{\mu_{it}}{\mu_it} 
-        (as described in Held/Höhle/Hofmann, 2005) to a multivariate 
-        time series of counts.  
+  Fits a Negative binomial model (as described in Held et al. (2006) to an univariate time series of counts.  
 }
 \usage{
 algo.twins(disProgObj, control=list(burnin=1000, filter=10,
@@ -17,38 +15,20 @@ algo.twins(disProgObj, control=list(burnin=1000, filter=10,
   \item{disProgObj}{object of class \code{disProg}}
   \item{control}{control object:
         \describe{
-        \item{\code{lambda}}{If \code{TRUE} an autoregressive 
-              parameter \eqn{\lambda} is included, if \code{lambda} is a vector of logicals,
-              unit-specific parameters \eqn{\lambda_i} are included. By default, observations \eqn{y_{t-lag}}{y_t-lag}
-              at the previous time points, i.e. \eqn{lag=1}, are used for the autoregression. Other lags can be
-              used by specifying \code{lambda} as a vector of integers, see Examples and \code{\link{meanResponse}} for details.}
-        \item{\code{neighbours}}{If \code{TRUE} an autoregressive parameter for 
-              adjacent units \eqn{\phi} is included, if \code{neighbours} is a vector of logicals,
-              unit-specific parameters \eqn{\phi_i} are included. By default, observations \eqn{y_{t-lag}}{y_t-lag}
-              at the previous time points, i.e. \eqn{lag=1}, are used for the autoregression. Other lags can be
-              used by specifying \code{neighbours} as a vector of integers.}
-        \item{\code{linear}}{a \code{logical} (or a vector of logicals) indicating wether a linear 
-              trend \eqn{\beta} (or a linear trend \eqn{\beta_i} for each unit)
-              is included}
-        \item{\code{nseason}}{Integer number of Fourier frequencies; if \code{nseason} is a vector
-              of integers, each unit \eqn{i} gets its own seasonal parameters }
-        \item{\code{negbin}}{if \code{"single"} negative binomial rather than poisson is used,
-              if \code{"multiple"} unit-specific overdispersion parameters are used.}
-        \item{\code{proportion}}{see details in \code{\link{meanResponse}} }
-        \item{\code{lag.range}}{determines which observations are used to fit the model }
-        }}        
-%  \item{thetastart}{vector with starting values for all parameters specified
-%      in the control object (for \code{optim}).  } 
-%  \item{verbose}{if \code{true} information about convergence is printed}
-
+        \item{\code{burnin}}{Number of burn in samples.}
+        \item{\code{filter}}{Thinning parameter. If \code{filter = 10} every 10th sample is after the burn in is returned.}
+        \item{\code{sampleSize}}{Number of returned samples. Total number of samples = \code{burnin+filter*sampleSize}}
+        \item{\code{alpha_xi}}{Parameter \eqn{\alpha_{\xi}}{\alpha_\xi} of the hyperprior of the epidemic parameter \eqn{\lambda}{\lambda}}
+        \item{\code{beta_xi}}{Parameter \eqn{\beta_{\xi}}{\beta_\xi} of the hyperprior of the epidemic parameter \eqn{\lambda}{\lambda}}
+        \item{\code{psiRWSigma}}{Starting value for the tuning of the variance of the random walk proposal for the overdispersion parameter \eqn{\psi}{\psi}.}
+        \item{\code{alpha_psi}}{Parameter \eqn{\alpha_{\psi}}{\alpha_\psi} of the prior of the overdispersion parameter \eqn{\psi}{\psi}}
+        \item{\code{beta_psi}}{Parameter \eqn{\beta_{\psi}}{\beta_\psi} of the prior of the overdispersion parameter \eqn{\psi}{\psi}}
+        \item{\code{logFile}}{Base file name for the output files. The function writes three output files in your current working directory (i.e. getwd()). If \code{logfile = "twins.log"} the results are stored in the three files "twins.log", "twins.log2" and "twins.log.acc".  
+        "twins.log" containes the returned samples of the parameters \eqn{\psi}{\psi}, \eqn{\gamma_{0}}{\gamma_0}, \eqn{\gamma_{1}}{\gamma_1}, \eqn{\gamma_{2}}{\gamma_2}, K, \eqn{\xi_{\lambda}}{\xi_\lambda} \eqn{\lambda_{1},...,\lambda{n}}{\lambda_1,...,\lambda_{n}}, the predictive distribution of the number of cases at time \eqn{n+1} and the deviance.   
+        "twins.log2" containes the sample means of the variables \eqn{X_{t}, Y_{t}, \omega_{t}}{X_t, Y_t, \omega_t} and the relative frequency of a changepoint at time t for t=1,...,n and the relative frequency of a predicted changepoint at time n+1.  
+        "twins.log.acc" contains the acceptance rates of \eqn{\psi}{\psi}, the changepoints and the endemic parameters \eqn{\gamma_{0}}{\gamma_0}, \eqn{\gamma_{1}}{\gamma_1}, \eqn{\gamma_{2}}{\gamma_2} in the third column and the variance of the random walk proposal for the update of the parameter \eqn{\psi}{\psi} in the second column.}
 }
-\value{Returns an object of class \code{atwins} with elements 
-  \itemize{
-    \item{control}{specified control object}
-    \item{disProgObj}{specified \code{disProg}-object}
-    \item{logFile}{MISSING!!}
-    \item{logFile2}{MISSING!!}
-  }
+}
 }
 \details{Note that for the time being this function is not a
   surveillance algorithm, but only a modelling approach as described in
@@ -58,7 +38,19 @@ algo.twins(disProgObj, control=list(burnin=1000, filter=10,
   working directory (i.e. getwd()): twins.log, twins.log.acc and twins.log2
   Thus you need to have write permissions in the current getwd() directory.
 }
-\author{M. Hofmann and M. Höhle}
+\value{Returns an object of class \code{atwins} with elements 
+  \itemize{
+    \item{control}{specified control object}
+    \item{disProgObj}{specified \code{disProg}-object}
+    \item{logFile}{containes the returned samples of the parameters \eqn{\psi}{\psi}, \eqn{\gamma_{0}}{\gamma_0}, \eqn{\gamma_{1}}{\gamma_1}, \eqn{\gamma_{2}}{\gamma_2}, K, \eqn{\xi_{\lambda}}{\xi_\lambda} \eqn{\lambda_{1},...,\lambda{n}}{\lambda_1,...,\lambda_{n}}, the predictive distribution and the deviance.}
+    \item{logFile2}{containes the sample means of the variables \eqn{X_{t}, Y_{t}, \omega_{t}}{X_t, Y_t, \omega_t} and the relative frequency of a changepoint at time t for t=1,...,n and the relative frequency of a predicted changepoint at time n+1.} 
+}
+}
+\references{Held, L., Hofmann, M., H�hle, M. and Schmid V. (2006) A two-component
+  model for counts of infectious diseases, Biostatistics, \bold{7}, pp.
+  422--437.
+}
+\author{M. Hofmann and M. H�hle}
 \examples{
 
 #Load the data used in the Held et al. (2006) paper
@@ -81,10 +73,6 @@ print(summary(mcmc(otwins$logFile[,c("psi","xipsi","K")])))
 }
 \keyword{ts}
 \keyword{regression}
-\source{L. Held, M. Hofmann, M. Höhle and V. Schmid, A two-component
-  model for counts of infectious diseases (2006), Biostatistics, 7, pp.
-  422–437.
-}
 
 
 
