@@ -382,6 +382,7 @@ algo.rogerson <- function(disProgObj,
 
   if (is.null(control$s)) { stop("Error: the s value is not specified") }
   if (is.null(control$hValues)) { stop("Error: the hValues are not specified") }
+#  if (is.null(control$ARL0)) { stop("Error: no ARL0 value specified") }
 
   #Default value is poisson
   control$distribution <- match.arg(control$distribution,c("poisson","binomial"))
@@ -444,7 +445,7 @@ algo.rogerson <- function(disProgObj,
   cusum <- matrix(0,nrow=(size+1), ncol=nAreas*reps)
   cusum[1,] <- fir
   alarm <- matrix(data = 0, nrow = (size+1), ncol = nAreas*reps)
-# upperbound <- matrix(0,nrow=(size),ncol=reps)
+  upperbound <- matrix(0,nrow=(size+1),ncol=reps)
 
   #CUSUM as in Rogerson (2004)
   for(t in 1:size){
@@ -468,27 +469,31 @@ algo.rogerson <- function(disProgObj,
       cusum.t <- cusum[t,]
       cusum.t[alarm[t,]==1] <- pmin(cusum[t,], control$limit*h)[alarm[t,]==1]
       cusum[t+1,]<- pmax(0, cusum.t + ct*(x[t,]-kt))
-    } else
+    } else {
       cusum[t+1,]<- pmax(0, cusum[t,] + ct*(x[t,]-kt))
-
+    }
     # give alarm if the cusum is larger than h
     alarm[t+1,] <- cusum[t+1,] >= h
-#    #upperbound[t,] <- (h-cusum[t,])/ct + kt
+    # in case speed is premium then one might want to comment this line
+    upperbound[t+1,] <- ceiling( (h-cusum[t,])/ct + kt) 
+
+    # ensure upper bound is between 0 and 1 - this can be removed
+    if (upperbound[t+1,] < 0) { upperbound[t+1,] <- 0}
+    if (upperbound[t+1,] > nt[t]) { upperbound[t+1,] <- nt[t] }
   }
 
-  # ensure upper bound is positive
-  #upperbound[upperbound < 0] <- 0
 
   # discard cusum[1] and alarm[1]
   cusum <- as.matrix(cusum[-1,])
   alarm <- as.matrix(alarm[-1,])
+  upperbound <- as.matrix(upperbound[-1,])
 
   #Add name and data name to control object.
   control$name <- paste("CUSUM Rogerson:",control$distribution)
   control$data <- paste(deparse(substitute(disProgObj)))
 
   # return alarm and upperbound vectors
-  result <- list(alarm = alarm, upperbound = cusum, disProgObj=disProgObj,control=c(control,list(h=h)))
+  result <- list(alarm = alarm, upperbound = upperbound, disProgObj=disProgObj,control=c(control,list(h=h)))
   class(result) = "survRes" # for surveillance system result
   return(result)
 }

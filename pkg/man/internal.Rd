@@ -11,6 +11,7 @@
 \alias{insert.zeroes}
 \alias{wait}
 \alias{init.sts}
+\alias{merge.list}
 %Functions from M.Paul
 \alias{commonDenom}
 \alias{logInterpolation}

@@ -16,19 +16,21 @@ wrap.algo <- function(sts, algo, control,
                       verbose=TRUE,...) {
   #Number of time series
   nAreas <- ncol(sts@observed)
+  nTimePoints <- nrow(sts@observed)
   nAlarm <- length(control$range)
-  #Adjust alarm matrix so we have the same number of values as control$range
-  sts@alarm <- matrix(NA,ncol=nAreas,nrow=nAlarm)
-  sts@upperbound <- matrix(NA,ncol=nAreas,nrow=nAlarm)
 
-  #Loop
+  #Create alarm matrix having same size as sts
+  sts@alarm <- matrix(NA,ncol=nAreas,nrow=nTimePoints,dimnames=dimnames(sts@observed))
+  sts@upperbound <- matrix(NA,ncol=nAreas,nrow=nTimePoints,dimnames=dimnames(sts@observed))
+
+  #Loop over all regions
   for (k in 1:nAreas) {
     if (verbose) {
       cat("Running ",algo," on area ",k," out of ",nAreas,"\n")
     }
     
-    ##Create an old S4 disProg object
-    disProg.k <- create.disProg(sts@week, sts@observed[,k], sts@state[,k], freq=sts@freq, start=sts@start)
+    ##Create an old S3 disProg object
+    disProg.k <- sts2disProg(sts[,k])
 
     #Use the univariate algorithm (possibly preprocess control object)
     kcontrol <- control.hook(k)
@@ -36,18 +38,20 @@ wrap.algo <- function(sts, algo, control,
     
     #Transfer results to the S4 object
     if (!is.null(survRes.k)) {
-      sts@alarm[,k] <- survRes.k$alarm
-      sts@upperbound[,k] <- survRes.k$upperbound
+      sts@alarm[control$range,k] <- survRes.k$alarm
+      sts@upperbound[control$range,k] <- survRes.k$upperbound
 
       #Control object needs only to be set once
       sts@control <- survRes.k$control
     }
   }
 
-  #Throw away the un-needed observations
+  #Reduce sts object to only those obervations in range
   sts@observed <- sts@observed[control$range,,drop=FALSE]
   sts@state <- sts@state[control$range,,drop=FALSE]
   sts@populationFrac <- sts@populationFrac[control$range,,drop=FALSE]
+  sts@alarm <- sts@alarm[control$range,,drop=FALSE]
+  sts@upperbound <- sts@upperbound[control$range,,drop=FALSE]
   
   #Fix the corresponding start entry
   start <- sts@start
@@ -56,7 +60,7 @@ wrap.algo <- function(sts, algo, control,
   start.sampleNo <- (new.sampleNo - 1) %% sts@freq + 1
   sts@start <- c(start.year,start.sampleNo)
 
-  #Ensure dimnames
+  #Ensure dimnames in the new object
   sts <- fix.dimnames(sts)
   
   return(sts)
@@ -113,9 +117,21 @@ rogerson <- function(sts, control = list(range=range, theta0t=NULL,
                             nt=NULL, FIR=FALSE,limit=NULL, digits=1),...) {
   #Hook function to find right theta0t vector
   control.hook = function(k) {
-    control$hValues <- hValues(theta0 = control$theta0t[,k], ARL0=control$ARL0, control$s , distr = control$distribution)$hValues
+    #If no hValues given then compute them
+    if (is.null(control[["hValues",exact=TRUE]])) {
+      control$hValues <- hValues(theta0 = unique(control$theta0t[,k]), ARL0=control$ARL0, s=control$s , distr = control$distribution)$hValues
+    }
+    #Extract values relevant for the k'th component
     control$theta0t <- control$theta0t[,k]
-#    print(control)
+    if (is.null(control[["nt",exact=TRUE]])) {
+      control$nt <- sts@populationFrac[range,]
+    } else {
+      if (!all.equal(sts@populationFrac[range,k],control$nt[,k])) {
+        warning("Warning: nt slot of control specified, but specified population differs.")
+      } else {
+        control$nt <- control$nt[,k]
+      }
+    }
     return(control)
   }
   #WrapIt
