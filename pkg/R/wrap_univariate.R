@@ -52,7 +52,10 @@ wrap.algo <- function(sts, algo, control,
   sts@populationFrac <- sts@populationFrac[control$range,,drop=FALSE]
   sts@alarm <- sts@alarm[control$range,,drop=FALSE]
   sts@upperbound <- sts@upperbound[control$range,,drop=FALSE]
-  
+
+  #Set correct theta0t matrix for all 
+  sts@control$theta0t <- control$theta0t
+
   #Fix the corresponding start entry
   start <- sts@start
   new.sampleNo <- start[2] + min(control$range) - 1
@@ -124,7 +127,7 @@ rogerson <- function(sts, control = list(range=range, theta0t=NULL,
     #Extract values relevant for the k'th component
     control$theta0t <- control$theta0t[,k]
     if (is.null(control[["nt",exact=TRUE]])) {
-      control$nt <- sts@populationFrac[range,]
+      control$nt <- sts@populationFrac[range,k]
     } else {
       if (!all.equal(sts@populationFrac[range,k],control$nt[,k])) {
         warning("Warning: nt slot of control specified, but specified population differs.")

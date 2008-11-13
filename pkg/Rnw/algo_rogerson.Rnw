@@ -707,11 +707,16 @@ algo.rogerson <- function(disProgObj,
     # give alarm if the cusum is larger than h
     alarm[t+1,] <- cusum[t+1,] >= h
     # in case speed is premium then one might want to comment this line
-    upperbound[t+1,] <- ceiling( (h-cusum[t,])/ct + kt) 
+    if((control$limit >= 0) & any(alarm[t,]==1)) {
+      upperbound[t+1,] <- ceiling( (h-cusum.t)/ct + kt) 
+    } else {
+      upperbound[t+1,] <- ceiling( (h-cusum[t,])/ct + kt) 
+    }
 
     # ensure upper bound is between 0 and 1 - this can be removed
     if (upperbound[t+1,] < 0) { upperbound[t+1,] <- 0}
     if (upperbound[t+1,] > nt[t]) { upperbound[t+1,] <- nt[t] }
+#    if (nt[t]==0) { upperbound[t+1,] <- NA }
   }
 
 

@@ -199,7 +199,7 @@ setGeneric("year", function(x, ...) standardGeneric("year"));
 setMethod("year", "sts", function(x,...) return((x@week-1) %/% x@freq + x@start[1]))
 #Extract which observation within year we have
 setGeneric("obsinyear", function(x, ...) standardGeneric("obsinyear"));
-setMethod("obsinyear", "sts", function(x,...) return( (sts@week-1 + sts@start[2]-1) %% sts@freq + 1))
+setMethod("obsinyear", "sts", function(x,...) return( (x@week-1 + x@start[2]-1) %% x@freq + 1))
 
 
 #####################################################################
@@ -299,9 +299,11 @@ merge.list <- function (x, y, ...)
 
 ##########################################################################
 # Plot functions
+#
+# colors - c( fill color of polygons, line color of polygons, upperbound)
 ##########################################################################
 
-plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, xlab="time", ylab="No. infected", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0.5,...) {
+plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0.5,hookFunc=function() {},...) {
 
   #Extract slots -- depending on the algorithms: x@control$range
   observed   <- x@observed[,k]
@@ -326,56 +328,50 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
   if (is.null(main)) {
     #If no surveillance algorithm has been run
     if (length(x@control) != 0) {
-     # main = paste("Analysis of ", as.character(disease), " using ",
       main = paste("Surveillance using ", as.character(method),sep="") 
     }
   }
   #No titles are drawn when more than one is plotted.
   if (domany) main = ""
 
-  # left/right help for constructing the columns
-  dx.observed <- 0.5
-  observedxl <- (1:length(observed))-dx.observed
-  observedxr <- (1:length(observed))+dx.observed
-  upperboundx <- (1:length(upperbound)) - (dx.observed - dx.upperbound)
-  
   # control where the highest value is
   max <- max(c(observed,upperbound),na.rm=TRUE)
   
-  #if ylim is not specified
+  #if ylim is not specified, give it a default value
   if(is.null(ylim) ){
     ylim <- c(-1/20*max, max)
   }
 
+  # left/right help for constructing the columns
+  dx.observed <- 0.5
+  upperboundx <- (1:length(upperbound)) - (dx.observed - dx.upperbound)
+  
+  #Generate the matrices to plot (values,last value)
+  xstuff <- cbind(c(upperboundx,length(observed) + min(1-(dx.observed - dx.upperbound),0.5)))
+  ystuff <-cbind(c(upperbound,upperbound[length(observed) ]))
 
+  #Plot the results 
+  matplot(x=xstuff,y=ystuff,xlab=xlab,ylab=ylab,main=main,ylim=ylim,axes = !(xaxis.years),type=type,lty=lty[-c(1:2)],col=col[-c(1:2)],lwd=lwd[-c(1:2)],...)
 
-  #Generate the matrices to plot
-  xstuff <- cbind(observedxl, observedxr, upperboundx)
-  ystuff <-cbind(observed, observed, upperbound)
-        
+  #This draws the polygons containing the number of counts (sep. by NA)
+  i <- rep(1:length(observed),each=5)
+  dx <- rep(dx.observed * c(-1,-1,1,1,NA), times=length(observed))
+  x.points <- i + dx
+  y.points <- as.vector(t(cbind(0, observed, observed, 0, NA)))
+  polygon(x.points,y.points,col=col[1],border=col[2],lwd=lwd[1])
 
-  #Plot the results using one Large plot call (we do this by modifying
-  #the call). 
-  matplot(x=xstuff,y=ystuff,xlab=xlab,ylab=ylab,main=main,ylim=ylim,axes = !(xaxis.years),type=type,lty=lty,col=col,...)
-
-  for(i in 1:length(observed)){
-    matlines( c(i-dx.observed, i+dx.observed), c(observed[i],observed[i]), col=col[1] )
-    if (!is.na(alarm[i]) && (alarm[i] == 1))
-      matpoints( i, -1/40*ylim[2], pch=alarm.symbol$pch, col=alarm.symbol$col, cex= alarm.symbol$cex)
-    if (state[i] == 1)
-      matpoints( i, -1/20*ylim[2], pch=outbreak.symbol$pch, col=outbreak.symbol$col,cex = outbreak.symbol$cex)
+  #Draw outbreak symbols
+  alarmIdx <- which(!is.na(alarm) & (alarm == 1))
+  if (length(alarmIdx)>0) {
+    matpoints( alarmIdx, rep(-1/40*ylim[2],length(alarmIdx)), pch=alarm.symbol$pch, col=alarm.symbol$col, cex= alarm.symbol$cex)
   }
-  matlines( c(length(observed) - (dx.observed - dx.upperbound),
-              length(observed) + min(1-(dx.observed - dx.upperbound),0.5)),
-           c(upperbound[length(observed) ],upperbound[length(observed) ]), col=col[3],lty=lty[3] )
-              
-  # check where to place the legend. If the left upper side is free place it there
-  if (max * 2/3 >= max(
-                max(observed[1:floor(1/4 * length(observed))]),
-                max(upperbound[1:floor(1/4 * length(upperbound))]),na.rm=TRUE
-                )) {
-    xlegpos <- 0
+  
+  #Draw alarm symbols
+  stateIdx <- which(state == 1)
+  if (length(stateIdx)>0) {
+    matpoints( stateIdx, rep(-1/20*ylim[2],length(stateIdx)), pch=outbreak.symbol$pch, col=outbreak.symbol$col,cex = outbreak.symbol$cex)
   }
+
   #Label of x-axis 
   if(xaxis.years){
     if (x@freq ==52) {
@@ -439,6 +435,10 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
     
     do.call("legend",legend.opts)
   }
+
+  #Call hook function for user customized action
+  environment(hookFunc) <- environment()
+  hookFunc()
 
   invisible()
 }
@@ -578,7 +578,7 @@ function (x, y, ...) {
 }
 
 #xaxis.years=TRUE,startyear = 2001, firstweek = 1, legend=TRUE
-plot.sts.time <- function(x, type, method=x@control$name, disease=x@control$data,same.scale=TRUE,...) {
+plot.sts.time <- function(x, type, method=x@control$name, disease=x@control$data,same.scale=TRUE,par.list=list(mfrow=magic.dim(nAreas),mar=par()$mar),...) {
 
   #Plot as one if type = time + unit 
   as.one=all(!is.na(pmatch(c("time","unit"),type[[3]] ))) & is.na(pmatch("|",type[[3]]))
@@ -600,10 +600,18 @@ plot.sts.time <- function(x, type, method=x@control$name, disease=x@control$data
   nAreas <- ncol(observed)
 
   if (binaryTS) {
-    max <-  max(max(observed / population),max(x@upperbound / population),na.rm=TRUE)
+    pi <-  ifelse(population == 0,  0,observed / population)
+    un <-  ifelse(population == 0, 0, x@upperbound / population)
+    max <-  max(max(pi),max(un),na.rm=TRUE)
   } else {
     max <-  max(max(observed),max(x@upperbound),na.rm=TRUE)
   }
+
+  #Check empty arguments
+  if (is.null(par.list[["mfrow",exact=TRUE]])) {
+    par.list$mfrow <- magic.dim(nAreas)
+  } 
+  
 
   #multivariate time series
   if(nAreas > 1){
@@ -611,8 +619,9 @@ plot.sts.time <- function(x, type, method=x@control$name, disease=x@control$data
     if(as.one) {
       #### This is currently not supported
     } else {
-      #set window size     
-      par(mfrow=magic.dim(nAreas),mar=c(2,1,1,1))
+      #set window size
+      oldpar <- par()
+      par(par.list)
 
       #All plots on same scale? If yes, then check if a scale
       #is already specified using the ylim argument
@@ -633,7 +642,8 @@ plot.sts.time <- function(x, type, method=x@control$name, disease=x@control$data
         mtext(colnames(observed)[k],line=-1.3)     
       }
       #reset graphical params
-      par(mfrow=c(1,1), mar=c(5, 4, 4, 2)+0.1)
+      #par(mfrow=c(1,1), mar=c(5, 4, 4, 2)+0.1)
+      oldwarn <- options()$warn ; options(warn=-1) ; par(oldpar) ; options(warn=oldwarn)
     }
   } else {  #univariate time series
     plot.sts.time.one(x=x, domany=FALSE,...)
