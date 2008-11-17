@@ -26,7 +26,10 @@ init.sts <- function(.Object, week, start=c(2000,1), freq=52, observed, state, m
   #Name handling
   namesObs <-colnames(observed)
   namesState <- colnames(observed)
-
+  #Ensure observed, state are on matrix form
+  observed <- as.matrix(observed)
+  state <- as.matrix(state)
+  
   #check number of columns of observed and state
   nAreas <- ncol(observed)
   nObs <- nrow(observed)
@@ -112,7 +115,14 @@ setMethod("initialize", "sts", init.sts)
 
 #Partial -- use a disProg object as start and convert it.
 disProg2sts <- function(disProgObj, map=NULL) {
-  sts <- new("sts", week=disProgObj$week, start=disProgObj$start, freq=disProgObj$freq, observed=disProgObj$observed, state = disProgObj$state, map=map, neighbourhood=disProgObj$neighbourhood, populationFrac=disProgObj$populationFrac,alarm=disProgObj$alarm,upperbound=disProgObj$upperbound)
+  #Ensure that week slot is not zero
+  if (is.null(disProgObj[["week",exact=TRUE]])) {
+    myweek <- 1:nrow(as.matrix(disProgObj$observed))
+  } else {
+    myweek <- disProgObj$week
+  }
+    
+  sts <- new("sts", week=myweek, start=disProgObj$start, freq=disProgObj$freq, observed=disProgObj$observed, state = disProgObj$state, map=map, neighbourhood=disProgObj$neighbourhood, populationFrac=disProgObj$populationFrac,alarm=disProgObj$alarm,upperbound=disProgObj$upperbound)
   return(sts)
 }
 
@@ -145,6 +155,10 @@ sts2disProg <- function(sts) {
 ###########################################################################
 
 setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...) {
+  
+ #Action of aggregation for populationFrac depends on the type 
+ binaryTS <- sum( x@populationFrac > 1 ) > 1
+
   #Aggregate time
   if (by == "time") {
     if (nfreq == "all") {
@@ -167,6 +181,12 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
     x@alarm <- as.matrix(aggregate(x@alarm,by=list(new),sum)[,-1])
     x@upperbound <- as.matrix(aggregate(x@upperbound,by=list(new),sum)[,-1])
     x@populationFrac <- as.matrix(aggregate(x@populationFrac,by=list(new),sum)[,-1])
+
+    #the population fractions need to be recomputed if not a binary ts
+    if (!binaryTS) {
+      sums <- matrix(rep(apply(x@populationFrac,1,sum),times=ncol(x)),ncol=ncol(x))
+      x@populationFrac <-x@populationFrac/sums
+    }
   }
   if (by == "unit") {
     #Aggregate units
@@ -183,7 +203,7 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
 
   return(x)
 })
-
+  
 
 #####################################################################
 # Misc access functions
@@ -381,7 +401,7 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
       weeks <- 1:length(observed) + (firstweek-1)
       noYears <- ceiling(max(weeks)/52)
       quarterStarts <- rep( (0:(noYears))*52, each=4) + rep( c(1,14,27,40), noYears+1)
-      weeks <- subset(weeks, !is.na(pmatch(weeks,quarterStarts)))
+      weeks <- subset(weeks, !is.na(match(weeks,quarterStarts)))
       weekIdx <- weeks - (firstweek-1)
 
       # get the right year for each week
@@ -428,7 +448,7 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
   if(!is.null(legend.opts)) {
     #Fill empty (mandatory) slots in legend.opts list
     if (is.null(legend.opts$lty)) legend.opts$lty = c(lty[1],lty[3],NA,NA)
-    if (is.null(legend.opts$col)) legend.opts$col = c(col[1],col[3],outbreak.symbol$col,alarm.symbol$col)
+    if (is.null(legend.opts$col)) legend.opts$col = c(col[2],col[3],outbreak.symbol$col,alarm.symbol$col)
     if (is.null(legend.opts$pch)) legend.opts$pch = c(NA,NA,outbreak.symbol$pch,alarm.symbol$pch)
     if (is.null(legend.opts$legend))
       legend.opts$legend = c("Infected", "Threshold","Outbreak","Alarm" )
@@ -720,6 +740,7 @@ plot.sts.spacetime <- function(x,type,legend=NULL,opts.col=NULL,labels=TRUE,wait
 
   #Make the columns of o as in the map object
   o.col <- o.col[,pmatch(region.id,o.col.id),drop=FALSE]
+  alarm.col <- alarm[,pmatch(region.id,o.col.id),drop=FALSE]
 
   #Screen processing
   screen.matrix <- matrix(c(0,1,0,1,0,1,0.8,1),2,4,byrow=TRUE)
@@ -741,7 +762,8 @@ plot.sts.spacetime <- function(x,type,legend=NULL,opts.col=NULL,labels=TRUE,wait
     #Plot the map on screen 1
     screen(1)
     plot(map,col=o.col[t,],xlab="",ylab="",...)
-    plot(map,dens=alarm*15,add=TRUE)
+    #Indicate alarms as shaded overlays
+    plot(map,dens=alarm.col*15,add=TRUE)
     
 
     if (labels)
