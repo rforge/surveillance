@@ -155,7 +155,7 @@ by Rossi et al. (1999)</li>
 href="http://dx.doi.org/10.1007/s00180-007-0074-8"><span
 style="font-family: monospace;">surveillance</span>:
 					An R package for the surveillance of infectious diseases</a>, Computational Statistics (2007), 22(4), pp. 571-582.</li>
-<li><a href="hoehle-surveillance.pdf">Presenation</a> held at the ESCAIDE satellite workshop on <ii>Computer supported outbreak detection and signal management</ii> (<a href="hoehle-surveillance.R">R-File</a>, <a href="ha.csv">Data</a>)
+<li><a href="hoehle-surveillance.pdf">Invited talk</a> held at the ESCAIDE satellite workshop on <ii>Computer supported outbreak detection and signal management</ii> (<a href="hoehle-surveillance.R">R-File</a>, <a href="ha.csv">Data</a>)
 <li>Use of the package in veterinary public health surveillance can be found in <a href="http://epub.ub.uni-muenchen.de/2093/">Statistical approaches to the surveillance of infectious diseases for veterinary public health</a>
 <li>Read the package vignette
 <li><a href="http://www.stat.uni-muenchen.de/~hoehle/pubs/compstat2006-presentation.pdf">CompStat2006
@@ -175,11 +175,23 @@ href="http://www.geomed2005.org">Geomed2005</a> conference.</li>
 <ul>
 <li><a href="http://www.stat.uni-muenchen.de/~hoehle">Michael H&ouml;hle</a>, Department of Statistics, University of Munich, Germany (Project Admin)</li>
 <li><a href="http://www.biostat.uzh.ch/aboutus/people/mpaul.html">Michaela Paul</a>, Institute of Social and Preventive Medicine, University of Zurich, Switzerland</li>
-<li>Current student programmer: Valentin Wimmer</li>
-<li>Former student programmers: C. Lang, Andrea Riebler</li>
+     <li>Former student programmers: C. Lang, Andrea Riebler, Valentin Wimmer</li>
 </ul>
 </blockquote>
 </blockquote>
+
+<hr><b>Financial support:</b>
+<blockquote>
+<blockquote>
+     The development of models and algorithms implemented in surveillance was financially supported by :
+     <ul>
+     <li><a href="http://www.en.mc-health.uni-muenchen.de/index.html">Munich Center of Health Sciences</a> (MC-Health, since 2007)</li>
+     <li>Swiss National Science Foundation (SNF, since 2007)  </li>
+     <li>German Science Foundation (DFG, 2003-2006)</li>
+     </ul>
+</blockquote>
+</blockquote>
+     
 
 <!-- 
 <p> The <strong>project summary page</strong> you can find <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
