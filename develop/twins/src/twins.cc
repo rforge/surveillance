@@ -2,7 +2,7 @@
  * Author: Mathias Hofmann
  *         Michael Höhle <hoehle@stat.uni-muenchen.de>
  *         Volker Schmid
- * Date:   April 2005 *
+ * Date:   Oct 2008 -- modified version of code from Apr 2005 *
  *
  * Markov Chain Monte Carlo (MCMC) estimation in the Branching Process
  * like Epidemic Model. Instead of a slow R solution this code
@@ -861,12 +861,15 @@ return;
 // }
 
 //mxs.cc
+/* hoehle - no fortran
 extern "C" {
 int gpskca_(int& n,int degree[],int rstart[],int connec[], int& ioptpro, int& worklen, int permut[], int work[], int& bandwidth, int& profile, int& error, int& space);        
 int dpbtrf_(char& uplo,int& n,int& bw, double mx_neu[], int& bw1,int& info);
 int dtbsv_(char& uplo, char& trans, char& diag, int& n, int& bw, double A[], int& bw1, double z[], int& incx);
 }
+*/
 
+/*hofmann - no fortran
 void loese(double* A, double* z, int &n, int& bw)     
 {
 	
@@ -880,7 +883,8 @@ int incx=1;
 dtbsv_(uplo,trans,diag, n, bw, A, bw1, z, incx);
 return;
 } 
-
+*/
+/*hofmann - no fortran
 void loese2(double* A, double* z, int &n, int& bw)     
 {
 	
@@ -894,9 +898,9 @@ int incx=1;
 dtbsv_(uplo,trans,diag, n, bw, A, bw1, z, incx);
 return;
 } 
+*/
 
-
-
+/*hofmann - no fortran
 double* cholesky(int n, double* matrix,  int& bw)
 {
 // double* mx_neu = new double[bw+1*n];
@@ -971,8 +975,8 @@ dpbtrf_(uplo, n, bw, matrix, bw1, info);
 return matrix;
 
 }
-
-
+*/
+/*hofmann - no fortran
 void update_beta_nurrw(double* gamma, double* alpha, double* beta, double* delta, long** X, long** Z, long** Y, long n, long I, double taubeta, int rw, double p, double** lambda, long& acc_beta, long doit, double* my, double* my2, double* temp, double* z, double* theta, double* Q, double* Q2, double* L, double* L2, double** xcov, int ncov, int scov, double** omega, double** omegaX, int mode)
 {
 int bandw=rw+1;
@@ -1155,7 +1159,8 @@ if (exp(akzw)>gsl_rng_uniform(r))
 
 return;
 }
-
+*/
+/*hofmann - no fortran
 void update_beta_block( double* alpha, double* beta, double* gamma, double* delta, long** X, long n, long I, double taubeta, int rw, long& acc_beta, long sampleCounter, int n1, int n2, double* my, double* my2, double* z, double* theta, double* beta0, double* Q, double* Q2, double* L, double* L2, double** xcov, int ncov, int scov, double** omega)
 {
 
@@ -1283,8 +1288,9 @@ if (exp(akzw)>gsl_rng_uniform(r))
 
 return;
 }
+*/
 
-
+/*hofmann - no fortran
 void update_beta_tau_block( double* alpha, double* beta, double* gamma, double* delta, double beta_a, double beta_b, long** X, long n, long I, double& taubeta, int rw, long& acc_beta, double taubetaRWSigma, double taubetaStar, long sampleCounter, int n1, int n2, double* my, double* my2, double* z, double* theta, double* beta0, double* Q, double* Q2, double* L, double* L2, double** xcov, int ncov, int scov, double** omega)
 {
 
@@ -1452,7 +1458,7 @@ if (exp(akzw)>gsl_rng_uniform(r))
 
 return;
 }
-
+*/
 
 
 void machnu(double* mu, double* alpha, double* beta, double* delta, double** nu, long I, long n, int ncov, double** xcov, int scov)
@@ -3762,8 +3768,9 @@ register long sampleCounter=1;
 	 //  update_beta_nurrw(gamma, alpha, beta, delta, X, Z, Y, n, I,  taubeta,  rw, 1, lambda, acc_beta, sampleCounter, my, my2, temp, z, theta, Q, Q2, L, L2, xcov, ncov, scov, omega, omega, 1);
 	 //update_beta_block(alpha, beta, gamma, delta, X, n, I, taubeta, rw, acc_beta, sampleCounter, n1, n2, my, my2, z, theta, beta0, Q, Q2, L, L2, xcov, ncov, scov, omega);
 
+/*hofmann - no fortran
 	 update_beta_tau_block(alpha, beta, gamma, delta, beta_a, beta_b, X, n, I, taubeta, rw, acc_beta, taubetaRWSigma, taubetaStar, sampleCounter, n1, n2, my, my2, z, theta, beta0, Q, Q2, L, L2, xcov, ncov, scov, omega);
-
+*/
 	  //taubeta=beta_a/beta_b;
 	 // taubeta=hyper(rw, beta, beta_a, beta_b, n);
 	   //taubeta=720;

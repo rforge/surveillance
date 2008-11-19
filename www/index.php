@@ -48,38 +48,39 @@ echo $contents; } ?>
 <ul>
 <ul>
 <li> The intention of the R-package <tt>surveillance</tt> is to
-provide a test-bench for surveillance algorithms. It allows users to
-test new algorithms and compare their results with those of standard
-surveillance methods. Among others the package contains an
+provide open source software  for the visualization and
+    monitoring of count data time series in public health surveillance.
+Potential users are epidemiologists and others working in applied infectious disease epidemiology. 
+<li> Furthermore, <tt>surveillance</tt> also provides a data structure and framework for methodological
+developments of surveillance algorithms. 
+<li> Among others the package contains an
 implementation of the following procedures:</li>
-</ul>
-</ul>
-<ul>
-<ul>
 <ul>
 <li>Stroup et al. (1989)</li>
-<li>Farrington et al. (1996) <br>
-</li>
+<li>Farrington et al. (1996)</li>
 <li>The system used at the Robert Koch
-Institute (RKI), Germany. <br>
-</li>
+Institute (RKI), Germany. </li>
 <li>A Bayesian predictive posterior approach documented in
 H&ouml;hle (2007)<br>
 </li>
 <li>An online version of the Hidden Markov Model approach by
-(Le Strat and Carrat (1999)
-<li>Surveillance for time varying Poisson means as documented
-in Rogerson and Yamada (2004)<br>
+Le Strat and Carrat (1999)
+<li>Surveillance for time varying Poisson means as documented in
+Rogerson and Yamada (2004). <br> This approach has been extended to
+cover time varying proportions in a binomial setting.
 </li>
 <li>An approximate CUSUM method for time varying Poisson means
-as documented in Rossi (1999)</li>
+as documented in Rossi et al (1999)</li>
 <li>Generalized likelihood ratio detectors for time varying
 Poisson means documented in H&ouml;hle (2006)<br>
 </li>
 </ul>
-<li>Furthermore the package contains estimation routines for the
-model described in Held et al (2005)<br>
-</li>
+<li>Furthermore the package contains estimation and prediction routines for the
+models described in 
+<ul>
+	       <li>Held et al. (2005)</li>
+     <li>Held et al. (2006) </li>
+</ul>
 <li>For evaluation purposes, the package contains example
 datasets drawn
 from the SurvStat@RKI Database maintained the RKI, Germany. More
@@ -100,21 +101,23 @@ under the GPL conditions.</li>
 <b>Download:</b>
 <blockquote>
 <blockquote>
-<blockquote> The <tt>surveillance</tt> package (version 0.9-8) is
+<blockquote> The <tt>surveillance</tt> package (version 0.9-9) is
 available for download from <a
 href="http://cran.r-project.org/src/contrib/Descriptions/surveillance.html">CRAN</a>.<br>
-Package development, help-forum and bugtracking is hosted through
+      Current package development, help-forum and bugtracking is hosted through
 R-Forge:<br>
 <br>
 <div style="text-align: center;"><a
 href="https://r-forge.r-project.org/projects/surveillance/">https://r-forge.r-project.org/projects/surveillance/</a><br>
 </div>
 <br>
-From this page snapshots of the current development version are
+From this page snapshots of the current development version 0.9-10 are
 available.<br>
 <br>
 New features:<br>
 <ul>
+      <li>(0.9-10) See NEWS file in the current distribution
+      <li>(0.9-9) Minor update to remove several R CMD check warning on CRAN
 <li>(0.9-8) The <tt>algo.glrpois</tt> function now handles both increases and decreases. Furthermore, a companion function <tt>algo.glrnb</tt> has been written, which handles negative binomial time series with fixed dispersion parameter (this function is still experimental). For further details see the file NEWS in the distribution.
 <li>(0.9-7) Improved <tt>algo.hhh</tt> and improvements on the <tt>algo.glrpois</tt> routine. 
 <li>(0.9-6) The surveillance algorithms for time varying
@@ -152,6 +155,7 @@ by Rossi et al. (1999)</li>
 href="http://dx.doi.org/10.1007/s00180-007-0074-8"><span
 style="font-family: monospace;">surveillance</span>:
 					An R package for the surveillance of infectious diseases</a>, Computational Statistics (2007), 22(4), pp. 571-582.</li>
+<li><a href="hoehle-surveillance.pdf">Presenation held at the ESCAIDE satellite workshop on <ii>Computer supported outbreak detection and signal management</ii> (<a href="hoehle-surveillance.R">R-File</a>, <a href="ha.csv">Data</a>)
 <li>Use of the package in veterinary public health surveillance can be found in <a href="http://epub.ub.uni-muenchen.de/2093/">Statistical approaches to the surveillance of infectious diseases for veterinary public health</a>
 <li>Read the package vignette
 <li><a href="http://www.stat.uni-muenchen.de/~hoehle/pubs/compstat2006-presentation.pdf">CompStat2006

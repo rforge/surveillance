@@ -25,5 +25,7 @@ set.seed(123)
 obj <- algo.twins(hepatitisA)
 
 #This shows the entire output
-plot(obj)
-
+pdf("test.pdf")
+plot(obj,ask=FALSE)
+cat("Output is saved in test.pdf\n")
+dev.off()

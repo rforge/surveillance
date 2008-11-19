@@ -8,7 +8,7 @@
 }
 \usage{
   algo.farrington(disProgObj, control=list(range=NULL, b=3, w=3,
-  reweight=TRUE,verbose=FALSE,alpha=0.01,powertrans="2/3"))
+  reweight=TRUE,verbose=FALSE,alpha=0.01,trend=TRUE,limit54=c(5,4),powertrans="2/3"))
 }
 \arguments{
 \item{disProgObj}{object of class disProgObj (including the observed and the state chain)}
