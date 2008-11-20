@@ -72,7 +72,7 @@ cover time varying proportions in a binomial setting.
 <li>An approximate CUSUM method for time varying Poisson means
 as documented in Rossi et al (1999)</li>
 <li>Generalized likelihood ratio detectors for time varying
-Poisson means documented in H&ouml;hle (2006)<br>
+Poisson and negative binomial means documented in H&ouml;hle and Paul (2008)<br>
 </li>
 </ul>
 <li>Furthermore the package contains estimation and prediction routines for the

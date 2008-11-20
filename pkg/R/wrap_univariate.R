@@ -120,10 +120,6 @@ rogerson <- function(sts, control = list(range=range, theta0t=NULL,
                             nt=NULL, FIR=FALSE,limit=NULL, digits=1),...) {
   #Hook function to find right theta0t vector
   control.hook = function(k) {
-    #If no hValues given then compute them
-    if (is.null(control[["hValues",exact=TRUE]])) {
-      control$hValues <- hValues(theta0 = unique(control$theta0t[,k]), ARL0=control$ARL0, s=control$s , distr = control$distribution)$hValues
-    }
     #Extract values relevant for the k'th component
     control$theta0t <- control$theta0t[,k]
     if (is.null(control[["nt",exact=TRUE]])) {
@@ -134,6 +130,12 @@ rogerson <- function(sts, control = list(range=range, theta0t=NULL,
       } else {
         control$nt <- control$nt[,k]
       }
+    }
+    #If no hValues given then compute them
+    if (is.null(control[["hValues",exact=TRUE]])) {
+#This code does not appear to work once n is big.      
+#      control$hValues <- hValues(theta0 = unique(control$theta0t), ARL0=control$ARL0, s=control$s , distr = control$distribution, n=mean(control$nt))$hValues
+            control$hValues <- hValues(theta0 = unique(control$theta0t), ARL0=control$ARL0, s=control$s , distr = control$distribution, n=mean(control$nt))$hValues
     }
     return(control)
   }
