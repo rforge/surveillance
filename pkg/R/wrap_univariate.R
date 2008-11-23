@@ -132,9 +132,9 @@ rogerson <- function(sts, control = list(range=range, theta0t=NULL,
     #Extract values relevant for the k'th component
     control$theta0t <- control$theta0t[,k]
     if (is.null(control[["nt",exact=TRUE]])) {
-      control$nt <- sts@populationFrac[range,k]
+      control$nt <- sts@populationFrac[control$range,k]
     } else {
-      if (!all.equal(sts@populationFrac[range,k],control$nt[,k])) {
+      if (!all.equal(sts@populationFrac[control$range,k],control$nt[,k])) {
         warning("Warning: nt slot of control specified, but specified population differs.")
       } else {
         control$nt <- control$nt[,k]
