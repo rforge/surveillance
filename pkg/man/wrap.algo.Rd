@@ -7,6 +7,7 @@
 \alias{cusum}
 \alias{farrington}
 \alias{glrpois}
+\alias{glrnb}
 \alias{rogerson}
 \encoding{latin1}
 
@@ -28,6 +29,9 @@ bayes(sts, control = list(range = range, b = 0, w = 6, actY = TRUE,alpha=0.05),.
 rki(sts, control = list(range = range, b = 2, w = 4, actY = FALSE),...)
 cusum(sts,  control = list(range=range, k=1.04, h=2.26,m=NULL, trans="standard",alpha=NULL),...)
 glrpois(sts, control = list(range=range,c.ARL=5, S=1,beta=NULL, Mtilde=1, M=-1, change="intercept",theta=NULL),...)
+glrnb(sts, control = list(range=range,c.ARL=5, mu0=NULL, alpha=0,
+            Mtilde=1, M=-1, change="intercept",theta=NULL,dir=c("inc","dec"),
+           ret=c("cases","value")),...)
 }
 \arguments{
   \item{sts}{Object of class \code{sts}}

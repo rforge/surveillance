@@ -13,6 +13,7 @@
 \alias{initialize,sts-method}
 \alias{obsinyear,sts-method}
 \alias{year,sts-method}
+\alias{as.data.frame,sts-method}
 
 \encoding{latin1}
 
@@ -64,7 +65,13 @@
     \item{year}{\code{signature(x = "sts")}:
       extracts the corresponding year of each observation of \code{x}}
     \item{obsinyear}{\code{signature(x = "sts")}:
-      extracts the corresponding week number within the year of each observation of \code{x}}
+      extracts the corresponding week number within the year of each
+      observation of \code{x}}
+    \item{as.data.frame}{\code{signature(x = "sts")}:
+      converts the \code{observed}, \code{week}, \code{state} and
+      \code{alarm} slots of \code{x} into a data frame with column names
+      matching the colnames of the respective slots. Useful when one wants
+      to fit a model based on the object}
     \item{plot}{\code{signature(x="sts",y="missing",function(x, y, type,...)...)}: this function is
       the successor of the \code{\link{plot.disProg}} and 
       \code{\link{plot.survRes}} functions. It takes (more or less) the

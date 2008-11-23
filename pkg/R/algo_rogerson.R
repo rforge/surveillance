@@ -89,7 +89,9 @@ arlCusum <- function(h=10, k=3, theta=2.4, distr=c("poisson","binomial"), W=NULL
   # I - transition matrix R
   IminusR <- diag(1,M+1) - transition
 
+#Solve might work poorly in some cases
   res <- try(solve(IminusR)%*%rep(1,M+1),silent=TRUE)
+#  res <- try(qr.solve(IminusR)%*%rep(1,M+1),silent=TRUE)
   if(inherits(res, "try-error")){
     warning("I-R singular\n")
     return(NA)
@@ -481,10 +483,8 @@ algo.rogerson <- function(disProgObj,
       upperbound[t+1,] <- ceiling( (h-cusum[t,])/ct + kt) 
     }
 
-    # ensure upper bound is between 0 and 1 - this can be removed
-    if (upperbound[t+1,] < 0) { upperbound[t+1,] <- 0}
-    if (upperbound[t+1,] > nt[t]) { upperbound[t+1,] <- nt[t] }
-#    if (nt[t]==0) { upperbound[t+1,] <- NA }
+    #Ensure upperbound is positive (this should always be the case)
+    if (upperbound[t+1,] < 0) { upperbound[t+1,] <- 0}    
   }
 
 

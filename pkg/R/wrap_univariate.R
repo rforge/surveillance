@@ -106,6 +106,15 @@ glrpois <- function(sts, control = list(range=range,c.ARL=5, S=1,
   wrap.algo(sts,algo="algo.glrpois",control=control,...)
 }
 
+#GLRnb wrapper
+glrnb <- function(sts, control = list(range=range,c.ARL=5, mu0=NULL, alpha=0,
+                         Mtilde=1, M=-1, change="intercept",theta=NULL,dir=c("inc","dec"),
+                         ret=c("cases","value")), ...) {
+  wrap.algo(sts,algo="algo.glrnb",control=control,...)
+}
+
+
+
 #### this code definitely needs some more documentation -- wrap.algo atm is
 # 100% without docu
 #Rogerson wrapper
@@ -135,7 +144,7 @@ rogerson <- function(sts, control = list(range=range, theta0t=NULL,
     if (is.null(control[["hValues",exact=TRUE]])) {
 #This code does not appear to work once n is big.      
 #      control$hValues <- hValues(theta0 = unique(control$theta0t), ARL0=control$ARL0, s=control$s , distr = control$distribution, n=mean(control$nt))$hValues
-            control$hValues <- hValues(theta0 = unique(control$theta0t), ARL0=control$ARL0, s=control$s , distr = control$distribution, n=mean(control$nt))$hValues
+            control$hValues <- hValues(theta0 = unique(control$theta0t), ARL0=control$ARL0, s=control$s , distr = control$distribution)$hValues
     }
     return(control)
   }

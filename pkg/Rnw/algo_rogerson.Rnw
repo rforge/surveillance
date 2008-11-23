@@ -715,10 +715,8 @@ algo.rogerson <- function(disProgObj,
       upperbound[t+1,] <- ceiling( (h-cusum[t,])/ct + kt) 
     }
 
-    # ensure upper bound is between 0 and 1 - this can be removed
-    if (upperbound[t+1,] < 0) { upperbound[t+1,] <- 0}
-    if (upperbound[t+1,] > nt[t]) { upperbound[t+1,] <- nt[t] }
-#    if (nt[t]==0) { upperbound[t+1,] <- NA }
+    #Ensure upperbound is positive (this should always be the case)
+    if (upperbound[t+1,] < 0) { upperbound[t+1,] <- 0}    
   }
 
 

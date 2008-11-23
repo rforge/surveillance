@@ -162,21 +162,14 @@ tms.plot <-function(x,m.par,xlab="",ylab="",ylim=FALSE,...){
 # properly documented
 ######################################################################
 
-plot.atwins <- function(x, ...) { #which=c(1,4,6,7),ask=TRUE) {
+plot.atwins <- function(x, which=c(1,4,6,7), ask=TRUE) {
   #Extract from the 3 dots
-  dots <- list(...)
-  if(is.null(dots[["which",exact=TRUE]])) {
+  if(is.null(which)) {
     which <- c(1,4,6,7)
-  } else {
-    which <- dots$which
-  }
-  if(is.null(dots[["ask",exact=TRUE]])) {
+  } 
+  if(is.null(ask)) {
     ask <- TRUE
-  } else {
-    ask <- dots$ask
   }
-  
-
   
   #Make list of X,Y,Z,omega means of results2
   m.results <-make.pois(x)
