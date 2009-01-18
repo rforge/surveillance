@@ -224,6 +224,8 @@ setMethod("obsinyear", "sts", function(x,...) return( (x@week-1 + x@start[2]-1) 
 
 #####################################################################
 #[-method for accessing the observed, alarm, etc. objects
+# new param:
+#  normPopulationFrac - normalize population frac
 #####################################################################
 
 setMethod("[", "sts", function(x, i, j, ..., drop) {
@@ -235,7 +237,13 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   x@observed <- x@observed[i,j,drop=FALSE]
   x@state <- x@state[i,j,drop=FALSE]
   x@alarm <- x@alarm[i,j,drop=FALSE]
+
   x@populationFrac <- x@populationFrac[i,j,drop=FALSE]
+  #If not binary TS the populationFrac is normed
+  binaryTS <- sum( x@populationFrac > 1 ) > 1
+  if (!binaryTS) {
+    x@populationFrac <- x@populationFrac / apply(x@populationFrac,MARGIN=1,sum)
+   }  
   x@upperbound <- x@upperbound[i,j,drop=FALSE]
 
   #Neighbourhood matrix
