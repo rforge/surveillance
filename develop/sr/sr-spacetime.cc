@@ -111,7 +111,7 @@ int CalculaLambda(SVEventLst &ev, const double RaioC, const double epslon, std::
 {
   size_t i, j, NCj, NumTotEvt, NumEvtCil;
   short **MSpace;
-  double pontox, pontoy, DistEucl, Soma, UCj, fator, lambda, lambdaMax;
+  double pontox, pontoy, DistEucl, UCj, fator, lambda, lambdaMax;
   
   ev.sort();
   
@@ -209,13 +209,13 @@ extern "C" {
   //Create SVEventLst
   SVEvent e;
   SVEventLst eList;
-  int i;
-  
+  unsigned int i;
+  long j;
   //Fill coordinates of event list
-  for(i=0;i<*n;i++){
-    e.x = x[i];
-    e.y = y[i];
-    e.t = t[i];
+  for(j=0;j<*n;j++){
+    e.x = x[j];
+    e.y = y[j];
+    e.t = t[j];
     eList.push_back(e);
   }
 	
