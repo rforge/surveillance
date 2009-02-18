@@ -73,11 +73,9 @@ algo.glrnb <- function(disProgObj,
   }
   
    #Postprocess
-  if ((control$alpha>0) & (control$ret == "cases")) {
-    stop("Return of cases is currently not implemented for the negative binomial distribution!")
+  if ((control$alpha>0) & (control$ret == "cases") & (is.null(control[["theta",exact=TRUE]]))) {
+    stop("Return of cases is currently not implemented for the GLR detector based on the negative binomial distribution!")
   }
-	
-	
 	
   #The counts
   x <- observed[control$range]
@@ -112,16 +110,18 @@ algo.glrnb <- function(disProgObj,
         	res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(dir),as.integer(ret),PACKAGE="surveillance")
 
         	}
-        }else { #negbin
+        } else { #negbin
           res <- .C("glr_nb_window",x=as.integer(x),mu0=as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),dir=as.integer(dir),PACKAGE="surveillance")
         }
-      } else {
+      } else { ###################### !is.null(control$theta)
         if (control$alpha == 0) { #poisson
 
-          res <- .C("lr_cusum",as.integer(x),as.double(mu0),length(x),as.double(control$theta),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(ret),PACKAGE="surveillance")
+          res <- .C("lr_cusum",x=as.integer(x),mu0=as.double(mu0),lx=length(x),as.double(control$theta),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(ret),PACKAGE="surveillance")
 
         } else { #negbin
-          stop("The LR feature of the negative binomial distribution is currently not implemented!")
+          warning("LR feature of the negative binomial distribution is currently experimental!")
+          res <- .C("lr_cusum_nb",x=as.integer(x),mu0=as.double(mu0),alpha=as.double(control$alpha),lx=length(x),as.double(control$theta),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(ret),PACKAGE="surveillance")
+
         }
       }
     } else { ################### Epidemic chart #######################

@@ -77,8 +77,8 @@ algo.glrnb(disProgObj,control = list(range=range,c.ARL=5,
 \details{ 
 %
   This function implements the seasonal cound data chart based on
-  generalized likelihood ratio (GLR) as described in the SFB
-  Discussion Paper 500 (the paper covers only the Poisson case). A moving-window generalized likelihood ratio
+  generalized likelihood ratio (GLR) as described in the Hoehle and Paul
+  (2008) paper. A moving-window generalized likelihood ratio
   detector is used, i.e. the detector has the form
 %
 \deqn{N = \inf\left\{ n : \max_{1\leq k \leq
@@ -142,8 +142,12 @@ plot(glr.ts,xaxis.years=FALSE)
 
 \keyword{classif}
 \source{
+Count data regression charts for the monitoring of surveillance time
+series (2008), M. Höhle and M. Paul, Computational Statistics and
+Data Analysis, 52(9), pp. 4357–4368.
+
 Poisson regression charts for the monitoring of surveillance time
-series (2006), H�hle, M., SFB386 Discussion Paper 500.
+series (2006), Höhle, M., SFB386 Discussion Paper 500.
 }
 
 
