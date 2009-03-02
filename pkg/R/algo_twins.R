@@ -162,7 +162,7 @@ tms.plot <-function(x,m.par,xlab="",ylab="",ylim=FALSE,...){
 # properly documented
 ######################################################################
 
-plot.atwins <- function(x, which=c(1,4,6,7), ask=TRUE) {
+plot.atwins <- function(x, which=c(1,4,6,7), ask=TRUE,...) {
   #Extract from the 3 dots
   if(is.null(which)) {
     which <- c(1,4,6,7)

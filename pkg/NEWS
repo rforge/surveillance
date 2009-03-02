@@ -1,10 +1,12 @@
 1.0-1
 =====
+
 * Negative Binomial CUSUM or the more general NegBin likelihood ratio
   detector is now implemented as part of algo.glrnb
 
 * Experimental space-time surveillance function as in Assuncao and Correa
-  (2009)
+  (2009) (to appear in Computational statics & Data Analysis)
+
 
 0.9-10
 ======

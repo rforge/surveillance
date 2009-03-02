@@ -13,11 +13,8 @@
 
 \title{Multivariate Surveillance through independent univariate algorithms}
 \description{
-
   This function takes an \code{sts} object and applies an univariate
-  surveillance algorithm to the time series of each observational unit.
-
-  
+  surveillance algorithm to the time series of each observational unit. 
 }
 \usage{
 %This is the main function
@@ -48,8 +45,8 @@ glrnb(sts, control = list(range=range,c.ARL=5, mu0=NULL, alpha=0,
 }
 \value{
   An \item{sts} object with the \code{alarm}, \code{upperbound},
-  etc. slots filled with the results of independent and univariate
-  surveillance algorithm.
+  etc. slots filled with the results of independent and univariate 
+  surveillance algorithm. 
 }
 \seealso{
   \code{\link{algo.bayes}}, \code{\link{algo.cdc}},

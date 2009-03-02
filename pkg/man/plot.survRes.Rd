@@ -8,7 +8,7 @@
 }
 \usage{
   \method{plot}{survRes}(x, method=x$control$name, disease=x$control$data, 
-  xaxis.years=TRUE,startyear = 2001, firstweek = 1, same.scale=TRUE,...)
+  xaxis.years=TRUE,startyear = 2001, firstweek = 1, same.scale=TRUE,\dots)
   \method{plot}{survRes.one}(x, method=x$control$name, disease=x$control$data,
    domany=FALSE,ylim=NULL,xaxis.years=TRUE,startyear = 2001, firstweek = 1, 
    xlab="time", ylab="No. infected", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4), 

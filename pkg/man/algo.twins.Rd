@@ -39,12 +39,10 @@ algo.twins(disProgObj, control=list(burnin=1000, filter=10,
   Thus you need to have write permissions in the current getwd() directory.
 }
 \value{Returns an object of class \code{atwins} with elements 
-  \itemize{
-    \item{control}{specified control object}
-    \item{disProgObj}{specified \code{disProg}-object}
-    \item{logFile}{containes the returned samples of the parameters \eqn{\psi}{\psi}, \eqn{\gamma_{0}}{\gamma_0}, \eqn{\gamma_{1}}{\gamma_1}, \eqn{\gamma_{2}}{\gamma_2}, K, \eqn{\xi_{\lambda}}{\xi_\lambda} \eqn{\lambda_{1},...,\lambda{n}}{\lambda_1,...,\lambda_{n}}, the predictive distribution and the deviance.}
-    \item{logFile2}{containes the sample means of the variables \eqn{X_{t}, Y_{t}, \omega_{t}}{X_t, Y_t, \omega_t} and the relative frequency of a changepoint at time t for t=1,...,n and the relative frequency of a predicted changepoint at time n+1.} 
-}
+  \item{control}{specified control object}
+  \item{disProgObj}{specified \code{disProg}-object}
+  \item{logFile}{containes the returned samples of the parameters \eqn{\psi}{\psi}, \eqn{\gamma_{0}}{\gamma_0}, \eqn{\gamma_{1}}{\gamma_1}, \eqn{\gamma_{2}}{\gamma_2}, K, \eqn{\xi_{\lambda}}{\xi_\lambda} \eqn{\lambda_{1},...,\lambda{n}}{\lambda_1,...,\lambda_{n}}, the predictive distribution and the deviance.}
+  \item{logFile2}{containes the sample means of the variables \eqn{X_{t}, Y_{t}, \omega_{t}}{X_t, Y_t, \omega_t} and the relative frequency of a changepoint at time t for t=1,...,n and the relative frequency of a predicted changepoint at time n+1.} 
 }
 \references{Held, L., Hofmann, M., Höhle, M. and Schmid V. (2006) A two-component
   model for counts of infectious diseases, Biostatistics, \bold{7}, pp.
