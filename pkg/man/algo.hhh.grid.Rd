@@ -118,7 +118,7 @@ algo.hhh.grid(influMen, control=model2, thetastartMatrix=grid, maxTime=30)
 
 }
 \keyword{misc}
-\source{Held, L., Höhle, M., Hofmann, M. (2005) A statistical framework for the 
+\source{Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework for the 
     analysis of multivariate infectious disease surveillance counts. 
     \emph{Statistical Modelling}, \bold{5}, p. 187--199.}
 

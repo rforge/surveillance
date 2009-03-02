@@ -206,7 +206,7 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
   
 
 #####################################################################
-# Misc access functions
+# Miscellaneous access methods
 ####################################################################
 
 setMethod("nrow", "sts", function(x) return(nrow(x@observed)))

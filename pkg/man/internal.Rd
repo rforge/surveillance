@@ -36,6 +36,11 @@
 \alias{pois.plot}
 \alias{tms.plot}
 
+%Weird functions from sp package which produce warnings in R CMD check
+%for the surveillance package (??)
+\alias{summary,GridTopology-method}
+\alias{summary,Spatial-method}
+
 \title{Internal surveillance Functions}
 \description{
   Undocumented internal \code{surveillance} functions. If you really

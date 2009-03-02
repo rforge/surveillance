@@ -8,7 +8,8 @@
 }
 \usage{
 algo.glrnb(disProgObj,control = list(range=range,c.ARL=5, 
-         mu0=NULL, alpha=0, Mtilde=1, M=-1, change="intercept",theta=NULL,dir=c("inc","dec"),ret=c("cases","value")))
+         mu0=NULL, alpha=0, Mtilde=1, M=-1, change="intercept",
+         theta=NULL,dir=c("inc","dec"),ret=c("cases","value")))
 }
 \arguments{
 \item{disProgObj}{object of class \code{disProg} to do surveillance
@@ -143,11 +144,11 @@ plot(glr.ts,xaxis.years=FALSE)
 \keyword{classif}
 \source{
 Count data regression charts for the monitoring of surveillance time
-series (2008), M. HÃ¶hle and M. Paul, Computational Statistics and
-Data Analysis, 52(9), pp. 4357â€“4368.
+series (2008), M. \enc{Höhle}{Hoehle} and M. Paul, Computational Statistics and
+Data Analysis, 52(9), pp. 4357--4368.
 
 Poisson regression charts for the monitoring of surveillance time
-series (2006), HÃ¶hle, M., SFB386 Discussion Paper 500.
+series (2006), \enc{Höhle}{Hoehle}, M., SFB386 Discussion Paper 500.
 }
 
 

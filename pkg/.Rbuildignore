@@ -16,3 +16,6 @@ surveillance_0.9-*
 inst/unitTests/report.*
 inst/unitTests/reportSummary.*
 _res.rc*
+twins.log
+twins.log.acc
+twins.log2

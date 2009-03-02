@@ -251,7 +251,7 @@ aggregate.disProg <- function(x,...){
                 either in one single plot or in several plots for each individual
                 time series. }
 }
-\author{M. Höhle with contributions by A. Riebler and C. Lang}
+\author{M. \enc{Höhle}{Hoehle} with contributions by A. Riebler and C. Lang}
 \examples{
 
     # Plotting of simulated data
@@ -513,7 +513,7 @@ plot.disProg <- function(x, title = "", xaxis.years=TRUE, startyear = x$start[1]
 \details{
   The \code{plot.survRes.one} is intended for internal use. At the moment none of the surveillance methods support multivariate \code{survRes} objects. New versions of the packages currently under development will handle this.
 }
-\author{M. Höhle}
+\author{M. \enc{Höhle}{Hoehle}}
 \examples{
 data(ha)
 ctrl <- list(range = 209:290, b = 2, w = 6, alpha = 0.005)

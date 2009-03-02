@@ -11,8 +11,6 @@
 \alias{dim,sts-method}
 \alias{colnames,sts,missing,missing-method}
 \alias{initialize,sts-method}
-\alias{obsinyear,sts-method}
-\alias{year,sts-method}
 \alias{as.data.frame,sts-method}
 
 \encoding{latin1}
@@ -82,7 +80,7 @@
   }
 }
 
-\author{M. Höhle}
+\author{M. \enc{Höhle}{Hoehle}}
 \examples{
   data("ha")
   shp <- system.file("shapes/berlin.shp",package="surveillance")

@@ -8,7 +8,8 @@
 }
 \usage{
   algo.farrington(disProgObj, control=list(range=NULL, b=3, w=3,
-  reweight=TRUE,verbose=FALSE,alpha=0.01,trend=TRUE,limit54=c(5,4),powertrans="2/3"))
+  reweight=TRUE,verbose=FALSE,alpha=0.01,trend=TRUE,limit54=c(5,4),
+  powertrans="2/3"))
 }
 \arguments{
 \item{disProgObj}{object of class disProgObj (including the observed and the state chain)}
@@ -59,7 +60,7 @@ res <- algo.farrington(salmonella.agona,control=control)
 #Plot the result.
 plot(res,disease="Salmonella Agona",method="Farrington")
 }
-\author{M. Höhle}
+\author{M. \enc{Höhle}{Hoehle}}
 \seealso{\code{\link{algo.farrington.fitGLM}},\code{\link{algo.farrington.threshold}}}
 \keyword{classif}
 \source{A statistical algorithm for the early detection of outbreaks of infectious disease, Farrington, C.P., Andrews, N.J, Beale A.D. and Catchpole, M.A. (1996). , J. R. Statist. Soc. A, 159, 547-563.}

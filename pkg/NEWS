@@ -2,11 +2,11 @@
 =====
 
 * Negative Binomial CUSUM or the more general NegBin likelihood ratio
-  detector is now implemented as part of algo.glrnb
+  detector is now implemented as part of algo.glrnb.
+  This includes the back calculation of the required number of cases
+  before an alarm.
 
-* Experimental space-time surveillance function as in Assuncao and Correa
-  (2009) (to appear in Computational statics & Data Analysis)
-
+* Time varying proportion binomial CUSUM.
 
 0.9-10
 ======
@@ -31,7 +31,7 @@
        rogerson( x, control(..., distribution="binomial"))
 
 * An experimental implementation of the twins model documented in 
-  Held, L., Hofmann, M., H√∂hle, M. and Schmid V. (2006) A two-component
+  Held, L., Hofmann, M., HÅˆhle, M. and Schmid V. (2006) A two-component
   model for counts of infectious diseases, Biostatistics, 7, pp.
   422--437 is now available as algo.twins.
 

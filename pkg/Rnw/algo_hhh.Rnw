@@ -5,10 +5,10 @@
 \alias{print.ah}
 \alias{coef.ah}
 \encoding{latin1}
-\title{Model fit based on the Held, Höhle, Hofman paper} 
+\title{Model fit based on the Held, Hoehle, Hofman paper} 
 \description{
         Fits a Poisson/negative binomial model with mean \eqn{\mu_{it}}{\mu_it} 
-        (as described in Held/Höhle/Hofmann, 2005) to a multivariate 
+        (as described in Held/\enc{Höhle}{Hoehle}/Hofmann, 2005) to a multivariate 
         time series of counts.  
 }
 \usage{
@@ -64,7 +64,7 @@ algo.hhh(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
 }
 \details{Note that for the time being this function is not a surveillance algorithm, but only a modelling approach as described in the Held et. al (2005) paper.}
 \seealso{\code{\link{meanResponse}}}
-\author{M. Paul, L. Held, M. Höhle}
+\author{M. Paul, L. Held, M. \enc{Höhle}{Hoehle}}
 \examples{
 
 # univariate time series: salmonella agona cases 
@@ -124,7 +124,7 @@ algo.hhh(influMen, control=model2)
 }
 \keyword{ts}
 \keyword{regression}
-\source{Held, L., Höhle, M., Hofmann, M. (2005) A statistical framework for the 
+\source{Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework for the 
     analysis of multivariate infectious disease surveillance counts. 
     \emph{Statistical Modelling}, \bold{5}, p. 187--199.}
 
@@ -483,7 +483,7 @@ algo.hhh.grid(influMen, control=model2, thetastartMatrix=grid, maxTime=30)
 
 }
 \keyword{misc}
-\source{Held, L., Höhle, M., Hofmann, M. (2005) A statistical framework for the 
+\source{Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework for the 
     analysis of multivariate infectious disease surveillance counts. 
     \emph{Statistical Modelling}, \bold{5}, p. 187--199.}
 
@@ -986,7 +986,7 @@ meanResponse(theta, designRes)
 
 \keyword{models}
 
-\source{Held, L., Höhle, M., Hofmann, M. (2005) A statistical framework for the 
+\source{Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework for the 
     analysis of multivariate infectious disease surveillance counts. 
     \emph{Statistical Modelling}, \bold{5}, p. 187--199.}
 

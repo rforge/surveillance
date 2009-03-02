@@ -27,10 +27,11 @@
 /p1  { stroke } def
 /p2  { gsave bg fill grestore newpath } def
 /p3  { gsave bg fill grestore stroke } def
-/t   { 6 -2 roll moveto gsave rotate
-       ps mul neg 0 2 1 roll rmoveto
+/t   { 5 -2 roll moveto gsave rotate
        1 index stringwidth pop
        mul neg 0 rmoveto show grestore } def
+/ta  { 4 -2 roll moveto gsave rotate show } def
+/tb  { 2 -1 roll 0 rmoveto show } def
 /cl  { grestore gsave newpath 3 index 3 index moveto 1 index
        4 -1 roll lineto  exch 1 index lineto lineto
        closepath clip newpath } def
@@ -923,12 +924,15 @@ np
 0 0 l
 o
 0.00 0.00 936.00 432.00 cl
-/ps 18 def /Font2 findfont 18 s
+/Font2 findfont 18 s
 0 setgray
-496.80 396.74 (Kryptosporidiosis in BW 2001-2005) .5 0 0 t
-/ps 18 def /Font1 findfont 18 s
-496.80 17.28 (time) .5 0 0 t
-11.52 223.20 (No. infected) .5 0 90 t
+344.00 396.74 (Kr) 0 ta
+0.180 (yptosporidiosis in BW 2001-2005) tb gr
+/Font1 findfont 18 s
+496.80 17.28 (time) .5 0 t
+11.52 175.18 (No) 90 ta
+-0.720 (. inf) tb
+-0.540 (ected) tb gr
 57.60 72.00 936.00 374.40 cl
 0 setgray
 0.75 setlinewidth
@@ -2708,25 +2712,25 @@ np
 901.52 57.60 m
 0 -7.20 l
 o
-/ps 18 def /Font1 findfont 18 s
-92.08 53.28 (2001) .5 0 0 t
-92.08 31.68 (I) .5 0 0 t
-193.26 53.28 (2001) .5 0 0 t
-193.26 31.68 (III) .5 0 0 t
-294.44 53.28 (2002) .5 0 0 t
-294.44 31.68 (I) .5 0 0 t
-395.62 53.28 (2002) .5 0 0 t
-395.62 31.68 (III) .5 0 0 t
-496.80 53.28 (2003) .5 0 0 t
-496.80 31.68 (I) .5 0 0 t
-597.98 53.28 (2003) .5 0 0 t
-597.98 31.68 (III) .5 0 0 t
-699.16 53.28 (2004) .5 0 0 t
-699.16 31.68 (I) .5 0 0 t
-800.34 53.28 (2004) .5 0 0 t
-800.34 31.68 (III) .5 0 0 t
-901.52 53.28 (2005) .5 0 0 t
-901.52 31.68 (I) .5 0 0 t
+/Font1 findfont 18 s
+92.08 53.28 (2001) .5 0 t
+92.08 31.68 (I) .5 0 t
+193.26 53.28 (2001) .5 0 t
+193.26 31.68 (III) .5 0 t
+294.44 53.28 (2002) .5 0 t
+294.44 31.68 (I) .5 0 t
+395.62 53.28 (2002) .5 0 t
+395.62 31.68 (III) .5 0 t
+496.80 53.28 (2003) .5 0 t
+496.80 31.68 (I) .5 0 t
+597.98 53.28 (2003) .5 0 t
+597.98 31.68 (III) .5 0 t
+699.16 53.28 (2004) .5 0 t
+699.16 31.68 (I) .5 0 t
+800.34 53.28 (2004) .5 0 t
+800.34 31.68 (III) .5 0 t
+901.52 53.28 (2005) .5 0 t
+901.52 31.68 (I) .5 0 t
 np
 57.60 96.53 m
 0 266.67 l
@@ -2751,11 +2755,11 @@ np
 57.60 363.20 m
 -7.20 0 l
 o
-40.32 96.53 (0) .5 0 90 t
-40.32 163.20 (50) .5 0 90 t
-40.32 229.87 (100) .5 0 90 t
-40.32 296.53 (150) .5 0 90 t
-40.32 363.20 (200) .5 0 90 t
+40.32 96.53 (0) .5 90 t
+40.32 163.20 (50) .5 90 t
+40.32 229.87 (100) .5 90 t
+40.32 296.53 (150) .5 90 t
+40.32 363.20 (200) .5 90 t
 57.60 72.00 936.00 374.40 cl
 0 setgray
 0.75 setlinewidth
@@ -2777,10 +2781,11 @@ np
 465.64 341.78 m
 0 7.64 l
 o
-/ps 12 def /Font1 findfont 12 s
+/Font1 findfont 12 s
 0 setgray
-487.24 355.69 (Infected) 0 0 0 t
-487.24 341.29 (Outbreak) 0 0 0 t
+487.24 355.69 (Inf) 0 ta
+-0.360 (ected) tb gr
+487.24 341.29 (Outbreak) 0 0 t
 ep
 %%Trailer
 %%Pages: 1

@@ -22,7 +22,7 @@
                 outbreak, the computed alarm status and the defined alarm status.
         }
 }
-\author{M. Höhle, A. Riebler, C. Lang}
+\author{M. \enc{Höhle}{Hoehle}, A. Riebler, C. Lang}
 \examples{
 
     # Plotting of simulated data

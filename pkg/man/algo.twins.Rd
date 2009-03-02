@@ -8,8 +8,8 @@
 }
 \usage{
 algo.twins(disProgObj, control=list(burnin=1000, filter=10,
-   sampleSize=2500, alpha_xi=10, beta_xi=10, psiRWSigma=0.25, alpha_psi=1,
-   beta_psi=0.1, logFile="twins.log"))
+   sampleSize=2500, alpha_xi=10, beta_xi=10, psiRWSigma=0.25,
+   alpha_psi=1, beta_psi=0.1, logFile="twins.log"))
 }
 \arguments{
   \item{disProgObj}{object of class \code{disProg}}

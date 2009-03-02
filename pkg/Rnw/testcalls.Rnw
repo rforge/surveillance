@@ -22,7 +22,7 @@
         and printed for each diesease as latex table. Additonally a summary latex table
         for all diseases is printed
 }
-\author{M. Höhle, A. Riebler, C. Lang}
+\author{M. \enc{Höhle}{Hoehle}, A. Riebler, C. Lang}
 \examples{
     test(c("m1", "m2", "m3", "m4", "m5", "q1_nrwh", "q2", "s1",
                         "s2", "s3", "k1", "n1", "n2", "h1_nrwrp"))
@@ -91,7 +91,7 @@ test <- function(data = c("k1", "m5"), range = 157:339){
 \seealso{\code{\link{sim.pointSource}}, \code{\link{algo.call}}, \code{\link{algo.compare}},
   \code{\link{plot.survRes}}, \code{\link{compMatrix.writeTable}}
 }
-\author{M. Höhle, A. Riebler, C. Lang}
+\author{M. \enc{Höhle}{Hoehle}, A. Riebler, C. Lang}
 \examples{
     testSim(K = 2)
     testSim(r = 0.5, K = 5)
@@ -143,7 +143,7 @@ testSim <- function(p = 0.99, r = 0.01, length = 400, A = 1, alpha = 1, beta = 0
 \seealso{\code{\link{readData}}, \code{\link{correct53to52}}, \code{\link{enlargeData}},
                 \code{\link{algo.call}}, \code{\link{plot.survRes}}
 }
-\author{M. Höhle, A. Riebler, C. Lang}
+\author{M. \enc{Höhle}{Hoehle}, A. Riebler, C. Lang}
 \examples{
     makePlot("./", "k1", "rki2", "RKI 2", "Kryptosporidiose")
 }
