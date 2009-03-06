@@ -17,25 +17,22 @@
 #include <iostream>
 #include <fstream>
 
-//New C++ uses header iostream (without the .h) followed by a namespace
+/*New C++ uses header iostream (without the .h) followed by a namespace*/
 using namespace std;
 
-//#include <time.h>
-//#include <string.h>
-//#include <stdlib.h>
 #include <math.h>
 
 /* Replaced calls to GSL with functions from the R API */
 #include <R.h>
 #include <Rmath.h>
-//wrappers to what used to be GSL functions
+/*wrappers to what used to be GSL functions*/
 #include "gsl_wrappers.h"
 
-//////////////////////////////////
-//Globals
-/////////////////////////////////
+/************************************
+  Globals
+*************************************/
 
-//Setup params
+/*Setup params*/
 int overdispersion;
 int varnu;
 int la_rev;
@@ -53,7 +50,7 @@ double psiRWSigma = 0.25;
 double xRWSigma = 0.25;
 double taubetaRWSigma = 0.25;
 
-//Priors
+/*Priors*/
 double alpha_lambda = 1.0;
 double beta_lambda = 1.0;
 
@@ -69,16 +66,16 @@ double alpha_psi = 1.0;
 double beta_psi = 10.0;
 
 
-  double alpha_a=1;
-  double alpha_b=0.001;
-  double beta_a=1.0;
-  double beta_b=.00001;
-  double gamma_a=1;
-  double gamma_b=0.001;
-  double delta_a=1;
-  double delta_b=0.001;
-  double epsilon_a=1;
-  double epsilon_b=0.001;
+double alpha_a=1;
+double alpha_b=0.001;
+double beta_a=1.0;
+double beta_b=.00001;
+double gamma_a=1;
+double gamma_b=0.001;
+double delta_a=1;
+double delta_b=0.001;
+double epsilon_a=1;
+double epsilon_b=0.001;
 
 
 double* my;
@@ -97,9 +94,6 @@ double* gammaalt;
 double* z2;
 int n1;
 int n2;
-
-
-
 
 
 /*********************************************************************
@@ -213,9 +207,9 @@ double sumI1(double** X, long I, long t) {
  *********************************************************************/
 long factorial(long x){
   long fac=1;
-  if(x<0){cout<<"negative value passed to factorial function" << endl; exit(-1);}
+  if(x<0){ REprintf("negative value passed to factorial function\n"); exit(-1);}
   else{
-    if(x=0){fac=1;}
+    if(x==0){fac=1;}
     else{
       for(int i=1;i<=x;i++){
         fac*=i;
@@ -230,7 +224,7 @@ long factorial(long x){
  *********************************************************************/
 double logit(double y){
   if(y <= 0 || y >= 1){
-    cout << "y <= 0 or y >= 1 in logit function." << endl;
+    REprintf("y <= 0 or y >= 1 in logit function.\n");
     exit(-1);
   }
   double logit;
@@ -351,10 +345,9 @@ double xMx2(double* Q, double* x, int n, int b)
 }
 
 
-// BERECHNET A-1, k ist matrixlaenge
+/* BERECHNET A-1, k ist matrixlaenge*/
 void invers(double* A,int k)
 {
-  //cout << "invers ! K=" << k;
 
 double* ergebnis=new double[k*k];
 if (k==1)
@@ -372,14 +365,14 @@ if (k==2)
   }
 if (k>2)
   {
-    cout << "PROGRAMMFEHLER ! in invers()";
+    REprintf("Error in the twins.cc function invers()\n");
   }
 for (int i=0; i< k*k; i++)
  {
    A[i]=ergebnis[i];
  }
 
-//delete[] ergebnis;
+/*delete[] ergebnis;*/
 return;
 
 }
@@ -390,12 +383,12 @@ for (int i=0; i<a; i++)
   {
     for (int j=0; j<b; j++)
       {
-	cout << A[i*b+j] << " ";
+	Rprintf("%f ", A[i*b+j]);
       }
-    cout << endl;
+    Rprintf("\n");
   }
- cout << endl;
-return;
+ Rprintf("\n");
+ return;
 }
 
 
@@ -410,25 +403,25 @@ for (int i=0; i<n; i++)
 	zs+=matrix[i][j];
 	if (matrix[i][j]!=matrix[j][i])
 	  {
-	    cout << "FEHLER: Matrix nicht symmetrisch ! (Zeile:" << i << ", Spalte:" <<j << endl;
+	    REprintf("Error: Matrix is not symmetric! (Row: %d, Column %d\n",i,j); 
 	    return 1;
 	  }
       }
     if (zs != 0)
       {
-	cout << "FEHLER: Zeilensumme nicht Null in Zeile "<< i << endl;
+	REprintf("Error: Row sum not zero in row %d",i,"\n");
         return 1;
       }
   }
-return 0;
+ return 0;
 }
 
 
 
 
 
-//updatealphabeta
-//Erzeugt Normalverteilten Zufallsvektor der Länge noa
+/*updatealphabeta
+  Erzeugt Normalverteilten Zufallsvektor der Länge noa*/
 void gausssample(double* temp, int noa)
 {
 
@@ -442,9 +435,6 @@ return;
 
 double hyper(int rw, double* theta, double k_a, double k_b, int n)
 {
-
-//double k_a = 1.0;
-//double k_b = 0.00005;
 
 double aa;
 double bb;
@@ -476,9 +466,7 @@ for (int i=3; i < n; i++)
 {
 	dopp_diff = theta[i-1] - 2*theta[i] + theta[i+1];
         summe = summe + dopp_diff * dopp_diff;
-// 	cout << dopp_diff<<endl;
 }
-//  cout << theta[0]<<theta[1]<<theta[n]<<theta[n-1]<<endl;
 bb = k_b + 0.5 * summe;
 
 
@@ -574,7 +562,6 @@ if (age_block==2)
     index++;
     temp[index]=-2*kappa;
     index++;
-    //temp[index]=0;
     index++;
     temp[index]=kappa+delta*nop;
   }
@@ -622,8 +609,8 @@ for (int i=1; i<=I; i++)
    }
    myneu=myneu+xreg[i]*taualpha;
    myneu=myneu/tauneu;
-   double akzw=0.5*log(tauneu/(2*PI))-0.5*tauneu*(alphaneu-myneu)*(alphaneu-myneu); // log Proposalw. alt|neu
-   akzw -= ((0.5*log(tau/(2*PI))-0.5*tau*(alpha[i]-my)*(alpha[i]-my))); // log Proposalw. neu|alt
+   double akzw=0.5*log(tauneu/(2*PI))-0.5*tauneu*(alphaneu-myneu)*(alphaneu-myneu); /* log Proposalw. alt|neu*/
+   akzw -= ((0.5*log(tau/(2*PI))-0.5*tau*(alpha[i]-my)*(alpha[i]-my))); /* log Proposalw. neu|alt*/
    akzw += (-0.5*taualpha*(alpha[i]-xreg[i])*(alpha[i]-xreg[i]));
    akzw -= (-0.5*taualpha*(alphaneu-xreg[i])*(alphaneu-xreg[i]));
    for (int t=2; t<=n; t++)
@@ -638,15 +625,6 @@ for (int i=1; i<=I; i++)
 		acc_alpha += 1;
 	}
 }
-//  double sum=0;
-//  for (int i=1; i<=I; i++)
-//    {
-//      sum+=alpha[i]-xreg[i];
-//    }
-//  for (int i=1;i<=I; i++)
-//    {
-//      alpha[i]=alpha[i]-(sum/I);
-//    }
 
 return;
 }
@@ -658,813 +636,100 @@ void erzeuge_b_Q(double* gamma  , double* my, double* Q, double* alpha, double* 
 {
   if (mode==1)
     {
-// b-vektor des Proposals
-for (int t=0;t<n; t++)
-{
-	my[t]=0.0;
-	for (int i=1; i<=I; i++)
+      /* b-vektor des Proposals*/
+      for (int t=0;t<n; t++)
 	{
-		my[t]+=X[i][t+2];
-		my[t]-=(1-beta[t+2])*omegaX[i][t+2]*delta[t+2]*(exp(sumg(ncov,xcov,gamma,t+2,scov)+alpha[i]+beta[t+2]));
+	  my[t]=0.0;
+	  for (int i=1; i<=I; i++)
+	    {
+	      my[t]+=X[i][t+2];
+	      my[t]-=(1-beta[t+2])*omegaX[i][t+2]*delta[t+2]*(exp(sumg(ncov,xcov,gamma,t+2,scov)+alpha[i]+beta[t+2]));
+	    }
 	}
-}
     }
- if (mode==2)
+  if (mode==2)
     {
-// b-vektor des Proposals
-for (int t=2;t<=n; t++)
-{
-	my[t-2]=0.0;
-	for (int i=1; i<=I; i++)
+      /* b-vektor des Proposals*/
+      for (int t=2;t<=n; t++)
 	{
-		my[t-2]+=Y[i][t];
-		my[t-2]-=(1-beta[t])*(omega[i][t]*Z[i][t-1]*exp(sumg(ncov,xcov,gamma,t,scov)+alpha[i]+beta[t]));
+	  my[t-2]=0.0;
+	  for (int i=1; i<=I; i++)
+	    {
+	      my[t-2]+=Y[i][t];
+	      my[t-2]-=(1-beta[t])*(omega[i][t]*Z[i][t-1]*exp(sumg(ncov,xcov,gamma,t,scov)+alpha[i]+beta[t]));
+	    }
 	}
+      
+      
+    }
+  
+  /* Präzisionsmatrix*/
+  berechneQ(Q, rw, taubeta, n, 1, 0.0);
+  
+  if (mode==1)
+    {
+      for (int i=1; i<=I; i++)
+	{
+	  for (int t=0; t<n; t++)
+	    {
+	      Q[(rw+1)*(t)]+= omegaX[i][t+2]*delta[t+2]*exp(sumg(ncov,xcov,gamma,t+2,scov)+alpha[i]+beta[t+2]);
+	    }	
+	}
+    }
+  
+  if (mode==2)
+    {
+      for (int i=1; i<=I; i++)
+	{
+	  for (int t=2; t<=n; t++)
+	    {
+	      Q[(rw+1)*(t-2)]+= omega[i][t]*Z[i][t-1]*exp(sumg(ncov,xcov,gamma,t,scov)+alpha[i]+beta[t]);
+	    }
+	}	
+    }
+  
+  return;
 }
-
-
-}
-
-//mxschreibe(my,1,n-1);
-
-// Präzisionsmatrix
-berechneQ(Q, rw, taubeta, n, 1, 0.0);
-
-// mxschreibe(Q,n-1,rw+1);
-
- if (mode==1)
-   {
-     for (int i=1; i<=I; i++)
-       {
-	 for (int t=0; t<n; t++)
-	   {
-	     Q[(rw+1)*(t)]+= omegaX[i][t+2]*delta[t+2]*exp(sumg(ncov,xcov,gamma,t+2,scov)+alpha[i]+beta[t+2]);
-	          }	
-   }
-   }
-
-//mxschreibe(Q,n-1,rw+1);
-
- if (mode==2)
-   {
-     for (int i=1; i<=I; i++)
-       {
-	 for (int t=2; t<=n; t++)
-	   {
-	     Q[(rw+1)*(t-2)]+= omega[i][t]*Z[i][t-1]*exp(sumg(ncov,xcov,gamma,t,scov)+alpha[i]+beta[t]);
-// 	     cout << omega[i][t]<<Z[i][t-1]<<endl;
-	   }
-       }	
-   }
-
-return;
-   }
 
 
 void erzeuge_b_Q_2(double* my, double* Q, double* alpha, double* beta, double* gamma, double* delta, long** X,
-		 long n, long I, double taubeta, int rw, double** xcov, int ncov, int scov, double** omega)
+		   long n, long I, double taubeta, int rw, double** xcov, int ncov, int scov, double** omega)
 {
 
-// b-vektor des Proposals
-for (int t=0;t<=n; t++)
-{
-	my[t]=0.0;
-	for (int i=1; i<=I; i++)
+  /* b-vektor des Proposals*/
+  for (int t=0;t<=n; t++)
+    {
+      my[t]=0.0;
+      for (int i=1; i<=I; i++)
 	{
-		my[t]+=X[i][t+2];
-		my[t]-=(1-beta[t])*omega[i][t+2]*delta[t+2]*exp(sumg(ncov,xcov,gamma,t+2,scov)+alpha[i]+beta[t]);
+	  my[t]+=X[i][t+2];
+	  my[t]-=(1-beta[t])*omega[i][t+2]*delta[t+2]*exp(sumg(ncov,xcov,gamma,t+2,scov)+alpha[i]+beta[t]);
 	}
-}
+    }
 
 
-//mxschreibe(my,1,n-1);
+  /* Präzisionsmatrix*/
+  berechneQ(Q, rw, taubeta, n+1, 1, 0.0);
 
-// Präzisionsmatrix
-berechneQ(Q, rw, taubeta, n+1, 1, 0.0);
-
-// mxschreibe(Q,n+1,rw+1);
-// cout << taubeta << endl;
-     for (int i=1; i<=I; i++)
-       {
-	 for (int t=0; t<=n; t++)
-	   {
-	     Q[(rw+1)*(t)]+= omega[i][t+2]*delta[t+2]*exp(sumg(ncov,xcov,gamma,t+2,scov)+alpha[i]+beta[t]);
-           }	
-       }
-
-
-//mxschreibe(Q,n-1,rw+1);
-
-return;
-}
-
-
-
-// double updatemu(double mu, double* alpha, double* beta, double lambda, double p, long I, long n, long** Y, long** S, long** X, long& acc_mu, int doit){
-
-//   double quot=(lambda*p/(1-lambda));
-//   double term1=0.0;
-//   for (int i=1; i<=I; i++)
-//     {
-//       term1 +=Y[i][1];
-//       for (int t=1; t<=n; t++)
-// 	{
-// 	  term1+=(X[i][t]+S[i][t]);
-// 	}
-//     }
-
-// //     double XSum = sumIn(X,I,n);
-// //     double SSum = sumIn(S,I,n);
-
-// //     double Y1Sum = 0;
-// //     for (register long i=1;i<=I; i++) {
-// //       Y1Sum = Y1Sum + Y[i][1];
-// //     }
-
-// //     double praemu=0.0;//log((XSum+SSum+Y1Sum)/(I*n+I*(lambda*p)/(1-lambda)));
-  
-
-// //   double v=0;
-// //   for (int i=1; i<=I; i++)
-// //     {
-// //       v += (quot*exp(mu+alpha[i]+beta[1]));
-
-// //         for (int t=1; t<=n; t++)
-// // 	  {
-// // 	    v += exp(mu+alpha[i]+beta[t]);
-// // 	  }
-
-// //     }  
-// //   double m=praemu+(term1-v)/v;
-// //   double muneu=gsl_ran_gaussian(r,sqrt(1/v))+m;
-
-// //   double vneu=0;
-// //   for (int i=1; i<=I; i++)
-// //     {
-// //       vneu += quot*exp(muneu+alpha[i]+beta[1]);
-// //         for (int t=1; t<=n; t++)
-// // 	  {
-// // 	    vneu += exp(muneu+alpha[i]+beta[t]);
-// // 	  }
-// //     }  
-// //   double mneu=praemu+(term1-vneu)/vneu;
-
-// //   double akzw=term1*muneu-term1*mu;
- 
-// //   for (int i=1; i<=I; i++)
-// //     {
-// //       akzw-=quot*exp(muneu+alpha[i]+beta[1]);
-// //       akzw+=quot*exp(mu+alpha[i]+beta[1]);
-// //       for (int t=1; t<=n; t++)
-// // 	  {
-// // 	    akzw -= exp(muneu+alpha[i]+beta[t]);
-// // 	    akzw += exp(mu+alpha[i]+beta[t]);  
-// // 	  }
-// //     }
-
-// //   akzw -= (0.5*log(v)-0.5*v*(muneu-m)*(muneu-m));
-// //   akzw += (0.5*log(vneu)-0.5*vneu*(mu-mneu)*(mu-mneu));
-
- 
-// //   if (exp(akzw) >= gsl_rng_uniform(r)&&doit>2)
-// // 	{
-// // 		mu=muneu;
-// // 		acc_mu++;
-// // 	}
-// //     for (int i=0; i<50000000; i++){acc_mu++;}
-// //     cout << mu << " " << muneu<< " " << term1 <<" "<<v<<" "<<akzw<< " " << alpha[3]<< " " << beta[25] <<endl;
-
-//   double muneu = mu+gsl_ran_gaussian(r,.05);
-//   double akzw=term1*muneu-term1*mu;
- 
-//   for (int i=1; i<=I; i++)
-//     {
-//       akzw-=quot*exp(muneu+alpha[i]+beta[1]);
-//       akzw+=quot*exp(mu+alpha[i]+beta[1]);
-//       for (int t=1; t<=n; t++)
-// 	  {
-// 	    akzw -= exp(muneu+alpha[i]+beta[t]);
-// 	    akzw += exp(mu+alpha[i]+beta[t]);  
-// 	  }
-//     }
-
-// //     for (int i=0; i<50000000; i++){acc_mu++;}
-// //     cout << mu << " " << muneu<< " " << term1 <<" "<<akzw<< " " << alpha[3]<< " " << beta[25] <<endl;
-
-//   if (exp(akzw) >= gsl_rng_uniform(r)&&doit>2)
-// 	{
-// 		mu=muneu;
-// 		acc_mu++;
-// 	}
-
-//   return mu;
-// }
-
-//mxs.cc
-/* hoehle - no fortran
-extern "C" {
-int gpskca_(int& n,int degree[],int rstart[],int connec[], int& ioptpro, int& worklen, int permut[], int work[], int& bandwidth, int& profile, int& error, int& space);        
-int dpbtrf_(char& uplo,int& n,int& bw, double mx_neu[], int& bw1,int& info);
-int dtbsv_(char& uplo, char& trans, char& diag, int& n, int& bw, double A[], int& bw1, double z[], int& incx);
-}
-*/
-
-/*hofmann - no fortran
-void loese(double* A, double* z, int &n, int& bw)     
-{
-	
-char uplo='L';
-char trans='T';
-char diag='N';
-int bw1 = bw+1;
-int incx=1;
-
-
-dtbsv_(uplo,trans,diag, n, bw, A, bw1, z, incx);
-return;
-} 
-*/
-/*hofmann - no fortran
-void loese2(double* A, double* z, int &n, int& bw)     
-{
-	
-char uplo='L';
-char trans='N';
-char diag='N';
-int bw1=bw+1;
-int incx=1;
-
-
-dtbsv_(uplo,trans,diag, n, bw, A, bw1, z, incx);
-return;
-} 
-*/
-
-/*hofmann - no fortran
-double* cholesky(int n, double* matrix,  int& bw)
-{
-// double* mx_neu = new double[bw+1*n];
-// for (int i=0; i<n; i++)
-//   {
-//     mx_neu[i] = new double[n];
-//   }
-
-char uplo='L';
-// for (int j=0; j < bw+1; j++)
-//    {
-// 	for (int i=0; i<n-j; i++)
-// 	  {
-// 	    mx_neu[j][i]=(double)matrix(i+j,i);
-// 	  }
-//    }
-
-// for (int j=0; j < bw+1; j++)
-//    {
-// 	for (int i=0; i<n-j; i++)
-// 	  {
-// 	    mx_neu[j+((bw+1)*i)]=(double)matrix(i+j,i);
-// 	  }
-//    }
-//  cout << endl;
-//  for(int a3=0;a3<((bw+1)*n);a3++)
-//    {
-// //   for(int a4=0;a4<n;a4++)
-// //    {
-// //      if (mx_neu[a3][a4]>-1)
-// //      {
-// //      cout << " ";
-// //      }
-//       cout << mx_neu[a3];
-// //    }
-//     cout << endl;
-//   }
-
-int info=0;
-int bw1=bw+1;
-dpbtrf_(uplo, n, bw, matrix, bw1, info);
-
-//  cout << "Info: "<< info << endl;
-
-
-// double** zerlegung = new double*[n];
-// for (int i=0; i<n; i++)
-//   {
-//     zerlegung[i]=new double[n];
-//   }
-
-// for (int i=0; i<n; i++)
-//   {
-//     for (int j=0; j<n; j++)
-//       {
-// 	zerlegung[i][j]=0.0;
-//       }
-//   }
-
-
-// LaGenMatDouble zerlegung(n,0.0);
-
-//    for (int j=0; j<bw+1; j++)
-//      {
-//        for (int i=0; i<n-j; i++)
-//          {
-//    	zerlegung[i+j][i]=mx_neu[(bw+1)*i+j];
-//          }
-//      }
-
-	
-return matrix;
-
-}
-*/
-/*hofmann - no fortran
-void update_beta_nurrw(double* gamma, double* alpha, double* beta, double* delta, long** X, long** Z, long** Y, long n, long I, double taubeta, int rw, double p, double** lambda, long& acc_beta, long doit, double* my, double* my2, double* temp, double* z, double* theta, double* Q, double* Q2, double* L, double* L2, double** xcov, int ncov, int scov, double** omega, double** omegaX, int mode)
-{
-int bandw=rw+1;
-int n2=n-1;
-
-
-
-
- erzeuge_b_Q(gamma, theta, Q, alpha, delta, beta, X, Z, Y, n2, I, taubeta, rw, lambda, p, xcov, ncov, omega, omegaX,scov, mode); //erzeugt b und Q, theta ist b
-
- // cout << theta[0]<<" " <<Q[0]<< " "<< Q[rw+1]<<endl;
- //  mxschreibe(Q,n2,bandw);
-
-for (int i=0; i< (bandw*n2); i++)
-  {
-    L[i]=Q[i];
-  }
-
- cholesky(n2, L, rw); // erzeugt L
-
-//  mxschreibe(Q,n2,bandw);
-//  mxschreibe(L,n2,bandw);
-
-
-//Lv=b
- loese2(L, theta, n2, rw); // theta ist v oder w
-
-//L^T my=v
- loese(L,theta, n2, rw); //theta ist mu
-
- // mxschreibe(beta,1,n+1);
- // mxschreibe(theta,1,n);
-//z
-gausssample(temp, n2);
-
- for (int i=0; i<n2; i++)
-   {
-     z[i]=temp[i];
-   }
-
-//L^T y=z
- loese(L,temp,n2, rw); //temp ist y oder v
-
-//x=my + y
-for (int i=n+1; i>0; i--)
-  {
-    theta[i]=theta[i-2]+temp[i-2]; // theta = mu + v
-  }
-
-// mxschreibe(theta,1,n+1);
-// mxschreibe(z,1,n+1);
-
-// theta ist der vorgeschlagene Vektor
-
-//mxschreibe(beta,1,n+1);
- erzeuge_b_Q(gamma, my2, Q2, alpha, delta, theta, X, Z, Y, n2, I, taubeta, rw, lambda, p, xcov, ncov, omega, omegaX,scov, mode); //erzeugt b^0 und Q^0, my2 ist b^0
-
- //mxschreibe(beta,1,n+1);
-
- for (int i=0; i< (bandw*n2); i++)
-   {
-     L2[i]=Q2[i]; //Q2 ist Q^0
-   }
-//  mxschreibe(beta,1,n);
-//  mxschreibe(theta,1,n);
-double akzw=0.0;  // loglik Proposal
-
- cholesky(n2,L2,rw); //L2 ist L^0
-
- loese2(L2, my2, n2, rw); //my2 ist jetzt v^0 oder w^0
-
-//L^T my=v
- loese(L2,my2, n2, rw);//my2 ist jetzt mittelwertsvektor,  my2 ist jetzt mu^0
-
- for (int i=0; i<n2; i++)
-   {
-     my2[i]=beta[i+2]-my2[i]; //my2 ist jetzt (beta^0 - mu^0)
-   }
-//  mxschreibe(L,n2,bandw);
-//  mxschreibe(my2,1,n2);
-//  akzw -= xMx(Q2,my2,n2,bandw); // -1/2*(beta^0 - mu^0)'Q^0(beta^0 - mu^0)
-  akzw -= 0.5*xMx2(Q2,my2,n2,bandw);
-  //   cout << akzw << endl;
-for (int i=0; i<n2; i++)  
-{
-  akzw -= log(L2[bandw*i]); // - log(L^0_tt)	
-	akzw += log(L[bandw*i]); // log(L_tt)
- }
-//  cout << akzw << endl;
-for (int i=0; i<n2; i++)  
-  {
-	akzw += 0.5*z[i]*z[i];
-}
-
-//  mxschreibe(z,1,n2);
-
-//  cout << akzw << endl;
-// Die Loglikelihoods
-for (int i=4; i<=n; i++)
-{
-  akzw += 0.5*taubeta*(beta[i]-2*beta[i-1]+beta[i-2])*(beta[i]-2*beta[i-1]+beta[i-2]); //beta^0' R beta^0
-	akzw -= 0.5*taubeta*(theta[i]-2*theta[i-1]+theta[i-2])*(theta[i]-2*theta[i-1]+theta[i-2]); // - beta' R beta
-}
-
-// berechneQ(Q, rw, taubeta, n2, 1, 0.0); //Q ist R
-// for(int i=0;i<n2;i++){
-//   my[i]=theta[i+2];
-//   my2[i]=beta[i+2];
-//  }
-// akzw -= xMx(Q,my,n2,bandw);
-// akzw += xMx(Q,my2,n2,bandw);
-
-//  cout << akzw << endl;
-
- if (mode==1)
-   {
- 
-     for (int i=1; i<=I; i++)
-       {
-	 double temp;
-	 temp=alpha[i];
-	 for (int t=2; t<=n; t++)
-	   {
-	     akzw -= beta[t]*(X[i][t]); // - beta^0 c	     
-	     akzw += omegaX[i][t]*delta[t]*exp(temp+beta[t]+sumg(ncov,xcov,gamma,t,scov)); // - h(beta^0)
-	     akzw += theta[t]*(X[i][t]); // beta c
-	     akzw -= omegaX[i][t]*delta[t]*exp(temp+theta[t]+sumg(ncov,xcov,gamma,t,scov)); // + h(beta)
-	   }
-       }
-
-   }
-
- if (mode==2)
-   {
-     for (int i=1; i<=I; i++)
-       {
-	 double temp;
-	 temp=alpha[i];
-	 for (int t=2; t<=n; t++)
-	   {
-	     akzw -= beta[t]*(Y[i][t]);
-	     
-	     akzw -= omega[i][t]*Z[i][t-1]*exp(temp+theta[t]+sumg(ncov,xcov,gamma,t,scov));
-	     akzw += theta[t]*(Y[i][t]);
-	     akzw += omega[i][t]*Z[i][t-1]*exp(temp+beta[t]+sumg(ncov,xcov,gamma,t,scov));
-	   }
-       }
-   }
-  
-//mxschreibe(beta,1,n+1),
-   //mxschreibe(theta,1,n+1);
-//  cout << akzw << endl<<endl;
-
-if (exp(akzw)>gsl_rng_uniform(r))
-{
-	for (int i=2; i<=n; i++)
+  for (int i=1; i<=I; i++)
+    {
+      for (int t=0; t<=n; t++)
 	{
-		beta[i]=theta[i];
-	}
-// 	mxschreibe(beta,1,n);
-	acc_beta++;
-
-}
-// cout << "YY:"<<beta[n-1]<<" "<<beta[n]<<endl;
-// cout << akzw <<" " << taubeta <<endl;
-
-// if (doit>73)
-//   {
-//  double sum=0.0;
-// 	for (int i=2; i<=n; i++)
-// 	{
-// 	  sum+=beta[i];
-// 	}
-// 	for (int i=2; i<=n; i++)
-// 	{
-// 	  beta[i]=beta[i]-(sum/(n-1));
-// 	}
-// 	gamma[0]=gamma[0]+(sum/(n-1));
-//   }//cout << sum << " ";
-
-return;
-}
-*/
-/*hofmann - no fortran
-void update_beta_block( double* alpha, double* beta, double* gamma, double* delta, long** X, long n, long I, double taubeta, int rw, long& acc_beta, long sampleCounter, int n1, int n2, double* my, double* my2, double* z, double* theta, double* beta0, double* Q, double* Q2, double* L, double* L2, double** xcov, int ncov, int scov, double** omega)
-{
-
- for(int t=0;t<=n2;t++){
-   beta0[t] = beta[t+2];
- }
-
- erzeuge_b_Q_2(theta, Q, alpha, beta0, gamma, delta, X, n2, I, taubeta, rw, xcov, ncov, scov, omega); //erzeugt b und Q, theta ist b
-
- //  mxschreibe(Q,n2,bandw);
-
-for (int i=0; i< ((rw+1)*n1); i++)
-  {
-    L[i]=Q[i]; //Q ist Q
-  }
-
- cholesky(n1, L, rw); // erzeugt L, L ist L
-
-//Lw=b -> w
- loese2(L, theta, n1, rw); // theta ist w
-
-//L^T my=w -> my
- loese(L,theta, n1, rw); //theta ist my
-
-//z
-gausssample(temp, n1);
-
- for (int i=0; i<=(n2); i++)
-   {
-     z[i]=temp[i]; //z ist z
-   }
-
- // cout << temp[n3-1] << endl;
- // cout << temp[n3] << endl;
-
-//L^T v=z -> v
- loese(L,temp,n1, rw); //temp ist v
-
- // cout << temp[n3-1] << endl;
- // cout << temp[n3] << endl;
-
-//beta=my + v
-for (int i=0; i<=(n2); i++)
-  {
-    theta[i] += temp[i]; // theta = mu + v
-  }
-
-// mxschreibe(theta,n-1,1);
-
-// cout << theta[n3]<< endl;
-// cout << beta0[n3]<< endl;
-
-// theta ist der vorgeschlagene Vektor
-
- erzeuge_b_Q_2(my2, Q2, alpha, theta, gamma, delta, X, n2, I, taubeta, rw, xcov, ncov, scov, omega); //erzeugt b^0 und Q^0, my2 ist b^0
-
- for (int i=0; i< ((rw+1)*(n-1)); i++)
-   {
-     L2[i]=Q2[i]; //Q2 ist Q^0
-   }
-
-
- // mxschreibe(Q2,n-1,rw+1);
- // mxschreibe(L2,n-1,rw+1);
-
- cholesky(n1,L2,rw); //L2 ist L^0
-
- // mxschreibe(L2,n-1,rw+1);
-
- //L^0w=b^0 -> w
- loese2(L2, my2, n1, rw); //my2 ist jetzt w^0
-
-//L^0^T my=w
- loese(L2,my2, n1, rw);//my2 ist jetzt mittelwertsvektor,  my2 ist jetzt mu^0
-
- for (int i=0; i<=(n2); i++)
-   {
-     my2[i]=beta0[i]-my2[i]; //my2 ist jetzt (beta^0 - mu^0)
-   }
+	  Q[(rw+1)*(t)]+= omega[i][t+2]*delta[t+2]*exp(sumg(ncov,xcov,gamma,t+2,scov)+alpha[i]+beta[t]);
+	}	
+    }
 
 
 
-double akzw=0.0;  // loglik Proposal
-
-//Prior
-for (int i=2; i<=(n2); i++){
-  akzw -= 0.5*taubeta*(theta[i]-2*theta[i-1]+theta[i-2])*(theta[i]-2*theta[i-1]+theta[i-2]); // - 0.5*taubeta*beta' R beta
-  akzw += 0.5*taubeta*(beta0[i]-2*beta0[i-1]+beta0[i-2])*(beta0[i]-2*beta0[i-1]+beta0[i-2]); // 0.5*taubeta*beta^0' R beta^0
-}
-// cout << akzw << endl;
-for (int i=1; i<=I; i++){
-  for (int t=0; t<=(n2); t++){
-    akzw += theta[t]*(X[i][t+2]); // beta c
-    akzw -= beta0[t]*(X[i][t+2]); // - beta^0 c	     
-    akzw -= omega[i][t+2]*delta[t+2]*exp(alpha[i]+theta[t]+sumg(ncov,xcov,gamma,t+2,scov)); // + h(beta)
-    akzw += omega[i][t+2]*delta[t+2]*exp(alpha[i]+beta0[t]+sumg(ncov,xcov,gamma,t+2,scov)); // - h(beta^0)
-
-  }
-}
-// cout << akzw << endl;
-for (int i=0; i<=(n2); i++)  {
-  akzw -= log(L[(rw+1)*i]); // - log(L_tt)
-  akzw += log(L2[(rw+1)*i]); // log(L^0_tt)	
-}
-// cout << akzw << endl;
-for (int i=0; i<=(n2); i++){
-  akzw += 0.5*z[i]*z[i];
-}
-// cout << akzw << endl;
-akzw -= 0.5*xMx2(Q2,my2,n2,rw+1); // -1/2*(beta^0 - mu^0)'Q^0(beta^0 - mu^0)
-
-// cout << akzw << endl << endl;
-
-// cout << taubeta << endl;
-
-if (exp(akzw)>gsl_rng_uniform(r))
-{
-	for (int i=0; i<=(n2); i++)
-	{
-		beta[i+2]=theta[i];
-	}
-	acc_beta++;
-
+  return;
 }
 
-return;
-}
-*/
-
-/*hofmann - no fortran
-void update_beta_tau_block( double* alpha, double* beta, double* gamma, double* delta, double beta_a, double beta_b, long** X, long n, long I, double& taubeta, int rw, long& acc_beta, double taubetaRWSigma, double taubetaStar, long sampleCounter, int n1, int n2, double* my, double* my2, double* z, double* theta, double* beta0, double* Q, double* Q2, double* L, double* L2, double** xcov, int ncov, int scov, double** omega)
-{
-
-
-  //update log(taubeta) with change of variables
-  taubetaStar = taubeta*exp(gsl_ran_gaussian(r,taubetaRWSigma));
-  //taubetaStar = 720;
-
-    // if(sampleCounter<10000){taubetaStar = 5000;}
- // cout << taubeta << "  " << taubetaStar << endl;
-  // if(sampleCounter%500==1){cout << taubeta << endl << endl;}
- for(int t=0;t<=n2;t++){
-   beta0[t] = beta[t+2];
- }
-
-
- // cout << taubetaStar << endl;
- erzeuge_b_Q_2(theta, Q, alpha, beta0, gamma, delta, X, n2, I, taubetaStar, rw, xcov, ncov, scov, omega); //erzeugt b und Q, theta ist b
- // cout << taubetaStar << endl;
-for (int i=0; i< ((rw+1)*n1); i++)
-  {
-    L[i]=Q[i]; //Q ist Q
-  }
-
-
-
- cholesky(n1, L, rw); // erzeugt L, L ist L
-
-//Lw=b -> w
- loese2(L, theta, n1, rw); // theta ist w
-
-//L^T my=w -> my
- loese(L,theta, n1, rw); //theta ist my
-
-for (int i=0; i<=(n2); i++)
-  {
-    my[i] = theta[i]; // my ist my 
-  }
-
-
-//z
-gausssample(temp, n1);
-
- for (int i=0; i<=(n2); i++)
-   {
-     z[i]=temp[i]; //z ist z
-   }
-
-//L^T v=z -> v
- loese(L,temp,n1, rw); //temp ist v
-
-//beta=my + v
-for (int i=0; i<=(n2); i++)
-  {
-    theta[i] += temp[i]; // theta = mu + v
-  }
-
-// theta ist der vorgeschlagene Vektor
-
-
-for (int i=0; i<=(n2); i++)
-  {
-    my[i] = theta[i] - my[i]; // my ist (my - beta) 
-  }
-
-
-// cout << taubeta << endl;
- erzeuge_b_Q_2(my2, Q2, alpha, theta, gamma, delta, X, n2, I, taubeta, rw, xcov, ncov, scov, omega); //erzeugt b^0 und Q^0, my2 ist b^0
- // cout << taubeta << endl;
- for (int i=0; i< ((rw+1)*(n1)); i++)
-   {
-     L2[i]=Q2[i]; //Q2 ist Q^0
-   }
-
-
- cholesky(n1,L2,rw); //L2 ist L^0
-
- //L^0w=b^0 -> w
- loese2(L2, my2, n1, rw); //my2 ist jetzt w^0
-
-//L^0^T my=w
- loese(L2,my2, n1, rw);//my2 ist jetzt mittelwertsvektor,  my2 ist jetzt mu^0
-
- for (int i=0; i<=(n2); i++)
-   {
-     my2[i]=beta0[i]-my2[i]; //my2 ist jetzt (beta^0 - mu^0)
-   }
-
-
-
-double akzw=0.0;  // loglik Proposal
-
-//Prior
-for (int i=2; i<=(n2); i++){
-      akzw -= 0.5*taubetaStar*(theta[i]-2*theta[i-1]+theta[i-2])*(theta[i]-2*theta[i-1]+theta[i-2]); // - 0.5*taubetaStar*beta' R beta
-      akzw += 0.5*taubeta*(beta0[i]-2*beta0[i-1]+beta0[i-2])*(beta0[i]-2*beta0[i-1]+beta0[i-2]); // 0.5*taubeta*beta^0' R beta^0
-      akzw += log(sqrt(taubetaStar)); //Normierungskonstante
-      akzw -= log(sqrt(taubeta));
-}
-
-
-// cout << akzw << endl;
-//likelihood
-for (int i=1; i<=I; i++){
-  for (int t=0; t<=(n2); t++){
-    akzw += theta[t]*(X[i][t+2]); // beta c
-    akzw -= beta0[t]*(X[i][t+2]); // - beta^0 c	     
-    akzw -= omega[i][t+2]*delta[t+2]*exp(alpha[i]+theta[t]+sumg(ncov,xcov,gamma,t+2,scov)); // + h(beta)
-    akzw += omega[i][t+2]*delta[t+2]*exp(alpha[i]+beta0[t]+sumg(ncov,xcov,gamma,t+2,scov)); // - h(beta^0)
-
-  }
-}
-// cout << akzw << endl;
-for (int i=0; i<=(n2); i++)  {
-  akzw -= log(L[(rw+1)*i]); // - log(L_tt) ??
-  akzw += log(L2[(rw+1)*i]); // + log(L^0_tt)	
-}
-// cout << akzw << endl;
-//for (int i=0; i<=(n2); i++){
-  //         akzw += 0.5*z[i]*z[i];
-  //}
-akzw += 0.5*xMx2(Q,my,n2,rw+1);
-// cout << akzw << endl;
-akzw -= 0.5*xMx2(Q2,my2,n2,rw+1); // -1/2*(beta^0 - mu^0)'Q^0(beta^0 - mu^0)
-
-
-// cout << akzw << endl;
-
-
-
-//Prior of log(taubeta)
-// akzw += gsl_ran_gamma_log_pdf(taubetaStar,beta_a,1/beta_b) + log(taubetaStar);
-// akzw -= gsl_ran_gamma_log_pdf(taubeta,beta_a,1/beta_b) + log(taubeta);
-
- akzw += beta_a*log(taubetaStar/taubeta);
- akzw -= beta_b*(taubetaStar - taubeta);
-
-
-// double akzw2 = exp(akzw);
- //akzw2 *= gsl_ran_gamma_pdf(taubetaStar,beta_a,1/beta_b)*taubetaStar/(gsl_ran_gamma_pdf(taubeta,beta_a,1/beta_b)*taubeta);
-
-
-
- // berechneQ(Q, rw, taubetaStar, n2+1, 1, 0.0);
- // berechneQ(Q2, rw, taubeta, n2+1, 1, 0.0);
- // mxschreibe(Q2,n1,rw+1);
- //akzw -= 0.5*xMx2(Q,theta,n2,rw+1); 
-//akzw += 0.5*xMx2(Q2,beta0,n2,rw+1); 
-
-
-// cout << akzw << endl << endl;
-
-// cout << taubeta << endl;
-
-if (exp(akzw)>gsl_rng_uniform(r))
-{
-	for (int i=0; i<=(n2); i++)
-	{
-		beta[i+2]=theta[i];
-	}
-	taubeta = taubetaStar;
-	acc_beta++;
-
-}
-
-return;
-}
-*/
 
 
 void machnu(double* mu, double* alpha, double* beta, double* delta, double** nu, long I, long n, int ncov, double** xcov, int scov)
 {
 	for (int i=1; i<=I; i++)
-	  { //cout.flush();
+	  { 
 		for (int t=2; t<=n; t++)
 		{
 			nu[i][t]=delta[t]*exp(sumg(ncov,xcov,mu,t,scov)+alpha[i]+beta[t]);
@@ -1472,377 +737,8 @@ void machnu(double* mu, double* alpha, double* beta, double* delta, double** nu,
 	}
 return;
 }
-/*
-void update_gamma(double* alpha, double* beta, double* gamma, int ncov, double** xcov, long** X, long** Z, long** Y, long n, long I, double taugamma, double p, double** lambda, long& acc_gamma, double* P, double* P2, double* gammaalt, double*z, double* L, double* m, double** omega, double** omegaX, int scov, int mode)
-{
-
-  // erzeuge Präzisionsmatrix
-
- 
-  for (int i=0; i<ncov; i++)
-    {
-      for (int j=0; j<ncov; j++)
-	{
-	  P[i*ncov+j]=0.0;
-	}
-      P[ncov*i]=taugamma;
-    }
-  if (mode==1)
-    {
-    for (int k=0; k<ncov; k++)
-    {
-      for (int l=k; l<ncov; l++)
-	{
-	  for (int i=1; i<=I; i++)
-	    {
-	      for (int t=2; t<=n; t++)
-		{
-		  P[k*ncov+l-k]+= xcov[k][t]*xcov[l][t]*omegaX[i][t]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-		  
-		  
-		}
- 	    }	      
-	}
-    }
-    }
-  // mxschreibe(P,ncov,ncov);
-  if (mode==2)
-    {
-    for (int k=0; k<ncov; k++)
-    {
-      for (int l=k; l<ncov; l++)
-	{
-	  for (int i=1; i<=I; i++)
-	    {
-	      for (int t=2; t<=n; t++)
-		{
-		  P[k*ncov+l-k]+= xcov[k][t]*xcov[l][t]*omega[i][t]*Z[i][t-1]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-		  
-		  
-		}
- 	    }	      
-	}
-    }
-    }
-
-   
-
-//     //erzeuge m
-
-    for (int j=0; j<ncov; j++)
-      {
-	m[j]=0.0;
-      }
-    if (mode==1)
-      {
-    for (int j=0; j<ncov; j++)
-      {
-	for (int i=1; i<=I; i++)
-	  {
-	    for (int t=2; t<=n; t++)
-	      {
-
-		m[j]+=xcov[j][t]*(X[i][t]);
-
-		//1.Ableitung
-		m[j] -= xcov[j][t]*omegaX[i][t]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-		//2.Ableitung
-		for (int k=0; k<ncov; k++)
-		  {
-		    m[j]+=gamma[k]*xcov[k][t]*xcov[j][t]*omegaX[i][t]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-		  }
-	      }
-	  }
-      }
-      }
-    if (mode==2)
-      {
-    for (int j=0; j<ncov; j++)
-      {
-	for (int i=1; i<=I; i++)
-	  {
-	    for (int t=2; t<=n; t++)
-	      {
-
-		m[j]+=xcov[j][t]*(Y[i][t]);
-
-		//1.Ableitung
-		m[j] -= xcov[j][t]*omega[i][t]*Z[i][t-1]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-		//2.Ableitung
-		for (int k=0; k<ncov; k++)
-		  {
-		    m[j]+=gamma[k]*xcov[k][t]*xcov[j][t]*omega[i][t]*Z[i][t-1]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-		  }
-	      }
-	  }
-      }
-      }
 
 
-    for (int i=0; i<ncov; i++)
-      {
-	gammaalt[i]=gamma[i];
-	gamma[i]=m[i];
-      }
-
-    //Ziehe gammaproposal
-    int bw=ncov-1;
-   
-    gausssample(z,ncov);    
-
-    cholesky(ncov,P,bw); 
-
-
-    
-    double akzw=0.0;
-    for (int i=0; i<ncov; i++)  
-      {
-	akzw += 0.5*z[i]*z[i];
-	akzw -= log(P[i*ncov]);
-      }
-
-//     cout << akzw << endl;
-
-
-
-    
-    loese2(P, gamma, ncov, bw);
-
-
-    loese(P, gamma, ncov, bw);
-
-
-    loese(P, z, ncov, bw);
-    for (int i=0; i<ncov; i++)
-      {
-	gamma[i]+=z[i];
-      }
-
-
-
-    //Berechen Akzeptanzwahrscheinlichkeit
-
-    
-      //erzeuge Präzisionsmatrix
-    
-    for (int i=0; i<ncov; i++)
-      {
-	for (int j=0; j<ncov; j++)
-	{
-	  P[i*ncov+j]=0.0;
-	}
-	P[ncov*i]=taugamma;
-      }
-    if (mode==1)
-      {
-    for (int k=0; k<ncov; k++)
-      {
-      for (int l=k; l<ncov; l++)
-	{
-	  for (int i=1; i<=I; i++)
-	    {
-	      for (int t=2; t<=n; t++)
-		{
-		  P[k*ncov+l-k]+= xcov[k][t]*xcov[l][t]*omegaX[i][t]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-		}
-	    }	      
-	}
-      }
-      }
-    if (mode==2)
-      {
-    for (int k=0; k<ncov; k++)
-      {
-      for (int l=k; l<ncov; l++)
-	{
-	  for (int i=1; i<=I; i++)
-	    {
-	      for (int t=2; t<=n; t++)
-		{
-		  P[k*ncov+l-k]+= xcov[k][t]*xcov[l][t]*omega[i][t]*Z[i][t-1]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-		}
-	    }	      
-	}
-      }
-      }
-
-
-//     mxschreibe(P,ncov,ncov);
-    
-    
-    //erzeuge m
-    
-    for (int j=0; j<ncov; j++)
-      {
-	m[j]=0.0;
-      }
-    if (mode==1)
-      {
-    for (int j=0; j<ncov; j++)
-      {
-	for (int i=1; i<=I; i++)
-	  {
-	    for (int t=2; t<=n; t++)
-	      {
-		m[j]+=xcov[j][t]*(X[i][t]);
-		
-		//1.Ableitung
-		m[j] -= xcov[j][t]*omegaX[i][t]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-		//2.Ableitung
-		for (int k=0; k<ncov; k++)
-		  {
-		    m[j]+=gamma[k]*xcov[k][t]*xcov[j][t]*omegaX[i][t]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-		  }		
-	      }
-	  }
-      }
-      }
-    if (mode==2)
-      {
-    for (int j=0; j<ncov; j++)
-      {
-	for (int i=1; i<=I; i++)
-	  {
-	    for (int t=2; t<=n; t++)
-	      {
-		m[j]+=xcov[j][t]*(Y[i][t]);
-		
-		//1.Ableitung
-		m[j] -= xcov[j][t]*omega[i][t]*Z[i][t-1]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-		//2.Ableitung
-		for (int k=0; k<ncov; k++)
-		  {
-		    m[j]+=gamma[k]*xcov[k][t]*xcov[j][t]*omega[i][t]*Z[i][t-1]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-		  }		
-	      }
-	  }
-      }
-      }
-
-  
-    for (int i=0; i<(ncov*ncov);i++)
-      {
-	P2[i]=P[i];
-      }
- 
-   
-    cholesky(ncov,P,bw);
-    for (int i=0; i<ncov; i++)
-      {
-	akzw+=log(P[i*ncov]);
-      }
-//     cout << akzw << endl;
-
-    loese2(P,m,ncov,bw);
-    loese(P,m,ncov,bw);
-    for (int i=0; i<ncov; i++)
-      {
-	m[i]=gammaalt[i]-m[i];
-      }
-//     mxschreibe(P2,ncov,ncov);
-
-    //  akzw -= xMx(P2,m,ncov,bw+1);
-     akzw -= 0.5*xMx(P2,m,ncov,bw+1);
-
-//     cout << akzw << endl;
-
-
-    for (int i=0; i<ncov; i++)
-      {
-	akzw -= 0.5*taugamma*gamma[i]*gamma[i];
-      }
-    if (mode==1)
-      {
-	
-    for (int j=0; j<ncov; j++)
-      {
-	for (int i=1; i<=I; i++) //fehler i<I 20.07.05
-	  {
-	    for (int t=2;t<=n; t++) //fehler t<n 20.07.05
-	      {
-		akzw+=gamma[j]*xcov[j][t]*(X[i][t]);
-		akzw-=omegaX[i][t]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-	      }
-	  }
-      }
-	
-      }
-    if (mode==2)
-      {
-    for (int j=0; j<ncov; j++)
-      {
-	for (int i=1; i<I; i++)
-	  {
-	    for (int t=2;t<n; t++)
-	      {
-		akzw+=gamma[j]*xcov[j][t]*(Y[i][t]);
-		akzw-=omega[i][t]*Z[i][t-1]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-	      }
-	  }
-      }
-      }
-
-//     cout << akzw << endl;
-
-    for (int i=0; i<ncov; i++)
-      {
-	z[i]=gamma[i];
-	gamma[i]=gammaalt[i];
- }
-
-    for (int i=0; i<ncov; i++)
-      {
-	akzw += 0.5*taugamma*gamma[i]*gamma[i];
-      }
- //    cout << akzw << endl;
-
-    if (mode==1)
-      {
-
-    for (int j=0; j<ncov; j++)
-      {
-	for (int i=1; i<=I; i++) //fehler i<I 20.07.05
-	  {
-	    for (int t=2;t<=n; t++) //fehler t<n 20.07.05
-	      {
-		akzw-=gamma[j]*xcov[j][t]*(X[i][t]);
-		akzw+=omegaX[i][t]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-	      }
-	  }
-      }
-
-      }
-    if (mode==2)
-      {
-    for (int j=0; j<ncov; j++)
-      {
-	for (int i=1; i<I; i++)
-	  {
-	    for (int t=2;t<n; t++)
-	      {
-		akzw-=gamma[j]*xcov[j][t]*(Y[i][t]);
-		akzw+=omega[i][t]*Z[i][t-1]*exp(alpha[i]+sumg(ncov,xcov,gamma,t,scov)+beta[t]);
-	      }
-	  }
-      }
-      }
-
-//     cout << akzw << endl;;
-//     mxschreibe(gamma,1,ncov);
-//     mxschreibe(z,1,ncov);
-
-//     cout << akzw << endl << endl;;
-    if (exp(akzw)>gsl_rng_uniform(r))
-      {
-	for (int i=0; i<ncov; i++)
-	  {
-	    gamma[i]=z[i];
-	  }
-	acc_gamma++;
-      }
-    return; 
-}
-*/
 void update_gamma_j(int j, double* alpha, double* beta, double* gamma, double* delta, int ncov, double** xcov, long** X, long n, long I, double taugamma, double* gammaneu, long& acc_gamma, double** omega, int scov)
 {
   double g = 0;
@@ -1851,55 +747,40 @@ void update_gamma_j(int j, double* alpha, double* beta, double* gamma, double* d
   double c = 0;
   for(int i=1;i<=I;i++){
     for(int t=2;t<=n;t++){
-      g -= omega[i][t]*delta[t]*exp(alpha[i] + beta[t] + sumg(ncov,xcov,gamma,t,scov)); // g ist g(gamma[j]^0)
+      g -= omega[i][t]*delta[t]*exp(alpha[i] + beta[t] + sumg(ncov,xcov,gamma,t,scov)); /* g ist g(gamma[j]^0)*/
       gd -= omega[i][t]*delta[t]*exp(alpha[i] + beta[t] + sumg(ncov,xcov,gamma,t,scov))*xcov[j][t];
       gdd -= omega[i][t]*delta[t]*exp(alpha[i] + beta[t] + sumg(ncov,xcov,gamma,t,scov))*xcov[j][t]*xcov[j][t];
       c += xcov[j][t]*X[i][t];
     }
   }
 
-  double s = sqrt(1/(taugamma-gdd)); // s ist s
+  double s = sqrt(1/(taugamma-gdd)); /* s ist s*/
   double b = c + gd - gamma[j]*gdd;
   double m = b*s*s;
 
   double gammajStar = gsl_ran_gaussian(r,s) + m;
 
-  // cout << g << endl;
-  // cout << gd << endl;
-  // cout << gdd << endl;
-  // cout << c << endl;
-  // cout << b << endl;
-  // cout << s << endl;
-  // cout << m << endl;
-  // cout << gammajStar << endl;
-  // cout << gamma[j] << endl << endl;
-
-  // cout << gamma[j] << endl;
+  /* Debug stuff deleted */
 
   for(int k=0;k<ncov;k++){
     gammaneu[k] = gamma[k];
   }
 
-  // cout << gammaneu[j] << endl;
-
   gammaneu[j] = gammajStar;
-
-  // cout << gamma[j] << endl;
-  // cout << gammaneu[j] << endl << endl;
 
   double g2 = 0;
   double gd2 = 0;
   double gdd2 = 0;
   for(int i=1;i<=I;i++){
     for(int t=2;t<=n;t++){
-      g2 -= omega[i][t]*delta[t]*exp(alpha[i] + beta[t] + sumg(ncov,xcov,gammaneu,t,scov)); // g2 ist g(gamma[j])
+      g2 -= omega[i][t]*delta[t]*exp(alpha[i] + beta[t] + sumg(ncov,xcov,gammaneu,t,scov)); /* g2 ist g(gamma[j])*/
       gd2 -= omega[i][t]*delta[t]*exp(alpha[i] + beta[t] + sumg(ncov,xcov,gammaneu,t,scov))*xcov[j][t];
       gdd2 -= omega[i][t]*delta[t]*exp(alpha[i] + beta[t] + sumg(ncov,xcov,gammaneu,t,scov))*xcov[j][t]*xcov[j][t];
 
     }
   }
 
-  double s2 = sqrt(1/(taugamma-gdd2)); //s2 ist s^0
+  double s2 = sqrt(1/(taugamma-gdd2)); /*s2 ist s^0*/
   double b2 = c + gd2 - gammajStar*gdd2; 
   double m2 = b2*s2*s2;
 
@@ -1907,19 +788,14 @@ void update_gamma_j(int j, double* alpha, double* beta, double* gamma, double* d
 
   a += gammajStar*c;
   a -= gamma[j]*c;
-  // cout << a << endl;
   a -= 0.5*taugamma*gammajStar*gammajStar;
   a += 0.5*taugamma*gamma[j]*gamma[j];
-  // cout << a << endl;
   a += g2;
   a -= g;
-  // cout << a << endl;
   a += log(s);
   a -= log(s2);
-  // cout << a << endl;
   a += 0.5*((gammajStar-m)/s)*((gammajStar-m)/s);
   a -= 0.5*((gamma[j]-m2)/s2)*((gamma[j]-m2)/s2);
-  //cout << a << endl << endl;
 
   if(exp(a)>gsl_rng_uniform (r)){
     gamma[j] = gammajStar;
@@ -1937,7 +813,7 @@ void update_beta_t(int t, double* alpha, double* beta, double* gamma, double* de
   double c = 0;
   double d = 0;
   for(int i=1;i<=I;i++){
-    h -= omega[i][t]*delta[t]*exp(alpha[i] + beta[t] + sumg(ncov,xcov,gamma,t,scov)); // h ist h(beta[t]^0), beta ist \beta^0, betatStar ist \beta
+    h -= omega[i][t]*delta[t]*exp(alpha[i] + beta[t] + sumg(ncov,xcov,gamma,t,scov)); /* h ist h(beta[t]^0), beta ist \beta^0, betatStar ist \beta*/
     c += X[i][t];
     }
   if(t==2){
@@ -1963,52 +839,34 @@ void update_beta_t(int t, double* alpha, double* beta, double* gamma, double* de
 
 
 
-  double s = sqrt(1/(d - h)); // s ist s
+  double s = sqrt(1/(d - h)); /* s ist s*/
   double b = c + (1 - beta[t])*h;
   double m = b*s*s;
 
   double betatStar = gsl_ran_gaussian(r,s) + m;
 
-  // cout << s << endl;
-  // cout << b << endl;
-  // cout << m << endl;
-  // cout << betatStar << endl;
-  // cout << beta[t] << endl;
-
-
   double h2 = 0;
   for(int i=1;i<=I;i++){
-    h2 -= omega[i][t]*delta[t]*exp(alpha[i] + betatStar + sumg(ncov,xcov,gamma,t,scov)); // h2 ist h(beta[t])
+    h2 -= omega[i][t]*delta[t]*exp(alpha[i] + betatStar + sumg(ncov,xcov,gamma,t,scov)); /* h2 ist h(beta[t])*/
     }
 
-  double s2 = sqrt(1/(d - h2)); // s2 ist s^0
+  double s2 = sqrt(1/(d - h2)); /* s2 ist s^0*/
   double b2 = c + (1 - betatStar)*h2;
   double m2 = b2*s2*s2;
-
-
-  // cout << s2 << endl;
-   // cout << b2 << endl;
-   // cout << m2 << endl;
-
 
 
   double a = 0;
 
   a += betatStar*c;
   a -= beta[t]*c;
-  // cout << a << endl;
   a -= 0.5*d*betatStar*betatStar;
   a += 0.5*d*beta[t]*beta[t];
-  // cout << a << endl;
   a += h2;
   a -= h;
-  // cout << a << endl;
   a += log(s);
   a -= log(s2);
-  // cout << a << endl;
   a += 0.5*((betatStar-m)/s)*((betatStar-m)/s);
   a -= 0.5*((beta[t]-m2)/s2)*((beta[t]-m2)/s2);
-  // cout << a << endl << endl;
 
   if(exp(a)>gsl_rng_uniform (r)){
     beta[t] = betatStar;
@@ -2025,12 +883,12 @@ void update_beta_t(int t, double* alpha, double* beta, double* gamma, double* de
 
 void update_lambda_br(double** lambda, double** lambda_br,double* xi_lambda, int** breakpoints, int** breakpointsStar, int* K, int* KStar, int* Km1, double alpha_lambda, double beta_lambda, long** Y, long** Z, long n, long I, double& acceptedbr, double** omega, int theta_pred_estim, int xi_estim, int K_geom, double p_K, double alpha_xi, double beta_xi)
 {
-    //update breakpoints of lambda using reversible jump MCMC
+  /*update breakpoints of lambda using reversible jump MCMC*/
 
 
-    int newbreakpoint;
-    int removebreakpoint;
-    int newbreakpointnumber;
+    int newbreakpoint =0;
+    int removebreakpoint=0;
+    int newbreakpointnumber=0;
     int u;
     double v=1;
     double a;
@@ -2041,29 +899,29 @@ void update_lambda_br(double** lambda, double** lambda_br,double* xi_lambda, int
 	a=gsl_rng_uniform(r);
 	if(a<0.5){u=1;}else{u=2;}
  
-	if(K[i]==1){u=2;v=.5;}  //K[i] is number of segments of lambda
-	if(K[i]==(n-1)){u=1;v=.5;} //if(!theta_pred_estim) max of K[i] is n-1
+	if(K[i]==1){u=2;v=.5;}  /*K[i] is number of segments of lambda*/
+	if(K[i]==(n-1)){u=1;v=.5;} /*if(!theta_pred_estim) max of K[i] is n-1*/
 
 
 	
-	//decide if new brreakpoint or remove breakpoint
-	if(u==1){//remove breakpoint
+	/*decide if new brreakpoint or remove breakpoint*/
+	if(u==1){/*remove breakpoint*/
 	  if(K[i]==2){v=2;} 
 	  KStar[i]=K[i]-1;
 	  a=gsl_rng_uniform(r);
           removebreakpoint=(int)floor(a*(double)(K[i]-1))+1; 
-	  //generate breakpointsStar
+	  /*generate breakpointsStar*/
 	  for(int k=1;k<removebreakpoint;k++){
 	    breakpointsStar[i][k]=breakpoints[i][k];
 	  }
 	  for(int k=(removebreakpoint+1);k<=K[i];k++){
 	    breakpointsStar[i][k-1]=breakpoints[i][k];
 	  }
-	}//if(u==1)
-	if(u==2){//new breakpoint
+	}/*if(u==1)*/
+	if(u==2){/*new breakpoint*/
 	  if(K[i]==(n-2)){v=2;} 
 	  KStar[i]=K[i]+1;
-	  //sample new breakpoint
+	  /*sample new breakpoint*/
 	  int need=1;
 	  while(need==1){
 	    need=0;
@@ -2076,8 +934,8 @@ void update_lambda_br(double** lambda, double** lambda_br,double* xi_lambda, int
   	        need=1;
 	      }
 	    }
-  	  }//while(need==1)
-	  //generate breakpointsStar
+  	  }/*while(need==1)*/
+	  /*generate breakpointsStar*/
   	  for(int k=1;k<=K[i];k++){
   	    if((newbreakpoint>breakpoints[i][k-1])&&(newbreakpoint<breakpoints[i][k])){
   	      newbreakpointnumber = k;
@@ -2089,11 +947,11 @@ void update_lambda_br(double** lambda, double** lambda_br,double* xi_lambda, int
 
 	  }
           breakpointsStar[i][newbreakpointnumber]=newbreakpoint;
-	  for(int k=newbreakpointnumber;k<=K[i];k++){ //changed K[I]
+	  for(int k=newbreakpointnumber;k<=K[i];k++){ /*changed K[I]*/
 	    breakpointsStar[i][k+1]=breakpoints[i][k];
 	  }
-	}//if(u==2)
-    }//if(!theta_pred_estim)
+	}/*if(u==2)*/
+    }/*if(!theta_pred_estim)*/
 
     if(theta_pred_estim){
 
@@ -2105,24 +963,24 @@ void update_lambda_br(double** lambda, double** lambda_br,double* xi_lambda, int
 
 
 	
-	//decide if new brreakpoint or remove breakpoint
-	if(u==1){//remove breakpoint
+	/*decide if new brreakpoint or remove breakpoint*/
+	if(u==1){/*remove breakpoint*/
 	  if(K[i]==2){v=2;} 
 	  KStar[i]=K[i]-1;
 	  a=gsl_rng_uniform(r);
           removebreakpoint=(int)floor(a*(double)(K[i]-1))+1; 
-	  //generate breakpointsStar
+	  /*generate breakpointsStar*/
 	  for(int k=1;k<removebreakpoint;k++){
 	    breakpointsStar[i][k]=breakpoints[i][k];
 	  }
-	  for(int k=(removebreakpoint+1);k<=K[i];k++){ //changed K[I]
+	  for(int k=(removebreakpoint+1);k<=K[i];k++){ /*changed K[I]*/
 	    breakpointsStar[i][k-1]=breakpoints[i][k];
 	  }
-	}//if(u==1)
-	if(u==2){//new breakpoint
+	}/*if(u==1)*/
+	if(u==2){/*new breakpoint*/
 	  if(K[i]==(n-1)){v=2;} 
 	  KStar[i]=K[i]+1;
-	  //sample new breakpoint
+	  /*sample new breakpoint*/
 	  int need=1;
 	  while(need==1){
 	    need=0;
@@ -2135,8 +993,8 @@ void update_lambda_br(double** lambda, double** lambda_br,double* xi_lambda, int
   	        need=1;
 	      }
 	    }
-  	  }//while(need==1)
-	  //generate breakpointsStar
+  	  }/*while(need==1)*/
+	  /*generate breakpointsStar*/
   	  for(int k=1;k<=K[i];k++){
   	    if((newbreakpoint>breakpoints[i][k-1])&&(newbreakpoint<breakpoints[i][k])){
   	      newbreakpointnumber = k;
@@ -2151,8 +1009,8 @@ void update_lambda_br(double** lambda, double** lambda_br,double* xi_lambda, int
 	  for(int k=newbreakpointnumber;k<=K[i];k++){ 
 	    breakpointsStar[i][k+1]=breakpoints[i][k];
 	  }
-	}//if(u==2)
-      }//if(theta_pred_estim)    
+	}/*if(u==2)*/
+    }/*if(theta_pred_estim)    */
       
 
     double sumY1=0.0;
@@ -2250,7 +1108,7 @@ void update_lambda_br(double** lambda, double** lambda_br,double* xi_lambda, int
     sumoZ4+=beta_la;
 
 	
-    double accbr = alpha_la*log(beta_la)-gsl_sf_lngamma(alpha_la); // alpha_lambda beta_lambda
+    double accbr = alpha_la*log(beta_la)-gsl_sf_lngamma(alpha_la); /* alpha_lambda beta_lambda*/
     if(K_geom){
       accbr += log(1-p_K);
     }
@@ -2267,19 +1125,19 @@ void update_lambda_br(double** lambda, double** lambda_br,double* xi_lambda, int
 	accbr=accbr-sumY1*log(sumoZ1)+sumY3*log(sumoZ3)+sumY4*log(sumoZ4);
       }
     if (gsl_rng_uniform (r) <= exp(accbr)) {
-      // for(int i=1;i<=I;i++){ changed
+      /* for(int i=1;i<=I;i++){ changed*/
         K[i] = KStar[i]; 
         for(int k=0;k<=KStar[i];k++){
           breakpoints[i][k]=breakpointsStar[i][k];
         }
         acceptedbr++;
-	//} changed
+	/*} changed*/
     }
 
     Km1[i]=K[i]-1;
 
 
-    //update xi_lambda
+    /*update xi_lambda*/
     if(xi_estim){
 	double a = alpha_xi + alpha_lambda*K[i];
 	double b = beta_xi;
@@ -2341,9 +1199,9 @@ void update_delta_br(double* delta, double* delta_br,double &xi_delta, int* brea
     //update breakpoints of lambda using reversible jump MCMC
 
 
-    int newbreakpoint;
-    int removebreakpoint;
-    int newbreakpointnumber;
+    int newbreakpoint = 0;
+    int removebreakpoint = 0;
+    int newbreakpointnumber = 0;
     int u;
     double v=1;
     double a;
@@ -2627,12 +1485,12 @@ void update_delta_br(double* delta, double* delta_br,double &xi_delta, int* brea
 
 void update_epsilon_br(double* epsilon, double* epsilon_br,double& xi_epsilon, int* breakpoints_epsilon, int* breakpointsStar_epsilon, int& K_epsilon, int& KStar_epsilon, int& Km1_epsilon, double epsilon_a, double epsilon_b, long** S, long n, long I, double& acceptedbr_epsilon, double** omega, int xi_estim_epsilon, int K_geom, double p_K, double alpha_xi, double beta_xi)
 {
-    //update breakpoints of lambda using reversible jump MCMC
-
-
-    int newbreakpoint;
-    int removebreakpoint;
-    int newbreakpointnumber;
+  /*update breakpoints of lambda using reversible jump MCMC*/
+  
+    /*define and initialize to avoid compiler warnings */
+    int newbreakpoint = 0;
+    int removebreakpoint = 0;
+    int newbreakpointnumber = 0;
     int u;
     double v=1;
     double a;
@@ -2975,7 +1833,7 @@ long** surveillancedata2twin(long* x, long n, long I) {
   //Count the number of data entries
   int n=0;
   fin >> n;
-  cout << "n=" << n << endl;
+  Rprintf("n=%d\n",n);
   int I=1; 
   //fin >> I;
   //cout << "I=" << I << endl;
@@ -3136,103 +1994,99 @@ void bplem_estimate(int verbose, ofstream &logfile, ofstream &logfile2, ofstream
   double x      = logit(lambda_const);
   
   if(!verbose) {
-    cout << "------------------------------------------------" << endl;
+    Rprintf("------------------------------------------------\n");
     if (!la_rev){
-    cout  << "lambda:  Ga(" << alpha_lambda << "," << beta_lambda << ")-->\t" 
-	 << lambda_const << endl;
+      Rprintf("lambda:  Ga(%f, %f)-->\t%f\n", alpha_lambda,  beta_lambda, lambda_const);
     }
-         if(!varnu){
-    cout << "nu:      Ga(" << alpha_nu << "," << beta_nu << ")-->\t" 
- 	 << nu_const << endl;
-         }
-	 if(overdispersion){
-    cout << "psi:     Ga(" << alpha_psi << "," << beta_psi << ")-->\t" 
-	 << psi << endl;
-	 }
-    cout << "------------------------------------------------" << endl;
+    if(!varnu){
+      Rprintf("nu:      Ga(%f, %f)-->\t%f\n", alpha_nu, beta_nu, nu_const);
+    }
+    if(overdispersion){
+      Rprintf("psi:     Ga(%f, %f)-->\t%f\n", alpha_psi, beta_psi, psi);
+    }
+    Rprintf("------------------------------------------------\n");
   }
   
-
+  
   //Allocate arrays for all latent variables and initialize them
-  	
-	long** X = new long*[I+1];
-	long** Y = new long*[I+1];
-	long** S = new long*[I+1];
-	double **omega= new double*[I+1];
-	double** sumX = new double*[I+1];
-	double** sumY = new double*[I+1];
-	double** sumS = new double*[I+1];
-	double **sumomega= new double*[I+1];
-        double **nu= new double*[I+1];
-	double *alpha=new double[I+1];
-	double* beta= new double[n+1];
-	double **lambda=new double*[I+1];
-	double **lambda_br=new double*[I+1];
-	double **eta=new double*[I+1];
-	double **eta2=new double*[I+1];
-	double **varr=new double*[I+1];
-	double **rpearson=new double*[I+1];
-	double **Sumeta=new double*[I+1];
-	double **Sumvarr=new double*[I+1];
-	double **Sumrpearson=new double*[I+1];
-	double *delta=new double[n+2];
-	double *delta_br=new double[n+2];
-        double xi_delta = 1;
-	double *epsilon=new double[n+2];
-	double *epsilon_br=new double[n+2];
-        double xi_epsilon = 1;
-	double xi_psi = 1;
-
-	int **breakpoints=new int*[I+1];
-	int **breakpointsStar=new int*[I+1];
-        long **bp=new long*[I+1];
-	int *K=new int[I+1];
-        int *Km1=new int[I+1];
-	int *KStar=new int[I+1];
-        double* xi_lambda=new double[I+1];
-	int *breakpoints_delta=new int[n+2];
-	int *breakpointsStar_delta=new int[n+2];
-        long *bp_delta=new long[n+2];
-	int K_delta;
-        int Km1_delta;
-	int KStar_delta;
-	int *breakpoints_epsilon=new int[n+2];
-	int *breakpointsStar_epsilon=new int[n+2];
-        long *bp_epsilon=new long[n+2];
-	int K_epsilon;
-        int Km1_epsilon;
-	int KStar_epsilon;
-	for (register long i=0; i<=I; i++){
-	X[i]=new long[n+1];
-	Y[i]=new long[n+1];
-	S[i]=new long[n+1];
-        omega[i]=new double[n+1];
-	sumX[i]=new double[n+1];
-	sumY[i]=new double[n+1];
-	sumS[i]=new double[n+1];
-        sumomega[i]=new double[n+1];
-        nu[i]=new double[n+1];
-	lambda[i]=new double[n+2];
-	lambda_br[i]=new double[n+2];
-	breakpoints[i]=new int[n+2];
-	breakpointsStar[i]=new int[n+2];
-        bp[i]=new long[n+2];
-	eta[i]=new double[n+1];
-	eta2[i]=new double[n+1];
-	varr[i]=new double[n+1];
-	rpearson[i]=new double[n+1];
-	Sumeta[i]=new double[n+1];
-	Sumvarr[i]=new double[n+1];
-	Sumrpearson[i]=new double[n+1];
-	}
-        long* Xnp1 = new long[I+1];
-        long* Snp1 = new long[I+1];
-        long* Ynp1 = new long[I+1];
-        long* Znp1 = new long[I+1];	
-        double* omeganp1 = new double[I+1];
-        double* nunp1 = new double[I+1];
-
-
+  long** X = new long*[I+1];
+  long** Y = new long*[I+1];
+  long** S = new long*[I+1];
+  double **omega= new double*[I+1];
+  double** sumX = new double*[I+1];
+  double** sumY = new double*[I+1];
+  double** sumS = new double*[I+1];
+  double **sumomega= new double*[I+1];
+  double **nu= new double*[I+1];
+  double *alpha=new double[I+1];
+  double* beta= new double[n+1];
+  double **lambda=new double*[I+1];
+  double **lambda_br=new double*[I+1];
+  double **eta=new double*[I+1];
+  double **eta2=new double*[I+1];
+  double **varr=new double*[I+1];
+  double **rpearson=new double*[I+1];
+  double **Sumeta=new double*[I+1];
+  double **Sumvarr=new double*[I+1];
+  double **Sumrpearson=new double*[I+1];
+  double *delta=new double[n+2];
+  double *delta_br=new double[n+2];
+  double xi_delta = 1;
+  double *epsilon=new double[n+2];
+  double *epsilon_br=new double[n+2];
+  double xi_epsilon = 1;
+  double xi_psi = 1;
+  
+  int **breakpoints=new int*[I+1];
+  int **breakpointsStar=new int*[I+1];
+  long **bp=new long*[I+1];
+  int *K=new int[I+1];
+  int *Km1=new int[I+1];
+  int *KStar=new int[I+1];
+  double* xi_lambda=new double[I+1];
+  int *breakpoints_delta=new int[n+2];
+  int *breakpointsStar_delta=new int[n+2];
+  long *bp_delta=new long[n+2];
+  int K_delta;
+  int Km1_delta;
+  int KStar_delta;
+  int *breakpoints_epsilon=new int[n+2];
+  int *breakpointsStar_epsilon=new int[n+2];
+  long *bp_epsilon=new long[n+2];
+  int K_epsilon;
+  int Km1_epsilon;
+  int KStar_epsilon;
+  for (register long i=0; i<=I; i++){
+    X[i]=new long[n+1];
+    Y[i]=new long[n+1];
+    S[i]=new long[n+1];
+    omega[i]=new double[n+1];
+    sumX[i]=new double[n+1];
+    sumY[i]=new double[n+1];
+    sumS[i]=new double[n+1];
+    sumomega[i]=new double[n+1];
+    nu[i]=new double[n+1];
+    lambda[i]=new double[n+2];
+    lambda_br[i]=new double[n+2];
+    breakpoints[i]=new int[n+2];
+    breakpointsStar[i]=new int[n+2];
+    bp[i]=new long[n+2];
+    eta[i]=new double[n+1];
+    eta2[i]=new double[n+1];
+    varr[i]=new double[n+1];
+    rpearson[i]=new double[n+1];
+    Sumeta[i]=new double[n+1];
+    Sumvarr[i]=new double[n+1];
+    Sumrpearson[i]=new double[n+1];
+  }
+  long* Xnp1 = new long[I+1];
+  long* Snp1 = new long[I+1];
+  long* Ynp1 = new long[I+1];
+  long* Znp1 = new long[I+1];	
+  double* omeganp1 = new double[I+1];
+  double* nunp1 = new double[I+1];
+  
+  
   if(!varnu){
     for (register int i=0; i<=I; i++) {
       for (register int t=0; t<=n; t++) {
@@ -3240,13 +2094,13 @@ void bplem_estimate(int verbose, ofstream &logfile, ofstream &logfile2, ofstream
       }
     }
   }
-
-        for (register int i=0; i<=I; i++) {
-      for (register int t=0; t<=n; t++) {
-        lambda[i][t] = lambda_const;
-      }
+  
+  for (register int i=0; i<=I; i++) {
+    for (register int t=0; t<=n; t++) {
+      lambda[i][t] = lambda_const;
     }
-
+  }
+  
   for (register int i=0; i<=I; i++) {
     for (register int t=0; t<=n; t++) {
       X[i][t] = 0; S[i][t] = 0; Y[i][t] = Z[i][t]; omega[i][t] = 1; eta[i][t] = 0; bp[i][t] = 0; bp_delta[t] = 0; bp_epsilon[t] = 0;
@@ -3255,154 +2109,151 @@ void bplem_estimate(int verbose, ofstream &logfile, ofstream &logfile2, ofstream
     bp[i][n+1] = 0; xi_lambda[i] = 1;
     bp_delta[n+1] = 0; bp_epsilon[n+1] = 0;
   }
-
-
-	// Für Saisonkomponenente
-	int ncov;
-	int scov = 0;
-	if(delta_rev){
-	  scov = 1;
+  
+  
+  /* Für Saisonkomponenente */
+  int ncov;
+  int scov = 0;
+  if(delta_rev){
+    scov = 1;
+  }
+  
+  double* gamma;
+  double* gammaneu = NULL;
+  double** xcov;
+  if(!nu_trend){
+    ncov=nfreq*2+1;
+    gamma = new double[ncov];
+    gammaneu = new double[ncov];
+    xcov = new double*[ncov];
+    for (int i=0; i<ncov; i++)
+      {
+	xcov[i]=new double[n+2];
+      }
+    if(varnu){
+      for (int t=2; t<=(n+1); t++)
+	{
+	  xcov[0][t]=1.0;
 	}
-
-	double* gamma;
-	double* gammaneu;
-	double** xcov;
-	if(!nu_trend){
-	ncov=nfreq*2+1;
-	gamma = new double[ncov];
-	gammaneu = new double[ncov];
-	xcov = new double*[ncov];
-	for (int i=0; i<ncov; i++)
-	  {
-	    xcov[i]=new double[n+2];
-	  }
-  if(varnu){
-	for (int t=2; t<=(n+1); t++)
-	  {
-	    xcov[0][t]=1.0;
-	  }
-	
-	for (int i=1; i<=nfreq; i++)
-	  {
-	    for (int t=2; t<=(n+1); t++)
-	      {
-		xcov[i*2-1][t]=sin(2*PI*(t-1)*i/T); //schwingung um einen Zeitpunkt nach hinten verschoben. beginnt bei t=2
-		xcov[i*2][t]=cos(2*PI*(t-1)*i/T);
-
-	      } 
-	    // cout << endl;
-	  }
-  } //if varnu
-	} //if !nu_trend
-	// Saisonkomponente mit linearem trend
-else{
-	ncov=nfreq*2+2;
-	gamma = new double[ncov];
-	xcov = new double*[ncov];
-	for (int i=0; i<ncov; i++)
-	  {
-	    xcov[i]=new double[n+2];
-	  }
-  if(varnu){
-	for (int t=2; t<=(n+1); t++)
-	  {
-	    xcov[0][t]=1.0;
-	    xcov[ncov-1][t]=t-n/2;
-	  }
-	
-	for (int i=1; i<=nfreq; i++)
-	  {
-	    for (int t=2; t<=(n+1); t++)
-	      {
-		xcov[i*2-1][t]=sin(2*PI*(t-1)*i/T); //schwingung um einen Zeitpunkt nach hinten verschoben. beginnt bei t=2
-		xcov[i*2][t]=cos(2*PI*(t-1)*i/T);
-
-	      } 
-	    //cout << endl;
-	  }
-  } //if varnu
-} // if nu_trend
-
-
-
-	// Regionenanteil
-	double* xreg=new double[I+1];
-	if(varnu){
-	for (int i=1; i<=I; i++)
-	  {
-	    xreg[i]=log(xi[i]);
-	    xi[i]=1;
-	    //	    cout << xreg[i]<<endl;
-	  }
+      
+      for (int i=1; i<=nfreq; i++)
+	{
+	  for (int t=2; t<=(n+1); t++)
+	    {
+	      xcov[i*2-1][t]=sin(2*PI*(t-1)*i/T); //schwingung um einen Zeitpunkt nach hinten verschoben. beginnt bei t=2
+	      xcov[i*2][t]=cos(2*PI*(t-1)*i/T);
+	      
+	    } 
+	  // cout << endl;
 	}
-	double taualpha=alpha_a/alpha_b;
-	double taubeta=beta_a/beta_b;
-	double taubetaStar;
-        //double taubeta=beta_a/beta_b;
-	double taugamma=gamma_a/gamma_b;
-	
-
-	
+    } //if varnu
+  } //if !nu_trend
+  // Saisonkomponente mit linearem trend
+  else{
+    ncov=nfreq*2+2;
+    gamma = new double[ncov];
+    xcov = new double*[ncov];
+    for (int i=0; i<ncov; i++)
+      {
+	xcov[i]=new double[n+2];
+      }
+    if(varnu){
+      for (int t=2; t<=(n+1); t++)
+	{
+	  xcov[0][t]=1.0;
+	  xcov[ncov-1][t]=t-n/2;
+	}
+      
+      for (int i=1; i<=nfreq; i++)
+	{
+	  for (int t=2; t<=(n+1); t++)
+	    {
+	      xcov[i*2-1][t]=sin(2*PI*(t-1)*i/T); //schwingung um einen Zeitpunkt nach hinten verschoben. beginnt bei t=2
+	      xcov[i*2][t]=cos(2*PI*(t-1)*i/T);
+	      
+	    } 
+	  //cout << endl;
+	}
+    } //if varnu
+  } // if nu_trend
+  
   
 
-	//  if(la_rev){
-    for(int i=0; i<=I; i++){
-      K[i]=1;
-      Km1[i]=0;
-      KStar[i]=1; 
-      breakpoints[i][0]=2;
-      breakpoints[i][1]=n+2;
-      breakpointsStar[i][0]=2; 
-      breakpointsStar[i][1]=n+2; 
-      for(int j=0; j<=(n+1); j++){
-	lambda_br[i][j]= 0;
+  // Regionenanteil
+  double* xreg=new double[I+1];
+  if(varnu){
+    for (int i=1; i<=I; i++)
+      {
+	xreg[i]=log(xi[i]);
+	xi[i]=1;
+	//	    cout << xreg[i]<<endl;
       }
-      for(int t=2; t<=(n+1); t++){ 
-	lambda[i][t]= 0; 
-      } 
+  }
+  double taualpha=alpha_a/alpha_b;
+  double taubeta=beta_a/beta_b;
+  /*double taubetaStar;*/
+  /*double taubeta=beta_a/beta_b;*/
+  double taugamma=gamma_a/gamma_b;
+  
+  
+  
+  //  if(la_rev){
+  for(int i=0; i<=I; i++){
+    K[i]=1;
+    Km1[i]=0;
+    KStar[i]=1; 
+    breakpoints[i][0]=2;
+    breakpoints[i][1]=n+2;
+    breakpointsStar[i][0]=2; 
+    breakpointsStar[i][1]=n+2; 
+    for(int j=0; j<=(n+1); j++){
+      lambda_br[i][j]= 0;
     }
+    for(int t=2; t<=(n+1); t++){ 
+      lambda[i][t]= 0; 
+    } 
+  }
   
-    //  }
-
+  //  }
   //  if(delta_rev){
-      K_delta=1;
-      Km1_delta=0;
-      KStar_delta=1; 
-      breakpoints_delta[0]=2;
-      breakpoints_delta[1]=n+2;
-      breakpointsStar_delta[0]=2; 
-      breakpointsStar_delta[1]=n+2; 
-      for(int j=0; j<=(n+1); j++){
-	delta_br[j]= 1;
-      }
-      for(int t=0; t<=(n+1); t++){ 
-	delta[t]= 1; 
-      } 
-      //  }
+  K_delta=1;
+  Km1_delta=0;
+  KStar_delta=1; 
+  breakpoints_delta[0]=2;
+  breakpoints_delta[1]=n+2;
+  breakpointsStar_delta[0]=2; 
+  breakpointsStar_delta[1]=n+2; 
+  for(int j=0; j<=(n+1); j++){
+    delta_br[j]= 1;
+  }
+  for(int t=0; t<=(n+1); t++){ 
+    delta[t]= 1; 
+  } 
+  //  }
+  
 
+  //  if(epsilon_rev){
+  K_epsilon=1;
+  Km1_epsilon=0;
+  KStar_epsilon=1; 
+  breakpoints_epsilon[0]=2;
+  breakpoints_epsilon[1]=n+2;
+  breakpointsStar_epsilon[0]=2; 
+  breakpointsStar_epsilon[1]=n+2; 
+  for(int j=0; j<=(n+1); j++){
+    epsilon_br[j]= 0;
+  }
+  for(int t=0; t<=(n+1); t++){ 
+    epsilon[t]= 0; 
+  } 
+  // }
 
-      //  if(epsilon_rev){
-      K_epsilon=1;
-      Km1_epsilon=0;
-      KStar_epsilon=1; 
-      breakpoints_epsilon[0]=2;
-      breakpoints_epsilon[1]=n+2;
-      breakpointsStar_epsilon[0]=2; 
-      breakpointsStar_epsilon[1]=n+2; 
-      for(int j=0; j<=(n+1); j++){
-	epsilon_br[j]= 0;
-      }
-      for(int t=0; t<=(n+1); t++){ 
-	epsilon[t]= 0; 
-      } 
-      // }
-
-
+  
   if(varnu){ 
     for (register int i=0; i<=I; i++) {
       alpha[i] = log(xreg[i]);
     }
- 
+    
     for (register int t=0; t<=n; t++) {
       beta[t] = 0.0;
     }
@@ -3418,47 +2269,47 @@ else{
 	}
       }
     }
-
+    
     // gamma[0] =  log(alpha_nu/beta_nu);
     if(scov==0){
-    gamma[0] = log(Zmin+1); //  //
+      gamma[0] = log(Zmin+1); //  //
     }
     machnu(gamma, alpha, beta,delta, nu, I, n, ncov, xcov,scov);
-
+    
   }//if varnu  
   
+  
+  //Vectors for betaupdate
+  int bandw=rw+1;
+  
+  
+  my=new double[n+1];
+  my2=new double[n+1];
+  temp=new double[n+1];
+  z=new double[n+1];
+  theta=new double[n+1];
+  beta0=new double[n+1];
+  Q=new double[(n-1)*bandw];
+  Q2=new double[(n-1)*bandw];
+  L=new double[(n-1)*bandw];
+  L2=new double[(n-1)*bandw];
+  P=new double[ncov*ncov];	
+  P2=new double[ncov*ncov];
+  gammaalt=new double[ncov];
+  z2=new double[ncov];
+  n1 = n-1;
+  n2 = n-2;
 
-    //Vectors for betaupdate
-    int bandw=rw+1;
-
-
-    my=new double[n+1];
-    my2=new double[n+1];
-    temp=new double[n+1];
-    z=new double[n+1];
-    theta=new double[n+1];
-    beta0=new double[n+1];
-    Q=new double[(n-1)*bandw];
-    Q2=new double[(n-1)*bandw];
-    L=new double[(n-1)*bandw];
-    L2=new double[(n-1)*bandw];
-    P=new double[ncov*ncov];	
-    P2=new double[ncov*ncov];
-    gammaalt=new double[ncov];
-    z2=new double[ncov];
-    n1 = n-1;
-    n2 = n-2;
-
-
-	
+  
+  
 
   for (register long i=1;i<=I; i++) {
     X[i][2] = (long)floor(nu[i][2]);
     Y[i][2] = (long)floor(lambda[i][2]*nu[i][2]/(1 - lambda[i][2]));
     omeganp1[i] = 1;
   }
-
-	
+  
+  
 	
   //Variables for statistics
   double acceptedPsi = 0;
@@ -3471,10 +2322,6 @@ else{
   long acc_gamma=0;
 
 
-  double accratelambda = 0;
-  double accratebr = 0;
-  double accratepsi = 0;
-	
   /*hoehle: min/max is deprecated double tuneSampleSize = 1000<?burnin; */
   double tuneSampleSize = MIN(1000,burnin);
 
@@ -3542,7 +2389,7 @@ else{
   //Calculate the necessary number of samples.
   long sampleSize = filter*samples + burnin;
   if (!verbose) {
-    cout << "Total number of samples = " << burnin << "+" << filter << "*" << samples << "= " << sampleSize << endl;
+    Rprintf("Total number of samples = %d + %d * %d = %d\n", burnin, filter, samples, sampleSize);
     //if (overdispersion) {
     //cout << "(overdispersion)" << endl;
     //}else {
@@ -3551,57 +2398,55 @@ else{
   }
 
 
-  //Loop over samples - start at 1
+  /*Loop over samples - start at 1*/
 register long sampleCounter=1;
   while ( sampleCounter<=sampleSize) {
  
     if ((!verbose) && ((sampleCounter % 10) == 0)) {
-      cout <<"."<<flush;
+      Rprintf(".");
     }
     //Progress bar: 0,..,100% is shown.
     if (sampleCounter > tuneSampleSize && (!verbose) && (sampleCounter % (long)floor(sampleSize/100.0) == 0)) {
-      cout << sampleCounter*100 / sampleSize << "% " << flush;
+      Rprintf("%d%%", sampleCounter*100 / sampleSize);
     }
     if(0){ 
-    if(varnu){     
-    if ((sampleCounter % 100 == 0)) {
-          cout<< "alpha\t" << (double)acc_alpha/I<<"  "
-      << "beta\t" <<" "<< beta[2] <<" "<< (double)acc_beta<<"  "
-      << "gamma[0]\t" <<" "<< gamma[0] <<" "<< "gamma[1]\t" <<" "<< gamma[1] <<" "<< "gamma[2]\t" <<" "<< gamma[2] <<" "<< (double)acc_gamma<<"  "
-	      << "lambda\t" << lambda[1][2] << endl;
-    }
-    } 
-    if(la_rev){     
-    if ((sampleCounter % 100 == 0)) {
-
-      cout<< "K\t" << K[1] << endl;
-
-    }
-    }
-
-    if(delta_rev){     
-    if ((sampleCounter % 100 == 0)) {
-
-      cout<< "K_delta\t" << K_delta << "  " << "delta[2]\t" << delta[2] << endl;
-
-
-    }
-    }
-    if(epsilon_rev){     
-    if ((sampleCounter % 100 == 0)) {
-      cout<< "K_epsilon\t" << K_epsilon << "  " << "epsilon[2]\t" << epsilon[2] << endl;
-    }
-    }
+      if(varnu){     
+	if ((sampleCounter % 100 == 0)) {
+	  Rprintf("alpha\t%f  beta\t%f  %f  gamma[0]\t%f  gamma[1]\t%f  gamma[2]\t%f  %f  lambda\t%f\n", (double)acc_alpha/I, beta[2], (double)acc_beta, gamma[0], gamma[1], gamma[2],(double)acc_gamma, lambda[1][2]);
+	  
+	  /*      cout<< "alpha\t" << (double)acc_alpha/I<<"  "
+	  << "beta\t" <<" "<< beta[2] <<" "<< (double)acc_beta<<"  "
+	  << "gamma[0]\t" <<" "<< gamma[0] <<" "<< "gamma[1]\t" <<" "
+	  << gamma[1] <<" "<< "gamma[2]\t" <<" "<< gamma[2] <<" "
+	  << (double)acc_gamma<<"  "
+	  << "lambda\t" << lambda[1][2] << endl;*/
+	}
+      } 
+      if(la_rev){     
+	if ((sampleCounter % 100 == 0)) {
+	  Rprintf("K\t%d\n", K[1]);
+	}
+      }
+      
+      if(delta_rev){     
+	if ((sampleCounter % 100 == 0)) {
+	  Rprintf("K_delta\t%f  delta[2]\t%f\n", K_delta, delta[2]);
+	}
+      }
+      if(epsilon_rev){     
+	if ((sampleCounter % 100 == 0)) {
+	  Rprintf("K_epsilon\t%f  epsilon[2]\t%f\n", K_epsilon, epsilon[2]);
+	}
+      }
     }
 
     //    cout << ":"<<flush;
-    //Temporary variables
-  
-    double a,b,c,binp;
+
+    /* Temporary variables, some which are not really used */
+    double a,b;  /* c, binp*/
     
-    //Calculate sums
+    /*Calculate sums */
     double XSum = sumIn2(X,I,n);
-    double YSum = sumIn2(Y,I,n);
  
     double xiSum = 0;
     for (register long i=1;i<=I; i++) {
@@ -4041,24 +2886,23 @@ register long sampleCounter=1;
     if(sampleCounter == tuneSampleSize){
       if (!la_rev)
 	{
-	cout << "Current xRWSigma=" << xRWSigma << " --> acc rate=" << acceptedlambda/tuneSampleSize << endl;
-      tune(xRWSigma, acceptedlambda, tuneSampleSize,tunex);
-        cout << "Corrected xRWSigma=" << xRWSigma << endl;
+	  Rprintf("Current xRWSigma= %f --> acc rate= %f\n", xRWSigma, acceptedlambda/tuneSampleSize);
+	  tune(xRWSigma, acceptedlambda, tuneSampleSize,tunex);
+	  Rprintf("Corrected xRWSigma= %f\n", xRWSigma);
 	}
       if(overdispersion){
-	cout << endl;
-        cout << "Current psiRWSigma=" << psiRWSigma << " --> acc rate=" << acceptedPsi/tuneSampleSize << endl;
+	Rprintf("\nCurrent psiRWSigma= %f --> acc rate = %f\n", psiRWSigma, acceptedPsi/tuneSampleSize);
         tune(psiRWSigma, acceptedPsi, tuneSampleSize,tunepsi);
-        cout << "Corrected psiRWSigma=" << psiRWSigma << endl;
+        Rprintf("Corrected psiRWSigma= %f\n", psiRWSigma);
       }
-          
-        if(varnu&&(rw>0)){
-        cout << "Current taubetaRWSigma=" << taubetaRWSigma << " --> acc rate=" << acc_beta/tuneSampleSize << endl;
+      
+      if(varnu&&(rw>0)){
+        Rprintf("Current taubetaRWSigma= %f --> acc rate %f\n", taubetaRWSigma, acc_beta/tuneSampleSize);
         tune(taubetaRWSigma, acc_beta, tuneSampleSize,tunetaubeta,0.1,0.4);
-        cout << "Corrected taubetaRWSigma=" << taubetaRWSigma << endl;
+        Rprintf("Corrected taubetaRWSigma= %f\n", taubetaRWSigma);
       }
-        
-	//tunetaubeta = 0;
+      
+      //tunetaubeta = 0;
 
       need=tunex + tunepsi + tunetaubeta;
       if(need > 0){
@@ -4120,14 +2964,9 @@ extern "C" {
 	      double *psiRWSigma_ptr, double *alpha_psi_ptr, double *beta_psi_ptr) {
 
   //Splash screen
-  cout << "MCMC Estimation in BPLE Model v1.0.1 (using R API). " << endl;
+  Rprintf("MCMC Estimation in BPLE Model v1.0.1 (using R API).\n");
 
   /* Datafile and Logfile variables */
-  /*  char *dataFile = new char[180];
-  char *logFile = new char[180];
-  char* logFile2 = new char[180]; */
-
-  /*  dataFile = *dataFile_ptr;*/
   char *logFile  = *logFile_ptr;
   char *logFile2 = *logFile2_ptr;
 
@@ -4176,20 +3015,20 @@ extern "C" {
   alpha_psi = *alpha_psi_ptr;
   beta_psi = *beta_psi_ptr;
 
-  /*  cout << "dataFile is in \"" << dataFile << "\"" << endl;*/
-  cout << "dim(x) = " << *n_ptr << "\t" << *I_ptr << endl;
-  cout << "logfile is in \"" << logFile << "\"." << endl;
-  cout << "logfile2 is in \"" << logFile2 << "\"." << endl;
-  cout << "burnin = " << burnin << " (" << *burnin_ptr << ")" << endl;
-  cout << "filter = " << filter << " (" << *filter_ptr << ")" << endl;
-  cout << "sampleSize = " << sampleSize << " (" << *sampleSize_ptr << ")" << endl;
-  cout << "T = " << T << endl;
-  cout << "nfreq = " << nfreq << endl;
-  cout << "alpha_xi = " << alpha_xi <<endl;
-  cout << "beta_xi = " << beta_xi << endl;
-  cout << "psiRWSigma = " <<   psiRWSigma << endl;
-  cout << "alpha_psi = " << alpha_psi << endl;
-  cout << "beta_psi = " << beta_psi << endl;
+  /* Status information */
+  Rprintf("dim(x) = %d\t%d\n", *n_ptr, *I_ptr);
+  Rprintf("logfile is in \"%s\".\n",logFile);
+  Rprintf("logfile2 is in \"%s\".\n", logFile2);
+  Rprintf("burnin = %d (%d)\n", burnin, *burnin_ptr);
+  Rprintf("filter = %d (%d)\n", filter, *filter_ptr);
+  Rprintf("sampleSize = %d (%d)\n", sampleSize, *sampleSize_ptr);
+  Rprintf("T = %d\n", T);
+  Rprintf("nfreq = %d\n",nfreq);
+  Rprintf("alpha_xi = %f\n", alpha_xi);
+  Rprintf("beta_xi = %f\n", beta_xi);
+  Rprintf("psiRWSigma = %f\n", psiRWSigma);
+  Rprintf("alpha_psi = %f\n", alpha_psi);
+  Rprintf("beta_psi = %f\n", beta_psi);
 
 
   /*********************************************************************** 
@@ -4201,8 +3040,8 @@ extern "C" {
   logfile.open(logFile);
   logfile2.open(logFile2);
   accfile.open(accFile);
-  if (!logfile) { cerr << "Error opening the log file." << endl;exit(-1);}
-  if (!accfile) { cerr << "Error opening the acc file." << endl;exit(-1);}
+  if (!logfile) { REprintf("Error opening the log file.\n");exit(-1);}
+  if (!accfile) { REprintf("Error opening the acc file.\n");exit(-1);}
 
 
   /* Allocate a random number generator -- this is now the R RNG and
@@ -4222,12 +3061,12 @@ extern "C" {
   Z = surveillancedata2twin(x_ptr,n,I);
   /*  Z = readData(dataFile,&n,&I);*/
 
-  cout << " ====== The data =======" << endl;
+  Rprintf(" ====== The data =======\n");
   for (int t=0; t<=n; t++) {
     for (int i=0; i<=I; i++) {
-      cout << Z[i][t] << "\t";
+      Rprintf("%d\t", Z[i][t]);
     }
-    cout << endl;
+    Rprintf("\n");
   }
 
   xi[1] = 1;  
@@ -4241,7 +3080,7 @@ extern "C" {
   logfile.close();
   logfile2.close();
   accfile.close();
-  cout << "\nDone with twins -- going back to R." << endl;
+  Rprintf("\nDone with twins -- going back to R.\n");
 
   //Done - save the current seed value for use in R
   PutRNGstate();

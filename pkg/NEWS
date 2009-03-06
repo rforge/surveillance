@@ -1,5 +1,5 @@
-1.0-1
-=====
+1.0-2 (released 6 Mar 2009)
+===========================
 
 * Negative Binomial CUSUM or the more general NegBin likelihood ratio
   detector is now implemented as part of algo.glrnb.

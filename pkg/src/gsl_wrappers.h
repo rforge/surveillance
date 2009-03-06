@@ -31,17 +31,17 @@ double gsl_ran_gamma(int RNG, double a, double b) {
   return(res);
 }
 
-double gsl_ran_poisson(int RNG, double lambda) {
+unsigned int gsl_ran_poisson(int RNG, double lambda) {
   //GetRNGstate();
-  double res = rpois(lambda);
+  unsigned int res = rpois(lambda);
   //PutRNGstate();
   return(res);
 }
 
 
-double gsl_ran_binomial(int RNG, double p, unsigned int n) {
+unsigned int gsl_ran_binomial(int RNG, double p, unsigned int n) {
   //GetRNGstate();
-  double res = rbinom(n,p);
+  unsigned int res = rbinom(n,p);
   //PutRNGstate();
   return(res);
 }

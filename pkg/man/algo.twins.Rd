@@ -36,7 +36,12 @@ algo.twins(disProgObj, control=list(burnin=1000, filter=10,
 
   Note also that the function writes three logfiles in your current
   working directory (i.e. getwd()): twins.log, twins.log.acc and twins.log2
-  Thus you need to have write permissions in the current getwd() directory.
+  Thus you need to have write permissions in the current getwd()
+  directory.
+
+  Currently, the example section is commented, because the underlying
+  C++ code appears to crash under some UNIX distributions and it takes
+  rather long time.
 }
 \value{Returns an object of class \code{atwins} with elements 
   \item{control}{specified control object}
@@ -44,30 +49,33 @@ algo.twins(disProgObj, control=list(burnin=1000, filter=10,
   \item{logFile}{containes the returned samples of the parameters \eqn{\psi}{\psi}, \eqn{\gamma_{0}}{\gamma_0}, \eqn{\gamma_{1}}{\gamma_1}, \eqn{\gamma_{2}}{\gamma_2}, K, \eqn{\xi_{\lambda}}{\xi_\lambda} \eqn{\lambda_{1},...,\lambda{n}}{\lambda_1,...,\lambda_{n}}, the predictive distribution and the deviance.}
   \item{logFile2}{containes the sample means of the variables \eqn{X_{t}, Y_{t}, \omega_{t}}{X_t, Y_t, \omega_t} and the relative frequency of a changepoint at time t for t=1,...,n and the relative frequency of a predicted changepoint at time n+1.} 
 }
-\references{Held, L., Hofmann, M., Höhle, M. and Schmid V. (2006) A two-component
+\references{Held, L., Hofmann, M., \enc{Höhle}{Hoehle}, M. and Schmid V. (2006) A two-component
   model for counts of infectious diseases, Biostatistics, \bold{7}, pp.
   422--437.
 }
-\author{M. Hofmann and M. Höhle}
+\author{M. Hofmann and M. \enc{Höhle}{Hoehle}}
 \examples{
-
+\dontrun{
 #Load the data used in the Held et al. (2006) paper
 data("hepatitisA")
 
 #Fix seed - this is used for the MCMC samplers in twins
 set.seed(123)
 
-#Call algorithm and save result
+#Call algorithm and save result. Apparently, the underlying C++
+#code can cause problems on some LINUX distributions (e.g. ubuntu):
+# *** glibc detected *** /usr/lib/R/bin/exec/R: corrupted double-linked
+# so until further notice this example code is put into dontrun mode
 otwins <- algo.twins(hepatitisA)
 
-#This shows the entire output
-plot(otwins)
+#This shows the entire output (use ask=TRUE for pause between plots)
+plot(otwins, ask=FALSE)
 
 #Direct access to MCMC output
 hist(otwins$logFile$psi,xlab=expression(psi),main="")
 require("coda")
 print(summary(mcmc(otwins$logFile[,c("psi","xipsi","K")])))
-
+}
 }
 \keyword{ts}
 \keyword{regression}

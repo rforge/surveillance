@@ -52,6 +52,9 @@
 \author{M. Hofmann and M. \enc{Höhle}{Hoehle}}
 \seealso{\link{algo.twins}}
 \examples{
+\dontrun{
+#Apparently, the algo.atwins can crash on some LINUX systems
+#thus for now the example section is commented
 
 #Load the data used in the Held et al. (2006) paper
 data("hepatitisA")
@@ -64,6 +67,7 @@ otwins <- algo.twins(hepatitisA)
 
 #This shows the entire output
 plot(otwins,which=c(1,2),ask=FALSE)
+}
 }
 \keyword{ts}
 \keyword{regression}

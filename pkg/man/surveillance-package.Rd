@@ -21,7 +21,7 @@
     Package: \tab surveillance\cr
     Type: \tab Package\cr
     Version: \tab 1.0-1\cr
-    Date: \tab 2009-03-02\cr
+    Date: \tab 2009-05-03\cr
     License: \tab GPL version 2 (http://www.gnu.org/licenses/gpl.html) \cr
   }
   \itemize{
@@ -38,10 +38,6 @@
   surveillance: An R package for the surveillance of infectious diseases (2007), M. \enc{Höhle}{Hoehle}, Computational Statistics, 22(4), pp. 571---582.
 }
 \keyword{ package }
-%\seealso{
-%~~ Optional links to other man pages, e.g. ~~
-%~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-%}
 \examples{
 \dontrun{demo(cost)}
 }
