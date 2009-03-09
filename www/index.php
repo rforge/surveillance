@@ -101,7 +101,7 @@ under the GPL conditions.</li>
 <b>Download:</b>
 <blockquote>
 <blockquote>
-<blockquote> The <tt>surveillance</tt> package (version 0.9-9) is
+<blockquote> The <tt>surveillance</tt> package (version 1.0-2) is
 available for download from <a
 href="http://cran.r-project.org/src/contrib/Descriptions/surveillance.html">CRAN</a>.<br>
       Current package development, help-forum and bugtracking is hosted through
@@ -111,36 +111,12 @@ R-Forge:<br>
 href="https://r-forge.r-project.org/projects/surveillance/">https://r-forge.r-project.org/projects/surveillance/</a><br>
 </div>
 <br>
-From this page snapshots of the current development version 0.9-10 are
+From this page snapshots of the current development version 1.0-3 are
 available.<br>
 <br>
 New features:<br>
 <ul>
-      <li>(0.9-10) See NEWS file in the current distribution
-      <li>(0.9-9) Minor update to remove several R CMD check warning on CRAN
-<li>(0.9-8) The <tt>algo.glrpois</tt> function now handles both increases and decreases. Furthermore, a companion function <tt>algo.glrnb</tt> has been written, which handles negative binomial time series with fixed dispersion parameter (this function is still experimental). For further details see the file NEWS in the distribution.
-<li>(0.9-7) Improved <tt>algo.hhh</tt> and improvements on the <tt>algo.glrpois</tt> routine. 
-<li>(0.9-6) The surveillance algorithms for time varying
-Poisson mean charts by Rogerson and Yamada has been implemented.<br>
-</li>
-<li>(0.9-5) Improved customization of the plotting routines for
-non-weekly data. <span style="font-family: monospace;">algo.hhh</span>
-also works with monthly data.<br>
-</li>
-<li>(0.9-4) First steps towards S4 by introducing the <span
-style="font-family: monospace;">sts</span> class. Multivariate
-surveillance using simple independent univariate algorithms (wrappers).
-Bug fixes.<br>
-</li>
-<li>(0.9-3) Poisson regression charts based on generalized
-likelihood
-ratio detection is implemented as <tt>algo.glrpois.</tt>To increase
-speed, the underlying algorithms of algo.glrpois are implemented in C.</li>
-<li>(0.9-2) The plot command now allows xlab, ylab, main as ...
-arguments, which overwrite the default values. Also, <tt>algo.cusum</tt>
-has been added, which implements the
-approach
-by Rossi et al. (1999)</li>
+      <li>(>0.9-10) See NEWS file in the current distribution</li>
 </ul>
 <ul>
 </ul>
