@@ -29,7 +29,6 @@ multinomialCUSUM <- function(y, pi0, pi1, n, h) {
 
     #Only run to the first alarm. Then reset.
     if ((S[t+1] >= h) | (t==ncol(y))) { stopped <- TRUE}
-#    if ((t==ncol(y))) { stopped <- TRUE}
   }
   #If no alarm at the end put rl to end (its censored!)
   if (sum(S[-1]>h)>0) {
@@ -173,6 +172,10 @@ testIt <- function() {
 
   source("~/Surveillance/surveillance/pkg/R/sts.R")
   ##Problem with plot function?!?!?!
+debug("plot.sts.time.one")
+#  pediatrist@state <- pediatrist@observed*0
+#  pediatrist@alarm <- pediatrist@observed*0
+#  pediatrist@upperbound <- pediatrist@observed*0
   plot(pediatrist)
 
   #Training and test data
@@ -209,6 +212,17 @@ testIt <- function() {
   source("multinomCUSUM.R")
 #  debug("multinomCUSUM")
   surv <- multinomCUSUM(pediatrist, control=list(range=range, pi=pi0, pi0=pi0, pi1=pi1, h=4))
-  ##Plot function does not work
-  plot(surv[,1])
+
+  #Problem: no real interpretation of CUSUM statistic
+  surv@upperbound <- surv@upperbound / 5
+  
+  hookFunc <- function() {
+    matlines(1:ncol(pi0),cbind(pi0[k,],pi1[k,]),col=c("green","red"),lwd=2)
+    axis(4,at=seq(0,max(surv@upperbound),by=1/5),labels=seq(0,max(surv@upperbound)*5,by=1),line=-0.5,mgp=c(3,-2,0),col="blue")
+  }
+  #Plot all but reference category
+  plot(surv[,1:4],par.list=list(mar=c(4,1,1,1)),dx.upperbound=0, hookFunc=hookFunc)
+   
+
+
 }

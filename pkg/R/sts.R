@@ -347,8 +347,8 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
   binaryTS <- sum( population > 1 ) > 1
 
   if (binaryTS) {
-    observed <- observed/population
-    upperbound <- upperbound/population
+    observed <- ifelse(population!=0,observed/population,0)
+    upperbound <- ifelse(population!=0,upperbound/population,0)
     if (ylab == "No. infected") { ylab <- "Proportion infected" }
   }
   
@@ -629,7 +629,11 @@ plot.sts.time <- function(x, type, method=x@control$name, disease=x@control$data
 
   if (binaryTS) {
     pi <-  ifelse(population == 0,  0,observed / population)
-    un <-  ifelse(population == 0, 0, x@upperbound / population)
+    if (identical(dim(x@upperbound), population)) {
+      un <-  ifelse(population == 0, 0, x@upperbound / population)
+    } else {
+      un <- 0
+    }
     max <-  max(max(pi),max(un),na.rm=TRUE)
   } else {
     max <-  max(max(observed),max(x@upperbound),na.rm=TRUE)
