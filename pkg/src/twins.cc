@@ -2761,18 +2761,21 @@ register long sampleCounter=1;
       for (register long t=2; t<=n; t++) {
         //Update X
         double binp = nu[i][t]*xi[i] / (epsilon[t] + nu[i][t]*xi[i] + lambda[i][t] * Z[i][t-1]);
-        X[i][t] =  gsl_ran_binomial(r, binp, Z[i][t]);
-
+	X[i][t] =  gsl_ran_binomial(r, binp, Z[i][t]);
 
         //Update S
         binp =  epsilon[t] / (epsilon[t] + lambda[i][t] * Z[i][t-1]);
-        S[i][t] =  gsl_ran_binomial(r, binp, (Z[i][t] - X[i][t]));
-
+	//hoehle 9 Apr 2009 -- protection against Z[i][t-1]==0 case, leading to binp = nan
+	if (Z[i][t-1] == 0) {binp = 1;}
+	S[i][t] =  gsl_ran_binomial(r, binp, (Z[i][t] - X[i][t]));
   
     
         //Update Y
         Y[i][t] = Z[i][t] - X[i][t] - S[i][t];
         
+	//Debug
+	//cout << "i=" << i << "\tt=" << t << "\tX=" << X[i][t] << "\tY=" << Y[i][t] << "\tZ=" << Z[i][t] << "\tS=" << S[i][t] << "\tepsilon=" << epsilon[t] << "\tbinp=" << binp << endl;
+
         //Update omega[t] in case of overdispersion
 	if(overdispersion){
 	       double a = psi + Z[i][t];
