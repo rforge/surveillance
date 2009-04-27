@@ -103,14 +103,16 @@ make.pois <- function(obj) {
 }
 
 pois.plot <- function(m.results,...) {
-  plotorder <- c(expression(Z),expression(X),expression(Y))
-  plotcols <- c(1,"blue","red")
+  plotorder <- c(expression(Z),expression(Y),expression(X))
+  plotcols <- c(1,"red","blue")
   lwd <- c(1,3,3)
   sts <- disProg2sts(m.results$disProgObj)
 
   #Make default legend if nothing else is specified.
   if (is.null(list(...)[["legend.opts",exact=TRUE]])) {
-    plot(sts,legend.opts=list(x="topleft",legend=paste(plotorder),lwd=lwd,col=plotcols,horiz=TRUE,y.intersp=0,lty=1),...)
+#    plot(sts,legend.opts=list(x="topleft",legend=paste(plotorder),lwd=lwd,col=plotcols,horiz=TRUE,y.intersp=0,lty=1),...)
+    #There is a bug here, but atm I do not have the time to fix it.
+    plot(sts,legend.opts=NULL,...)
   } else {
     plot(sts,...)
   }
