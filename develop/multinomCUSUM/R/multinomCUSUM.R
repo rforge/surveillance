@@ -36,6 +36,7 @@ multinomialCUSUM <- function(y, pi0, pi1, n, h) {
   } else {
     t <- ncol(pi0) ##Last one
   }
+  #Missing: cases needs to be returned!
   return(list(N=t,val=S[-1],cases=NULL))
 }
 
@@ -70,9 +71,13 @@ multinomCUSUM <- function(stsObj,
   #Extract the important parts from the arguments
   range <- control$range
   y <- t(stsObj@observed[range,,drop=FALSE])
+  pi0 <- control[["pi0",exact=TRUE]]
+  pi1 <- control[["pi1",exact=TRUE]]
   control$ret <- match.arg(control$ret, c("value","cases"))
   ret <- pmatch(control$ret,c("value","cases"))
-  n <- as.numeric(stsObj@populationFrac[range,1,drop=FALSE])  #just take first
+  ##n contains number. Same for all. Alternative: sum over y's
+#  n <- as.numeric(stsObj@populationFrac[range,1,drop=FALSE])  #just take first
+  n <- apply(y, 2, sum)
   
   #Semantic checks
   if ( ((ncol(y) != ncol(pi0)) | (ncol(pi0) != ncol(pi1))) |
@@ -118,7 +123,7 @@ multinomCUSUM <- function(stsObj,
       alarm[res$N + doneidx,] <- TRUE
 
       #Chop & get ready for next round
-      y <- y[,-(1:res$N),drop=FALSE] ; t <- t[-(1:res$N)]
+      y <- y[,-(1:res$N),drop=FALSE]
       pi0 <- pi0[,-(1:res$N),drop=FALSE]
       pi1 <- pi1[,-(1:res$N),drop=FALSE]
       n <- n[-(1:res$N)]
@@ -130,7 +135,7 @@ multinomCUSUM <- function(stsObj,
   }
 
   #Add upperbound-statistic of last segment, where no alarm is reached
-  upperbound[(doneidx-res$N+1):nrow(upperbound),]  <- matrix(rep(either(ret == 1, res$val, res$cases),each=ncol(upperbound)),ncol=ncol(upperbound),byrow=TRUE)
+  upperbound[(doneidx-res$N+1):nrow(upperbound),]  <- matrix( rep(either(ret == 1, res$val, res$cases),each=ncol(upperbound)),ncol=ncol(upperbound),byrow=TRUE)
   
 
   
@@ -153,7 +158,7 @@ multinomCUSUM <- function(stsObj,
   start.sampleNo <- (new.sampleNo - 1) %% stsObj@freq + 1
   stsObj@start <- c(start.year,start.sampleNo)
 
-  #Ensure dimnames in the new object ## FTHIS NEEDS TO BE FIXED!
+  #Ensure dimnames in the new object ## THIS NEEDS TO BE FIXED!
   #stsObj <- fix.dimnames(stsObj)
 
   #Done
