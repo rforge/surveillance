@@ -953,11 +953,12 @@ setMethod( "show", "sts", function( object ){
 
 #Method to convert sts object to a data frame
 setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, optional = FALSE,...) {
-  res <- data.frame("observed"=x@observed, "week"=x@week, "state"=x@state, "alarm"=x@alarm)
+  res <- data.frame("observed"=x@observed, "week"=x@week, "state"=x@state, "alarm"=x@alarm,"populationFrac"=x@populationFrac)
   
   colnames(res) <-  c(paste("observed.",colnames(x@observed),sep=""),"week",
                       paste("state.",colnames(x@observed),sep=""),
-                      paste("alarm.",colnames(x@observed),sep=""))
+                      paste("alarm.",colnames(x@observed),sep=""),
+                      paste("populationFrac.",colnames(x@observed),sep=""))
 
   return(res)
           
