@@ -4,9 +4,9 @@
 # are performed here, we expect "proper" input.
 #
 # Params:
-#  y - (k-1) \times tmax observation matrix for all but the reference category
-#  pi0 - (k-1) \times tmax in-control prob vector for all but ref cat
-#  pi1 - (k-1) \times tmax out-of-control prob vector for all but ref cat
+#  y - (k) \times tmax observation matrix for all categories
+#  pi0 - (k) \times tmax in-control prob vector for all categories
+#  pi1 - (k) \times tmax out-of-control prob vector for all categories
 #  n   - vector of dim tmax containing the varying sizes
 #  h   - decision threshold of the multinomial CUSUM
 #########################################################################
@@ -16,6 +16,7 @@ multinomialCUSUM <- function(y, pi0, pi1, n, h) {
   t <- 0
   stopped <- FALSE
   S <- numeric(ncol(y)+1)
+  U <- numeric(ncol(y)+1)
   
   #Run the Multinomial LR CUSUM
   while (!stopped) {
@@ -27,6 +28,12 @@ multinomialCUSUM <- function(y, pi0, pi1, n, h) {
     #Add to CUSUM
     S[t+1] <- max(0,S[t] + llr)
 
+    #Given past how many would cause an alarm. MISSING!
+    #For binomial we can compute it
+    if (nrow(y) == 2) {
+      U[t+1] = ceiling(max(0,(h - S[t] - log((1 - pi1[1,t])) * n[t] + log((1 - pi1[1,t])) * y[t] + log((1 - pi0[1,t])) * n[t] - log((1 - pi0[1,t])) * y[t]) / (log(pi1[1,t]) - log(pi0[1,t]))));
+    }
+    
     #Only run to the first alarm. Then reset.
     if ((S[t+1] >= h) | (t==ncol(y))) { stopped <- TRUE}
   }
@@ -37,7 +44,7 @@ multinomialCUSUM <- function(y, pi0, pi1, n, h) {
     t <- ncol(pi0) ##Last one
   }
   #Missing: cases needs to be returned!
-  return(list(N=t,val=S[-1],cases=NULL))
+  return(list(N=t,val=S[-1],cases=U[-1]))
 }
 
 ######################################################################
@@ -83,6 +90,9 @@ multinomCUSUM <- function(stsObj,
   if ( ((ncol(y) != ncol(pi0)) | (ncol(pi0) != ncol(pi1))) |
       ((nrow(y) != nrow(pi0)) | (nrow(pi0) != nrow(pi1)))) {
     stop("Error: dimensions of y, pi0 and pi1 have to match")
+  }
+  if ((control$ret == 2) & ncol(pi0) != 2) {
+    stop("Cases can only be returned in case of binomial, i.e. k=2")
   }
   if (length(n) != ncol(y)) {
     stop("Error: Length of n has to be equal to number of columns in y")
