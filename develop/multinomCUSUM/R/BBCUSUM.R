@@ -1,5 +1,5 @@
 #########################################################################
-# Multinomial CUSUM for y_t \sim M_k(n_t, \pi_t) for t=1,...,tmax
+# Beta binomial CUSUM for y_t \sim BB(n_t, \pi_t, sigma) for t=1,...,tmax
 # Workhorse function doing the actual computations - no semantic checks
 # are performed here, we expect "proper" input.
 #
@@ -11,7 +11,7 @@
 #  h   - decision threshold of the multinomial CUSUM
 #########################################################################
 
-multinomialCUSUM <- function(y, pi0, pi1, n, h) {
+BBCUSUM.calc <- function(y, pi0, pi1, n, h, sigma) {
   #Initialize variables
   t <- 0
   stopped <- FALSE
@@ -23,8 +23,8 @@ multinomialCUSUM <- function(y, pi0, pi1, n, h) {
     #Increase time
     t <- t+1
     #Compute log likelihood ratio
-    llr <- dmultinom(y[,t], size=n[t], prob=pi1[,t],log=TRUE) -
-      dmultinom(y[,t], size=n[t], prob=pi0[,t],log=TRUE)
+    llr <- dBB(y[,t], bd=n[t], mu=pi1[,t],sigma=sigma,log=TRUE) -
+      dBB(y[,t], bd=n[t], mu=pi0[,t],sigma=sigma,log=TRUE)
     #Add to CUSUM
     S[t+1] <- max(0,S[t] + llr)
 
@@ -32,7 +32,7 @@ multinomialCUSUM <- function(y, pi0, pi1, n, h) {
     #to sound an alarm given the past.
     if (nrow(y) == 2) {
       #Calculations in ../maple/numberneededbeforealarm.mw
-      at <- (h - S[t] - n[t] * ( log(1 - pi1[1,t]) - log(1-pi0[1,t]))) / (log(pi1[1,t]) - log(pi0[1,t]) - log(1-pi1[1,t]) + log(1-pi0[1,t]))
+      at <- 0# (h - S[t] - n[t] * ( log(1 - pi1[1,t]) - log(1-pi0[1,t]))) / (log(pi1[1,t]) - log(pi0[1,t]) - log(1-pi1[1,t]) + log(1-pi0[1,t]))
       U[t+1] = ceiling(max(0,at))
     }
     
@@ -61,9 +61,9 @@ multinomialCUSUM <- function(y, pi0, pi1, n, h) {
 #    * pi1 - (k-1) \times tmax out-of-control prob vector for all but ref cat
 ######################################################################
 
-multinomCUSUM <- function(stsObj,
+betabinomialCUSUM <- function(stsObj,
                                control = list(range=NULL,h=5,
-                                 pi0=NULL, pi1=NULL, ret=c("cases","value"))) {
+                                 pi0=NULL, pi1=NULL, sigma=NULL,ret=c("cases","value"))) {
 
   # Set the default values if not yet set
   if(is.null(control[["pi0",exact=TRUE]])) { 
@@ -74,6 +74,8 @@ multinomCUSUM <- function(stsObj,
   }
   if(is.null(control[["h",exact=TRUE]]))
     control$h <- 5
+    if(is.null(control[["sigma",exact=TRUE]]))
+    control$h <- 1
   if(is.null(control[["ret",exact=TRUE]]))
   	control$ret <- "value"
 
@@ -84,9 +86,7 @@ multinomCUSUM <- function(stsObj,
   pi1 <- control[["pi1",exact=TRUE]]
   control$ret <- match.arg(control$ret, c("value","cases"))
   ret <- pmatch(control$ret,c("value","cases"))
-  ##n contains number. Same for all. Alternative: sum over y's
-#  n <- as.numeric(stsObj@populationFrac[range,1,drop=FALSE])  #just take first
-  n <- apply(y, 2, sum)
+  n <- as.numeric(stsObj@populationFrac[range,1,drop=FALSE])  
   
   #Semantic checks
   if ( ((ncol(y) != ncol(pi0)) | (ncol(pi0) != ncol(pi1))) |
@@ -126,7 +126,7 @@ multinomCUSUM <- function(stsObj,
   #######################################################
   while (doneidx < noOfTimePoints) {
      ##Run multinomial CUSUM until the next alarm
-    res <- multinomialCUSUM(y, pi0, pi1, n, h=control$h)
+    res <- BBCUSUM.calc(y, pi0, pi1, n, h=control$h, sigma=control$sigma)
 
     #In case an alarm found log this and reset the chart at res$N+1
     if (res$N < ncol(y)) {
@@ -152,7 +152,7 @@ multinomCUSUM <- function(stsObj,
 
   
   # Add name and data name to control object
-  control$name <- "multinomCUSUM"
+  control$name <- "BBCUSUM"
   control$data <- NULL #not supported anymore
 
 
@@ -175,71 +175,4 @@ multinomCUSUM <- function(stsObj,
 
   #Done
   return(stsObj)
-}
-
-######################################################################
-# Tester function
-######################################################################
-
-testIt <- function() {
-  source("multinomCUSUM.R")
-  load("../data/pediatrist.RData")
-  library("surveillance")  
-  library("nnet")
-
-  source("~/Surveillance/surveillance/pkg/R/sts.R")
-  ##Problem with plot function?!?!?!
-debug("plot.sts.time.one")
-#  pediatrist@state <- pediatrist@observed*0
-#  pediatrist@alarm <- pediatrist@observed*0
-#  pediatrist@upperbound <- pediatrist@observed*0
-  plot(pediatrist)
-
-  #Training and test data
-  train <- 1:24 
-  range <- 25:42
-
-  #Fit multinomial model use 1-2 as reference category. For fitting remove rows
-  #among training data with rowsum zero
-  rowsumZero <- apply(pediatrist@observed[train,],1,sum) == 0
-  dfTrain <- data.frame(pediatrist@observed[train,][!rowsumZero,,drop=FALSE],t=train[!rowsumZero])
-  
-  m.pA <- multinom( I(as.matrix(dfTrain[,c(2,1,3,4,5)])) ~ 1 + t  + sin(2*pi/12*t) + cos(2*pi/12*t), data=dfTrain)
-
-  #Probability vectors under 0 and 1
-  theta0 <- coef(m.pA)
-  R <- c(1,1,1,1)
-  theta1 <- cbind(theta0[,1]+R,theta0[,-1])
-
-  #Time
-  period <- 12
-  t <- range
-  
-  #Create covariate matrix
-  x <- matrix(cbind(1,t,sin(2*pi*t/period),cos(2*pi*t/period)),nrow=length(t))
-
-  #Calculate probability of each class under H0 and H1
-  pi0 <- apply(exp(theta0 %*% t(x)), 2, function(x) x/(1+sum(x)))
-  pi1 <- apply(exp(theta1 %*% t(x)), 2, function(x) x/(1+sum(x)))
-
-  #Compute probabilities and y for all categories (i.e. not leaving out the last)
-  pi1 <- rbind(pi1,1-apply(pi1,2,sum))
-  pi0 <- rbind(pi0,1-apply(pi0,2,sum))
-
-  source("multinomCUSUM.R")
-#  debug("multinomCUSUM")
-  surv <- multinomCUSUM(pediatrist, control=list(range=range, pi=pi0, pi0=pi0, pi1=pi1, h=4))
-
-  #Problem: no real interpretation of CUSUM statistic
-  surv@upperbound <- surv@upperbound / 5
-  
-  hookFunc <- function() {
-    matlines(1:ncol(pi0),cbind(pi0[k,],pi1[k,]),col=c("green","red"),lwd=2)
-    axis(4,at=seq(0,max(surv@upperbound),by=1/5),labels=seq(0,max(surv@upperbound)*5,by=1),line=-0.5,mgp=c(3,-2,0),col="blue")
-  }
-  #Plot all but reference category
-  plot(surv[,1:4],par.list=list(mar=c(4,1,1,1)),dx.upperbound=0, hookFunc=hookFunc)
-   
-
-
 }
