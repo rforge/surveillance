@@ -331,7 +331,7 @@ merge.list <- function (x, y, ...)
 # colors - c( fill color of polygons, line color of polygons, upperbound)
 ##########################################################################
 
-plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0.5,hookFunc=function() {},...) {
+plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, weeksAsDate=FALSE, xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0.5,hookFunc=function() {},...) {
 
   #Extract slots -- depending on the algorithms: x@control$range
   observed   <- x@observed[,k]
@@ -419,6 +419,24 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
       # get the right number and order of quarter labels
       quarter <- sapply( (weeks-1) %/% 13 %% 4, quarterFunc)
 
+      #If weeksAsDate -- experimental functionality to handle ISO 8601
+      if (weeksAsDate) {
+        date <- as.Date(x@week, origin="1970-01-01")
+        years <- unique(as.numeric(format(date,"%Y")))
+        #Start of quarters in each year present in the data. 
+        qStart <- as.Date(paste(rep(years,each=4), c("-01-01","-04-01","-07-01","-10-01"),sep=""))
+        qName  <- rep(c("I","II","III","IV"), length.out=length(qStart))
+        qIdx   <- qStart <= max(date)+10 & qStart >= min(date)-10
+        qStart <- qStart[qIdx] ; qName <- qName[qIdx]
+        #Find week in data closest to these dates
+        weekIdx <- sapply(qStart, function(d) which.min(abs(as.numeric(date - d))))
+
+        date <- date[weekIdx]
+        #Year the ISO week belongs to
+        year <- as.numeric(format(date,"%G"))
+        quarter <- qName
+      }        
+      
       #construct the computed axis labels -- add quarters if xaxis.units is requested
       if (xaxis.units) {
         labels.week <- paste(year,"\n\n",quarter,sep="")
@@ -427,7 +445,11 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
       }
 
       axis( side=1,line=1,labels=FALSE,at=c(1,length(observed)),lwd.ticks=0)
-      axis( at=weekIdx , labels=labels.week , side=1, line = 1 ,cex=cex)
+      axis( at=weekIdx[which(quarter != "I")] , labels=labels.week[which(quarter != "I")] , side=1, line = 1 ,cex=cex)
+      #Bigger tick marks at the first quarter
+      at <- weekIdx[which(quarter == "I")]
+      axis( at=at  , labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
+      #2nd axis
       axis( side=2 ,cex=cex)
     } else { ##other frequency
       #A label at each unit
