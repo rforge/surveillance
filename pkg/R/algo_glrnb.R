@@ -34,8 +34,12 @@ algo.glrnb <- function(disProgObj,
     control$dir <- "inc"
   if(is.null(control[["ret",exact=TRUE]]))
   	control$ret <- "value"
+  if(control[["theta",exact=TRUE]] == 1) {
+    stop("Error: theta has to be larger than 1!")
+  }
   #if(is.null(control[["alpha",exact=TRUE]]))
   #    control$alpha <- 0
+
 
   #GLM (only filled if estimated)
   m <- NULL

@@ -950,16 +950,43 @@ setMethod( "show", "sts", function( object ){
   print( head(object@neighbourhood,n))
 } )
 
+######################################################################
+#Method to convert sts object to a data frame suitable for regression
+#Params:
+# row.names - from generic R function
+# optional  - from generic R function
+# freqByWeek -- if TRUE use information in week (supposed to be Dates)
+#               to freq (e.g. used for regression model)
+######################################################################
 
-#Method to convert sts object to a data frame
-setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, optional = FALSE,...) {
+setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, optional = FALSE, ...,freqByWeek=FALSE) {
+  #Convert object to data frame and give names
   res <- data.frame("observed"=x@observed, "week"=x@week, "state"=x@state, "alarm"=x@alarm,"populationFrac"=x@populationFrac)
-  
   colnames(res) <-  c(paste("observed.",colnames(x@observed),sep=""),"week",
                       paste("state.",colnames(x@observed),sep=""),
                       paste("alarm.",colnames(x@observed),sep=""),
                       paste("populationFrac.",colnames(x@observed),sep=""))
 
+  #Add a column denoting the number of week
+  if (freqByWeek) {
+    #Convert to date
+    date <- as.Date(x@week, origin="1970-01-01")
+    epochStr <- switch( as.character(x@freq), 
+                       "12" = "%m",
+                       "52" =  "%V",
+                       "365" = "%j")
+                       
+    #Find out how many epochs there are each year
+    years <- unique(as.numeric(format(date,"%Y")))
+    dummyDates <- as.Date(paste(rep(years,each=6),"-12-",26:31,sep=""))
+    maxEpoch <- tapply( as.numeric(format(dummyDates, epochStr)), rep(years,each=6), max)
+    #Assign this to result
+    res$freq <- maxEpoch[pmatch(format(date,"%Y"),names(maxEpoch),duplicates.ok=TRUE)]
+  } else {
+    #Otherwise just replicate the fixed frequency
+    res$freq <- x@freq
+  }
+  
   return(res)
-          
 })
+
