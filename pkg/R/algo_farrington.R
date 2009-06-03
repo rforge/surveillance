@@ -33,7 +33,7 @@ algo.farrington.fitGLM <- function(response,wtime,timeTrend=TRUE,reweight=TRUE) 
   #Model formula depends on whether to include a time trend or not.
   theModel <- as.formula(ifelse(timeTrend, "response~1+wtime","response~1"))
 
-  #Fit it.
+  #Fit it -- this is slow. An improvement would be to use glm.fit here.
   model <- glm(theModel, family = quasipoisson(link="log"))
     
  #Check convergence - if no convergence we return empty handed.
@@ -78,7 +78,7 @@ algo.farrington.fitGLM <- function(response,wtime,timeTrend=TRUE,reweight=TRUE) 
 ### chunk number 4: 
 ###################################################
 
-algo.farrington.threshold <- function(pred,phi,alpha=0.01,skewness.transform="none") {
+algo.farrington.threshold <- function(pred,phi,alpha=0.01,skewness.transform="none",y) {
   #Fetch mu0 and var(mu0) from the prediction object
   mu0 <- pred$fit
   tau <- phi + (pred$se.fit^2)/mu0
@@ -95,8 +95,13 @@ algo.farrington.threshold <- function(pred,phi,alpha=0.01,skewness.transform="no
   #Ensure that lower bound is non-negative
   lu[1] <- max(0,lu[1],na.rm=TRUE)
 
+  #Compute quantiles of the predictive distribution based on the
+  #normal approximation on the transformed scale
+  q <- pnorm( y^(1/exponent) , mean=mu0^exponent, sd=se)
+  m <- qnorm(0.5, mean=mu0^exponent, sd=se)^(1/exponent)
+  
   #Return lower and upper bounds
-  return(lu)
+  return(c(lu,q=q,m=m))
 }
 
 
@@ -133,7 +138,9 @@ algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, rewei
   alarm <- matrix(data = 0, nrow = length(control$range), ncol = 1)
   trend <- matrix(data = 0, nrow = length(control$range), ncol = 1)
   upperbound <- matrix(data = 0, nrow = length(control$range), ncol = 1)
-  
+  # predictive distribution
+  pd <- matrix(data = 0, nrow = length(control$range), ncol = 2)
+
   # Define objects
   n <- control$b*(2*control$w+1)
   
@@ -214,7 +221,7 @@ algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, rewei
     pred <- predict.glm(model,data.frame(wtime=c(k)),dispersion=model$phi,
                         type="response",se.fit=TRUE)
     #Calculate lower and upper threshold
-    lu <- algo.farrington.threshold(pred,model$phi,skewness.transform=control$powertrans,alpha=control$alpha)
+    lu <- algo.farrington.threshold(pred,model$phi,skewness.transform=control$powertrans,alpha=control$alpha, observed[k])
 
     ######################################################################
     # If requested show a plot of the fit.
@@ -247,18 +254,23 @@ algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, rewei
     #the okHistory variable meant to protect against zero count problems,
     #but instead it resulted in exceedance score == 0 for low counts. 
     #Now removed to be concordant with the Farrington 1996 paper.
-    X <- ifelse(enoughCases,(observed[k] - pred$fit) / (max(lu) - pred$fit),0)
+    X <- ifelse(enoughCases,(observed[k] - pred$fit) / (lu[2] - pred$fit),0)
 
     #Do we have an alarm -- i.e. is observation beyond CI??
     #upperbound only relevant if we can have an alarm (enoughCases)
     trend[k-min(control$range)+1] <- doTrend
     alarm[k-min(control$range)+1] <- (X>1)
     upperbound[k-min(control$range)+1] <- ifelse(enoughCases,lu[2],0)
+    #Compute bounds of the predictive
+    pd[k-min(control$range)+1,] <- lu[c(3,4)]
+
   }#done looping over all time points
 
   #Add name and data name to control object.
   control$name <- paste("farrington(",control$w,",",0,",",control$b,")",sep="")
   control$data <- paste(deparse(substitute(disProgObj)))
+  #Add information about predictive distribution
+  control$pd   <- pd
 
   # return alarm and upperbound vectors 
   result <- list(alarm = alarm, upperbound = upperbound, trend=trend, 

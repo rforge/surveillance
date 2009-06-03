@@ -22,7 +22,7 @@ fix.dimnames <- function(x) {
 }
 
 #constructor function
-init.sts <- function(.Object, week, start=c(2000,1), freq=52, observed, state, map=NULL, neighbourhood=NULL, populationFrac=NULL,alarm=NULL,upperbound=NULL, control=NULL) {
+init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0*observed, map=NULL, neighbourhood=NULL, populationFrac=NULL,alarm=NULL,upperbound=NULL, control=NULL,epochAsDate=FALSE) {
   #Name handling
   namesObs <-colnames(observed)
   namesState <- colnames(observed)
@@ -73,8 +73,9 @@ init.sts <- function(.Object, week, start=c(2000,1), freq=52, observed, state, m
   if (is.null(upperbound))
     upperbound <- matrix(NA,nrow=dim(observed)[1],ncol=dim(observed)[2])
 
-  ##Assign everything
-  .Object@week <- week
+  ##Assign everything else
+  .Object@week <- epoch
+  .Object@epochAsDate <- epochAsDate
 
   if (length(start) == 2) {
     .Object@start <- start
@@ -331,7 +332,7 @@ merge.list <- function (x, y, ...)
 # colors - c( fill color of polygons, line color of polygons, upperbound)
 ##########################################################################
 
-plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, weeksAsDate=FALSE, xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0.5,hookFunc=function() {},...) {
+plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, epochsAsDate=x@epochAsDate, xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0.5,hookFunc=function() {},...) {
 
   #Extract slots -- depending on the algorithms: x@control$range
   observed   <- x@observed[,k]
@@ -419,8 +420,8 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
       # get the right number and order of quarter labels
       quarter <- sapply( (weeks-1) %/% 13 %% 4, quarterFunc)
 
-      #If weeksAsDate -- experimental functionality to handle ISO 8601
-      if (weeksAsDate) {
+      #If epochAsDate -- experimental functionality to handle ISO 8601
+      if (epochsAsDate) {
         date <- as.Date(x@week, origin="1970-01-01")
         years <- unique(as.numeric(format(date,"%Y")))
         #Start of quarters in each year present in the data. 
@@ -981,16 +982,16 @@ setMethod( "show", "sts", function( object ){
 #               to freq (e.g. used for regression model)
 ######################################################################
 
-setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, optional = FALSE, ...,freqByWeek=FALSE) {
+setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, optional = FALSE, ...) {
   #Convert object to data frame and give names
-  res <- data.frame("observed"=x@observed, "week"=x@week, "state"=x@state, "alarm"=x@alarm,"populationFrac"=x@populationFrac)
-  colnames(res) <-  c(paste("observed.",colnames(x@observed),sep=""),"week",
+  res <- data.frame("observed"=x@observed, "epoch"=x@week, "state"=x@state, "alarm"=x@alarm,"populationFrac"=x@populationFrac)
+  colnames(res) <-  c(paste("observed.",colnames(x@observed),sep=""),"epoch",
                       paste("state.",colnames(x@observed),sep=""),
                       paste("alarm.",colnames(x@observed),sep=""),
                       paste("populationFrac.",colnames(x@observed),sep=""))
 
   #Add a column denoting the number of week
-  if (freqByWeek) {
+  if (x@epochAsDate) {
     #Convert to date
     date <- as.Date(x@week, origin="1970-01-01")
     epochStr <- switch( as.character(x@freq), 
@@ -1004,9 +1005,11 @@ setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, opti
     maxEpoch <- tapply( as.numeric(format(dummyDates, epochStr)), rep(years,each=6), max)
     #Assign this to result
     res$freq <- maxEpoch[pmatch(format(date,"%Y"),names(maxEpoch),duplicates.ok=TRUE)]
+    res$epochInPeriod <- as.numeric(format(date,epochStr)) / res$freq
   } else {
     #Otherwise just replicate the fixed frequency
     res$freq <- x@freq
+    res$epochInPeriod <- x@week %% res@freq
   }
   
   return(res)
