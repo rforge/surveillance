@@ -25,6 +25,26 @@ setReplaceMethod("epoch", "sts", function(x, value) {
  x
 })
 
+if(!isGeneric("observed")) setGeneric("observed", function(x) standardGeneric("observed"))
+setMethod("observed", "sts", function(x) {
+  return(x@observed)
+})
+setGeneric("observed<-", function(x, value) standardGeneric("observed<-"))
+setReplaceMethod("observed", "sts", function(x, value) {
+ x@observed <- value
+ x
+})
+if(!isGeneric("alarms")) setGeneric("alarms", function(x) standardGeneric("alarms"))
+setMethod("alarms", "sts", function(x) {
+  return(x@alarm)
+})
+setGeneric("alarms<-", function(x, value) standardGeneric("alarms<-"))
+setReplaceMethod("alarms", "sts", function(x, value) {
+ x@alarm <- value
+ x
+})
+
+
 ######################################################################
 #Some access functions similar to matrix/dataframe (definition in sts.R)
 ######################################################################
