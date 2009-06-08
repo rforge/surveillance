@@ -32,22 +32,22 @@ LLR.fun <- function(outcomes, mu, mu0, mu1, dX, ...) {
 #  mu0 - (k-1 \times T) matrix with in-control proportions
 #  mu1 - (k-1 \times T) matrix with out-of-control proportion 
 #  n   - vector of length T containing the total number of experiments for each time point
-#  hAll- The threshold h which is used for the CUSUM
+#  c.ARL- The threshold h which is used for the CUSUM
 #  g   - The number of levels to cut the state space into, i.e. M on foil 12
 ######################################################################
 
-LRCUSUM.runlength <- function(mu,mu0,mu1,hAll,dX.fun, n, g=5,...) {
+LRCUSUM.runlength <- function(mu,mu0,mu1,c.ARL,dX.fun, n, g=5,...) {
   #Semantic checks
   if ( ((ncol(mu) != ncol(mu0)) | (ncol(mu0) != ncol(mu1))) |
       ((nrow(mu) != nrow(mu0)) | (nrow(mu0) != nrow(mu1)))) {
     stop("Error: dimensions of mu, mu0 and mu1 have to match")
   }
-  if (missing(hAll)) {
+  if (missing(c.ARL)) {
     stop("No threshold specified!")
   }
   
   #Discretize number of possible states of the CUSUM
-  S <- c(-Inf,seq(0,hAll,length=g))
+  S <- c(-Inf,seq(0,c.ARL,length=g))
   names <- c(levels(cut(1,S,right=TRUE)),">=h")
   #Time variable
   t <- 1:ncol(mu)

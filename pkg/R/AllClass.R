@@ -1,7 +1,6 @@
 # -------------  class sts  ----------------------------------------
 
 setClass( "sts", representation(week = "numeric",
-#setClass( "sts", representation(epoch = "numeric",
                                 freq = "numeric",
                                 start = "numeric",
                                 observed = "matrix",
@@ -12,5 +11,7 @@ setClass( "sts", representation(week = "numeric",
                                 populationFrac= "matrix",
                                 map = "SpatialPolygonsDataFrame",
                                 control = "list",
-                                epochAsDate="logical"))
+#New slots add
+                                epochAsDate="logical",
+                                multinomialTS="logical"))
 

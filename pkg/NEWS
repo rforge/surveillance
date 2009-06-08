@@ -12,8 +12,10 @@
   plot functions so they can handle ISO weeks.
 
 * algo.farrington now also computes quantile and median of 
-  the predictive distribution
+  the predictive distribution.
 
+* Renamed the functions obsinyear to epochInYear, which now also
+  handles objects of class Date.
 
 1.0-2 (released on CRAN 6 Mar 2009)
 ===========================

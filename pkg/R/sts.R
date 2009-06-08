@@ -22,7 +22,7 @@ fix.dimnames <- function(x) {
 }
 
 #constructor function
-init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0*observed, map=NULL, neighbourhood=NULL, populationFrac=NULL,alarm=NULL,upperbound=NULL, control=NULL,epochAsDate=FALSE) {
+init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0*observed, map=NULL, neighbourhood=NULL, populationFrac=NULL,alarm=NULL,upperbound=NULL, control=NULL,epochAsDate=FALSE,multinomialTS=FALSE) {
   #Name handling
   namesObs <-colnames(observed)
   namesState <- colnames(observed)
@@ -76,6 +76,7 @@ init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0
   ##Assign everything else
   .Object@week <- epoch
   .Object@epochAsDate <- epochAsDate
+  .Object@multinomialTS <- multinomialTS
 
   if (length(start) == 2) {
     .Object@start <- start
@@ -219,8 +220,24 @@ setMethod("colnames", signature=c(x="sts",do.NULL="missing",prefix="missing"), f
 setGeneric("year", function(x, ...) standardGeneric("year"));
 setMethod("year", "sts", function(x,...) return((x@week-1) %/% x@freq + x@start[1]))
 #Extract which observation within year we have
-setGeneric("obsinyear", function(x, ...) standardGeneric("obsinyear"));
-setMethod("obsinyear", "sts", function(x,...) return( (x@week-1 + x@start[2]-1) %% x@freq + 1))
+setGeneric("epochInYear", function(x, ...) standardGeneric("epochInYear"));
+setMethod("epochInYear", "sts", function(x,...) {
+  if (x@epochAsDate) {
+    epochStr <- switch( as.character(x@freq), "12" = "%m","52" =  "%V","365" = "%j")
+    return(as.numeric(format(epoch(x),epochstr)))
+  } else {
+    return( (x@week-1 + x@start[2]-1) %% x@freq + 1)
+  }
+})
+setGeneric("year", function(x, ...) standardGeneric("year"));
+setMethod("year", "sts", function(x,...) {
+  if (x@epochAsDate) {
+    return(as.numeric(format(epoch(x),"%G")))
+  } else {
+    stop("Currently not implemented!")
+  }
+})
+
 
 
 #####################################################################
@@ -332,6 +349,85 @@ merge.list <- function (x, y, ...)
 # colors - c( fill color of polygons, line color of polygons, upperbound)
 ##########################################################################
 
+######################################################################
+#Format especially x-axis according to year and epoch. Also handling
+#ISO weeks
+######################################################################
+
+addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek,xaxis.units,cex) {
+  if (x@freq ==52) {
+    if (!epochsAsDate) {
+      # At which indices to put the "at" tick label. This will
+      # be exactly those week numbers where the new quarter begins: 1, 14, 27 and 40 + i*52.
+      # Note that week number and index is not the same due to the "firstweek" argument
+      weeks <- 1:length(observed) + (firstweek-1)
+      noYears <- ceiling(max(weeks)/52)
+      quarterStarts <- rep( (0:(noYears))*52, each=4) + rep( c(1,14,27,40), noYears+1)
+      weeks <- subset(weeks, !is.na(match(weeks,quarterStarts)))
+      weekIdx <- weeks - (firstweek-1)
+
+      # get the right year for each week
+      year <- weeks %/% 52 + startyear
+      # function to define the quarter order
+      quarterFunc <- function(i) { switch(i+1,"I","II","III","IV")}
+      # get the right number and order of quarter labels
+      quarter <- sapply( (weeks-1) %/% 13 %% 4, quarterFunc)
+    } else {   #If epochAsDate -- experimental functionality to handle ISO 8601
+      date <- as.Date(x@week, origin="1970-01-01")
+      years <- unique(as.numeric(format(date,"%Y")))
+      #Start of quarters in each year present in the data. 
+      qStart <- as.Date(paste(rep(years,each=4), c("-01-01","-04-01","-07-01","-10-01"),sep=""))
+      qName  <- rep(c("I","II","III","IV"), length.out=length(qStart))
+      qIdx   <- qStart <= max(date)+10 & qStart >= min(date)-10
+      qStart <- qStart[qIdx] ; qName <- qName[qIdx]
+      #Find week in data closest to these dates
+      weekIdx <- sapply(qStart, function(d) which.min(abs(as.numeric(date - d))))
+
+      date <- date[weekIdx]
+      #Year the ISO week belongs to
+      year <- as.numeric(format(date,"%G"))
+      quarter <- qName
+    }        
+      
+    #construct the computed axis labels -- add quarters if xaxis.units is requested
+    if (xaxis.units) {
+      labels.week <- paste(year,"\n\n",quarter,sep="")
+    } else {
+      labels.week <- paste(year,sep="")
+    }
+
+    axis( side=1,line=1,labels=FALSE,at=c(1,length(observed)),lwd.ticks=0)
+    axis( at=weekIdx[which(quarter != "I")] , labels=labels.week[which(quarter != "I")] , side=1, line = 1 ,cex=cex)
+    #Bigger tick marks at the first quarter
+    at <- weekIdx[which(quarter == "I")]
+    axis( at=at  , labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
+    #2nd axis
+#    axis( side=2 ,cex=cex)
+  } else { ##other frequency
+    #A label at each unit
+    myat.unit <- seq(firstweek,length.out=length(observed) )
+
+    # get the right year order
+    month <- (myat.unit-1) %% x@freq + 1
+    year <- (myat.unit - 1) %/% x@freq + startyear
+    #construct the computed axis labels -- add quarters if xaxis.units is requested
+    if (xaxis.units) {
+      mylabels.unit <- paste(year,"\n\n", (myat.unit-1) %% x@freq + 1,sep="")
+    } else {
+      mylabels.unit <- paste(year,sep="")
+    }
+    #Add axis
+    axis( at=(1:length(observed))  , labels=NA, side=1, line = 1 ,cex=cex)
+    axis( at=(1:length(observed))[month==1]  , labels=mylabels.unit[month==1] , side=1, line = 1 ,cex=cex)
+    #Bigger tick marks at the first unit
+    at <- (1:length(observed))[(myat.unit - 1) %% x@freq == 0]
+    axis( at=at  , labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
+    #2nd axis
+#    axis( side=2 ,cex=cex)
+  }
+  invisible()
+}
+
 plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, epochsAsDate=x@epochAsDate, xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0.5,hookFunc=function() {},...) {
 
   #Extract slots -- depending on the algorithms: x@control$range
@@ -345,7 +441,7 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
   method <-     x@control$name
   disease <-    x@control$data
   population <- x@populationFrac[,k]
-  binaryTS <- sum( population > 1 ) > 1
+  binaryTS <- x@multinomialTS
 
   if (binaryTS) {
     observed <- ifelse(population!=0,observed/population,0)
@@ -389,6 +485,11 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
   y.points <- as.vector(t(cbind(0, observed, observed, 0, NA)))
   polygon(x.points,y.points,col=col[1],border=col[2],lwd=lwd[1])
 
+  #Draw upper bound once more in case the polygons are filled
+  if (!is.na(col[1])) {
+    lines(x=xstuff,y=ystuff,type=type,lty=lty[-c(1:2)],col=col[-c(1:2)],lwd=lwd[-c(1:2)],...)
+  }
+  
   #Draw outbreak symbols
   alarmIdx <- which(!is.na(alarm) & (alarm == 1))
   if (length(alarmIdx)>0) {
@@ -401,80 +502,12 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
     matpoints( stateIdx, rep(-1/20*ylim[2],length(stateIdx)), pch=outbreak.symbol$pch, col=outbreak.symbol$col,cex = outbreak.symbol$cex)
   }
 
-  #Label of x-axis 
-  if(xaxis.years){
-    if (x@freq ==52) {
-      # At which indices to put the "at" tick label. This will
-      # be exactly those week numbers where the new quarter begins: 1, 14, 27 and 40 + i*52.
-      # Note that week number and index is not the same due to the "firstweek" argument
-      weeks <- 1:length(observed) + (firstweek-1)
-      noYears <- ceiling(max(weeks)/52)
-      quarterStarts <- rep( (0:(noYears))*52, each=4) + rep( c(1,14,27,40), noYears+1)
-      weeks <- subset(weeks, !is.na(match(weeks,quarterStarts)))
-      weekIdx <- weeks - (firstweek-1)
-
-      # get the right year for each week
-      year <- weeks %/% 52 + startyear
-      # function to define the quarter order
-      quarterFunc <- function(i) { switch(i+1,"I","II","III","IV")}
-      # get the right number and order of quarter labels
-      quarter <- sapply( (weeks-1) %/% 13 %% 4, quarterFunc)
-
-      #If epochAsDate -- experimental functionality to handle ISO 8601
-      if (epochsAsDate) {
-        date <- as.Date(x@week, origin="1970-01-01")
-        years <- unique(as.numeric(format(date,"%Y")))
-        #Start of quarters in each year present in the data. 
-        qStart <- as.Date(paste(rep(years,each=4), c("-01-01","-04-01","-07-01","-10-01"),sep=""))
-        qName  <- rep(c("I","II","III","IV"), length.out=length(qStart))
-        qIdx   <- qStart <= max(date)+10 & qStart >= min(date)-10
-        qStart <- qStart[qIdx] ; qName <- qName[qIdx]
-        #Find week in data closest to these dates
-        weekIdx <- sapply(qStart, function(d) which.min(abs(as.numeric(date - d))))
-
-        date <- date[weekIdx]
-        #Year the ISO week belongs to
-        year <- as.numeric(format(date,"%G"))
-        quarter <- qName
-      }        
-      
-      #construct the computed axis labels -- add quarters if xaxis.units is requested
-      if (xaxis.units) {
-        labels.week <- paste(year,"\n\n",quarter,sep="")
-      } else {
-        labels.week <- paste(year,sep="")
-      }
-
-      axis( side=1,line=1,labels=FALSE,at=c(1,length(observed)),lwd.ticks=0)
-      axis( at=weekIdx[which(quarter != "I")] , labels=labels.week[which(quarter != "I")] , side=1, line = 1 ,cex=cex)
-      #Bigger tick marks at the first quarter
-      at <- weekIdx[which(quarter == "I")]
-      axis( at=at  , labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
-      #2nd axis
-      axis( side=2 ,cex=cex)
-    } else { ##other frequency
-      #A label at each unit
-      myat.unit <- seq(firstweek,length.out=length(observed) )
-
-      # get the right year order
-      month <- (myat.unit-1) %% x@freq + 1
-      year <- (myat.unit - 1) %/% x@freq + startyear
-      #construct the computed axis labels -- add quarters if xaxis.units is requested
-      if (xaxis.units) {
-        mylabels.unit <- paste(year,"\n\n", (myat.unit-1) %% x@freq + 1,sep="")
-      } else {
-        mylabels.unit <- paste(year,sep="")
-      }
-      #Add axis
-      axis( at=(1:length(observed))  , labels=NA, side=1, line = 1 ,cex=cex)
-      axis( at=(1:length(observed))[month==1]  , labels=mylabels.unit[month==1] , side=1, line = 1 ,cex=cex)
-      #Bigger tick marks at the first unit
-      at <- (1:length(observed))[(myat.unit - 1) %% x@freq == 0]
-      axis( at=at  , labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
-      #2nd axis
-      axis( side=2 ,cex=cex)
-    }
+  #Label x-axis 
+  if(xaxis.years) {
+    addFormattedXAxis(x, epochsAsDate, observed, firstweek,xaxis.units,cex)
   }
+  #Label y-axis
+  axis( side=2 ,cex=cex)
 
   if(!is.null(legend.opts)) {
     #Fill empty (mandatory) slots in legend.opts list
@@ -495,7 +528,7 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
 }
 
 
-plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, xlab="time", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,cex.yaxis=1,...) {
+plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, epochsAsDate=x@epochAsDate, xlab="time", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,cex.yaxis=1,...) {
 
   k <- 1
   #Extract slots -- depending on the algorithms: x@control$range
@@ -508,6 +541,7 @@ plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL,xaxis.years=TRUE, xa
   firstweek <-  x@start[2]
   method <-     x@control$name
   disease <-    x@control$data
+  ylim <- c(0.5, ncol(x))
   
    ##### Handle the NULL arguments ######################################
   if (is.null(main)) {
@@ -544,57 +578,10 @@ plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL,xaxis.years=TRUE, xa
 
   #Label of x-axis 
   if(xaxis.years){
-    if (x@freq ==52) {
-            # At which indices to put the "at" tick label. This will
-      # be exactly those week numbers where the new quarter begins: 1, 14, 27 and 40 + i*52.
-      # Note that week number and index is not the same due to the "firstweek" argument
-      weeks <- 1:length(observed) + (firstweek-1)
-      noYears <- ceiling(max(weeks)/52)
-      quarterStarts <- rep( (0:(noYears))*52, each=4) + rep( c(1,14,27,40), noYears+1)
-      weeks <- subset(weeks, !is.na(pmatch(weeks,quarterStarts)))
-      weekIdx <- weeks - (firstweek-1)
-
-      # get the right year for each week
-      year <- weeks %/% 52 + startyear
-      # function to define the quarter order
-      quarterFunc <- function(i) { switch(i+1,"I","II","III","IV")}
-      # get the right number and order of quarter labels
-      quarter <- sapply( (weeks-1) %/% 13 %% 4, quarterFunc)
-
-      #construct the computed axis labels -- add quarters if xaxis.units is requested
-      if (xaxis.units) {
-        labels.week <- paste(year,"\n\n",quarter,sep="")
-      } else {
-        labels.week <- paste(year,sep="")
-      }
-
-      axis( side=1,line=1,labels=FALSE,at=c(1,length(observed)),lwd.ticks=0)
-      axis( at=weekIdx , labels=labels.week , side=1, line = 1 ,cex=cex)
-      axis( side=2, at=1:ncol(x),cex.axis=cex.yaxis, labels=colnames(x),las=2)
-    } else { ##other frequency
-      #A label at each unit
-      myat.unit <- seq(firstweek,length.out=length(observed) )
-
-      # get the right year order
-      month <- (myat.unit-1) %% x@freq + 1
-      year <- (myat.unit - 1) %/% x@freq + startyear
-      #construct the computed axis labels -- add quarters if xaxis.units is requested
-      if (xaxis.units) {
-        mylabels.unit <- paste(year,"\n\n", (myat.unit-1) %% x@freq + 1,sep="")
-      } else {
-        mylabels.unit <- paste(year,sep="")
-      }
-      #Add axis
-      axis( at=(1:length(observed))  , labels=NA, side=1, line = 1 ,cex=cex)
-      axis( at=(1:length(observed))[month==1]  , labels=mylabels.unit[month==1] , side=1, line = 1 ,cex=cex)
-      #Bigger tick marks at the first unit
-      at <- (1:length(observed))[(myat.unit - 1) %% x@freq == 0]
-      axis( at=at  , labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
-      #2nd axis -- this is the important part
-      axis( side=2, at=1:ncol(x),cex.axis=cex.yaxis, labels=colnames(x),las=2)
-      #axis( side=2 ,cex=cex)
-    }
+    addFormattedXAxis(x, epochsAsDate, observed, firstweek,xaxis.units,cex)
   }
+  axis( side=2, at=1:ncol(x),cex.axis=cex.yaxis, labels=colnames(x),las=2)
+
 
   #Draw all alarms
   for (i in 1:nrow(x)) {
@@ -639,7 +626,7 @@ plot.sts.time <- function(x, type, method=x@control$name, disease=x@control$data
   state <- x@state
   alarm <- x@alarm
   population <- x@populationFrac
-  binaryTS <- sum( population > 1 ) > 1
+  binaryTS <- x@multinomialTS
   
   #univariate timeseries ?
   if(is.vector(observed))
@@ -984,11 +971,11 @@ setMethod( "show", "sts", function( object ){
 
 setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, optional = FALSE, ...) {
   #Convert object to data frame and give names
-  res <- data.frame("observed"=x@observed, "epoch"=x@week, "state"=x@state, "alarm"=x@alarm,"populationFrac"=x@populationFrac)
+  res <- data.frame("observed"=x@observed, "epoch"=x@week, "state"=x@state, "alarm"=x@alarm,"population"=x@populationFrac)
   colnames(res) <-  c(paste("observed.",colnames(x@observed),sep=""),"epoch",
                       paste("state.",colnames(x@observed),sep=""),
                       paste("alarm.",colnames(x@observed),sep=""),
-                      paste("populationFrac.",colnames(x@observed),sep=""))
+                      paste("population.",colnames(x@observed),sep=""))
 
   #Add a column denoting the number of week
   if (x@epochAsDate) {
