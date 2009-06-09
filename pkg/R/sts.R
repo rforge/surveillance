@@ -124,7 +124,7 @@ disProg2sts <- function(disProgObj, map=NULL) {
     myweek <- disProgObj$week
   }
     
-  sts <- new("sts", week=myweek, start=disProgObj$start, freq=disProgObj$freq, observed=disProgObj$observed, state = disProgObj$state, map=map, neighbourhood=disProgObj$neighbourhood, populationFrac=disProgObj$populationFrac,alarm=disProgObj$alarm,upperbound=disProgObj$upperbound)
+  sts <- new("sts", epoch=myweek, start=disProgObj$start, freq=disProgObj$freq, observed=disProgObj$observed, state = disProgObj$state, map=map, neighbourhood=disProgObj$neighbourhood, populationFrac=disProgObj$populationFrac,alarm=disProgObj$alarm,upperbound=disProgObj$upperbound)
   return(sts)
 }
 
@@ -224,7 +224,7 @@ setGeneric("epochInYear", function(x, ...) standardGeneric("epochInYear"));
 setMethod("epochInYear", "sts", function(x,...) {
   if (x@epochAsDate) {
     epochStr <- switch( as.character(x@freq), "12" = "%m","52" =  "%V","365" = "%j")
-    return(as.numeric(format(epoch(x),epochstr)))
+    return(as.numeric(format(epoch(x),epochStr)))
   } else {
     return( (x@week-1 + x@start[2]-1) %% x@freq + 1)
   }
@@ -355,6 +355,9 @@ merge.list <- function (x, y, ...)
 ######################################################################
 
 addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek,xaxis.units,cex) {
+  #Declare commonly used variables.
+  startyear <-  x@start[1]
+  
   if (x@freq ==52) {
     if (!epochsAsDate) {
       # At which indices to put the "at" tick label. This will
