@@ -45,8 +45,8 @@ algo.glrnb(disProgObj,control = list(range=range,c.ARL=5,
         until the first observation use \code{M=-1}.}
     \item{\code{change}}{a string specifying the type of the
         alternative. Currently the two choices are
-        \code{intercept} and \code{epi}. See the SFB
-        Discussion Paper 500 for details.}
+        \code{intercept} and \code{epi}. See the \enc{Höhle}{Hoehle} and
+        Paul (2008) paper for details.}
     \item{\code{theta}}{if \code{NULL} then the GLR scheme is
         used. If not \code{NULL} the prespecified value for
         \eqn{\kappa} or \eqn{\lambda} is used in a recursive
@@ -147,8 +147,6 @@ Count data regression charts for the monitoring of surveillance time
 series (2008), M. \enc{Höhle}{Hoehle} and M. Paul, Computational Statistics and
 Data Analysis, 52(9), pp. 4357--4368.
 
-Poisson regression charts for the monitoring of surveillance time
-series (2006), \enc{Höhle}{Hoehle}, M., SFB386 Discussion Paper 500.
 }
 
 

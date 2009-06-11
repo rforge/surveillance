@@ -12,7 +12,15 @@
   plot functions so they can handle ISO weeks.
 
 * algo.farrington now also computes quantile and median of 
-  the predictive distribution.
+  the predictive distribution. Furthermore has the computation
+  of reference values been modified so its a) a little bit faster
+  and b) it is also able to handle ISO weeks now. The reference values
+  for date t0 are calculated as follows:
+  For i, i=1,..., b look at date t0 - i*year. From this date on move
+  w months/weeks/days to the left and right. In case of weeks:
+   For each of these
+  determined time points go back in time to the closest Monday
+
 
 * Renamed the functions obsinyear to epochInYear, which now also
   handles objects of class Date.

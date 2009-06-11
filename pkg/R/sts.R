@@ -132,7 +132,7 @@ disProg2sts <- function(disProgObj, map=NULL) {
 sts2disProg <- function(sts) {
   disProgObj <- create.disProg(week=sts@week, start=sts@start, freq=sts@freq,
                                observed=sts@observed, state=sts@state, neighbourhood=sts@neighbourhood,
-                               populationFrac=sts@populationFrac)
+                               populationFrac=sts@populationFrac, epochAsDate=sts@epochAsDate)
   #For survRes: alarm=sts@alarm, upperbound=sts@upperbound)
   return(disProgObj)
 }

@@ -32,4 +32,22 @@ algo.farrington.threshold(pred,phi,alpha=0.01,skewness.transform="none")
 \keyword{regression}
 
 
+\begin{Schunk}
+\begin{Sinput}
+> refvalIdxByDate <- function(t0, b, w, epochStr, epochs) {
++     refDays <- NULL
++     refPoints <- seq(t0, length = b + 1, by = "-1 year")[-1]
++     for (j in 1:length(refPoints)) {
++         refPointWindow <- c(rev(seq(refPoints[j], length = w + 
++             1, by = paste("-", epochStr, sep = ""))), seq(refPoints[j], 
++             length = w + 1, by = epochStr)[-1])
++         refDays <- append(refDays, refPointWindow)
++     }
++     refDays <- refDays - (as.numeric(format(refDays, "%w")) - 
++         1)
++     wtime <- match(as.numeric(refDays), epochs)
++     return(wtime)
++ }
+\end{Sinput}
+\end{Schunk}
 
