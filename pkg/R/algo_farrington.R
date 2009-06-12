@@ -133,8 +133,14 @@ refvalIdxByDate <- function(t0, b, w, epochStr, epochs) {
                         seq(refPoints[j], length=w+1, by=epochStr)[-1])
     refDays <- append(refDays,refPointWindow)
   }
-  #By convention: always go back to the closest monday (but always back, never ahead!)
-  refDays <- refDays -  (as.numeric(format(refDays, "%w")) - 1)
+  if (epochStr == "1 week") {
+    #By convention: always go back to the closest monday (but always back, never ahead!)
+    refDays <- refDays -  (as.numeric(format(refDays, "%w")) - 1)
+  }
+  if (epochStr == "1 month") {
+    #By convention: go back in time to  closest 1st of month
+    refDays <- refDays -  (as.numeric(format(refDays, "%d")) - 1)
+  }
   #Find the index of these reference values
   wtime <- match(as.numeric(refDays), epochs)
   return(wtime)

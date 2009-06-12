@@ -9,12 +9,12 @@
 #  mu1 - alternative model. A vector of length (k-1)
 ######################################################################
 
-LLR.fun <- function(outcomes, mu, mu0, mu1, dX, ...) {  
+LLR.fun <- function(outcomes, mu, mu0, mu1, dfun, ...) {  
   #Compute likelihood ratios. Both univariate and the multivariate
   #values are computed
   llr.res <-   t(apply(outcomes,1, function(y) {
-    llr <- dX(y, mu=mu1, log=TRUE,...) - dX(y, mu=mu0, log=TRUE, ...)
-    p <- dX(y, mu=mu, ...)
+    llr <- dfun(y, mu=mu1, log=TRUE,...) - dfun(y, mu=mu0, log=TRUE, ...)
+    p <- dfun(y, mu=mu, ...)
    return(c(llr=llr,p=p)) 
   }))
   res <- cbind(outcomes,llr.res)
@@ -36,7 +36,7 @@ LLR.fun <- function(outcomes, mu, mu0, mu1, dX, ...) {
 #  g   - The number of levels to cut the state space into, i.e. M on foil 12
 ######################################################################
 
-LRCUSUM.runlength <- function(mu,mu0,mu1,c.ARL,dX.fun, n, g=5,...) {
+LRCUSUM.runlength <- function(mu,mu0,mu1,c.ARL,dfun, n, g=5,...) {
   #Semantic checks
   if ( ((ncol(mu) != ncol(mu0)) | (ncol(mu0) != ncol(mu1))) |
       ((nrow(mu) != nrow(mu0)) | (nrow(mu0) != nrow(mu1)))) {
@@ -73,7 +73,7 @@ LRCUSUM.runlength <- function(mu,mu0,mu1,c.ARL,dX.fun, n, g=5,...) {
     }
 
     #Compute all possible likelihood ratios and their probability under mu
-    llr <- LLR.fun(outcomes,mu=mu0[,i],mu0=mu0[,i],mu1=mu1[,i],n=n[i],dX=dX.fun,...)
+    llr <- LLR.fun(outcomes,mu=mu0[,i],mu0=mu0[,i],mu1=mu1[,i],n=n[i],dfun=dfun,...)
 
     #Exact CDF of the LLR for this time
     F <- stepfun(sort(llr[,"llr"]),c(0,cumsum(llr[order(llr[,"llr"]),"p"])))

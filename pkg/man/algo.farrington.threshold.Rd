@@ -43,8 +43,14 @@ algo.farrington.threshold(pred,phi,alpha=0.01,skewness.transform="none")
 +             length = w + 1, by = epochStr)[-1])
 +         refDays <- append(refDays, refPointWindow)
 +     }
-+     refDays <- refDays - (as.numeric(format(refDays, "%w")) - 
-+         1)
++     if (epochStr == "1 week") {
++         refDays <- refDays - (as.numeric(format(refDays, "%w")) - 
++             1)
++     }
++     if (epochStr == "1 month") {
++         refDays <- refDays - (as.numeric(format(refDays, "%d")) - 
++             1)
++     }
 +     wtime <- match(as.numeric(refDays), epochs)
 +     return(wtime)
 + }
