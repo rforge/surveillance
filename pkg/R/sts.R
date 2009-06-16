@@ -351,8 +351,18 @@ merge.list <- function (x, y, ...)
 
 ######################################################################
 #Format especially x-axis according to year and epoch. Also handling
-#ISO weeks
+#ISO weeks.
+#This function could also use plot.Date, but then x-axis
+#has not simple 1:nrow(x) interpretation anymore.
+#
+#myplot <- function(x,...) {
+#  plot(epoch(x),observed(x),xaxt="n",type="h")#,...)
+#  axis.Date(1, x=epoch(x),las=2,format="%Y-W%V",at=seq(min(epoch(x)),max(epoch(x)),by="1 month"),las=2)
+#  axis.Date(1, x=epoch(x),format="%Y-W%V",at=seq(min(epoch(x)),max(epoch(x)),by="3 month"),las=2)
+#  axis.Date(1, x=epoch(x),at=seq(min(epoch(x)),max(epoch(x)),by="year"),label=FALSE,tcl=-1)
+#}
 ######################################################################
+
 
 addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek,xaxis.units,cex) {
   #Declare commonly used variables.
