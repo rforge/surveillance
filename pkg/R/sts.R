@@ -234,7 +234,7 @@ setMethod("year", "sts", function(x,...) {
   if (x@epochAsDate) {
     return(as.numeric(format(epoch(x),"%G")))
   } else {
-    stop("Currently not implemented!")
+    ((x@week-1 + x@start[2]-1) + (x@freq*x@start[1])) %/% x@freq 
   }
 })
 
@@ -432,6 +432,7 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek,xaxis.units,c
     #Add axis
     axis( at=(1:length(observed))  , labels=NA, side=1, line = 1 ,cex=cex)
     axis( at=(1:length(observed))[month==1]  , labels=mylabels.unit[month==1] , side=1, line = 1 ,cex=cex)
+#        axis( at=(1:length(observed)), labels=mylabels.unit, side=1, line = 1 ,cex=cex)
     #Bigger tick marks at the first unit
     at <- (1:length(observed))[(myat.unit - 1) %% x@freq == 0]
     axis( at=at  , labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
@@ -441,7 +442,7 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek,xaxis.units,c
   invisible()
 }
 
-plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, epochsAsDate=x@epochAsDate, xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0.5,hookFunc=function() {},...) {
+plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, axes=TRUE, xaxis.units=TRUE, epochsAsDate=x@epochAsDate, xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0.5,hookFunc=function() {},...) {
 
   #Extract slots -- depending on the algorithms: x@control$range
   observed   <- x@observed[,k]
@@ -516,11 +517,13 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, x
   }
 
   #Label x-axis 
-  if(xaxis.years) {
+  if(xaxis.years & axes) {
     addFormattedXAxis(x, epochsAsDate, observed, firstweek,xaxis.units,cex)
   }
   #Label y-axis
-  axis( side=2 ,cex=cex)
+  if (axes) {
+    axis( side=2 ,cex=cex)
+  }
 
   if(!is.null(legend.opts)) {
     #Fill empty (mandatory) slots in legend.opts list
