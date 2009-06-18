@@ -61,7 +61,7 @@
         \code{\link{algo.rkiLatestTimepoint}},\code{\link{algo.bayesLatestTimepoint}} and \code{\link{algo.bayes}} for
         the Bayes system.
 }
-\author{M. \enc{Höhle}{Hoehle}}
+\author{M. \enc{HÃ¶hle}{Hoehle}}
 \examples{
     # Create a test object
     disProgObj <- sim.pointSource(p = 0.99, r = 0.5, length = 500, 
