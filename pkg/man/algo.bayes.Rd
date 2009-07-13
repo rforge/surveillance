@@ -63,12 +63,16 @@
     and 9 from two years ago (also symmetrical around the
     comparable week). Alpha is fixed at 0.05.
   }
+
+  The procedure is now able to handle \code{NA}'s in the reference
+  values. In the summation and when counting the number of observed
+  reference values these are simply not counted.
 }
 \seealso{
         \code{\link{algo.call}}, \code{\link{algo.rkiLatestTimepoint}} and \code{\link{algo.rki}} for
         the RKI system.
 }
-\author{M. \enc{Höhle}{Hoehle}, A. Riebler, C. Lang}
+\author{M. \enc{HÃ¶hle}{Hoehle}, A. Riebler, C. Lang}
 \examples{
     disProg <- sim.pointSource(p = 0.99, r = 0.5, length = 208, A = 1,
                                     alpha = 1, beta = 0, phi = 0,
