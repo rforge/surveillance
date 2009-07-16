@@ -120,8 +120,8 @@ algo.farrington.threshold <- function(pred,phi,alpha=0.01,skewness.transform="no
 #
 # Details:
 #  Using the Date class the reference values are formed as follows:
-#   Starting from d0 go i, i\in 1,...,b years back in time.
-#   Here go
+#   Starting from d0 go i, i in 1,...,b years back in time.
+#   
 # Returns:
 #  a vector of indices in epochs which match
 ######################################################################
@@ -134,7 +134,8 @@ refvalIdxByDate <- function(t0, b, w, epochStr, epochs) {
     refDays <- append(refDays,refPointWindow)
   }
   if (epochStr == "1 week") {
-    #By convention: always go back to the closest monday (but always back, never ahead!)
+    #By convention: always go back to the closest monday 
+    #(but always back, never ahead!)
     refDays <- refDays -  (as.numeric(format(refDays, "%w")) - 1)
   }
   if (epochStr == "1 month") {

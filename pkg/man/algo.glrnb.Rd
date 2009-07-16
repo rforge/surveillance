@@ -45,8 +45,8 @@ algo.glrnb(disProgObj,control = list(range=range,c.ARL=5,
         until the first observation use \code{M=-1}.}
     \item{\code{change}}{a string specifying the type of the
         alternative. Currently the two choices are
-        \code{intercept} and \code{epi}. See the \enc{Höhle}{Hoehle} and
-        Paul (2008) paper for details.}
+        \code{intercept} and \code{epi}. See the SFB
+        Discussion Paper 500 for details.}
     \item{\code{theta}}{if \code{NULL} then the GLR scheme is
         used. If not \code{NULL} the prespecified value for
         \eqn{\kappa} or \eqn{\lambda} is used in a recursive
@@ -134,19 +134,27 @@ s.ts <- create.disProg(week=1:length(t),observed=x,state=(t>=tau))
 #Plot the data
 plot(s.ts,legend=NULL,xaxis.years=FALSE)
 
-#Run 
+#Run GLR based detection
 cntrl = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0, alpha=alpha, change="intercept",ret="value",dir="inc")
 glr.ts <- algo.glrnb(s.ts,control=c(cntrl))
 plot(glr.ts,xaxis.years=FALSE)
+
+#CUSUM LR detection with backcalculated number of cases
+cntrl2 = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0, alpha=alpha, change="intercept",ret="cases",dir="inc",theta=1.2)
+glr.ts2 <- algo.glrnb(s.ts,control=c(cntrl2))
+plot(glr.ts2,xaxis.years=FALSE)
+
 
 }
 
 \keyword{classif}
 \source{
 Count data regression charts for the monitoring of surveillance time
-series (2008), M. \enc{Höhle}{Hoehle} and M. Paul, Computational Statistics and
+series (2008), M. \enc{HÃ¶hle}{Hoehle} and M. Paul, Computational Statistics and
 Data Analysis, 52(9), pp. 4357--4368.
 
+Poisson regression charts for the monitoring of surveillance time
+series (2006), \enc{HÃ¶hle}{Hoehle}, M., SFB386 Discussion Paper 500.
 }
 
 
