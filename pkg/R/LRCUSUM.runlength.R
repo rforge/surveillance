@@ -1,9 +1,11 @@
 ######################################################################
-# Compute log likelihood ratio for a count data distribution
+# Compute log likelihood ratio for a univariate or multivariate
+# categorical distribution
 #
 # Params:
 #  outcomes - a data frame with all possible configuration for the (c-1)
-#             variables not being the reference category
+#             variables not being the reference category.
+#             NOTE: I THINK CURRENTLY ITS ALL STATES!
 #  mu  - expectation under which LLR under pi is computed
 #  mu0 - null model. A vector of length (k-1)
 #  mu1 - alternative model. A vector of length (k-1)
@@ -32,22 +34,22 @@ LLR.fun <- function(outcomes, mu, mu0, mu1, dfun, ...) {
 #  mu0 - (k-1 \times T) matrix with in-control proportions
 #  mu1 - (k-1 \times T) matrix with out-of-control proportion 
 #  n   - vector of length T containing the total number of experiments for each time point
-#  c.ARL- The threshold h which is used for the CUSUM
+#  h- The threshold h which is used for the CUSUM
 #  g   - The number of levels to cut the state space into, i.e. M on foil 12
 ######################################################################
 
-LRCUSUM.runlength <- function(mu,mu0,mu1,c.ARL,dfun, n, g=5,...) {
+LRCUSUM.runlength <- function(mu,mu0,mu1,h,dfun, n, g=5,...) {
   #Semantic checks
   if ( ((ncol(mu) != ncol(mu0)) | (ncol(mu0) != ncol(mu1))) |
       ((nrow(mu) != nrow(mu0)) | (nrow(mu0) != nrow(mu1)))) {
     stop("Error: dimensions of mu, mu0 and mu1 have to match")
   }
-  if (missing(c.ARL)) {
+  if (missing(h)) {
     stop("No threshold specified!")
   }
   
   #Discretize number of possible states of the CUSUM
-  S <- c(-Inf,seq(0,c.ARL,length=g))
+  S <- c(-Inf,seq(0,h,length=g))
   names <- c(levels(cut(1,S,right=TRUE)),">=h")
   #Time variable
   t <- 1:ncol(mu)
@@ -73,7 +75,7 @@ LRCUSUM.runlength <- function(mu,mu0,mu1,c.ARL,dfun, n, g=5,...) {
     }
 
     #Compute all possible likelihood ratios and their probability under mu
-    llr <- LLR.fun(outcomes,mu=mu0[,i],mu0=mu0[,i],mu1=mu1[,i],n=n[i],dfun=dfun,...)
+    llr <- LLR.fun(outcomes,mu=mu0[,i],mu0=mu0[,i],mu1=mu1[,i],size=n[i],dfun=dfun,...)
 
     #Exact CDF of the LLR for this time
     F <- stepfun(sort(llr[,"llr"]),c(0,cumsum(llr[order(llr[,"llr"]),"p"])))
@@ -88,9 +90,9 @@ LRCUSUM.runlength <- function(mu,mu0,mu1,c.ARL,dfun, n, g=5,...) {
           P[i,j,k] <- F(b) - F(a)
         } else { 
             #Rieman integral assuming as in Brook & Evans (1972) that S at midpoint
-            P[i,j,k] <- F(b-m) - F(a-m)
+            #P[i,j,k] <- F(b-m) - F(a-m)
             #Slightly better approximation by Hawkins (1992), which uses Simpson's rule
-            #P[i,j,k] <- (F(b-c) + 4*F(b-m) + F(b-d) - F(a-c) - 4*F(a-m) - F(a-d))/6
+            P[i,j,k] <- (F(b-c) + 4*F(b-m) + F(b-d) - F(a-c) - 4*F(a-m) - F(a-d))/6
         }
       }
  }

@@ -1012,7 +1012,7 @@ setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, opti
   } else {
     #Otherwise just replicate the fixed frequency
     res$freq <- x@freq
-    res$epochInPeriod <- x@week %% res@freq
+    res$epochInPeriod <- x@week %% res$freq
   }
   
   return(res)
