@@ -13,7 +13,7 @@
 #  h   - decision threshold of the Categorical CUSUM
 #########################################################################
 
-catcusum.LLRcompute <- function(y, pi0, pi1, h, dfun, n,...) {
+catcusum.LLRcompute <- function(y, pi0, pi1, h, dfun, n, calc.at=TRUE,...) {
   #Initialize variables
   t <- 0
   stopped <- FALSE
@@ -27,34 +27,43 @@ catcusum.LLRcompute <- function(y, pi0, pi1, h, dfun, n,...) {
     #Compute log likelihood ratio
 #    llr <- dmultinom(y[,t], size=n[t], prob=pi1[,t],log=TRUE) -
 #      dmultinom(y[,t], size=n[t], prob=pi0[,t],log=TRUE)
-    llr <-  dfun(y[,t,drop=FALSE], size=n[t], mu=pi1[,t,drop=FALSE], log=TRUE,...) - dfun(y[,t,drop=FALSE], size=n[t], mu=pi0[,t,drop=FALSE], log=TRUE, ...)
+    llr <-  dfun(y=y[,t,drop=FALSE], size=n[t], mu=pi1[,t,drop=FALSE], log=TRUE,...) - dfun(y=y[,t,drop=FALSE], size=n[t], mu=pi0[,t,drop=FALSE], log=TRUE, ...)
     #Add to CUSUM
     S[t+1] <- max(0,S[t] + llr)
 
     #For binomial data it is also possible to compute how many cases it would take
     #to sound an alarm given the past.
-    if (nrow(y) == 2) {
-      #For the binomial its possible to compute the number needed for an alarm exact
-      #Otherwise we need a numerical search routine
+    if (nrow(y) == 2 & calc.at) {
+      #For the binomial its possible to compute the number needed for an
+      #alarm exact
       if (identical(dfun,dbinom)) {
         #Calculations in ../maple/numberneededbeforealarm.mw
         at <- (h - S[t] - n[t] * ( log(1 - pi1[1,t]) - log(1-pi0[1,t]))) / (log(pi1[1,t]) - log(pi0[1,t]) - log(1-pi1[1,t]) + log(1-pi0[1,t]))
         U[t+1] = ceiling(max(0,at))
       } else {
-        if (S[t+1]<=h) {
-          #Compute the value by a grid search up to nmax.
-          ay <- rbind(seq(y[1,t],n[t],by=1),n[t]-seq(y[1,t],n[t],by=1))
-          llr <-  dfun(ay, size=n[t], mu=pi1[,t,drop=FALSE], log=TRUE,...) - dfun(ay, size=n[t], mu=pi0[,t,drop=FALSE], log=TRUE, ...)
-          alarm <- llr > h-S[t]
-          if (sum(alarm)==0) { U[t+1] <- Inf } else { U[t+1] <- ay[1,which.max(alarm)] }
+        #Compute the value at by trying all values betweeen 0 and n_t. If
+        #no alarm, then we know the value for an alarm must be larger than y_t
+        if (S[t+1]>h) {
+          ay <- rbind(seq(0,y[1,t],by=1),n[t]-seq(0,y[1,t],by=1))
         } else {
-          U[t+1] <- 0
+          ay <- rbind(seq(y[1,t],n[t],by=1),n[t]-seq(y[1,t],n[t],by=1))
+        }
+        
+        llr <-  dfun(ay, size=n[t], mu=pi1[,t,drop=FALSE], log=TRUE,...) - dfun(ay, size=n[t], mu=pi0[,t,drop=FALSE], log=TRUE, ...)
+        alarm <- llr > h-S[t]
+        
+        #Is a_t available, i.e. does a y_t exist or is the set over which to
+        #take the minimum empty?
+        if (sum(alarm)==0) {
+          U[t+1] <- NA
+        } else {
+          U[t+1] <- ay[1,which.max(alarm)]
         }
       }
     }
     
     #Only run to the first alarm. Then reset.
-    if ((S[t+1] >= h) | (t==ncol(y))) { stopped <- TRUE}
+    if ((S[t+1] > h) | (t==ncol(y))) { stopped <- TRUE}
   }
   #If no alarm at the end put rl to end (its censored!)
   if (sum(S[-1]>h)>0) {
@@ -107,21 +116,22 @@ categoricalCUSUM <- function(stsObj,
   pi1 <- control[["pi1",exact=TRUE]]
   dfun <- control[["dfun",exact=TRUE]]
   control$ret <- match.arg(control$ret, c("value","cases"))
-  ret <- pmatch(control$ret,c("value","cases"))
-  ##n contains number. Same for all. Alternative: sum over y's
-#  n <- as.numeric(stsObj@populationFrac[range,1,drop=FALSE])  #just take first
-  n <- apply(y, 2, sum)
+  #Total number of objects that are investigated. Note this
+  #can't be deduced from the observed y, because only (c-1) columns
+  #are reported so using: n <- apply(y, 2, sum) is wrong!
+  #Assumption: all populationFrac's contain n_t and we can take just one
+  n <- stsObj@populationFrac[range,1,drop=TRUE]
   
   #Semantic checks
   if ( ((ncol(y) != ncol(pi0)) | (ncol(pi0) != ncol(pi1))) |
       ((nrow(y) != nrow(pi0)) | (nrow(pi0) != nrow(pi1)))) {
     stop("Error: dimensions of y, pi0 and pi1 have to match")
   }
-  if ((control$ret == 2) & ncol(pi0) != 2) {
-    stop("Cases can only be returned in case of binomial, i.e. k=2")
+  if ((control$ret == "cases") & nrow(pi0) != 2) {
+    stop("Cases can only be returned in case k=2.")
   }
   if (length(n) != ncol(y)) {
-    stop("Error: Length of n has to be equal to number of columns in y")
+    stop("Error: Length of n has to be equal to number of columns in y.")
   }
   #Check if all n entries are the same
   if (!all(apply(stsObj@populationFrac[range,],1,function(x) all.equal(as.numeric(x),rev(as.numeric(x)))))) {
@@ -138,7 +148,6 @@ categoricalCUSUM <- function(stsObj,
     if (cond) return(whenTrue) else return(whenFalse)
   }
 
-  
   #Setup counters for the progress
   doneidx <- 0
   N <- 1
@@ -150,12 +159,12 @@ categoricalCUSUM <- function(stsObj,
   #######################################################
   while (doneidx < noOfTimePoints) {
      ##Run Categorical CUSUM until the next alarm
-    res <- catcusum.LLRcompute(y=y, pi0=pi0, pi1=pi1, n=n, h=control$h, dfun=dfun,...)
+    res <- catcusum.LLRcompute(y=y, pi0=pi0, pi1=pi1, n=n, h=control$h, dfun=dfun,calc.at=(control$ret=="cases"),...)
   
     #In case an alarm found log this and reset the chart at res$N+1
     if (res$N < ncol(y)) {
       #Put appropriate value in upperbound
-      upperbound[1:res$N + doneidx,]  <- matrix(rep(either(ret == 1, res$val[1:res$N] ,res$cases[1:res$N]),each=ncol(upperbound)),ncol=ncol(upperbound),byrow=TRUE)
+      upperbound[1:res$N + doneidx,]  <- matrix(rep(either(control$ret == "value", res$val[1:res$N] ,res$cases[1:res$N]),each=ncol(upperbound)),ncol=ncol(upperbound),byrow=TRUE)
       alarm[res$N + doneidx,] <- TRUE
 
       #Chop & get ready for next round
@@ -171,7 +180,7 @@ categoricalCUSUM <- function(stsObj,
   }
 
   #Add upperbound-statistic of last segment, where no alarm is reached
-  upperbound[(doneidx-res$N+1):nrow(upperbound),]  <- matrix( rep(either(ret == 1, res$val, res$cases),each=ncol(upperbound)),ncol=ncol(upperbound),byrow=TRUE)
+  upperbound[(doneidx-res$N+1):nrow(upperbound),]  <- matrix( rep(either(control$ret == "value", res$val, res$cases),each=ncol(upperbound)),ncol=ncol(upperbound),byrow=TRUE)
   
 
   

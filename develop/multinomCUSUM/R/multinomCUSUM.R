@@ -50,7 +50,7 @@ multinomialCUSUM <- function(y, pi0, pi1, n, h) {
 }
 
 ######################################################################
-# Wrap function to process disProg object by multinomCUSUM (new S4
+# Wrap function to process sts object by multinomCUSUM (new S4
 # style). Time varying number of counts is found in slot populationFrac.
 #
 # Params:

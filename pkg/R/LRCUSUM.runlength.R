@@ -5,7 +5,6 @@
 # Params:
 #  outcomes - a data frame with all possible configuration for the (c-1)
 #             variables not being the reference category.
-#             NOTE: I THINK CURRENTLY ITS ALL STATES!
 #  mu  - expectation under which LLR under pi is computed
 #  mu0 - null model. A vector of length (k-1)
 #  mu1 - alternative model. A vector of length (k-1)
@@ -58,7 +57,9 @@ LRCUSUM.runlength <- function(mu,mu0,mu1,h,dfun, n, g=5,...) {
   
   #Create transition matrix for CUSUM control chart
   P <- array(0, dim=c(length(t),g+1,g+1),dimnames=list(t,names,names))
+  #Once in the absorbing state stay there!
   P[,g+1,g+1] <- 1
+  
   #Loop over all P[t,,] and compute probabilities
   for (i in 1:length(t)) {
     cat("Looking at t=",i," out of ",length(t),"\n")
@@ -66,7 +67,7 @@ LRCUSUM.runlength <- function(mu,mu0,mu1,h,dfun, n, g=5,...) {
     #Compute all possible likelihood ratios and their probability under mu
     #Note: Currently all states are investigated. This might be way too
     #much work as defacto many states have an occurence prob near 0!!
-    args <- list() ; for (j in seq_len(km1)) args[[j]] <- 1:n[i]
+    args <- list() ; for (j in seq_len(km1)) args[[j]] <- 0:n[i]
     outcomes <- as.matrix(do.call("expand.grid", args))
     
     #Take only valid outcomes (might reduce drastically the number of cells)
