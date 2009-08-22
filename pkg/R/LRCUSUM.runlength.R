@@ -23,6 +23,32 @@ LLR.fun <- function(outcomes, mu, mu0, mu1, dfun, ...) {
   return(res)
 }
 
+######################################################################
+# Function to compute all possible outcomes for the categorical time
+# series. This is needed for the LLR computations
+#
+# Parameters:
+# km1 - Dimension of the problem (k-1)
+# n   - number of items arranged (i.e. number of experiments). Integer
+#
+# Returns:
+#  matrix of size (number of configs) \times km1
+#  containing all possible states
+######################################################################
+
+outcomeFunStandard <- function(k,n) {
+  #Compute all possible likelihood ratios and their probability under mu
+  #Note: Currently all states are investigated. This might be way too
+  #much work as defacto many states have an occurence prob near 0!!
+  args <- list() ; for (j in seq_len(k)) args[[j]] <- 0:n
+  outcomes <- as.matrix(do.call("expand.grid", args))
+  
+  #Take only valid outcomes (might reduce drastically the number of cells)
+  if (!is.null(n)) {
+    outcomes <- outcomes[apply(outcomes,1,sum) <= n,,drop=FALSE]
+  }
+  return(outcomes)
+}
 
 ######################################################################
 # Compute run length for CUSUM based on Markov representation of the
@@ -37,7 +63,7 @@ LLR.fun <- function(outcomes, mu, mu0, mu1, dfun, ...) {
 #  g   - The number of levels to cut the state space into, i.e. M on foil 12
 ######################################################################
 
-LRCUSUM.runlength <- function(mu,mu0,mu1,h,dfun, n, g=5,...) {
+LRCUSUM.runlength <- function(mu,mu0,mu1,h,dfun, n, g=5,outcomeFun=NULL,...) {
   #Semantic checks
   if ( ((ncol(mu) != ncol(mu0)) | (ncol(mu0) != ncol(mu1))) |
       ((nrow(mu) != nrow(mu0)) | (nrow(mu0) != nrow(mu1)))) {
@@ -45,6 +71,11 @@ LRCUSUM.runlength <- function(mu,mu0,mu1,h,dfun, n, g=5,...) {
   }
   if (missing(h)) {
     stop("No threshold specified!")
+  }
+  #If no specific way for computing the outcomes is given
+  #use the standard way.
+  if (is.null(outcomeFun)) {
+    outcomeFun <- outcomeFunStandard
   }
   
   #Discretize number of possible states of the CUSUM
@@ -61,22 +92,14 @@ LRCUSUM.runlength <- function(mu,mu0,mu1,h,dfun, n, g=5,...) {
   P[,g+1,g+1] <- 1
   
   #Loop over all P[t,,] and compute probabilities
-  for (i in 1:length(t)) {
+  for (i in seq_len(length(t))) {
     cat("Looking at t=",i," out of ",length(t),"\n")
 
-    #Compute all possible likelihood ratios and their probability under mu
-    #Note: Currently all states are investigated. This might be way too
-    #much work as defacto many states have an occurence prob near 0!!
-    args <- list() ; for (j in seq_len(km1)) args[[j]] <- 0:n[i]
-    outcomes <- as.matrix(do.call("expand.grid", args))
-    
-    #Take only valid outcomes (might reduce drastically the number of cells)
-    if (!is.null(n)) {
-      outcomes <- outcomes[apply(outcomes,1,sum) <= n[i],,drop=FALSE]
-    }
+    #Determine all possible outcomes
+    outcomes <- outcomeFun(km1,n[i])
 
     #Compute all possible likelihood ratios and their probability under mu
-    llr <- LLR.fun(outcomes,mu=mu0[,i],mu0=mu0[,i],mu1=mu1[,i],size=n[i],dfun=dfun,...)
+    llr <- LLR.fun(outcomes,mu=mu0[,i],mu0=mu0[,i],mu1=mu1[,i],dfun=dfun,size=n[i],...)
 
     #Exact CDF of the LLR for this time
     F <- stepfun(sort(llr[,"llr"]),c(0,cumsum(llr[order(llr[,"llr"]),"p"])))
@@ -105,11 +128,21 @@ LRCUSUM.runlength <- function(mu,mu0,mu1,h,dfun, n, g=5,...) {
   Ppower <- P[1,,]
   alarmUntilTime <- numeric(ncol(mu0))
   alarmUntilTime[1] <- Ppower[1,ncol(P)]
-  for (time in 2:length(t)) {
+  for (time in t[-1]) { #from 2 to length of t
     Ppower <- Ppower %*% P[time,,]
     alarmUntilTime[time] <- Ppower[1,ncol(P)]
   }
   pRL <- c(alarmUntilTime[1],diff(alarmUntilTime))
-  
-  return(list(P=P,pmf=pRL,cdf=alarmUntilTime))
+
+  mom <- NA
+  #If the Markov chain is homogenous then compute ARL by inverting
+  if (length(t) == 1) {
+    R <- P[,1:g,1:g]
+    I <- diag(rep(1,g))
+    mom <- solve(I-R) %*% matrix(1,g,1) #-- no sparse computing
+    #Alternative using sparse 
+    #mom <- solve(Matrix(id-r)) %*% matrix(1,mw,1)
+  }
+       
+  return(list(P=P,pmf=pRL,cdf=alarmUntilTime,arl=mom[1]))
 }
