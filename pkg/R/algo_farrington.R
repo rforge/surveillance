@@ -304,9 +304,8 @@ algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, rewei
       #Add the prediction
       lines(data$wtime,preds,col=1,pch=2)
 
-      #Add the thresholds
-      #points(c(k,k),lu,cex=1,pch=3,col=3)
-      lines(rep(k,2),lu,col=3,lty=2)
+      #Add the thresholds to the plot
+      lines(rep(k,2),lu[1:2],col=3,lty=2)
     }
 
 
