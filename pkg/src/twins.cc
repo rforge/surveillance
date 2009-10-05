@@ -1112,7 +1112,7 @@ void update_lambda_br(double** lambda, double** lambda_br,double* xi_lambda, int
     if(K_geom){
       accbr += log(1-p_K);
     }
-    accbr=accbr*pow(-1,u)+log(v);
+    accbr=accbr*pow((double)(-1),u)+log(v);
 
     if (u==2)
       {
@@ -1383,7 +1383,7 @@ void update_delta_br(double* delta, double* delta_br,double &xi_delta, int* brea
     if(K_geom){
       accbr += log(1-p_K);
     }
-    accbr=accbr*pow(-1,u)+log(v);
+    accbr=accbr*pow((double)(-1),u)+log(v);
 
     if (u==2)
       {
@@ -1673,7 +1673,7 @@ void update_epsilon_br(double* epsilon, double* epsilon_br,double& xi_epsilon, i
     if(K_geom){
       accbr += log(1-p_K);
     }
-    accbr=accbr*pow(-1,u)+log(v);
+    accbr=accbr*pow((double)(-1),u)+log(v);
 
     if (u==2)
       {
@@ -2800,7 +2800,7 @@ register long sampleCounter=1;
       if(!theta_pred_estim){
 	double p_thetanp1 = ((double(K[i]))/double(n)); //(1+double(K[i]))
 	if(K_geom){
-	  p_thetanp1 = (double(K[i])*(1.0-p_K)*(1.0-pow(1.0-p_K,n-1)))/((double(n)-1.0)*(1.0-pow(1.0-p_K,n)));
+	  p_thetanp1 = (double(K[i])*(1.0-p_K)*(1.0-pow((double)1.0-p_K,n-1)))/((double(n)-1.0)*(1.0-pow((double)1.0-p_K,n)));
 	}
         if(gsl_rng_uniform (r)<=p_thetanp1){
         if (sampleCounter>burnin) {
@@ -2830,7 +2830,7 @@ register long sampleCounter=1;
           if(delta_rev){
 	    double p_thetanp1 = ((double(K[i]))/double(n)); //(1+double(K[i]))
 	    if(K_geom){
-	      p_thetanp1 = ((double(K[i]))*(1.0-p_K)*(1.0-pow(1.0-p_K,n-1)))/((double(n)-1.0)*(1.0-pow(1.0-p_K,n)));
+	      p_thetanp1 = ((double(K[i]))*(1.0-p_K)*(1.0-pow((double)1.0-p_K,n-1)))/((double(n)-1.0)*(1.0-pow((double)1.0-p_K,n)));
 	    }
             if(gsl_rng_uniform (r)<=p_thetanp1){
               if (sampleCounter>burnin) {
@@ -2852,7 +2852,7 @@ register long sampleCounter=1;
         if(epsilon_rev){
 	  double p_thetanp1 = ((double(K[i]))/double(n)); //(1+double(K[i]))
 	  if(K_geom){
-  	    p_thetanp1 = ((double(K[i]))*(1.0-p_K)*(1.0-pow(1.0-p_K,n-1)))/((double(n)-1.0)*(1.0-pow(1.0-p_K,n)));
+  	    p_thetanp1 = ((double(K[i]))*(1.0-p_K)*(1.0-pow((double)1.0-p_K,n-1)))/((double(n)-1.0)*(1.0-pow((double)1.0-p_K,n)));
 	  }
           if(gsl_rng_uniform (r)<=p_thetanp1){
             if (sampleCounter>burnin) {
