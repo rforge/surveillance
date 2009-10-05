@@ -53,7 +53,7 @@ init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0
   if (is.null(populationFrac)) {
     populationFrac <- matrix(1/nAreas,nrow=nObs,ncol=nAreas)
   }
-  if (nAreas ==1){
+  if (nAreas ==1 & (!multinomialTS)){
     populationFrac <- matrix(1,nrow=nObs, ncol=1)
   }
   
@@ -988,11 +988,16 @@ setMethod( "show", "sts", function( object ){
 setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, optional = FALSE, ...) {
   #Convert object to data frame and give names
   res <- data.frame("observed"=x@observed, "epoch"=x@week, "state"=x@state, "alarm"=x@alarm,"population"=x@populationFrac)
-  colnames(res) <-  c(paste("observed.",colnames(x@observed),sep=""),"epoch",
-                      paste("state.",colnames(x@observed),sep=""),
-                      paste("alarm.",colnames(x@observed),sep=""),
-                      paste("population.",colnames(x@observed),sep=""))
 
+  if (ncol(x) > 1) {
+    colnames(res) <-  c(paste("observed.",colnames(x@observed),sep=""),"epoch",
+                        paste("state.",colnames(x@observed),sep=""),
+                        paste("alarm.",colnames(x@observed),sep=""),
+                        paste("population.",colnames(x@observed),sep=""))
+  } else {
+      colnames(res) <-  c("observed","epoch","state","alarm","population")
+  }
+  
   #Add a column denoting the number of week
   if (x@epochAsDate) {
     #Convert to date

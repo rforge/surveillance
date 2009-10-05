@@ -9,6 +9,17 @@
 \alias{nrow,sts-method}
 \alias{ncol,sts-method}
 \alias{dim,sts-method}
+\alias{alarms,sts-method}
+\alias{alarms<-,sts-method}
+\alias{control,sts-method}
+\alias{control<-,sts-method}
+\alias{epoch,sts-method}
+\alias{epoch<-,sts-method}
+\alias{epochInYear,sts-method}
+\alias{observed,sts-method}
+\alias{observed<-,sts-method}
+\alias{population,sts-method}
+\alias{population<-,sts-method}
 \alias{colnames,sts,missing,missing-method}
 \alias{initialize,sts-method}
 \alias{as.data.frame,sts-method}
@@ -54,8 +65,20 @@
       extract number of columns of the \code{observed} matrix slot.}
     \item{dim}{\code{signature(x = "sts")}: extract matrix dimensions of
       \code{observed} using \code{\link{dim}}.}
-    \item{colnames}{\code{signature(x="sts",do.NULL="missing",prefix="missing")}:
-      extract \code{\link{colnames}} of the \code{observed} matrix.}
+    \item{alarms}{\code{signature(x = "sts")}: extract the \code{alarm}
+      slot of an \code{sts} object.}
+    \item{control}{\code{signature(x = "sts")}: extract the \code{control}
+      slot of an \code{sts} object.}
+    \item{observed}{\code{signature(x = "sts")}: extract the \code{observed}
+      slot of an \code{sts} object.}
+    \item{population}{\code{signature(x = "sts")}: extract the \code{population}
+      slot of an \code{sts} object.}
+    \item{epoch}{\code{signature(x = "sts")}: extract the \code{epoch}
+      slot of an \code{sts} object. If ISO dates are used then the
+      returned object is of class \code{Date}.}
+    \item{epochInYear}{\code{signature(x = "sts")}: Returns the epoch
+      number within the year of the \code{epoch} slot.}
+    \item{colnames}{\code{signature(x="sts",do.NULL="missing",prefix="missing")}: extract \code{\link{colnames}} of the \code{observed} matrix.}
     \item{initialize}{\code{signature(x="sts")}: the internal function
       \code{init.sts} is called, which assigns all slots.  }
     \item{aggregate}{\code{signature(x="sts")}: see
