@@ -135,12 +135,14 @@ s.ts <- create.disProg(week=1:length(t),observed=x,state=(t>=tau))
 plot(s.ts,legend=NULL,xaxis.years=FALSE)
 
 #Run GLR based detection
-cntrl = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0, alpha=alpha, change="intercept",ret="value",dir="inc")
+cntrl = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0, alpha=alpha, 
+             change="intercept",ret="value",dir="inc")
 glr.ts <- algo.glrnb(s.ts,control=c(cntrl))
 plot(glr.ts,xaxis.years=FALSE)
 
 #CUSUM LR detection with backcalculated number of cases
-cntrl2 = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0, alpha=alpha, change="intercept",ret="cases",dir="inc",theta=1.2)
+cntrl2 = list(range=t,c.ARL=5, Mtilde=1, mu0=mu0, alpha=alpha, 
+              change="intercept",ret="cases",dir="inc",theta=1.2)
 glr.ts2 <- algo.glrnb(s.ts,control=c(cntrl2))
 plot(glr.ts2,xaxis.years=FALSE)
 

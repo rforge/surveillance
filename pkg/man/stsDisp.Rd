@@ -69,7 +69,8 @@
   column to plot.
 
   \preformatted{plot.sts.time(x,
-    type,method=x@control$name,disease=x@control$data,same.scale=TRUE,par.list=list(mfrow=magic.dim(nAreas),mar=par()$mar),...)}
+    type,method=x@control$name,disease=x@control$data,same.scale=TRUE,
+    par.list=list(mfrow=magic.dim(nAreas),mar=par()$mar),...)}
   
   \preformatted{plot.sts.time.one <- function(x, k=1,
   domany=FALSE,ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE,
@@ -77,8 +78,8 @@
   main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1),
   outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24,
   col=2, cex=1),cex=1,legend.opts=list(x="top",
-  legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0.5,hookFunc=function()
-  {},...)}
+  legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0.5,
+  hookFunc=function() {},...)}
 
   Note that the \code{hookFunc} is called after all the basic plotting
   has be done, i.e. it is not possible to control formatting with this
@@ -86,7 +87,9 @@
   
   For spacetime plots the following internal function does all the work:
 
-  \preformatted{plot.sts.spacetime(x,type,legend=NULL,opts.col=NULL,labels=TRUE,wait.ms=250,cex.lab=0.7,verbose=FALSE,dev.printer=NULL,...)}
+  \preformatted{plot.sts.spacetime(x,type,legend=NULL,opts.col=NULL,
+    labels=TRUE,wait.ms=250,cex.lab=0.7,verbose=FALSE,
+    dev.printer=NULL,...)}
 
   Alarmplot
   \preformatted{plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)),
@@ -129,10 +132,12 @@ dev.printer <-
 list(device=png,extension=".png",width=640,height=480,name="/tmp/berlin")
 
 #Do the animation
-plot(aggregate(has4,nfreq=13), type = observed ~ 1 | unit * time, dev.printer=dev.printer)
+plot(aggregate(has4,nfreq=13), type = observed ~ 1 | unit * time,
+         dev.printer=dev.printer)
 
 #Use ImageMagick -- replace /sw/bin/convert by your path to convert
-system(paste("/sw/bin/convert -delay 50 ",dev.printer$name,"*.png /tmp/animated.gif",sep=""))
+system(paste("/sw/bin/convert -delay 50 ",dev.printer$name,
+           "*.png /tmp/animated.gif",sep=""))
 }
 
 }

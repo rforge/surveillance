@@ -19,7 +19,7 @@ algo.twins(disProgObj, control=list(burnin=1000, filter=10,
         \item{\code{burnin}}{Number of burn in samples.}
         \item{\code{filter}}{Thinning parameter. If \code{filter = 10} every 10th sample is after the burn in is returned.}
         \item{\code{sampleSize}}{Number of returned samples. Total
-	  number of samples = \code{burnin+filter*sampleSize}}
+	  number of samples = \code{burnin}+\code{filter}*\code{sampleSize}}
 	\item{\code{noOfHarmonics}}{Number of harmonics to use in the
 	  modelling, i.e. \eqn{L}{L} in (2.2) of Held et al (2006).}
         \item{\code{alpha_xi}}{Parameter \eqn{\alpha_{\xi}}{\alpha_\xi} of the hyperprior of the epidemic parameter \eqn{\lambda}{\lambda}}

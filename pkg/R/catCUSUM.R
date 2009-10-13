@@ -66,6 +66,7 @@ catcusum.LLRcompute <- function(y, pi0, pi1, h, dfun, n, calc.at=TRUE,...) {
     if ((S[t+1] > h) | (t==ncol(y))) { stopped <- TRUE}
   }
   #If no alarm at the end put rl to end (its censored!)
+  #Question: Is this not automatically handled?
   if (sum(S[-1]>h)>0) {
     t <- which.max(S[-1] > h)
   } else {
