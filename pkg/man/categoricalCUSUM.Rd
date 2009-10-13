@@ -42,7 +42,7 @@ categoricalCUSUM(stsObj,control = list(range=NULL,h=5,pi0=NULL,
   described by regression models for binomial, beta-binomial or
   multinomial data. The later includes e.g. multinomial logistic
   regression models, proportional odds models or Bradley-Terry models
-  for paired comparisons. See the \enc{HÃ¶hle}{Hoehle} (2010) reference
+  for paired comparisons. See the \enc{Höhle}{Hoehle} (2010) reference
   for further details about the methodology.
   
   Once an alarm is found the CUSUM scheme is resetted (to zero) and
@@ -53,7 +53,7 @@ categoricalCUSUM(stsObj,control = list(range=NULL,h=5,pi0=NULL,
   etc. slots trimmed to the \code{control$range} indices.
 }
 \references{
-  HÃ¶hle, M. (2010), Changepoint detection in categorical time series, 
+  Höhle, M. (2010), Changepoint detection in categorical time series, 
   Book chapter to appear in T. Kneib and G. Tutz (Eds.), Statistical
   Modelling and Regression Structures, Springer.
 }
@@ -134,7 +134,7 @@ which.max(alarms(surv[,1]))
 #ToDo: Compute run length using LRCUSUM.runlength
 }
 
-\author{M. \enc{HÃ¶hle}{Hoehle}}
+\author{M. \enc{Höhle}{Hoehle}}
 \keyword{regression}
 
 % positives <- matrix(c(25,54,50,70,54,83,62,37,53,29,48,95,63,53,47,67,31,56,20,37,33,34,28,58,45,31,34,17,25,23,19,32,29,34,46,58,45,50,50,41,57,66,41,68,58,35,40,45,20,49,33,24,21,31,25,28,29,20,25,13,41,31,25,25,7,9,48,15,4,45,7,52,21,19,60,25,24,26,16,15,8,17,43,19,10,31,26,19,20,20,27,17,27,23,35,34,53,32,58,81,37,3,0,0,0,1,41,21,34,33,48,17,61,39,70,13,56,65,50,39,46,29,35,18,35,43,34,49,49,18,36,30,34,55,61,44,35,23,35,37,33,37,15,17,66,8,2,10,39,17,42,27,28,55,26,0,0,0,0,0,1,0,0,0,16,36,36,25,34,26,2),ncol=1)

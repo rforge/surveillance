@@ -60,7 +60,7 @@
 \details{
   The \code{plot.survRes.one} is intended for internal use. At the moment none of the surveillance methods support multivariate \code{survRes} objects. New versions of the packages currently under development will handle this.
 }
-\author{M. \enc{HÃ¶hle}{Hoehle}}
+\author{M. \enc{Höhle}{Hoehle}}
 \examples{
 data(ha)
 ctrl <- list(range = 209:290, b = 2, w = 6, alpha = 0.005)

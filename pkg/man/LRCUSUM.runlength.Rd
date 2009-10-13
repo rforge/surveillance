@@ -39,7 +39,7 @@ on Markov chains to determine the PMF of the run length of a
 time-constant CUSUM detector. They describe the dynamics of the CUSUM
 statistic by a Markov chain with a discretized state space of
 size \eqn{g+2}. This is adopted to the time varying case in
-\enc{HÃ¶hle}{Hoehle} (2010) and implemented in R using the \dots notation
+\enc{Höhle}{Hoehle} (2010) and implemented in R using the \dots notation
 such that it works for a very large class of distributions.
 
 }
@@ -56,11 +56,11 @@ such that it works for a very large class of distributions.
     Markov chain. See the eqns in the reference for details.}
 }
 \references{
-  HÃ¶hle, M. (2010), Changepoint detection in categorical time series, 
+  Höhle, M. (2010), Changepoint detection in categorical time series, 
   Book chapter to appear in T. Kneib and G. Tutz (Eds.), Statistical
   Modelling and Regression Structures, Springer.
 
-  HÃ¶hle, M. and Mazick, A. (2009), Aberration detection in R illustrated
+  Höhle, M. and Mazick, A. (2009), Aberration detection in R illustrated
   by Danish mortality monitoring, Book chapter to appear in T. Kass-Hout
   and X. Zhang (Eds.) Biosurveillance: A Health Protection Priority,
   CRCPress.
@@ -116,6 +116,6 @@ plot(1:length(mu0),rl$cdf,type="l",xlab="t",ylab="CDF")
 ########################################################
 }
 
-\author{M. \enc{HÃ¶hle}{Hoehle}}
+\author{M. \enc{Höhle}{Hoehle}}
 \keyword{regression}
 

@@ -1,5 +1,5 @@
-1.1-0 
-==========================
+1.1-0 (uploaded on CRAN XX/2009)
+================================
 
 * Added the functions categoricalCUSUM and LRCUSUM.runlength
   for the CUSUM monitoring of general categorical time series
@@ -12,6 +12,12 @@
 
 * Experimental implementation of the prospective space-time cluster
   detection described in Assuncao and Correa (2009).
+
+* Added a demo("biosurvbook") containing the code of an upcoming
+  book chapter on how to use the surveillance package. This
+  contains the description of ISO date use, negative binomial CUSUM,
+  run-length computation, etc. From an applicational point of view
+  the methods are illustrated by Danish mortality monitoring.
 
 * Fixed a small bug in algo.cdc found by Marian Talbert Allen
   which resulted in the control$m argument being ignored.

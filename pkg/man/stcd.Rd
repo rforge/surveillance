@@ -67,6 +67,6 @@ res <- stcd(burkitt$x,burkitt$y,burkitt$t,radius,epsilon,threshold)
 #Index of the event
 which.max(res$R >= threshold)
 }
-\author{M. O. Prates, T. Correa and M. \enc{HÃ¶hle}{Hoehle}}
+\author{M. O. Prates, T. Correa and M. \enc{Höhle}{Hoehle}}
 \keyword{cluster}
 

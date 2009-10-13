@@ -143,7 +143,7 @@ pb.surv2 <- pairedbinCUSUM(deleval,control=list(theta0=theta0,
 plot(pb.surv2, xaxis.years=FALSE)
 }
 
-\author{S. Steiner and M. \enc{HÃ¶hle}{Hoehle}}
+\author{S. Steiner and M. \enc{Höhle}{Hoehle}}
 \keyword{regression}
 
 %deleval <- read.table("~/MCHealth/Varizellen/R/leval.txt",header=TRUE)

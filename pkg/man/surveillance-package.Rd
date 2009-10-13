@@ -20,7 +20,7 @@
   \tabular{ll}{
     Package: \tab surveillance\cr
     Type: \tab Package\cr
-    Version: \tab 1.0-1\cr
+    Version: \tab 1.1-0\cr
     Date: \tab 2009-05-03\cr
     License: \tab GPL version 2 (http://www.gnu.org/licenses/gpl.html) \cr
   }
@@ -29,13 +29,13 @@
   }
 }
 \author{
-  Author: M. \enc{HÃ¶hle}{Hoehle} with contributions from T. Correa, M. Hofmann,
+  Author: M. \enc{Höhle}{Hoehle} with contributions from T. Correa, M. Hofmann,
   C. Lang, M. Paul, A. Riebler and V. Wimmer
   
-  Maintainer: Michael \enc{HÃ¶hle}{Hoehle} \email{<hoehle@stat.uni-muenchen.de>}
+  Maintainer: Michael \enc{Höhle}{Hoehle} \email{<hoehle@stat.uni-muenchen.de>}
 }
 \references{
-  surveillance: An R package for the surveillance of infectious diseases (2007), M. \enc{HÃ¶hle}{Hoehle}, Computational Statistics, 22(4), pp. 571---582.
+  surveillance: An R package for the surveillance of infectious diseases (2007), M. \enc{Höhle}{Hoehle}, Computational Statistics, 22(4), pp. 571---582.
 }
 \keyword{ package }
 \examples{
