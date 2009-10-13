@@ -5,6 +5,8 @@
 \alias{observed-methods}
 \alias{alarms}
 \alias{alarms<-}
+\alias{upperbound}
+\alias{upperbound<-}
 \alias{alarms-methods}
 \alias{control}
 \alias{control<-}

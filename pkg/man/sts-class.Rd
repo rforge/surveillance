@@ -11,6 +11,8 @@
 \alias{dim,sts-method}
 \alias{alarms,sts-method}
 \alias{alarms<-,sts-method}
+\alias{upperbound,sts-method}
+\alias{upperbound<-,sts-method}
 \alias{control,sts-method}
 \alias{control<-,sts-method}
 \alias{epoch,sts-method}
@@ -65,13 +67,15 @@
       extract number of columns of the \code{observed} matrix slot.}
     \item{dim}{\code{signature(x = "sts")}: extract matrix dimensions of
       \code{observed} using \code{\link{dim}}.}
-    \item{alarms}{\code{signature(x = "sts")}: extract the \code{alarm}
-      slot of an \code{sts} object.}
-    \item{control}{\code{signature(x = "sts")}: extract the \code{control}
-      slot of an \code{sts} object.}
     \item{observed}{\code{signature(x = "sts")}: extract the \code{observed}
       slot of an \code{sts} object.}
     \item{population}{\code{signature(x = "sts")}: extract the \code{population}
+      slot of an \code{sts} object.}
+    \item{alarms}{\code{signature(x = "sts")}: extract the \code{alarm}
+      slot of an \code{sts} object.}
+    \item{upperbound}{\code{signature(x = "sts")}: extract the \code{upperbound}
+      slot of an \code{sts} object.}
+    \item{control}{\code{signature(x = "sts")}: extract the \code{control}
       slot of an \code{sts} object.}
     \item{epoch}{\code{signature(x = "sts")}: extract the \code{epoch}
       slot of an \code{sts} object. If ISO dates are used then the

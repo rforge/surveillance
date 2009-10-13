@@ -110,8 +110,8 @@ pairedbinCUSUM.runlength <- function(p,w1,w2,h1,h2,h11,h22, sparse=FALSE) {
 
 ######################################################################
 # Paired binary CUSUM method as described by Steiner et al (1999).
-# This is the workhorse and should be wrapped into a function
-# being able to handle input as an S4 sts object
+# This is the workhorse and is wrapped into a nice function
+# being able to handle input as an S4 sts object in pairedbinCUSUM.
 #
 # Parameters:
 #   x      - data
@@ -123,10 +123,10 @@ pairedbinCUSUM.runlength <- function(p,w1,w2,h1,h2,h11,h22, sparse=FALSE) {
 #   h22    - secondary limit for 2nd series
 ######################################################################
 
-pairedbinCUSUM.workhorse <- function(x,theta0, theta1, h1,h2,h11,h22) {
+pairedbinCUSUM.LLRcompute <- function(x,theta0, theta1, h1,h2,h11,h22) {
   #Initialize variables
   t <- 0
-  alarm <- FALSE
+  alarm <- c(FALSE,FALSE)
   stopped <- FALSE
   S <- matrix(0,nrow(x)+1,2)
 
@@ -144,15 +144,26 @@ pairedbinCUSUM.workhorse <- function(x,theta0, theta1, h1,h2,h11,h22) {
 
     #Do we have an alarm? Could be caused by primary limits or by
     #secondary limits
-    alarm <- (S[t+1,1] > h1) | (S[t+1,2] > h2) |
-                 ((S[t+1,1] > h11) & (S[t+1,2] > h22))
-    if (alarm | (t==nrow(x))) { stopped <- TRUE}
+    alarm <- c(S[t+1,1] > h1, S[t+1,2] > h2)
+    if ((S[t+1,1] > h11) & (S[t+1,2] > h22)) { alarm <- c(TRUE,TRUE) }
+#    alarm <- (S[t+1,1] > h1) | (S[t+1,2] > h2) |
+#             ((S[t+1,1] > h11) & (S[t+1,2] > h22))
+    #If one or both of the CUSUMs produced an alarm then stop
+    if ((sum(alarm)>0) | (t==nrow(x))) { stopped <- TRUE}
   }
-  return(list(N=t,val=S[-1],cases=U[-1]))
+  return(list(N=t,val=S[-1,],alarm=alarm))
 }
 
+######################################################################
+# STS wrapper for the Paired binary CUSUM method. This follows in
+# style the categoricalCUSUM method.
+######################################################################
+
 pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2,h11,h22)) {
-  # Set the default values if not yet set
+   # Set the default values if not yet set
+  if(is.null(control[["range",exact=TRUE]])) { 
+    control$range <- 1:nrow(observed(stsObj))
+  }
   if(is.null(control[["theta0",exact=TRUE]])) { 
     stop("Error: No specification of in-control parameters theta0!")
   }
@@ -174,7 +185,7 @@ pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2
 
   #Extract the important parts from the arguments
   range <- control$range
-  y <- t(stsObj@observed[range,,drop=FALSE])
+  y <- stsObj@observed[range,,drop=FALSE]
   theta0 <- control[["theta0",exact=TRUE]]
   theta1 <- control[["theta1",exact=TRUE]]
   h1 <- control[["h1",exact=TRUE]]
@@ -187,16 +198,11 @@ pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2
     stop("Error: The number of columns in the sts object needs to be two.")
   }
 
-  #Reserve space for the results
-  #start with cusum[timePoint -1] = 0, i.e. set cusum[1] = 0
-  alarm <- matrix(data = 0, nrow = length(range), ncol = nrow(y))
-  upperbound <- matrix(data = 0, nrow = length(range), ncol = nrow(y))
-
-  #Small helper function to be used along the way --> move to other file!
-  either <- function(cond, whenTrue, whenFalse) {
-    if (cond) return(whenTrue) else return(whenFalse)
-  }
-
+  #Reserve space for the results. Contrary to the categorical CUSUM
+  #method, each ROW represents a series.
+  alarm <- matrix(data = 0, nrow = length(range), ncol = ncol(y))
+  upperbound <- matrix(data = 0, nrow = length(range), ncol = ncol(y))
+  
   #Setup counters for the progress
   doneidx <- 0
   N <- 1
@@ -207,17 +213,17 @@ pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2
   #Loop as long as we are not through the entire sequence
   #######################################################
   while (doneidx < noOfTimePoints) {
-     ##Run paired binary CUSUM until the next alarm
-    res <- pairedbinCUSUM.workhorse(x=y, theta0=theta0, theta1=theta1, h1=h1, h2=h2, h11=h11, h22=h22)
+     #Run paired binary CUSUM until the next alarm
+    res <- pairedbinCUSUM.LLRcompute(x=y, theta0=theta0, theta1=theta1, h1=h1, h2=h2, h11=h11, h22=h22)
   
     #In case an alarm found log this and reset the chart at res$N+1
-    if (res$N < ncol(y)) {
+    if (res$N < nrow(y)) {
       #Put appropriate value in upperbound
-      upperbound[1:res$N + doneidx,]  <- matrix(rep(either(control$ret == "value", res$val[1:res$N] ,res$cases[1:res$N]),each=ncol(upperbound)),ncol=ncol(upperbound),byrow=TRUE)
-      alarm[res$N + doneidx,] <- TRUE
-
-      #Chop & get ready for next round
-      y <- y[,-(1:res$N),drop=FALSE]
+      upperbound[1:res$N + doneidx,]  <- res$val[1:res$N,]
+      alarm[res$N + doneidx,] <- res$alarm
+    
+     #Chop & get ready for next round
+      y <- y[-(1:res$N),,drop=FALSE]
 #      theta0 <- pi0[,-(1:res$N),drop=FALSE]
 #      theta1 <- pi1[,-(1:res$N),drop=FALSE]
 #      n <- n[-(1:res$N)]
@@ -229,14 +235,11 @@ pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2
   }
 
   #Add upperbound-statistic of last segment, where no alarm is reached
-  upperbound[(doneidx-res$N+1):nrow(upperbound),]  <- matrix( rep(either(control$ret == "value", res$val, res$cases),each=ncol(upperbound)),ncol=ncol(upperbound),byrow=TRUE)
-  
-
+  upperbound[(doneidx-res$N+1):nrow(upperbound),]  <- res$val
   
   # Add name and data name to control object
-  control$name <- "multinomCUSUM"
+  control$name <- "pairedbinCUSUM"
   control$data <- NULL #not supported anymore
-
 
   #New direct calculations on the sts object
   stsObj@observed <- stsObj@observed[control$range,,drop=FALSE]
@@ -251,9 +254,6 @@ pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2
   start.year <- start[1] + (new.sampleNo - 1) %/% stsObj@freq 
   start.sampleNo <- (new.sampleNo - 1) %% stsObj@freq + 1
   stsObj@start <- c(start.year,start.sampleNo)
-
-  #Ensure dimnames in the new object ## THIS NEEDS TO BE FIXED!
-  #stsObj <- fix.dimnames(stsObj)
 
   #Done
   return(stsObj)

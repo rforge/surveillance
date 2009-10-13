@@ -44,6 +44,16 @@ setReplaceMethod("alarms", "sts", function(x, value) {
  x@alarm <- value
  x
 })
+# upperbound slot
+if(!isGeneric("upperbound")) setGeneric("upperbound", function(x) standardGeneric("upperbound"))
+setMethod("upperbound", "sts", function(x) {
+  return(x@upperbound)
+})
+setGeneric("upperbound<-", function(x, value) standardGeneric("upperbound<-"))
+setReplaceMethod("upperbound", "sts", function(x, value) {
+ x@upperbound <- value
+ x
+})
 # population slot (actually its populationFrac)
 if(!isGeneric("population")) setGeneric("population", function(x) standardGeneric("population"))
 setMethod("population", "sts", function(x) {
