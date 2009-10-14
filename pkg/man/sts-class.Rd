@@ -1,4 +1,5 @@
 \name{sts-class}
+\Rdversion{1.1}
 \docType{class}
 \alias{sts-class}
 %
@@ -41,21 +42,39 @@
 
 \section{Slots}{
   \describe{
-  \item{\code{week}:}{Object of class \code{numeric} specifying the week
-  numbers. Actually this is not really used at the moment. }
-  \item{\code{freq}:}{If weekly data \code{freq} corresponds to 52, in case of monthly data \code{freq} is 12.}
-  \item{\code{start}:}{vector of length two denoting the year and the sample number (week, month, etc.) of the first observation}
-  \item{\code{observed}:}{A matrix of size \code{length(week)} times the
-  number of regions containing the weekly/monthly number of counts in
-  each region. The colnames of the matrix should match the ID values of
-  the shapes in the \code{map} slot.}
-  \item{\code{state}:}{Matrix with the same dimension as \code{observed} containing booleans whether at the specific time point there was an outbreak in the region}
-  \item{\code{alarm}:}{Matrix with the same dimension as \code{observed} specifying whether an outbreak detection algorithm declared a specific time point in the region as having an alarm. If the object containins just observations then this slot is null. }
-  \item{\code{upperbound}:}{Matrix with upper bound values }
-  \item{\code{neighbourhood}:}{Symmetric matrix of booleans size \eqn{(number of regions)^2} stating the neighbourhood matrix. }
-  \item{\code{populationFrac}:}{Object of class \code{matrix}.}
-  \item{\code{map}:}{Object of class \code{SpatialPolygonsDataFrame} providing a shape of the areas which are monitored. }
-  \item{\code{control}:}{Object of class \code{list}, thais is a rather free data type to be returned by the surveillance algorithms. }
+    \item{\code{week}:}{Object of class \code{numeric} specifying the week
+      numbers. Actually this is not really used at the moment. }
+    \item{\code{freq}:}{If weekly data \code{freq} corresponds to 52, in
+      case of monthly data \code{freq} is 12.}
+    \item{\code{start}:}{vector of length two denoting the year and the
+      sample number (week, month, etc.) of the first observation}
+    \item{\code{observed}:}{A matrix of size \code{length(week)} times the
+      number of regions containing the weekly/monthly number of counts in
+      each region. The colnames of the matrix should match the ID values of
+      the shapes in the \code{map} slot.}
+    \item{\code{state}:}{Matrix with the same dimension as \code{observed}
+      containing booleans whether at the specific time point there was an
+      outbreak in the region}
+    \item{\code{alarm}:}{Matrix with the same dimension as
+      \code{observed} specifying whether an outbreak detection algorithm
+      declared a specific time point in the region as having an alarm. If
+      the object containins just observations then this slot is null. }
+    \item{\code{upperbound}:}{Matrix with upper bound values }
+    \item{\code{neighbourhood}:}{Symmetric matrix of booleans size
+      \eqn{(number of regions)^2} stating the neighbourhood matrix. } 
+    \item{\code{populationFrac}:}{Object of class \code{matrix}.}
+    \item{\code{map}:}{Object of class \code{SpatialPolygonsDataFrame}
+      providing a shape of the areas which are monitored. }
+    \item{\code{control}:}{Object of class \code{list}, thais is a
+      rather free data type to be returned by the surveillance algorithms. }
+    \item{\code{epochAsDate}:}{Object of class \code{"logical"} stating
+      whether to use a ISO 8601 representation of the epoch/week slot using
+      the \code{Date} class (\code{epochAsDate=TRUE}) or just to
+      interpret the epochs/weeks as numerics (\code{epochAsDate=FALSE}).}
+    \item{\code{multinomialTS}:}{Object of class \code{"logical"}
+      stating whether to interpret the object as \code{observed} out of
+      \code{population}, i.e. a multinomial interpretation instead of a
+      count interpretation.}
   }
 }
 

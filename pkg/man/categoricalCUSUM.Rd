@@ -116,10 +116,11 @@ abattoir2 <- new("sts",epoch=1:nrow(abattoir), start=c(2006,1),freq=52,
 
 ######################################################################
 #Function to use as dfun in the categoricalCUSUM
-#(just a wrapper to the dBB function)
+#(just a wrapper to the dBB function). Note that from v 3.0-1 the
+#first argument of dBB changed its name from "y" to "x"!
 ######################################################################
 mydBB.cusum <- function(y, mu, sigma, size, log = FALSE) {
-  return(dBB(y=y[1,], mu = mu[1,], sigma = sigma, bd = size, log = log))
+  return(dBB(y[1,], mu = mu[1,], sigma = sigma, bd = size, log = log))
 }
 
 
