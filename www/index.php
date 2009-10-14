@@ -52,12 +52,10 @@ echo $contents; } ?>
     monitoring of count data and categorical time series.</li>
 <li> The main application is in the detection of aberrations in routine collected
   public health data seen as univariate and multivariate time series of
-  counts. Hence, potential users are biostatisticians, epidemiologists and others working in applied infectious disease epidemiology. </li>
-  <li> However, applications could just as well originate from
-  environmetrics, reliability engineering, econometrics or social sciences.
-<li> Furthermore, <tt>surveillance</tt> provides an S4 class data structure and framework for methodological developments of change-point algorithms. 
-<li> Among others the package contains an
-implementation of the following procedures:</li>
+  counts. Hence, potential users are biostatisticians, epidemiologists and others working in applied infectious disease epidemiology. However, applications could just as well originate from
+  environmetrics, reliability engineering, econometrics or social sciences. </li>
+<li> <tt>surveillance</tt> provides an S4 class data structure and framework for methodological developments of change-point algorithms. 
+<li> The following outbreak detection procedures for cound data time series are implemented in the package:</li>
 <ul>
 <li>Stroup et al. (1989)</li>
 <li>Farrington et al. (1996)</li>
@@ -82,11 +80,11 @@ Poisson and negative binomial means documented in H&ouml;hle and Paul (2008)<br>
 
 
 
-<li>Furthermore the package contains estimation and prediction routines for the
+<li>Retrospective modelling of univariate and multivariate count data time series is also available as estimation and prediction routines for the
 models described in 
 <ul>
      <li>Held et al. (2005) and Paul et al. (2008)</li>
-     <li>Held et al. (2006) </li>
+     <li>Held et al. (2006)</li>
 </ul>
 <li>For evaluation purposes, the package contains example
 datasets drawn
@@ -133,14 +131,14 @@ New features:<br>
 <blockquote>
 <blockquote>
 <ul>
-<li>A good introduction to the package is provided in the paper <a
+<li>A good (but slightly old) introduction to the package is provided in the paper <a
 href="http://dx.doi.org/10.1007/s00180-007-0074-8"><span
 style="font-family: monospace;">surveillance</span>:
 					An R package for the surveillance of infectious diseases</a>, Computational Statistics (2007), 22(4), pp. 571-582. <a href="http://www.stat.uni-muenchen.de/~hoehle/pubs/hoehle-CoSt2008-preprint.pdf"> [preprint]</a></li>
-<li>A more recent description can be found in the book chapter <it>Aberration detection in R illustrated by Danish mortality monitoring</it> (2009),  M. Höhle and A. Mazick,  To appear in T. Kass-Hout and  X. Zhang (Eds.) Biosurveillance: A Health Protection Priority, CRC Press. [preprint].</li>
+<li>A more recent description can be found in the book chapter <i>Aberration detection in R illustrated by Danish mortality monitoring</i> (2009),  M. Höhle and A. Mazick,  To appear in T. Kass-Hout and  X. Zhang (Eds.) Biosurveillance: A Health Protection Priority, CRC Press. [<a href="http://www.stat.uni-muenchen.de/~hoehle/pubs/hoehle_mazick2009-preprint.pdf">preprint</a>].</li>
 <li>An overview of statistical methods and implementational usage is given the course notes of the short course on <a href="http://www.stat.uni-muenchen.de/~hoehle/surv-short/index.html">Statistical surveillance of infectious diseases</a> held at the Department of Statistics, Universidade Federal de Minas Gerais (UFMG), Belo Horizonte, Brazil, Nov 27-28, 2008.</li>
 <li><a href="hoehle-surveillance.pdf">Invited talk</a> held at the ESCAIDE satellite workshop on <ii>Computer supported outbreak detection and signal management</ii> (<a href="hoehle-surveillance.R">R-File</a>, <a href="ha.csv">Data</a> from SurvStat@RKI)
-<li>Use of the package in veterinary public health surveillance can be found in <a href="http://epub.ub.uni-muenchen.de/2093/">Statistical approaches to the surveillance of infectious diseases for veterinary public health</a>
+<li>Application of the package in veterinary public health surveillance is described in <a href="http://epub.ub.uni-muenchen.de/2093/">Statistical approaches to the surveillance of infectious diseases for veterinary public health</a>
 <li>Read the package vignette
 <li>Sometimes one picture says more than 1000 words:</li>
 <img src="survlr.png" align="center">

@@ -24,7 +24,7 @@
  implementations typical outbreak detection procedures such as Stroup et
  al. (1989), Farrington et al., (1996), Rossi et al. (1999), Rogerson
  and Yamada (2001), a Bayesian approach (\enc{Höhle}{Hoehle}, 2007),
- negative binomial CUSUM methods (\enc{Höhle}{Hoehle}, 2009), and a
+ negative binomial CUSUM methods (\enc{Höhle}{Hoehle} and Mazick, 2009), and a
  detector based on generalized likelihood ratios (\enc{Höhle}{Hoehle}
  and Paul, 2008). However, also CUSUMs for the prospective change-point
  detection in binomial, beta-binomial and multinomial time series is

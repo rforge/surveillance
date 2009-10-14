@@ -26,7 +26,7 @@ plot(aggregate(ha),main="Hepatitis A in Berlin 2001-2006")
 # Importing data from a csv file. 
 ######################################################################
 ha.counts <- as.matrix(read.csv("ha.csv")) 
-ha <- new("sts",week=1:nrow(ha.counts), start=c(2001,1), freq=52,
+ha <- new("sts",epoch=1:nrow(ha.counts), start=c(2001,1), freq=52,
            observed=ha.counts,
            state=matrix(0,nrow(ha.counts),ncol(ha.counts)))
 
