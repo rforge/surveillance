@@ -43,7 +43,7 @@ int SistemadeVigilancia(SVEventLst &ev, const double RaioC, const double epslon,
   short **MSpace;
   double pontox, pontoy, DistEucl, Soma, UCj, fator;
  
-  //order the list of files
+  //order the event list
   ev.sort();
    
   SVEventLst::size_type n_event = ev.size();
@@ -226,7 +226,7 @@ extern "C" {
   SistemadeVigilancia(eList,*radius,*epsilon,R);
 
   //Debug purposes
-  //cout << "Size of R = " << R.size() << endl;
+  cout << "Size of R = " << R.size() << endl;
   //Move values of test statistic for return 
   for(i=0;i<R.size();i++){
     //cout << "R[" << i << "] = " << R[i] << endl;
@@ -234,6 +234,7 @@ extern "C" {
   }
   
   //Find index, where R is above the limit for the first time
+  //Boolean "controle" indicates whether there is an alarm or not.
   bool controle = false;
   for(i=0;i<R.size();i++){
     if(R[i]>*threshold){
@@ -253,15 +254,19 @@ extern "C" {
   }
   *idxFirstAlarm = cont;
 	
+  cout << "Got behind SVEventLst part." << endl;
+
   //Whats the Calcula Lambda function doing anyway?
   //Question: don't we only do this IN CASE we have an alarm
   unsigned int num = cont;	
-  CalculaLambda(eList,*radius,*epsilon,R,num);
+  if (controle) {
+    CalculaLambda(eList,*radius,*epsilon,R,num);
 
-  //Index of the cluster center
-  *idxClusterCenter = num;
-
-
+    //Index of the cluster center
+    *idxClusterCenter = num;
+  } else {
+    *idxClusterCenter = -1;
+  }
   //Clean up (nothing to clean) and done
 }
 

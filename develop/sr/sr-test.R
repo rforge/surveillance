@@ -174,6 +174,7 @@ testIt <- function() {
   epsilon <- 0.5 # relative change within the cluster
   radius <- 20 # radius
   threshold <- 161 # threshold limit
+#  threshold <- 2000 # threshold limit
 
   #Load the library
   dyn.load("sr-spacetime.so")

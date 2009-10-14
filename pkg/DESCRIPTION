@@ -1,11 +1,11 @@
 Package: surveillance
-Title: Modeling and change-point detection in discrete response time series
+Title: Modeling and monitoring discrete response time series
 Version: 1.1-0
-Date: 2009-10-13
-Author: M. Höhle with contributions from T. Correa, M. Hofmann, C. Lang, M. Paul, A. Riebler and V. Wimmer
+Date: 2009-10-14
+Author: M. Höhle with contributions from T. Correa, M. Hofmann, C. Lang, M. Paul, A. Riebler, S. Steiner and V. Wimmer
 Depends: methods,utils,xtable,spc,sp,maptools,vcd,msm,Matrix
 Suggests: RUnit,digest,coda,gamlss,splancs
-Description: A package implementing statistical methods for the modeling and change-point detection in time series of counts, proportions and categorical data. Focus is on outbreak detection in count data time series originating from public health surveillance of infectious diseases, but applications could just as well originate from environmetrics, econometrics or social sciences.  Currently the package contains implementations typical outbreak detection procedures such as Stroup et. al (1989), Farrington et al, (1996), Rossi et al. (1999), Rogerson and Yamada (2001), a Bayesian approach, negative binomial CUSUM methods and a detector based on generalized likelihood ratios (GLR). Furthermore, inference methods for the infectious disease model in Held et al. (2005) and Paul et al. (2008) are provided. A novel CUSUM approach combining logistic and multinomial logistic modelling is also included. The package contains several real-world datasets and the ability to simulate outbreak data. 
+Description: A package implementing statistical methods for the modeling and change-point detection in time series of counts, proportions and categorical data. Focus is on outbreak detection in count data time series originating from public health surveillance of infectious diseases, but applications could just as well originate from environmetrics, reliability engineering, econometrics or social sciences.  Currently the package contains implementations typical outbreak detection procedures such as Stroup et. al (1989), Farrington et al, (1996), Rossi et al. (1999), Rogerson and Yamada (2001), a Bayesian approach, negative binomial CUSUM methods and a detector based on generalized likelihood ratios. Furthermore, inference methods for the retrospective infectious disease model in Held et al. (2005), Held et al. (2006) and Paul et al. (2008) are provided. A novel CUSUM approach combining logistic and multinomial logistic modelling is also included. The package contains several real-world datasets, the ability to simulate outbreak data, visualize the results of the monitoring in temporal, spatial or spatio-temporal fashion.
 Maintainer: Michael Höhle <hoehle@stat.uni-muenchen.de>
 License: GPL-2 
 URL: http://surveillance.r-forge.r-project.org/

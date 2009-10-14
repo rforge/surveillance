@@ -48,11 +48,14 @@ echo $contents; } ?>
 <ul>
 <ul>
 <li> The intention of the R-package <tt>surveillance</tt> is to
-provide open source software  for the visualization and
-    monitoring of count data time series in public health surveillance.
-Potential users are epidemiologists and others working in applied infectious disease epidemiology. 
-<li> Furthermore, <tt>surveillance</tt> also provides a data structure and framework for methodological
-developments of surveillance algorithms. 
+     provide open source software  for the visualization, modelling and
+    monitoring of count data and categorical time series.</li>
+<li> The main application is in the detection of aberrations in routine collected
+  public health data seen as univariate and multivariate time series of
+  counts. Hence, potential users are biostatisticians, epidemiologists and others working in applied infectious disease epidemiology. </li>
+  <li> However, applications could just as well originate from
+  environmetrics, reliability engineering, econometrics or social sciences.
+<li> Furthermore, <tt>surveillance</tt> provides an S4 class data structure and framework for methodological developments of change-point algorithms. 
 <li> Among others the package contains an
 implementation of the following procedures:</li>
 <ul>
@@ -71,14 +74,18 @@ cover time varying proportions in a binomial setting.
 </li>
 <li>An approximate CUSUM method for time varying Poisson means
 as documented in Rossi et al (1999)</li>
-<li>Generalized likelihood ratio detectors for time varying
+<li>Likelihood and generalized likelihood ratio detectors for time varying
 Poisson and negative binomial means documented in H&ouml;hle and Paul (2008)<br>
 </li>
 </ul>
+     <li>Categorical models include change-point detection based on regression models for binomial and beta-binomial distributed response.  Furthermore, multi-categorical models include the paired-binary approach taken in Steiner et al. (1999) and the multinomial logistic model, proportional odds model and Bthe radley-Terry models described in  H&ouml;hle (2010).</li>
+
+
+
 <li>Furthermore the package contains estimation and prediction routines for the
 models described in 
 <ul>
-	       <li>Held et al. (2005)</li>
+     <li>Held et al. (2005) and Paul et al. (2008)</li>
      <li>Held et al. (2006) </li>
 </ul>
 <li>For evaluation purposes, the package contains example
@@ -101,7 +108,7 @@ under the GPL conditions.</li>
 <b>Download:</b>
 <blockquote>
 <blockquote>
-<blockquote> The <tt>surveillance</tt> package (version 1.0-2) is
+<blockquote> The <tt>surveillance</tt> package (version 1.1-0) is
 available for download from <a
 href="http://cran.r-project.org/src/contrib/Descriptions/surveillance.html">CRAN</a>.<br>
       Current package development, help-forum and bugtracking is hosted through
@@ -111,8 +118,7 @@ R-Forge:<br>
 href="https://r-forge.r-project.org/projects/surveillance/">https://r-forge.r-project.org/projects/surveillance/</a><br>
 </div>
 <br>
-From this page snapshots of the current development version 1.0-3 are
-available.<br>
+From this page snapshots of the current development version are available.<br>
 <br>
 New features:<br>
 <ul>
@@ -131,6 +137,7 @@ New features:<br>
 href="http://dx.doi.org/10.1007/s00180-007-0074-8"><span
 style="font-family: monospace;">surveillance</span>:
 					An R package for the surveillance of infectious diseases</a>, Computational Statistics (2007), 22(4), pp. 571-582. <a href="http://www.stat.uni-muenchen.de/~hoehle/pubs/hoehle-CoSt2008-preprint.pdf"> [preprint]</a></li>
+<li>A more recent description can be found in the book chapter <it>Aberration detection in R illustrated by Danish mortality monitoring</it> (2009),  M. Höhle and A. Mazick,  To appear in T. Kass-Hout and  X. Zhang (Eds.) Biosurveillance: A Health Protection Priority, CRC Press. [preprint].</li>
 <li>An overview of statistical methods and implementational usage is given the course notes of the short course on <a href="http://www.stat.uni-muenchen.de/~hoehle/surv-short/index.html">Statistical surveillance of infectious diseases</a> held at the Department of Statistics, Universidade Federal de Minas Gerais (UFMG), Belo Horizonte, Brazil, Nov 27-28, 2008.</li>
 <li><a href="hoehle-surveillance.pdf">Invited talk</a> held at the ESCAIDE satellite workshop on <ii>Computer supported outbreak detection and signal management</ii> (<a href="hoehle-surveillance.R">R-File</a>, <a href="ha.csv">Data</a> from SurvStat@RKI)
 <li>Use of the package in veterinary public health surveillance can be found in <a href="http://epub.ub.uni-muenchen.de/2093/">Statistical approaches to the surveillance of infectious diseases for veterinary public health</a>
@@ -148,7 +155,7 @@ style="font-family: monospace;">surveillance</span>:
 <li><a href="http://www.stat.uni-muenchen.de/~hoehle">Michael H&ouml;hle</a>, Department of Statistics, University of Munich, Germany (Project Admin)</li>
 <li><a href="http://www.biostat.uzh.ch/aboutus/people/mpaul.html">Michaela Paul</a>, Institute of Social and Preventive Medicine, University of Zurich, Switzerland</li>
      <li>Former student programmers: C. Lang, Andrea Riebler, Valentin Wimmer</li>
-     <li>Contributions by: T. Correa, M. Hofmann</li>
+     <li>Contributions by: T. Correa, M. Hofmann and S. Steiner</li>
 </ul>
 </blockquote>
 </blockquote>
