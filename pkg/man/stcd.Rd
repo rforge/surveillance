@@ -4,8 +4,8 @@
 
 \title{Spatio-temporal cluster detection}
 \description{
-  Shiryaev-Roberts based spatio-temporal cluster detection
-  based on the work in Assuncao & Correa (2009).
+  Shiryaev-Roberts based prospective spatio-temporal cluster detection
+  as in Assuncao & Correa (2009).
   
 }
 \usage{
@@ -25,18 +25,18 @@ stcd(x, y,t,radius,epsilon,threshold)
 \details{
  Shiryaev-Roberts based spatio-temporal cluster detection based
  on the work in Assuncao and Correa (2009). The implementation
- is based on C++ code was originally written by Marcos Oliveira Prates, UMFG,
+ is based on C++ code originally written by Marcos Oliveira Prates, UMFG,
  Brazil and provided by Thais Correa, UMFG, Brazil during her research
  stay in Munich. This stay was financially supported by the Munich
  Center of Health Sciences.
 
  Note that the vectors \code{x}, \code{y} and \code{t} need to be of the
- same length. Furthermore, the vector \code{t} needs to be sorted.
+ same length. Furthermore, the vector \code{t} needs to be sorted (to
+ improve speed, the latter is not verified within the function).
  
- The current implementation used a call to a C++ function to perform the
- actual computations of the test statistic. Furthermore, the function is
- currently experimental. Data type and results may be subject to
- changes.
+ The current implementation uses a call to a C++ function to perform the
+ actual computations of the test statistic. The function is currently
+ experimental -- data type and results may be subject to changes.
 
 }
 \value{A list with three components

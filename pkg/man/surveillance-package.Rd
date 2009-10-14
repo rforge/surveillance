@@ -8,7 +8,26 @@
 }
 \description{
 
-  surveillance is an \R package implementing statistical methods for the
+  A package implementing statistical methods for the modeling and
+  change-point detection in time series of counts, proportions and
+  categorical data. Focus is on outbreak detection in count data time
+  series originating from public health surveillance of infectious
+  diseases, but applications could just as well originate from
+  environmetrics, reliability engineering, econometrics or social
+  sciences.
+ 
+} 
+
+\details{
+  \tabular{ll}{
+    Package: \tab surveillance\cr
+    Type: \tab Package\cr
+    Version: \tab 1.1-0\cr
+    Date: \tab 2009-10-14\cr
+    License: \tab GPL version 2 (http://www.gnu.org/licenses/gpl.html) \cr
+  }
+
+  \code{surveillance} is an \R package implementing statistical methods for the
   retrospective modeling and prospective change-point detection in time
   series of counts, proportions and categorical data. The main
   application is in the detection of aberrations in routine collected
@@ -40,20 +59,6 @@
  multivariate time series of counts. Finally, the fully Bayesian
  approach for univariate time series of counts from Held et al. (2006)
  is also implemented.
-} 
-
-\details{
-  \tabular{ll}{
-    Package: \tab surveillance\cr
-    Type: \tab Package\cr
-    Version: \tab 1.1-0\cr
-    Date: \tab 2009-10-14\cr
-    License: \tab GPL version 2 (http://www.gnu.org/licenses/gpl.html) \cr
-  }
-  The package
-  \itemize{
-    
-  }
 }
 \author{
   Author: M. \enc{Höhle}{Hoehle} with contributions from T. Correa, M. Hofmann,

@@ -3,10 +3,12 @@
 \alias{catcusum.LLRcompute}
 \encoding{latin1}
 
-\title{Run length computation of a CUSUM detector}
+\title{CUSUM detector for time-varying categorical time series}
 \description{
   Function to process \code{sts} object by binomial, beta-binomial
-  or multinomial CUSUM.
+  or multinomial CUSUM. Logistic, multinomial logistic, proportional
+  odds or Bradley-Terry regression models are used to specify in-control
+  and out-of-control parameters.
 }
 \usage{
 categoricalCUSUM(stsObj,control = list(range=NULL,h=5,pi0=NULL,
@@ -19,21 +21,26 @@ categoricalCUSUM(stsObj,control = list(range=NULL,h=5,pi0=NULL,
     \code{populationFrac}. }
   \item{control}{Control object containing several items
     \itemize{
-      \item{range}{Vector of length \eqn{t_{max}} with indices of the
+      \item{\code{range}}{Vector of length \eqn{t_{max}} with indices of the
 	\code{observed} slot to monitor.}
-      \item{h}{Threshold to use for CUSUM. Once the CUSUM statistics is
-	larger or equal to \code{h} we have an alarm.}
-      \item{pi0}{\eqn{(k-1) \times t_{max}} in-control probability
+      \item{\code{h}}{Threshold to use for the monitoring. Once the
+	CUSUM statistics is larger or equal to \code{h} we have an alarm.}
+      \item{\code{pi0}}{\eqn{(k-1) \times t_{max}} in-control probability
 	vector for all categories except the reference category.}
-      \item{mu1}{\eqn{(k-1) \times t_{max}} out-of-control probability
+      \item{\code{mu1}}{\eqn{(k-1) \times t_{max}} out-of-control probability
 	vector for all categories except the reference category.}
-      \item{h}{The threshold h which is used for the CUSUM.}
-      \item{dfun}{The probability mass function or density used to compute
-	the likelihood ratios of the CUSUM. In a negative binomial CUSUM
-	this is \code{dnbinom}, in a binomial CUSUM \code{dbinom} and in a
-	multinomial CUSUM \code{dmultinom}.}
-      \item{ret}{Return the necessary proportion to sound an alarm in the
-	slot \code{upperbound} or just the value of the CUSUM statistic.}
+      \item{\code{dfun}}{The probability mass function or density used
+	to compute the likelihood ratios of the CUSUM. In a negative
+	binomial CUSUM this is \code{dnbinom}, in a binomial CUSUM
+	\code{dbinom} and in a multinomial CUSUM \code{dmultinom}. The
+	function must be able to handle the arguments \code{y},
+	\code{size}, \code{mu} and \code{log}. As a consequence, one in
+	the case of the beta-binomial distribution has to write a small
+	wrapper function.}
+      \item{\code{ret}}{Return the necessary proportion to sound an alarm in the
+	slot \code{upperbound} or just the value of the CUSUM
+	statistic. Thus, \code{ret} is one of tha values in
+	\code{c("cases","value")}.}
   }}
   \item{\dots}{Additional arguments to send to \code{dfun}.}
 }
@@ -64,7 +71,7 @@ categoricalCUSUM(stsObj,control = list(range=NULL,h=5,pi0=NULL,
 #test.
 #######################################
 
-#Load data
+#Load meat inspection data
 data("abattoir")
 
 #Use GAMLSS to fit beta-bin regression model
