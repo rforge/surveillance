@@ -86,7 +86,10 @@ void lr_cusum(int* x,double* mu0, int *lx_R, double *kappa_R, double *c_ARL_R,in
     /* Add up */
     if (n==0) {
       ret_lr[n] = fmax(0,zn);
-      if (ret==2) ret_cases[n] = (c_ARL + mu0[n]*(kappa-1))/kappa ;
+      //5.11.2009 -- Bug fix. There was a small programming error for the 
+      //computing the cases for n==0.
+      //      if (ret==2) ret_cases[n] = (c_ARL + mu0[n]*(kappa-1))/kappa ;
+      if (ret==2) ret_cases[n] = (c_ARL + mu0[n]*(exp(kappa)-1))/kappa ;
     } 
     else {
       ret_lr[n] = fmax(0,ret_lr[n-1] + zn);
@@ -267,7 +270,7 @@ void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *re
       /* to find the number of cases that are necassary to produce an alarm */
       /* optionally, if ret == 2*/
       if (ret == 2){
-        /* change the value at timepoint n as long as an alarm is produced */
+        /* change the value at timepoint n until an alarm is produced */
         
         int xnnew = -1;
             
@@ -277,7 +280,7 @@ void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *re
         /* save the old value of x */
         int xnold = x[n];
         
-        /* increase/decrease xnnew as long the glr-statistic with the new x is >= c_ARL */    
+        /* increase/decrease xnnew until the glr-statistic with the new x is >= c_ARL */    
         while ((dir*glrnew < c_ARL*dir)){
           
           /* increase/decrease xnnew */

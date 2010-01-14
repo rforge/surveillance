@@ -284,12 +284,13 @@ anscombeNB <- function(y,mu,alpha=0.1) {
         normal setting.
 }
 \usage{
-  find.kh(ARLa = 500, ARLr = 7, sided = "one", verbose=FALSE)
+  find.kh(ARLa = 500, ARLr = 7, sided = "one", method = "BFGS", verbose=FALSE)
 }
 \arguments{
         \item{ARLa}{average run length in acceptance setting, aka. in control state. Specifies the number of observations before false alarm.}
         \item{ARLr}{average run length in rejection state, aka. out of control state. Specifies the number of observations before an increase is detected (i.e. detection delay)}
         \item{sided}{one-sided cusum scheme}
+       \item{method}{Which method to use in the function \code{\link{optim}}. Standard choice is BFGS, but in some situation Nelder-Mead can be advantageous.} 
         \item{verbose}{gives extra information about the root finding process}
 }
 \value{
@@ -324,16 +325,21 @@ anscombeNB <- function(y,mu,alpha=0.1) {
 #         false alarm
 #  ARLw - average run length in rejection state (i.e. number before
 #         an increase is detected (i.e. detection delay)
+#  method - optim method to use, see ?optim
 #
 # Returns:
 #  list( k - reference value, h - decision interval)
 ######################################################################
-find.kh <- function(ARLa=500,ARLr=7,sided="one",verbose=FALSE) {
+find.kh <- function(ARLa=500,ARLr=7,sided="one",method="BFGS",verbose=FALSE) {
   #Small helper function which is to be minimized
   fun <- function(k) {
     if (k>0) {
       #Compute decision interval
       h <- xcusum.crit(L0=ARLa,k=k,r=50,sided=sided)
+
+      #Check if xcusum.crit managed to find a solution
+      if (is.nan(h)) stop(paste("xcusum.crit in package spc was not able to find a h corresponding to ARLa=",ARLa," and k=",k))
+
       if (h > 0) {
         #Compute ARLr given the above computed h
         arlr <- xcusum.arl(k,h,mu=2*k,r=50,sided=sided)
@@ -349,7 +355,7 @@ find.kh <- function(ARLa=500,ARLr=7,sided="one",verbose=FALSE) {
       return( 1e99)
     }
   }
-  k <- optim(1,fun,method="BFGS")$par
+  k <- optim(1,fun,method=method)$par
   return(list(k=k,h=xcusum.crit(L0=ARLa,k=k,r=50,sided=sided)))
 }
 
