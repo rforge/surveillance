@@ -1,6 +1,6 @@
 /*******************************************************************
  * Author: Mathias Hofmann
- *         Michael Höhle <hoehle@stat.uni-muenchen.de>
+ *         Michael Hï¿½hle <hoehle@stat.uni-muenchen.de>
  *         Volker Schmid
  * Date:   Oct 2008 -- modified version of code from Apr 2005 *
  *
@@ -421,7 +421,7 @@ for (int i=0; i<n; i++)
 
 
 /*updatealphabeta
-  Erzeugt Normalverteilten Zufallsvektor der Länge noa*/
+  Erzeugt Normalverteilten Zufallsvektor der Lï¿½nge noa*/
 void gausssample(double* temp, int noa)
 {
 
@@ -663,7 +663,7 @@ void erzeuge_b_Q(double* gamma  , double* my, double* Q, double* alpha, double* 
       
     }
   
-  /* Präzisionsmatrix*/
+  /* Prï¿½zisionsmatrix*/
   berechneQ(Q, rw, taubeta, n, 1, 0.0);
   
   if (mode==1)
@@ -708,7 +708,7 @@ void erzeuge_b_Q_2(double* my, double* Q, double* alpha, double* beta, double* g
     }
 
 
-  /* Präzisionsmatrix*/
+  /* Prï¿½zisionsmatrix*/
   berechneQ(Q, rw, taubeta, n+1, 1, 0.0);
 
   for (int i=1; i<=I; i++)
@@ -2111,7 +2111,7 @@ void bplem_estimate(int verbose, ofstream &logfile, ofstream &logfile2, ofstream
   }
   
   
-  /* Für Saisonkomponenente */
+  /* Fï¿½r Saisonkomponenente */
   int ncov;
   int scov = 0;
   if(delta_rev){
@@ -2152,6 +2152,7 @@ void bplem_estimate(int verbose, ofstream &logfile, ofstream &logfile2, ofstream
   else{
     ncov=nfreq*2+2;
     gamma = new double[ncov];
+    gammaneu = new double[ncov];
     xcov = new double*[ncov];
     for (int i=0; i<ncov; i++)
       {
@@ -2577,7 +2578,7 @@ register long sampleCounter=1;
     }
 
     if(varnu){
-// Unterprogramme für den Update von alpha und beta
+// Unterprogramme fï¿½r den Update von alpha und beta
       if (I>=2)
 	{
 	  alphaupdate(gamma, alpha, beta, delta, lambda, 1, I, n, Y, X, acc_alpha, taualpha, ncov, xcov, xreg, omega, omega, scov,1);
@@ -2605,7 +2606,7 @@ register long sampleCounter=1;
 	}
 
 
-//Update für zeitlichen effekt mit RW
+//Update fï¿½r zeitlichen effekt mit RW
 
      if (rw>0)
        {
@@ -2795,7 +2796,7 @@ register long sampleCounter=1;
     // cout << S[1][2] << endl;
 
 
-    //Praediktive Verteilung für variables nu
+    //Praediktive Verteilung fï¿½r variables nu
     for (register long i=1;i<=I;i++) {
       if(!theta_pred_estim){
 	double p_thetanp1 = ((double(K[i]))/double(n)); //(1+double(K[i]))
