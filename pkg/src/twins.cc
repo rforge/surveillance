@@ -1112,7 +1112,7 @@ void update_lambda_br(double** lambda, double** lambda_br,double* xi_lambda, int
     if(K_geom){
       accbr += log(1-p_K);
     }
-    accbr=accbr*pow((double)(-1),u)+log(v);
+    accbr=accbr*pow((double)(-1.0),u)+log(v);
 
     if (u==2)
       {
@@ -1383,7 +1383,7 @@ void update_delta_br(double* delta, double* delta_br,double &xi_delta, int* brea
     if(K_geom){
       accbr += log(1-p_K);
     }
-    accbr=accbr*pow((double)(-1),u)+log(v);
+    accbr=accbr*pow((double)(-1.0),u)+log(v);
 
     if (u==2)
       {
@@ -1673,7 +1673,7 @@ void update_epsilon_br(double* epsilon, double* epsilon_br,double& xi_epsilon, i
     if(K_geom){
       accbr += log(1-p_K);
     }
-    accbr=accbr*pow((double)(-1),u)+log(v);
+    accbr=accbr*pow((double)(-1.0),u)+log(v);
 
     if (u==2)
       {
