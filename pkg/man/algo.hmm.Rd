@@ -16,7 +16,7 @@
 \usage{
   algo.hmm(disProgObj, control = list(range=range, Mtilde=-1, 
              noStates=2, trend=TRUE, noHarmonics=1,
-             covEffectEqual=FALSE))
+             covEffectEqual=FALSE, saveHMMs = FALSE))
 }
 \arguments{
         \item{disProgObj}{object of class disProg (including the observed and the state chain)}
