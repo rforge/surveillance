@@ -2388,43 +2388,6 @@ void bplem_estimate(int verbose, ofstream &logfile, ofstream &logfile2, ofstream
   //Vectors for betaupdate
   int bandw=rw+1;
   
-  double my[n+1];
-  double my2[n+1];
-  double temp[n+1];
-  double z[n+1];
-  double theta[n+1];
-  double beta0[n+1];
-  double Q[(n-1)*bandw];
-  double Q2[(n-1)*bandw];
-  double L[(n-1)*bandw];
-  double L2[(n-1)*bandw];
-  double P[ncov*ncov];
-  double P2[ncov*ncov];
-  double gammaalt[ncov];
-  double z2[ncov];
-  int n1 = n - 1;
-  int n2 = n - 2;  
-
-  // these are not global any longer so no "new" necessary
-
-  // my=new double[n+1];
-  // my2=new double[n+1];
-  // temp=new double[n+1];
-  // z=new double[n+1];
-  // theta=new double[n+1];
-  // beta0=new double[n+1];
-  // Q=new double[(n-1)*bandw];
-  // Q2=new double[(n-1)*bandw];
-  // L=new double[(n-1)*bandw];
-  // L2=new double[(n-1)*bandw];
-  // P=new double[ncov*ncov];	
-  // P2=new double[ncov*ncov];
-  // gammaalt=new double[ncov];
-  // z2=new double[ncov];
-  // n1 = n-1;
-  // n2 = n-2;
-
-
   for (register long i=1;i<=I; i++) {
     X[i][2] = (long)floor(nu[i][2]);
     Y[i][2] = (long)floor(lambda[i][2]*nu[i][2]/(1 - lambda[i][2]));

@@ -106,7 +106,7 @@ under the GPL conditions.</li>
 <b>Download:</b>
 <blockquote>
 <blockquote>
-<blockquote> The <tt>surveillance</tt> package (version 1.1-0) is
+<blockquote> The <tt>surveillance</tt> package (version 1.1-2) is
 available for download from <a
 href="http://cran.r-project.org/src/contrib/Descriptions/surveillance.html">CRAN</a>.<br>
       Current package development, help-forum and bugtracking is hosted through
@@ -135,10 +135,10 @@ New features:<br>
 href="http://dx.doi.org/10.1007/s00180-007-0074-8"><span
 style="font-family: monospace;">surveillance</span>:
 					An R package for the surveillance of infectious diseases</a>, Computational Statistics (2007), 22(4), pp. 571-582. <a href="http://www.stat.uni-muenchen.de/~hoehle/pubs/hoehle-CoSt2008-preprint.pdf"> [preprint]</a></li>
-<li>A more recent description can be found in the book chapter <i>Aberration detection in R illustrated by Danish mortality monitoring</i> (2009),  M. Höhle and A. Mazick,  To appear in T. Kass-Hout and  X. Zhang (Eds.) Biosurveillance: A Health Protection Priority, CRC Press. [<a href="http://www.stat.uni-muenchen.de/~hoehle/pubs/hoehle_mazick2009-preprint.pdf">preprint</a>].</li>
+<li>A more recent description can be found in the book chapter <i>Aberration detection in R illustrated by Danish mortality monitoring</i> (2010),  M. Höhle and A. Mazick,  To appear in T. Kass-Hout and  X. Zhang (Eds.) Biosurveillance: A Health Protection Priority, CRC Press. [<a href="http://www.stat.uni-muenchen.de/~hoehle/pubs/hoehle_mazick2009-preprint.pdf">preprint</a>].</li>
 <li>An overview of statistical methods and implementational usage is given the course notes of the short course on <a href="http://www.stat.uni-muenchen.de/~hoehle/surv-short/index.html">Statistical surveillance of infectious diseases</a> held at the Department of Statistics, Universidade Federal de Minas Gerais (UFMG), Belo Horizonte, Brazil, Nov 27-28, 2008.</li>
 <li><a href="hoehle-surveillance.pdf">Invited talk</a> held at the ESCAIDE satellite workshop on <ii>Computer supported outbreak detection and signal management</ii> (<a href="hoehle-surveillance.R">R-File</a>, <a href="ha.csv">Data</a> from SurvStat@RKI)
-<li>Application of the package in veterinary public health surveillance is described in <a href="http://epub.ub.uni-muenchen.de/2093/">Statistical approaches to the surveillance of infectious diseases for veterinary public health</a>
+<li>Application of the package in veterinary public health surveillance is described in <a href="http://dx.doi.org/10.1016/j.prevetmed.2009.05.017">Statistical approaches to the surveillance of infectious diseases for veterinary public health</a> [<a href="http://epub.ub.uni-muenchen.de/2093/">preprint</a>].
 <li>Read the package vignette
 <li>Sometimes one picture says more than 1000 words:</li>
 <img src="survlr.png" align="center">
@@ -163,7 +163,7 @@ style="font-family: monospace;">surveillance</span>:
 <blockquote>
      The development of models and algorithms implemented in surveillance was financially supported by :
      <ul>
-     <li><a href="http://www.en.mc-health.uni-muenchen.de/index.html">Munich Center of Health Sciences</a> (MC-Health, since 2007)</li>
+     <li><a href="http://www.en.mc-health.uni-muenchen.de/index.html">Munich Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
      <li>Swiss National Science Foundation (SNF, since 2007)  </li>
      <li>German Science Foundation (DFG, 2003-2006)</li>
      </ul>
