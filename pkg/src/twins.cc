@@ -102,6 +102,61 @@ typedef Dynamic_2d_array<double> DoubleMatrix;
 typedef Dynamic_2d_array<int> IntMatrix;
 
 
+
+// Analogous class for vectors (== 1D arrays)
+template < class T >
+class Dynamic_1d_array
+{
+public:
+  // constructor
+  Dynamic_1d_array(size_t length) :
+    m_length(length),
+    m_data((length !=0) ? new T[length] : NULL)
+  {}
+
+  // copy ctr
+  Dynamic_1d_array(const Dynamic_1d_array& src) :
+    m_length(src.m_length),
+    m_data((src.m_length!=0) ? new T[src.m_length] : NULL)
+  {
+    for(size_t i=0; i<m_length; ++i)
+      (*this)[i] = src[i];
+  }
+  
+  // destructor
+  ~Dynamic_1d_array()
+  {
+    delete[] m_data;
+  }
+  
+  // non-const access
+  inline T& operator[](size_t i) 
+  {
+    return m_data[i];
+  }
+  
+  // const access
+  inline T const& operator[](size_t i) const 
+  {
+    return m_data[i];
+  }
+
+private:
+  const size_t m_length;
+  T* m_data; 
+};
+
+
+// Note that the class Dynamic_1d_array automatically allocates and
+// deallocates the memory.
+typedef Dynamic_1d_array<long> LongVector;
+typedef Dynamic_1d_array<double> DoubleVector;
+typedef Dynamic_1d_array<int> IntVector;
+
+
+
+
+
 /************************************
   Globals
 *************************************/
@@ -404,9 +459,8 @@ double xMx2(double* Q, double* x, int n, int b)
 /* BERECHNET A-1, k ist matrixlaenge*/
 void invers(double* A,int k)
 {
-
-  double ergebnis[k*k];
-
+  DoubleVector ergebnis(k * k);
+  
   if (k==1)
     {
       ergebnis[0] = 1.0/A[0];
@@ -549,7 +603,7 @@ double hyper(int rw, double* theta, double k_a, double k_b, int n)
 }
 
 
-double update_tau_alpha(double* alpha, long I, double aa, double bb, double* xreg)
+double update_tau_alpha(const DoubleVector& alpha, long I, double aa, double bb, double* xreg)
 {
   
   aa += double(I);
@@ -562,7 +616,7 @@ double update_tau_alpha(double* alpha, long I, double aa, double bb, double* xre
 }
 
 
-double update_tau_gamma(double* alpha, long ncov, double aa, double bb)
+double update_tau_gamma(const DoubleVector& alpha, long ncov, double aa, double bb)
 {
   
   aa += double(ncov);
@@ -630,7 +684,7 @@ void berechneQ(double* temp, int age_block, double kappa, int noa,int nop, doubl
 
 
 
-double sumg(int ncov, const DoubleMatrix& xcov, double* gamma, int t, int scov)
+double sumg(int ncov, const DoubleMatrix& xcov, DoubleVector& gamma, int t, int scov)
 {
   double sum=0;
   for (int i=scov; i<ncov; i++)
@@ -643,7 +697,7 @@ double sumg(int ncov, const DoubleMatrix& xcov, double* gamma, int t, int scov)
 
 
 
-void alphaupdate(double* gamma, double* alpha, double* beta, double* delta, const DoubleMatrix& lambda, double p, long I, long n, const LongMatrix& Y, const LongMatrix& X, long& acc_alpha, double taualpha, int ncov, const DoubleMatrix& xcov, double* xreg, const DoubleMatrix& omega, const DoubleMatrix& omegaX, int scov, int mode){
+void alphaupdate(DoubleVector& gamma, DoubleVector& alpha, DoubleVector& beta, DoubleVector& delta, const DoubleMatrix& lambda, double p, long I, long n, const LongMatrix& Y, const LongMatrix& X, long& acc_alpha, double taualpha, int ncov, const DoubleMatrix& xcov, double* xreg, const DoubleMatrix& omega, const DoubleMatrix& omegaX, int scov, int mode){
 
   for (int i=1; i<=I; i++)
     {
@@ -691,7 +745,7 @@ void alphaupdate(double* gamma, double* alpha, double* beta, double* delta, cons
 
 
 
-void erzeuge_b_Q(double* gamma  , double* my, double* Q, double* alpha, double* delta, double* beta, const LongMatrix& X, const LongMatrix& Z, const LongMatrix& Y,
+void erzeuge_b_Q(DoubleVector& gamma  , double* my, double* Q, const DoubleVector& alpha, DoubleVector& delta, DoubleVector& beta, const LongMatrix& X, const LongMatrix& Z, const LongMatrix& Y,
 		 long n, long I, double taubeta, int rw, const DoubleMatrix& lambda, double p, const DoubleMatrix& xcov, int ncov, const DoubleMatrix& omega, const DoubleMatrix& omegaX,int scov, int mode)
 {
   if (mode==1)
@@ -752,7 +806,7 @@ void erzeuge_b_Q(double* gamma  , double* my, double* Q, double* alpha, double* 
 }
 
 
-void erzeuge_b_Q_2(double* my, double* Q, double* alpha, double* beta, double* gamma, double* delta, const LongMatrix& X,
+void erzeuge_b_Q_2(double* my, double* Q, const DoubleVector& alpha, DoubleVector& beta, DoubleVector& gamma, DoubleVector& delta, const LongMatrix& X,
 		   long n, long I, double taubeta, int rw, const DoubleMatrix& xcov, int ncov, int scov, const DoubleMatrix& omega)
 {
 
@@ -786,7 +840,7 @@ void erzeuge_b_Q_2(double* my, double* Q, double* alpha, double* beta, double* g
 
 
 
-void machnu(double* mu, double* alpha, double* beta, double* delta, DoubleMatrix& nu, long I, long n, int ncov, const DoubleMatrix& xcov, int scov)
+void machnu(DoubleVector& mu, const DoubleVector& alpha, DoubleVector& beta, DoubleVector& delta, DoubleMatrix& nu, long I, long n, int ncov, const DoubleMatrix& xcov, int scov)
 {
   for (int i=1; i<=I; i++)
     { 
@@ -799,7 +853,7 @@ void machnu(double* mu, double* alpha, double* beta, double* delta, DoubleMatrix
 }
 
 
-void update_gamma_j(int j, double* alpha, double* beta, double* gamma, double* delta, int ncov, const DoubleMatrix& xcov, const LongMatrix& X, long n, long I, double taugamma, double* gammaneu, long& acc_gamma, const DoubleMatrix& omega, int scov)
+void update_gamma_j(int j, const DoubleVector& alpha, DoubleVector& beta, DoubleVector& gamma, DoubleVector& delta, int ncov, const DoubleMatrix& xcov, const LongMatrix& X, long n, long I, double taugamma, DoubleVector& gammaneu, long& acc_gamma, const DoubleMatrix& omega, int scov)
 {
   double g = 0;
   double gd = 0;
@@ -867,7 +921,7 @@ void update_gamma_j(int j, double* alpha, double* beta, double* gamma, double* d
 
 
 
-void update_beta_t(int t, double* alpha, double* beta, double* gamma, double* delta, int ncov, const DoubleMatrix& xcov, const LongMatrix& X, long n, long I, double taubeta, long& acc_beta, const DoubleMatrix& omega, int scov)
+void update_beta_t(int t, const DoubleVector& alpha, DoubleVector& beta, DoubleVector& gamma, DoubleVector& delta, int ncov, const DoubleMatrix& xcov, const LongMatrix& X, long n, long I, double taubeta, long& acc_beta, const DoubleMatrix& omega, int scov)
 {
   double h = 0;
   double c = 0;
@@ -941,7 +995,7 @@ void update_beta_t(int t, double* alpha, double* beta, double* gamma, double* de
 
 
 
-void update_lambda_br(DoubleMatrix& lambda, DoubleMatrix& lambda_br,double* xi_lambda, IntMatrix& breakpoints, IntMatrix& breakpointsStar, int* K, int* KStar, int* Km1, double alpha_lambda, double beta_lambda, const LongMatrix& Y, const LongMatrix& Z, long n, long I, double& acceptedbr, const DoubleMatrix& omega, int theta_pred_estim, int xi_estim, int K_geom, double p_K, double alpha_xi, double beta_xi)
+void update_lambda_br(DoubleMatrix& lambda, DoubleMatrix& lambda_br,DoubleVector& xi_lambda, IntMatrix& breakpoints, IntMatrix& breakpointsStar, IntVector& K, IntVector& KStar, IntVector& Km1, double alpha_lambda, double beta_lambda, const LongMatrix& Y, const LongMatrix& Z, long n, long I, double& acceptedbr, const DoubleMatrix& omega, int theta_pred_estim, int xi_estim, int K_geom, double p_K, double alpha_xi, double beta_xi)
 {
   /*update breakpoints of lambda using reversible jump MCMC*/
 
@@ -1254,7 +1308,7 @@ void update_lambda_br(DoubleMatrix& lambda, DoubleMatrix& lambda_br,double* xi_l
 
 
 
-void update_delta_br(double* delta, double* delta_br,double &xi_delta, int* breakpoints_delta, int* breakpointsStar_delta, int& K_delta, int& KStar_delta, int& Km1_delta, double delta_a, double delta_b, const LongMatrix& X, const DoubleMatrix& nu, long n, long I, double& acceptedbr_delta, const DoubleMatrix& omega, int xi_estim_delta, int K_geom, double p_K, double alpha_xi, double beta_xi)
+void update_delta_br(DoubleVector& delta, DoubleVector& delta_br,double &xi_delta, IntVector& breakpoints_delta, IntVector& breakpointsStar_delta, int& K_delta, int& KStar_delta, int& Km1_delta, double delta_a, double delta_b, const LongMatrix& X, const DoubleMatrix& nu, long n, long I, double& acceptedbr_delta, const DoubleMatrix& omega, int xi_estim_delta, int K_geom, double p_K, double alpha_xi, double beta_xi)
 {
   //update breakpoints of lambda using reversible jump MCMC
 
@@ -1543,7 +1597,7 @@ void update_delta_br(double* delta, double* delta_br,double &xi_delta, int* brea
 
 
 
-void update_epsilon_br(double* epsilon, double* epsilon_br,double& xi_epsilon, int* breakpoints_epsilon, int* breakpointsStar_epsilon, int& K_epsilon, int& KStar_epsilon, int& Km1_epsilon, double epsilon_a, double epsilon_b, const LongMatrix& S, long n, long I, double& acceptedbr_epsilon, const DoubleMatrix& omega, int xi_estim_epsilon, int K_geom, double p_K, double alpha_xi, double beta_xi)
+void update_epsilon_br(DoubleVector& epsilon, DoubleVector& epsilon_br,double& xi_epsilon, IntVector& breakpoints_epsilon, IntVector& breakpointsStar_epsilon, int& K_epsilon, int& KStar_epsilon, int& Km1_epsilon, double epsilon_a, double epsilon_b, const LongMatrix& S, long n, long I, double& acceptedbr_epsilon, const DoubleMatrix& omega, int xi_estim_epsilon, int K_geom, double p_K, double alpha_xi, double beta_xi)
 {
   /*update breakpoints of lambda using reversible jump MCMC*/
   
@@ -1989,7 +2043,7 @@ double satdevalt(long n, long I, const LongMatrix& X, const LongMatrix& Y, const
  *    D = -2log p(Z|theta)
  */
 double satdev(long n, long I, const LongMatrix& Z, 
-	      const DoubleMatrix& lambda, const DoubleMatrix& nu, double *xi, double *epsilon, DoubleMatrix& eta, double psi, int overdispersion) {
+	      const DoubleMatrix& lambda, const DoubleMatrix& nu, double *xi, DoubleVector& epsilon, DoubleMatrix& eta, double psi, int overdispersion) {
   double res = 0;
   //Loop over all data
   for (register int i=1; i<=I; i++) {
@@ -2015,7 +2069,7 @@ double satdev(long n, long I, const LongMatrix& Z,
 
 
 double chisq(long n, long I, const LongMatrix& Z, 
-	     const DoubleMatrix& lambda, const DoubleMatrix& nu, double *xi, double *epsilon, DoubleMatrix& eta, DoubleMatrix& varr, DoubleMatrix& rpearson, double psi, int overdispersion) {
+	     const DoubleMatrix& lambda, const DoubleMatrix& nu, double *xi, DoubleVector& epsilon, DoubleMatrix& eta, DoubleMatrix& varr, DoubleMatrix& rpearson, double psi, int overdispersion) {
   double res = 0;
   //Loop over all data
   for (register int i=1; i<=I; i++) {
@@ -2148,39 +2202,39 @@ void bplem_estimate(int verbose, ofstream &logfile, ofstream &logfile2, ofstream
 
   // then the rest (1D arrays and numbers)
 
-  double alpha[I+1];
-  double beta[n+1];
-  double delta[n+2];
-  double delta_br[n+2];
+  DoubleVector alpha(I + 1);
+  DoubleVector beta(n + 1);
+  DoubleVector delta(n + 2);
+  DoubleVector delta_br(n + 2);
   double xi_delta = 1;
-  double epsilon[n+2];
-  double epsilon_br[n+2];
+  DoubleVector epsilon(n + 2);
+  DoubleVector epsilon_br(n + 2);
   double xi_epsilon = 1;
   double xi_psi = 1;
   
-  int K[I+1];
-  int Km1[I+1];
-  int KStar[I+1];
-  double xi_lambda[I+1];
-  int breakpoints_delta[n+2];
-  int breakpointsStar_delta[n+2];
-  long bp_delta[n+2];
+  IntVector K(I + 1);
+  IntVector Km1(I + 1);
+  IntVector KStar(I + 1);
+  DoubleVector xi_lambda(I + 1);
+  IntVector breakpoints_delta(n+2);
+  IntVector breakpointsStar_delta(n+2);
+  LongVector bp_delta(n+2);
   int K_delta = 0; 
   int Km1_delta = 0;
   int KStar_delta = 0;
-  int breakpoints_epsilon[n+2];
-  int breakpointsStar_epsilon[n+2];
-  long bp_epsilon[n+2];
+  IntVector breakpoints_epsilon(n+2);
+  IntVector breakpointsStar_epsilon(n+2);
+  LongVector bp_epsilon(n+2);
   int K_epsilon = 0;
   int Km1_epsilon = 0;
   int KStar_epsilon = 0;
 
-  long Xnp1[I+1];
-  long Snp1[I+1];
-  long Ynp1[I+1];
-  long Znp1[I+1];	
-  double omeganp1[I+1];
-  double nunp1[I+1];
+  LongVector   Xnp1(I + 1);
+  LongVector   Snp1(I + 1);
+  LongVector   Ynp1(I + 1);
+  LongVector   Znp1(I + 1);	
+  DoubleVector omeganp1(I + 1);
+  DoubleVector nunp1(I + 1);
   
   
   if(!varnu){
@@ -2217,8 +2271,8 @@ void bplem_estimate(int verbose, ofstream &logfile, ofstream &logfile2, ofstream
   // determine the number of covariates and allocate then
   // the vectors and design matrix.
   ncov = nu_trend ? (nfreq * 2 + 2) : (nfreq * 2 + 1);
-  double gamma[ncov];
-  double gammaneu[ncov];
+  DoubleVector gamma(ncov);
+  DoubleVector gammaneu(ncov);
   DoubleMatrix xcov(ncov, n+2);
 
   // bad, do not do that:
@@ -2384,9 +2438,6 @@ void bplem_estimate(int verbose, ofstream &logfile, ofstream &logfile2, ofstream
     
   }//if varnu  
   
-  
-  //Vectors for betaupdate
-  int bandw=rw+1;
   
   for (register long i=1;i<=I; i++) {
     X[i][2] = (long)floor(nu[i][2]);
