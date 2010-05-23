@@ -603,7 +603,7 @@ double hyper(int rw, double* theta, double k_a, double k_b, int n)
 }
 
 
-double update_tau_alpha(const DoubleVector& alpha, long I, double aa, double bb, double* xreg)
+double update_tau_alpha(const DoubleVector& alpha, long I, double aa, double bb, DoubleVector& xreg)
 {
   
   aa += double(I);
@@ -697,7 +697,7 @@ double sumg(int ncov, const DoubleMatrix& xcov, DoubleVector& gamma, int t, int 
 
 
 
-void alphaupdate(DoubleVector& gamma, DoubleVector& alpha, DoubleVector& beta, DoubleVector& delta, const DoubleMatrix& lambda, double p, long I, long n, const LongMatrix& Y, const LongMatrix& X, long& acc_alpha, double taualpha, int ncov, const DoubleMatrix& xcov, double* xreg, const DoubleMatrix& omega, const DoubleMatrix& omegaX, int scov, int mode){
+void alphaupdate(DoubleVector& gamma, DoubleVector& alpha, DoubleVector& beta, DoubleVector& delta, const DoubleMatrix& lambda, double p, long I, long n, const LongMatrix& Y, const LongMatrix& X, long& acc_alpha, double taualpha, int ncov, const DoubleMatrix& xcov, DoubleVector& xreg, const DoubleMatrix& omega, const DoubleMatrix& omegaX, int scov, int mode){
 
   for (int i=1; i<=I; i++)
     {
@@ -2340,7 +2340,7 @@ void bplem_estimate(int verbose, ofstream &logfile, ofstream &logfile2, ofstream
   
 
   // Regionenanteil
-  double xreg[I+1];
+  DoubleVector xreg(I + 1);
 
   if(varnu){
     for (int i=1; i<=I; i++)
