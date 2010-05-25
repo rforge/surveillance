@@ -14,9 +14,9 @@
 \item{control}{A list controlling the behaviour of the algorithm
     \describe{
     \item{\code{range}}{determines the desired
-        timepoints which should be monitored. Note that it is
+        time-points which should be monitored. Note that it is
         automatically assumed that ALL other values in \code{disProgObj}
-        can be used for the estimatation, i.e. for a specific value \code{i}
+        can be used for the estimation, i.e. for a specific value \code{i}
         in \code{range} all values from 1 to \code{i} are used for estimation.}
     \item{\code{k}}{The threshold value. Once the outbreak statistic
         is above this threshold \code{k} an alarm is sounded.}
@@ -33,8 +33,8 @@
 \value{
 \item{survRes}{
     \code{algo.outbreakP} gives a list of class \code{survRes} which
-    includes the vector of alarm values for every timepoint in
-    \code{range}, the vector of threshold values for every timepoint
+    includes the vector of alarm values for every time-point in
+    \code{range}, the vector of threshold values for every time-point
     in \code{range}.  
   }
 }
@@ -46,7 +46,7 @@
  \deqn{OutbreakP(s) = \prod_{t=1}^s \left( \frac{\hat{\mu}^{C1}(t)}{\hat{\mu}^D(t)} \right)^{x(t)} },
 
  where \eqn{\hat{\mu}^{C1}(t)} is the estimated mean obtained by
- unimodal regression under the assumption of one change-point and
+ uni-modal regression under the assumption of one change-point and
  \eqn{\hat{\mu}^D(t)} is the estimated result when there is no
  change-point (i.e. this is just the mean of all observations). Note
  that the contrasted hypothesis assume all means are equal until the
