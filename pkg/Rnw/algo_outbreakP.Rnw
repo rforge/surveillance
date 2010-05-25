@@ -79,7 +79,7 @@
 
  The R code contains e.g. the search for NNBA (see details).
 }
-\author{M. \enc{Höhle}{Hoehle} -- based on Java code by by Frisen and \enc{Schiöler}{Schioeler}}
+\author{M. \enc{Höhle}{Hoehle} -- based on Java code by Frisen and \enc{Schiöler}{Schioeler}}
 \references{
 \enc{Frisén}{Frisen}, Andersson and \enc{Schiöler}{Schioeler} (2009), Robust
 outbreak surveillance of epidemics in Sweden, Statistics in
