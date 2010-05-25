@@ -1,5 +1,13 @@
-1.1-3 (uploaded on CRAN 22/05/2010
-==================================
+1.2-1 
+===================================
+
+* Added algo.outbreakP (Frisen & Andersson, 2009) providing a
+  semiparametric approach for outbreak detection for Poisson
+  distributed variables.
+
+
+1.1-6 (uploaded on CRAN 25/05/2010)
+===================================
 
 * a few minor bug fixes
 
@@ -27,7 +35,7 @@
   contains the description of ISO date use, negative binomial CUSUM,
   run-length computation, etc. From an applicational point of view
   the methods are illustrated by Danish mortality monitoring.
-
+  
 * Fixed a small bug in algo.cdc found by Marian Talbert Allen
   which resulted in the control$m argument being ignored.
 
