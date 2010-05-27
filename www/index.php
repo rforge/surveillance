@@ -75,8 +75,9 @@ as documented in Rossi et al (1999)</li>
 <li>Likelihood and generalized likelihood ratio detectors for time varying
 Poisson and negative binomial means documented in H&ouml;hle and Paul (2008)<br>
 </li>
+<li>Semiparametric surveillance of outbreaks by Frisén and Andersson (2009)</li> 
 </ul>
-     <li>Categorical models include change-point detection based on regression models for binomial and beta-binomial distributed response.  Furthermore, multi-categorical models include the paired-binary approach taken in Steiner et al. (1999) and the multinomial logistic model, proportional odds model and Bthe radley-Terry models described in  H&ouml;hle (2010).</li>
+     <li>Categorical models include change-point detection based on regression models for binomial and beta-binomial distributed response.  Furthermore, multi-categorical models include the paired-binary approach taken in Steiner et al. (1999) and the multinomial logistic model, proportional odds model and the Bradley-Terry models described in  H&ouml;hle (2010).</li>
 
 
 
@@ -106,9 +107,9 @@ under the GPL conditions.</li>
 <b>Download:</b>
 <blockquote>
 <blockquote>
-<blockquote> The <tt>surveillance</tt> package (version 1.1-2) is
+<blockquote> The <tt>surveillance</tt> package (version 1.1-6) is
 available for download from <a
-href="http://cran.r-project.org/src/contrib/Descriptions/surveillance.html">CRAN</a>.<br>
+href="http://cran.r-project.org/web/packages/surveillance/">CRAN</a>.<br>
       Current package development, help-forum and bugtracking is hosted through
 R-Forge:<br>
 <br>
@@ -120,7 +121,7 @@ From this page snapshots of the current development version are available.<br>
 <br>
 New features:<br>
 <ul>
-      <li>(>0.9-10) See NEWS file in the current distribution</li>
+      <li>See <a href="http://cran.r-project.org/web/packages/surveillance/NEWS">NEWS</a> file in the current distribution</li>
 </ul>
 <ul>
 </ul>
