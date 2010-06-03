@@ -39,9 +39,9 @@
   }
 }
 \details{
- A likelihood ratio test based on the Poisson distribution is implemented
- where the mean of the in-control and out-of-control hypothesis are computed
- by isotonic regression.
+  A generalized likelihood ratio test based on the Poisson
+  distribution is implemented where the means of the in-control and
+  out-of-control states are computed by isotonic regression.
 
  \deqn{OutbreakP(s) = \prod_{t=1}^s \left( \frac{\hat{\mu}^{C1}(t)}{\hat{\mu}^D(t)} \right)^{x(t)} },
 
@@ -64,7 +64,11 @@
  observation by one for each time point in \code{control$range} and
  then calling the workhorse function of the algorithm again. The argument
  \code{control$maxUpperboundCases} controls the upper limit of this
- search (default is 1e5).
+ search (default is 1e5). 
+ Currently, even though the statistic has passed the threshold, the NNBA
+ is still computed. After a few time instances what typically happens is
+ that no matter the observed value we would have an alarm at this time point. In this case the value of NNBA is set to \code{NA}. Furthermore, the first time
+ point is always \code{NA}, unless \code{k<1}.
 
 }
 \source{
@@ -102,7 +106,7 @@ upperbound(outbreakP(mysts, control=list(range=1:length(y),k=100,
 #Graphical illustration with number-needed-before-alarm (NNBA) upperbound.
 res <- outbreakP(mysts, control=list(range=1:length(y),k=100, 
            ret="cases"))
-plot(res,dx.upperbound=0,lwd=c(1,1,3))
+plot(res,dx.upperbound=0,lwd=c(1,1,3),legend.opts=list(legend=c("Infected","NNBA","Outbreak","Alarm"),horiz=TRUE))
 
 }
 

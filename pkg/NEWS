@@ -5,6 +5,10 @@
   semiparametric approach for outbreak detection for Poisson
   distributed variables.
 
+* Fixed a bug in the method "years" for sts classes. The method
+  was defined twice. On Windows (but not on other systems) this 
+  caused errors. Thanks to Ashley Ford, University of Warwick, UK
+  for pointing this out.
 
 1.1-6 (uploaded on CRAN 25/05/2010)
 ===================================

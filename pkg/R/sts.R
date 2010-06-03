@@ -215,10 +215,6 @@ setMethod("nrow", "sts", function(x) return(nrow(x@observed)))
 setMethod("ncol", "sts", function(x) return(ncol(x@observed)))
 setMethod("dim", "sts", function(x) return(dim(x@observed)))
 setMethod("colnames", signature=c(x="sts",do.NULL="missing",prefix="missing"), function(x,do.NULL, prefix) return(colnames(x@observed)))
-#Extract the corresponding year for each observation using
-#the sts@start information
-setGeneric("year", function(x, ...) standardGeneric("year"));
-setMethod("year", "sts", function(x,...) return((x@week-1) %/% x@freq + x@start[1]))
 #Extract which observation within year we have
 setGeneric("epochInYear", function(x, ...) standardGeneric("epochInYear"));
 setMethod("epochInYear", "sts", function(x,...) {
@@ -231,6 +227,7 @@ setMethod("epochInYear", "sts", function(x,...) {
     return( (x@week-1 + x@start[2]-1) %% x@freq + 1)
   }
 })
+#Extract the corresponding year for each observation using
 setGeneric("year", function(x, ...) standardGeneric("year"));
 setMethod("year", "sts", function(x,...) {
   if (x@epochAsDate) {
@@ -529,12 +526,13 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, a
 
   if(!is.null(legend.opts)) {
     #Fill empty (mandatory) slots in legend.opts list
-    if (is.null(legend.opts$lty)) legend.opts$lty = c(lty[1],lty[3],NA,NA)
-    if (is.null(legend.opts$col)) legend.opts$col = c(col[2],col[3],outbreak.symbol$col,alarm.symbol$col)
-    if (is.null(legend.opts$pch)) legend.opts$pch = c(NA,NA,outbreak.symbol$pch,alarm.symbol$pch)
+    if (is.null(legend.opts$x)) legend.opts$x <- "topleft"
+    if (is.null(legend.opts$lty)) legend.opts$lty <- c(lty[1],lty[3],NA,NA)
+    if (is.null(legend.opts$col)) legend.opts$col <- c(col[2],col[3],outbreak.symbol$col,alarm.symbol$col)
+    if (is.null(legend.opts$pch)) legend.opts$pch <- c(NA,NA,outbreak.symbol$pch,alarm.symbol$pch)
     if (is.null(legend.opts$legend))
-      legend.opts$legend = c("Infected", "Threshold","Outbreak","Alarm" )
-    
+      legend.opts$legend <- c("Infected", "Threshold","Outbreak","Alarm" )
+    print(legend.opts)
     do.call("legend",legend.opts)
   }
 

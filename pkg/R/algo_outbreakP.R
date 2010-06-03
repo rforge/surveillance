@@ -65,13 +65,13 @@ calc.outbreakP.statistic <- function(x) {
       leftl[i+1] = leftl[(leftl[i+1] - 1)+1];
     }
     
-     #calculate yhat 
+    #calculate yhat 
     for (j in leftl[i+1]:i){
       yhat[j+1] = meanl[i+1];
     }
   }
 		
-  #Numerically more stable computation of the alarm statistic based on log
+  #Numerically more stable computation of the alarm statistic on log scale
   logalarm <- 0
   for (j in 1:n) {
     logalarm = logalarm + x[j+1] * (log(yhat[j+1]) - log(xbar))
@@ -112,8 +112,8 @@ algo.outbreakP <- function(disProgObj, control = list(range = range, k=100, ret=
 
     #Find NNBA or just return value of the test statistic (faster)
     if (control$ret == "cases") {
-      #If length is 1 or 2 no alarm can be given unless k<1
-      if (i<=2) {
+      #If length is 1 no alarm can be given unless k<1
+      if (i<=1) {
         upperbound[count] <- ifelse(control$k>=1, NA, 0)
       } else {
         #Go up or down
@@ -123,7 +123,7 @@ algo.outbreakP <- function(disProgObj, control = list(range = range, k=100, ret=
         foundNNBA <- FALSE
         #Loop with modified last observation until alarm is caused (dx=1)
         #or until NO alarm is caused anymore (dx=-1)
-        while ((observedi > 0 & observedi < 1e5) & (!foundNNBA)) {
+        while ( ((delta == -1 & observedi > 0) | (delta == 1 & observedi < 1e5)) & (!foundNNBA)) {
           observedi <- observedi + delta
           newObserved <- c(observed[seq_len(i-1)],observedi)
           statistic <- calc.outbreakP.statistic( newObserved )
