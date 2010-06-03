@@ -185,7 +185,7 @@ the surveillance of infectious diseases</a>, Computational Statistics
 detection in R illustrated by Danish mortality monitoring</i> (2010),
 M. Höhle and A. Mazick, To appear in T. Kass-Hout and X. Zhang (Eds.)
 Biosurveillance: A Health Protection Priority, CRC Press. [<a
-							   href="http://www.stat.uni-muenchen.de/%7Ehoehle/pubs/hoehle_mazick2009-preprint.pdf">preprint</a>]. Note: As ISO 8601 handling is not fully implemented in R on Windows the demo("biosurvbook") will currently not work on Windows. </li>
+							   href="http://www.stat.uni-muenchen.de/%7Ehoehle/pubs/hoehle_mazick2009-preprint.pdf">preprint</a>]. Note: As ISO 8601 handling is not fully implemented in R on Windows the demo("biosurvbook") will only run with package version >= 1.2, where a workaround was implemented.</li>
       <li>An overview of statistical methods and implementational usage
 is given the course notes of the short course on <a
  href="http://www.stat.uni-muenchen.de/%7Ehoehle/surv-short/index.html">Statistical

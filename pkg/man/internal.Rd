@@ -36,6 +36,9 @@
 \alias{make.pois}
 \alias{pois.plot}
 \alias{tms.plot}
+%Utility functions
+\alias{format.Date2}
+\alias{isoWeekYear}
 
 %Weird functions from sp package which produce warnings in R CMD check
 %for the surveillance package (??)
