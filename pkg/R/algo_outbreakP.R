@@ -130,19 +130,6 @@ algo.outbreakP <- function(disProgObj, control = list(range = range, k=100, ret=
           foundNNBA <- (statistic > control$k) == ifelse(alarm[count],FALSE,TRUE)
         }
         upperbound[count] <- ifelse( foundNNBA, observedi + ifelse(alarm[count],1,0), NA) 
-
-#        #If there was an alarm, would zero cases have changed anything??
-#        if (alarm[count]) {
-#          newObserved <- c(observed[seq_len(i-1)],0)
-#          statistic <- calc.outbreakP.statistic( newObserved )
-#          if (statistic > k) {
-#            upperbound[count] <- NA
-#          } else {
-#            upperbound[count] <- observedi + 1 #coz we detected when there is NO alarm anymore, and we want NNBA
-#          }
-#        } else {
-#            upperbound[count] <- observedi
-#          }
       }
     } else {
       upperbound[count] <- statistic

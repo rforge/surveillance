@@ -71,7 +71,7 @@ isoWeekYear<-function(Y,M=NULL,D=NULL){
 #          processed on Windows. Otherwise the call is sent to format.Date
 ######################################################################
 
-format.Date2 <- function(x, format) {
+formatDate <- function(x, format) {
   if (sessionInfo()[[1]]$os == "mingw32") {
     res <- switch(format,
            "%G"=isoWeekYear(x)$ISOYear,

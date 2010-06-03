@@ -222,7 +222,7 @@ setMethod("epochInYear", "sts", function(x,...) {
   #http://www.opengroup.org/onlinepubs/009695399/functions/strptime.html
   if (x@epochAsDate) {
     epochStr <- switch( as.character(x@freq), "12" = "%m","52" =  "%V","365" = "%j")
-    return(as.numeric(format.Date2(epoch(x),epochStr)))
+    return(as.numeric(formatDate(epoch(x),epochStr)))
   } else {
     return( (x@week-1 + x@start[2]-1) %% x@freq + 1)
   }
@@ -231,7 +231,7 @@ setMethod("epochInYear", "sts", function(x,...) {
 setGeneric("year", function(x, ...) standardGeneric("year"));
 setMethod("year", "sts", function(x,...) {
   if (x@epochAsDate) {
-    return(as.numeric(format.Date2(epoch(x),"%G")))
+    return(as.numeric(formatDate(epoch(x),"%G")))
   } else {
     ((x@week-1 + x@start[2]-1) + (x@freq*x@start[1])) %/% x@freq 
   }
@@ -371,7 +371,7 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek,xaxis.units,c
       quarter <- sapply( (weeks-1) %/% 13 %% 4, quarterFunc)
     } else {   #If epochAsDate -- experimental functionality to handle ISO 8601
       date <- as.Date(x@week, origin="1970-01-01")
-      years <- unique(as.numeric(format.Date2(date,"%Y")))
+      years <- unique(as.numeric(formatDate(date,"%Y")))
       #Start of quarters in each year present in the data. 
       qStart <- as.Date(paste(rep(years,each=4), c("-01-01","-04-01","-07-01","-10-01"),sep=""))
       qName  <- rep(c("I","II","III","IV"), length.out=length(qStart))
@@ -382,7 +382,7 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek,xaxis.units,c
 
       date <- date[weekIdx]
       #Year the ISO week belongs to
-      year <- as.numeric(format.Date2(date,"%G"))
+      year <- as.numeric(formatDate(date,"%G"))
       quarter <- qName
     }        
       
@@ -1002,12 +1002,12 @@ setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, opti
                        "365" = "%j")
                        
     #Find out how many epochs there are each year
-    years <- unique(as.numeric(format.Date2(date,"%Y")))
+    years <- unique(as.numeric(formatDate(date,"%Y")))
     dummyDates <- as.Date(paste(rep(years,each=6),"-12-",26:31,sep=""))
-    maxEpoch <- tapply( as.numeric(format.Date2(dummyDates, epochStr)), rep(years,each=6), max)
+    maxEpoch <- tapply( as.numeric(formatDate(dummyDates, epochStr)), rep(years,each=6), max)
     #Assign this to result
-    res$freq <- maxEpoch[pmatch(format.Date2(date,"%Y"),names(maxEpoch),duplicates.ok=TRUE)]
-    res$epochInPeriod <- as.numeric(format.Date2(date,epochStr)) / res$freq
+    res$freq <- maxEpoch[pmatch(formatDate(date,"%Y"),names(maxEpoch),duplicates.ok=TRUE)]
+    res$epochInPeriod <- as.numeric(formatDate(date,epochStr)) / res$freq
   } else {
     #Otherwise just replicate the fixed frequency
     res$freq <- x@freq

@@ -38,7 +38,7 @@ glrnb(sts, control = list(range=range,c.ARL=5, mu0=NULL, alpha=0,
          theta=NULL,dir=c("inc","dec"),
          ret=c("cases","value")),...)
 outbreakP(sts, control=list(range = range, k=100,
-         ret=c("cases","value"),maxUpperboundCases=1e5))
+         ret=c("cases","value"),maxUpperboundCases=1e5),...)
 }
 \arguments{
   \item{sts}{Object of class \code{sts}}
