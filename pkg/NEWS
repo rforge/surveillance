@@ -5,10 +5,13 @@
   semiparametric approach for outbreak detection for Poisson
   distributed variables.
 
-* Fixed a bug in the method "years" for sts classes. The method
-  was defined twice. On Windows (but not on other systems) this 
-  caused errors. Thanks to Ashley Ford, University of Warwick, UK
-  for pointing this out.
+* Added a pure R function for extracting ISO week and year from Date
+  objects. This function (isoWeekYear) is only called if "%G" and "%V"
+  format strings are used on Windows (sessionInfo()[[1]]$os == "mingw32")
+  as this is not implemented for "format.Date" on Windows.  
+  Thanks to Ashley Ford,  University of Warwick, UK for identifying 
+  this Windows specific bug.
+
 
 1.1-6 (uploaded on CRAN 25/05/2010)
 ===================================
