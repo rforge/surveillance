@@ -21,6 +21,9 @@ library("surveillance")
 data("momo")
 
 #Create a plot of the data as in Figure. 1 of the book chapter
+#Note: Extracting ISO weeks and ISO years currently does not work
+#on Windows. Thus this demo does not work on Windows atm. Some fix needs
+#to be found!
 plot(momo[year(momo)>=2000,],ylab="No. of deaths",par.list=list(mar=c(4,2.2,2,1),cex.axis=1.5), type=observed ~ time | unit, col=c(gray(0.3),NA,NA),xaxis.units=FALSE,xlab="time (weeks)")
 
 
