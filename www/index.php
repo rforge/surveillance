@@ -156,8 +156,12 @@ R-Forge:<br>
       </div>
       <br>
 From this page snapshots of the current development version are
-							   available. For example -- if you are running a recent R version -- you can obtain a binary snapshot of the development version as <tt>install.packages("surveillance",repos="http://r-forge.r-project.org")</tt>. You can also manually download the <a href="http://r-forge.r-project.org/bin">binary snapshot</a> or the <a href="http://r-forge.r-projec.org/src">source tarball.
-      <br>
+							   available. For example -- if you are running a recent R version -- you can obtain a binary snapshot of the development version as<br>
+
+<div style="text-align: center;"> <tt>install.packages("surveillance",repos="http://r-forge.r-project.org")</tt>.</div>
+
+ You can also manually download the <a href="http://r-forge.r-project.org/bin">binary snapshot</a> or the <a href="http://r-forge.r-projec.org/src">source tarball.
+      <br><p>
 New features:<br>
       <ul>
         <li>See <a
