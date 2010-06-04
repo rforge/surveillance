@@ -156,12 +156,12 @@ R-Forge:<br>
       </div>
       <br>
 From this page snapshots of the current development version are
-available.<br>
+							   available. For example -- if you are running a recent R version -- you can obtain a binary snapshot of the development version as <tt>install.packages("surveillance",repos="http://r-forge.r-project.org")</tt>. You can also manually download the <a href="http://r-forge.r-project.org/bin">binary snapshot</a> or the <a href="http://r-forge.r-projec.org/src">source tarball.
       <br>
 New features:<br>
       <ul>
         <li>See <a
- href="http://cran.r-project.org/web/packages/surveillance/NEWS">NEWS</a>
+ href="https://r-forge.r-project.org/scm/viewvc.php/pkg/NEWS?view=markup&root=surveillance">NEWS</a>
 file in the current distribution</li>
       </ul>
       <ul>
