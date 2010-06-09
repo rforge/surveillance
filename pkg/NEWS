@@ -12,7 +12,15 @@
   Thanks to Ashley Ford,  University of Warwick, UK for identifying 
   this Windows specific bug.
 
-
+* For algo.farrington a faster fit routine "algo.farrington.fitGLM.fast"
+  has been provided by Mikko Virtanen, National Institute for Health 
+  and Welfare, Finland. The new function calls glm.fit
+  directly, which gives a doubling of speed for long series. However, if one 
+  wants to process the fitted model output some of the GLM routines might
+  not work on this output. For backwards compability the argument
+  control$fitFun = "algo.farrington.fitGLM" provides the old (and slow)
+  behaviour.
+  
 1.1-6 (uploaded on CRAN 25/05/2010)
 ===================================
 

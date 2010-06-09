@@ -118,7 +118,7 @@ algo.rkiLatestTimepoint <- function(disProgObj, timePoint = NULL, control = list
         stop("The vector of observed is too short!")
   }
 
-  # construct the reference values
+  # Extract the reference values from the historic time series
   basevec <- c()
   # if actY == TRUE use also the values of the year of timepoint
   if(control$actY){
