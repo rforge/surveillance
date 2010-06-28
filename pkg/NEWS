@@ -1,5 +1,12 @@
-1.2-1 
-===================================
+1.2-2
+
+* Minor proof reading of documentation.
+
+* Added an argument "extraMSMargs" to the algo.hmm function.
+
+
+1.2-1 (uploaded to CRAN on 10/06/2010)
+======================================
 
 * Added algo.outbreakP (Frisen & Andersson, 2009) providing a
   semiparametric approach for outbreak detection for Poisson
@@ -31,7 +38,7 @@
 
 
 1.1-0 (uploaded on CRAN 14/10/2009)
-==================================
+===================================
 
 * Added the functions categoricalCUSUM and LRCUSUM.runlength
   for the CUSUM monitoring of general categorical time series
@@ -75,7 +82,7 @@
   handles objects of class Date.
 
 1.0-2 (released on CRAN 6 Mar 2009)
-===========================
+===================================
 
 * Negative Binomial CUSUM or the more general NegBin likelihood ratio
   detector is now implemented as part of algo.glrnb.

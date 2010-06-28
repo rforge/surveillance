@@ -71,14 +71,31 @@ calc.outbreakP.statistic <- function(x) {
     }
   }
 		
-  #Numerically more stable computation of the alarm statistic on log scale
-  logalarm <- 0
+  alarm.stat <- 1
   for (j in 1:n) {
-    logalarm = logalarm + x[j+1] * (log(yhat[j+1]) - log(xbar))
+    #Ensure 0/0 = 1 so we don't get NaNs
+    div <- ifelse(yhat[j+1]==0 & xbar==0, 1, yhat[j+1]/xbar)
+    alarm.stat <- alarm.stat * (div)^x[j+1]
   }
+  return(alarm.stat)
 
-  #Done, return the value  
-  return(exp(logalarm))
+##  logalarm <- 0
+##  for (j in 1:n) {
+##     #Eqn (5) in Frisen et al paper in log form. However: it is undefined
+##     #what happens if \hat{\mu}^D(t) == 0 (it is a division by zero). 
+##     #We fix 0/0 = 1
+##     if (xbar != 0) {
+##       if (yhat[j+1] != 0) { #if \hat{\mu}^{C1} == 0 then
+##         logalarm = logalarm + x[j+1] * (log(yhat[j+1]) - log(xbar))
+##       }
+##     } else {
+##       if (yhat[j+1] != 0) {
+##         stop("Division by zero in Eqn (5) of Frisen paper!")
+##       }
+##     }
+##  }
+##  #Done, return the value  
+##  return(exp(logalarm))
 }
 
 ######################################################################

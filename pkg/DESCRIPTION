@@ -1,7 +1,7 @@
 Package: surveillance
 Title: Modeling and monitoring discrete response time series
-Version: 1.2-1
-Date: 2010-05-25
+Version: 1.2-2
+Date: 2010-06-11
 Author: M. Höhle with contributions from T. Correa, M. Hofmann, C. Lang, M. Paul, A. Riebler, S. Steiner, M. Virtanen and V. Wimmer
 Depends: methods,utils,xtable,spc,sp,maptools,vcd,msm,Matrix
 Suggests: RUnit,digest,coda,gamlss,splancs

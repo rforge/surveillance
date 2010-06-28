@@ -3,9 +3,12 @@
 \alias{algo.glrnb}
 \encoding{latin1}
 
-\title{Cound data regression charts}
+\title{Count data regression charts}
 \description{
- Count data regression charts for the monitoring of surveillance time series.
+  %
+  Cumulative sum count data regression charts for the monitoring of
+  surveillance time series.
+ %
 }
 \usage{
 algo.glrnb(disProgObj,control = list(range=range,c.ARL=5, 
