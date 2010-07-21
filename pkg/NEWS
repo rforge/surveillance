@@ -4,6 +4,13 @@
 
 * Added an argument "extraMSMargs" to the algo.hmm function.
 
+* Fixed bug in outbreakP when having observations equal to zero
+  in the beginning. Here, \hat{\mu}^{C1} in (5) of Frisen et al (2008)
+  is zero and hence the log-based summation in the code failed. 
+  Changed to product as in the original code, which however might be
+  less numerically stable.
+  
+
 
 1.2-1 (uploaded to CRAN on 10/06/2010)
 ======================================
