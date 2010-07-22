@@ -24,7 +24,7 @@
 
 
 stcd <- function(x, y,t,radius,epsilon,areaA, areaAcapBk, threshold,cusum=FALSE) {
-  #check that x,y,t are of the same length.
+  #check that the vectors x,y,t are of the same length.
   n <- length(x)
   if ((length(y) != n) | (length(t) != n)) {
     stop("Vectors x,y,t not of same size.")
@@ -40,7 +40,7 @@ stcd <- function(x, y,t,radius,epsilon,areaA, areaAcapBk, threshold,cusum=FALSE)
   res$idxCC <- res$idxCC+1
   
   #Missing: compute which indices are part of the cluster.
-  #Thais
+  #--> Thais R-code
   
-  return(list(R=res$R,idxFA=res$idxFA+1,idxCC=res$idxCC+1))
+  return(list(R=res$R,idxFA=res$idxFA,idxCC=res$idxCC))
 }

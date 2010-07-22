@@ -1,6 +1,6 @@
 1.2-2
 
-* Minor proof reading of documentation.
+* Minor proof-reading of the documentation.
 
 * Added an argument "extraMSMargs" to the algo.hmm function.
 
@@ -10,7 +10,9 @@
   Changed to product as in the original code, which however might be
   less numerically stable.
   
-
+* Fixed bug in stcd which added one to the calculated index of idxFA and idxCC.
+  Thanks to Thais Rotsen Correa for pointing this out.
+  
 
 1.2-1 (uploaded to CRAN on 10/06/2010)
 ======================================
