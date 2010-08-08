@@ -441,7 +441,9 @@ ri <- function(type=c("iid","car")[1],
   } else if(type=="car"){
     # construct penalty matrix K
     K <- nhood(sts)
+    # check neighbourhood matrix (should contain "1" if i~j and "0" otherwise
     if(any(is.na(K))) stop("neighbourhood matrix contains NA\'s")
+    if(!all(K %in% c(0,1))) stop("neighbourhood matrix must contain elements 1 for neighbours and 0 otherwise")
     # number of neighbours
     ne <- colSums(K)
     K <- -1*K
@@ -1885,7 +1887,7 @@ updateRegression <- function(theta,sd.corr,model=model,
     if(is.null(trace)) trace <- 1
     res <- nlminb(start=theta, objective=ll, gradient=gr, hessian=penFisher, 
                   sd.corr=sd.corr,model=model, 
-                  control=list(trace=trace,abs.tol=1e-20,rel.tol=1e-10,x.tol=1.5e-8, iter.max=50), 
+                  control=list(trace=trace,abs.tol=1e-20,rel.tol=1e-10,x.tol=1.5e-8, iter.max=15), 
                   lower=lowerBound,
                   scale=scale,...)
     theta.new <- res$par
@@ -1944,7 +1946,7 @@ updateVariance <- function(sd.corr,theta,model, control=list(scoreTol=1e-5, para
     if(is.null(trace)) trace <- 1
     res <- nlminb(start=sd.corr, objective=ll, gradient=gr, hessian=marFisher,
                  theta=theta, model=model,
-                 control=list(trace=trace),scale=scale,...)
+                 control=list(trace=trace, iter.max=15),scale=scale,...)
     sd.corr.new <- res$par
     ll <- -res$objective
   } else if(method == "nlm"){
