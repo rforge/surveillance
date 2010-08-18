@@ -2,7 +2,7 @@
 ### chunk number 1: 
 ###################################################
 
-algo.hmm <- function(disProgObj, control = list(range=range, Mtilde=-1, noStates=2, trend=TRUE, noHarmonics=1,covEffectEqual=FALSE, saveHMMs = FALSE )){
+algo.hmm <- function(disProgObj, control = list(range=range, Mtilde=-1, noStates=2, trend=TRUE, noHarmonics=1,covEffectEqual=FALSE, saveHMMs = FALSE, extraMSMargs=list() )){
 
   # Set the default values if not yet set
   if(is.null(control$Mtilde)){ control$Mtilde <- -1 }

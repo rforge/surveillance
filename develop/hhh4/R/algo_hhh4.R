@@ -28,7 +28,7 @@ algo.hhh4 <- function(stsObj,
                subset = 2:nrow(stsObj),             # typically 2:nrow(obs) if model contains autoregression
                optimizer = list(tech = "nlminb",    # details for used optimizer (nlminb is default, optim may also be used)
                                 stop.tol = 1e-5,
-                                stop.niter = 50),
+                                stop.niter = 100),
                verbose = FALSE,
                start=list(fixed=NULL,random=NULL,sd.corr=NULL), # list with initials, overrides any initial values in formulas
                envir = .GlobalEnv     # environment where all covariates are contained (this needs some work)

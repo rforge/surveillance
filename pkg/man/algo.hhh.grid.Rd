@@ -48,16 +48,14 @@ algo.hhh.grid(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
 \item{maxTime}{maximum of time (in seconds) to elapse until algorithm stopps.}
 }
 
-\value{\item{ahg}{Returns an object of class \code{ahg} with elements 
-    \itemize{
-          \item{best}{result of a call to \code{algo.hhh} with highest likelihood } 
-          \item{allLoglik}{values of loglikelihood for all starting values used}
-          \item{gridSize}{number of different starting values in thetastartMatrix}
-          \item{gridUsed}{number of used starting values}
-          \item{time}{elapsed time}
-          \item{convergence}{if \code{false} \code{algo.hhh} did not converge
-              for all (used) starting values}
-    }} 
+\value{Returns an object of class \code{ahg} with elements 
+    \item{best}{result of a call to \code{algo.hhh} with highest likelihood } 
+    \item{allLoglik}{values of loglikelihood for all starting values used}
+    \item{gridSize}{number of different starting values in thetastartMatrix}
+    \item{gridUsed}{number of used starting values}
+    \item{time}{elapsed time}
+    \item{convergence}{if \code{false} \code{algo.hhh} did not converge
+        for all (used) starting values}
 }
 
 \seealso{\code{\link{meanResponse}},\code{\link{create.grid}},\code{\link{algo.hhh}}}
@@ -66,14 +64,14 @@ algo.hhh.grid(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
 \dontrun{
 ## monthly counts of menigococcal infections in France
 data(meningo.age)
-				
+            
 # specify model for algo.hhh.grid
 model1 <- list(lambda=TRUE)
 
 # create grid of inital values
 grid1 <- create.grid(meningo.age, model1, 
                      params = list(epidemic=c(0.1,0.9,5)))
-							
+                     
 # try multiple starting values, print progress information
 algo.hhh.grid(meningo.age, control=model1, thetastartMatrix=grid1,
                verbose=TRUE)
@@ -85,7 +83,7 @@ grid2 <- create.grid(meningo.age, model2,
                      params = list(epidemic=c(0.1,0.9,3), 
                                    endemic=c(-0.5,0.5,3), 
                                    negbin = c(0.3, 12, 10)))
-											
+                                 
 # run algo.hhh.grid, search time is limited to 30 sec
 algo.hhh.grid(meningo.age, control=model2, thetastartMatrix=grid2,
               maxTime=30)
@@ -116,10 +114,18 @@ model2 <- list(lambda=c(1,1), neighbours=c(NA,0),
 algo.hhh.grid(influMen, control=model2, thetastartMatrix=grid, maxTime=30)
 }
 }
-\keyword{misc}
-\source{Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework for the 
-    analysis of multivariate infectious disease surveillance counts. 
-    \emph{Statistical Modelling}, \bold{5}, p. 187--199.}
+\keyword{ts}
+\keyword{regression}
+\references{
+  Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework 
+    for the analysis of multivariate infectious disease surveillance counts, 
+    Statistical Modelling, \bold{5}, 187--199.
+    
+  Paul, M., Held, L. and Toschke, A. M. (2008) Multivariate modelling of 
+    infectious disease surveillance data, Statistics in Medicine, \bold{27}, 
+    6250--6267.    
+}
+
 
 
 % create.grid

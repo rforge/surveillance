@@ -6,12 +6,16 @@
 # lag.range =c(lag.neg, lag.pos) 
 #  i.e. (1,0) for t-1,t (DEFAULT)
 #       (2,2) for t-2,t-1,t,t+1,t+2
-algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE, 
-   linear=FALSE, nseason=0,
-   negbin=c("none", "single", "multiple"), 
-   proportion=c("none", "single", "multiple"),
-   lag.range=NULL),
-               thetastart=NULL, verbose=TRUE){
+algo.hhh <- function(disProgObj, 
+                     control=list(lambda=TRUE, 
+                                  neighbours=FALSE, 
+                                  linear=FALSE, 
+                                  nseason=0,
+                                  negbin=c("none", "single", "multiple"), 
+                                  proportion=c("none", "single", "multiple"),
+                                  lag.range=NULL),
+                     thetastart=NULL, 
+                     verbose=TRUE){
         
   #Convert sts objects
   if (class(disProgObj) == "sts") disProgObj <- sts2disProg(disProgObj)
@@ -77,8 +81,9 @@ algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
   
   # check neighbourhood matrix if neighbours=TRUE or proportion!="none"
   if(sum(!is.na(control$neighbours))>0 | control$proportion != "none"){
-    if(any(is.na(disProgObj$neighbourhood)))
-    stop("No correct neighbourhood matrix given\n")
+    # is there a neighbourhood matrix?
+    if(is.null(disProgObj$neighbourhood)) stop("No neighbourhood matrix is provided\n")
+    if(any(is.na(disProgObj$neighbourhood))) stop("No correct neighbourhood matrix given\n")
   }
 
   #make "design" matrices
@@ -1478,12 +1483,12 @@ gradient <- function(theta,designRes){
         grSeason[j-(designRes$dimTheta$trend>0),(j > (2*control$nseason)+(designRes$dimTheta$trend>0))] <- NA
       }  
       # gradient now is in order sin(omega_1)_A, sin(omega_1)_B, sin(omega_1)_C, ...  
-      #									cos(omega_1)_A, cos(omega_1)_B, cos(omega_1)_C, ...
-      #									sin(omega_2)_A, sin(omega_2)_B, sin(omega_2)_C, ...  
-      #									...
+      #                          cos(omega_1)_A, cos(omega_1)_B, cos(omega_1)_C, ...
+      #                          sin(omega_2)_A, sin(omega_2)_B, sin(omega_2)_C, ...  
+      #                          ...
       # and needs to be in the following order:
-      # 		sin(omega_1)_A, cos(omega_1)_A, sin(omega_2)_A, ..., cos(omega_S.max)_A
-      # 		sin(omega_1)_B, cos(omega_1)_B, sin(omega_2)_B, ..., cos(omega_S.max)_B
+      #     sin(omega_1)_A, cos(omega_1)_A, sin(omega_2)_A, ..., cos(omega_S.max)_A
+      #     sin(omega_1)_B, cos(omega_1)_B, sin(omega_2)_B, ..., cos(omega_S.max)_B
   
       # remove NA's, i.e. only derivatives for {gamma_{ij}: j <=2*S_i}
       # check if there are any NaN's
@@ -1706,14 +1711,7 @@ getLambda <- function(theta.epidemic, designRes, t.weights=1){
     else return(NULL)
   }
   
-  nhood <- designRes$disProgObj$neighbourhood
-  # time-varying weights w_ji
-  if(length(dim(nhood))==3)
-    nhood <- nhood[,,t.weights]
-    
-  diag(nhood) <- 0
-  nareas <- ncol(nhood)
-  nOfNeighbours <- colSums(nhood>0)
+   nareas <- ncol(designRes$Y) #ncol(nhood)
   
   if(designRes$control$proportion=="none"){
     # no lambda
@@ -1730,6 +1728,16 @@ getLambda <- function(theta.epidemic, designRes, t.weights=1){
     Lambda <- diag(lambda,nareas)
     
     if(dimPhi>0){
+      # extract neighbourhood, i.e. weight matrix
+      nhood <- designRes$disProgObj$neighbourhood
+      # time-varying weights w_ji
+      if(length(dim(nhood))==3)
+        nhood <- nhood[,,t.weights]
+      
+      # ensure the diagonal is zero
+      diag(nhood) <- 0
+      nOfNeighbours <- colSums(nhood>0)
+    
       # single phi for all units
       if(length(designRes$control$neighbours)==1 & sum(!is.na(designRes$control$neighbours))==1){
         phi <-rep(coef.phi,nareas)
@@ -1737,7 +1745,7 @@ getLambda <- function(theta.epidemic, designRes, t.weights=1){
         phi <- rep(0,nareas)
         phi[!is.na(designRes$control$neighbours)] <- coef.phi
       }  
-      phi.weights <- matrix(phi,nrow=nareas,ncol=nareas,byrow=FALSE)*nhood#designRes$disProgObj$neighbourhood
+      phi.weights <- matrix(phi,nrow=nareas,ncol=nareas,byrow=FALSE)*nhood
       Lambda[nhood>0] <- phi.weights[nhood>0]
     }
 
@@ -1764,18 +1772,18 @@ expAlpha.mm <- function(Lambda,Y){
 
 ########
 logLik.ah <- function(object,...){
-	if(!inherits(object, "ah"))
-		stop("expected object to be an object of class ah\n")
-	if(!object$convergence)
-		stop("algorithm did not converge\n")
-	val <- object$loglikelihood
-	attr(val, "df") <- length(coef(object))
-	attr(val, "nobs") <- object$nObs
-	class(val) <- "logLik"
-	return(val)
+   if(!inherits(object, "ah"))
+      stop("expected object to be an object of class ah\n")
+   if(!object$convergence)
+      stop("algorithm did not converge\n")
+   val <- object$loglikelihood
+   attr(val, "df") <- length(coef(object))
+   attr(val, "nobs") <- object$nObs
+   class(val) <- "logLik"
+   return(val)
 }
 logLik.ahg <- function(object, ...){
-	logLik.ah(object$best)
+   logLik.ah(object$best)
 }
 
 

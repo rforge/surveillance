@@ -47,8 +47,7 @@ algo.hhh(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
   \item{verbose}{if \code{true} information about convergence is printed}
 
 }
-\value{\item{ahg}{Returns an object of class \code{ah} with elements 
-  \itemize{
+\value{Returns an object of class \code{ah} with elements 
     \item{coefficients}{estimated parameters}
     \item{se}{estimated standard errors}
     \item{cov}{covariance matrix}
@@ -59,10 +58,14 @@ algo.hhh(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
     \item{disProgObj}{specified \code{disProg}-object}
     \item{lag}{which lag was used for the autoregressive parameters \eqn{lambda} and \eqn{phi} }
     \item{nObs}{number of observations used for fitting the model}
-    }
-  }
 }
-\details{Note that for the time being this function is not a surveillance algorithm, but only a modelling approach as described in the Held et. al (2005) paper.}
+\details{
+
+Note that for the time being this function is not a surveillance algorithm, 
+but only a modelling approach as described in the papers by Held et. al (2005)  
+and Paul et. al (2008).
+
+}
 \seealso{\code{\link{meanResponse}}}
 \author{M. Paul, L. Held, M. \enc{Höhle}{Hoehle}}
 \examples{
@@ -124,9 +127,16 @@ algo.hhh(influMen, control=model2)
 }
 \keyword{ts}
 \keyword{regression}
-\source{Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework for the 
-    analysis of multivariate infectious disease surveillance counts. 
-    \emph{Statistical Modelling}, \bold{5}, p. 187--199.}
+\references{
+  Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework 
+    for the analysis of multivariate infectious disease surveillance counts, 
+    Statistical Modelling, \bold{5}, 187--199.
+    
+  Paul, M., Held, L. and Toschke, A. M. (2008) Multivariate modelling of 
+    infectious disease surveillance data, Statistics in Medicine, \bold{27}, 
+    6250--6267.    
+
+}
 
 
 <<echo=FALSE>>=
@@ -135,12 +145,16 @@ algo.hhh(influMen, control=model2)
 # lag.range =c(lag.neg, lag.pos) 
 #  i.e. (1,0) for t-1,t (DEFAULT)
 #       (2,2) for t-2,t-1,t,t+1,t+2
-algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE, 
-   linear=FALSE, nseason=0,
-   negbin=c("none", "single", "multiple"), 
-   proportion=c("none", "single", "multiple"),
-   lag.range=NULL),
-               thetastart=NULL, verbose=TRUE){
+algo.hhh <- function(disProgObj, 
+                     control=list(lambda=TRUE, 
+                                  neighbours=FALSE, 
+                                  linear=FALSE, 
+                                  nseason=0,
+                                  negbin=c("none", "single", "multiple"), 
+                                  proportion=c("none", "single", "multiple"),
+                                  lag.range=NULL),
+                     thetastart=NULL, 
+                     verbose=TRUE){
         
   #Convert sts objects
   if (class(disProgObj) == "sts") disProgObj <- sts2disProg(disProgObj)
@@ -206,8 +220,9 @@ algo.hhh<-function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
   
   # check neighbourhood matrix if neighbours=TRUE or proportion!="none"
   if(sum(!is.na(control$neighbours))>0 | control$proportion != "none"){
-    if(any(is.na(disProgObj$neighbourhood)))
-    stop("No correct neighbourhood matrix given\n")
+    # is there a neighbourhood matrix?
+    if(is.null(disProgObj$neighbourhood)) stop("No neighbourhood matrix is provided\n")
+    if(any(is.na(disProgObj$neighbourhood))) stop("No correct neighbourhood matrix given\n")
   }
 
   #make "design" matrices
@@ -413,16 +428,14 @@ algo.hhh.grid(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
 \item{maxTime}{maximum of time (in seconds) to elapse until algorithm stopps.}
 }
 
-\value{\item{ahg}{Returns an object of class \code{ahg} with elements 
-    \itemize{
-          \item{best}{result of a call to \code{algo.hhh} with highest likelihood } 
-          \item{allLoglik}{values of loglikelihood for all starting values used}
-          \item{gridSize}{number of different starting values in thetastartMatrix}
-          \item{gridUsed}{number of used starting values}
-          \item{time}{elapsed time}
-          \item{convergence}{if \code{false} \code{algo.hhh} did not converge
-              for all (used) starting values}
-    }} 
+\value{Returns an object of class \code{ahg} with elements 
+    \item{best}{result of a call to \code{algo.hhh} with highest likelihood } 
+    \item{allLoglik}{values of loglikelihood for all starting values used}
+    \item{gridSize}{number of different starting values in thetastartMatrix}
+    \item{gridUsed}{number of used starting values}
+    \item{time}{elapsed time}
+    \item{convergence}{if \code{false} \code{algo.hhh} did not converge
+        for all (used) starting values}
 }
 
 \seealso{\code{\link{meanResponse}},\code{\link{create.grid}},\code{\link{algo.hhh}}}
@@ -481,10 +494,18 @@ model2 <- list(lambda=c(1,1), neighbours=c(NA,0),
 algo.hhh.grid(influMen, control=model2, thetastartMatrix=grid, maxTime=30)
 }
 }
-\keyword{misc}
-\source{Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework for the 
-    analysis of multivariate infectious disease surveillance counts. 
-    \emph{Statistical Modelling}, \bold{5}, p. 187--199.}
+\keyword{ts}
+\keyword{regression}
+\references{
+  Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework 
+    for the analysis of multivariate infectious disease surveillance counts, 
+    Statistical Modelling, \bold{5}, 187--199.
+    
+  Paul, M., Held, L. and Toschke, A. M. (2008) Multivariate modelling of 
+    infectious disease surveillance data, Statistics in Medicine, \bold{27}, 
+    6250--6267.    
+}
+
 
 <<echo=FALSE>>=
 algo.hhh.grid <- function(disProgObj, control=list(lambda=TRUE,neighbours=FALSE, 
@@ -898,8 +919,9 @@ loglikelihood <- function(theta, designRes){
 \title{Calculate mean response needed in algo.hhh}
 \description{
         Calculates the mean response for the model specified in designRes 
-        according to equations (1.2) and (1.1) in Held et al., 2005
-        for univariate time series and equations (3.3) and (3.2) (with extensions)
+        according to equations (1.2) and (1.1) in Held et al. (2005)
+        for univariate time series and equations (3.3) and (3.2) (with extensions
+        given in equations (2) and (4) in Paul et al., 2008)
         for multivariate time series. See details.
 }
 \usage{
@@ -985,9 +1007,17 @@ meanResponse(theta, designRes)
 
 \keyword{models}
 
-\source{Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework for the 
-    analysis of multivariate infectious disease surveillance counts. 
-    \emph{Statistical Modelling}, \bold{5}, p. 187--199.}
+\references{
+  Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework 
+    for the analysis of multivariate infectious disease surveillance counts, 
+    Statistical Modelling, \bold{5}, 187--199.
+    
+  Paul, M., Held, L. and Toschke, A. M. (2008) Multivariate modelling of 
+    infectious disease surveillance data, Statistics in Medicine, \bold{27}, 
+    6250--6267.    
+
+}
+
 
 <<echo=FALSE>>=
 meanResponse <- function(theta, designRes){
@@ -2246,14 +2276,7 @@ getLambda <- function(theta.epidemic, designRes, t.weights=1){
     else return(NULL)
   }
   
-  nhood <- designRes$disProgObj$neighbourhood
-  # time-varying weights w_ji
-  if(length(dim(nhood))==3)
-    nhood <- nhood[,,t.weights]
-    
-  diag(nhood) <- 0
-  nareas <- ncol(nhood)
-  nOfNeighbours <- colSums(nhood>0)
+   nareas <- ncol(designRes$Y) #ncol(nhood)
   
   if(designRes$control$proportion=="none"){
     # no lambda
@@ -2270,6 +2293,16 @@ getLambda <- function(theta.epidemic, designRes, t.weights=1){
     Lambda <- diag(lambda,nareas)
     
     if(dimPhi>0){
+      # extract neighbourhood, i.e. weight matrix
+      nhood <- designRes$disProgObj$neighbourhood
+      # time-varying weights w_ji
+      if(length(dim(nhood))==3)
+        nhood <- nhood[,,t.weights]
+      
+      # ensure the diagonal is zero
+      diag(nhood) <- 0
+      nOfNeighbours <- colSums(nhood>0)
+    
       # single phi for all units
       if(length(designRes$control$neighbours)==1 & sum(!is.na(designRes$control$neighbours))==1){
         phi <-rep(coef.phi,nareas)
@@ -2277,7 +2310,7 @@ getLambda <- function(theta.epidemic, designRes, t.weights=1){
         phi <- rep(0,nareas)
         phi[!is.na(designRes$control$neighbours)] <- coef.phi
       }  
-      phi.weights <- matrix(phi,nrow=nareas,ncol=nareas,byrow=FALSE)*nhood#designRes$disProgObj$neighbourhood
+      phi.weights <- matrix(phi,nrow=nareas,ncol=nareas,byrow=FALSE)*nhood
       Lambda[nhood>0] <- phi.weights[nhood>0]
     }
 

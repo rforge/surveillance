@@ -1,3 +1,4 @@
+% algo.hhh
 \name{algo.hhh}
 \alias{algo.hhh}
 \alias{print.ah}
@@ -45,8 +46,7 @@ algo.hhh(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
   \item{verbose}{if \code{true} information about convergence is printed}
 
 }
-\value{\item{ahg}{Returns an object of class \code{ah} with elements 
-  \itemize{
+\value{Returns an object of class \code{ah} with elements 
     \item{coefficients}{estimated parameters}
     \item{se}{estimated standard errors}
     \item{cov}{covariance matrix}
@@ -57,10 +57,14 @@ algo.hhh(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
     \item{disProgObj}{specified \code{disProg}-object}
     \item{lag}{which lag was used for the autoregressive parameters \eqn{lambda} and \eqn{phi} }
     \item{nObs}{number of observations used for fitting the model}
-    }
-  }
 }
-\details{Note that for the time being this function is not a surveillance algorithm, but only a modelling approach as described in the Held et. al (2005) paper.}
+\details{
+
+Note that for the time being this function is not a surveillance algorithm, 
+but only a modelling approach as described in the papers by Held et. al (2005)  
+and Paul et. al (2008).
+
+}
 \seealso{\code{\link{meanResponse}}}
 \author{M. Paul, L. Held, M. \enc{Höhle}{Hoehle}}
 \examples{
@@ -73,7 +77,7 @@ salmonella <- create.disProg(week=1:length(salmonella.agona$observed),
 
 model1 <- list(lambda=TRUE, linear=TRUE, 
                nseason=1, negbin="single")
-					
+               
 algo.hhh(salmonella, control=model1)
 
 # multivariate time series: 
@@ -122,10 +126,18 @@ algo.hhh(influMen, control=model2)
 }
 \keyword{ts}
 \keyword{regression}
-\source{Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework for the 
-    analysis of multivariate infectious disease surveillance counts. 
-    \emph{Statistical Modelling}, \bold{5}, p. 187--199.}
+\references{
+  Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework 
+    for the analysis of multivariate infectious disease surveillance counts, 
+    Statistical Modelling, \bold{5}, 187--199.
+    
+  Paul, M., Held, L. and Toschke, A. M. (2008) Multivariate modelling of 
+    infectious disease surveillance data, Statistics in Medicine, \bold{27}, 
+    6250--6267.    
+
+}
 
 
 
 % algo.hhh.grid
+

@@ -5,7 +5,7 @@
 \description{ 
   %
   This function implements on-line HMM detection of outbreaks based on
-  the retrospective procedure described in Le Strat and Carret (1999).
+  the retrospective procedure described in Le Strat and Carrat (1999).
   Using the function \code{msm} (library \code{msm}) a specified HMM
   is estimated, the decoding problem, i.e. the most probable state
   configuration, is found by the Viterbi algorithm and the most
@@ -142,7 +142,7 @@ table(tab[,1],tab[,2])
 
 <<echo=F>>=
 
-algo.hmm <- function(disProgObj, control = list(range=range, Mtilde=-1, noStates=2, trend=TRUE, noHarmonics=1,covEffectEqual=FALSE, saveHMMs = FALSE )){
+algo.hmm <- function(disProgObj, control = list(range=range, Mtilde=-1, noStates=2, trend=TRUE, noHarmonics=1,covEffectEqual=FALSE, saveHMMs = FALSE, extraMSMargs=list() )){
 
   # Set the default values if not yet set
   if(is.null(control$Mtilde)){ control$Mtilde <- -1 }
