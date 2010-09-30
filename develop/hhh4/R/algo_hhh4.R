@@ -1,5 +1,5 @@
 ########################################################################
-## algo.hhh4 is an extended version of algo.hhh for the sts-class
+## hhh4 is an extended version of algo.hhh for the sts-class
 ## The function allows the incorporation of random effects and covariates.
 ########################################################################
 
@@ -8,7 +8,7 @@
 # - formula formulation is experimental and not yet implemented in full generality 
 # - do some profiling...
 
-algo.hhh4 <- function(stsObj, 
+hhh4 <- function(stsObj, 
    control = list(
                ar = list(f = ~ -1,        # a formula " exp(x'lamba)*y_t-1 " (ToDo: or a matrix " Lambda %*% y_t-1 ")
                          lag = 1,         # autoregression on y_i,t-lag (currently not used)
@@ -20,8 +20,8 @@ algo.hhh4 <- function(stsObj,
                          weights = NULL,  # weights w_ji, if NULL neighbourhood matrix of stsObj is used
                          initial = NULL   # vector with initial values for parameter if pred = ~1 (not really used ATM)
                          ),
-               end = list(f = ~ 1,         # a formula " exp(x'nu) * n_ij "
-                          offset = NULL,   # optional offset n_ij
+               end = list(f = ~ 1,         # a formula " exp(x'nu) * n_it "
+                          offset = NULL,   # optional offset n_it
                           initial = NULL   # vector with initial values for parameter if pred = ~1 (not really used ATM)
                           ),
                family = c("Poisson","NegBin1","NegBinM")[1],
@@ -31,12 +31,18 @@ algo.hhh4 <- function(stsObj,
                                 stop.niter = 100),
                verbose = FALSE,
                start=list(fixed=NULL,random=NULL,sd.corr=NULL), # list with initials, overrides any initial values in formulas
-               envir = .GlobalEnv     # environment where all covariates are contained (this needs some work)
+               data=data.frame(t=epoch(sts)-1)    # data.frame or named list with covariates that are specified in the formulas for the 3 components
                )
    ){
         
   #Convert sts objects
   if(inherits(stsObj, "disProg")) stsObj <- disProg2sts(stsObj)
+  
+  if(is.null(control$data)){
+    control$data <- list(.sts=stsObj, t=epoch(stsObj)-1)
+  } else {  # coerce to list
+    control$data <- modifyList(list(.sts=stsObj),as.list(control$data))
+  }
 
   #set default values (if not provided in control)
   control <- setControl(control, stsObj)
@@ -162,9 +168,6 @@ algo.hhh4 <- function(stsObj,
 ## set default values for model specifications in control
 setControl <- function(control, stsObj){
   
-  #Convert to sts objects
-  if (inherits(stsObj, "disProg")) stsObj <- disProg2sts(stsObj)
-  
   nTime <- nrow(stsObj)
   nUnits <- ncol(stsObj)
   
@@ -244,7 +247,7 @@ setControl <- function(control, stsObj){
     
     # if no weight is specified, the nhood-matrix of the stsObj is used
     if(is.null(control$ne$weights)){
-      w <- nhood(stsObj)
+      w <- neighbourhood(stsObj)
       diag(w) <- 0
       control$ne$weights <- w
     }
@@ -285,10 +288,10 @@ setControl <- function(control, stsObj){
     control$subset <- 2:nTime
   }
         
-  if(is.null(control[["optimizer", exact=TRUE]])) control$optimizer <- list(tech="nlminb", stop.tol=1e-6,stop.niter=50)
+  if(is.null(control[["optimizer", exact=TRUE]])) control$optimizer <- list(tech="nlminb", stop.tol=1e-5,stop.niter=100)
   if(is.null(control$optimizer[["tech", exact=TRUE]])) control$optimizer$tech <- "nlminb"
-  if(is.null(control$optimizer[["stop.tol", exact=TRUE]])) control$optimizer$stop.tol <- 1e-6
-  if(is.null(control$optimizer[["stop.niter", exact=TRUE]])) control$optimizer$stop.niter <-50
+  if(is.null(control$optimizer[["stop.tol", exact=TRUE]])) control$optimizer$stop.tol <- 1e-5
+  if(is.null(control$optimizer[["stop.niter", exact=TRUE]])) control$optimizer$stop.niter <-100
 
   if(is.null(control[["verbose",exact=TRUE]]))
     control$verbose <- FALSE
@@ -305,16 +308,7 @@ setControl <- function(control, stsObj){
       control$start$sd.corr <- NULL 
   }
   
-  if(is.null(control[["envir",exact=TRUE]]))
-    control$envir <- .GlobalEnv
-    
-  ##* This is a temporary solution, some work is needed here
-  # make sure stsObj is in environment
-  if(exists(".sts", envir=control$envir)) {
-    cat("WARNING: object \'.sts\' overwritten\n")
-  }
-  assign(".sts", stsObj, envir=control$env)
-         
+        
   control$nTime <- nTime
   control$nUnits <- nUnits
 
@@ -337,9 +331,9 @@ isInModel <- function(formula, name=deparse(substitute(formula))){
 # used to incorporate covariates and unit-specific effects
 fe <- function(x,          # covariate 
                which=NULL, # Null= overall, vector with booleans = unit-specific
-               initial=NULL, # vector of inital values for parameters
-               sts=.sts
+               initial=NULL # vector of inital values for parameters
                ){
+  sts <- get("env",parent.frame(1))$.sts
   nTime <- nrow(sts)
   nUnits <- ncol(sts)
                
@@ -420,9 +414,12 @@ fe <- function(x,          # covariate
 ri <- function(type=c("iid","car")[1], 
                corr=c("none","all")[1],
                initial.var=NULL,  # initial value for variance
-               initial.re=NULL, 
-               sts=.sts){
+               initial.re=NULL 
+               ){
   x <- 1
+  
+  sts <- get("env",parent.frame(1))$.sts
+  
   type <- match.arg(type, c("iid","car"))
   corr <- match.arg(corr, c("none","all"))
   corr <- switch(corr, 
@@ -440,7 +437,7 @@ ri <- function(type=c("iid","car")[1],
     
   } else if(type=="car"){
     # construct penalty matrix K
-    K <- nhood(sts)
+    K <- neighbourhood(sts)
     # check neighbourhood matrix (should contain "1" if i~j and "0" otherwise
     if(any(is.na(K))) stop("neighbourhood matrix contains NA\'s")
     if(!all(K %in% c(0,1))) stop("neighbourhood matrix must contain elements 1 for neighbours and 0 otherwise")
@@ -513,9 +510,17 @@ checkFormula <- function(f, env, component){
   if(!intercept.all & nVars==0) stop("formula",deparse(substitute(f)),"contains no variables\n")
   
   if(intercept.all){
-    res <- c(fe(1),list(offsetComp=component))
+    res <- c(eval(fe(1),envir=env),list(offsetComp=component))
   } else {
     res <- NULL
+  }
+  
+  # find out fixed effects without "fe()" specification
+  fe.raw <- grep("fe(*)|ri(*)", attr(term,"term.labels"), invert=TRUE)
+  # evaluate covariates
+  if(length(fe.raw)>0){
+    for(i in fe.raw)
+      res <- cbind(res, c(eval(substitute(fe(x), list(x=vars[[i+1]])),envir=env),list(offsetComp=component)))
   }
   
   # fixed effects
@@ -550,9 +555,9 @@ checkFormula <- function(f, env, component){
 # interpret and check the specifications of each component
 # control must contain all arguments, i.e. setControl was used
 interpretControl <- function(control, stsObj){
-  
+
   # get environment for evaluation of covariates
-  env <- control$envir
+  env <- control$data
    
   nTime <- nrow(stsObj)
   nUnits <- ncol(stsObj)
@@ -646,23 +651,27 @@ interpretControl <- function(control, stsObj){
   # check if a vector of initials is supplied
   if(!is.null(control$start$fixed)){
     if(length(control$start$fixed) != dim.fe+dim.overdisp)
-    stop("initial values in start$fixed must be of length",dim.fe+dim.overdisp,"\n")
+    stop("initial values in start$fixed must be of length ",dim.fe+dim.overdisp,"\n")
     
     initial.fe.overdisp <- control$start$fixed
   }
   if(!is.null(control$start$random)){
   if(length(control$start$random) != dim.re)
-    stop("initial values in start$random must be of length",dim.re,"\n")  
+    stop("initial values in start$random must be of length ",dim.re,"\n")  
     initial.re <- control$start$random
   }
   if(!is.null(control$start$sd.corr)){
   if(length(control$start$sd.corr) != dim.var+dim.corr)
-    stop("initial values in start$sd.corr must be of length",dim.var+dim.corr,"\n")  
+    stop("initial values in start$sd.corr must be of length ",dim.var+dim.corr,"\n")  
     initial.sd.corr <- control$start$sd.corr
   }
 
-
-  names(initial.fe.overdisp) <- c(names.fe,rep("overdisp",dim.overdisp))
+  if(dim.overdisp>1){
+    names.overdisp <- paste("overdisp", colnames(stsObj), sep=".")
+  } else {
+    names.overdisp <- rep("overdisp",dim.overdisp)  # dim.overdisp may be 0
+  }
+  names(initial.fe.overdisp) <- c(names.fe,names.overdisp)
   initial.theta <- c(initial.fe.overdisp,initial.re)
   names(initial.sd.corr) <- c(names.var,head(paste("corr",1:3,sep="."),dim.corr))
   
@@ -702,11 +711,16 @@ print.ah4 <- function(x,digits = max(3, getOption("digits") - 3),reparamPsi=TRUE
     }
     
     if(x$dim["random"]>0){
-      cat('\nRandom effects: \n\n')
-      print(round(cbind(Var=getCov(x)),digits=digits))
+      cat('\nRandom effects: \n')
+      V <- as.matrix(round(diag(getCov(x)),digits=digits))
+      corr <- round(getCov(x),digits=digits)
+      corr[upper.tri(corr,diag=TRUE)] <- ""
+      V.corr <- cbind(V,corr)
+      colnames(V.corr) <- c("Var","Corr",rep("",ncol(V.corr)-2))
+      print(noquote(V.corr))
     }
         
-    cat('\nFixed effects: \n\n')
+    cat('\n\nFixed effects: \n')
     coefs <- rbind(coefficients(x, se=TRUE,reparamPsi=reparamPsi)[1:x$dim["fixed"],])
     
     print(round(cbind("Estimates"=coefs[,"Estimates"],
@@ -744,7 +758,7 @@ logLik.ah4 <- function(object,...){
 }
 
 
-coef.ah4 <- function(object,se=FALSE, reparamPsi=FALSE,...){
+coef.ah4 <- function(object,se=FALSE, reparamPsi=TRUE, idx2Exp=NULL, amplitudeShift=FALSE,...){
   coefs <- object$coefficients
   stdErr <- object$se
 
@@ -762,6 +776,32 @@ coef.ah4 <- function(object,se=FALSE, reparamPsi=FALSE,...){
     D <- diag(coefs[index],length(index))
     stdErr[index] <- sqrt(diag(D %*% object$cov[index,index] %*% t(D)))
   }
+  if(!is.null(idx2Exp)){
+    # extract coefficients on log-scale
+    exp.names <- names(coefs)[idx2Exp]
+    # change labels
+    names(coefs)[idx2Exp] <- paste("exp(",exp.names,")",sep="")
+    
+    # transform
+    coefs[idx2Exp] <- exp(coefs[idx2Exp])
+    D <- diag(coefs[idx2Exp],length(idx2Exp))
+    stdErr[idx2Exp] <- sqrt(diag(D %*% object$cov[idx2Exp,idx2Exp] %*% t(D)))
+  
+  }
+  
+  
+  if(amplitudeShift){
+    indexAS <- sort(c(grep(c(".sin"),names(coefs),fixed=TRUE),grep(c(".cos"),names(coefs),fixed=TRUE)))
+    namesSinCos <- names(coefs)[indexAS]
+    namesSinCos <- gsub(".sin",".A",namesSinCos)
+    namesSinCos <- gsub(".cos",".s",namesSinCos)
+    names(coefs)[indexAS] <- namesSinCos
+    coefs[indexAS] <- sinCos2amplitudeShift(coefs[indexAS])
+    D <- jacobianAmplitudeShift(coefs[indexAS])
+    cov <- D %*% object$cov[indexAS,indexAS] %*% t(D)
+    stdErr[indexAS] <- sqrt(diag(cov))
+  }
+
   if(se)
     return(cbind("Estimates"=coefs,"Std. Error"=stdErr))
   else
@@ -791,6 +831,8 @@ getCov <- function(x){
   Sigma <- x$Sigma
   corr <- cov2cor(Sigma)
   diag(corr) <- diag(Sigma)
+  rownames(corr) <- colnames(corr) <- gsub("sd.","",names(x$Sigma.orig))[grep("sd.",names(x$Sigma.orig))]
+
   return(corr)
 }
 
@@ -952,7 +994,7 @@ penLogLik <- function(theta, sd.corr, model){
   overdispParam <- exp(pars$overdisp)
     
   if(model$nOverdisp > 1) {
-    overdispParam <- matrix(overdispParam,ncol=model$nUnits, nrow=model$nTime, byrow=TRUE)
+    overdispParam <- matrix(overdispParam,ncol=model$nUnits, nrow=model$nTime, byrow=TRUE)[model$subset,,drop=FALSE]
   }
   
   mu <- meanHHH(theta=theta, model=model)$mean
@@ -1014,7 +1056,7 @@ penScore <- function(theta, sd.corr, model){
   #ensure overdispersion param is positive
   psi <- exp(pars$overdisp)
   if(model$nOverdisp > 1) {
-    psi <- matrix(overdispParam,ncol=model$nUnits, nrow=model$nTime, byrow=TRUE)
+    psi <- matrix(psi,ncol=model$nUnits, nrow=model$nTime, byrow=TRUE)[subset,,drop=FALSE]
   }
   #random effects
   randomEffects <- pars$random
@@ -1157,7 +1199,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
   #ensure overdispersion param is positive
   psi <- exp(pars$overdisp)
   if(model$nOverdisp > 1) {
-    psi <- matrix(overdispParam,ncol=model$nUnits, nrow=model$nTime, byrow=TRUE)
+    psi <- matrix(psi,ncol=model$nUnits, nrow=model$nTime, byrow=TRUE)[subset,,drop=FALSE]
   }
   #random effects
   randomEffects <- pars$random
@@ -1990,7 +2032,6 @@ fitHHH <- function(theta,sd.corr,model, control=list(tol=1e-5,niter=15),
   dimRE <- model$nRE
   
   
-  if(0) plot(theta,pch=19,col=2,ylim=c(-1,1))
   while(convergence != 0 & (i< control$niter)){
     i <- i+1
     # update regression coefficients
@@ -2194,13 +2235,170 @@ newtonRaphson <- function(x,fn,..., control=list(scoreTol=1e-5, paramTol=1e-8,F.
 }
 
 # neighbourhood matrix slot 
-if(!isGeneric("nhood")) setGeneric("nhood", function(x) standardGeneric("nhood"))
-setMethod("nhood", "sts", function(x) {
+if(!isGeneric("neighbourhood")) setGeneric("neighbourhood", function(x) standardGeneric("neighbourhood"))
+setMethod("neighbourhood", "sts", function(x) {
   return(x@neighbourhood)
 })
-setGeneric("nhood<-", function(x, value) standardGeneric("nhood<-"))
-setReplaceMethod("nhood", "sts", function(x, value) {
+setGeneric("neighbourhood<-", function(x, value) standardGeneric("neighbourhood<-"))
+setReplaceMethod("neighbourhood", "sts", function(x, value) {
  x@neighbourhood <- value
  x
 })
+
+##############
+addSeason2formula <- function(f=~1,       # formula to start with
+                              S=1,         # number of sine/cosine pairs
+                              period=52
+                              ){
+  f <- deparse(f)
+  # create formula
+  if(max(S)>0 & length(S)==1){
+    for(i in 1:S){
+      f <- paste(f,"+sin(",2*i,"*pi*t/",period,")+cos(",2*i,"*pi*t/",period,")",sep="")
+    }
+  } else {
+    nSeason <- length(S)
+    for(i in 1:max(S)){
+      which <- paste(i <= S,collapse=",")
+      f <- paste(f,"+ fe( sin(",2*i,"*pi*t/",period,"), which=c(",which,")) + fe( cos(",2*i,"*pi*t/",period,"), which=c(",which,"))",sep="")
+    }
+  }
+  return(as.formula(f))
+}
+
+
+
+predict.ah4 <- function(object,newSubset=NULL,type=c("response","endemic","epi.own","epi.neighbours"),...){
+  type <- match.arg(type,c("response","endemic","epi.own","epi.neighbours"))
+  control <- object$control
+  
+  data <- object$stsObj
+  if(!is.null(newSubset)){
+    control$subset <- newSubset
+  }
+  
+  # predictions for "old" time points
+  model <- interpretControl(control, data)
+  coefs <- coef(object, reparamPsi=FALSE)
+  predicted <- meanHHH(coefs,model)
+
+  if(type=="response") result <-predicted$mean
+  else if(type=="endemic") result <- predicted$endemic
+  else if(type=="epi.own") result <- predicted$epi.own
+  else if(type=="epi.neighbours") result <- pedicted$epi.neighbours
+
+   return(result)
+  
+}
+
+
+
+oneStepAhead <- function(result, # result of call to hhh4
+                         tp,     # one-step-ahead predictions for time points (tp+1):nrow(stsObj)
+                         verbose=1){
+  
+  stsObj <- result$stsObj
+  model <- result$terms
+  control <- result$control
+  
+  # which model: negbin or poisson?
+  dimOverdisp <- model$nOverdisp
+  negbin <- dimOverdisp>0
+
+  nTime <- nrow(stsObj)
+  pred <- matrix(NA,nrow=length(tp:nTime)-1,ncol=ncol(stsObj))
+  psi <- matrix(NA,nrow=length(tp:nTime)-1,ncol=ifelse(dimOverdisp>1,ncol(stsOb),1))
+    
+  res <- resN <- result
+  coefs <- coef(res,reparamPsi=FALSE)
+  control.i<-control
+  
+  which <- 1
+  search2 <- function(i,which){
+    control.i$subset <- 2:i
+    
+    if(which==1){
+      #starting values of previous time point i-1
+      control.i$start <- list(fixed=fixef(res.old),random=ranef(res.old),sd.corr=getSdCorr(res.old))
+    } else {
+      #starting values of last time point
+      control.i$start <- list(fixed=fixef(resN),random=ranef(resN),sd.corr=getSdCorr(resN))
+    }
+    res <- hhh4(stsObj,control.i)  
+
+    return(res)
+  }
+  
+ 
+  # save value of log-likelihood (pen+mar) and parameter estimates
+  params <- matrix(NA,nrow=length(tp:nTime)-1,ncol=length(coef(res))+2)
+  # save values of estimated covariance
+  vars <- matrix(NA,nrow=length(tp:nTime)-1,ncol=model$nSigma)
+
+  # make one-step ahead prediction for time point tp+1
+  for(i in (tp):(nTime-1)) {
+      cat(nTime-i,"\n")
+      res.old <- res
+      
+      # fit model to data for time points 1,...,tp
+      # use initial values from previous fit or from fit to all
+      res <- search2(i, which=which)
+      
+      # check convergence        
+      # do a grid search in case of non-convergence ?
+      if(res$convergence){
+      # make one-step ahead prediction for time point tp+1
+        pred[i-tp+1,] <- tail(predict(res,newSubset=2:(i+1),type="response"),1)
+        params[i-tp+1,] <- c(res$loglikelihood,res$margll,coef(res,reparamPsi=FALSE))
+        vars[i-tp+1,] <- getSdCorr(res)
+        if(negbin)
+          psi[i-tp+1,] <- coef(res, reparamPsi=FALSE)[grep("overdisp",names(coef(res)))]
+      } else {
+        cat("NO convergence in iteration", i-tp,"\n")
+        res <- res.old
+      }
+  }
+   
+  return(list(mean=pred,psi=psi,params=params,variances=vars,x=observed(stsObj[(tp+1):nTime]),result=resN))
+
+}
+
+# plot estimated mean 
+# this needs to be made more customizable
+plot.ah4 <- function(x,i=1,ylim=NULL, ylab="No. infected",title=NULL,m=NULL,xlab="", col=c("grey30","grey60","grey85"),cex=.6,pch=19, legend=FALSE){
+
+  if(is.null(title))
+    title <-colnames(observed(x$stsOb))[i]
+
+  obs <- observed(x$stsObj)[-1,i]
+  
+  if(!is.null(ylim))
+    max <- ylim
+  else max <- c(-1/20*max(obs,na.rm=T), max(obs,na.rm=T))
+
+   start <- x$stsObj@start
+   start[2] <-  start[2]+1
+  plot(ts(obs,freq=x$stsObj@freq,start=start),ylim=max,ylab=ylab,type="n",las=1,xlab=xlab)
+  title(main=title,line=0.5)
+
+  if(is.null(m))
+    m <- meanHHH(coef(x,reparamPsi=FALSE),interpretControl(x$control,x$stsObj))
+  m$endemic[is.na(m$mean)] <- 0
+  m$epi.own[is.na(m$mean)] <- 0
+  m$mean[is.na(m$mean)] <- 0
+    
+  tp <- (1:(length(obs)))/x$stsObj@freq +x$stsObj@start[1] + x$stsObj@start[2]/x$stsObj@freq
+  if(!is.null(dim(as.matrix(m$epidemic)))) {
+    polygon(c(tp[1],tp,tail(tp,1)),c(0,as.matrix(m$mean)[,i],0),col=col[1],border=col[1])
+    if(!is.null(dim(m$epi.own)))
+      polygon(c(tp[1],tp,tail(tp,1)),c(0,as.matrix(m$endemic)[,i]+as.matrix(m$epi.own)[,i],0),col=col[2],border=col[2])
+  }
+  polygon(c(tp[1],tp,tail(tp,1)),c(0,as.matrix(m$endemic)[,i],0),col=col[3],border=col[3])
+ points(tp,obs,pch=pch,cex=cex)
+ 
+ if(legend){
+   legend("topright", bty="n", c("observed","ne","ar","end"), pch=c(pch,rep(NA,3)), lty=c(NA,rep(1,3)),lwd=8,pt.lwd=1, col=c(1,col))
+ }
+
+}
 

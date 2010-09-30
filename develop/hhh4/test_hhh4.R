@@ -6,29 +6,14 @@ load("data/flu-BYBW.RData")
 sts.flu <- sts.flu[1:200,1:80]
 
 ###############################################################
-## generate "covariates" for temporal and seasonal trends
+## generate formula for temporal and seasonal trends
 # in fact, this should be done automatically in algo.hhh4...
-
-week <- epoch(sts.flu)-1
-
-form<-function(mod="~-1",S=1, period=sts.flu@freq){
-  if(S>0){
-    for(i in 1:S){
-      mod <- paste(mod,"+sin(",2*i,"*pi*t/",period,")+cos(",2*i,"*pi*t/",period,")",sep="")
-    }
-  }
-  return(as.formula(mod))
-}
-
-X.Season<-model.matrix(form(),data.frame(t=week))
-sin1 <- X.Season[,1]
-cos1 <- X.Season[,2]
+f.end <- addSeason2formula(f = ~ -1 + ri(type="iid"), S=1, period=52)
 
 cntrl <- list(ar = list(f = ~ 1),
-              end = list(f = ~ -1+ri(type="iid") +fe(sin1) + fe(cos1), offset = population(sts.flu)),
-              verbose=1)
+              end = list(f =f.end, offset = population(sts.flu)),
+              verbose=1, data=data.frame(t=epoch(sts.flu)-1))
                
-res <- algo.hhh4(sts.flu,cntrl)
-
+res <- hhh4(sts.flu,cntrl)
 
 
