@@ -4,23 +4,35 @@
 create.disProg <- function(week, observed, state, start=c(2001,1), freq=52, neighbourhood=NULL, populationFrac=NULL,epochAsDate=FALSE){
   namesObs <-colnames(observed)
   
+  # check whether observed contains only numbers
+  if(!all(sapply(observed, is.numeric))){
+    stop("\'observed\' must be a matrix with numbers\n")
+  }
+   
   #univariate timeseries ?
   if(is.vector(observed)){
     observed <- matrix(observed,ncol=1)
     namesObs <- deparse(quote(observed))
+  } else {  # ensure we have a matrix
+    observed <- as.matrix(observed)
   }
-  if(is.vector(state))
-    state <- matrix(state,ncol=1)
   
+  if(missing(state)){
+    state <- 0*observed
+  } else if(is.vector(state)){
+    state <- matrix(state,ncol=1)
+  } else {
+    state <- as.matrix(state)
+  }
     
   #check number of columns of observed and state
   nAreas <- ncol(observed)
   nObs <- nrow(observed)
   if(ncol(observed) != ncol(state)){
     #if there is only one state-vector for more than one area, repeat it
-    if(ncol(state)==1)
+    if(ncol(state)==1) {
       state <- matrix(rep(state,nAreas),ncol=nAreas,byrow=FALSE)
-    else{ 
+    } else { 
       cat('wrong dimensions of observed and state \n')
       return(NULL)
     }
@@ -37,17 +49,25 @@ create.disProg <- function(week, observed, state, start=c(2001,1), freq=52, neig
       cat('wrong dimensions of neighbourhood matrix \n')
       return(NULL)
     }
+  } else {
+     # no neighbourhood specified
+     neighbourhood <- matrix(NA,nrow=nAreas,ncol=nAreas)
   }
   
   if(is.null(populationFrac)) {
     populationFrac <- matrix(1/ncol(observed),nrow=nObs, ncol=ncol(observed))
   } else {
-    populationFrac <- populationFrac
+    # make sure populationFrac is a matrix
+    populationFrac <- as.matrix(populationFrac)
+    # check dimensions
+    if(nrow(populationFrac)!= nObs | ncol(populationFrac)!= nAreas)
+      stop("dimensions of \'populationFrac\' and \'observed\' do not match\n")
+    # check whether populationFrac contains only numbers
+    if(!all(sapply(populationFrac, is.numeric))){
+      stop("\'populationFrac\' must be a matrix with real numbers\n")
+  }
   }
 
-  #if(is.null(neighbourhood) & (nAreas >1) )
-  #  
-  
   #labels for observed and state
   if(is.null(namesObs)){
     namesObs <- paste(deparse(quote(observed)),1:nAreas,sep="")
