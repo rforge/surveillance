@@ -757,7 +757,7 @@ plot.sts.spacetime <- function(x,type,legend=NULL,opts.col=NULL,labels=TRUE,wait
   o.col[is.na(o.col)] <- gray(1)
   dimnames(o.col) <- dimnames(o)
 
-  #Sort the o xected according to the names in the map xect
+  #Sort the o according to the names in the map
   region.id <- unlist(lapply(map@polygons,function(poly) poly@ID))
   o.col.id <- dimnames(o.col)[[2]]
 
@@ -795,7 +795,8 @@ plot.sts.spacetime <- function(x,type,legend=NULL,opts.col=NULL,labels=TRUE,wait
     
 
     if (labels)
-      text(getSpPPolygonsLabptSlots(map), labels=as.character(region.id), cex.lab=cex.lab)
+      #getSpPPolygonsLabptSlots is deprecated. Use coordinates method insteas
+      text(coordinates(map), labels=as.character(region.id), cex.lab=cex.lab)
   
     if (!aggregate) { title(paste(t,"/",maxt,sep="")) }
 
