@@ -2250,6 +2250,9 @@ addSeason2formula <- function(f=~1,       # formula to start with
                               S=1,         # number of sine/cosine pairs
                               period=52
                               ){
+  # return formula as is if S = 0
+  if(max(S) == 0) return(f)
+  
   f <- deparse(f)
   # create formula
   if(max(S)>0 & length(S)==1){
@@ -2307,7 +2310,7 @@ oneStepAhead <- function(result, # result of call to hhh4
 
   nTime <- nrow(stsObj)
   pred <- matrix(NA,nrow=length(tp:nTime)-1,ncol=ncol(stsObj))
-  psi <- matrix(NA,nrow=length(tp:nTime)-1,ncol=ifelse(dimOverdisp>1,ncol(stsOb),1))
+  psi <- matrix(NA,nrow=length(tp:nTime)-1,ncol=ifelse(dimOverdisp>1,ncol(stsObj),1))
     
   res <- resN <- result
   coefs <- coef(res,reparamPsi=FALSE)
@@ -2370,7 +2373,7 @@ plot.ah4 <- function(x,i=1,ylim=NULL, ylab="No. infected",title=NULL,m=NULL,xlab
   if(is.null(title))
     title <-colnames(observed(x$stsOb))[i]
 
-  obs <- observed(x$stsObj)[-1,i]
+  obs <- observed(x$stsObj)[x$control$subset,i]
   
   if(!is.null(ylim))
     max <- ylim

@@ -47,7 +47,6 @@ Institute of Social and Preventive Medicine\\
 University of Zurich, Switzerland
 } 
 \date{\today}
-%\date{}
 
 \usepackage{Sweave}
 \begin{document}
@@ -152,8 +151,8 @@ directory. Most data sets originate from the SurvStat@RKI database
 (RKI), Germany. Selected data sets will be analyzed in Section~\ref{sec:hhh} 
 and are introduced in the following. Note that many of the built-in datasets 
 are stored in the S3 class data structure \code{disProg}. 
-They can be easily converted into the easier to handle S4 \sts\ data structure using
-the function \code{disProg2sts}. The resulting \sts\ object can accessed 
+They can be easily converted into the S4 \sts\ data structure using
+the function \code{disProg2sts}. The resulting \sts\ object can be accessed 
 similar as standard \code{matrix} objects and allows easy temporal and spatial
 aggregation as will be shown in the remainder of this section. \\
 
@@ -165,7 +164,6 @@ As a first example, the weekly number of influenza and meningococcal disease
 cases in Germany is considered.
 \begin{Schunk}
 \begin{Sinput}
-> # load data
 > data(influMen)
 > # convert to sts class and print basic information about the time series
 > print(fluMen <- disProg2sts(influMen))
@@ -217,13 +215,12 @@ See \cite{hoehle-mazick-2010} for a detailed description of the plot routines.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \example{Influenza in Southern Germany, 01/2001-52/2008}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Finally, the spatio-temporal spread of influenza in the 140 Kreise (districts) 
+The spatio-temporal spread of influenza in the 140 Kreise (districts) 
 of Bavaria and Baden-W\"urttemberg  is analyzed using the weekly number of 
-cases reported to the RKI~\citep{survstat-fluByBw}.
+cases reported to the RKI~\citep{survstat-fluByBw} in the years 2001--2008.
 An \sts\ object containing the data is created as follows:
 \begin{Schunk}
 \begin{Sinput}
-> # read in observed number of cases
 > flu.counts <- as.matrix(read.table("../data/flu_ByBw.txt"))
 > # read in adjacency matrix with elements 1 if two regions share a common border
 > nhood <- as.matrix(read.table("../data/neighourhood_ByBw.txt"))
@@ -233,12 +230,11 @@ An \sts\ object containing the data is created as follows:
 \end{Schunk}
 \begin{center}
 \vspace*{-2em}
-\setkeys{Gin}{width=.35\textwidth}
+\setkeys{Gin}{width=.5\textwidth}
 \includegraphics{figs/vignette_hhh4-nhoodByBw}
 \end{center}
 \begin{Schunk}
 \begin{Sinput}
-> # read in a shapefile of the districts in Bavaria and Baden-Wuerttemberg
 > map <- readShapePoly("../shapes/districts_BYBW.shp", IDvar = "id")
 > # read in population fractions
 > p <- as.matrix(read.table("../data/population_2001-12-31_ByBw.txt"))
@@ -263,7 +259,7 @@ A map of the total number of cases in the year 2001 may be obtained as follows:
 \end{Sinput}
 \end{Schunk}
 \begin{center}
-\vspace*{-2em}\includegraphics[width=.4\textwidth]{figs/vignette_hhh4-flu-ByBw}
+\vspace*{-2em}\includegraphics[width=.5\textwidth]{figs/vignette_hhh4-flu-ByBw}
 \end{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -367,7 +363,7 @@ $i$. This can be done via
 A call to \hhh\ fits a Poisson or negative binomial model with conditional
 mean
 \begin{align*}
-  \mu_{it} = \lambda_{it} y_{i,t-1} + \phi_{it} \sum_{j} w_{ji} y_{j,t-1} +e_{it} \nu_{it}
+  \mu_{it} = \lambda_{it} y_{i,t-1} + \phi_{it} \sum_{j\neq i} w_{ji} y_{j,t-1} +e_{it} \nu_{it}
 \end{align*}
 to a multivariate time series of counts.
 Here, the three unknown quantities are decomposed additively on the log scale
@@ -380,7 +376,7 @@ where $\alpha_0,\beta_0,\gamma_0$ are intercepts, $\bm{\alpha},\bm{\beta},\bm{\g
 are vectors of unknown parameters corresponding to covariate vectors 
 $\bm{u}_{it},\bm{x}_{it},\bm{z}_{it}$, and $a_i,b_i,c_i$ are random effects. 
 For instance, model~\eqref{eq:nu_t} with $S=1$ seasonal terms may be
-represented as $\bm{z}_{it}=(t,\sin(2\pi/\code{freq}),\cos(2\pi/\code{freq}))^\top$.
+represented as $\bm{z}_{it}=(t,\sin(2\pi/\code{freq}\;t),\cos(2\pi/\code{freq}\;t))^\top$.
 The stacked vector of all random effects
 is assumed to follow a normal distribution with mean $\bm{0}$ and covariance
 matrix $\bm{\Sigma}$, see \cite{paul-held-2010} for further details.
@@ -462,11 +458,11 @@ A Poisson model without autoregression and $S=1$ seasonal term is specified
 as follows:
 \begin{Schunk}
 \begin{Sinput}
-> # specify formula object for endemic component
 > ( f_S1 <- addSeason2formula(f = ~ 1, S = 1, period = 52) )
 \end{Sinput}
 \begin{Soutput}
 ~1 + sin(2 * pi * t/52) + cos(2 * pi * t/52)
+<environment: 0xcff351c>
 \end{Soutput}
 \begin{Sinput}
 > # fit Poisson model
@@ -511,7 +507,7 @@ in the formula specification. In can be included in the model with
 +                         )
 +            )
 > # fit model
-> result2 <- hhh4(meningo, control=m2)
+> result2 <- hhh4(meningo, control = m2)
 > # extract ML estimates
 > round(coef(result2, se = TRUE,      # also return standard errors
 +                     idx2Exp = 1     # exponentiate 1st param [-> exp(alpha)]
@@ -561,10 +557,9 @@ This model corresponds to the second model of Tab.~2 in \cite{paul-etal-2008}
 and is fitted with
 \begin{Schunk}
 \begin{Sinput}
-> # create formula for endemic component
 > f.end <- addSeason2formula(f = ~ -1 + fe(1, which = c(TRUE, TRUE)), 
 +                                            # disease-specific intercepts
-+                            S = c(3, 1),    # S=3 for flu, S=1 for men
++                            S = c(3, 1),    # S = 3 for flu, S = 1 for men
 +                            period = 52)
 > # specify model
 > m <- list(ar = list(f = ~ -1 + fe(1, which=c(TRUE, TRUE))), 
@@ -608,11 +603,11 @@ Number of time points:    311
 \end{Schunk}
 A plot of the estimated mean for the meningococcal disease data, 
 decomposed into the three components, is obtained with
-%\setkeys{Gin}{width=.9\textwidth}
+\setkeys{Gin}{width=.8\textwidth}
 \begin{center}
 \begin{Schunk}
 \begin{Sinput}
-> plot(result, i = 2, col = c("orange", "blue", "grey90"), legend = TRUE)
+> plot(result, i = 2, col = c("orange", "blue", "grey85"), legend = TRUE)
 \end{Sinput}
 \end{Schunk}
 \includegraphics{figs/vignette_hhh4-fit_men}
@@ -623,7 +618,7 @@ decomposed into the three components, is obtained with
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 For disease counts observed in a large number of regions, say, (i.e.\
-high-dimensional multivariate time series of counts) the use of region-specific 
+highly multivariate time series of counts) the use of region-specific 
 parameters to account for regional heterogeneity is no longer feasible, 
 as estimation and identifiability problems may occur. 
 \cite{paul-held-2010} propose a random effects formulation to analyze the weekly
@@ -649,7 +644,6 @@ a fixed autoregressive parameter $\lambda$ to the influenza data
 
 \begin{Schunk}
 \begin{Sinput}
-> # weight matrix w_ji = 1/(No. neighbors of j) if j ~ i, and 0 otherwise
 > wji <- neighbourhood(flu)/rowSums(neighbourhood(flu))
 > # endemic component: iid random effects, linear trend, and S=3 seasonal terms
 > f.end <- addSeason2formula(f = ~ -1 + ri(type = "iid", corr="all") + 
@@ -754,8 +748,7 @@ and contains $S=1$ seasonal term in the endemic component
 \citep[cf.~model A0 in Tab.~3 in ][]{herzog-etal-2010} is obtained with
 \begin{Schunk}
 \begin{Sinput}
-> # endemic component: Intercept + S=1 sine/cosine pair
-> f.end <- addSeason2formula(f = ~ 1, S= 1, period = 26)
+> f.end <- addSeason2formula(f = ~ 1, S = 1, period = 26)
 > # autoregressive component: Intercept + vaccination coverage information
 > model.A0 <- list(ar = list(f = ~ 1 + logVac0),
 +                  end = list(f = f.end, offset = population(measles2w)),
@@ -784,10 +777,10 @@ end.s(2 * pi * t/26)     -0.10       0.12
  \section{Summary}
 As part of the \R-package \surveillance, the function \hhh\ provides
 a flexible tool for the modelling of multivariate time series 
-of infectious disease counts. The discussed count data model provides 
-a flexible framework, where serial and spatio-temporal, as well as
-heterogeneity in incidence levels and disease transmission can be accounted
-for. The functionality of \hhh\ was illustrated using several built-in data 
+of infectious disease counts. The discussed count data model is able to
+account for serial and spatio-temporal correlation, as well as
+heterogeneity in incidence levels and disease transmission. 
+The functionality of \hhh\ was illustrated using several built-in data 
 sets.
 
 \bibliography{references}
