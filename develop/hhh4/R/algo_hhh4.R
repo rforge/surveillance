@@ -614,7 +614,7 @@ interpretControl <- function(control, stsObj){
   
   if(dim.corr>0){
     if(dim.var!=dim.corr) stop("Use corr=\'all\' or corr=\'none\' ")
-    dim.corr <- switch(dim.corr,1,1,3)
+    dim.corr <- switch(dim.corr,0,1,3) 
   }
   
   # the vector with dims of the random effects must be equal if they are correlated

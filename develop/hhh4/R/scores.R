@@ -171,4 +171,34 @@ pit <- function(J=10,x,pdistr=pnbinom,...){
   return(erg)
 }
 
+#######################################################
+## scores1, scores2 - vector with scores from two models
+#########################################################
+permutationTest <- function(score1,score2, nPermutation=9999,plot=F){
+  meanScore1 <- mean(score1)
+  meanScore2 <- mean(score2)
+  diffObserved <- meanScore1 -meanScore2
+  
+  nTime <- length(score1)
+  diffMean <- rep(NA,nPermutation)
+  
+  for(i in 1:nPermutation){
+    sel <- rbinom(nTime, size=1, prob=0.5)
+    g1 <- (sum(score1[sel==0]) + sum(score2[sel==1]))/nTime
+    g2 <- (sum(score1[sel==1]) + sum(score2[sel==0]))/nTime
+    diffMean[i] <- g1-g2
+  }
+
+  if(plot){
+    hist(diffMean, nclass=50, prob=T,xlab="Difference between means",main="")
+    abline(v=diffObserved,col=4)
+  }
+  
+  pVal <- (1+sum(abs(diffMean)>=abs(diffObserved)))/(nPermutation+1)
+
+  pTtest <- t.test(score1,score2,paired=T)$p.value
+  
+  cat("mean difference=",diffObserved,"\tp(permutation) =",pVal,"\tp(paired t-test) =",pTtest,"\n")
+  return(list(diffObs=diffObserved, pVal.permut=pVal,pVal.t=pTtest))
+}
 
