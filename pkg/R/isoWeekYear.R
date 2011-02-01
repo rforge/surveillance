@@ -78,6 +78,7 @@ formatDate <- function(x, format) {
            "%V"=isoWeekYear(x)$ISOWeek,
             format.Date(x, format))
   } else {
-    format.Date(x, format)
+    res <- format.Date(x, format)
   }
+  return(res)
 }
