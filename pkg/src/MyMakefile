@@ -1,5 +1,5 @@
 lib:
-	RCMD SHLIB --output=surveillance surveillance.c
+	RCMD SHLIB --output=surveillance surveillance.c stcd-assuncaocorrea.cc # twins.cc 
 
 liblinux:
 	R CMD SHLIB surveillance.c
@@ -9,6 +9,11 @@ plain:
 
 test:
 	R --vanilla < fast_glr.R	
+
+#Compiling in cygwin on Windows does not work with RCMD SHLIB. An alternative
+#hack to do the same
+windowspanic:
+	x86_64-w64-mingw32-g++ -shared -s -static-libgcc -o surveillance.dll stcd-assuncaocorrea.o surveillance.o twins.o -LC:/Programme/R/R-2.11.1-x64/bin -lR
 
 clean:
 	rm surveillance.d surveillance.o surveillance.dll surveillance.so surveillance.exe surveillance_res.rc

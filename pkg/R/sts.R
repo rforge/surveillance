@@ -74,14 +74,14 @@ init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0
     upperbound <- matrix(NA,nrow=dim(observed)[1],ncol=dim(observed)[2])
 
   ##Assign everything else
-  .Object@week <- epoch
+  .Object@epoch <- epoch
   .Object@epochAsDate <- epochAsDate
   .Object@multinomialTS <- multinomialTS
 
   if (length(start) == 2) {
     .Object@start <- start
   } else {
-    stop("start must be a vector of length two denoting (year, week/month/idx)")
+    stop("start must be a vector of length two denoting (year, epoch/week/month/idx)")
   }
 
   .Object@freq <- freq
@@ -117,8 +117,8 @@ setMethod("initialize", "sts", init.sts)
 
 #Partial -- use a disProg object as start and convert it.
 disProg2sts <- function(disProgObj, map=NULL) {
-  #Ensure that week slot is not zero
-  if (is.null(disProgObj[["week",exact=TRUE]])) {
+  #Ensure that epoch slot is not zero
+  if (is.null(disProgObj[["epoch",exact=TRUE]])) {
     myweek <- 1:nrow(as.matrix(disProgObj$observed))
   } else {
     myweek <- disProgObj$week
@@ -130,7 +130,7 @@ disProg2sts <- function(disProgObj, map=NULL) {
 
 #The reverse action
 sts2disProg <- function(sts) {
-  disProgObj <- create.disProg(week=sts@week, start=sts@start, freq=sts@freq,
+  disProgObj <- create.disProg(week=sts@epoch, start=sts@start, freq=sts@freq,
                                observed=sts@observed, state=sts@state, neighbourhood=sts@neighbourhood,
                                populationFrac=sts@populationFrac, epochAsDate=sts@epochAsDate)
   #For survRes: alarm=sts@alarm, upperbound=sts@upperbound)
@@ -176,7 +176,7 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
     m <- ceiling(n/howmany)
     new <- rep(1:m,each=howmany)[1:n]
     x@freq <- ifelse(nfreq == "all", howmany, nfreq)
-    x@week <- 1:m
+    x@epoch <- 1:m
     
     x@observed <- as.matrix(aggregate(x@observed,by=list(new),sum)[,-1])
     x@state <- as.matrix(aggregate(x@state,by=list(new),sum)[,-1])>0
@@ -224,7 +224,7 @@ setMethod("epochInYear", "sts", function(x,...) {
     epochStr <- switch( as.character(x@freq), "12" = "%m","52" =  "%V","365" = "%j")
     return(as.numeric(formatDate(epoch(x),epochStr)))
   } else {
-    return( (x@week-1 + x@start[2]-1) %% x@freq + 1)
+    return( (x@epoch-1 + x@start[2]-1) %% x@freq + 1)
   }
 })
 #Extract the corresponding year for each observation using
@@ -233,7 +233,7 @@ setMethod("year", "sts", function(x,...) {
   if (x@epochAsDate) {
     return(as.numeric(formatDate(epoch(x),"%G")))
   } else {
-    ((x@week-1 + x@start[2]-1) + (x@freq*x@start[1])) %/% x@freq 
+    ((x@epoch-1 + x@start[2]-1) + (x@freq*x@start[1])) %/% x@freq 
   }
 })
 
@@ -250,7 +250,7 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   if(missing(i)) {i <- min(1,nrow(x@observed)):nrow(x@observed)}
   if(missing(j)) {j <- min(1,ncol(x@observed)):ncol(x@observed)}
 
-  x@week <- x@week[i]
+  x@epoch <- x@epoch[i]
   x@observed <- x@observed[i,j,drop=FALSE]
   x@state <- x@state[i,j,drop=FALSE]
   x@alarm <- x@alarm[i,j,drop=FALSE]
@@ -274,7 +274,7 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   x@start <- c(start.year,start.sampleNo)
 
   #Save time by not allocating a new object
-  #res <- new("sts",week=week, freq=x@freq, start=start,observed=observed,state=state,alarm=alarm,upperbound=upperbound,neighbourhood=neighbourhood,populationFrac=populationFrac,map=x@map,control=x@control)
+  #res <- new("sts",epoch=week, freq=x@freq, start=start,observed=observed,state=state,alarm=alarm,upperbound=upperbound,neighbourhood=neighbourhood,populationFrac=populationFrac,map=x@map,control=x@control)
     
   return(x)
 })
@@ -370,7 +370,7 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek,xaxis.units,c
       # get the right number and order of quarter labels
       quarter <- sapply( (weeks-1) %/% 13 %% 4, quarterFunc)
     } else {   #If epochAsDate -- experimental functionality to handle ISO 8601
-      date <- as.Date(x@week, origin="1970-01-01")
+      date <- as.Date(x@epoch, origin="1970-01-01")
       years <- unique(as.numeric(formatDate(date,"%Y")))
       #Start of quarters in each year present in the data. 
       qStart <- as.Date(paste(rep(years,each=4), c("-01-01","-04-01","-07-01","-10-01"),sep=""))
@@ -777,13 +777,13 @@ plot.sts.spacetime <- function(x,type,legend=NULL,opts.col=NULL,labels=TRUE,wait
     }
     
     #Clean screen (title area)
-    screen(2)
+    screen(n=2)
     par(bg=gray(1))
     erase.screen()
     par(bg="transparent")
 
     #Plot the map on screen 1
-    screen(1)
+    screen(n=1)
     plot(map,col=o.col[t,],xlab="",ylab="",...)
     #Indicate alarms as shaded overlays
     if (!all(is.na(alarm.col))) {
@@ -942,7 +942,7 @@ insert.zeroes<- function(x,length=3) {
 # show
 setMethod( "show", "sts", function( object ){
   cat( "-- An object of class sts -- \n" )
-  #cat( "length(week):\t", length(object@week),"\n" )
+  #cat( "length(week):\t", length(object@epoch),"\n" )
   if (!object@epochAsDate) {
     cat( "freq:\t\t", object@freq,"\n" )
   } else {
@@ -982,7 +982,7 @@ setMethod( "show", "sts", function( object ){
 
 setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, optional = FALSE, ...) {
   #Convert object to data frame and give names
-  res <- data.frame("observed"=x@observed, "epoch"=x@week, "state"=x@state, "alarm"=x@alarm,"population"=x@populationFrac)
+  res <- data.frame("observed"=x@observed, "epoch"=x@epoch, "state"=x@state, "alarm"=x@alarm,"population"=x@populationFrac)
 
   if (ncol(x) > 1) {
     colnames(res) <-  c(paste("observed.",colnames(x@observed),sep=""),"epoch",
@@ -996,7 +996,7 @@ setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, opti
   #Add a column denoting the number of week
   if (x@epochAsDate) {
     #Convert to date
-    date <- as.Date(x@week, origin="1970-01-01")
+    date <- as.Date(x@epoch, origin="1970-01-01")
     epochStr <- switch( as.character(x@freq), 
                        "12" = "%m",
                        "52" =  "%V",
@@ -1012,7 +1012,7 @@ setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, opti
   } else {
     #Otherwise just replicate the fixed frequency
     res$freq <- x@freq
-    res$epochInPeriod <- x@week %% res$freq
+    res$epochInPeriod <- x@epoch %% res$freq
   }
   
   return(res)

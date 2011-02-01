@@ -20,7 +20,7 @@ stcd(x, y,t,radius,epsilon,areaA, areaAcapBk, threshold, cusum=FALSE)
     to detect. See reference paper for an explicit definition.}
   \item{areaA}{Area of the observation region A (single number) -- This
     argument is currently ignored!}
-  \item{areaAcapBk}{Area of A \ B(s_k,\rho) for all k=1,\ldots,n
+  \item{areaAcapBk}{Area of A \ B(s_k,rho) for all k=1,\ldots,n
     (vector). This argument is currently ignored!}
   \item{threshold}{Threshold limit for the alarm and should be equal to
     the desired Average-Run-Length (ARL) of the detector.}

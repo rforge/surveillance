@@ -6,10 +6,12 @@
  */
 
 #include "stcd-assuncaocorrea.h"
+
 #include <cmath>
 #include <iostream>
 
 using namespace std;
+
 
 // Calculate the number of events in the cylinder B( (xk,yk), rho)
 // (i.e. represented by the boolean matrix MSpace) between event times
@@ -40,6 +42,8 @@ int ContaEvt(short **MSpace, const int EvtN, const int EvtJ)
     Soma += MSpace[EvtJ][i];
   return(Soma);
 }
+
+
 
 //////////////////////////////////////////////////////////////////////
 // Comment: Unfortunately, this function has not been commented in the 

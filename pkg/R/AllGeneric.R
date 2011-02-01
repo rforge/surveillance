@@ -14,14 +14,14 @@ if(!isGeneric("aggregate")) setGeneric("aggregate", useAsDefault=aggregate)
 if(!isGeneric("epoch")) setGeneric("epoch", function(x, as.Date=x@epochAsDate) standardGeneric("epoch"))
 setMethod("epoch", "sts", function(x, as.Date=x@epochAsDate) {
   if (!as.Date) {
-    return(x@week)
+    return(x@epoch)
   } else {
-    return(as.Date(x@week, origin="1970-01-01"))
+    return(as.Date(x@epoch, origin="1970-01-01"))
   }
 })
 setGeneric("epoch<-", function(x, value) standardGeneric("epoch<-"))
 setReplaceMethod("epoch", "sts", function(x, value) {
- x@week <- value
+ x@epoch <- value
  x
 })
 # observed slot
@@ -72,6 +72,17 @@ setMethod("control", "sts", function(x) {
 setGeneric("control<-", function(x, value) standardGeneric("control<-"))
 setReplaceMethod("control", "sts", function(x, value) {
  x@control <- value
+ x
+})
+###multinomial Time series slot
+##control slot
+if(!isGeneric("multinomialTS")) setGeneric("multinomialTS", function(x) standardGeneric("multinomialTS"))
+setMethod("multinomialTS", "sts", function(x) {
+  return(x@multinomialTS)
+})
+setGeneric("multinomialTS<-", function(x, value) standardGeneric("multinomialTS<-"))
+setReplaceMethod("multinomialTS", "sts", function(x, value) {
+ x@multinomialTS <- value
  x
 })
 

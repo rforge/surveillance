@@ -62,7 +62,7 @@ wrap.algo <- function(sts, algo, control,
   start.year <- start[1] + (new.sampleNo - 1) %/% sts@freq 
   start.sampleNo <- (new.sampleNo - 1) %% sts@freq + 1
   sts@start <- c(start.year,start.sampleNo)
-  sts@week <- sts@week[control$range]
+  sts@epoch <- sts@epoch[control$range]
   sts@epochAsDate <- sts@epochAsDate
   
   #Ensure dimnames in the new object

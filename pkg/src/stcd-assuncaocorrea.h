@@ -4,7 +4,7 @@
  * Department of Statistics, UFMG, Brazil on 06 April 2006
  * 
  * R interface by Michael Höhle initiated on 12 Jan 2009
- * Note: Some function names are in Portugese
+ * Note: Some function names and documentation are in Portugese
  */
 
 
@@ -36,6 +36,8 @@ int SistemadeVigilancia(SVEventLst &ev,
 			const int cusum, std::valarray<double> &R);
 int CalculaLambda(SVEventLst &ev, const double RaioC, const double epslon, 
 		  std::valarray<double> &R, unsigned int &numObs);
+
+
 
 // Hoehle wrapper function to create SVEvent list
 //void SRspacetime(double *x, double *y, double *t, long *n, double *radius, double *epsilon, double *Rarray);

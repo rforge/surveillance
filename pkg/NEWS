@@ -1,4 +1,23 @@
+1.3
+===
+
+This is a major realease integrating plenty of new code (unfortunately
+not all documented as good as it could be). This includes code
+for the twinstim and the hhh4 model. It may take a while
+before this version will become available from CRAN. For further details
+see below.
+
+* Renamed the "week" slot of the sts S4 class to be named "epoch". All
+  saved data objects have accordingly be renamed, but some hazzle
+  is to be expected if one you have old sts objects stored in binary
+  form. The function convertSTS can be used to convert such "old school"
+  sts objects.
+
+
 1.2-2
+=====
+* Replaced the deprecated getSpPPolygonsLabptSlots method with calls
+  to the coordinates method when plotting the map slot. 
 
 * Minor proof-reading of the documentation.
 
