@@ -1,0 +1,14 @@
+######################################################################
+# ToDo list
+######################################################################
+
+- Document hhh4 function and the many helper function. Skeleton in
+  man/hhh4.Rd
+
+- Document influenza and measles data from Michaela's paper
+
+- Update hhh4 vignette so it runs
+
+- Convert S4 objects to new epoch format
+
+- Sometime in the distant future: R CMD check without errors

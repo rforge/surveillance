@@ -1,0 +1,52 @@
+######################################################################
+# ToDo List for twinstim implementation
+#
+# $Date: 2010-04-23 10:49:46 +0200 (Fri, 23 Apr 2010) $
+######################################################################
+
+#Open issues
+- robustification/ of optim procedure by making it more adaptive -> sebastian
+- Documentation of functions in Rd files -> michael
+- intensityPlot as in twinSIR, i.e. on W integrated intensity (and its components) as a function of time, grouped by type
+
+- dev.printer argument for the animate function
+-> sebastian doesn't understand this point, because the snapshots will be saved anyway
+
+#Done
+12/08/2010 (sebastian): speed-up calculation of tau importantly by only evaluating .siafInt(siafpars) once
+06/08/2010 (sebastian): Lambda(t) function, i.e. cumulative intensity function
+08/11/2010 (sebastian): Implementation of simulation algorithm
+
+
+######################################################################
+#Bug reports
+######################################################################
+
+- 21/10/2010 R0 on an object containing agegrp as a factor variable
+             in the epidemic component apparently does not work.
+
+#######
+#Open:
+#######
+
+
+
+
+#########
+#Closed:
+#########
+
+29/07/2010>> Summary/print für twinstim Objekte, die mit do.call
+  erzeugt worden sind scheint nicht zu funktionieren.
+  Siehe analyses-joint für Beispiele.
+30/07/2010-fix>> alist
+
+30/07/2010>> imdepi$events@data -- see email
+
+30/07/2010>> Fitting twinstim models with epidemic component given by:
+        epidemic=~ 0 -- see email.
+
+10/08/2010 computing the cumulative intensity function at the end of
+the fit is VERY slow if model contains siaf component.  E.g. for best
+model having siaf_1 it takes about 60-90 minutes while the fit takes 5
+minutes. Possible to fix this??
