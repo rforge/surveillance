@@ -17,6 +17,13 @@
 
   #Load the C code library for the glr stuff
   library.dynam("surveillance", pkgname, libname)
+  
+  #License limitation for package gpclib
+  cat("\n\tNote: polygon geometry computations related to",
+      "\tthe \"epidataCS\" class in surveillance depend on",
+      "\tthe package gpclib, which has a restricted licence.\n",
+      sep="\n")
+
 }
 
 
