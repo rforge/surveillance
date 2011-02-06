@@ -52,33 +52,99 @@
 \usage{
 hhh4 <- function(stsObj, 
    control = list(
-               ar = list(f = ~ -1,        # a formula " exp(x'lamba)*y_t-1 " (ToDo: or a matrix " Lambda %*% y_t-1 ")
-                         lag = 1,         # autoregression on y_i,t-lag (currently not used)
-                         weights = NULL,  # optional weights, only used if model is a contact matrix (currently not used)
-                         initial = NULL   # vector with initial values for parameters if pred is a matrix or if pred = ~1 (not really used ATM)
+               ar = list(f = ~ -1,        
+                         lag = 1,         
+                         weights = NULL,  
+                         initial = NULL   
                          ),
-               ne = list(f = ~ -1,        # a formula " exp(x'phi) * \sum_j {w_ji * y_j,t-1} "
-                         lag = 1,         # autoregression on y_j,t-lag  (currently not used)
-                         weights = NULL,  # weights w_ji, if NULL neighbourhood matrix of stsObj is used
-                         initial = NULL   # vector with initial values for parameter if pred = ~1 (not really used ATM)
+               ne = list(f = ~ -1,        
+                         lag = 1,         
+                         weights = NULL,  
+                         initial = NULL   
                          ),
-               end = list(f = ~ 1,         # a formula " exp(x'nu) * n_it "
-                          offset = NULL,   # optional offset n_it
-                          initial = NULL   # vector with initial values for parameter if pred = ~1 (not really used ATM)
+               end = list(f = ~ 1,         
+                          offset = NULL,   
+                          initial = NULL   
                           ),
                family = c("Poisson","NegBin1","NegBinM")[1],
-               subset = 2:nrow(stsObj),             # typically 2:nrow(obs) if model contains autoregression
-               optimizer = list(tech = "nlminb",    # details for used optimizer (nlminb is default, optim may also be used)
+               subset = 2:nrow(stsObj),             
+               optimizer = list(tech = "nlminb",    
                                 stop.tol = 1e-5,
                                 stop.niter = 100),
                verbose = FALSE,
-               start=list(fixed=NULL,random=NULL,sd.corr=NULL), # list with initials, overrides any initial values in formulas
-               data=data.frame(t=epoch(sts)-1)    # data.frame or named list with covariates that are specified in the formulas for the 3 components
+               start=list(fixed=NULL,random=NULL,sd.corr=NULL),
+               data=data.frame(t=epoch(sts)-1)   
                )
    )
 }
 \arguments{
+  \item{stsObj}{object of class \code{sts} containing the multivariate
+    count data time series}
+  \item{control}{control object, which is a list containing several
+    components:
+    \describe{
+      \item{\code{ar}}{\describe{
+	  \item{f=list(f = ~ -1)}{a formula for \eqn{\exp(x'\lamba)\cdot y_{t-1}}{exp(x'lamba)*y_t-1}}
+	  \item{lag = 1}{autoregression on \eqn{y_{i,t-lag}}{y_i,t-lag}
+	    (currently not used)}
+	  \item{weights = NULL}{optional weights, only used if model is
+	    a contact matrix (currently not used)}
+	  \item{initial = NULL}{vector with initial values for
+	    parameters if pred is a matrix or if pred = ~1 (not really
+	    used ATM)}
+	}
+      }
+      \item{\code{ar}}{A list with the following elements:
+	\describe{
+          \item{f = ~ -1}{a formula \eqn{\exp(x'\lamba)\cdot y_{t-1}}{exp(x'lamba)*y_t-1}}
+	  \item{lag = 1}{autoregression on y_i,t-lag (currently not
+	    used)}
+	  \item{weights = NULL}{optional weights, only used if model
+	    is a contact matrix (currently not used)}
+	  \item{initial = NULL}{vector with initial values for
+	    parameters if pred is a matrix or if pred = ~1 (not really
+	    used ATM)}
+	}
+      }
+      \item{\code{ne}}{A list with the following components:
+	\describe{
+	  \item{f = ~ -1}{a formula \eqn{\exp(x'phi) \cdot \sum_j {w_ji \cdot
+		y_{j,t-1}}}{exp(x'phi) * \sum_j {w_ji *
+		y_j,t-1}}}
+	  \item{lag = 1}{autoregression on y_j,t-lag  (currently not
+	    used)}
+	  \item{weights = NULL}{weights w_ji, if NULL neighbourhood
+	    matrix of stsObj is used}
+	  \item{initial = NULL}{vector with initial values for
+	    parameter if pred = ~1 (not really used ATM)}
+	}
+      }
+      \item{\code{end}}{Model for the endemic component given as list
+	with the following components
+	\describe{
+	  \item{f = ~ 1}{a formula \eqn{exp(x'nu) * n_it}}
+	  \item{offset = NULL}{optional offset n_it}
+	  \item{initial = NULL}{vector with initial values for
+	    parameter if pred = ~1 (not really used ATM)}
+	}
+      }
+      \item{\code{family}}{Distributional family -- either Poisson,
+	or one of two parametrizations of the negative Binomial
+	distribution
+      }
+      \item{\code{subset}}{typically 2:nrow(obs) if model contains
+	autoregression}
+      \item{optimizer}{ details for used optimizer (nlminb is default, optim may also be used)}
+      \item{verbose}{Logical if additional information is to be printed
+	during the computations}
+      \item{\code{start}}{list with initials, overrides any initial
+	values in formulas}
+      \item{\code{data}}{ data.frame or named list with covariates that
+	are specified in the formulas for the 3 components}
+    }
+  }
 }
+
 \value{Returns an object of class \code{ah4} with elements
   \item{coefficients}{named vector with estimated parameters of the model}
   \item{se}{estimated standard errors}
