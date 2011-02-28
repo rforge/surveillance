@@ -16,7 +16,7 @@
   An \code{sts} object containing \eqn{417\times 140}{417 x 140}
   observations starting from week 1 in 2001.
   
-  The \code{population} slot contains the population fraction
+  The \code{population} slot contains the population fractions
   of each district at 31.12.2001, obtained from the Federal Statistical
   Office of Germany.
   
