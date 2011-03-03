@@ -105,7 +105,7 @@ print(paste("Doing computations: ",compute,sep=""))
   focus on outbreak detection methods. The following illustrates the use 
   of \hhh\ as estimation and prediction routine for the modelling framework 
   proposed by \citet{held-etal-2005}, and extended in \citet{paul-etal-2008}, 
-  \citet{paul-held-2010} and \citet{herzog-etal-2010}.
+  \citet{paul-held-2011} and \citet{herzog-etal-2010}.
 \end{abstract}
 
 
@@ -215,9 +215,13 @@ cases reported to the RKI~\citep{survstat-fluByBw} in the years 2001--2008.
 An \sts\ object containing the data is created as follows:
 <<eval=F>>=
 # read in observed number of cases
-flu.counts <- as.matrix(read.table(system.file("data/flu_ByBw.txt",package="surveillance")))
+flu.counts <- as.matrix(read.table(system.file("data/counts_flu_ByBw.txt", 
+                                      package = "surveillance")))
+# remove 'X' in column names                                      
+colnames(flu.counts) <- substring(colnames(flu.counts),first = 2, last = 5)                                      
 # read in adjacency matrix with elements 1 if two regions share a common border
-nhood <- as.matrix(read.table(system.file("data/neighourhood_ByBw.txt",package="surveillance")))
+nhood <- as.matrix(read.table(system.file("data/neighourhood_ByBw.txt",
+                                      package = "surveillance")))
 # visualize adjacency matrix
 image(Matrix(nhood))
 @
@@ -226,19 +230,24 @@ image(Matrix(nhood))
 \setkeys{Gin}{width=.5\textwidth}
 <<nhoodByBw, fig=TRUE, echo=F, width=4,height=4>>=
 # read in observed number of cases
-flu.counts <- as.matrix(read.table(system.file("data/flu_ByBw.txt",package="surveillance")))
+flu.counts <- as.matrix(read.table(system.file("data/counts_flu_ByBw.txt", package = "surveillance")))
+# remove 'X' in columnnames                                      
+colnames(flu.counts) <- substring(colnames(flu.counts),first=2,last=5)                                      
 # read in a shapefile of the districts in Bavaria and Baden-Wuerttemberg
-map <- readShapePoly(system.file("shapes/districts_BYBW.shp",package="surveillance"), IDvar = "id")
+map <- readShapePoly(system.file("shapes/districts_BYBW.shp", package = "surveillance"), IDvar = "id")
 # read in adjacency matrix with elements 1 if two regions share a common border
-nhood <- as.matrix(read.table(system.file("data/neighourhood_ByBw.txt",package="surveillance")))
+nhood <- as.matrix(read.table(system.file("data/neighourhood_ByBw.txt", package = "surveillance")))
 print(image(Matrix(nhood)))
 @
 \end{center}
 <<keep.source=T>>=
 # read in a shapefile of the districts in Bavaria and Baden-Wuerttemberg
-map <- readShapePoly(system.file("shapes/districts_BYBW.shp",package="surveillance"), IDvar = "id")
+map <- readShapePoly(system.file("shapes/districts_BYBW.shp",
+                        package = "surveillance"), IDvar = "id")
 # read in population fractions
-p <- as.matrix(read.table(system.file("data/population_2001-12-31_ByBw.txt",package="surveillance")))
+p <- matrix(read.table(system.file("data/population_2001-12-31_ByBw.txt",
+                          package = "surveillance"), header = TRUE)$popFrac, 
+            nrow = nrow(flu.counts), ncol= ncol(flu.counts), byrow = TRUE)
 # create sts object
 flu <- new("sts", epoch = 1:nrow(flu.counts),
                   observed = flu.counts,
@@ -249,34 +258,20 @@ flu <- new("sts", epoch = 1:nrow(flu.counts),
                   population = p
                   )
 @
-<<echo=F>>=
-namesLK <- substring(colnames(flu.counts),first=2,last=100)
-colnames(flu.counts) <- namesLK
-flu <- new("sts", epoch = 1:nrow(flu.counts),
-                  observed = flu.counts,
-                  start = c(2001, 1),
-                  freq = 52,
-                  neighbourhood = nhood,
-                  map = map,
-                  population = p
-                  )
-@
+This \sts\ object is already included in \surveillance\ and may be
+loaded with \code{data(fluBYBW)}.
+
 A map of the total number of cases in the year 2001 may be obtained as follows:
-<<eval=F>>=
-plot(flu[year(flu) == 2001, ],    # select year 2001
-     type = observed ~ 1 | unit,  # map of counts aggregated over times t
-     labels = FALSE               # suppress region labels in map
-     )
-@
-<<flu-ByBw, fig=T,width=6,height=6, include=F,echo=F>>=
+\setkeys{Gin}{width=.5\textwidth}
+%\vspace*{-2em}
+\begin{center}
+<<flu-ByBw, fig=T,width=6,height=6, include=T,echo=T>>=
 par(mar=c(0,0,0,0))
 plot(flu[year(flu) == 2001, ],    # select year 2001
      type = observed ~ 1 | unit,  # map of counts aggregated over times t
      labels = FALSE               # suppress region labels in map
      )
 @
-\begin{center}
-\vspace*{-2em}\includegraphics[width=.5\textwidth]{figs/vignette_hhh4-flu-ByBw}
 \end{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -287,25 +282,19 @@ German Bundesl\"ander (federal states), in the years 2005--2007. These data
 are analyzed in~\cite{herzog-etal-2010} after aggregation into successive 
 bi-weekly periods.
 
-<<eval=FALSE>>=
+\setkeys{Gin}{width=1\textwidth}
+\begin{center}
+<<measles, fig=T, echo=T>>=
 data("measlesDE")
 # aggregate into successive bi-weekly periods
-measles2w <- aggregate(measles.land, nfreq = 26)
+measles2w <- aggregate(measlesDE, nfreq = 26)
 
-plot(measles2w, type = observed ~ time,   # ts plot aggregated over all units i
-                main = "Bi-weekly number of measles cases in Germany", 
-                legend.opts = NULL        # suppress default legend
-                )
-@
-<<measles, fig=T, echo=F>>=
-data("measlesDE")
-measles2w <- aggregate(measles.land, nfreq = 26)
 plot(measles2w, type = observed ~ time,   # plot aggregated over all units i
                    main = "Bi-weekly number of measles cases in Germany", 
                    legend.opts = NULL        # suppress default legend
                    )
 @
-
+\end{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Model
@@ -377,7 +366,7 @@ $i$. This can be done via
   \item unit-specific fixed parameters, e.g.\ $\log(\lambda_i)=\alpha_i$ 
      \citep{paul-etal-2008};
   \item unit-specific random effects, e.g\ $\log(\lambda_i)=\alpha_0 +a_i$, 
-     $a_i \stackrel{\text{iid}}{\sim} \n(0,\sigma^2_\lambda)$ \citep{paul-held-2010};
+     $a_i \stackrel{\text{iid}}{\sim} \n(0,\sigma^2_\lambda)$ \citep{paul-held-2011};
   \item linking parameters with known (possibly time-varying) explanatory 
      variables, e.g.\ $\log(\lambda_i)=\alpha_0 +x_i\alpha_1$ with
      region-specific vaccination coverage $x_i$ \citep{herzog-etal-2010}.
@@ -402,9 +391,9 @@ For instance, model~\eqref{eq:nu_t} with $S=1$ seasonal terms may be
 represented as $\bm{z}_{it}=(t,\sin(2\pi/\code{freq}\;t),\cos(2\pi/\code{freq}\;t))^\top$.
 The stacked vector of all random effects
 is assumed to follow a normal distribution with mean $\bm{0}$ and covariance
-matrix $\bm{\Sigma}$, see \cite{paul-held-2010} for further details.
+matrix $\bm{\Sigma}$, see \cite{paul-held-2011} for further details.
 Inference is based on (penalized) likelihood methodology as proposed in 
-\cite{paul-held-2010}. In applications, each component (\code{ar})--(\code{end}) 
+\cite{paul-held-2011}. In applications, each component (\code{ar})--(\code{end}) 
 may be omitted in parts or as a whole.
 
 
@@ -463,7 +452,7 @@ in a matrix of size $T \times I$.
 
 In the following, the functionality of \hhh\ is demonstrated using
 the data sets introduced in Section~\ref{sec:data}
-and previously analyzed in \cite{paul-etal-2008}, \cite{paul-held-2010} and 
+and previously analyzed in \cite{paul-etal-2008}, \cite{paul-held-2011} and 
 \cite{herzog-etal-2010}.
 Selected results are reproduced. For a thorough discussion 
 we refer to these papers.
@@ -570,7 +559,7 @@ For disease counts observed in a large number of regions, say, (i.e.\
 highly multivariate time series of counts) the use of region-specific 
 parameters to account for regional heterogeneity is no longer feasible, 
 as estimation and identifiability problems may occur. 
-\cite{paul-held-2010} propose a random effects formulation to analyze the weekly
+\cite{paul-held-2011} propose a random effects formulation to analyze the weekly
 number of influenza cases in \Sexpr{ncol(flu)} districts of Southern Germany.
 For example, consider a model with random intercepts in the endemic component: 
 $c_i \sim \n(0,\sigma^2_\nu), i=1,\ldots,I$.
@@ -579,14 +568,14 @@ Such effects are specified in a formula object as
 f.end <- ~ -1 + ri(type = "iid", corr = "all")
 @
 Setting \code{type = "car"} would assume that the random effects are spatially 
-correlated instead of uncorrelated. See \cite{paul-held-2010} for further details.
+correlated instead of uncorrelated. See \cite{paul-held-2011} for further details.
 The argument \code{corr = "all"} allows for correlation between region-specific 
 random effects in different components, e.g.\ random incidence levels $c_i$ 
 in the endemic component and random effects $b_i$ in the neighbor-driven component.
 The following call to \hhh\ fits such a random effects model with
 linear trend and $S=3$ seasonal terms in the endemic component and
 a fixed autoregressive parameter $\lambda$ to the influenza data 
-\citep[cf. model B2 in Tab.~3 in][]{paul-held-2010}.
+\citep[cf. model B2 in Tab.~3 in][]{paul-held-2011}.
 
 <<eval=F, echo=F>>=
 # weight matrix w_ji = 1/(No. neighbors of j) if j ~ i, and 0 otherwise
@@ -646,7 +635,7 @@ one-step-ahead forecasts with the actually observed data
 provides a natural alternative. In this context, \cite{gneiting-raftery-2007}
 recommend the use of strictly proper scoring 
 rules, such as the logarithmic score or the ranked probability score.
-See \cite{czado-etal-2009} and \cite{paul-held-2010} for further details.
+See \cite{czado-etal-2009} and \cite{paul-held-2011} for further details.
 
 One-step-ahead predictions for the last 2 years for model B2 are obtained as 
 follows:
@@ -662,13 +651,16 @@ colMeans(scores(pred.B2)[, c("logs", "rps")])
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Measles data
 <<eval=T, echo=F>>=
+data(MMRcoverageDE)
+cardVac1 <- MMRcoverageDE[1:16,3:4]
+
 adjustVac <- function(cardVac, p=0.5,nrow=1){
   card <- cardVac[,1]
   vac <- cardVac[,2]
   vacAdj <- vac*card + p*vac*(1-card)
   return(matrix(vacAdj,nrow=nrow, ncol=length(vacAdj), byrow=TRUE))
 }
-vac0 <- 1-adjustVac(vac2006[1:16,3:4],p=0.5,nrow=measles2w@freq*3)
+vac0 <- 1-adjustVac(cardVac1,p=0.5,nrow=measles2w@freq*3)
 colnames(vac0) <- colnames(measles2w)
 @
 As a last example, consider the number of measles cases in the 16 federal states
@@ -678,9 +670,12 @@ coverage. In the following, information about vaccination coverage in each
 state, namely the log proportion of unvaccinated school starters, is included 
 as explanatory variable in a model for the bi-weekly aggregated measles data. 
 See \cite{herzog-etal-2010} for further details.
- 
-The $\Sexpr{nrow(vac0)}\times \Sexpr{ncol(vac0)}$ matrix \code{vac0} contains 
-the proportion of unvaccinated school starters in each state $i$.
+
+Vaccination coverage levels for the year 2006 are available in the dataset
+\code{data(MMRcoverageDE)}. This dataset can be used to compute
+the $\Sexpr{nrow(vac0)}\times \Sexpr{ncol(vac0)}$ matrix \code{vac0} with adjusted
+proportions of unvaccinated school starters in each state $i$ used by
+\cite{herzog-etal-2010} 
 <<>>=
 vac0[1:2, 1:5]
 @
@@ -702,7 +697,6 @@ round(coef(result.A0,
            se = TRUE,              # also return standard errors
            amplitudeShift = TRUE   # transform sin/cos terms to 
            ), 2)                   # Amplitude/shift formulation
-
 @
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
