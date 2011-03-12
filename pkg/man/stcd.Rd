@@ -37,8 +37,8 @@ stcd(x, y,t,radius,epsilon,areaA, areaAcapBk, threshold, cusum=FALSE)
 \details{
  Shiryaev-Roberts based spatio-temporal cluster detection based
  on the work in Assuncao and Correa (2009). The implementation
- is based on C++ code originally written by Marcos Oliveira Prates, UMFG,
- Brazil and provided by Thais Correa, UMFG, Brazil during her research
+ is based on C++ code originally written by Marcos Oliveira Prates, UFMG,
+ Brazil and provided by Thais Correa, UFMG, Brazil during her research
  stay in Munich. This stay was financially supported by the Munich
  Center of Health Sciences.
 
