@@ -2,10 +2,19 @@
 
 #Make summary a generic function
 setGeneric("summary")
+#Generate a new generic function for animations
+animate <- function (object, ...) {
+    UseMethod("animate")
+}
+if(!isGeneric("animate")) setGeneric("animate",useAsDefault=aggregate)
+
+
 
 #Conversion of some other functions
 if(!isGeneric("plot")) setGeneric("plot", useAsDefault=plot)
 if(!isGeneric("aggregate")) setGeneric("aggregate", useAsDefault=aggregate)
+
+
 
 ######################################################################
 #Access and replace functions

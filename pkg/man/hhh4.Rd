@@ -129,8 +129,9 @@ hhh4 <- function(stsObj,
 	}
       }
       \item{\code{family}}{Distributional family -- either Poisson,
-	or one of two parametrizations of the negative Binomial
-	distribution
+	or the negative Binomial distribution with one common
+	overdispersion parameter for all units (\code{NegBin1}) or a
+	overdispersion parameter for each units (\code{NegBinM}).
       }
       \item{\code{subset}}{typically 2:nrow(obs) if model contains
 	autoregression}
