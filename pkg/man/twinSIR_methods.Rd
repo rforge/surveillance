@@ -105,7 +105,7 @@ calculation of the so-called one-sided AIC (OSAIC).
   \deqn{OSAIC = -2 l(\theta, \tau) + 2 \sum_{g=0}^p w(p,g) (k-p+g)}{%
         OSAIC = -2 l(theta, tau) + 2 sum_{g=0}^p w(p,g) (k-p+g)}
   where \eqn{w(p,g)} are \eqn{p}-specific weights.  For more details see
-  Section 5.2 in \enc{Höhle}{Hoehle} (2008).
+  Section 5.2 in \enc{Höhle}{Hoehle} (2009).
 }
 
 \value{
@@ -119,12 +119,9 @@ calculation of the so-called one-sided AIC (OSAIC).
   \emph{Journal of Statistical Planning and Inference} \strong{115},
   pp. 397--411.
 
-  \enc{Höhle}{Hoehle}, Michael (2008)
-  Spatio-temporal epidemic modelling using additive-multiplicative
-  intensity models. 
-  \emph{Ludwig-Maximilians-\enc{Universität}{Universitaet},%
-  Department of Statistics: Technical Reports}, No. 41.
-  Available at \url{http://epub.ub.uni-muenchen.de/6366/}.
+  \enc{Höhle}{Hoehle}, M. (2009),
+  Additive-Multiplicative Regression Models for Spatio-Temporal
+  Epidemics, Biometrical Journal, 51(6):961-978.
 }
 
 \author{

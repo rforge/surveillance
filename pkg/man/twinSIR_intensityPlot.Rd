@@ -93,14 +93,7 @@ intensityPlot(x, type = c("overall", "individual"),
 \references{
   \enc{Höhle}{Hoehle}, M. (2009),
   Additive-Multiplicative Regression Models for Spatio-Temporal
-  Epidemics, Accepted for publication in the Biometrical Journal.
-  
-  \enc{Höhle}{Hoehle}, Michael (2008)
-  Spatio-temporal epidemic modelling using additive-multiplicative
-  intensity models. 
-  \emph{Ludwig-Maximilians-\enc{Universität}{Universitaet},%
-  Department of Statistics: Technical Reports}, No. 41.
-  Available at \url{http://epub.ub.uni-muenchen.de/6366/}.
+  Epidemics, Biometrical Journal, 51(6):961-978.
 }
 
 \author{
@@ -108,7 +101,7 @@ Sebastian Meyer
 }
 
 \seealso{
-\code{\link{twinSIR}} or \enc{Höhle}{Hoehle} (2008) for a more detailed
+\code{\link{twinSIR}} or \enc{Höhle}{Hoehle} (2009) for a more detailed
 description of the intensity model.
 }
 

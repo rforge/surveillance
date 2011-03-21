@@ -13,6 +13,13 @@ see below.
   form. The function convertSTS can be used to convert such "old school"
   sts objects.
 
+* Support for twinSIR models as described in HÅˆhle (2009) and epidata
+  objects has been moved from package RLadyBug to surveillance. That means
+  continuous-time discrete-space SIR models.
+
+* Support for twinsir models as described in Meyer et al (2010). That
+  means continuous-time continuous-space infectious models
+
 
 1.2-2
 =====

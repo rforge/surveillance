@@ -29,5 +29,14 @@
 }
 
 
+################################################################################
+# Little helper function checking if its argument is scalar,
+# i.e. a numeric vector of length 1.
+################################################################################
+
+isScalar <- function (x) {
+    length(x) == 1L && is.vector(x, mode = "numeric")
+}
+
 
 

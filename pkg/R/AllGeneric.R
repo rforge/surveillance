@@ -6,7 +6,7 @@ setGeneric("summary")
 animate <- function (object, ...) {
     UseMethod("animate")
 }
-if(!isGeneric("animate")) setGeneric("animate",useAsDefault=aggregate)
+if(!isGeneric("animate")) setGeneric("animate",useAsDefault=animate)
 
 
 

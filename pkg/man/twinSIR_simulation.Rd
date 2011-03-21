@@ -225,7 +225,7 @@ simEpidata(formula, data, id.col, I0.col, coords.cols, subset,
   (and by the epidemic effects \code{alpha}).
 
   The simulation algorithm used is \emph{Ogata's modified thinning}.
-  For details, see \enc{Höhle}{Hoehle} (2008), Section 4.
+  For details, see \enc{Höhle}{Hoehle} (2009), Section 4.
 }
 
 \value{
@@ -264,14 +264,7 @@ simEpidata(formula, data, id.col, I0.col, coords.cols, subset,
 \references{
   \enc{Höhle}{Hoehle}, M. (2009),
   Additive-Multiplicative Regression Models for Spatio-Temporal
-  Epidemics, Accepted for publication in the Biometrical Journal.
-  
-  \enc{Höhle}{Hoehle}, Michael (2008)
-  Spatio-temporal epidemic modelling using additive-multiplicative
-  intensity models. 
-  \emph{Ludwig-Maximilians-\enc{Universität}{Universitaet},%
-  Department of Statistics: Technical Reports}, No. 41.
-  Available at \url{http://epub.ub.uni-muenchen.de/6366/}.
+  Epidemics, Biometrical Journal, 51(6):961-978.
 }
 
 \author{ 
