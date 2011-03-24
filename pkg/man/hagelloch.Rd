@@ -10,7 +10,7 @@
   Dr. Heike Oesterle.  
 }
 \usage{
-data(hagelloch)
+data("hagelloch")
 }
 \format{
   Loading the data in \code{hagelloch} gives two objects:
@@ -120,13 +120,13 @@ data(hagelloch)
 }
 
 \references{
-  Pfeilsticker, A. (1863). Beitr\enc{ae}{ä} zur Pathologie der Masern mit
+  Pfeilsticker, A. (1863). Beitr\enc{ae}{ä}ge zur Pathologie der Masern mit
   besonderer Ber\enc{ue}{ü}cksichtgung der statistischen Verh\enc{ae}{ä}ltnisse,
   M.D. Thesis, Eberhard-Karls Universit\enc{ae}{ä}t, T\enc{ue}{ü}bingen.
   Available as \url{http://www.archive.org/details/beitrgezurpatho00pfeigoog}.
 
   
-  Oesterle, H. (1992). Statistiche Reanalyse einer Masernepidemie 1861
+  Oesterle, H. (1992). Statistische Reanalyse einer Masernepidemie 1861
   in Hagelloch, M.D. Thesis, Eberhard-Karls Universit\enc{ae}{ä}at,
   T\enc{ue}{ü}bingen.
 
