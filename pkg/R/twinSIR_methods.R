@@ -58,10 +58,14 @@ logLik.twinSIR <- function (object, ...)
         cat("Computing OSAIC weights for px =",px,"epidemic covariates",
             "based on", nsim, "simulations...\n")
         W <- vcov(twinSIRobject)[1:px,1:px]
-        w.sim <- w.chibarsq.sim(p=px, W=W, N=nsim)
-        #c.f. (12) in Hughes & King (2003), r_i=px, m=0:px, ki=npar
-        #as npar=pz+px, we have that npar-px = pz, hence the sum is
-        k * sum(w.sim * (pz + 0:px))
+        #The simulation approach has unresolved problems for some situations (initial constraints
+        #can fail). Catch this operation until exact cause has been investigated
+        tryCatch( { 
+          w.sim <- w.chibarsq.sim(p=px, W=W, N=nsim)
+          #c.f. (12) in Hughes & King (2003), r_i=px, m=0:px, ki=npar
+          #as npar=pz+px, we have that npar-px = pz, hence the sum is
+          k * sum(w.sim * (pz + 0:px))
+        }, error=function(e) NA)
     }
     
     attr(penalty, "exact") <- px <= 2
@@ -413,3 +417,99 @@ profile.twinSIR <- function (fitted, profile, alpha = 0.05,
   
   return(list(lp=resProfile, ci.hl=ciProfile, profileObj=profile))
 }
+
+######################################################################
+# Cox-Snell like residuals
+#
+# Parameters:
+#  object - the fitted model to plot the residuals for
+######################################################################
+
+
+residuals.twinSIR <- function(object, plot=TRUE, ...) {
+   #Extract parameters
+  theta.hat <- coef(object)
+
+  #Extract event and stop-times
+  eventTimes <- attr(object$model$survs,"eventTimes")
+  sortedStop <- sort(unique(object$model$survs[,"stop"]))
+  eventTimesIdx <- match(eventTimes, sortedStop)
+  
+  #Dimensions and zero vector (in case we need it)
+  nTimes <- nrow(object$model$X)
+  zerovec <- numeric(nTimes)
+  tau <- numeric(length(eventTimes))
+
+  # Extract the fitted model params from theta
+  px <- ncol(object$model$X)
+  pz <- ncol(object$model$Z)
+  theta <- coef(object)
+  alpha <- theta[seq_len(px)]
+  beta <- theta[px+seq_len(pz)]
+
+  # Initialize e, h and thus lambda
+  if (px > 0) { e <- as.vector(object$model$X %*% as.matrix(alpha)) } else { e <- zerovec }
+  if (pz > 0) { h <- as.vector(exp(object$model$Z %*% as.matrix(beta))) } else { h <- zerovec }
+  lambda <- (e + h)
+
+  #Determine bloks
+  BLOCK <- as.numeric(factor(object$model$survs$start))
+
+  # lambda_i integrals, i.e. integral of \lambda_i until t for each individual
+  dt <- object$model$survs[,"stop"] - object$model$survs[,"start"]
+
+  #Easier - no individual summations as they are all summed anyhow afterwards
+  intlambda <- tapply( object$model$weights * lambda* dt, BLOCK, sum)
+
+  #Compute cumulative intensities
+  tau <- cumsum(intlambda)[eventTimesIdx]
+
+  #Transform to uniform variable
+  Y <- diff(tau) # Y <- diff(c(0,tau))
+  U <- sort(1-exp(-Y))
+  n <- length(U)
+
+  #Helper function to invert KS test
+  f <- function(x,p) {
+    STATISTIC <- x
+    1 - .C("pkolmogorov2x", p = as.double(STATISTIC), as.integer(n), PACKAGE = "stats")$p - p
+  }
+
+  #Test inversion
+  D95 <- uniroot(f,lower=0,upper=1.3,p=0.05)$root
+  D99 <- uniroot(f,lower=0,upper=1.3,p=0.01)$root
+
+  #Small helper function to invert the K-S test
+  f <- function(x,p) {
+    STATISTIC <- x
+    1 - .C("pkolmogorov2x", p = as.double(STATISTIC), as.integer(n), PACKAGE = "stats")$p - p
+  }
+
+  #Small helper function for plotting a straight line
+  myabline <- function(a,b,x.grid,...) {
+    lines(x.grid, a + b * x.grid, ...)
+  }
+
+  #Kolmogorov-Smirnov error bounds
+  D95 <- uniroot(f,lower=0,upper=1.3,p=0.05)$root
+  D99 <- uniroot(f,lower=0,upper=1.3,p=0.01)$root
+
+  #Calculate KS test
+  ks <- ks.test(tau,"punif",0,max(tau),exact=TRUE,alternative="two.sided")
+
+  #Ready for plotting#
+  if (plot) {
+    #Figure 10 in Ogata (1988)
+    plot(U, ecdf(U)(U),type="s",xlab=expression(u[(i)]),ylab="Cumulative distribution")
+    rug(U)
+    myabline(a=0,b=1,x.grid=seq(0,1,length=1000),col=1,lwd=2)
+    myabline(a=D95,b=1,x.grid=seq(0,1,length=1000),col=1,lty=2)
+    myabline(a=-D95,b=1,x.grid=seq(0,1,length=1000),col=1,lty=2)
+    myabline(a=D99,b=1,x.grid=seq(0,1,length=1000),col=1,lty=2)
+    myabline(a=-D99,b=1,x.grid=seq(0,1,length=1000),col=1,lty=2)
+  }
+  
+  #Done
+  invisible(list(tau=tau,ks=ks,U=U,D95=D95,D99=D99))
+}
+

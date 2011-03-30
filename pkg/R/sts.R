@@ -682,7 +682,10 @@ plot.sts.time <- function(x, type, method=x@control$name, disease=x@control$data
         #Changed call of plot.sts.time.one to invocation using "call"
         argsK <- merge.list(args,list("x"=x,"k"=k,"domany"=TRUE,"legend"=NULL))
         do.call("plot.sts.time.one",args=argsK)
-        mtext(colnames(observed)[k],line=-1.3)     
+        #Add title - do this using the cex.main size
+        cex.main <- list(...)[["cex.main",exact=TRUE]]
+        if (is.null(cex.main)) { cex.main <- 1 }
+        mtext(colnames(observed)[k],line=-1.3,cex=cex.main)     
       }
       #reset graphical params
       #par(mfrow=c(1,1), mar=c(5, 4, 4, 2)+0.1)

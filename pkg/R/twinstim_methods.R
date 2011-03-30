@@ -311,11 +311,11 @@ setMethod("R0", signature(object = "twinstim"),
 # 95% Kolmogorov-Smirnov error bounds.
 ######################################################################
 
-KSPlot <- function(m) {
+residuals.twinstim <- function(m,plot=TRUE,...) {
   tau <- m$tau
   n <- length(tau)
 
-  #Figure 10 in Ogata (1988)
+  #Transform to uniform variable
   Y <- diff(tau) # Y <- diff(c(0,tau))
   U <- sort(1-exp(-Y))
 
@@ -334,20 +334,23 @@ KSPlot <- function(m) {
   D95 <- uniroot(f,lower=0,upper=0.1,p=0.05)$root
   D99 <- uniroot(f,lower=0,upper=0.1,p=0.01)$root
 
-  #Ready for plotting, but don't produce the plot yet, just set up the
-  #scene
-  plot(U, ecdf(U)(U),xlab=expression(u[i]),ylab="Cumulative distribution",type="n")
-  rug(U)
-
-  col <- "gray"
-  myabline(a=0,b=1,x.grid=seq(0,1,length=1000),col=col,lwd=2)
-  lines(U, ecdf(U)(U),type="s")
-
-  myabline(a=D95,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
-  myabline(a=-D95,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
-  #myabline(a=D99,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
-  #myabline(a=-D99,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
-  legend(x="topleft",lty=2,col=col,"95% KS error bounds")
-  #Done
-  invisible()
+  if (plot) {
+    #Figure 10 in Ogata (1988)
+    #Ready for plotting, but don't produce the plot yet, just set up the
+    #scene
+    plot(U, ecdf(U)(U),xlab=expression(u[i]),ylab="Cumulative distribution",type="n")
+    rug(U)
+    col <- "gray"
+    myabline(a=0,b=1,x.grid=seq(0,1,length=1000),col=col,lwd=2)
+    lines(U, ecdf(U)(U),type="s")
+    
+    myabline(a=D95,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
+    myabline(a=-D95,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
+    #myabline(a=D99,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
+    #myabline(a=-D99,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
+    legend(x="topleft",lty=2,col=col,"95% KS error bounds")
+    #Done
+  }
+  
+  invisible(list(tau=tau,U=U,D95=D95,D99=D99))
 }

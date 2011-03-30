@@ -252,3 +252,10 @@ gridcellOfEvent <- function (t, tilename, stgrid)
         stop("'stgrid' has overlapping spatio-temporal grid cells")
     }
 }
+
+
+#Count number of instances at the same location of a SpatialPoint objects
+multiplicity.sp <- function(sppoints) {
+  d <- as.matrix(dist(coordinates(sppoints)))
+  return(apply(d, 1, function(x) sum(x==0)))
+}
