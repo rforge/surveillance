@@ -205,28 +205,39 @@ allEpiCovNonNA <- !is.na(imdepi$events@data$agegrp) &
 #Define spatial interaction function to be a isotropic bivariate
 #Gaussian with same parameters for both finetypes
 siaf_log1 <- siaf.gaussian(1, logsd = TRUE, density = FALSE, effRangeMult = 6)
+siaf_constant <- siaf.constant
 
 #Start values (taken from the best model in fits5 of the Epi/mydata
 startvalues <-  c(-20.36516096, -0.04926598, 0.26183958, 0.26681968,
 -12.57458928, 0.64631559, -0.18675885, -0.84955802, 2.82866154)
 #Crude intercept estimate -> if model only has an endemic component with
 #a single population 
-popdensity.overall <- mean(subset(imdepi$stgrid, BLOCK == 1)$popdensity)
-h.intercept <- with(as(imdepi$events,"data.frame"),log(length(ID)/max(time)))/popdensity.overall
+#popdensity.overall <- mean(subset(imdepi$stgrid, BLOCK == 1)$popdensity)
+#h.intercept <- with(as(imdepi$events,"data.frame"),log(length(ID)/max(time)))/popdensity.overall
+
 #Define start values
-#startvalues <- c(h.intercept, rep(0,7),4)
-startvalues <- c(-20, rep(0,7),3)
+optim.args <- list(par = rep(0,8), method = "nlminb", control = list(fnscale = -10000,trace=4,REPORT=1))
 
-optim.args <- list(par = startvalues, method = "nlminb", control = list(fnscale = -10000,trace=4,REPORT=1))
-
-#Fit a twinstim model
-imdepi.fit <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) + 
+#Fit a twinstim model (no interaction)
+imdepi.fit0 <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) + 
               sin(start * 2 * pi/365) + cos(start * 2 * pi/365), 
               epidemic = ~1 + agegrp + type, 
-              siaf = siaf_log1, data = imdepi, subset = allEpiCovNonNA, 
+              data = imdepi, subset = allEpiCovNonNA, 
               optim.args = optim.args, finetune=FALSE, model=TRUE,
               nCub = 24, 
               typeSpecificEndemicIntercept = FALSE)
+
+#Now with spatial interaction
+optim.args <- modifyList(optim.args,list(par=c(coef(imdepi.fit0),3)))
+imdepi.fit1 <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) + 
+              sin(start * 2 * pi/365) + cos(start * 2 * pi/365), 
+              epidemic = ~1 + agegrp + type, 
+              siaf = siaf_log1,
+              data = imdepi, subset = allEpiCovNonNA, 
+              optim.args = optim.args, finetune=FALSE, model=TRUE,
+              nCub = 24, 
+              typeSpecificEndemicIntercept = FALSE)
+
 
 summary(imdepi.fit)
 }
