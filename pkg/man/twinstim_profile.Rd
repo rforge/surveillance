@@ -1,0 +1,96 @@
+\encoding{latin1}
+\name{twinstim_profile}
+\alias{profile.twinstim}
+
+\title{
+Profile Likelihood Computation and Confidence Intervals for
+\code{twinstim} objects
+}
+
+\description{
+  Function to compute estimated and profile likelihood based confidence
+  intervals for \code{twinstim} objects. Computations might be cumbersome!
+}
+
+\usage{
+\method{profile}{twinstim}(fitted, profile, alpha = 0.05,
+        control = list(fnscale = -1, factr = 10, maxit = 100), ...)
+}
+
+\arguments{
+  \item{fitted}{
+    an object of class \code{"twinstim"}.
+  }
+  \item{profile}{
+    a list with elements being numeric vectors of length 4.  These vectors must
+    have the form \code{c(index, lower, upper, gridsize)}.
+    \describe{
+      \item{\code{index}:}{
+        index of the parameter to be profiled in the vector \code{coef(fitted)}.
+      }
+      \item{\code{lower, upper}:}{
+        lower/upper limit of the grid on which the profile log-likelihood is
+        evaluated. Can also be \code{NA} in which case \code{lower/upper} equals 
+        the lower/upper bound of the respective 0.3 \% Wald confidence interval
+        (+-3*se).
+      }
+      \item{\code{gridsize}:}{
+        grid size of the equally spaced grid between lower and upper.  Can also
+        be 0 in which case the profile log-likelihood for this parameter is not 
+        evaluated on a grid.
+      }
+    }
+  }
+  \item{alpha}{
+    \eqn{(1-\alpha)\%}{(1-alpha)\%} profile likelihood based confidence
+    intervals are computed.  If alpha <= 0, then no confidence intervals are
+    computed.
+  }
+  \item{control}{
+    control object to use in \code{\link{optim}} for the profile log-likelihood
+    computations.
+  }
+  \item{\dots}{
+    unused (argument of the generic).
+  }
+}
+
+\value{
+list with profile log-likelihood evaluations on the grid and highest likelihood
+and wald confidence intervals.  The argument \code{profile} is also returned.
+}
+
+\author{
+Michael \enc{Höhle}{Hoehle}
+}
+
+\examples{
+# the following call takes a while
+\dontrun{
+#Load the twinstim model fitted to the IMD data
+data("imdepifit")
+
+#prof <- profile(imdepi.fit, list(c(1,0,0.05,5), c(3,NA,NA,0), c(4, NA,
+NA, 10)))
+
+#Generate profiling object for a list of parameters for the new model
+names <- c("h.(Intercept)") #c("h.(Intercept)","e.typeC")
+coefList <- lapply(names, function(name) {
+  c(pmatch(name,names(coef(imdepi.fit))),NA,NA,15)
+})
+
+#Profile object 
+prof <- profile(imdepi.fit, coefList)
+
+#Plot result for one variable
+par(mfrow=c(1,2))
+for (name in names) {
+  with(as.data.frame(prof$lp[[name]]),matplot(grid,cbind(profile,estimated,wald),type="l",xlab=name))
+  legend(x="bottomleft",c("profile","estimated","wald"),lty=1:3,col=1:3)
+}
+}
+}
+\keyword{htest}
+\keyword{methods}
+\keyword{optimize}
+\keyword{dplot}

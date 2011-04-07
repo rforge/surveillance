@@ -354,3 +354,146 @@ residuals.twinstim <- function(m,plot=TRUE,...) {
   
   invisible(list(tau=tau,U=U,D95=D95,D99=D99))
 }
+
+######################################################################
+# Function to compute estimated and profile likelihood based
+# confidence intervals. Heavy computations might be necessary!
+#
+#Params:
+# fitted - output from a fit with twinstim
+# profile - list with 4D vector as entries - format:
+#               c(index, lower, upper, grid size)
+#           where index is the index in the coef vector
+#                 lower and upper are the parameter limits (can be NA)
+#                 grid size is the grid size of the equally spaced grid
+#                 between lower and upper (can be 0)
+# alpha - (1-alpha)% profile likelihood CIs are computed.
+#         If alpha <= 0 then no CIs are computed
+# control - control object to use for optim in the profile loglik computations
+#
+# Returns:
+#  list with profile loglikelihood evaluations on the grid
+#  and highest likelihood and wald confidence intervals
+######################################################################
+
+profile.twinstim <- function (fitted, profile, alpha = 0.05,
+    control = list(fnscale = -1, factr = 1e1, maxit = 100), ...)
+{
+  ## Check that input is ok
+  profile <- as.list(profile)
+  if (length(profile) == 0L) {
+    stop("nothing to do")
+  }
+  lapply(profile, function(one) {
+    if (length(one) != 4L) {
+      stop("each profile entry has to be of form ",
+           "'c(index, lower, upper, grid size)'")
+    }})
+  if (is.null(fitted[["functions"]])) {
+    stop("'fitted' must contain the component 'functions' -- fit using the option model=TRUE")
+  }
+
+  ################################################################
+  warning("Sorry, the profile likelihood is not implemented yet.")
+  ###############################################################
+
+  ## Control of the optim procedure
+  if (is.null(control[["fnscale",exact=TRUE]])) { control$fnscale <- -10000 }
+#  if (is.null(control[["factr",exact=TRUE]])) { control$factr <- 1e1 }
+  if (is.null(control[["maxit",exact=TRUE]])) { control$maxit <- 100 }
+  if (is.null(control[["trace",exact=TRUE]])) { control$trace <- 2 }
+#  if (is.null(control[["abstol",exact=TRUE]])) { control$abstol <- 1e-1 }
+ control$abstol <- 1e-1 
+
+  
+  ## Estimated normalized likelihood function
+  ltildeestim <- function(thetai,i) {
+    theta <- theta.ml
+    theta[i] <- thetai
+    fitted$functions$ll(theta) - loglik.theta.ml
+  }
+
+  ## Profile normalized likelihood function
+  ltildeprofile <- function(thetai,i)
+  {
+    cat("Investigating theta[",i,"] = ",thetai,"\n")
+    
+    emptyTheta <- rep(0, length(theta.ml))
+      
+    # Likelihood l(theta_{-i}) = l(theta_i, theta_i)
+    ltildethetaminusi <- function(thetaminusi) {
+      theta <- emptyTheta
+      theta[-i] <- thetaminusi
+      theta[i] <- thetai
+      cat("Investigating theta = ",theta,"\n")
+      res <- fitted$functions$ll(theta) - loglik.theta.ml
+      cat("Current ltildethetaminusi value: ",res,"\n")
+      return(res)
+    }
+    # Score function of all params except thetaminusi
+    stildethetaminusi <- function(thetaminusi) {
+      theta <- emptyTheta
+      theta[-i] <- thetaminusi
+      theta[i] <- thetai
+      res <- fitted$functions$sc(theta)[-i]
+      cat("Current stildethetaminusi value: ",res,"\n")
+      return(res)
+    }
+      
+    # Call optim -- currently not adapted to arguments of control arguments
+    # used in the fit
+    resOthers <- tryCatch(
+            optim(par=theta.ml[-i], fn = ltildethetaminusi, gr = stildethetaminusi,
+                  method = "BFGS", control = control),
+            warning = function(w) print(w), error = function(e) list(value=NA))
+    resOthers$value
+  }
+  
+
+  
+  ## Initialize
+  theta.ml <- coef(fitted)
+  loglik.theta.ml <- c(logLik(fitted))
+  se <- sqrt(diag(vcov(fitted)))
+  resProfile <- list()
+
+  
+  ## Perform profile computations for all requested parameters
+  cat("Evaluating the profile logliks on a grid...\n")
+  for (i in 1:length(profile))
+    {
+    cat("i= ",i,"/",length(profile),"\n")
+    #Index of the parameter in the theta vector
+    idx <- profile[[i]][1]
+    #If no borders are given use those from wald intervals (unconstrained)
+    if (is.na(profile[[i]][2])) profile[[i]][2] <- theta.ml[idx] - 3*se[idx]
+    if (is.na(profile[[i]][3])) profile[[i]][3] <- theta.ml[idx] + 3*se[idx]
+    #Evaluate profile loglik on a grid (if requested)
+    if (profile[[i]][4] > 0) {
+      thetai.grid <- seq(profile[[i]][2],profile[[i]][3],length=profile[[i]][4])
+      resProfile[[i]] <- matrix(NA, nrow = length(thetai.grid), ncol = 4L,
+        dimnames = list(NULL, c("grid","profile","estimated","wald")))
+
+      #Loop over all gridpoints
+      for (j in 1:length(thetai.grid)) {
+        cat("\tj= ",j,"/",length(thetai.grid),"\n")
+        resProfile[[i]][j,] <- c(thetai.grid[j],
+           ltildeprofile(thetai.grid[j],idx),#NA
+           ltildeestim(thetai.grid[j],idx),
+           - 1/2*(1/se[idx]^2)*(thetai.grid[j] - theta.ml[idx])^2)
+      }
+    }
+  }
+  names(resProfile) <- names(theta.ml)[sapply(profile, function(x) x[1L])]
+
+  ###############################
+  ## Profile likelihood intervals
+  ###############################
+  # Not done, yet
+  ciProfile <- NULL
+
+  ####Done, return
+  return(list(lp=resProfile, ci.hl=ciProfile, profileObj=profile))
+}
+
+

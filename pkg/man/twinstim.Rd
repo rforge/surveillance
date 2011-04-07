@@ -135,7 +135,9 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data, subset, na
   \item{coverged}{Logical.}
   \item{fisherinfo}{Expected Fisher information evaluated at the
     MLE. Only part of the output if \code{partial} is \code{FALSE} and if
-    spatial and temporal interaction functions are provided with their derivatives.}
+    spatial and temporal interaction functions are provided with their
+    derivatives.}
+  \item{method}{Name of the optimizing function used to determine the MLE.}
   \item{fisherinfo.observed}{Observed Fisher information matrix
     evaluated at the value of the MLE. Obtained as the negative Hessian.
     This is only part of the result if \code{optim.args$method} is not
@@ -158,7 +160,12 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data, subset, na
       \item{tiaf}{Formula used to specify the temporal interaction function.}
     }
   }
-  \item{functions}{Description of 'comp2'}
+  \item{functions}{If \code{model=TRUE} this is a \code{list} with
+  components \code{ll}, \code{sc} and \code{fi} containing objects of
+  type \code{function} containing functions for evaluating the
+  likelihood, the score and the expected fisher information for a
+  parameter vector \eqn{\theta}{theta}.
+  }
   \item{call}{The matched call.}
   \item{runtime}{Contains the \code{proc.time} queried time taken to fit
     the model.}
@@ -175,7 +182,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data, subset, na
   München. Available as http://epub.ub.uni-muenchen.de/11703/
 }
 \author{
-  S. Meyer
+  S. Meyer with documentation by M. \enc{Höhle}{Hoehle}.
 }
 \note{
 %%  ~~further notes~~
@@ -187,6 +194,43 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data, subset, na
 See Also as \code{\link{RLadyBug::twinSIR}}.
 }
 \examples{
+#Load invasive meningococcal disease data
+data("imdepi")
+
+\dontrun{
+#Indicator - we only take cases with all necessary covariates observed
+allEpiCovNonNA <- !is.na(imdepi$events@data$agegrp) &
+                     !is.na(imdepi$events@data$type)
+
+#Define spatial interaction function to be a isotropic bivariate
+#Gaussian with same parameters for both finetypes
+siaf_log1 <- siaf.gaussian(1, logsd = TRUE, density = FALSE, effRangeMult = 6)
+
+#Start values (taken from the best model in fits5 of the Epi/mydata
+startvalues <-  c(-20.36516096, -0.04926598, 0.26183958, 0.26681968,
+-12.57458928, 0.64631559, -0.18675885, -0.84955802, 2.82866154)
+#Crude intercept estimate -> if model only has an endemic component with
+#a single population 
+popdensity.overall <- mean(subset(imdepi$stgrid, BLOCK == 1)$popdensity)
+h.intercept <- with(as(imdepi$events,"data.frame"),log(length(ID)/max(time)))/popdensity.overall
+#Define start values
+#startvalues <- c(h.intercept, rep(0,7),4)
+startvalues <- c(-20, rep(0,7),3)
+
+optim.args <- list(par = startvalues, method = "nlminb", control = list(fnscale = -10000,trace=4,REPORT=1))
+
+#Fit a twinstim model
+m <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) + 
+              sin(start * 2 * pi/365) + cos(start * 2 * pi/365), 
+              epidemic = ~1 + agegrp + type, 
+              siaf = siaf_log1, data = imdepi, subset = allEpiCovNonNA, 
+              optim.args = optim.args, finetune=FALSE, model=TRUE,
+              nCub = 12, 
+              typeSpecificEndemicIntercept = FALSE)
+
+summary(m)
+}
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

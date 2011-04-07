@@ -997,6 +997,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     fit <- list( coefficients = optimRes$par,
         loglik = structure(optimRes$value, partial = partial),
         counts = optimRes1$counts + if (finetune) optimRes$counts else 0L,
+        method = optimRes$method, #added by hoehle 07.04.2011
         converged = (optimRes$convergence == 0) )
 
 
