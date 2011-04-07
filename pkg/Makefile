@@ -20,6 +20,9 @@ build:
 #	R CMD build --force docs=normal --no-vignettes ../surveillance
 	R CMD build --no-vignettes --force .
 
+wininstall:
+	R --arch x64 CMD INSTALL .
+
 winbin:
 	Rcmd build --binary --no-vignettes --force --docs=normal ../surveillance
 #binary:

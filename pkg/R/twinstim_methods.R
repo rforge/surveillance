@@ -377,7 +377,7 @@ residuals.twinstim <- function(m,plot=TRUE,...) {
 ######################################################################
 
 profile.twinstim <- function (fitted, profile, alpha = 0.05,
-    control = list(fnscale = -1, factr = 1e1, maxit = 100), ...)
+    control = list(fnscale = -1, factr = 1e1, maxit = 100), do.ltildeprofile=FALSE,...)
 {
   ## Check that input is ok
   profile <- as.list(profile)
@@ -398,12 +398,9 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
   ###############################################################
 
   ## Control of the optim procedure
-  if (is.null(control[["fnscale",exact=TRUE]])) { control$fnscale <- -10000 }
-#  if (is.null(control[["factr",exact=TRUE]])) { control$factr <- 1e1 }
+  if (is.null(control[["fnscale",exact=TRUE]])) { control$fnscale <- -1 }
   if (is.null(control[["maxit",exact=TRUE]])) { control$maxit <- 100 }
   if (is.null(control[["trace",exact=TRUE]])) { control$trace <- 2 }
-#  if (is.null(control[["abstol",exact=TRUE]])) { control$abstol <- 1e-1 }
- control$abstol <- 1e-1 
 
   
   ## Estimated normalized likelihood function
@@ -416,7 +413,7 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
   ## Profile normalized likelihood function
   ltildeprofile <- function(thetai,i)
   {
-    cat("Investigating theta[",i,"] = ",thetai,"\n")
+    #cat("Investigating theta[",i,"] = ",thetai,"\n")
     
     emptyTheta <- rep(0, length(theta.ml))
       
@@ -425,9 +422,9 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
       theta <- emptyTheta
       theta[-i] <- thetaminusi
       theta[i] <- thetai
-      cat("Investigating theta = ",theta,"\n")
+      #cat("Investigating theta = ",theta,"\n")
       res <- fitted$functions$ll(theta) - loglik.theta.ml
-      cat("Current ltildethetaminusi value: ",res,"\n")
+      #cat("Current ltildethetaminusi value: ",res,"\n")
       return(res)
     }
     # Score function of all params except thetaminusi
@@ -436,7 +433,7 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
       theta[-i] <- thetaminusi
       theta[i] <- thetai
       res <- fitted$functions$sc(theta)[-i]
-      cat("Current stildethetaminusi value: ",res,"\n")
+      #cat("Current stildethetaminusi value: ",res,"\n")
       return(res)
     }
       
@@ -478,7 +475,8 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
       for (j in 1:length(thetai.grid)) {
         cat("\tj= ",j,"/",length(thetai.grid),"\n")
         resProfile[[i]][j,] <- c(thetai.grid[j],
-           ltildeprofile(thetai.grid[j],idx),#NA
+           #Do we need to compute ltildeprofile (can be quite time consuming)
+           ifelse(do.ltildeprofile, ltildeprofile(thetai.grid[j],idx), NA),
            ltildeestim(thetai.grid[j],idx),
            - 1/2*(1/se[idx]^2)*(thetai.grid[j] - theta.ml[idx])^2)
       }

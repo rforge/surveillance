@@ -13,7 +13,9 @@ test:
 #Compiling in cygwin on Windows does not work with RCMD SHLIB. An alternative
 #hack to do the same
 windowspanic:
-	x86_64-w64-mingw32-g++ -shared -s -static-libgcc -o surveillance.dll stcd-assuncaocorrea.o surveillance.o twins.o -LC:/Programme/R/R-2.11.1-x64/bin -lR
+#	x86_64-w64-mingw32-g++ -shared -s -static-libgcc -o surveillance.dll stcd-assuncaocorrea.o surveillance.o twins.o -LC:/Programme/R/R-2.11.1-x64/bin -lR
+#compile for 64 bit
+	x86_64-w64-mingw32-g++ -shared -s -static-libgcc -o surveillance.dll stcd-assuncaocorrea.o surveillance.o twins.o -LC:/Programme/R/R-2.12.1/bin/x64/ -lR
 
 clean:
 	rm surveillance.d surveillance.o surveillance.dll surveillance.so surveillance.exe surveillance_res.rc

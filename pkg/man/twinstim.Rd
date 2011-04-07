@@ -220,15 +220,15 @@ startvalues <- c(-20, rep(0,7),3)
 optim.args <- list(par = startvalues, method = "nlminb", control = list(fnscale = -10000,trace=4,REPORT=1))
 
 #Fit a twinstim model
-m <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) + 
+imdepi.fit <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) + 
               sin(start * 2 * pi/365) + cos(start * 2 * pi/365), 
               epidemic = ~1 + agegrp + type, 
               siaf = siaf_log1, data = imdepi, subset = allEpiCovNonNA, 
               optim.args = optim.args, finetune=FALSE, model=TRUE,
-              nCub = 12, 
+              nCub = 24, 
               typeSpecificEndemicIntercept = FALSE)
 
-summary(m)
+summary(imdepi.fit)
 }
 
 }

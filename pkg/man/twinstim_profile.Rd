@@ -48,7 +48,8 @@ Profile Likelihood Computation and Confidence Intervals for
   }
   \item{control}{
     control object to use in \code{\link{optim}} for the profile log-likelihood
-    computations.
+    computations. It might be necessary to control \code{maxit} or
+  \code{reltol} in order to obtain results in finite time.
   }
   \item{\dots}{
     unused (argument of the generic).
@@ -70,17 +71,15 @@ Michael \enc{Höhle}{Hoehle}
 #Load the twinstim model fitted to the IMD data
 data("imdepifit")
 
-#prof <- profile(imdepi.fit, list(c(1,0,0.05,5), c(3,NA,NA,0), c(4, NA,
-NA, 10)))
-
 #Generate profiling object for a list of parameters for the new model
 names <- c("h.(Intercept)") #c("h.(Intercept)","e.typeC")
 coefList <- lapply(names, function(name) {
-  c(pmatch(name,names(coef(imdepi.fit))),NA,NA,15)
+  c(pmatch(name,names(coef(imdepi.fit))),NA,NA,11)
 })
 
-#Profile object 
-prof <- profile(imdepi.fit, coefList)
+#Profile object (necessary to specify a more loose convergence
+#criterion). Speed things up by using do.ltildeprofile=FALSE (the default)
+prof <- profile(imdepi.fit, coefList,control=list(fnscale=-1,maxit=50,reltol=0.1,REPORT=1),do.ltildeprofile=TRUE)
 
 #Plot result for one variable
 par(mfrow=c(1,2))
