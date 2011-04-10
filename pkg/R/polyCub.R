@@ -27,6 +27,12 @@ polyCub.midpoint <- function (polyregion, f, ..., eps = NULL, dimyx = NULL)
     fxy <- function (x, y, ...) f(cbind(x,y), ...)
     
     # calculate pixel values of fxy
+# hoehle - 10 Apr 2011 - problem in new spatstat, if eps too large the
+# try does not work anymore and the function interrupts. Hence, a crude
+# bug fix is implemented forcing an upper limit on eps, until Sebastian
+# finds time to study the code more carefully.
+#    IM <- try(as.im.function(X = fxy, W = polyregion, ..., eps = eps, dimyx = dimyx), silent = TRUE)
+    eps <- max(exp(1),min(exp(5),eps)) #force upper & limit limit on eps (this is a hack, but as.mask appears to have a problem that makes try/catch useless.
     IM <- try(as.im.function(X = fxy, W = polyregion, ..., eps = eps, dimyx = dimyx), silent = TRUE)
     
     # if eps was to small such that the dimensions of the image would be too big
