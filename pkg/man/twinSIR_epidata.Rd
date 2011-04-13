@@ -5,7 +5,7 @@
 \alias{epidata}
 
 \title{
-Class for Epidemic Data
+Class for Epidemic Data Discrete in Space and Continuous in Time
 }
 
 \description{
