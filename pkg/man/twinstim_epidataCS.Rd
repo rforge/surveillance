@@ -3,9 +3,9 @@
 \alias{print.epidataCS}
 \alias{[.epidataCS}
 \alias{epidataCS}
-
+\alias{update.epidataCS}
 \title{
-Class for Representing Space-Time Orocess Data Continuous in Space and Continuous in Time
+Class for Representing Space-Time Process Data Continuous in Space and Continuous in Time
 }
 
 \description{ The function \code{as.epidataCS} converts a matrix or a

@@ -384,6 +384,13 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
     # Check qmatrix
     if (!missing(qmatrix)) object$qmatrix <- checkQ(qmatrix, levels(object$events$type))
 
+    #hoehle @ 16 Apr 2011 - bug fix. .obsInfLength was not handled
+    # Update length of infection time, i.e. length = min(T-time, eps.t)
+    if (!missing(eps.t)) {
+      timeRange <- with(object$stgrid, c(start[1], stop[length(stop)]))
+      object$events$.obsInfLength <- with(object$events@data, pmin(timeRange[2]-time, eps.t))
+    }
+    
     # Update .sources
     if (!missing(eps.t) || !missing(eps.s) || !missing(qmatrix)) {
         eventTimes <- object$events$time
