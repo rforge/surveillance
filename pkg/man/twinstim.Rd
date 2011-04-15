@@ -21,7 +21,7 @@
   Fit a two-component spatio-temporal conditional intensity function model
 }
 \description{
-  A twinstim model as described in Meyer (2010) is fitted to
+  A twinstim model as described in Meyer et al. (2010) is fitted to
   marked spatio-temporal point process data. This constitutes a
   regression approach for conditional intensity function modelling.
 }
@@ -191,7 +191,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data, subset, na
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-See Also as \code{\link{RLadyBug::twinSIR}}.
+See Also as \code{\link{surveillance::twinSIR}}.
 }
 \examples{
 #Load invasive meningococcal disease data
