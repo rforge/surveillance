@@ -5,7 +5,7 @@
 \alias{epidataCS}
 
 \title{
-Class for Epidemic Data Continuous in Space and Continuous in Time
+Class for Representing Space-Time Orocess Data Continuous in Space and Continuous in Time
 }
 
 \description{ The function \code{as.epidataCS} converts a matrix or a
@@ -101,7 +101,7 @@ Sebastian Meyer, Documentation by Michael H\enc{ö}{oe}hle
 
 \examples{
 }
-}
+
 
 \keyword{spatial}
 \keyword{classes}

@@ -66,8 +66,8 @@ tiaf.constant()
 See Also as \code{\link{surveillance::twinstim}}.
 }
 \examples{
-}
-
+#Finetype indenepdent spatial interaction function used in the twinstim paper
+siaf_log1 <- siaf.gaussian(1, logsd = TRUE, density = FALSE, effRangeMult = 6)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
