@@ -115,12 +115,6 @@ al. (2008)</li>
           <li><code>algo.twins</code> - Held et al. (2006)</li>
         </ul>
       </li>
-      <li>Prospective space-time cluster detection:</li>
-      <ul>
-        <li><code>stcd</code> - (experimental) Point process based
-approach by Assuncao &amp; Correa (2009)<br>
-        </li>
-      </ul>
       <li>For evaluation purposes, the package contains example
 datasets drawn
 from the SurvStat@RKI Database maintained the RKI, Germany. More
@@ -131,11 +125,17 @@ specificity and detection delay can be computed for entire sets of
 surveillance time series. Furthermore, a Markov Chain approximation for
 computing the run-length distribution of the proposed likelihood ratio
 CUSUMs is available as function <code>LRCUSUM.runlength.</code></li>
-<li> From version 1.3-0 (current development version) on, the package contains experimental functionality for the retrospective continuous time modelling of epidemic phenomena:  
+<li> Retrospective continuous time modelling and simulation of epidemic phenomena (experimental from version 1.3-0 on):  
 <ul>
-<li><code>twinSIR</code> continuous-time and discrete-space modelling as described in H&ouml;hle (2009). The <code>epidata</code> class provides the appropriate data structure for such data.
-<li><code>twinstim</code> continuous-time and continuous-space modelling as desribed in Meyer et al. (2010) and as caputred by the <code>epidataCS</code> data class.
+<li><code>twinSIR</code> - continuous-time and discrete-space modelling as described in H&ouml;hle (2009). The <code>epidata</code> class provides the appropriate data structure for such data.
+<li><code>twinstim</code> - continuous-time and continuous-space modelling as desribed in Meyer et al. (2010) and as caputred by the <code>epidataCS</code> data class.
 </ul>
+      <li>Prospective space-time cluster detection:</li>
+      <ul>
+        <li><code>stcd</code> - (experimental) Point process based
+approach by Assuncao &amp; Correa (2009)<br>
+        </li>
+      </ul>
       <li>The package comes with ABSOLUTELY NO WARRANTY; for details
 see <a href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>
 (GPL). This is free software, and and you are welcome to redistribute
@@ -230,6 +230,7 @@ Höhle</a>, Department of Statistics, University of Munich, Germany
       <li><a href="http://www.biostat.uzh.ch/aboutus/people/mpaul.html">Michaela
 Paul</a>, Institute of Social and Preventive Medicine, University of
 Zurich, Switzerland</li>
+	<li>Sebastian Meyer, Department of Psychiatry and Psychotherapy, Ludwig-Maximilians-Universit&auml;t, M&uuml;nchen, Germany</li> 
       <li>Former student programmers: C. Lang, Andrea Riebler, Valentin
 Wimmer</li>
       <li>Contributions by: T. Correa, M. Hofmann and S. Steiner</li>
