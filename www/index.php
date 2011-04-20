@@ -48,19 +48,18 @@ echo $contents; } ?>
   <ul>
     <ul>
       <li> The intention of the R-package <tt>surveillance</tt> is to
-provide open source software for the visualization, modelling and
-monitoring of count data, binary and categorical time series. <br>
+provide open source software for the temporal and spatio-temporal visualization, modelling and
+monitoring of epidemic phenomena. This includes count, binary and categorical data time series as well as continuous-time processes having discrete or continuous spatial resolution. <br>
       </li>
+<li> Potential users of the package are biostatisticians, epidemiologists and others working in, e.g., applied infectious disease epidemiology. However, applications could just as
+well originate from environmetrics, reliability engineering,
+econometrics or social sciences. 
       <li> The main application is in the detection of aberrations in
 routine collected public health data seen as univariate and
-multivariate time series of counts. Hence, potential users are
-biostatisticians, epidemiologists and others working in applied
-infectious disease epidemiology. However, applications could just as
-well originate from environmetrics, reliability engineering,
-econometrics or social sciences. </li>
+multivariate time series of counts. </li>
       <li> <tt>surveillance</tt> provides an S4 class data structure
 and framework for methodological developments of change-point
-algorithms. </li>
+algorithms for time series of counts. </li>
       <li>Prospective outbreak detection procedures for count data time
 series:</li>
       <ul>
@@ -132,6 +131,11 @@ specificity and detection delay can be computed for entire sets of
 surveillance time series. Furthermore, a Markov Chain approximation for
 computing the run-length distribution of the proposed likelihood ratio
 CUSUMs is available as function <code>LRCUSUM.runlength.</code></li>
+<li> From version 1.3-0 (current development version) on, the package contains experimental functionality for the retrospective continuous time modelling of epidemic phenomena:  
+<ul>
+<li><code>twinSIR</code> continuous-time and discrete-space modelling as described in H&ouml;hle (2009). The <code>epidata</code> class provides the appropriate data structure for such data.
+<li><code>twinstim</code> continuous-time and continuous-space modelling as desribed in Meyer et al. (2010) and as caputred by the <code>epidataCS</code> data class.
+</ul>
       <li>The package comes with ABSOLUTELY NO WARRANTY; for details
 see <a href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>
 (GPL). This is free software, and and you are welcome to redistribute
@@ -144,7 +148,7 @@ under the GPL conditions.</li>
 <b>Download:</b>
 <blockquote>
   <blockquote>
-    <blockquote> The <tt>surveillance</tt> package (version 1.1-6) is
+    <blockquote> The <tt>surveillance</tt> package (version 1.2-1) is
 available for download from <a
  href="http://cran.r-project.org/web/packages/surveillance/">CRAN</a>.<br>
 Current package development, help-forum and bugtracking is hosted
