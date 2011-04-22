@@ -92,10 +92,10 @@ algo.farrington.fitGLM.fast <- function(response,wtime,timeTrend=TRUE,reweight=T
   #Create design matrix and formula needed for the terms object
   #Results depends on whether to include a time trend or not.
   if (timeTrend) {
-    design<-cbind(intercept=1,wtime) 
+    design<-cbind(intercept=1,wtime=wtime) 
     Formula<-response~wtime 
   } else {
-    design<-matrix(1,nrow=length(wtime))
+    design<-matrix(1,nrow=length(wtime),dimnames=list(NULL,c("intercept")))
     Formula<-response~1
   }
   
@@ -284,8 +284,12 @@ algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, rewei
   observed <- disProgObj$observed
   freq <- disProgObj$freq
   epochStr <- switch( as.character(freq), "12" = "1 month","52" =  "1 week","365" = "1 day")
-  #Fetch population (new)
-  population <- disProgObj$populationFrac
+  #Fetch population (if it exists)
+  if (!is.null(disProgObj$populationFrac)) {
+    population <- disProgObj$populationFrac } 
+  else { 
+    population <- rep(1,length(observed))
+  }
 
   ######################################################################
   # Fix missing control options

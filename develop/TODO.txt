@@ -12,6 +12,19 @@
 #======================================================================
 #======================================================================
 
+########
+# Bugs
+########
+
+#Open
+05/04/2011 simulation does not work on the fitted Hagelloch data (->Sebastian?)
+04/04/2011 osAIC computations by simulation does not work in some
+           cases where estimated coefficient is small (global in Hagelloch)
+           Problems occur in the quadratic programming (->Michael)
+
+#Fixed
+
+
 ###########
 # Feature
 ###########
@@ -24,17 +37,6 @@
 #Done 
 
 
-########
-# Bugs
-########
-
-#Open
-05/04/2011 simulation does not work on the fitted Hagelloch data (->Sebastian?)
-04/04/2011 osAIC computations by simulation does not work in some
-           cases where estimated coefficient is small (global in Hagelloch)
-           Problems occur in the quadratic programming (->Michael)
-
-#Fixed
 
 
 #======================================================================
@@ -63,9 +65,7 @@
             stpp <- simulate(m, nsim=1, data = imdepi, tiles = kreise, t0 = 0, T = 300, W = W, nCub=24)
 
 - 15/04/2011 Using siaf=siaf.constant in twinstim  does not work. Is this intended?
- 
-
-
+- 16/04/2011 Use of finetune=TRUE appears not to lead to convergence. How to fix this?
 
 #Closed:
 
@@ -90,13 +90,13 @@ minutes. Possible to fix this??
 ##########
 
 #Open issues / feature requests
-- Profile function as in twinSIR
 - Plot function for epidataCS objects
 - robustification/ of optim procedure by making it more adaptive -> sebastian
 - Documentation of functions in Rd files -> michael
 - intensityPlot as in twinSIR, i.e. on W integrated intensity (and its components) as a function of time, grouped by type
 
 #Done
+08/04/2011 (michael): Implemented profile function as in twinSIR.
 12/08/2010 (sebastian): speed-up calculation of tau importantly by only evaluating .siafInt(siafpars) once
 06/08/2010 (sebastian): Lambda(t) function, i.e. cumulative intensity function
 08/11/2010 (sebastian): Implementation of simulation algorithm
