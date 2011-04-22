@@ -31,7 +31,7 @@ algo.farrington.assign.weights <- function(s) {
 ###################################################
 ### chunk number 3: 
 ###################################################
-#line 138 "Rnw/algo_farrington.Rnw"
+#line 137 "Rnw/algo_farrington.Rnw"
 algo.farrington.fitGLM <- function(response,wtime,timeTrend=TRUE,reweight=TRUE,...) {
   #Model formula depends on whether to include a time trend or not.
   theModel <- as.formula(ifelse(timeTrend, "response~1+wtime","response~1"))
@@ -200,7 +200,7 @@ algo.farrington.fitGLM.populationOffset <- function(response,wtime,population,ti
 ###################################################
 ### chunk number 4: 
 ###################################################
-#line 340 "Rnw/algo_farrington.Rnw"
+#line 339 "Rnw/algo_farrington.Rnw"
 
 algo.farrington.threshold <- function(pred,phi,alpha=0.01,skewness.transform="none",y) {
   #Fetch mu0 and var(mu0) from the prediction object
@@ -232,7 +232,7 @@ algo.farrington.threshold <- function(pred,phi,alpha=0.01,skewness.transform="no
 ###################################################
 ### chunk number 5: 
 ###################################################
-#line 408 "Rnw/algo_farrington.Rnw"
+#line 407 "Rnw/algo_farrington.Rnw"
 ######################################################################
 # Compute indices of reference value using Date class
 #
@@ -277,7 +277,7 @@ refvalIdxByDate <- function(t0, b, w, epochStr, epochs) {
 ###################################################
 ### chunk number 6: 
 ###################################################
-#line 567 "Rnw/algo_farrington.Rnw"
+#line 566 "Rnw/algo_farrington.Rnw"
 
 algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, reweight=TRUE, verbose=FALSE,alpha=0.01,trend=TRUE,limit54=c(5,4),powertrans="2/3",fitFun=c("algo.farrington.fitGLM.fast","algo.farrington.fitGLM","algo.farrington.fitGLM.populationOffset"))) { 
   #Fetch observed
