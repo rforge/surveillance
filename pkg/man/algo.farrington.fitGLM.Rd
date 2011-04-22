@@ -17,15 +17,27 @@
 }
 \usage{
   algo.farrington.fitGLM(response, wtime, timeTrend = TRUE, 
-                         reweight = TRUE)
+                         reweight = TRUE, ...)
   algo.farrington.fitGLM.fast(response, wtime, timeTrend = TRUE, 
-                         reweight = TRUE)
+                         reweight = TRUE, ...)
+  algo.farrington.fitGLM.populationOffset(response, wtime, population,
+                         timeTrend=TRUE,reweight=TRUE, ...) {
 }
 \arguments{
   \item{response}{The vector of observed base counts}
   \item{wtime}{Vector of week numbers corresponding to \code{response}}
   \item{timeTrend}{Boolean whether to fit the \eqn{\beta t}{beta*t} or not}
   \item{reweight}{Fit twice -- 2nd time with Anscombe residuals}
+  \item{population}{Population size. Possibly used as offset, i.e. in
+    \code{algo.farrington.fitGLM.populationOffset} the value 
+    \code{log(population)} is used as offset in the linear
+     predictor of the GLM:   
+   \deqn{\log \mu_t = \log(\text{population}) + \alpha + \beta w_t}{
+   	           log mu_t = log(population) alpha + beta * w}
+   This provides a way to adjust the Farrington procedure to the case
+   of greatly varying populations. Note: This is an experimental implementation with methodology not covered by the original paper.
+  }		       
+  \item{\dots}{Used to catch additional arguments, currently not used.}
 }
 %
 \details{Compute weights from an initial fit and rescale using

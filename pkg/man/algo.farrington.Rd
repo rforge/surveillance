@@ -17,7 +17,7 @@
   algo.farrington(disProgObj, control=list(range=NULL, b=3, w=3,
   reweight=TRUE,verbose=FALSE,alpha=0.01,trend=TRUE,limit54=c(5,4),
   powertrans="2/3",
-  fitFun=c("algo.farrington.fitGLM.fast","algo.farrington.fitGLM")))
+  fitFun=c("algo.farrington.fitGLM.fast","algo.farrington.fitGLM","algo.farrington.fitGLM.populationOffset")))
 }
 \arguments{
 \item{disProgObj}{object of class disProgObj (including the \code{observed} and the \code{state} time series.)}
@@ -56,7 +56,8 @@
     \item{\code{fitFun}}{String containing the name of the fit
         function to be used for fitting the GLM. The options are
         \code{algo.farrington.fitGLM.fast} (default) and
-        \code{algo.farrington.fitGLM}. See details or
+        \code{algo.farrington.fitGLM} or 
+        \code{algo.farrington.fitGLM.populationOffset}. See details of
         \code{\link{algo.farrington.fitGLM}} for more information.}
       % 
       }
@@ -110,7 +111,7 @@ system.time( sts2 <- farrington(sts, control=list(range=c(500:1000),
 sum(upperbound(sts1) - upperbound(sts2))
 }
 }
-\author{M. \enc{HÃ¶hle}{Hoehle}}
+\author{M. \enc{Höhle}{Hoehle}}
 \seealso{\code{\link{algo.farrington.fitGLM}},\code{\link{algo.farrington.threshold}}}
 \keyword{classif}
 \source{A statistical algorithm for the early detection of outbreaks of infectious disease, Farrington, C.P., Andrews, N.J, Beale A.D. and Catchpole, M.A. (1996), J. R. Statist. Soc. A, 159, 547-563.}
