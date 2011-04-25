@@ -15,7 +15,7 @@ Spatio-Temporal animation of an continuous-time continuous-space epidemic
 }
 
 \usage{
-\method{animate}{animate.epidataCS}(object, interval = c(0,Inf), time.spacing = NULL,
+\method{animate}{epidataCS}(object, interval = c(0,Inf), time.spacing = NULL,
     legend.opts = list(), timer.opts = list(), pch = 15:18, col.current = "red",
     col.I = getOption("epicolor")$I, col.R = getOption("epicolor")$R,
     col.influence = "#FEE0D2", ...)
@@ -25,7 +25,7 @@ Spatio-Temporal animation of an continuous-time continuous-space epidemic
   \item{object}{
     an object inheriting from class \code{"epidataCS"}.
   }
-  \item{interval}{}
+  \item{interval}{Time interval for the simulation.}
   \item{time.spacing}{
     time interval for the animation steps.  If \code{NULL} (the default), the
     events are plotted one by one with pauses of \code{sleep} seconds.  Thus, 
@@ -93,6 +93,7 @@ the numbers of susceptible, infectious and removed individuals.
 }
 
 \examples{
+  #Currently no examples
 }
 
 \keyword{hplot}

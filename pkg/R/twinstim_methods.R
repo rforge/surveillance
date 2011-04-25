@@ -311,8 +311,8 @@ setMethod("R0", signature(object = "twinstim"),
 # 95% Kolmogorov-Smirnov error bounds.
 ######################################################################
 
-residuals.twinstim <- function(m,plot=TRUE,...) {
-  tau <- m$tau
+residuals.twinstim <- function(object,plot=TRUE,...) {
+  tau <- object$tau
   n <- length(tau)
 
   #Transform to uniform variable

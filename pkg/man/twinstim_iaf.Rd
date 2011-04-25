@@ -40,8 +40,8 @@ tiaf.constant()
   constraint. Default: \code{TRUE}}
   \item{density}{Normalize expression (\code{TRUE}) or just use Kernel
   of the density (\code{FALSE}).}
-  \item{effRangeMult}{}
-  \item{validpars}{}
+  \item{effRangeMult}{Determines the effective range for numerical integration in terms of multiples of the parameter, i.e. with \code{effRangeMult=6} numerical integration only considers the 6-sigma area around the event instead of the whole observation region W.}
+  \item{validpars}{See \code{\link{twinstim}}. If \code{logsd = FALSE}, you should either use constrained optimisation (L-BFGS-B) or set \code{validpars} to \code{function (pars) pars > 0}.}
 }
 \references{
   S. Meyer, J. Elias and M. Höhle (2010): A space-time conditional
@@ -63,7 +63,7 @@ tiaf.constant()
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-See Also as \code{\link{surveillance::twinstim}}.
+See Also as \code{\link{twinstim}}.
 }
 \examples{
 #Finetype indenepdent spatial interaction function used in the twinstim paper

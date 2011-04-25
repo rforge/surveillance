@@ -26,7 +26,10 @@
   regression approach for conditional intensity function modelling.
 }
 \usage{
-twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data, subset, na.action = na.fail, optim.args, nCub, partial = FALSE, finetune = TRUE, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop, 1), typeSpecificEndemicIntercept = FALSE, model = FALSE)
+twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
+subset, na.action = na.fail, optim.args, nCub, partial = FALSE, finetune
+= TRUE, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop, 1),
+typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -110,7 +113,12 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data, subset, na
     equals the evaluation environment of the fitting function, i.e. it
     is kept in the workspace and the necessary model frames are still
     available when \code{twinstim} has finished.
-}
+  }
+  \item{cumCIF}{Logical (Default: \code{TRUE}) indicating whether to
+  calculate the fitted cumulative intensity at event times. Useful for,
+  e.g. plotting the residuals using
+  \code{\link{residuals.twinstim}}.
+  }
 }
 \details{
   The function performs maximum likelihood inference
@@ -191,7 +199,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data, subset, na
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-See Also as \code{\link{surveillance::twinSIR}}.
+See Also as \code{\link{twinSIR}}.
 }
 \examples{
 #Load invasive meningococcal disease data

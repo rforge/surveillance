@@ -14,7 +14,8 @@ Profile Likelihood Computation and Confidence Intervals for
 
 \usage{
 \method{profile}{twinstim}(fitted, profile, alpha = 0.05,
-        control = list(fnscale = -1, factr = 10, maxit = 100), ...)
+        control = list(fnscale = -1, factr = 10, maxit = 100),
+        do.ltildeprofile=FALSE, ...)
 }
 
 \arguments{
@@ -51,6 +52,11 @@ Profile Likelihood Computation and Confidence Intervals for
     computations. It might be necessary to control \code{maxit} or
   \code{reltol} in order to obtain results in finite time.
   }
+  \item{do.ltildeprofile}{If \code{TRUE} calculate profile likelihood as
+    well. This might take a while, since an optimisation for all other
+    parameters has to be performed. Useful for likelihood based
+    confidence intervals. Default: \code{FALSE}.
+  }
   \item{\dots}{
     unused (argument of the generic).
   }
@@ -72,7 +78,7 @@ Michael \enc{Höhle}{Hoehle}
 data("imdepifit")
 
 #Generate profiling object for a list of parameters for the new model
-names <- c("h.(Intercept)") #c("h.(Intercept)","e.typeC")
+names <- c("h.(Intercept)","e.typeC")
 coefList <- lapply(names, function(name) {
   c(pmatch(name,names(coef(imdepi.fit))),NA,NA,11)
 })

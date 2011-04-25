@@ -23,6 +23,10 @@
 \alias{observed<-,sts-method}
 \alias{population,sts-method}
 \alias{population<-,sts-method}
+\alias{multinomialTS,sts-method}
+\alias{multinomialTS<-,sts-method}
+\alias{neighbourhood,sts-method}
+\alias{neighbourhood<-,sts-method}
 \alias{colnames,sts,missing,missing-method}
 \alias{initialize,sts-method}
 \alias{as.data.frame,sts-method}
@@ -42,8 +46,14 @@
 
 \section{Slots}{
   \describe{
-    \item{\code{week}:}{Object of class \code{numeric} specifying the week
-      numbers. Actually this is not really used at the moment. }
+    \item{\code{epoch}:}{Object of class \code{numeric} or specifying
+  the time of observation. In old versions of the package this used to
+  be the week numbers. However, can be day or month as well depending on
+  the \code{freq} argument. Furthermore, if \code{epochAsDate=TRUE} then
+  it is the \code{as.numeric} representation of \code{Date} objects
+  giving the exact date of the observation. Note: This slot used to be
+  called \code{week} but has been renamed to reflect the greater
+  flexibility in the choice of observation time.}
     \item{\code{freq}:}{If weekly data \code{freq} corresponds to 52, in
       case of monthly data \code{freq} is 12.}
     \item{\code{start}:}{vector of length two denoting the year and the
@@ -90,6 +100,10 @@
       slot of an \code{sts} object.}
     \item{population}{\code{signature(x = "sts")}: extract the \code{population}
       slot of an \code{sts} object.}
+    \item{multinomialTS}{\code{signature(x = "sts")}: extract the
+      \code{multinomialTS} slot of an \code{sts} object.}
+    \item{neighbourhood}{\code{signature(x = "sts")}: extract the
+	  \code{neighbourhood} slot of an \code{sts} object.}
     \item{alarms}{\code{signature(x = "sts")}: extract the \code{alarm}
       slot of an \code{sts} object.}
     \item{upperbound}{\code{signature(x = "sts")}: extract the \code{upperbound}

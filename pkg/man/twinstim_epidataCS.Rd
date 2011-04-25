@@ -1,5 +1,6 @@
 \name{twinstim_epidataCS}
 \alias{as.epidataCS}
+\alias{as.epidata.epidataCS}
 \alias{print.epidataCS}
 \alias{[.epidataCS}
 \alias{epidataCS}
@@ -22,7 +23,8 @@ Class for Representing Space-Time Process Data Continuous in Space and Continuou
 
 \usage{
 as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes), nCircle2Poly = 32)
-update.epidataCS(object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
+\method{update}{epidataCS}(object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
+as.epidata.epidataCS(epidataCS, tileCentroids, eps = 0.001)
 }
 
 \arguments{
@@ -68,17 +70,21 @@ update.epidataCS(object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
   transmission between the event types. will be internally converted to
   logical. Defaults to an independent spread of the event types. 
   }
-  \item{nCircle2Poly}{
-  }
-  \item{object}{
-  }
-  \item{eps.t}{
-  }
-  \item{eps.s}{
-  }
+  \item{nCircle2Poly}{Number of polygons (cake slices) to represent a
+  circle by when doing numerical integration.}
+  \item{object}{Object of type \code{epidataCS} to modify.}
+  \item{eps.t}{Maximal temporal interaction range.}
+  \item{eps.s}{Maximal spatial interaction range.}
+  \item{epidataCS}{An object of type \code{epidataCS}.}
+  \item{tileCentroids}{A coordinate matrix whose row names are the
+    tile levels.}
+  \item{eps}{Interval to subtract from ties.}
+  \item{\dots}{Further arguments. Unused.}
 }
 
-\details{ 
+\details{
+  The function \code{as.epidata.epidataCS} converts an \code{epidataCS}
+  object to an \code{\link{epidata}} object.
 }
 
 \note{

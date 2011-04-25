@@ -44,6 +44,62 @@
 \alias{summary,GridTopology-method}
 \alias{summary,Spatial-method}
 
+%twinSIR, twinstim and hhh4 functions which are not documented. This
+%is more like a TODO list!!
+\alias{Lambda}
+\alias{R0,twinstim-method}
+\alias{Ztilde.chibarsq}
+\alias{animate}
+\alias{bdist}
+\alias{checkEvents}
+\alias{checkQ}
+\alias{checkSimArgs}
+\alias{checkstgrid}
+\alias{coefficients.twinSIR}
+\alias{convertSTS}
+\alias{dSigma1}
+\alias{dSigma2}
+\alias{determineSources}
+\alias{discpoly}
+\alias{doIt}
+\alias{dss}
+\alias{fun}
+\alias{gaussCub}
+\alias{getSummary}
+\alias{gridcellOfEvent}
+\alias{head.epidataCS}
+\alias{inside.gpc.poly}
+\alias{intersectCircle}
+\alias{isClosed}
+\alias{isScalar}
+\alias{likelihood.ci}
+\alias{logScore}
+\alias{marks.epidataCS}
+\alias{multiplicity.sp}
+\alias{nses}
+\alias{obligColsNames_events}
+\alias{obligColsNames_stgrid}
+\alias{permutationTest}
+\alias{pit}
+\alias{pit.one}
+\alias{polyCub.SV}
+\alias{polyCub.midpoint}
+\alias{print.simEpidataCSlist}
+\alias{print.summary.twinSIR}
+\alias{read.design}
+\alias{read.model}
+\alias{residuals.twinSIR}
+\alias{residuals.twinstim}
+\alias{rps}
+\alias{rps.one}
+\alias{scale.gpc.poly}
+\alias{scores}
+\alias{ses}
+\alias{summary.epidataCS}
+\alias{tail.epidataCS}
+\alias{w.chibarsq.sim}
+
+ 
 \title{Internal surveillance Functions}
 \description{
   Undocumented internal \code{surveillance} functions. If you really

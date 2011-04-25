@@ -23,19 +23,19 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5, nCub,
     W = unionSpatialPolygons(tiles, IDs = rep.int(1,length(tiles@polygons)), avoidGEOS = TRUE),
     trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
-    .skipChecks = FALSE, .onlyEvents = FALSE)
-simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
+    .skipChecks = FALSE, .onlyEvents = FALSE,...)
+simulate.twinstim(object, nsim = 1, seed = NULL, data, tiles,
     rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5, nCub,
     W = unionSpatialPolygons(tiles, IDs = rep.int(1,length(tiles@polygons)), avoidGEOS = TRUE),
     trace = FALSE, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
-simplify = TRUE)
+simplify = TRUE, ...)
 }
 
 \arguments{
   \item{endemic}{see 'twinstim'. Note that the extra argument 'typeSpecificEndemicIntercept' of 'twinstim' is implied by 'beta0' here.}
   \item{epidemic}{see 'twinstim'. Marks appearing in this formula must
     be returned by the generating function 'rmarks'.}
-  \item{siaf}{see \link{twinstim::siaf}. The 'siaf' specification must contain the element 'simulate', a function which draws random locations following the spatial kernel 'siaf$f'. The first argument of the function is the number of points to sample, the second one is the vector of parameters 'siafpars', the third one is the type indicator (a character string matching a type name as specified by 'dimnames(qmatrix)'); with the current implementation there will always be simulated only one location at a time.}
+  \item{siaf}{see \link{siaf}. The 'siaf' specification must contain the element 'simulate', a function which draws random locations following the spatial kernel 'siaf$f'. The first argument of the function is the number of points to sample, the second one is the vector of parameters 'siafpars', the third one is the type indicator (a character string matching a type name as specified by 'dimnames(qmatrix)'); with the current implementation there will always be simulated only one location at a time.}
   \item{tiaf}{See siaf}
   \item{qmatrix}{see 'epidataCS'. Note that this square matrix and its
   'dimnames' determine the number and names of the different event
@@ -78,7 +78,10 @@ simplify = TRUE)
   events having occured during (-Inf;t0] are regarded as part of the
   prehistory H_0 of the process. The time point 't0' must be an element
   of data$stgrid$start. By default, and also if 't0=NULL', it is the
-  earliest time point of the spatio-temporal grid 'stgrid'. 
+  earliest time point of the spatio-temporal grid 'stgrid'.
+  In other words: \code{t0} is the temporal range of the
+  simulation(s). By default (NULL), the same time range as for the
+  fitting of 'object' is used.  
 }
 \item{W}{
   W: see as.epidataCS. Must have the same proj4string as 'events' and
@@ -126,17 +129,34 @@ simplify = TRUE)
   an object of class "epidataCS", usually the one to which the
   "twinstim" 'object' was fitted
 }
-\item{t0}{
-  temporal range of the simulation(s). By default (NULL), the same time
-  range as for the fitting of 'object' is used. 
-}
 \item{T}{
   See t0
 }
-\item{simplify}{it is strongly recommended to set 'simplify = TRUE' (default) if 'nsim' is large. This saves space and computation time, because for each simulated epidemic only the "events" component is saved. All other components, which do not vary between simulations, are only stored from the first run. In this case, the runtime of each simulation is stored as an attribute "runtime" to each simulated "events".}
+\item{simplify}{it is strongly recommended to set 'simplify = TRUE'
+  (default) if 'nsim' is large. This saves space and computation time,
+  because for each simulated epidemic only the "events" component is
+  saved. All other components, which do not vary between simulations,
+  are only stored from the first run. In this case, the runtime of each
+  simulation is stored as an attribute "runtime" to each simulated
+  "events".}
+\item{nEvents}{Simulate \code{nEvents} events up to time \code{T}. It is bounded above by 10000.}
+\item{nCub}{ Determines the accuracy of the cubature of the \code{siaf}' function. If \code{siaf$Fcircle} is specified, nCub = effRange/eps, where eps is used as pixel width and height in the two-dimensional midpoint rule (see polyCub.midpoint). Thus nCub is the desired number of subdivions of effRange in both dimensions and eps = effRange/nCub. If \code{siaf$Fcircle} is missing, nCub equals the above mentioned eps.}
+\item{nCircle2Poly}{Number of polygons (cake slices) a circle  is
+  represented by in the numeric integration.}
+\item{gmax}{Maximal value the temporal interaction function can
+  attain. If \code{NULL} then it is chosen (semi-)automatic?}
+\item{\dots}{Further arguments for compability with the generic function
+  (unused).
+}
 }
 
 \details{
+  Simulation works based on Ogata's modified thinning algorithm as
+  described in Meyer et al (2010). Note: The more detailed the polygons
+  in \code{tiles} are the slower the algorithm is. Often, it can be
+  advantageous to sacrifice some detail for speed by reducing polygon
+  complexity using, e.g., the Douglas-Peucker reduction method available
+  at \url{http://mapshaper.com/test/demo.html}.
 }
 
 \references{

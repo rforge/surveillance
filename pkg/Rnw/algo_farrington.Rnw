@@ -251,7 +251,7 @@ algo.farrington.fitGLM.fast <- function(response,wtime,timeTrend=TRUE,reweight=T
 #  takes an additional "population" parameter
 ######################################################################
 
-algo.farrington.fitGLM.populationOffset <- function(response,wtime,population,timeTrend=TRUE,reweight=TRUE) {
+algo.farrington.fitGLM.populationOffset <- function(response,wtime,population,timeTrend=TRUE,reweight=TRUE,...) {
   #Model formula depends on whether to include a time trend or not.
   theModel <- as.formula(ifelse(timeTrend, "response~offset(log(population)) + 1 + wtime","response~offset(log(population)) + 1"))
 

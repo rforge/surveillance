@@ -36,7 +36,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5, nCub,
     W = unionSpatialPolygons(tiles, IDs = rep.int(1,length(tiles@polygons)), avoidGEOS = TRUE),
     trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
-    .skipChecks = FALSE, .onlyEvents = FALSE)
+    .skipChecks = FALSE, .onlyEvents = FALSE, ...)
 {
     ptm <- proc.time()[[3]]
     cl <- match.call()
@@ -933,7 +933,7 @@ checkSimArgs <- expression(
 simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5, nCub,
     W = unionSpatialPolygons(tiles, IDs = rep.int(1,length(tiles@polygons)), avoidGEOS = TRUE),
-    trace = FALSE, nCircle2Poly = 32, gmax = NULL, .allocate = 500, simplify = TRUE)
+    trace = FALSE, nCircle2Poly = 32, gmax = NULL, .allocate = 500, simplify = TRUE, ...)
 {
     ptm <- proc.time()[[3]]
     cl <- match.call()

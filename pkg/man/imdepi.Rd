@@ -1,4 +1,5 @@
 \name{imdepi}
+\docType{data}
 \alias{imdepi}
 \encoding{latin1}
 
@@ -7,9 +8,7 @@
   specific finetypes of invasive meningococcal diseases in
   Germany. 
 }
-\usage{
-data("imdepi")
-}
+\usage{imdepi}
 \format{
   Loading the data in \code{imdepi} gives an object of type
   \code{epidataCS} with entries \code{events}, \code{stgrid}, \code{W}
@@ -79,6 +78,13 @@ data("imdepi")
   details about the IMD event data.
 }
 
+\references{
+  S. Meyer, J. Elias and M. Höhle (2010): A space-time conditional
+  intensity model for infectious disease occurence, Department of
+  Statistics: Technical Reports, No. 95, 27 pages, 2010.
+  Available as http://epub.ub.uni-muenchen.de/11898/
+}
+
 \examples{
   data("imdepi")
 
@@ -138,12 +144,6 @@ data("imdepi")
   }
 }
 
-\references{
-  S. Meyer, J. Elias and M. Höhle (2010): A space-time conditional
-  intensity model for infectious disease occurence, Department of
-  Statistics: Technical Reports, No. 95, 27 pages, 2010.
-  Available as http://epub.ub.uni-muenchen.de/11898/
-}
-\seealso{\code{\link{surveillance::epidataCS}}}
+\seealso{\code{\link{epidataCS}}}
 \keyword{datasets}
 

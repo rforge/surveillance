@@ -90,6 +90,9 @@ data("hagelloch")
 }
 \examples{
   data("hagelloch")
+  #Data frame with the original data documented in Oesterle (1992)
+  head(hagelloch.df)
+  #Represented as epidata object
   summary(hagelloch)
 
   ###################################################
@@ -98,9 +101,8 @@ data("hagelloch")
 
   #Show case locations as in Neal & Roberts (different scaling) using
   #the data.frame
-  plot(hagelloch.df$HNX,hagelloch.df$HNY,xlab="x [m]",ylab="x [m]",pch=15)
-  #Same using the epidata object
-  with(hagelloch[hagelloch$BLOCK == 1,], plot(x.loc,y.loc,xlab="x [m]",ylab="x [m]",pch=15))
+  coordinates(hagelloch.df) <- c("HNX","HNY")
+  plot(hagelloch.df,xlab="x [m]",ylab="x [m]",pch=15,axes=TRUE,cex=sqrt(multiplicity.sp(hagelloch.df)))
 
   #Epicurve
   hist(as.numeric(hagelloch.df$tS),xlab="Time (days)",ylab="Cases",main="")
@@ -134,6 +136,6 @@ data("hagelloch")
   selection for the 1861 Hagelloch measles epidemic, Biostatistics
   5(2):249-261
 }
-\seealso{\code{\link{surveillance::twinSIR}},\code{\link{surveillance::epidata}}}
+\seealso{\code{\link{twinSIR}},\code{\link{epidata}}}
 \keyword{datasets}
 
