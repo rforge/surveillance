@@ -55,7 +55,13 @@ such that it works for a very large class of distributions.
     length variable.}
   \item{arl}{If the model is time homogenous (i.e. if \eqn{T==1}) then
     the ARL is computed based on the stationary distribution of the
-    Markov chain. See the eqns in the reference for details.}
+    Markov chain. See the eqns in the reference for details. Note: If
+    the model is not time homogeneous then the function returns
+    \code{NA} and the ARL has to be approximated manually from the
+    output. One could use \code{sum(1:length(pmf) * pmf)}, which is an
+    approximation because of using a finite support for a sum which
+    should be from 1 to infinity.
+  }
 }
 \references{
   Höhle, M. (2010), Changepoint detection in categorical time series, 
