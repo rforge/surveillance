@@ -160,9 +160,10 @@ Y <- table( factor(symptomTimes,levels=1:max(symptomTimes)))
 plot(1:length(Y),Y,type="h",xlab="",lwd=2,ylim=c(0,max(X,Y)))
 lines(1:length(Y)+0.2,X,col="gray",type="h")
 
+######################################################################
 #Do the EM looping
-#bp.k0 <- backproj.becker(Y=Y,k=0,dincu=dincu,pincu=pincu,eps=1e-5)
-bp.k0 <- backproj.becker(Y=Y,k=0,dincu=dincu,pincu=pincu,eps=1e-6,hookFun=plotIt,ylim=c(0,max(X,Y)))
+######################################################################
+bp.k0 <- backproj.becker(Y=Y,k=0,dincu=dincu,pincu=pincu,eps=1e-5,hookFun=plotIt,ylim=c(0,max(X,Y)))
 lines(1:length(Y),X,col=2,type="h")
 
 incu.sample <- rincu(1e5)
