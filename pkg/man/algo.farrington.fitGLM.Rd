@@ -33,7 +33,7 @@
     \code{algo.farrington.fitGLM.populationOffset} the value 
     \code{log(population)} is used as offset in the linear
     predictor of the GLM:   
-    \deqn{\log \mu_t = \log(\text{population}) + \alpha + \beta w_t}{
+    \deqn{\log \mu_t = \log(\texttt{population}) + \alpha + \beta w_t}{
       log mu_t = log(population) alpha + beta * w}
     This provides a way to adjust the Farrington procedure to the case
     of greatly varying populations. Note: This is an experimental implementation with methodology not covered by the original paper.

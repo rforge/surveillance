@@ -50,7 +50,7 @@
   random effects. 
 }
 \usage{
-hhh4 <- function(stsObj, 
+hhh4(stsObj, 
    control = list(
                ar = list(f = ~ -1,        
                          lag = 1,         
@@ -84,7 +84,7 @@ hhh4 <- function(stsObj,
     components:
     \describe{
       \item{\code{ar}}{\describe{
-	  \item{f=list(f = ~ -1)}{a formula for \eqn{\exp(x'\lamba)\cdot y_{t-1}}{exp(x'lamba)*y_t-1}}
+	  \item{f=list(f = ~ -1)}{a formula for \eqn{\exp(x'\lambda)\cdot y_{t-1}}{exp(x'lambda)*y_t-1}}
 	  \item{lag = 1}{autoregression on \eqn{y_{i,t-lag}}{y_i,t-lag}
 	    (currently not used)}
 	  \item{weights = NULL}{optional weights, only used if model is
@@ -96,7 +96,7 @@ hhh4 <- function(stsObj,
       }
       \item{\code{ar}}{A list with the following elements:
 	\describe{
-          \item{f = ~ -1}{a formula \eqn{\exp(x'\lamba)\cdot y_{t-1}}{exp(x'lamba)*y_t-1}}
+          \item{f = ~ -1}{a formula \eqn{\exp(x'\lambda)\cdot y_{t-1}}{exp(x'lambda)*y_t-1}}
 	  \item{lag = 1}{autoregression on y_i,t-lag (currently not
 	    used)}
 	  \item{weights = NULL}{optional weights, only used if model

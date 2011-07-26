@@ -1550,7 +1550,7 @@ marLogLik <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   fisher <- fisher.unpen 
   fisher[-(1:dimFE.O),-(1:dimFE.O)] <- fisher[-(1:dimFE.O),-(1:dimFE.O)] + Sigma.inv
   
-  F.inv <- try(solve(fisher),silent=T)
+  F.inv <- try(solve(fisher),silent=TRUE)
   
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING: penalized Fisher is singular!\n")
@@ -1615,7 +1615,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   fisher <- fisher.unpen 
   fisher[-(1:dimFE.O),-(1:dimFE.O)] <- fisher[-(1:dimFE.O),-(1:dimFE.O)] + Sigma.inv
   
-  F.inv <- try(solve(fisher),silent=T)
+  F.inv <- try(solve(fisher),silent=TRUE)
   
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING: penalized Fisher is singular!\n")
@@ -1692,7 +1692,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   fisher <- fisher.unpen 
   fisher[-(1:dimFE.O),-(1:dimFE.O)] <- fisher[-(1:dimFE.O),-(1:dimFE.O)] + Sigma.inv
   
-  F.inv <- try(solve(fisher),silent=T)
+  F.inv <- try(solve(fisher),silent=TRUE)
   
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING: penalized Fisher is singular!\n")
@@ -2127,7 +2127,7 @@ newtonRaphson <- function(x,fn,..., control=list(scoreTol=1e-5, paramTol=1e-8,F.
     }
     # get cholesky decompositon
     F <- fisher(ll)
-    F.chol <- try(chol(F),silent=T)
+    F.chol <- try(chol(F),silent=TRUE)
     # could still give a nearly singular matrix
     # => could also check condition number
     
@@ -2213,7 +2213,7 @@ newtonRaphson <- function(x,fn,..., control=list(scoreTol=1e-5, paramTol=1e-8,F.
   
   # fisher info
   F <- fisher(ll)
-  if(inherits(try(solve(F),silent=T),"try-error")){ 
+  if(inherits(try(solve(F),silent=TRUE),"try-error")){ 
     cat("\n\n***************************************\nfisher not regular!\n")
     #print(summary(x))
     return(list(coefficients=x, loglikelihood=loglik, fisher=F, convergence=22, notpd = notpd, steph = steph))
@@ -2368,7 +2368,7 @@ oneStepAhead <- function(result, # result of call to hhh4
 
 # plot estimated mean 
 # this needs to be made more customizable
-plot.ah4 <- function(x,i=1,ylim=NULL, ylab="No. infected",title=NULL,m=NULL,xlab="", col=c("grey30","grey60","grey85"),cex=.6,pch=19, legend=FALSE){
+plot.ah4 <- function(x,i=1,ylim=NULL, ylab="No. infected",title=NULL,m=NULL,xlab="", col=c("grey30","grey60","grey85"),cex=.6,pch=19, legend=FALSE, ...){
 
   if(is.null(title))
     title <-colnames(observed(x$stsOb))[i]
@@ -2377,7 +2377,7 @@ plot.ah4 <- function(x,i=1,ylim=NULL, ylab="No. infected",title=NULL,m=NULL,xlab
   
   if(!is.null(ylim))
     max <- ylim
-  else max <- c(-1/20*max(obs,na.rm=T), max(obs,na.rm=T))
+  else max <- c(-1/20*max(obs,na.rm=TRUE), max(obs,na.rm=TRUE))
 
    start <- x$stsObj@start
    start[2] <-  start[2]+1
