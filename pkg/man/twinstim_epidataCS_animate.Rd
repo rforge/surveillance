@@ -81,7 +81,7 @@ Spatio-Temporal animation of an continuous-time continuous-space epidemic
 %}
 
 \author{
-Sebastian Meyer, Documentation by Michael H\enc{oe}{ö}hle
+Sebastian Meyer, Documentation by Michael H\enc{ö}{oe}hle
 }
 
 \seealso{

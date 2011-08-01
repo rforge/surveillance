@@ -1,27 +1,34 @@
 --------------------------------------------------------------------------------
 | SEBASTIAN'S PERSONAL TODO LIST                                               |
 | This file contains notes of every description.                               |
-| $Date: 2010-11-16 04:08:22 +0100 (Tue, 16 Nov 2010) $                        |
+| $Date: 2010-11-16 04:08:22 +0100 (Di, 16. Nov 2010) $                        |
 --------------------------------------------------------------------------------
 
-funktion um nachträglich tau zu berechnen, wenn model=TRUE.
-plot.twinstim (= residual plot or serial correlation plot). call function for a posteriori calculation of tau if tau is not part of the twinstim-object
+- Bei NA-Zuordnung von tile eine warning schmeißen statt abzubrechen (abbruch erfolgt zur zeit mit na.fail in buildmmh)
+- REPORT argument in simEpidataCS
+- kreise "simplifizieren". geht mit simplify.owin(as.owin(as(kreise, "gpc.poly")), 10) oder http://mapshaper.com/test/demo.html
+- twinstim-parametrisierung ändern. es soll möglich sein ohne optimierung ein twinstim objekt zu erhalten, dass auf den startwerten basiert. nicht optim.args=NULL sondern neuer parameter "do.optim" oder so ähnlich (vgl. andere pakete)
+- update-funktion für "epidataCS" bzgl. stgrid variablen hinzufügen oder löschen (NULL). was ist mit zusätzlichen markierungen? => "marks<-"
+- möglichkeit für drop.unused.levels = FALSE in twinstim und as.epidataCS. das geht wohl nur ohne optimierung?
 
-environments optimieren, damit fits beim speichern nicht soviel speicherplatz beanspruchen.
-statt emptyenv() wäre auch globalenv() eine einfache option für die formulas, dann brauche ich in R0 keine änderung in baseenv() mehr.
-R0-Bug bei Faktorvariablen
-optimierung erst adaptiv, dann fest wegen konvergenz! ODER SCHAUKELALGORITHMUS!
+- funktion um nachträglich tau zu berechnen, wenn model=TRUE.
+- plot.twinstim (= residual plot or serial correlation plot). call function for a posteriori calculation of tau if tau is not part of the twinstim-object
+- integrate tiebreak functions into RLadyBug
 
-Rd-doku!!
+- environments optimieren, damit fits beim speichern nicht soviel speicherplatz beanspruchen.
+- R0-Bug bei Faktorvariablen
+- optimierung erst adaptiv, dann fest wegen konvergenz! ODER SCHAUKELALGORITHMUS!
 
-any simplifications in simulation from twinstim objects?
+- Rd-doku!!
 
-es wäre natürlich trotzdem mal interessant effRangeMult auf Inf zu setzen und die Ergebnisse zu vergleichen.
-test wie es mit echter gaußdichte funktioniert (nicht wert 1 bei 0)
-test mit lower für sigma
-validierung von twinstim durch twinSIR bei nur endemischer komponente
+- any simplifications in simulation from twinstim objects?
 
-irgendwie typ-spezifische endemische kovariablen erlauben (influenza!). über "special" kriegt man den intercept nicht typspezifisch. also: eigenes argument typeSpecificEffects = c("(Intercept)", "influenza0")... vorsicht mit kategorialen variablen => ergeben mehrere parameter
+- es wäre natürlich trotzdem mal interessant effRangeMult auf Inf zu setzen und die Ergebnisse zu vergleichen.
+- test wie es mit echter gaußdichte funktioniert (nicht wert 1 bei 0)
+- test mit lower für sigma
+- validierung von twinstim durch twinSIR bei nur endemischer komponente
+
+- irgendwie typ-spezifische endemische kovariablen erlauben (influenza!). über "special" kriegt man den intercept nicht typspezifisch. also: eigenes argument typeSpecificEffects = c("(Intercept)", "influenza0")... vorsicht mit kategorialen variablen => ergeben mehrere parameter
 
 
 

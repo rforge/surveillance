@@ -61,6 +61,9 @@ summary.twinstim <- function (object,
     ans$coefficients.beta <- coefficients[seq_len(nbeta),,drop=FALSE]
     ans$coefficients.gamma <- coefficients[nbeta+seq_len(q),,drop=FALSE]
     ans$coefficients.iaf <- coefficients[nNotIaf+seq_len(niafpars),,drop=FALSE]
+    # usually, siaf and tiaf parameters are strictly positive,
+    # thus the usual wald test with H0: para=0 is invalid
+    is.na(ans$coefficients.iaf[,4]) <- TRUE
     # estimated parameter correlation
     if (correlation) {
         ans$correlation <- cov2cor(ans$cov)
@@ -156,7 +159,7 @@ print.summary.twinstim <- function (x,
 
 ### 'cat's the summary in LaTeX code
 
-toLatex.summary.twinstim <- function (object, digits = max(3, getOption("digits") - 3), align = "rrrrr", ...)
+toLatex.summary.twinstim <- function (object, digits = max(3, getOption("digits") - 3), align = "rrrrr", withAIC = TRUE, ...)
 {
 library("xtable")
 ret <- capture.output({
@@ -177,13 +180,16 @@ ret <- capture.output({
             parnames <- paste("\\texttt{",tab2[,1],"}",sep="")
             tab2 <- as.data.frame(lapply(tab2[,-1], function(x) paste("$",x,"$",sep="")))
             rownames(tab2) <- parnames
+            if (length(naps <- grep("e\\.[st]iaf", parnames))) tab2[naps, 4] <- ""  # p-value for siaf and tiaf is NA
             print(xtable(tab2), only.contents = TRUE, include.colnames = FALSE, sanitize.text.function = identity, hline.after = NULL)
             cat("\\hline\n")
         }
     }
-    cat("\\hline\n")
-    cat("AIC:& $", format(object$aic, digits=max(4, digits+1)), "$ &&&\\\\\n")
-    cat("Log-likelihood:& $", format(object$loglik, digits=digits), "$ &&&\\\\\n")
+    if (withAIC) {
+        cat("\\hline\n")
+        cat("AIC:& $", format(object$aic, digits=max(4, digits+1)), "$ &&&\\\\\n")
+        cat("Log-likelihood:& $", format(object$loglik, digits=digits), "$ &&&\\\\\n")
+    }
     cat("\\hline\n")
     cat("\\end{tabular}\n")
 })
@@ -343,7 +349,7 @@ residuals.twinstim <- function(object,plot=TRUE,...) {
     col <- "gray"
     myabline(a=0,b=1,x.grid=seq(0,1,length=1000),col=col,lwd=2)
     lines(U, ecdf(U)(U),type="s")
-    
+
     myabline(a=D95,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
     myabline(a=-D95,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
     #myabline(a=D99,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
@@ -351,7 +357,7 @@ residuals.twinstim <- function(object,plot=TRUE,...) {
     legend(x="topleft",lty=2,col=col,"95% KS error bounds")
     #Done
   }
-  
+
   invisible(list(tau=tau,U=U,D95=D95,D99=D99))
 }
 
@@ -402,7 +408,7 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
   if (is.null(control[["maxit",exact=TRUE]])) { control$maxit <- 100 }
   if (is.null(control[["trace",exact=TRUE]])) { control$trace <- 2 }
 
-  
+
   ## Estimated normalized likelihood function
   ltildeestim <- function(thetai,i) {
     theta <- theta.ml
@@ -414,9 +420,9 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
   ltildeprofile <- function(thetai,i)
   {
     #cat("Investigating theta[",i,"] = ",thetai,"\n")
-    
+
     emptyTheta <- rep(0, length(theta.ml))
-      
+
     # Likelihood l(theta_{-i}) = l(theta_i, theta_i)
     ltildethetaminusi <- function(thetaminusi) {
       theta <- emptyTheta
@@ -436,7 +442,7 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
       #cat("Current stildethetaminusi value: ",res,"\n")
       return(res)
     }
-      
+
     # Call optim -- currently not adapted to arguments of control arguments
     # used in the fit
     resOthers <- tryCatch(
@@ -445,16 +451,16 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
             warning = function(w) print(w), error = function(e) list(value=NA))
     resOthers$value
   }
-  
 
-  
+
+
   ## Initialize
   theta.ml <- coef(fitted)
   loglik.theta.ml <- c(logLik(fitted))
   se <- sqrt(diag(vcov(fitted)))
   resProfile <- list()
 
-  
+
   ## Perform profile computations for all requested parameters
   cat("Evaluating the profile logliks on a grid...\n")
   for (i in 1:length(profile))
