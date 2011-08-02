@@ -63,7 +63,7 @@ summary.twinstim <- function (object,
     ans$coefficients.iaf <- coefficients[nNotIaf+seq_len(niafpars),,drop=FALSE]
     # usually, siaf and tiaf parameters are strictly positive,
     # thus the usual wald test with H0: para=0 is invalid
-    is.na(ans$coefficients.iaf[,4]) <- TRUE
+    is.na(ans$coefficients.iaf[,3:4]) <- TRUE
     # estimated parameter correlation
     if (correlation) {
         ans$correlation <- cov2cor(ans$cov)
@@ -180,7 +180,7 @@ ret <- capture.output({
             parnames <- paste("\\texttt{",tab2[,1],"}",sep="")
             tab2 <- as.data.frame(lapply(tab2[,-1], function(x) paste("$",x,"$",sep="")))
             rownames(tab2) <- parnames
-            if (length(naps <- grep("e\\.[st]iaf", parnames))) tab2[naps, 4] <- ""  # p-value for siaf and tiaf is NA
+            if (length(naps <- grep("e\\.[st]iaf", parnames))) tab2[naps, 3:4] <- ""  # z-value and p-value for siaf and tiaf are NA
             print(xtable(tab2), only.contents = TRUE, include.colnames = FALSE, sanitize.text.function = identity, hline.after = NULL)
             cat("\\hline\n")
         }
