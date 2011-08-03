@@ -203,7 +203,7 @@ ret
 
 plotiaf <- function (twinstim, iaf = c("siaf", "tiaf"),
     types = 1:nrow(twinstim$qmatrix), xlim = c(0,eps), ylim = c(0,1),
-    cols = rainbow(length(types)), add = FALSE, ...)
+    cols = rainbow(length(types)), lwd = c(2, 1), add = FALSE, ...)
 {
     iaf <- match.arg(iaf)
     eps <- twinstim$medianeps[if (iaf=="siaf") "spatial" else "temporal"]
@@ -214,9 +214,9 @@ plotiaf <- function (twinstim, iaf = c("siaf", "tiaf"),
     cis <- confint(twinstim, idxpars)
     if (!add) plot(xlim, ylim, type="n", ...)
     for (i in seq_along(types)) {
-        curve(FUN(if(iaf=="siaf") cbind(x,0) else x, pars, types[i]), add=TRUE, col=cols[i])
-        curve(FUN(if(iaf=="siaf") cbind(x,0) else x, cis[,1], types[i]), add = TRUE, lty=2, col=cols[i])
-        curve(FUN(if(iaf=="siaf") cbind(x,0) else x, cis[,2], types[i]), add = TRUE, lty=2, col=cols[i])
+        curve(FUN(if(iaf=="siaf") cbind(x,0) else x, pars, types[i]), add=TRUE, lty=1, col=cols[i], lwd=lwd[1])
+        curve(FUN(if(iaf=="siaf") cbind(x,0) else x, cis[,1], types[i]), add = TRUE, lty=2, col=cols[i], lwd=lwd[2])
+        curve(FUN(if(iaf=="siaf") cbind(x,0) else x, cis[,2], types[i]), add = TRUE, lty=2, col=cols[i], lwd=lwd[2])
     }
 }
 
