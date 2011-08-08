@@ -35,7 +35,7 @@
 \references{
   Paul, M. and Held, L. (2011) Predictive assessment of a non-linear
     random  effects model for multivariate time series of infectious
-    disease counts. Statistics in Medicine, DOI: 10.1002/sim.4177.
+    disease counts. Statistics in Medicine, \bold{30}, 1118--1136.
 }
 
 \keyword{datasets}

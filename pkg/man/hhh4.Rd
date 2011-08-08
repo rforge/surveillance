@@ -19,6 +19,8 @@
 \alias{updateVariance}
 \alias{updateRegression}
 \alias{d2Sigma3}
+\alias{dSigma1}
+\alias{dSigma2}
 \alias{dSigma3}
 \alias{d2Sigma1}
 \alias{d2Sigma2}
@@ -83,49 +85,40 @@ hhh4(stsObj,
   \item{control}{control object, which is a list containing several
     components:
     \describe{
-      \item{\code{ar}}{\describe{
-	  \item{f=list(f = ~ -1)}{a formula for \eqn{\exp(x'\lambda)\cdot y_{t-1}}{exp(x'lambda)*y_t-1}}
+      \item{\code{ar}}{ Model for the autoregressive component given as
+          list with the following components: 
+          \describe{
+	  \item{f = ~ -1}{a formula for \eqn{\exp(x'\lambda)\cdot y_{t-1}}{exp(x'\lambda)*y_t-1}}
 	  \item{lag = 1}{autoregression on \eqn{y_{i,t-lag}}{y_i,t-lag}
-	    (currently not used)}
+	    (currently only \code{lag = 1} is possible)}
 	  \item{weights = NULL}{optional weights, only used if model is
-	    a contact matrix (currently not used)}
+	    a contact matrix (currently not implemented)}
 	  \item{initial = NULL}{vector with initial values for
-	    parameters if pred is a matrix or if pred = ~1 (not really
+	    parameters if \code{f = ~1} (not really
 	    used ATM)}
 	}
       }
-      \item{\code{ar}}{A list with the following elements:
+      \item{\code{ne}}{Model for the neighbor-driven component given as
+       list with the following components:
 	\describe{
-          \item{f = ~ -1}{a formula \eqn{\exp(x'\lambda)\cdot y_{t-1}}{exp(x'lambda)*y_t-1}}
-	  \item{lag = 1}{autoregression on y_i,t-lag (currently not
-	    used)}
-	  \item{weights = NULL}{optional weights, only used if model
-	    is a contact matrix (currently not used)}
-	  \item{initial = NULL}{vector with initial values for
-	    parameters if pred is a matrix or if pred = ~1 (not really
-	    used ATM)}
-	}
-      }
-      \item{\code{ne}}{A list with the following components:
-	\describe{
-	  \item{f = ~ -1}{a formula \eqn{\exp(x'phi) \cdot \sum_j {w_ji \cdot
-		y_{j,t-1}}}{exp(x'phi) * \sum_j {w_ji *
+	  \item{f = ~ -1}{a formula \eqn{\exp(x'\phi) \cdot \sum_j {w_{ji} \cdot
+		y_{j,t-1}}}{exp(x'\phi) * \sum_j {w_ji *
 		y_j,t-1}}}
-	  \item{lag = 1}{autoregression on y_j,t-lag  (currently not
-	    used)}
-	  \item{weights = NULL}{weights w_ji, if NULL neighbourhood
-	    matrix of stsObj is used}
+	  \item{lag = 1}{autoregression on \eqn{y_{j,t-lag}}{y_j,t-lag}  
+	    (currently only \code{lag = 1} is possible)}
+	  \item{weights = NULL}{weights \eqn{w_{ji}}{w_ji}, if 
+	    \code{NULL} the neighbourhood matrix of \code{stsObj} is used}
 	  \item{initial = NULL}{vector with initial values for
-	    parameter if pred = ~1 (not really used ATM)}
+	    parameter if \code{f = ~1} (not really used ATM)}
 	}
       }
       \item{\code{end}}{Model for the endemic component given as list
 	with the following components
 	\describe{
-	  \item{f = ~ 1}{a formula \eqn{exp(x'nu) * n_it}}
-	  \item{offset = NULL}{optional offset n_it}
+	  \item{f = ~ 1}{a formula \eqn{\exp(x'\nu) \cdot n_{it}}{exp(x'\nu) * n_it}}
+	  \item{offset = NULL}{optional multiplicative offset \eqn{n_{it}}{n_it}}
 	  \item{initial = NULL}{vector with initial values for
-	    parameter if pred = ~1 (not really used ATM)}
+	    parameter if \code{f = ~1} (not really used ATM)}
 	}
       }
       \item{\code{family}}{Distributional family -- either Poisson,
@@ -133,13 +126,15 @@ hhh4(stsObj,
 	overdispersion parameter for all units (\code{NegBin1}) or a
 	overdispersion parameter for each units (\code{NegBinM}).
       }
-      \item{\code{subset}}{typically 2:nrow(obs) if model contains
+      \item{\code{subset}}{typically \code{2:nrow(obs)} if model contains
 	autoregression}
-      \item{optimizer}{ details for used optimizer (nlminb is default, optim may also be used)}
-      \item{verbose}{Logical if additional information is to be printed
+      \item{\code{optimizer}}{ details for used optimizer (\code{nlminb} is 
+        default, \code{optim} may also be used)}
+      \item{\code{verbose}}{Logical if additional information is to be printed
 	during the computations}
       \item{\code{start}}{list with initials, overrides any initial
-	values in formulas}
+	values in formulas (this is currently the only way to specify
+	initial values)}
       \item{\code{data}}{ data.frame or named list with covariates that
 	are specified in the formulas for the 3 components}
     }
@@ -147,25 +142,25 @@ hhh4(stsObj,
 }
 
 \value{Returns an object of class \code{ah4} with elements
-  \item{coefficients}{named vector with estimated parameters of the model}
-  \item{se}{estimated standard errors}
-  \item{cov}{covariance matrix}
-  \item{Sigma}{  }
-  \item{Sigma.orig}{  }
-  \item{Sigma.cov}{  }
-  \item{call}{  }
-  \item{dim}{  }
-  \item{loglikelihood}{loglikelihood avaluated at the MLE}
-  \item{margll}{  }
-  \item{convergence}{  }
+  \item{coefficients}{named vector with estimated (regression) parameters of the model}
+  \item{se}{estimated standard errors (for regression parameters)}
+  \item{cov}{covariance matrix (for regression parameters)}
+  \item{Sigma}{estimated variance components for random effects}
+  \item{Sigma.orig}{estimated variance components on internal scale used for optimization  }
+  \item{Sigma.cov}{ inverse of (minus Hessian matrix) for variance components }
+  \item{call}{ the matched call }
+  \item{dim}{ vector with number of fixed and random effects in the model }
+  \item{loglikelihood}{(penalized) loglikelihood evaluated at the MLE}
+  \item{margll}{ (approximate) log marginal likelihood should the model contain random effects  }
+  \item{convergence}{logical. Did optimizer converge?}
   \item{fitted.values}{fitted mean values \eqn{\mu_{i,t}}{\mu_it}}
   \item{control}{control object of the fit}
-  \item{terms}{  }
-  \item{stsObj}{  }
-  \item{lag}{  }
+  \item{terms}{ the terms object used in the fit }
+  \item{stsObj}{ the supplied \code{stsObj} }
+  \item{lag}{ specified lag of the autoregression, ATM always \eqn{=1} }
   \item{nObs}{number of observations used for fitting the model}
-  \item{nTime}{  }
-  \item{nUnit}{  }
+  \item{nTime}{ number of time points used for fitting the model }
+  \item{nUnit}{ number of units (e.g.\ areas) used for fitting the model }
 }
 
 \details{
@@ -175,7 +170,7 @@ hhh4(stsObj,
   is available.
 
 }
-\seealso{}
+\seealso{\code{\link{algo.hhh}}, \code{\link{meanResponse}}}
 \author{M. Paul and L. Held}
 \examples{
 ######################################################################
@@ -184,7 +179,7 @@ hhh4(stsObj,
 # also the vignette
 ######################################################################
 
-data("flu-BYBW") 
+data("fluBYBW") 
 
 
 ###############################################################
@@ -195,95 +190,95 @@ f.end <- addSeason2formula(f = ~ -1 + ri(type="iid", corr="all") + I((t-208)/100
 ## models 
 # A0
 cntrl_A0 <- list(ar = list(f = ~ -1),
-              end = list(f =f.end, offset = population(sts.flu)),
+              end = list(f =f.end, offset = population(fluBYBW)),
 	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(sts.flu)-1))
-(res_A0 <- hhh4(sts.flu,cntrl_A0))
+              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+(res_A0 <- hhh4(fluBYBW,cntrl_A0))
 
 \dontrun{
 # B0
 cntrl_B0 <- list(ar = list(f = ~ 1),
-              end = list(f =f.end, offset = population(sts.flu)),
+              end = list(f =f.end, offset = population(fluBYBW)),
 	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(sts.flu)-1))
-res_B0 <- hhh4(sts.flu,cntrl_B0)               
+              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+res_B0 <- hhh4(fluBYBW,cntrl_B0)               
  
 
 # C0
 cntrl_C0 <- list(ar = list(f = ~ -1 + ri(type="iid", corr="all")),
-              end = list(f =f.end, offset = population(sts.flu)),
+              end = list(f =f.end, offset = population(fluBYBW)),
 	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(sts.flu)-1))
-res_C0 <- hhh4(sts.flu,cntrl_C0)               
+              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+res_C0 <- hhh4(fluBYBW,cntrl_C0)               
 
 
 #A1
 cntrl_A1 <- list(ar = list(f = ~ -1),
 	      ne = list(f = ~ 1, weights = wji),
-              end = list(f =f.end, offset = population(sts.flu)),
+              end = list(f =f.end, offset = population(fluBYBW)),
 	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(sts.flu)-1))
-res_A1 <- hhh4(sts.flu,cntrl_A1)               
+              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+res_A1 <- hhh4(fluBYBW,cntrl_A1)               
 
 
 # B1
 cntrl_B1 <- list(ar = list(f = ~ 1),
 	      ne = list(f = ~ 1, weights = wji),
-              end = list(f =f.end, offset = population(sts.flu)),
+              end = list(f =f.end, offset = population(fluBYBW)),
 	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(sts.flu)-1))
-res_B1 <- hhh4(sts.flu,cntrl_B1)               
+              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+res_B1 <- hhh4(fluBYBW,cntrl_B1)               
 
 
 # C1
 cntrl_C1 <- list(ar = list(f = ~ -1 + ri(type="iid", corr="all")),
 	      ne = list(f = ~ 1, weights = wji),
-              end = list(f =f.end, offset = population(sts.flu)),
+              end = list(f =f.end, offset = population(fluBYBW)),
 	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(sts.flu)-1))
-res_C1 <- hhh4(sts.flu,cntrl_C1)               
+              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+res_C1 <- hhh4(fluBYBW,cntrl_C1)               
 
 
 #A2
 cntrl_A2 <- list(ar = list(f = ~ -1),
 	      ne = list(f = ~ -1 + ri(type="iid", corr="all"), weights = wji),
-              end = list(f =f.end, offset = population(sts.flu)),
+              end = list(f =f.end, offset = population(fluBYBW)),
 	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(sts.flu)-1))
-res_A2 <- hhh4(sts.flu,cntrl_A2)               
+              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+res_A2 <- hhh4(fluBYBW,cntrl_A2)               
 
 
 # B2
 cntrl_B2 <- list(ar = list(f = ~ 1),
 	      ne = list(f = ~ -1 + ri(type="iid", corr="all"), weights = wji),
-              end = list(f =f.end, offset = population(sts.flu)),
+              end = list(f =f.end, offset = population(fluBYBW)),
 	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(sts.flu)-1))
-res_B2 <- hhh4(sts.flu,cntrl_B2)               
+              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+res_B2 <- hhh4(fluBYBW,cntrl_B2)               
 
 # C2
 cntrl_C2 <- list(ar = list(f = ~ -1 + ri(type="iid", corr="all")),
 	      ne = list(f = ~ -1 + ri(type="iid", corr="all"), weights = wji),
-              end = list(f =f.end, offset = population(sts.flu)),
+              end = list(f =f.end, offset = population(fluBYBW)),
 	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(sts.flu)-1),
+              verbose=1, data=data.frame(t=epoch(fluBYBW)-1),
               start=list(fixed=fixef(res_B0),random=c(rep(0,140),ranef(res_B0)), sd.corr=c(-.5,getSdCorr(res_B0),0)))
-res_C2 <- hhh4(sts.flu,cntrl_C2)               
+res_C2 <- hhh4(fluBYBW,cntrl_C2)               
 
 
 # D
 cntrl_D <- list(ar = list(f = ~ 1),
 	      ne = list(f = ~ -1 + ri(type="iid"), weights = wji),
-              end = list(f =addSeason2formula(f = ~ -1 + ri(type="car") + I((t-208)/100), S=3, period=52), offset = population(sts.flu)),
+              end = list(f =addSeason2formula(f = ~ -1 + ri(type="car") + I((t-208)/100), S=3, period=52), offset = population(fluBYBW)),
 	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(sts.flu)-1))
-res_D <- hhh4(sts.flu,cntrl_D)               
+              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+res_D <- hhh4(fluBYBW,cntrl_D)               
 
 
 #####################################################################
 ## do 1-step ahead predictions
 #####################################################################
-tp <- nrow(sts.flu)-2*52
+tp <- nrow(fluBYBW)-2*52
 
 val_A0 <- oneStepAhead(res_A0,tp=tp) 
 val_B0 <- oneStepAhead(res_B0,tp=tp) 
@@ -358,7 +353,7 @@ rownames(pVals_flu) <- nam
 
   Paul, M. and Held, L. (2011) Predictive assessment of a non-linear
     random  effects model for multivariate time series of infectious
-    disease counts. Statistics in Medicine, DOI: 10.1002/sim.4177.
+    disease counts. Statistics in Medicine, \bold{30}, 1118--1136
 }
 
 

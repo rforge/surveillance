@@ -600,7 +600,7 @@ if(compute){
   
   system.time(pred.B2 <- oneStepAhead(result.B2,tp=nrow(flu)-2*52))
     
-  save(result.B2, pred.B2, file=".hhh4results")
+  save(result.B2, pred.B2, file="hhh4results.RData")
 }
 @
 

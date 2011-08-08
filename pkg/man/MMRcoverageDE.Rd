@@ -44,8 +44,7 @@
 \references{
   Herzog, S.A., Paul, M. and Held, L. (2010) Heterogeneity in vaccination
     coverage explains the size and occurrence of measles epidemics in
-    German surveillance data. Epidemiology and Infection, 
-    DOI: 10.1017/S0950268810001664.
+    German surveillance data. Epidemiology and Infection, \bold{139}, 505--515.
 }
 
 \keyword{datasets}
