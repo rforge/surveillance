@@ -38,6 +38,9 @@
 04/04/2011 osAIC computations by simulation does not work in some
            cases where estimated coefficient is small (global in Hagelloch)
            Problems occur in the quadratic programming (->Michael)
+25/03/2011 die intensityPlot-Funktion in twinSIR funktioniert nicht,
+           wenn es schon anfänglich infektiöse Individuen gibt
+           (wie in den hagelloch-Daten)
 
 #Fixed
 
@@ -83,6 +86,7 @@
 
 - 15/04/2011 Using siaf=siaf.constant in twinstim  does not work. Is this intended?
 - 16/04/2011 Use of finetune=TRUE appears not to lead to convergence. How to fix this?
+- 11/10/2011 twinstim example imdepi.fit0 does not work (no convergence)
 
 #Closed:
 
