@@ -1,23 +1,38 @@
 ######################################################################
-# Experimental implementation of the backprojection method by Becker
-# (1991). Useful in outbreak situations
+# Implementation of the backprojection method as described in
+# Becker et al. (1991), Stats in Med, 10, 1527-1542. The method
+# was originally developed for the back-projection of AIDS incidence
+# but it is equally useful for analysing the epidemic curve in outbreak
+# situations of a disease with long incubation time, e.g. in order
+# to illustrate the effect of intervention measures.
 ######################################################################
 
 ######################################################################
-#Replace NaN or is.infinite values with zero.
-#Good against division by zero problems.
+# Helper function: Replace NaN or is.infinite values with zero.
+# Good against division by zero problems.
+#
+# Parameters:
+#  x - a vector of type double
 ######################################################################
 naninf2zero <- function(x) {x[is.nan(x) | is.infinite(x)] <- 0 ; return(x)}
 
 
 ######################################################################
-# Single step of the EMS algorithm by Becker et al (1991)
+# Single step of the EMS algorithm by Becker et al (1991). This function
+# is called by backprojNP.
 #
 # Parameters:
-#  lambda.old - vector of current value of the rates of length T
-#  N.old      - matrix of current value of the complete data
-#  Y          - vector observed value of length T
-#  k          - smoothing parameter, needs to be an even number
+#  lambda.old - vector of length T containing the current rates
+#  Y          - vector of length T containing the observed values
+#  dincu      - probability mass function of the incubation time. I.e.
+#               a function to be evaluated at integer numbers
+#  pincu      - cumulative mass function of the incubation time, i.e. an
+#               object of type function. Needs to in sync with dincu. 
+#  k          - smoothing parameter of the EMS algo,
+#               needs to be an even number
+#
+# Returns:
+# 
 ######################################################################
 
 em.step.becker <- function(lambda.old, Y, dincu, pincu, k=8) {
@@ -33,7 +48,7 @@ em.step.becker <- function(lambda.old, Y, dincu, pincu, k=8) {
   #EM step. Problem that some of the sums can be zero if the incubation
   #distribution has zeroes at d=0,1,2
   for (t in 1:T) {
-    #Calculate sum in (3a) of Becker (1991)
+    #Calculate sum as in equation (3a) of Becker (1991)
     sum3a <- 0
     for (d in 0:(T-t)) {
       sum3a <- sum3a + Y[t+d] * naninf2zero(dincu(d) / sum(sapply(1:(t+d),function(i) lambda.old[i]*dincu(t+d-i))))
@@ -59,118 +74,215 @@ em.step.becker <- function(lambda.old, Y, dincu, pincu, k=8) {
 }
 
 ######################################################################
-# This is the iterator function for the backprojection method by
-# calling em.step.becker.
+# STS compatible function to call the non-parametric back-projection
+# method of Becker et al (1991) for time aggregated data.
 #
 # Parameters:
-#  Y -
-#  k - smoothing parameter
+#  sts - sts object with the observed incidence as "observed" slot
+#  incu.pmf.vec - incubation time pmf as a vector with index 0,..,d_max. Please
+#                 note that the support includes zero!
+#  k - smoothing parameter for the EMS algorithm
 #  eps - relative convergence criteration
-#  iterm.max - max number of iterations
-#  verbose - extra output
+#  iter.max - max number of iterations
+#  verbose - boolean, if TRUE provide extra output when running the method
 #  lambda0 - start value for lambda, default: uniform
-#  hookFun - hook function
+#  hookFun - hook function to call after each EMS step, a function
+#            of type hookFun=function(Y,lambda,...)
 #
 # Returns:
-#  vector of lambdas.
+#  sts object with upperbound set to the backprojected lambda.
 ######################################################################
 
-backproj.becker <- function(Y,dincu,pincu,k=8,eps=1e-5,iter.max=250,verbose=TRUE,lambda0=rep(sum(Y)/length(Y),length(Y)),hookFun=function(Y,lambda,...) {},...) {
-  #Iteration counter and convergence indicator
-  i <- 0
-  stop <- FALSE
-  res <- list(lambda=lambda0)
-  
-  #Loop until stop 
-  while (!stop) {
-    #Add to counter
-    i <- i+1
-    lambda.i <- res$lambda
-    res <- em.step.becker(lambda.old=lambda.i,Y=Y,dincu=dincu,pincu=pincu,k=k)
-    
-    #check stop
-    if (verbose) {
-      cat("Convergence criterion @ iteration i=",i,": ", abs(sum(res$lambda) - sum(lambda.i))/sum(lambda.i),"\n")
-    }
-    stop <- abs(sum(res$lambda) - sum(lambda.i))/sum(lambda.i) < eps | (i>iter.max)
 
-    #Hook
-    hookFun(Y,res$lambda,...)
+backprojNP <- function(sts, incu.pmf.vec,k=8,eps=1e-5,iter.max=250,verbose=TRUE,lambda0=NULL,hookFun=function(Y,lambda,...) {},...) {
+
+  #Backprojection only works for univariate time series
+  if (ncol(sts)>1) {
+    warning("Multivariate time series: Backprojection uses same incubation time distribution and eps for the individual time series.")
   }
+
+
+  #Create incubation time distribution vectors
+  inc.pmf <- incu.pmf.vec
+  inc.cdf <- cumsum(inc.pmf)
+  
+  #Create wrapper functions for the PMF and CDF based on the vector
+  dincu <- function(x) {
+    notInSupport <- x<0 | x>=length(inc.pmf)
+    #Give index -1 to invalid queries
+    x[notInSupport] <- -1
+    return(c(0,inc.pmf)[x+2])
+  }
+
+  pincu <- function(x) {
+    x[x<0] <- -1
+    x[x>=length(inc.cdf)] <- length(inc.cdf)-1
+    return(c(0,inc.cdf)[x+2])
+  }
+
+  
+  #Define object to return
+  lambda <- matrix(NA,ncol=ncol(sts),nrow=nrow(sts))
+  
+  for (j in 1:ncol(sts)) {
+    #Inform (if requested) what series we are looking at
+    if ((ncol(sts)>1) & verbose) {
+      cat("Backprojecting series no. ",j,"\n")
+    }
+
+    #Extract incidence time series
+    Y <- observed(sts)[,j]
+
+    #If default behaviour for lambda0 is desired
+    if (is.null(lambda0)) {
+      lambda0 <- rep(sum(Y)/length(Y),length(Y))
+    } 
+  
+    #Iteration counter and convergence indicator
+    i <- 0
+    stop <- FALSE
+    res <- list(lambda=lambda0)
+  
+    #Loop until stop 
+    while (!stop) {
+      #Add to counter
+      i <- i+1
+      lambda.i <- res$lambda
+      res <- em.step.becker(lambda.old=lambda.i,Y=Y,dincu=dincu,pincu=pincu,k=k)
+      
+      #check stop
+      #In original paper, but funny as - and + deviations cancel.
+      #criterion <- abs(sum(res$lambda) - sum(lambda.i))/sum(lambda.i)
+      criterion <- sqrt(sum((res$lambda- lambda.i)^2))/sqrt(sum(lambda.i^2))
+
+      if (verbose) {
+        cat("Convergence criterion @ iteration i=",i,": ", criterion,"\n")
+      }
+      #Check whether to stop
+      stop <- criterion < eps | (i>iter.max)
+      
+      #Hook
+      hookFun(Y=Y,lambda=res$lambda)
+    }
+    #Done
+    lambda[,j] <- res$lambda
+  }
+
+  #Create new object with return put in the upperbound slot
+  bp.sts <- sts
+  bp.sts@upperbound <- lambda
+  bp.sts@control <- list(k=k,eps=eps,iter=i)
+  return(bp.sts)
+}
+
+
+######################################################################
+# EMS back-projection method including bootstrap based confidence
+# intervals. The theory is indirectly given in Becker and Marschner (1993),
+# Biometrika, 80(1):165-178 and more specifically in Yip et al, 2011,
+# Communications in Statistics -- Simulation and Computation,
+# 37(2):425-433.
+#
+# Parameters:
+#
+#  sts - sts object with the observed incidence as "observed" slot
+#  incu.pmf.vec - incubation time pmf as a vector with index 0,..,d_max. Please
+#                 note that the support includes zero!
+#  k - smoothing parameter for the EMS algorithm
+#  eps - relative convergence criteration. If a vector of length two
+#        then the first argument is used for the k=0 initial fit and
+#        the second element for all EMS fits
+#
+#  iter.max - max number of iterations. Can be a vector of length two.
+#             Similar use as in eps.
+#  verbose - boolean, if TRUE provide extra output when running the method
+#  lambda0 - start value for lambda, default: uniform
+#  hookFun - hook function to call after each EMS step, a function
+#            of type hookFun=function(Y,lambda,...)
+#  B - number of bootstrap replicates. If B=-1 then no bootstrap CIs
+#      are calculated.
+#
+# Returns:
+#  sts object with upperbound set to the backprojected lambda.
+######################################################################
+
+backprojNP.ci <- function(sts, incu.pmf.vec,k=8,eps=rep(0.005,2),iter.max=rep(250,2),B=-1,alpha=0.05,verbose=TRUE,lambda0=NULL,hookFun=function(Y,lambda,...) {},...) {
+
+  #Backprojection only works for univariate time series
+  if (ncol(sts)>1) {
+    warning("Multivariate time series: Backprojection uses same incubation time distribution and eps for the individual time series. This functionality has not been tested.")
+  }
+  
+  #If the eps and iter.max arguments are too short, make them length 2.
+  if (length(eps)==1) eps <- rep(eps,2)
+  if (length(iter.max)==1) iter.max <- rep(iter.max,2)
+  
+  #Create wrapper functions for the PMF based on the vector
+  dincu <- function(x) {
+    notInSupport <- x<0 | x>=length(inc.pmf)
+    #Give index -1 to invalid queries
+    x[notInSupport] <- -1
+    return(c(0,inc.pmf)[x+2])
+  }
+ 
+  #Compute the estimate to report (i.e. use 2nd component of the args)
+  if (verbose) {
+    cat("Back-projecting with k=",k," to get lambda estimate.\n")
+  }
+  stsk <- backprojNP(sts, incu.pmf.vec=incu.pmf.vec,k=k,eps=eps[2],iter.max=iter.max[2],verbose=verbose,lambda0=lambda0,hookFun=hookFun)
+
+  #If no bootstrap to do return object right away.
+  if (B<=0) {
+    warning("No bootstrap CIs calculated as requested.")
+    stsk@control$ci <- NULL
+    stsk@control$lambda <- NULL
+    return(sts0)
+  }
+
+  #Call back-project function without smoothing, i.e. with k=0.
+  if (verbose) {
+    cat("Back-projecting with k=",0," to get lambda estimate for parametric bootstrap.\n")
+  }
+  sts0 <- backprojNP(sts, incu.pmf.vec=incu.pmf.vec,k=0,eps=eps[1],iter.max=iter.max[1],verbose=verbose,lambda0=lambda0,hookFun=hookFun)
+
+  ###########################################################################
+  #Create bootstrap samples and loop for each sample while storing the result
+  ###########################################################################
+  sts.boot <- sts0
+  #Define object to return
+  lambda <- array(NA,dim=c(ncol(sts),nrow(sts),B))
+
+  #Loop in order to create the sample
+  for (b in 1:B) {
+    if (verbose) { cat("Bootstrap sample ",b,"/",B,"\n") }
+    
+    #Compute convolution for the mean of the observations (matrix wise)
+    mu <- matrix(0, nrow=nrow(sts0), ncol=ncol(sts0))
+    for (t in 1:nrow(mu)) {
+      for (s in 0:(t-1)) {
+        mu[t,] <- mu[t,,drop=FALSE] + upperbound(sts0)[t-s,,drop=FALSE] * dincu(s)
+      }
+    }
+    
+    #Create new observations in the observed slot
+    observed(sts.boot) <- matrix(rpois(prod(dim(sts.boot)),lambda=mu),ncol=ncol(sts0))
+
+    #Run the backprojection on the bootstrap sample. Use original result
+    #as starting value.
+    sts.boot <- backprojNP(sts.boot, incu.pmf.vec=incu.pmf.vec,k=k,eps=eps[2],iter.max=iter.max[2],verbose=verbose,lambda0=upperbound(stsk),hookFun=hookFun)
+    #Extract the result
+    lambda[,,b] <- upperbound(sts.boot)
+  }
+
+  #Compute an equal tailed (1-alpha)*100% confidence intervals based on the
+  #bootstrap samples
+  ci <- t(apply(lambda,MARGIN=c(1,2), quantile, p=c(alpha/2,1-alpha/2))[,1,])
+
+  #Add CI output to control part. Not necessarily nice as the slot was not
+  #realldy designed for this purpose.
+  stsk@control <- list(k=k,eps=eps[2],iter.max=iter.max[2],lambda=lambda,ci=ci)
+
   #Done
-  return(res$lambda)
+  return(stsk)
 }
 
-
-plotIt <- function(Y,lambda,...) {
-  par(las=2)
-  T <- length(Y)
-  plot(1:T,Y,type="h",ylab="Cases",lwd=2,xaxt="n",xlab="",...)
-  lines(1:T+0.3,lambda,type="h",col="gray",lty=1,lwd=2)  
-  axis(1,at=1:T,label=1:T,cex.axis=0.7)
-  legend(x="topleft",c(expression(Y[t]),expression(lambda[t])),col=c(1,"gray"),lty=c(1,1),lwd=2)
-
-  invisible()
-}
-
-#T <- max(times) #lets say the last days are not good yet
-#Y <- table(factor(times,levels=1:max(times)))[1:T]
-#T <- length(Y)
-
-######################################################################
-#Simulated outbreak
-######################################################################
-
-#Incubation time distribution vector (support starts at zero!)
-inc.pmf <- c(0,pgamma(1:25,15,1.4) - pgamma(0:24,15,1.4))
-inc.cdf <- cumsum(inc.pmf)
-
-#Wrap above array within PMF and CDF functions with discrete support.
-dincu <- function(x) {
-  notInSupport <- x<0 | x>=length(inc.pmf)
-  #Give index -1 to invalid queries
-  x[notInSupport] <- -1
-  return(c(0,inc.pmf)[x+2])
-}
-inc.cdf <- cumsum(inc.pmf)
-pincu <- function(x) {
-  x[x<0] <- -1
-  x[x>=length(inc.cdf)] <- length(inc.cdf)-1
-  return(c(0,inc.cdf)[x+2])
-}
-rincu <- function(n) {
-  sample(0:25, size=n, replace=TRUE, prob=inc.pmf)
-}
-
-
-barplot(inc.pmf,names.arg=0:25)
-
-#Simulate outbreak starting at time t0 of length l
-t0 <- 23
-l <- 10
-
-#Sample time of exposure and length of incubation time
-n <- 1e3
-exposureTimes <- t0 + sample(x=0:(l-1),size=n,replace=TRUE)
-symptomTimes <- exposureTimes + rincu(n)
-
-X <- table( factor(exposureTimes,levels=1:max(symptomTimes)))
-Y <- table( factor(symptomTimes,levels=1:max(symptomTimes)))
-
-plot(1:length(Y),Y,type="h",xlab="",lwd=2,ylim=c(0,max(X,Y)))
-lines(1:length(Y)+0.2,X,col="gray",type="h")
-
-######################################################################
-#Do the EM looping
-######################################################################
-bp.k0 <- backproj.becker(Y=Y,k=0,dincu=dincu,pincu=pincu,eps=1e-5,hookFun=plotIt,ylim=c(0,max(X,Y)))
-lines(1:length(Y),X,col=2,type="h")
-
-incu.sample <- rincu(1e5)
-delta.star <- quantile(incu.sample,p=(1:length(symptomTimes))/length(symptomTimes),type=3)
-exposureTime.hypothetical <- symptomTimes -  delta.star
-
-plot(1:length(Y),Y,type="h")
-other <- table(factor(exposureTime.hypothetical,levels=1:max(symptomTimes)))
-lines(1:length(Y)+0.2,X,col=2,type="h")
-lines(1:length(Y)+0.4,other,type="h",col="green")
