@@ -23,90 +23,95 @@ fix.dimnames <- function(x) {
 
 #constructor function
 init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0*observed, map=NULL, neighbourhood=NULL, populationFrac=NULL,alarm=NULL,upperbound=NULL, control=NULL,epochAsDate=FALSE,multinomialTS=FALSE) {
-  #Name handling
-  namesObs <-colnames(observed)
-  namesState <- colnames(observed)
-  #Ensure observed, state are on matrix form
-  observed <- as.matrix(observed)
-  state <- as.matrix(state)
+
+  #If used in constructor
+  if(nargs() > 1) {
+    #Name handling  
+    namesObs <-colnames(observed)
+    namesState <- colnames(observed)
+    #Ensure observed, state are on matrix form
+    observed <- as.matrix(observed)
+    state <- as.matrix(state)
   
-  #check number of columns of observed and state
-  nAreas <- ncol(observed)
-  nObs <- nrow(observed)
-  if(ncol(observed) != ncol(state)){
-    #if there is only one state-vector for more than one area, repeat it
-    if(ncol(state)==1)
-      state <- ts(matrix(rep(state,nAreas),ncol=nAreas,byrow=FALSE),freq=frequency(observed))
-    else{ 
-      cat('wrong dimensions of observed and state \n')
+    #check number of columns of observed and state
+    nAreas <- ncol(observed)
+    nObs <- nrow(observed)
+    if(ncol(observed) != ncol(state)){
+      #if there is only one state-vector for more than one area, repeat it
+      if(ncol(state)==1)
+        state <- ts(matrix(rep(state,nAreas),ncol=nAreas,byrow=FALSE),freq=frequency(observed))
+      else{ 
+        cat('wrong dimensions of observed and state \n')
+      return(NULL)
+      }
+    }
+    
+    #check neighbourhood matrix
+    if(!is.null(neighbourhood) & (any(dim(neighbourhood) != nAreas))) {
+      cat('wrong dimensions of neighbourhood matrix \n')
       return(NULL)
     }
-  }
-  
-  #check neighbourhood matrix
-  if(!is.null(neighbourhood) & (any(dim(neighbourhood) != nAreas))) {
-    cat('wrong dimensions of neighbourhood matrix \n')
-    return(NULL)
-  }
+    
+    #popFrac
+    if (is.null(populationFrac)) {
+      populationFrac <- matrix(1/nAreas,nrow=nObs,ncol=nAreas)
+    }
+    if (nAreas ==1 & (!multinomialTS)){
+      populationFrac <- matrix(1,nrow=nObs, ncol=1)
+    }
+    
+    #labels for observed and state
+    if(is.null(namesObs)){
+      namesObs <- paste("observed", 1:nAreas, sep="")       
+      namesState <- paste("state", 1:nAreas, sep="")  
+    }
+    
+    dimnames(observed) <- list(NULL,namesObs)
+    dimnames(state) <- list(NULL,namesState)
 
-  #popFrac
-  if (is.null(populationFrac)) {
-    populationFrac <- matrix(1/nAreas,nrow=nObs,ncol=nAreas)
+    if (is.null(neighbourhood))
+      neighbourhood <- matrix(NA,nrow=ncol(observed),ncol=ncol(observed))
+    if (is.null(alarm)) 
+      alarm      <- matrix(NA,nrow=dim(observed)[1],ncol=dim(observed)[2])
+    if (is.null(upperbound))
+      upperbound <- matrix(NA,nrow=dim(observed)[1],ncol=dim(observed)[2])
+
+    ##Assign everything else
+    .Object@epoch <- epoch
+    .Object@epochAsDate <- epochAsDate
+    .Object@multinomialTS <- multinomialTS
+    
+    if (length(start) == 2) {
+      .Object@start <- start
+    } else {
+      stop("start must be a vector of length two denoting (year, epoch/week/month/idx)")
+    }
+    
+    .Object@freq <- freq
+    .Object@state <- state
+    .Object@observed <- observed
+    
+    #It is not possible to assign a null argument to the
+    #SpatialPolygonsDataFrame slot. 
+    if (!is.null(map)) {
+      .Object@map <- map
+    }
+    
+    .Object@neighbourhood <- neighbourhood
+    .Object@populationFrac <- populationFrac
+    .Object@alarm <- alarm
+    .Object@upperbound <- upperbound
+    
+    if (!is.null(control))
+      .Object@control <- control
+    
+    #Make sure all arrays have the same dimnames
+    .Object <- fix.dimnames(.Object)
   }
-  if (nAreas ==1 & (!multinomialTS)){
-    populationFrac <- matrix(1,nrow=nObs, ncol=1)
-  }
-  
-  #labels for observed and state
-  if(is.null(namesObs)){
-    namesObs <- paste("observed", 1:nAreas, sep="")       
-    namesState <- paste("state", 1:nAreas, sep="")  
-  }
- 
-  dimnames(observed) <- list(NULL,namesObs)
-  dimnames(state) <- list(NULL,namesState)
-
-  if (is.null(neighbourhood))
-    neighbourhood <- matrix(NA,nrow=ncol(observed),ncol=ncol(observed))
-  if (is.null(alarm)) 
-    alarm      <- matrix(NA,nrow=dim(observed)[1],ncol=dim(observed)[2])
-  if (is.null(upperbound))
-    upperbound <- matrix(NA,nrow=dim(observed)[1],ncol=dim(observed)[2])
-
-  ##Assign everything else
-  .Object@epoch <- epoch
-  .Object@epochAsDate <- epochAsDate
-  .Object@multinomialTS <- multinomialTS
-
-  if (length(start) == 2) {
-    .Object@start <- start
-  } else {
-    stop("start must be a vector of length two denoting (year, epoch/week/month/idx)")
-  }
-
-  .Object@freq <- freq
-  .Object@state <- state
-  .Object@observed <- observed
-
-  #It is not possible to assign a null argument to the
-  #SpatialPolygonsDataFrame slot. 
-  if (!is.null(map)) {
-    .Object@map <- map
-  }
-  
-  .Object@neighbourhood <- neighbourhood
-  .Object@populationFrac <- populationFrac
-  .Object@alarm <- alarm
-  .Object@upperbound <- upperbound
-  
-  if (!is.null(control))
-    .Object@control <- control
-
-  #Make sure all arrays have the same dimnames
-  .Object <- fix.dimnames(.Object)
   
   return(.Object)
 }
+
 
 ###########################################################################
 # Initialization -- two modes possible: full or just disProg, freq and map

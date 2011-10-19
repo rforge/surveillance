@@ -7,6 +7,10 @@
 # to illustrate the effect of intervention measures.
 ######################################################################
 
+#Load class definition
+source("class-stsbp.R")
+
+
 ######################################################################
 # Helper function: Replace NaN or is.infinite values with zero.
 # Good against division by zero problems.
@@ -94,7 +98,7 @@ em.step.becker <- function(lambda.old, Y, dincu, pincu, k=8) {
 ######################################################################
 
 
-backprojNP <- function(sts, incu.pmf.vec,k=8,eps=1e-5,iter.max=250,verbose=TRUE,lambda0=NULL,hookFun=function(Y,lambda,...) {},...) {
+backprojNP.fit <- function(sts, incu.pmf.vec,k=8,eps=1e-5,iter.max=250,verbose=FALSE,lambda0=NULL,hookFun=function(Y,lambda,...) {},...) {
 
   #Backprojection only works for univariate time series
   if (ncol(sts)>1) {
@@ -206,7 +210,7 @@ backprojNP <- function(sts, incu.pmf.vec,k=8,eps=1e-5,iter.max=250,verbose=TRUE,
 #  sts object with upperbound set to the backprojected lambda.
 ######################################################################
 
-backprojNP.ci <- function(sts, incu.pmf.vec,k=8,eps=rep(0.005,2),iter.max=rep(250,2),B=-1,alpha=0.05,verbose=TRUE,lambda0=NULL,hookFun=function(Y,lambda,...) {},...) {
+backprojNP <- function(sts, incu.pmf.vec,k=8,eps=rep(0.005,2),iter.max=rep(250,2),B=-1,alpha=0.05,verbose=FALSE,lambda0=NULL,hookFun=function(Y,lambda,...) {},...) {
 
   #Backprojection only works for univariate time series
   if (ncol(sts)>1) {
@@ -229,21 +233,21 @@ backprojNP.ci <- function(sts, incu.pmf.vec,k=8,eps=rep(0.005,2),iter.max=rep(25
   if (verbose) {
     cat("Back-projecting with k=",k," to get lambda estimate.\n")
   }
-  stsk <- backprojNP(sts, incu.pmf.vec=incu.pmf.vec,k=k,eps=eps[2],iter.max=iter.max[2],verbose=verbose,lambda0=lambda0,hookFun=hookFun)
+  stsk <- backprojNP.fit(sts, incu.pmf.vec=incu.pmf.vec,k=k,eps=eps[2],iter.max=iter.max[2],verbose=verbose,lambda0=lambda0,hookFun=hookFun)
 
   #If no bootstrap to do return object right away.
   if (B<=0) {
-    warning("No bootstrap CIs calculated as requested.")
-    stsk@control$ci <- NULL
-    stsk@control$lambda <- NULL
-    return(sts0)
+    if (verbose) { cat("No bootstrap CIs calculated as requested.\n") }
+    stsk <- as(stsk,"stsBP")
+    stsk@control <- list(k=k,eps=eps,iter.max=iter.max)
+    return(stsk)
   }
 
   #Call back-project function without smoothing, i.e. with k=0.
   if (verbose) {
     cat("Back-projecting with k=",0," to get lambda estimate for parametric bootstrap.\n")
   }
-  sts0 <- backprojNP(sts, incu.pmf.vec=incu.pmf.vec,k=0,eps=eps[1],iter.max=iter.max[1],verbose=verbose,lambda0=lambda0,hookFun=hookFun)
+  sts0 <- backprojNP.fit(sts, incu.pmf.vec=incu.pmf.vec,k=0,eps=eps[1],iter.max=iter.max[1],verbose=verbose,lambda0=lambda0,hookFun=hookFun)
 
   ###########################################################################
   #Create bootstrap samples and loop for each sample while storing the result
@@ -269,7 +273,7 @@ backprojNP.ci <- function(sts, incu.pmf.vec,k=8,eps=rep(0.005,2),iter.max=rep(25
 
     #Run the backprojection on the bootstrap sample. Use original result
     #as starting value.
-    sts.boot <- backprojNP(sts.boot, incu.pmf.vec=incu.pmf.vec,k=k,eps=eps[2],iter.max=iter.max[2],verbose=verbose,lambda0=upperbound(stsk),hookFun=hookFun)
+    sts.boot <- backprojNP.fit(sts.boot, incu.pmf.vec=incu.pmf.vec,k=k,eps=eps[2],iter.max=iter.max[2],verbose=verbose,lambda0=upperbound(stsk),hookFun=hookFun)
     #Extract the result
     lambda[,,b] <- upperbound(sts.boot)
   }
@@ -280,7 +284,13 @@ backprojNP.ci <- function(sts, incu.pmf.vec,k=8,eps=rep(0.005,2),iter.max=rep(25
 
   #Add CI output to control part. Not necessarily nice as the slot was not
   #realldy designed for this purpose.
-  stsk@control <- list(k=k,eps=eps[2],iter.max=iter.max[2],lambda=lambda,ci=ci)
+  stsk <- as(stsk,"stsBP")
+
+  #Add extra slots
+  stsk@ci <- ci
+  stsk@lambda <- lambda
+  stsk@control <- list(k=k,eps=eps,iter.max=iter.max,B=B)
+
 
   #Done
   return(stsk)

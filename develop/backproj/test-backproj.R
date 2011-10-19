@@ -2,7 +2,9 @@
 # This block is for testing only
 ######################################################################
 
+library("surveillance")
 source("backproj.R")
+source("class-stsbp.R")
 
 ######################################################################
 # Hook function to use for back-projection
@@ -71,7 +73,6 @@ plot(1:length(Y),as.numeric(Y),type="h",xlab="",lwd=2,ylim=c(0,max(X,Y)))
 lines(1:length(Y)+0.2,X,col="gray",type="h")
 
 #Create sts object
-library("surveillance")
 sts <- new("sts", epoch=1:length(Y),observed=matrix(Y,ncol=1), alarm=0*matrix(Y,ncol=1))
 plot(sts,xaxis.years=FALSE,legend=NULL)
   
@@ -84,8 +85,33 @@ lines(1:length(Y),X,col=2,type="h")
 #Test bootstrap version
 #debug("backprojNPBoot")
 #sts.bp2 <- backprojNP.ci(sts, k=c(0,2),incu.pmf.vec=inc.pmf,eps=c(0.005,0.01),B=100,hookFun=plotIt,ylim=c(0,max(X,Y)))
-sts.bp0 <- backprojNP.ci(sts, k=0,incu.pmf.vec=inc.pmf,eps=c(0.005,0.005),B=100,hookFun=NULL)
-sts.bp2 <- backprojNP.ci(sts, k=2,incu.pmf.vec=inc.pmf,eps=c(0.005,0.005),B=100,hookFun=NULL,ylim=c(0,max(X,Y)))
+class(sts.bp)
+plot(sts.bp)
+
+sts.bp0 <- backprojNP(sts, k=0,incu.pmf.vec=inc.pmf,eps=c(0.005,0.005),B=-1,verbose=TRUE)
+plot(sts.bp0)
+class(sts.bp0)
+as(sts.bp0,"sts")
+
+sts.bp0.ci <- backprojNP(sts, k=0,incu.pmf.vec=inc.pmf,eps=c(0.005,0.005),B=3,verbose=TRUE)
+sts.bp2.ci <- backprojNP(sts, k=2,incu.pmf.vec=inc.pmf,eps=c(0.005,0.005),B=100,verbose=TRUE)
+
+#Plot 3 -- no seperate plot function exists for these objects
+#          do it manually.
+sts.bp <- sts.bp0.ci
+plot(upperbound(sts.bp),type="n",ylim=c(0,max(sts.bp@ci)),ylab="Cases",xlab="time")
+polygon( c(1:nrow(sts.bp),rev(1:nrow(sts.bp))),
+         c(sts.bp@ci[,2],rev(sts.bp@ci[,1])),col="lightgray")
+lines(upperbound(sts.bp),type="l",lwd=2)
+#legend(x="topright",c(expression(lambda[t]),"95% CI"),lty=c(1,NA),col=c(1,NA),fill=c(NA,"lightgray"),border=c(NA,1),lwd=c(2,NA))
+legend(x="topright",c(expression(lambda[t])),lty=c(1),col=c(1),fill=c(NA),border=c(NA),lwd=c(2))
+#Add truth for comparison
+lines(1:length(Y),X,col=2,type="h")
+
+
+
+######################################################################
+
 
 
 #Plot type 1
@@ -102,24 +128,6 @@ for (i in 1:nrow(sts.bp2)) {
                                  sts.bp2@control$ci[i,2],
                                  sts.bp2@control$ci[i,1]),col="lightgray")
 }
-
-#Plot 3 -- no seperate plot function exists for these objects
-#          do it manually.
-plot(upperbound(sts.bp2),type="n",ylim=c(0,max(sts.bp2@control$ci)),ylab="Cases",xlab="time")
-polygon( c(1:nrow(sts.bp2),rev(1:nrow(sts.bp2))),
-         c(sts.bp2@control$ci[,2],rev(sts.bp2@control$ci[,1])),col="lightgray")
-lines(upperbound(sts.bp2),type="l",lwd=2)
-#legend(x="topright",c(expression(lambda[t]),"95% CI"),lty=c(1,NA),col=c(1,NA),fill=c(NA,"lightgray"),border=c(NA,1),lwd=c(2,NA))
-legend(x="topright",c(expression(lambda[t])),lty=c(1),col=c(1),fill=c(NA),border=c(NA),lwd=c(2))
-#Add truth for comparison
-lines(1:length(Y),X,col=2,type="h")
-
-
-
-
-
-
-
 
 ######################################################################
 #Do the EM looping
