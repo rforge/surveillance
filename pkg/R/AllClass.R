@@ -15,3 +15,12 @@ setClass( "sts", representation(epoch = "numeric",  ##this slot used to be named
                                 epochAsDate="logical",
                                 multinomialTS="logical"))
 
+
+
+######################################################################
+# Definition of the stsBP class for backprojections.
+######################################################################
+
+setClass( "stsBP", representation(ci = "array",
+                                  lambda = "array"),
+                    contains = "sts")

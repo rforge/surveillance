@@ -3,8 +3,10 @@
 ######################################################################
 
 library("surveillance")
-source("backproj.R")
-source("class-stsbp.R")
+source("../../pkg/R/sts.R")
+source("backprojNP.R")
+source("class-stsBP.R")
+
 
 ######################################################################
 # Hook function to use for back-projection
@@ -20,10 +22,6 @@ plotIt <- function(Y,lambda,...) {
 
   invisible()
 }
-
-#T <- max(times) #lets say the last days are not good yet
-#Y <- table(factor(times,levels=1:max(times)))[1:T]
-#T <- length(Y)
 
 ######################################################################
 #Simulated outbreak
@@ -75,9 +73,11 @@ lines(1:length(Y)+0.2,X,col="gray",type="h")
 #Create sts object
 sts <- new("sts", epoch=1:length(Y),observed=matrix(Y,ncol=1), alarm=0*matrix(Y,ncol=1))
 plot(sts,xaxis.years=FALSE,legend=NULL)
-  
+lines(1:length(Y)+0.2,X,col="gray",type="h")
+
 #Call non-parametric back projection function
-sts.bp <- backprojNP(sts, k=0,incu.pmf.vec=inc.pmf,eps=0.005,hookFun=plotIt,ylim=c(0,max(X,Y)))
+bpnp.control <- list(k=0,eps=rep(0.005,2), iter.max=rep(250,2),B=-1,hookFun=plotIt,verbose=TRUE)
+sts.bp <- backprojNP(sts, incu.pmf.vec=inc.pmf, control=bpnp.control, ylim=c(0,max(X,Y)))
   
 plot(sts.bp,xaxis.years=FALSE,legend=NULL,las=1)
 lines(1:length(Y),X,col=2,type="h")
@@ -88,12 +88,14 @@ lines(1:length(Y),X,col=2,type="h")
 class(sts.bp)
 plot(sts.bp)
 
-sts.bp0 <- backprojNP(sts, k=0,incu.pmf.vec=inc.pmf,eps=c(0.005,0.005),B=-1,verbose=TRUE)
-plot(sts.bp0)
-class(sts.bp0)
-as(sts.bp0,"sts")
+#sts.bp0 <- backprojNP(sts, k=0,incu.pmf.vec=inc.pmf,eps=c(0.005,0.005),B=-1,verbose=TRUE)
+#plot(sts.bp0)
+#class(sts.bp0)
+#as(sts.bp0,"sts")
+
 
 sts.bp0.ci <- backprojNP(sts, k=0,incu.pmf.vec=inc.pmf,eps=c(0.005,0.005),B=3,verbose=TRUE)
+
 sts.bp2.ci <- backprojNP(sts, k=2,incu.pmf.vec=inc.pmf,eps=c(0.005,0.005),B=100,verbose=TRUE)
 
 #Plot 3 -- no seperate plot function exists for these objects

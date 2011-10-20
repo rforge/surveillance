@@ -1,5 +1,6 @@
 ######################################################################
 # Definition of the stsBP class
+######################################################################
 setClass( "stsBP", representation(ci = "array",
                                   lambda = "array"),
                     contains = "sts")

@@ -5,10 +5,12 @@
 # but it is equally useful for analysing the epidemic curve in outbreak
 # situations of a disease with long incubation time, e.g. in order
 # to illustrate the effect of intervention measures.
+#
+# See backprojNP.Rd for the remaining details.
 ######################################################################
 
 #Load class definition
-source("class-stsbp.R")
+#source("class-stsBP.R")
 
 
 ######################################################################
@@ -39,7 +41,7 @@ naninf2zero <- function(x) {x[is.nan(x) | is.infinite(x)] <- 0 ; return(x)}
 # 
 ######################################################################
 
-em.step.becker <- function(lambda.old, Y, dincu, pincu, k=8) {
+em.step.becker <- function(lambda.old, Y, dincu, pincu, k) {
   #k needs to be divisible by two
   if (k %% 2 != 0) stop("k needs to be even.")
 
@@ -98,7 +100,7 @@ em.step.becker <- function(lambda.old, Y, dincu, pincu, k=8) {
 ######################################################################
 
 
-backprojNP.fit <- function(sts, incu.pmf.vec,k=8,eps=1e-5,iter.max=250,verbose=FALSE,lambda0=NULL,hookFun=function(Y,lambda,...) {},...) {
+backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=FALSE,lambda0=NULL,hookFun=function(Y,lambda,...) {},...) {
 
   #Backprojection only works for univariate time series
   if (ncol(sts)>1) {
@@ -210,16 +212,27 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=8,eps=1e-5,iter.max=250,verbose=F
 #  sts object with upperbound set to the backprojected lambda.
 ######################################################################
 
-backprojNP <- function(sts, incu.pmf.vec,k=8,eps=rep(0.005,2),iter.max=rep(250,2),B=-1,alpha=0.05,verbose=FALSE,lambda0=NULL,hookFun=function(Y,lambda,...) {},...) {
+backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,2),B=-1,alpha=0.05,verbose=FALSE,lambda0=NULL,hookFun=function(Y,lambda,...) {}),...) {
 
   #Backprojection only works for univariate time series
   if (ncol(sts)>1) {
     warning("Multivariate time series: Backprojection uses same incubation time distribution and eps for the individual time series. This functionality has not been tested.")
   }
-  
+
+  #Fill control object as appropriate and in sync with the default value
+  if (is.null(control[["k",exact=TRUE]]))  { control$k <- 2 }
+  if (is.null(control[["eps",exact=TRUE]])) { control$eps <- rep(0.005,2) }
+  if (is.null(control[["iter.max",exact=TRUE]])) { control$iter.max <- rep(250,2) }
+  if (is.null(control[["B",exact=TRUE]])) { control$B <- -1 }
+  if (is.null(control[["alpha",exact=TRUE]])) { control$alpha <- 0.05 }
+  if (is.null(control[["verbose",exact=TRUE]])) { control$verbose <- FALSE }
+  if (is.null(control[["lambda0",exact=TRUE]])) { control$lambda0 <- NULL }
+  if (is.null(control[["hookFun",exact=TRUE]])) { control$hookFun <- function(Y,lambda,...) {} }
+
+      
   #If the eps and iter.max arguments are too short, make them length 2.
-  if (length(eps)==1) eps <- rep(eps,2)
-  if (length(iter.max)==1) iter.max <- rep(iter.max,2)
+  if (length(control$eps)==1) control$eps <- rep(control$eps,2)
+  if (length(control$iter.max)==1) control$iter.max <- rep(control$iter.max,2)
   
   #Create wrapper functions for the PMF based on the vector
   dincu <- function(x) {
@@ -230,35 +243,35 @@ backprojNP <- function(sts, incu.pmf.vec,k=8,eps=rep(0.005,2),iter.max=rep(250,2
   }
  
   #Compute the estimate to report (i.e. use 2nd component of the args)
-  if (verbose) {
-    cat("Back-projecting with k=",k," to get lambda estimate.\n")
+  if (control$verbose) {
+    cat("Back-projecting with k=",control$k," to get lambda estimate.\n")
   }
-  stsk <- backprojNP.fit(sts, incu.pmf.vec=incu.pmf.vec,k=k,eps=eps[2],iter.max=iter.max[2],verbose=verbose,lambda0=lambda0,hookFun=hookFun)
+  stsk <- backprojNP.fit(sts, incu.pmf.vec=incu.pmf.vec,k=control$k,eps=control$eps[2],iter.max=control$iter.max[2],verbose=control$verbose,lambda0=control$lambda0,hookFun=control$hookFun)
 
-  #If no bootstrap to do return object right away.
-  if (B<=0) {
-    if (verbose) { cat("No bootstrap CIs calculated as requested.\n") }
+  #If no bootstrap to do return object right away as stsBP object.
+  if (control$B<=0) {
+    if (control$verbose) { cat("No bootstrap CIs calculated as requested.\n") }
     stsk <- as(stsk,"stsBP")
-    stsk@control <- list(k=k,eps=eps,iter.max=iter.max)
+    stsk@control <- control 
     return(stsk)
   }
 
   #Call back-project function without smoothing, i.e. with k=0.
-  if (verbose) {
+  if (control$verbose) {
     cat("Back-projecting with k=",0," to get lambda estimate for parametric bootstrap.\n")
   }
-  sts0 <- backprojNP.fit(sts, incu.pmf.vec=incu.pmf.vec,k=0,eps=eps[1],iter.max=iter.max[1],verbose=verbose,lambda0=lambda0,hookFun=hookFun)
+  sts0 <- backprojNP.fit(sts, incu.pmf.vec=incu.pmf.vec,k=0,eps=control$eps[1],iter.max=control$iter.max[1],verbose=control$verbose,lambda0=control$lambda0,hookFun=control$hookFun)
 
   ###########################################################################
   #Create bootstrap samples and loop for each sample while storing the result
   ###########################################################################
   sts.boot <- sts0
   #Define object to return
-  lambda <- array(NA,dim=c(ncol(sts),nrow(sts),B))
+  lambda <- array(NA,dim=c(ncol(sts),nrow(sts),control$B))
 
   #Loop in order to create the sample
-  for (b in 1:B) {
-    if (verbose) { cat("Bootstrap sample ",b,"/",B,"\n") }
+  for (b in 1:control$B) {
+    if (control$verbose) { cat("Bootstrap sample ",b,"/",control$B,"\n") }
     
     #Compute convolution for the mean of the observations (matrix wise)
     mu <- matrix(0, nrow=nrow(sts0), ncol=ncol(sts0))
@@ -273,23 +286,22 @@ backprojNP <- function(sts, incu.pmf.vec,k=8,eps=rep(0.005,2),iter.max=rep(250,2
 
     #Run the backprojection on the bootstrap sample. Use original result
     #as starting value.
-    sts.boot <- backprojNP.fit(sts.boot, incu.pmf.vec=incu.pmf.vec,k=k,eps=eps[2],iter.max=iter.max[2],verbose=verbose,lambda0=upperbound(stsk),hookFun=hookFun)
+    sts.boot <- backprojNP.fit(sts.boot, incu.pmf.vec=incu.pmf.vec,k=control$k,eps=control$eps[2],iter.max=control$iter.max[2],verbose=control$verbose,lambda0=upperbound(stsk),hookFun=control$hookFun)
     #Extract the result
     lambda[,,b] <- upperbound(sts.boot)
   }
 
   #Compute an equal tailed (1-alpha)*100% confidence intervals based on the
   #bootstrap samples
-  ci <- t(apply(lambda,MARGIN=c(1,2), quantile, p=c(alpha/2,1-alpha/2))[,1,])
+  ci <- t(apply(lambda,MARGIN=c(1,2), quantile, p=c(control$alpha/2,1-control$alpha/2))[,1,])
 
-  #Add CI output to control part. Not necessarily nice as the slot was not
-  #realldy designed for this purpose.
+  #Convert output to stsBP object and add information to the extra slots
   stsk <- as(stsk,"stsBP")
 
   #Add extra slots
   stsk@ci <- ci
   stsk@lambda <- lambda
-  stsk@control <- list(k=k,eps=eps,iter.max=iter.max,B=B)
+  stsk@control <- control 
 
 
   #Done
