@@ -61,24 +61,26 @@ typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE)
   \code{data$events@data} \code{data.frame}
 }
 \item{na.action}{
-  How to deal with missing values in '\code{data$events}'. Do not use
-  'na.pass'. Missing values in the spatio-temporal grid '\code{data$stgrid}'
-  are not accepted.
+  How to deal with missing values in \code{data$events}. Do not use
+  \code{\link{na.pass}}. Missing values in the spatio-temporal grid
+  \code{data$stgrid} are not accepted.
 }
 \item{optim.args}{
-  \code{NULL} or an argument list passed to 'optim' containing at least
-  the element 'par', the start values of the parameters in the order par
-  = c(endemic, epidemic, siaf, tiaf).
+  \code{NULL} or an argument list passed to \code{\link{optim}} containing
+  at least the element \code{par}, the start values of the parameters in
+  the order \code{par = c(endemic, epidemic, siaf, tiaf)}.
+  Note that \code{optim} receives the negative log-likelihood for minimization
+  (thus, if used, \code{optim.args$control$fnscale} should be positive).
 
-  Exceptionally, the 'method' argument may also be "nlminb", in which
-  case the 'nlminb' optimizer is used. This is also the default. In this case,
-  the only control parameters available are \code{maxit}, \code{REPORT},
-  \code{abstol}, and \code{reltol}, which are passed appropriately to
-  \code{nlminb}.
+  Exceptionally, the \code{method} argument may also be \code{"nlminb"}, in
+  which case the \code{\link{nlminb}} optimizer is used. This is also the
+  default. In this case, the only control parameters available are
+  \code{maxit}, \code{REPORT}, \code{abstol}, and \code{reltol}, which are
+  passed appropriately to \code{\link{nlminb}}.
 
-  If 'optim.args' is \code{NULL} then no optimization will be performed but
-  the necessary functions will be returned in a list (similar to
-  '\code{model = TRUE}').
+  If \code{optim.args} is \code{NULL}, then no optimization will be performed
+  but the necessary functions will be returned in a list (similar to what is
+  returned if \code{model = TRUE}).
 }
 \item{nCub}{
   Determines the accuracy of the cubature of the 'siaf' function. If \code{siaf$Fcircle} is specified, nCub = effRange/eps, where eps is used as pixel width and height in the two-dimensional midpoint rule (see polyCub.midpoint). Thus nCub is the desired number of subdivions of effRange in both dimensions and eps = effRange/nCub. If \code{siaf$Fcircle} is missing, nCub equals the above mentioned eps.
@@ -184,7 +186,7 @@ typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE)
   intensity model for infectious disease occurence, Department of
   Statistics: Technical Reports, No. 95, 27 pages, 2010.
   Available as http://epub.ub.uni-muenchen.de/11898/
-  
+
   Meyer, S. (2010): Spatio-Temporal Infectious Disease Epidemiology based
   on Point Processes. Master Thesis, Ludwig-Maximilians-\enc{Universität}{Universitaet}
   München. Available as http://epub.ub.uni-muenchen.de/11703/
@@ -219,7 +221,7 @@ siaf_constant <- siaf.constant
 #startvalues <-  c(-20.36516096, -0.04926598, 0.26183958, 0.26681968,
 #-12.57458928, 0.64631559, -0.18675885, -0.84955802, 2.82866154)
 #Crude intercept estimate -> if model only has an endemic component with
-#a single population 
+#a single population
 #popdensity.overall <- mean(subset(imdepi$stgrid, BLOCK == 1)$popdensity)
 #h.intercept <- with(as(imdepi$events,"data.frame"),log(length(ID)/max(time)))/popdensity.overall
 
@@ -227,23 +229,23 @@ siaf_constant <- siaf.constant
 optim.args <- list(par = rep(0,8), method = "nlminb", control = list(fnscale = -10000,trace=4,REPORT=1))
 
 #Fit a twinstim model (no space interaction)
-imdepi.fit0 <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) + 
-              sin(start * 2 * pi/365) + cos(start * 2 * pi/365), 
-              epidemic = ~1 + agegrp + type, 
-              data = imdepi, subset = allEpiCovNonNA, 
+imdepi.fit0 <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) +
+              sin(start * 2 * pi/365) + cos(start * 2 * pi/365),
+              epidemic = ~1 + agegrp + type,
+              data = imdepi, subset = allEpiCovNonNA,
               optim.args = optim.args, finetune=FALSE, model=TRUE,
-              nCub = 24, 
+              nCub = 24,
               typeSpecificEndemicIntercept = FALSE)
 
 #Now with spatial interaction function
 optim.args <- modifyList(optim.args,list(par=c(coef(imdepi.fit0),3)))
-imdepi.fit1 <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) + 
-              sin(start * 2 * pi/365) + cos(start * 2 * pi/365), 
-              epidemic = ~1 + agegrp + type, 
+imdepi.fit1 <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) +
+              sin(start * 2 * pi/365) + cos(start * 2 * pi/365),
+              epidemic = ~1 + agegrp + type,
               siaf = siaf_log1,
-              data = imdepi, subset = allEpiCovNonNA, 
+              data = imdepi, subset = allEpiCovNonNA,
               optim.args = optim.args, finetune=FALSE, model=TRUE,
-              nCub = 24, 
+              nCub = 24,
               typeSpecificEndemicIntercept = FALSE)
 
 

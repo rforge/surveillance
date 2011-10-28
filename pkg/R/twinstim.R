@@ -15,7 +15,7 @@
 # data: epidataCS object
 # subset: logical expression indicating events to keep: missing values are taken as false. the expression is evaluated in the context of the data$events@data data.frame
 # na.action: how to deal with missing values in 'data$events'. Do not use 'na.pass'. Missing values in the spatio-temporal grid 'data$stgrid' are not accepted.
-# optim.args: NULL or an argument list passed to 'optim' containing at least the element 'par', the start values of the parameters in the order par = c(endemic, epidemic, siaf, tiaf). Exceptionally, the 'method' argument may also be "nlminb", in which case the 'nlminb' optimizer is used. This is also the default. If 'optim.args' is NULL then no optimization will be performed but the necessary functions will be returned in a list (similar to 'model = TRUE').
+# optim.args: NULL or an argument list passed to 'optim' containing at least the element 'par', the start values of the parameters in the order par = c(endemic, epidemic, siaf, tiaf). Note that 'optim' receives the negative log-likelihood for minimization (thus, if used, control$fnscale should be positive). Exceptionally, the 'method' argument may also be "nlminb", in which case the 'nlminb' optimizer is used. This is also the default. If 'optim.args' is NULL then no optimization will be performed but the necessary functions will be returned in a list (similar to 'model = TRUE').
 #  nCub - determines the accuracy of the cubature of the 'siaf' function. If siaf$Fcircle is specified, nCub = effRange/eps, where eps is used as pixel width and height in the two-dimensional midpoint rule (see polyCub.midpoint). Thus nCub is the desired number of subdivions of effRange in both dimensions and eps = effRange/nCub. If siaf$Fcircle is missing, nCub equals the above mentioned eps.
 # partial: logical indicating if the partial log-likelihood proposed by Diggle et al. (2009) should be used.
 # finetune: logical indicating if a second maximisation should be performed with robust Nelder-Mead optim using as starting point the resulting parameters from the first maximisation. Default to TRUE.
@@ -129,6 +129,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     # and there only eventBlocks[includes] is used (i.e. no prehistory events)
     my.na.action <- function (object, ...) {
         prehistevents <- object[object[["(time)"]] <= t0, "(ID)"]
+        if (length(prehistevents) == 0L) return(na.action(object, ...))
         origprehistblocks <- object[match(prehistevents,object[["(ID)"]]), "(BLOCK)"]
         object[object[["(ID)"]] %in% prehistevents, "(BLOCK)"] <- 0L
         xx <- na.action(object, ...)

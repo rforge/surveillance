@@ -38,9 +38,8 @@
 04/04/2011 osAIC computations by simulation does not work in some
            cases where estimated coefficient is small (global in Hagelloch)
            Problems occur in the quadratic programming (->Michael)
-25/03/2011 die intensityPlot-Funktion in twinSIR funktioniert nicht,
-           wenn es schon anfänglich infektiöse Individuen gibt
-           (wie in den hagelloch-Daten)
+25/03/2011 intensityPlot in twinSIR does not work if there are initially
+           infectious individuals (as in the hagelloch data)
 
 #Fixed
 
@@ -90,9 +89,9 @@
 
 #Closed:
 
-29/07/2010>> Summary/print fÃ¼r twinstim Objekte, die mit do.call
+29/07/2010>> Summary/print fuer twinstim Objekte, die mit do.call
   erzeugt worden sind scheint nicht zu funktionieren.
-  Siehe analyses-joint fÃ¼r Beispiele.
+  Siehe analyses-joint fuer Beispiele.
 30/07/2010-fix>> alist
 
 30/07/2010>> imdepi$events@data -- see email
@@ -112,8 +111,8 @@ minutes. Possible to fix this??
 
 #Open issues / feature requests
 - Plot function for epidataCS objects
-- robustification/ of optim procedure by making it more adaptive -> sebastian
-- Documentation of functions in Rd files -> michael
+- robustification of optim procedure by making it less adaptive -> sebastian
+- Documentation of functions in Rd files; also update references (Biometrics)
 - intensityPlot as in twinSIR, i.e. on W integrated intensity (and its components) as a function of time, grouped by type
 
 #Done
