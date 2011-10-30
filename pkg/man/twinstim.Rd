@@ -226,12 +226,12 @@ siaf_constant <- siaf.constant
 #h.intercept <- with(as(imdepi$events,"data.frame"),log(length(ID)/max(time)))/popdensity.overall
 
 #Define start values
-optim.args <- list(par = rep(0,8), method = "nlminb", control = list(fnscale = -10000,trace=4,REPORT=1))
+optim.args <- list(par = rep(0,6), method = "nlminb", control = list(fnscale = -10000,trace=4,REPORT=1))
 
 #Fit a twinstim model (no space interaction)
 imdepi.fit0 <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) +
               sin(start * 2 * pi/365) + cos(start * 2 * pi/365),
-              epidemic = ~1 + agegrp + type,
+              epidemic = ~1 + type, #+agegrp causes problems
               data = imdepi, subset = allEpiCovNonNA,
               optim.args = optim.args, finetune=FALSE, model=TRUE,
               nCub = 24,
@@ -241,7 +241,7 @@ imdepi.fit0 <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) +
 optim.args <- modifyList(optim.args,list(par=c(coef(imdepi.fit0),3)))
 imdepi.fit1 <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) +
               sin(start * 2 * pi/365) + cos(start * 2 * pi/365),
-              epidemic = ~1 + agegrp + type,
+              epidemic = ~1 + type, #agegrp works here.
               siaf = siaf_log1,
               data = imdepi, subset = allEpiCovNonNA,
               optim.args = optim.args, finetune=FALSE, model=TRUE,
