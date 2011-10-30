@@ -69,6 +69,11 @@ backprojNP(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,
 	and bootstrap fitting using the specified \code{k}. If \code{k} is
 	only of length one, then this number is replicated twice.
       }
+      \item{\code{Tmark}}{Numeric with \eqn{T'\leq T}. Upper time limit
+  on which to base convergence, i.e. only the values
+  \eqn{\lambda_1,\ldots,\lambda_{T'}} are monitored for convergence. See
+  details. 
+      }
       \item{\code{iter.max}}{
       }
       \item{\code{B}}{
@@ -95,7 +100,9 @@ backprojNP(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,
   In the present implementation the algorithm iterates until
   \deqn{\frac{||\lambda^{(k+1)} - \lambda^{(k)}||}{||\lambda^{(k)}||} <
   \epsilon} This is a slight adaptation of the proposals in Becker et
-  al. (1991).
+  al. (1991). If \eqn{T} is the length of \eqn{\lambda} then one can
+  avoid instability of the algorithm near the end by considering only
+  the \eqn{\lambda}{lambda}'s with index \eqn{1,\ldots,T'}.
 
   
   See the references for further information.
