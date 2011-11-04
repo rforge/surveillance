@@ -9,10 +9,6 @@
 # See backprojNP.Rd for the remaining details.
 ######################################################################
 
-#Load class definition
-#source("class-stsBP.R")
-
-
 ######################################################################
 # Helper function: Replace NaN or is.infinite values with zero.
 # Good against division by zero problems.
@@ -212,7 +208,7 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
 #  sts object with upperbound set to the backprojected lambda.
 ######################################################################
 
-backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,2),B=-1,alpha=0.05,verbose=FALSE,lambda0=NULL,hookFun=function(Y,lambda,...) {}),...) {
+backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,2),Tmark=nrow(sts),B=-1,alpha=0.05,verbose=FALSE,lambda0=NULL,hookFun=function(Y,lambda,...) {}),...) {
 
   #Backprojection only works for univariate time series
   if (ncol(sts)>1) {
@@ -223,6 +219,7 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
   if (is.null(control[["k",exact=TRUE]]))  { control$k <- 2 }
   if (is.null(control[["eps",exact=TRUE]])) { control$eps <- rep(0.005,2) }
   if (is.null(control[["iter.max",exact=TRUE]])) { control$iter.max <- rep(250,2) }
+  if (is.null(control[["Tmark",exact=TRUE]])) { control$Tmark <- nrow(sts) }
   if (is.null(control[["B",exact=TRUE]])) { control$B <- -1 }
   if (is.null(control[["alpha",exact=TRUE]])) { control$alpha <- 0.05 }
   if (is.null(control[["verbose",exact=TRUE]])) { control$verbose <- FALSE }
