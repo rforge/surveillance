@@ -116,10 +116,8 @@ Michael \enc{Höhle}{Hoehle}
 }
 
 \examples{
-#Load simulated outbreak data. 
-D <- read.table("http://www.stat.uni-muenchen.de/~hoehle/teaching/moid2011/tutorials/cast-backnow/outbreak.txt",header=TRUE)
-#Convert date columns to dates
-for (i in grep("^d.*",names(D))) { D[,i] <- as.Date(D[,i])}
+#Load simulated outbreak data.
+D <- read.table("http://www.stat.uni-muenchen.de/~hoehle/teaching/moid2011/tutorials/cast-backnow/outbreak.txt",header=TRUE,colClasses=c("integer",rep("Date",3)))
  
 s <- as.Date("2011-06-02") ;
 k <- 10 ; l <- 3
