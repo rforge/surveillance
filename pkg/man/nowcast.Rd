@@ -52,7 +52,8 @@ nowcast(s,t,D,dEventCol="dHospital",dReportCol="dReport",
   returned by the function. However, it is possible to specify several
   methods here, e.g. in order to compare score evaluations.
   }
-  
+  \item{aggregate.by}{Time scale used for the temporal aggregation of
+  the records in the data \code{D}. See also \link{surveillance::cases2sts}.}
   \item{control}{A list with named arguments controlling the
     functionality of the nowcasting.
     \describe{
@@ -125,7 +126,9 @@ k <- 10 ; l <- 3
 t <- seq(s-k-l+1,s-l,by="1 day")
 dRange <- as.Date(c("2011-05-01","2011-07-10"))
 
-nc <- nowcast(s=s,t=t,D=D,dEventCol="dHospital",dReportCol="dRegister",method="bayes.nb",control=list(dRange=dRange))
+#Perform the nowcast
+nc <- nowcast(s=s,t=t,D=D,dEventCol="dHospital",dReportCol="dRegister",
+              method="bayes.nb",aggregate.by="1 day",control=list(dRange=dRange))
 
 #Show result
 plot(nc,xaxis.years=FALSE,dx.upperbound=0,legend=NULL,lty=c(1,1,1),lwd=c(1,1,2),ylab="Cases",xlab="Time (days)",main="",ylim=c(0,max(nc@ci,na.rm=TRUE)))

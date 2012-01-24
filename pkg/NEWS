@@ -20,6 +20,10 @@ see below.
 * Support for twinstim models as described in Meyer et al (2010). That
   means continuous-time continuous-space infectious models
 
+* Added functionality for the backproject (backprojNP) and 
+  now-casting (nowcast) of sts objects.
+
+* Removed the function algo.cdc and algo.rki
 
 1.2-2
 =====

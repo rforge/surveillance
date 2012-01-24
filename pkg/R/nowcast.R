@@ -14,6 +14,7 @@
 
 nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
                     method=c("freq.pi","bayes.nb","bayes.betapi","uniform"),
+                    aggregate.by="1 day",
                     control=list(
                       dRange=NULL,
                       timeDelay=function(d1,d2) {as.numeric(d2-d1)},
@@ -40,12 +41,18 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
     dMin <- control$dRange[1]
     dMax <- control$dRange[2]
   }
-  dateRange <- seq(dMin,dMax,by="1 day")
 
+  dateRange <- seq(dMin,dMax,by=aggregate.by)
+  timeDelay <- NULL
+  
   if (is.null(control[["timeDelay"]])) {
     timeDelay <- function(d1,d2) {as.numeric(d2-d1)}
   } else {
-    if (!is.function(timeDelay)) stop("timeDelay(d1,d2) needs to be a function.")
+    if (is.function(control[["timeDelay"]])) {
+      timeDelay <- control[["timeDelay"]]
+    } else {
+      stop("timeDelay(d1,d2) needs to be a function.")
+    }
   }
   
   #Create a column containing the reporting delay using the timeDelay
@@ -59,13 +66,15 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
   }
   
   #Create an sts object containing the observed number of counts until s
-  observed <- table(factor(as.character(D.sub[,dEventCol]), levels=as.character(dateRange)))
-  sts <- new("sts",epoch=as.numeric(dateRange),observed=matrix(observed,ncol=1),epochAsDate=TRUE,freq=365)
+#  observed <- table(factor(as.character(D.sub[,dEventCol]), levels=as.character(dateRange)))
+#  sts <- new("sts",epoch=as.numeric(dateRange),observed=matrix(observed,ncol=1),epochAsDate=TRUE,freq=365)
+  sts <- cases2sts(D.sub,dEventCol,aggregate.by=aggregate.by,dRange=dateRange)
   sts <- as(sts,"stsBP")
 
   #Create an object containing the "truth" based on D
-  observed <- table(factor(as.character(D[,dEventCol]), levels=as.character(dateRange)))
-  sts.truth <- new("sts",epoch=as.numeric(dateRange),observed=matrix(observed,ncol=1),epochAsDate=TRUE,freq=365)
+#  observed <- table(factor(as.character(D[,dEventCol]), levels=as.character(dateRange)))
+#  sts.truth <- new("sts",epoch=as.numeric(dateRange),observed=matrix(observed,ncol=1),epochAsDate=TRUE,freq=365)
+  sts.truth <- cases2sts(D,dEventCol,aggregate.by=aggregate.by,dRange=dateRange)
   
   
   #Estimation function for the delay. Standard procedure is to reduce
@@ -374,4 +383,3 @@ outside.ci <- function(P,y,alpha) {
 1-alpha/2))]
   ifelse( y>=ci[1] & y<=ci[2], 0, 1)
 }
-
