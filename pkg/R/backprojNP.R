@@ -89,14 +89,14 @@ em.step.becker <- function(lambda.old, Y, dincu, pincu, k) {
 #  verbose - boolean, if TRUE provide extra output when running the method
 #  lambda0 - start value for lambda, default: uniform
 #  hookFun - hook function to call after each EMS step, a function
-#            of type hookFun=function(Y,lambda,...)
+#            of type hookFun=function(stsj,...)
 #
 # Returns:
 #  sts object with upperbound set to the backprojected lambda.
 ######################################################################
 
 
-backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=FALSE,lambda0=NULL,hookFun=function(Y,lambda,...) {},...) {
+backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=FALSE,lambda0=NULL,hookFun=function(stsbp,...) {},...) {
 
   #Backprojection only works for univariate time series
   if (ncol(sts)>1) {
@@ -163,8 +163,10 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
       #Check whether to stop
       stop <- criterion < eps | (i>iter.max)
       
-      #Hook
-      hookFun(Y=Y,lambda=res$lambda)
+      #Call Hook
+      stsj <- sts[,j]
+      upperbound(stsj) <- matrix(res$lambda,ncol=1)
+      hookFun(stsj,...)
     }
     #Done
     lambda[,j] <- res$lambda

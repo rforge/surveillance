@@ -12,12 +12,14 @@
 #       seq.Date -- see \link{seq.date} for further details.
 #
 # Author: Michael Hoehle
-# Date LaMo: 24 Jan 2012
+# Date LaMo: 06 Feb 2012
 ######################################################################
 
 cases2sts <- function(cases,dateCol,aggregate.by="1 week",dRange=NULL) {
  #by <- match.arg(by,c("1 day","1 week","1 month","1 year")
-  dRange <- range(cases[,dateCol],na.rm=TRUE)
+  if (is.null(dRange)) {
+    dRange <- range(cases[,dateCol],na.rm=TRUE)
+  }
 
   #Make sure that if weeks we span the entire data set.
   if ((aggregate.by=="1 week" | aggregate.by == "7 day") & is.null(dRange)) {

@@ -78,15 +78,21 @@ backprojNP(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,
       }
       \item{\code{B}}{
       }
-      \item{\code{alpha}}{
+      \item{\code{alpha}}{(1-\eqn{\alpha}{alpha})*100\% confidence
+  intervals are computed based on the percentile method.}
       }
-      \item{\code{verbose}}{
+      \item{\code{verbose}}{(boolean). If true show extra progress and
+  debug information.
       }
-      \item{\code{lambda0}}{
+      \item{\code{lambda0}}{Start values.
       }
       \item{\code{hookFun}}{
+	Hook function called for each iteration of the EM algorithm. The
+  function provides an stsBP object with upperbound set to the current
+  value of lambda. If no action desired just leave the function body
+  empty (default).
       }
-      \item{\dots}{
+      \item{\dots}{Dots are sent to the hook function.
       }
     }
   }
@@ -145,19 +151,21 @@ n <- 1e3 ; t0 <- 23 ; l <- 10
 
 #PMF of the incubation time is an interval censored gamma distribution
 #with mean 15 truncated at 25.
-inc.pmf <- c(0,(pgamma(1:25,15,1.4) - pgamma(0:24,15,1.4))/pgamma(25,15,1.4))
+dmax <- 25
+inc.pmf <- c(0,(pgamma(1:dmax,15,1.4) - pgamma(0:(dmax-1),15,1.4))/pgamma(dmax,15,1.4))
 #Function to sample from the incubation time
 rincu <- function(n) {
-  sample(0:25, size=n, replace=TRUE, prob=inc.pmf)
+  sample(0:dmax, size=n, replace=TRUE, prob=inc.pmf)
 }
 #Sample time of exposure and length of incubation time
 set.seed(123)
 exposureTimes <- t0 + sample(x=0:(l-1),size=n,replace=TRUE)
 symptomTimes <- exposureTimes + rincu(n)
 
-#Time series of exposured and symptoms. Convert Y to an sts object
-X <- table( factor(exposureTimes,levels=1:(max(symptomTimes)+25)))
-Y <- table( factor(symptomTimes,levels=1:(max(symptomTimes)+25)))
+#Time series of exposure (truth) and symptom onset (observed)
+X <- table( factor(exposureTimes,levels=1:(max(symptomTimes)+dmax)))
+Y <- table( factor(symptomTimes,levels=1:(max(symptomTimes)+dmax)))
+#Convert Y to an sts object
 sts <- new("sts", epoch=1:length(Y),observed=matrix(Y,ncol=1))
 
 #Plot the outbreak
@@ -165,6 +173,11 @@ plot(sts,xaxis.years=FALSE,legend=NULL)
 #Add true number of exposures to the plot
 lines(1:length(Y)+0.2,X,col="red",type="h",lty=2)
 
+
+#Helper function to show the EM step
+plotIt <- function(sts,...) {
+  plot(sts,xaxis.years=FALSE,legend=NULL,ylim=c(0,140))
+}
 
 #Call non-parametric back-projection function with hook function but
 #without bootstrapped confidence intervals
@@ -185,8 +198,9 @@ bpnp.control2 <- modifyList(bpnp.control, list(hookFun=NULL,k=2,B=100))
 sts.bp2 <- backprojNP(sts, incu.pmf.vec=inc.pmf, control=bpnp.control2)
 
 ######################################################################
-# Plot the result. This is currently a manul routine. Need to specify 
-# a plot method for stsBP objects.
+# Plot the result. This is currently a manual routine.
+# ToDo: Need to specify a plot method for stsBP objects which also
+#       shows the CI.
 #
 # Parameters:
 #  stsBP - object of class stsBP which is to be plotted.
