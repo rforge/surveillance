@@ -40,7 +40,17 @@
 }
 
 \usage{
-backprojNP(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,2),B=-1,alpha=0.05,verbose=FALSE,lambda0=NULL,hookFun=function(Y,lambda,...) {}),...)
+backprojNP(sts, incu.pmf.vec, 
+   control = list(k = 2, 
+                  eps = rep(0.005,2), 
+                  iter.max=rep(250,2), 
+                  Tmark = nrow(sts), 
+                  B = -1, 
+                  alpha = 0.05, 
+                  verbose = FALSE, 
+                  lambda0 = NULL,
+                  hookFun = function(Y,lambda,...) {}),
+                  ...)
 }
 
 \arguments{
@@ -79,7 +89,7 @@ backprojNP(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,
       \item{\code{B}}{
       }
       \item{\code{alpha}}{(1-\eqn{\alpha}{alpha})*100\% confidence
-  intervals are computed based on the percentile method.}
+  intervals are computed based on the percentile method.
       }
       \item{\code{verbose}}{(boolean). If true show extra progress and
   debug information.

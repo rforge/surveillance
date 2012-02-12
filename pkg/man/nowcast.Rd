@@ -17,15 +17,16 @@
 }
 
 \usage{
-nowcast(s,t,D,dEventCol="dHospital",dReportCol="dReport",
-           method=c("bayes.nb","bayes.betapi","freq.pi","uniform"),
-           control=list(
-             dRange=NULL,
-             timeDelay=function(d1,d2) {as.numeric(d2-d1)},
-             estimateF="dynamic",
-             alpha=0.05,
-             y.prior.max=300,
-             B=1e5, score=FALSE))
+nowcast(s, t, D, dEventCol = "dHospital", dReportCol = "dReport",
+          method = c("freq.pi","bayes.nb","bayes.betapi","uniform"),
+          control = list(
+            dRange = NULL,
+            timeDelay = function(d1,d2) {as.numeric(d2-d1)},
+            estimateF = "dynamic",
+            alpha = 0.05,
+            y.prior.max = 300,
+            B = 1e5, 
+            score = FALSE))
 }
 
 \arguments{
