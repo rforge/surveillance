@@ -4,7 +4,7 @@
 
 \title{MMR coverage levels in the 16 states of Germany}
 \description{Coverage levels at school entry for the first and second dose
-  of the combinde measles-mumps-rubella (MMR) vaccine in 2006, estimated 
+  of the combined measles-mumps-rubella (MMR) vaccine in 2006, estimated 
   from children presenting vaccination documents at school entry examinations.
 }
 \usage{data(MMRcoverageDE)
