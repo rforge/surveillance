@@ -1,7 +1,9 @@
+### R code from vignette source 'Rnw/algo_farrington.Rnw'
+### Encoding: ISO8859-1
+
 ###################################################
-### chunk number 1: 
+### code chunk number 1: algo_farrington.Rnw:25-35
 ###################################################
-#line 26 "Rnw/algo_farrington.Rnw"
 anscombe.residuals <- function(m,phi) {
   y <- m$y
   mu <- fitted.values(m)
@@ -15,9 +17,8 @@ anscombe.residuals <- function(m,phi) {
 
 
 ###################################################
-### chunk number 2: 
+### code chunk number 2: algo_farrington.Rnw:60-68
 ###################################################
-#line 61 "Rnw/algo_farrington.Rnw"
 algo.farrington.assign.weights <- function(s) {
   #s_i^(-2) for s_i<1 and 1 otherwise
   gamma <- length(s)/(sum(  (s^(-2))^(s>1) ))
@@ -29,9 +30,8 @@ algo.farrington.assign.weights <- function(s) {
 
 
 ###################################################
-### chunk number 3: 
+### code chunk number 3: algo_farrington.Rnw:136-305
 ###################################################
-#line 137 "Rnw/algo_farrington.Rnw"
 algo.farrington.fitGLM <- function(response,wtime,timeTrend=TRUE,reweight=TRUE,...) {
   #Model formula depends on whether to include a time trend or not.
   theModel <- as.formula(ifelse(timeTrend, "response~1+wtime","response~1"))
@@ -43,8 +43,10 @@ algo.farrington.fitGLM <- function(response,wtime,timeTrend=TRUE,reweight=TRUE,.
   if (!model$converged) {
     #Try without time dependence
     if (timeTrend) {
-     model <- glm(response ~ 1, family = quasipoisson(link="log"))
-     cat("Warning: No convergence with timeTrend -- trying without.\n")
+      cat("Warning: No convergence with timeTrend -- trying without.\n")
+      #Set model to one without time trend
+      theModel <- as.formula("response~1")
+      model <- glm(response ~ 1, family = quasipoisson(link="log"))
     } 
 
     if (!model$converged) {
@@ -106,10 +108,14 @@ algo.farrington.fitGLM.fast <- function(response,wtime,timeTrend=TRUE,reweight=T
    if (!model$converged) {
       #Try without time dependence
      if (timeTrend) {
-       model <- glm.fit(design[,1,drop=FALSE],response, family = quasipoisson(link = "log"))
-       Formula<-response~1
        cat("Warning: No convergence with timeTrend -- trying without.\n")
+       #Drop time from design matrix
+       design <- design[,1,drop=FALSE]
+       #Refit
+       model <- glm.fit(design,response, family = quasipoisson(link = "log"))
+       Formula<-response~1
      } 
+     #No convergence and no time trend. That's not good.
    }
 
    #Fix class of output to glm/lm object in order for anscombe.residuals to work
@@ -132,7 +138,7 @@ algo.farrington.fitGLM.fast <- function(response,wtime,timeTrend=TRUE,reweight=T
    model$phi <- phi
    model$wtime <- wtime
    model$response <- response
-   model$terms<-terms(Formula)
+   model$terms <- terms(Formula)
    # cheating a bit, all methods for glm may not work
    class(model)<-c("algo.farrington.glm","glm") 
    #Done
@@ -198,9 +204,8 @@ algo.farrington.fitGLM.populationOffset <- function(response,wtime,population,ti
 
 
 ###################################################
-### chunk number 4: 
+### code chunk number 4: algo_farrington.Rnw:344-370
 ###################################################
-#line 339 "Rnw/algo_farrington.Rnw"
 
 algo.farrington.threshold <- function(pred,phi,alpha=0.01,skewness.transform="none",y) {
   #Fetch mu0 and var(mu0) from the prediction object
@@ -230,9 +235,8 @@ algo.farrington.threshold <- function(pred,phi,alpha=0.01,skewness.transform="no
 
 
 ###################################################
-### chunk number 5: 
+### code chunk number 5: algo_farrington.Rnw:412-451
 ###################################################
-#line 407 "Rnw/algo_farrington.Rnw"
 ######################################################################
 # Compute indices of reference value using Date class
 #
@@ -275,9 +279,8 @@ refvalIdxByDate <- function(t0, b, w, epochStr, epochs) {
 
 
 ###################################################
-### chunk number 6: 
+### code chunk number 6: algo_farrington.Rnw:571-769
 ###################################################
-#line 566 "Rnw/algo_farrington.Rnw"
 
 algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, reweight=TRUE, verbose=FALSE,alpha=0.01,trend=TRUE,limit54=c(5,4),powertrans="2/3",fitFun=c("algo.farrington.fitGLM.fast","algo.farrington.fitGLM","algo.farrington.fitGLM.populationOffset"))) { 
   #Fetch observed
@@ -384,7 +387,9 @@ algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, rewei
     #2) the predicted value is not larger than any observed value
     #3) the historical data span at least 3 years.
     doTrend <- control$trend
-    if (control$trend) {
+#Bug discovered by Julia Kammerer and Sabrina Heckl: Only investigate trend if it actually was part of the GLM
+    #if (control$trend) {
+    if ("wtime" %in% names(coef(model))){
       #is the p-value for the trend significant (0.05) level
       p <- summary.glm(model)$coefficients["wtime",4]
       significant <- (p < 0.05)

@@ -96,7 +96,7 @@ em.step.becker <- function(lambda.old, Y, dincu, pincu, k) {
 ######################################################################
 
 
-backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=FALSE,lambda0=NULL,hookFun=function(stsbp,...) {},...) {
+backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=FALSE,lambda0=NULL,hookFun=function(stsbp) {}, ...) {
 
   #Backprojection only works for univariate time series
   if (ncol(sts)>1) {
@@ -166,7 +166,7 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
       #Call Hook
       stsj <- sts[,j]
       upperbound(stsj) <- matrix(res$lambda,ncol=1)
-      hookFun(stsj,...)
+      hookFun(stsj, ...)
     }
     #Done
     lambda[,j] <- res$lambda

@@ -98,9 +98,10 @@ backprojNP(sts, incu.pmf.vec,
       }
       \item{\code{hookFun}}{
 	Hook function called for each iteration of the EM algorithm. The
-  function provides an stsBP object with upperbound set to the current
-  value of lambda. If no action desired just leave the function body
-  empty (default).
+	function should take a single argument \code{cur.sts} of
+	\code{stsBP0} class. It will be have the upperbound set to the current
+        value of lambda. If no action desired just leave the function body
+	empty (default).
       }
       \item{\dots}{Dots are sent to the hook function.
       }
@@ -185,8 +186,8 @@ lines(1:length(Y)+0.2,X,col="red",type="h",lty=2)
 
 
 #Helper function to show the EM step
-plotIt <- function(sts,...) {
-  plot(sts,xaxis.years=FALSE,legend=NULL,ylim=c(0,140))
+plotIt <- function(cur.sts,...) {
+  plot(cur.sts,xaxis.years=FALSE,legend=NULL,ylim=c(0,140))
 }
 
 #Call non-parametric back-projection function with hook function but

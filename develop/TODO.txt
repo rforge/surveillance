@@ -19,6 +19,7 @@
 
 #Open
 21/04/2011 incorporate a NAMESPACE :)
+02/11/2011 plot for sts objects which contains daily data as Date obj
 
 
 
