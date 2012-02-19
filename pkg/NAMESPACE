@@ -1,0 +1,63 @@
+# Started to build namespace for the surveillance package. This might
+# take a while before working correctly so we start by an exportPattern(".")
+
+# Export all names
+exportPattern(".")
+
+#Load C code
+useDynLib("surveillance")
+
+# Import all packages listed as Imports or Depends
+import(
+  intervals,
+  methods,
+  utils,
+  xtable,
+  spc,
+  sp,
+  maptools,
+  vcd,
+  msm,
+  Matrix,
+  gpclib,
+  spatstat,
+  quadprog
+)
+
+#Surveillance time series
+exportClasses("sts",
+              "stsBP")
+
+
+#twinSIR method
+export(cox)
+export(as.epidata)
+export(intersperse)
+export(twinSIR)
+export(intensityPlot)
+export(stateplot)
+export(simEpidata)
+
+S3method("[", epidata)
+S3method(print, epidata)
+S3method(summary, epidata)
+S3method(print, summary.epidata)
+S3method(plot, epidata)
+S3method(animate, epidata)
+S3method(plot, summary.epidata)
+S3method(animate, summary.epidata)
+
+S3method(print, twinSIR)
+S3method(summary, twinSIR)
+S3method(print, summary.twinSIR)
+S3method(plot, twinSIR)
+S3method(profile, twinSIR)
+S3method(coef, twinSIR)
+S3method(vcov, twinSIR)
+S3method(logLik, twinSIR)
+S3method(AIC, twinSIR)
+S3method(extractAIC, twinSIR)
+S3method(simulate, twinSIR)
+
+#twinstim methods
+

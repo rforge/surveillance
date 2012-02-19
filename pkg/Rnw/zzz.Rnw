@@ -1,10 +1,13 @@
 <<echo=F>>=
 
-.First.lib <- function(libname, pkgname) {
+.First.lib <- function(libname, pkgname) { #this works for R < 2.14
+#.onLoad <- function(libname, pkgname) {
   #Load the necessary packages
-  library(spc)
-  library(maptools)
-  library(msm)
+  
+# Removed as now part of namespace  
+#  library(spc)
+#  library(maptools)
+#  library(msm)
 
   #Load the CIdata thing
   data(CIdata, package=pkgname)
@@ -15,8 +18,9 @@
   surveillance.gvar.hyp <<- scan(file.path(.path.package('surveillance'),'data',"hypGeomSmall.txt"),quiet=TRUE)
   surveillance.gvar.z <<- - c(0:1000/100, 11:100)
 
-  #Load the C code library for the glr stuff
-  library.dynam("surveillance", pkgname, libname)
+# Removed. Now part of namespace
+#  #Load the C code library for the glr stuff  
+# library.dynam("surveillance", pkgname, libname)
   
   #License limitation for package gpclib
   cat("\n\tNote: polygon geometry computations related to",

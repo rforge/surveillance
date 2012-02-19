@@ -326,6 +326,7 @@ setMethod("plot", signature(x="sts", y="missing"), function(x, y, type,...) {
     }
     if (alarmOk) {
       plot.sts.alarm(x,...)
+      return(invisible())
     }
   }
 })
