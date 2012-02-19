@@ -11,6 +11,8 @@ useDynLib("surveillance")
 import(
   intervals,
   methods,
+  inline,
+  Rcpp,
   utils,
   xtable,
   spc,

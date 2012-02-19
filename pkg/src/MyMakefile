@@ -1,5 +1,5 @@
 lib:
-	RCMD SHLIB --output=surveillance surveillance.c stcd-assuncaocorrea.cc # twins.cc 
+	RCMD SHLIB --output=surveillance surveillance.c stcd-assuncaocorrea.cc backproj.cc # twins.cc 
 
 liblinux:
 	R CMD SHLIB surveillance.c

@@ -49,6 +49,7 @@ backprojNP(sts, incu.pmf.vec,
                   alpha = 0.05, 
                   verbose = FALSE, 
                   lambda0 = NULL,
+                  eq3a.method = "R",
                   hookFun = function(Y,lambda,...) {}),
                   ...)
 }
@@ -95,6 +96,14 @@ backprojNP(sts, incu.pmf.vec,
   debug information.
       }
       \item{\code{lambda0}}{Start values.
+      }
+      \item{\code{eq3a.method}}{A single character being either
+	\code{"R"} or \code{"C"} depending on whether the three nested loops
+	of equation 3a in Becker et al. (1991) are to be executed as safe R
+	code (can be extremely slow, however the implementation is not
+	optimized for speed) or a C code (can be more than 200 times
+	faster!). However, the C implementation is experimental and can
+	hang R if, e.g., the time series does not go far enough back.
       }
       \item{\code{hookFun}}{
 	Hook function called for each iteration of the EM algorithm. The
@@ -193,7 +202,13 @@ plotIt <- function(cur.sts,...) {
 #Call non-parametric back-projection function with hook function but
 #without bootstrapped confidence intervals
 bpnp.control <- list(k=0,eps=rep(0.005,2), iter.max=rep(250,2),B=-1,hookFun=plotIt,verbose=TRUE)
-sts.bp <- backprojNP(sts, incu.pmf.vec=inc.pmf, control=bpnp.control, ylim=c(0,max(X,Y)))
+system.time(sts.bp <- backprojNP(sts, incu.pmf.vec=inc.pmf,control=bpnp.control, ylim=c(0,max(X,Y))))
+
+#Fast C version! 
+system.time(sts.bp.fast <- backprojNP(sts, incu.pmf.vec=inc.pmf, control=modifyList(bpnp.control,list(eq3a.method="C")), ylim=c(0,max(X,Y))))
+
+#Check if results are equal.
+all.equal(upperbound(sts.bp),upperbound(sts.bp.fast))
 
 #Show result
 plot(sts.bp,xaxis.years=FALSE,legend=NULL,lwd=c(1,1,2),lty=c(1,1,1))

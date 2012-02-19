@@ -19,6 +19,81 @@
 naninf2zero <- function(x) {x[is.nan(x) | is.infinite(x)] <- 0 ; return(x)}
 
 
+## Rcpp inline function to significantly speed up the computation of equation
+## 3a in the Becker et al. (1991) paper. Created with the help of Daniel
+## Sabanes Bové, University of Zurich.
+
+## eq3a <-
+##     cxxfunction(signature(rlambdaOld="numeric",
+##                           ry="numeric",
+##                           rincuPmf="numeric"),
+##                 '
+## {
+##     // get arguments
+## NumericVector lambdaOld(rlambdaOld);
+## int T = lambdaOld.length();
+## NumericVector y(ry);
+## NumericVector incuPmf(rincuPmf);
+## NumericVector dincu(T);
+## NumericVector pincu(T);
+## pincu[0] = dincu[0];    
+## for (int i=1; i<incuPmf.length(); i++) {
+##   dincu[i] = incuPmf[i];
+##   pincu[i] = pincu[i-1] + dincu[i];
+## }
+## for (int i=incuPmf.length(); i<T; i++) {
+##   dincu[i] = 0.0;
+##   pincu[i] = 1.0;
+## }  
+
+      
+## // result vector
+## NumericVector phiNew(T);
+
+## // many loops
+## for(int t = 0; t < T; ++t)
+## {
+##     double sum3a = 0.0;
+
+##     for(int d = 0; d <= T - (t + 1); ++d)
+##     {
+## 	double tmp = 0.0;
+
+## 	for(int i = 0; i < t + d; ++i)
+## 	{
+## 	    tmp += lambdaOld[i] * dincu[t + d - i];
+## 	}
+       
+## 	tmp = dincu[d] / tmp;
+
+## 	if(R_IsNaN(tmp) || (! R_finite(tmp)))
+## 	{
+## 	    tmp = 0.0;
+## 	}
+
+## 	sum3a += y[t + d] * tmp;	    
+##     }
+    
+
+##     //printf("Querying index %d\\n", T-(t+1));
+    
+##     phiNew[t] = lambdaOld[t] / pincu[T - (t + 1)] * sum3a;
+    
+##     if(R_IsNaN(phiNew[t]) || (! R_finite(phiNew[t])))
+##     {
+## 	phiNew[t] = 0.0;
+##     }
+## }
+
+##     //Show values
+##     //for (int i=0; i<T; ++i) {
+##     //  printf( "%f\\n", phiNew[i]);
+##     //}
+
+## return wrap(phiNew);} ',
+## plugin="Rcpp")
+
+
 ######################################################################
 # Single step of the EMS algorithm by Becker et al (1991). This function
 # is called by backprojNP.
@@ -37,26 +112,34 @@ naninf2zero <- function(x) {x[is.nan(x) | is.infinite(x)] <- 0 ; return(x)}
 # 
 ######################################################################
 
-em.step.becker <- function(lambda.old, Y, dincu, pincu, k) {
+em.step.becker <- function(lambda.old, Y, dincu, pincu, k, incu.pmf, eq3a.method=c("R","C")) {
   #k needs to be divisible by two
   if (k %% 2 != 0) stop("k needs to be even.")
+  #which method to use 
+  eq3a.method <- match.arg(eq3a.method,c("R","C"))
 
   #Initialize
   T <- length(Y)
   
   #Define new parameters
   phi.new <- lambda.new <- 0*lambda.old
-  
-  #EM step. Problem that some of the sums can be zero if the incubation
-  #distribution has zeroes at d=0,1,2
-  for (t in 1:T) {
+
+  if (eq3a.method=="R") {
+    #EM step. Problem that some of the sums can be zero if the incubation
+    #distribution has zeroes at d=0,1,2
+     for (t in 1:T) {
     #Calculate sum as in equation (3a) of Becker (1991)
-    sum3a <- 0
-    for (d in 0:(T-t)) {
-      sum3a <- sum3a + Y[t+d] * naninf2zero(dincu(d) / sum(sapply(1:(t+d),function(i) lambda.old[i]*dincu(t+d-i))))
+      sum3a <- 0
+      for (d in 0:(T-t)) {
+        sum3a <- sum3a + Y[t+d] * naninf2zero(dincu(d) / sum(sapply(1:(t+d),function(i) lambda.old[i]*dincu(t+d-i))))
+      }
+      phi.new[t] <- naninf2zero(lambda.old[t]/pincu(T-t)) * sum3a
     }
-    phi.new[t] <- naninf2zero(lambda.old[t]/pincu(T-t)) * sum3a
+  } else {
+    phi.new <- .Call("eq3a",lambda.old=as.numeric(lambda.old),Y=as.numeric(Y),incu.pmf=as.numeric(incu.pmf),PACKAGE="surveillance")
+    #phi.new <- eq3a(lambda.old, Y, incu.pmf)
   }
+
   
   #Smoothing step
   if (k>0) {
@@ -72,7 +155,7 @@ em.step.becker <- function(lambda.old, Y, dincu, pincu, k) {
   }
   
   #Done.
-  return(list(lambda=lambda.new))
+  return(lambda=lambda.new)
 }
 
 ######################################################################
@@ -96,13 +179,15 @@ em.step.becker <- function(lambda.old, Y, dincu, pincu, k) {
 ######################################################################
 
 
-backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=FALSE,lambda0=NULL,hookFun=function(stsbp) {}, ...) {
+backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=FALSE,lambda0=NULL,eq3a.method=c("R","C"),hookFun=function(stsbp) {}, ...) {
 
   #Backprojection only works for univariate time series
   if (ncol(sts)>1) {
     warning("Multivariate time series: Backprojection uses same incubation time distribution and eps for the individual time series.")
   }
 
+  #Determine method
+  eq3a.method <- match.arg(eq3a.method, c("R","C"))
 
   #Create incubation time distribution vectors
   inc.pmf <- incu.pmf.vec
@@ -124,7 +209,7 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
 
   
   #Define object to return
-  lambda <- matrix(NA,ncol=ncol(sts),nrow=nrow(sts))
+  lambda.hat <- matrix(NA,ncol=ncol(sts),nrow=nrow(sts))
   
   for (j in 1:ncol(sts)) {
     #Inform (if requested) what series we are looking at
@@ -143,19 +228,19 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
     #Iteration counter and convergence indicator
     i <- 0
     stop <- FALSE
-    res <- list(lambda=lambda0)
+    lambda <- lambda0
   
     #Loop until stop 
     while (!stop) {
       #Add to counter
       i <- i+1
-      lambda.i <- res$lambda
-      res <- em.step.becker(lambda.old=lambda.i,Y=Y,dincu=dincu,pincu=pincu,k=k)
+      lambda.i <- lambda
+      lambda <- em.step.becker(lambda.old=lambda.i,Y=Y,dincu=dincu,pincu=pincu,k=k, incu.pmf=incu.pmf.vec, eq3a.method=eq3a.method)
       
       #check stop
       #In original paper, but funny as - and + deviations cancel.
       #criterion <- abs(sum(res$lambda) - sum(lambda.i))/sum(lambda.i)
-      criterion <- sqrt(sum((res$lambda- lambda.i)^2))/sqrt(sum(lambda.i^2))
+      criterion <- sqrt(sum((lambda- lambda.i)^2))/sqrt(sum(lambda.i^2))
 
       if (verbose) {
         cat("Convergence criterion @ iteration i=",i,": ", criterion,"\n")
@@ -165,16 +250,16 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
       
       #Call Hook
       stsj <- sts[,j]
-      upperbound(stsj) <- matrix(res$lambda,ncol=1)
+      upperbound(stsj) <- matrix(lambda,ncol=1)
       hookFun(stsj, ...)
     }
     #Done
-    lambda[,j] <- res$lambda
+    lambda.hat[,j] <- lambda
   }
 
   #Create new object with return put in the upperbound slot
   bp.sts <- sts
-  bp.sts@upperbound <- lambda
+  bp.sts@upperbound <- lambda.hat
   bp.sts@control <- list(k=k,eps=eps,iter=i)
   return(bp.sts)
 }
@@ -210,7 +295,7 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
 #  sts object with upperbound set to the backprojected lambda.
 ######################################################################
 
-backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,2),Tmark=nrow(sts),B=-1,alpha=0.05,verbose=FALSE,lambda0=NULL,hookFun=function(Y,lambda,...) {}),...) {
+backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,2),Tmark=nrow(sts),B=-1,alpha=0.05,verbose=FALSE,lambda0=NULL,eq3a.method="R",hookFun=function(Y,lambda,...) {}),...) {
 
   #Backprojection only works for univariate time series
   if (ncol(sts)>1) {
@@ -226,9 +311,9 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
   if (is.null(control[["alpha",exact=TRUE]])) { control$alpha <- 0.05 }
   if (is.null(control[["verbose",exact=TRUE]])) { control$verbose <- FALSE }
   if (is.null(control[["lambda0",exact=TRUE]])) { control$lambda0 <- NULL }
+  if (is.null(control[["eq3a.method",exact=TRUE]])) { control$eq3a.method <- "R" }
   if (is.null(control[["hookFun",exact=TRUE]])) { control$hookFun <- function(Y,lambda,...) {} }
 
-      
   #If the eps and iter.max arguments are too short, make them length 2.
   if (length(control$eps)==1) control$eps <- rep(control$eps,2)
   if (length(control$iter.max)==1) control$iter.max <- rep(control$iter.max,2)
@@ -245,7 +330,7 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
   if (control$verbose) {
     cat("Back-projecting with k=",control$k," to get lambda estimate.\n")
   }
-  stsk <- backprojNP.fit(sts, incu.pmf.vec=incu.pmf.vec,k=control$k,eps=control$eps[2],iter.max=control$iter.max[2],verbose=control$verbose,lambda0=control$lambda0,hookFun=control$hookFun)
+  stsk <- backprojNP.fit(sts, incu.pmf.vec=incu.pmf.vec,k=control$k,eps=control$eps[2],iter.max=control$iter.max[2],verbose=control$verbose,lambda0=control$lambda0,hookFun=control$hookFun,eq3a.method=control$eq3a.method)
 
   #If no bootstrap to do return object right away as stsBP object.
   if (control$B<=0) {
@@ -259,7 +344,7 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
   if (control$verbose) {
     cat("Back-projecting with k=",0," to get lambda estimate for parametric bootstrap.\n")
   }
-  sts0 <- backprojNP.fit(sts, incu.pmf.vec=incu.pmf.vec,k=0,eps=control$eps[1],iter.max=control$iter.max[1],verbose=control$verbose,lambda0=control$lambda0,hookFun=control$hookFun)
+  sts0 <- backprojNP.fit(sts, incu.pmf.vec=incu.pmf.vec,k=0,eps=control$eps[1],iter.max=control$iter.max[1],verbose=control$verbose,lambda0=control$lambda0,hookFun=control$hookFun, eq3a.method=control$eq3a.method)
 
   ###########################################################################
   #Create bootstrap samples and loop for each sample while storing the result
@@ -285,7 +370,7 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
 
     #Run the backprojection on the bootstrap sample. Use original result
     #as starting value.
-    sts.boot <- backprojNP.fit(sts.boot, incu.pmf.vec=incu.pmf.vec,k=control$k,eps=control$eps[2],iter.max=control$iter.max[2],verbose=control$verbose,lambda0=upperbound(stsk),hookFun=control$hookFun)
+    sts.boot <- backprojNP.fit(sts.boot, incu.pmf.vec=incu.pmf.vec,k=control$k,eps=control$eps[2],iter.max=control$iter.max[2],verbose=control$verbose,lambda0=upperbound(stsk),hookFun=control$hookFun, eq3a.method=control$eq3a.method)
     #Extract the result
     lambda[,,b] <- upperbound(sts.boot)
   }

@@ -15,7 +15,6 @@
 # Date LaMo: 06 Feb 2012
 ######################################################################
 
-
 cases2sts <- function(cases,dateCol,aggregate.by="1 week",dRange=NULL,
                       startYearFormat=switch(aggregate.by,"1 day"="%V","7 day"="%V","1 week"="%V","1 month"="%Y"),
                       startEpochFormat=switch(aggregate.by,"1 day"="%j","7 day"="%V","1 week"="%V","1 month"="%d")
