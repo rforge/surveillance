@@ -13,7 +13,10 @@
 }
 
 \usage{
-cases2sts(cases,dateCol,aggregate.by="1 week",dRange=NULL)
+cases2sts(cases,dateCol,aggregate.by="1 week",dRange=NULL,
+                      startYearFormat=switch(aggregate.by,"1 day"="%V","7 day"="%V","1 week"="%V","1 month"="%Y"),
+                      startEpochFormat=switch(aggregate.by,"1 day"="%j","7 day"="%V","1 week"="%V","1 month"="%d")
+)
 }
 
 \arguments{
@@ -31,6 +34,12 @@ cases2sts(cases,dateCol,aggregate.by="1 week",dRange=NULL)
     use. If not specified these dates are extracted automatically by
     taking \code{range(D[,dateCol])}.
   }
+  \item{startYearFormat}{Strptime compatible format string to use for
+    determining how the date string is generated. Usually the provided
+  options are sufficient.}
+  \item{statEpochFormat}{Strptime compatible format string to use for
+    determining how the date string is generated. Usually the provided
+  options are sufficient.}
 }
 
 \details{
@@ -53,7 +62,7 @@ Michael \enc{Höhle}{Hoehle}
 }
 
 \note{
-  The methods and implementation is still experimental.
+  This implementation is still experimental.
 }
 
 \seealso{
