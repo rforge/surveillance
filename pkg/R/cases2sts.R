@@ -15,21 +15,27 @@
 # Date LaMo: 06 Feb 2012
 ######################################################################
 
-cases2sts <- function(cases,dateCol,aggregate.by="1 week",dRange=NULL) {
+cases2sts <- function(cases,dateCol,aggregate.by="1 week",dRange=NULL,
+                      startYearFormat=switch(aggregate.by,"1 day"="%V","7 day"="%V","1 week"="%V","1 month"="%Y"),
+                      startEpochFormat=switch(aggregate.by,"1 day"="%j","7 day"="%V","1 week"="%V","1 month"="%d")
+                      ) {
  #by <- match.arg(by,c("1 day","1 week","1 month","1 year")
   if (is.null(dRange)) {
     dRange <- range(cases[,dateCol],na.rm=TRUE)
   }
 
-  #Make sure that if weeks we span the entire data set.
-  if ((aggregate.by=="1 week" | aggregate.by == "7 day") & is.null(dRange)) {
-    #Adjust first date to a monday and the last to be a sunday
-    weekDay <- as.numeric(format(dRange, "%w"))
-    dRange[1] <- dRange[1] - ifelse( weekDay[1] == 0, 6, (weekDay[1]-1))
-    dRange[2] <- dRange[2] + 7
-  }
-  
-  dates <- seq(min(dRange), max(dRange), by=aggregate.by)
+  ## #Make sure that if weeks we span the entire data set.
+  ## if ((aggregate.by=="1 week" | aggregate.by == "7 day") & is.null(dRange)) {
+  ##   #Adjust first date to a monday and the last to be a sunday
+  ##   weekDay <- as.numeric(format(dRange, "%w"))
+  ##   dRange[1] <- dRange[1] - ifelse( weekDay[1] == 0, 6, (weekDay[1]-1))
+  ##   dRange[2] <- dRange[2] + 7
+  ## }
+
+  #Add exactly one time step to dRange to ensure that cut
+  #contains the respective level
+  maxDate <- seq(max(dRange),length.out=2,by=aggregate.by)[-1]
+  dates <- seq(min(dRange), maxDate, by=aggregate.by)
 
   #Make a table containing the specific number of cases. Note that this
   #needs to occur using a cut statement
@@ -40,9 +46,19 @@ cases2sts <- function(cases,dateCol,aggregate.by="1 week",dRange=NULL) {
 
   #Translate "by" to freq string
   freq <- switch(aggregate.by,"1 day"=365,"7 day"=52,"1 week"=52,"1 month"=12)
-  
+
+  #Extract start year
+  ## startYearFormat <- switch(aggregate.by,"1 day"="%V","7 day"="%V","1 week"="%V","1 month"="%Y")
+  ## #Start epoch
+  ## startEpochFormat <- switch(aggregate.by,"1 day"="%j","7 day"="%V","1 week"="%V","1 month"="%d")
+
+  startYear <- as.numeric(formatDate(min(dates),startYearFormat))
+  startEpoch <- as.numeric(formatDate(min(dates),startEpochFormat))
+                  
   observed <- matrix(observed,ncol=1)
-  sts <- new("sts",epoch=as.numeric(epoch),observed=observed, alarm=0*observed, epochAsDate=TRUE,freq=freq)
+
+  #Create S4 object
+  sts <- new("sts",epoch=as.numeric(epoch),observed=observed, alarm=0*observed, epochAsDate=TRUE,freq=freq,start=c(startYear,startEpoch))
 
   #Return
   return(sts)

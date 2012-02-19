@@ -329,6 +329,8 @@ setMethod("plot", signature(x="sts", y="missing"), function(x, y, type,...) {
       return(invisible())
     }
   }
+  #Return invisible.
+  invisible()
 })
 
 ######################################################################
@@ -523,7 +525,8 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, a
     if (is.null(legend.opts$pch)) legend.opts$pch <- c(NA,NA,outbreak.symbol$pch,alarm.symbol$pch)
     if (is.null(legend.opts$legend))
       legend.opts$legend <- c("Infected", "Threshold","Outbreak","Alarm" )
-    print(legend.opts)
+    #Show what is sent to legend.
+    #print(legend.opts)
     do.call("legend",legend.opts)
   }
 
