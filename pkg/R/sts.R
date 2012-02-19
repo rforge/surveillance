@@ -242,8 +242,6 @@ setMethod("year", "sts", function(x,...) {
   }
 })
 
-
-
 #####################################################################
 #[-method for accessing the observed, alarm, etc. objects
 # new param:
@@ -270,10 +268,17 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
 
   #Neighbourhood matrix
   x@neighbourhood <- x@neighbourhood[j,j,drop=FALSE]
-  
-  #Fix the corresponding start entry
+
+  #Fix the corresponding start entry. i can either be a vector of
+  #logicals or specific index. Needs to work in both cases.
+  #Note: This code does not work if we have week 53s!
+  if (is.logical(i)) {
+    i.min <- which.max(i) #first TRUE entry
+  } else {
+    i.min <- min(i)
+  }
   start <- x@start
-  new.sampleNo <- start[2] + min(i) - 1
+  new.sampleNo <- start[2] + i.min - 1
   start.year <- start[1] + (new.sampleNo - 1) %/% x@freq 
   start.sampleNo <- (new.sampleNo - 1) %% x@freq + 1
   x@start <- c(start.year,start.sampleNo)
@@ -329,8 +334,6 @@ setMethod("plot", signature(x="sts", y="missing"), function(x, y, type,...) {
       return(invisible())
     }
   }
-  #Return invisible.
-  invisible()
 })
 
 ######################################################################
@@ -525,7 +528,6 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, a
     if (is.null(legend.opts$pch)) legend.opts$pch <- c(NA,NA,outbreak.symbol$pch,alarm.symbol$pch)
     if (is.null(legend.opts$legend))
       legend.opts$legend <- c("Infected", "Threshold","Outbreak","Alarm" )
-    #Show what is sent to legend.
     #print(legend.opts)
     do.call("legend",legend.opts)
   }
