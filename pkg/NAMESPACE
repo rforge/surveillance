@@ -62,3 +62,32 @@ S3method(simulate, twinSIR)
 
 #twinstim methods
 
+
+#hhh methods
+export(algo.hhh)
+export(algo.hhh.grid)
+export(create.grid)
+
+S3method(print, ah)
+S3method(coef, ah)
+S3method(predict, ah)
+S3method(residuals, ah)
+S3method(logLik, ah)
+
+S3method(print, ahg)
+S3method(coef, ahg)
+S3method(predict, ahg)
+S3method(residuals, ahg)
+S3method(logLik, ahg)
+
+export(hhh4)
+export(addSeason2formula)
+export(oneStepAhead)
+export(ranef)
+export(fixef)
+
+S3method(print, ah4)
+S3method(coef, ah4)
+S3method(predict, ah4)
+S3method(plot, ah4)
+
