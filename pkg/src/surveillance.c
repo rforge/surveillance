@@ -250,7 +250,7 @@ void glr_cusum(int* x,double* mu0, int *lx_R, int *n0_R, double *c_ARL_R,int *re
   double c_ARL = *c_ARL_R;
    
   /* Loop variables */
-  register int n, l; /*n0-1*/
+  register int n; /*l,n0-1*/
   
   for (n=0; n<n0-1; n++) { ret_glr[n] = 0; }
   for (n=0; n<n0-1; n++) { ret_cases[n] = 0; }
@@ -347,7 +347,7 @@ void glr_cusum_window(int* x,double* mu0, int *lx_R, int *M_R, int *Mtilde_R, do
   double c_ARL = *c_ARL_R;
 
   /* Loop variables (n>Mtilde, so we start with n=Mtilde (due to -1 in index) */
-  register int n = Mtilde,l;
+  register int n = Mtilde; /*l*/
   int stop = 0;
   int N = lx;
 
