@@ -17,7 +17,7 @@ import(
   spc,
   sp,
   maptools,
-  vcd,
+#  vcd, -- moved this to suggest since it currently does not work on Rforge
   msm,
   Matrix,
   gpclib,
