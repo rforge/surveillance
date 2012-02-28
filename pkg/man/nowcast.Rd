@@ -113,8 +113,8 @@ Michael \enc{Höhle}{Hoehle}
   The methods and implementation is still experimental.
 }
 
-\seealso{
-}
+%\seealso{
+%}
 
 \examples{
 #Load simulated outbreak data.

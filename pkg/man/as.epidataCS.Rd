@@ -113,11 +113,11 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes), nCircle2Poly = 32L)
 \author{
   S. Meyer
 }
-\note{
+%\note{
 %%  ~~further notes~~
-}
+%}
 \seealso{
-See Also \code{\link{surveillance::twinstim}}, ~~~
+See also \code{\link{surveillance::twinstim}}, ~~~
 }
 \examples{
 #No examples are currently available

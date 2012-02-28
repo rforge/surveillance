@@ -95,8 +95,8 @@ as.epidata.epidataCS(epidataCS, tileCentroids, eps = 0.001)
   reserved for the respective columns only.
 }
 
-\value{
-}
+%\value{
+%}
 
 \author{
 Sebastian Meyer, Documentation by Michael H\enc{ö}{oe}hle

@@ -182,10 +182,10 @@ typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE)
 }
 }
 \references{
-  S. Meyer, J. Elias and M. Höhle (2010): A space-time conditional
-  intensity model for infectious disease occurence, Department of
-  Statistics: Technical Reports, No. 95, 27 pages, 2010.
-  Available as http://epub.ub.uni-muenchen.de/11898/
+  A space-time conditional intensity model for invasive meningococcal
+  disease occurrence (2011), S. Meyer, J. Elias and M. H\enc{ö}{oe}hle,
+  Biometrics, Epub ahead of print, DOI: 10.1111/j.1541-0420.2011.01684.x.
+  A technical report is available as: http://epub.ub.uni-muenchen.de/11898/
 
   Meyer, S. (2010): Spatio-Temporal Infectious Disease Epidemiology based
   on Point Processes. Master Thesis, Ludwig-Maximilians-\enc{Universität}{Universitaet}
@@ -194,9 +194,9 @@ typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE)
 \author{
   S. Meyer with documentation by M. \enc{Höhle}{Hoehle}.
 }
-\note{
-%%  ~~further notes~~
-}
+%\note{
+%%%  ~~further notes~~
+%}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 

@@ -14,7 +14,7 @@
   \code{epidataCS} with entries \code{events}, \code{stgrid}, \code{W}
   and \code{qmatrix}. See 'details' for further information.
 }
-\description{
+\details{
   The dataset contains a slightly modified version of the data used in
   Meyer et al. (2010) represented as an \code{epidataCS} object. 
 
@@ -45,7 +45,7 @@
   With \code{coordinates(imdepi$events)} one obtains the (x,y) location
   of the events. The identifier in \code{tile} is indexed according to
   the German official municipality key ('Amtlicher
-  Gemeindeschl\enc{ue}{ü}ssel'). See
+  Gemeindeschl\enc{ü}{ue}ssel'). See
   \url{https://secure.wikimedia.org/wikipedia/de/wiki/Amtlicher_Gemeindeschl\%C3\%BCssel} for details.
 
     
@@ -70,7 +70,7 @@
 \source{
   National Reference Centre for Meningococci (NRZM) -- hosted by the
   Department of Hygiene and Microbiology,
-  Julius-Maximilians-Universit\enc{ae}{ä}t W\enc{ue}{ü}rzburg, Germany.
+  Julius-Maximilians-Universit\enc{ä}{ae}t W\enc{ü}{ue}rzburg, Germany.
   Thanks to Dr. Johannes Elias and Prof. Dr. Ulrich Vogel from the NRZM
   for providing the IMD event data. See
   \url{http://www.meningococcus.de/}
@@ -79,10 +79,10 @@
 }
 
 \references{
-  S. Meyer, J. Elias and M. Höhle (2010): A space-time conditional
-  intensity model for infectious disease occurence, Department of
-  Statistics: Technical Reports, No. 95, 27 pages, 2010.
-  Available as http://epub.ub.uni-muenchen.de/11898/
+  S. Meyer, J. Elias and M. H\enc{ö}{oe}hle (2011), A space-time conditional
+  intensity model for invasive meningococcal, Biometrics, Epub ahead of
+  print. Note: A technical report is available as
+  http://epub.ub.uni-muenchen.de/11898/ 
 }
 
 \examples{

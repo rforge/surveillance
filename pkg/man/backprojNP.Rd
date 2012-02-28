@@ -162,8 +162,8 @@ Michael \enc{Höhle}{Hoehle}
   \code{stsBP} objects is currently missing.
 }
 
-\seealso{
-}
+%\seealso{
+%}
 
 \examples{
 #Generate an artificial outbreak of size n starting at time t0 and being of length

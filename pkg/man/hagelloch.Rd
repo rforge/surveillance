@@ -5,7 +5,7 @@
 
 \title{1861 measles epidemic in the city of Hagelloch, Germany}
 \description{Data on the 188 cases in the measles outbreak among children in the
-  German city of Hagelloch (near T\enc{ue}{ü}bingen) 1861. The data were
+  German city of Hagelloch (near T\enc{ü}{ue}bingen) 1861. The data were
   originally collected by Dr. Albert Pfeilsticker and re-analysed by
   Dr. Heike Oesterle.  
 }
@@ -122,14 +122,14 @@ data("hagelloch")
 }
 
 \references{
-  Pfeilsticker, A. (1863). Beitr\enc{ae}{ä}ge zur Pathologie der Masern mit
-  besonderer Ber\enc{ue}{ü}cksichtgung der statistischen Verh\enc{ae}{ä}ltnisse,
-  M.D. Thesis, Eberhard-Karls Universit\enc{ae}{ä}t, T\enc{ue}{ü}bingen.
+  Pfeilsticker, A. (1863). Beitr\enc{ä}{ae}ge zur Pathologie der Masern mit
+  besonderer Ber\enc{ü}{ue}cksichtgung der statistischen Verh\enc{ä}{ae}ltnisse,
+  M.D. Thesis, Eberhard-Karls Universit\enc{ae}{ä}t, T\enc{ü}{ue}bingen.
   Available as \url{http://www.archive.org/details/beitrgezurpatho00pfeigoog}.
 
   
   Oesterle, H. (1992). Statistische Reanalyse einer Masernepidemie 1861
-  in Hagelloch, M.D. Thesis, Eberhard-Karls Universit\enc{ae}{ä}at,
+  in Hagelloch, M.D. Thesis, Eberhard-Karls Universit\enc{ä}{ae}at,
   T\enc{ue}{ü}bingen.
 
   Neal, P. J. and Robert, G. O (2004). Statistical inference and model

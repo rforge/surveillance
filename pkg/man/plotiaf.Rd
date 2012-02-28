@@ -55,18 +55,18 @@ plotiaf(twinstim, iaf = c("siaf", "tiaf"), types = 1:nrow(twinstim$qmatrix), xli
  on Point Processes. Master Thesis, Ludwig-Maximilians-\enc{Universität}{Universitaet}
  München. Available as http://epub.ub.uni-muenchen.de/11703/
 }
-\author{
-%%  ~~who you are~~
-}
-\note{
+%\author{
+%  Sebastian Meyer
+%}
+%\note{
 %%  ~~further notes~~
-}
+%}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
+%\seealso{
+%%% ~~objects to See Also as \code{\link{help}}, ~~~
+%}
 \examples{
 ##---- Should be DIRECTLY executable !! ----
 }

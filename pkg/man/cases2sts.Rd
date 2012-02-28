@@ -54,9 +54,6 @@ cases2sts(cases,dateCol,aggregate.by="1 week",dRange=NULL,
   slot might not be appropriate.
 }
 
-\references{
-}
-
 \author{
 Michael \enc{Höhle}{Hoehle}
 }
@@ -66,6 +63,7 @@ Michael \enc{Höhle}{Hoehle}
 }
 
 \seealso{
+  See also \code{\link{seq.date}}.
 }
 
 \examples{
