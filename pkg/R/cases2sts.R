@@ -16,8 +16,8 @@
 ######################################################################
 
 cases2sts <- function(cases,dateCol,aggregate.by="1 week",dRange=NULL,
-                      startYearFormat=switch(aggregate.by,"1 day"="%V","7 day"="%V","1 week"="%V","1 month"="%Y"),
-                      startEpochFormat=switch(aggregate.by,"1 day"="%j","7 day"="%V","1 week"="%V","1 month"="%d")
+                      startYearFormat=switch(aggregate.by,"1 day"="%V","7 day"="%V","1 week"="%V","1 month"="%Y","3 month"="%Y"),
+                      startEpochFormat=switch(aggregate.by,"1 day"="%j","7 day"="%V","1 week"="%V","1 month"="%m","3 month"="%Q")
                       ) {
  #by <- match.arg(by,c("1 day","1 week","1 month","1 year")
   if (is.null(dRange)) {
@@ -45,12 +45,7 @@ cases2sts <- function(cases,dateCol,aggregate.by="1 week",dRange=NULL,
   epoch <- as.Date(names(observed))
 
   #Translate "by" to freq string
-  freq <- switch(aggregate.by,"1 day"=365,"7 day"=52,"1 week"=52,"1 month"=12)
-
-  #Extract start year
-  ## startYearFormat <- switch(aggregate.by,"1 day"="%V","7 day"="%V","1 week"="%V","1 month"="%Y")
-  ## #Start epoch
-  ## startEpochFormat <- switch(aggregate.by,"1 day"="%j","7 day"="%V","1 week"="%V","1 month"="%d")
+  freq <- switch(aggregate.by,"1 day"=365,"7 day"=52,"1 week"=52,"1 month"=12,"3 month"=4)
 
   startYear <- as.numeric(formatDate(min(dates),startYearFormat))
   startEpoch <- as.numeric(formatDate(min(dates),startEpochFormat))
