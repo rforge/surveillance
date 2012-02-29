@@ -4,21 +4,44 @@
 % $Date: 2010-04-23 10:49:46 +0200 (Fri, 23 Apr 2010) $
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \encoding{latin1}
-\name{as.epidataCS}
-\alias{as.epidataCS}
+\name{twinstim_epidataCS}
+\alias{as.epidataCS} 
+\alias{as.epidata.epidataCS}
+\alias{print.epidataCS}
+\alias{[.epidataCS}
+\alias{epidataCS}
+\alias{update.epidataCS}
+\title{
+  Class for Representing Space-Time Process Data Continuous in Space and
+  Continuous in Time 
+}
+
+%\name{as.epidataCS}
+%\alias{as.epidataCS}
 %\alias{checkEvents}
 %\alias{checkstgrid}
 %\alias{.influenceRegions}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-  Create objects representing spatio-temporal data for analysis with twinstim.
-}
+%\title{
+%  Create objects representing spatio-temporal data for analysis with twinstim.
+%}
+
 \description{
   Data structure for (c)ontinuous (s)patio-temporal event data, typically
   cases of an infectious disease. The data structure simultaneously
   contains a spatio-temporal grid of endemic covariates.
 
+  Objects of this class are a collection of specific data frames
+  containing the event history of an epidemic together with some
+  additional attributes such as a spatio-temporal grid of endemic
+  covariates. These objects are the basis for fitting 
+  spatio-temporal epidemic intensity models with the function
+  \code{\link{twinstim}}. Similarly, the function
+  \code{update.epidataCS} allows one to quickly update certain
+  parameters of an \code{epidataCS} object without having to reconstruct
+  it again.
+  
   For \code{epidataCS} objects there exist \code{head}, \code{print},
   \code{summary}, \code{animate} and \code{update} functions.
   It is also possible to convert the data to \code{epidata} objects
@@ -111,13 +134,17 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes), nCircle2Poly = 32L)
   Available as http://epub.ub.uni-muenchen.de/11703/
 }
 \author{
-  S. Meyer
+  Sebastian Meyer, Documentation by Michael H\enc{ö}{oe}hle
 }
-%\note{
-%%  ~~further notes~~
-%}
+\note{
+  The column name \code{"BLOCK"} is a reserved name.  This column will be 
+  added automatically at conversion and the resulting data frame will be 
+  sorted by this column and by id.  Also the names \code{"id"}, \code{"start"},
+  \code{"stop"}, \code{"event"} and \code{"Revent"} are
+  reserved for the respective columns only.
+}
 \seealso{
-See also \code{\link{surveillance::twinstim}}, ~~~
+See also \code{\link{twinstim}}, ~~~
 }
 \examples{
 #No examples are currently available
