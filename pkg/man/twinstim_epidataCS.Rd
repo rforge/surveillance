@@ -1,5 +1,5 @@
 \name{twinstim_epidataCS}
-\alias{as.epidataCS}
+\alias{as.epidataCS} 
 \alias{as.epidata.epidataCS}
 \alias{print.epidataCS}
 \alias{[.epidataCS}
