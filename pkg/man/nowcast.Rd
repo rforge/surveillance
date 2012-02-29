@@ -3,8 +3,10 @@
 \alias{nowcast}
 %Internal functions
 \alias{nowcast.fit}
-\alias{naninf2zero}
-\alias{em.step.becker}
+\alias{dist.median}
+\alias{outside.ci}
+\alias{logS}
+\alias{RPS}
 
 \title{
   Nowcasting epidemic curves when case reports arrive with delay
@@ -19,6 +21,7 @@
 \usage{
 nowcast(s, t, D, dEventCol = "dHospital", dReportCol = "dReport",
           method = c("freq.pi","bayes.nb","bayes.betapi","uniform"),
+          aggregate.by="1 day",
           control = list(
             dRange = NULL,
             timeDelay = function(d1,d2) {as.numeric(d2-d1)},
@@ -54,7 +57,8 @@ nowcast(s, t, D, dEventCol = "dHospital", dReportCol = "dReport",
   methods here, e.g. in order to compare score evaluations.
   }
   \item{aggregate.by}{Time scale used for the temporal aggregation of
-  the records in the data \code{D}. See also \link{surveillance::cases2sts}.}
+  the records in the data \code{D}. See 
+  \link{cases2sts} and \link{seq.Date} for further information.}
   \item{control}{A list with named arguments controlling the
     functionality of the nowcasting.
     \describe{
@@ -91,7 +95,7 @@ nowcast(s, t, D, dEventCol = "dHospital", dReportCol = "dReport",
 }
 
 \value{
-  \code{nowcast} returns an object of \code{\link{stsBP}}.
+  \code{nowcast} returns an object of \code{"\linkS4class{stsBP}"}.
 }
 
 \references{

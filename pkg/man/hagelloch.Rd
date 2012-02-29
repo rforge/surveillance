@@ -19,8 +19,7 @@ data("hagelloch")
   entire process history of outbreak in the population of 188 children.
   The latter is a simple \code{data.frame} containing the a single line
   with individual information of each infected child. 
-}
-\description{
+
   The covariate information in either \code{hagelloch} or
   \code{hagelloch.df} are as follows:
   
@@ -124,13 +123,13 @@ data("hagelloch")
 \references{
   Pfeilsticker, A. (1863). Beitr\enc{ä}{ae}ge zur Pathologie der Masern mit
   besonderer Ber\enc{ü}{ue}cksichtgung der statistischen Verh\enc{ä}{ae}ltnisse,
-  M.D. Thesis, Eberhard-Karls Universit\enc{ae}{ä}t, T\enc{ü}{ue}bingen.
+  M.D. Thesis, Eberhard-Karls Universit\enc{ä}{ae}t, T\enc{ü}{ue}bingen.
   Available as \url{http://www.archive.org/details/beitrgezurpatho00pfeigoog}.
 
   
   Oesterle, H. (1992). Statistische Reanalyse einer Masernepidemie 1861
   in Hagelloch, M.D. Thesis, Eberhard-Karls Universit\enc{ä}{ae}at,
-  T\enc{ue}{ü}bingen.
+  T\enc{ü}{ue}bingen.
 
   Neal, P. J. and Robert, G. O (2004). Statistical inference and model
   selection for the 1861 Hagelloch measles epidemic, Biostatistics

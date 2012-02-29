@@ -20,6 +20,10 @@
 \alias{population}
 \alias{population<-}
 \alias{population-methods}
+\alias{neighbourhood<-}
+\alias{neighbourhood-methods}
+\alias{multinomialTS<-}
+\alias{multinomialTS-methods}
 \title{ Methods }
 \description{
  Method to extract or set the corresponding slot of an

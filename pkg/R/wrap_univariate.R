@@ -76,14 +76,6 @@ farrington <- function(sts, control=list(range=NULL, b=3, w=3, reweight=TRUE, ve
   wrap.algo(sts,algo="algo.farrington",control=control,...)
 }
 
-#CDC wrapper
-cdc <- function(sts, control= list(range = range,alpha=0.025),...) {
-  if (sts@epochAsDate) {
-    warning("algo.cdc currently can't handle Date entries. Computing reference values based on freq")
-  }
-  wrap.algo(sts,algo="algo.cdc",control=control,...)
-}
-
 #Bayes wrapper (this can be implemented more efficiently)
 bayes <- function(sts, control = list(range = range, b = 0, w = 6, actY = TRUE,alpha=0.05),...) {
   if (sts@epochAsDate) {

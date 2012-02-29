@@ -49,16 +49,16 @@ backprojNP(sts, incu.pmf.vec,
                   alpha = 0.05, 
                   verbose = FALSE, 
                   lambda0 = NULL,
-                  eq3a.method = "R",
-                  hookFun = function(Y,lambda,...) {}),
-                  ...)
+                  eq3a.method = c("R","C"),
+                  hookFun = function(stsbp) {}),
+     \dots)
 }
 
 \arguments{
   \item{sts}{
-    an object of class \code{"\link{sts}"} (or one that can be coerced to
-    that class): contains the observed number of symptom onsets as a
-    time series. 
+    an object of class \code{"\linkS4class{sts}"} (or one that can be
+    coerced to that class): contains the observed number of symptom
+    onsets as a time series. 
   }
   \item{incu.pmf.vec}{Probability mass function (PMF) of the incubation
     time. The PMF is specified as a vector with the value of the PMF
@@ -86,16 +86,21 @@ backprojNP(sts, incu.pmf.vec,
   details. 
       }
       \item{\code{iter.max}}{
+	The maximum number of EM iterations to do before stopping. 
       }
       \item{\code{B}}{
+	Number of parametric bootstrap samples to perform from an
+	initial k=0 fit. For each sample a back projection is performed.
+	See Becker and Marschner (1993) for details.
       }
       \item{\code{alpha}}{(1-\eqn{\alpha}{alpha})*100\% confidence
   intervals are computed based on the percentile method.
       }
       \item{\code{verbose}}{(boolean). If true show extra progress and
-  debug information.
+      debug information.
       }
-      \item{\code{lambda0}}{Start values.
+      \item{\code{lambda0}}{Start values for lambda. Vector needs to be
+	of the length \code{nrow(sts)}.
       }
       \item{\code{eq3a.method}}{A single character being either
 	\code{"R"} or \code{"C"} depending on whether the three nested loops
@@ -107,14 +112,15 @@ backprojNP(sts, incu.pmf.vec,
       }
       \item{\code{hookFun}}{
 	Hook function called for each iteration of the EM algorithm. The
-	function should take a single argument \code{cur.sts} of
-	\code{stsBP0} class. It will be have the upperbound set to the current
-        value of lambda. If no action desired just leave the function body
-	empty (default).
-      }
-      \item{\dots}{Dots are sent to the hook function.
+	function should take a single argument \code{stsbp} of class
+	\code{"\linkS4class{stsBP}"} class. It will be have the
+        lambda set to the current value of lambda. If no action desired
+        just leave the function body empty (default). Additional
+	arguments are possible.
       }
     }
+  }
+  \item{\dots}{Additional arguments are sent to the hook function.
   }
 }
 
@@ -135,7 +141,7 @@ backprojNP(sts, incu.pmf.vec,
 }
 
 \value{
-  \code{backprojNP} returns an object of \code{\link{stsBP}}.
+  \code{backprojNP} returns an object of \code{"\linkS4class{stsBP}"}.
 }
 
 \references{
@@ -195,7 +201,7 @@ lines(1:length(Y)+0.2,X,col="red",type="h",lty=2)
 
 
 #Helper function to show the EM step
-plotIt <- function(cur.sts,...) {
+plotIt <- function(cur.sts) {
   plot(cur.sts,xaxis.years=FALSE,legend=NULL,ylim=c(0,140))
 }
 

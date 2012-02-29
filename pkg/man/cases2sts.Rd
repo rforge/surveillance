@@ -14,11 +14,10 @@
 
 \usage{
 cases2sts(cases,dateCol,aggregate.by="1 week",dRange=NULL,
-                      startYearFormat=switch(aggregate.by,"1 day"="%V","7 day"="%V","1 week"="%V","1 month"="%Y"),
-                      startEpochFormat=switch(aggregate.by,"1 day"="%j","7 day"="%V","1 week"="%V","1 month"="%d")
+            startYearFormat=switch(aggregate.by,"1 day"="\%V","7 day"="\%V","1 week"="\%V","1 month"="\%Y","3 month"="\%Y"),
+           startEpochFormat=switch(aggregate.by,"1 day"="\%j","7 day"="\%V","1 week"="\%V","1 month"="\%m","3 month"="\%Q")
 )
 }
-
 \arguments{
   \item{cases}{
     A \code{data.frame} containing the line list of cases.
@@ -28,7 +27,7 @@ cases2sts(cases,dateCol,aggregate.by="1 week",dRange=NULL,
     temporally aggregated.
   }
   \item{aggregate.by}{Temporal aggregation level given as a string, see
-  the \code{by} variable of the \link{seq.date} function for further details. 
+  the \code{by} variable of the \link{seq.Date} function for further details. 
   }
   \item{dRange}{A vector containing the minimum and maximum data to
     use. If not specified these dates are extracted automatically by
@@ -37,7 +36,7 @@ cases2sts(cases,dateCol,aggregate.by="1 week",dRange=NULL,
   \item{startYearFormat}{Strptime compatible format string to use for
     determining how the date string is generated. Usually the provided
   options are sufficient.}
-  \item{statEpochFormat}{Strptime compatible format string to use for
+  \item{startEpochFormat}{Strptime compatible format string to use for
     determining how the date string is generated. Usually the provided
   options are sufficient.}
 }
@@ -50,7 +49,7 @@ cases2sts(cases,dateCol,aggregate.by="1 week",dRange=NULL,
 }
 
 \value{
-  The function returns an object of \code{\link{sts}}. The \code{freq}
+  The function returns an object of \code{"\linkS4class{sts}"}. The \code{freq}
   slot might not be appropriate.
 }
 
@@ -63,7 +62,7 @@ Michael \enc{Höhle}{Hoehle}
 }
 
 \seealso{
-  See also \code{\link{seq.date}}.
+  See also \code{\link{seq.Date}}.
 }
 
 \examples{

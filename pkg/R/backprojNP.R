@@ -194,6 +194,9 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
   inc.cdf <- cumsum(inc.pmf)
   
   #Create wrapper functions for the PMF and CDF based on the vector
+  #However: The function uses the global variable inc.pmf which
+  #apparently is dirty coding. But how to define this function
+  #in an environment where inc.pmf is present?
   dincu <- function(x) {
     notInSupport <- x<0 | x>=length(inc.pmf)
     #Give index -1 to invalid queries
@@ -257,8 +260,8 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
     lambda.hat[,j] <- lambda
   }
 
-  #Create new object with return put in the upperbound slot
-  bp.sts <- sts
+  #Create new object with return put in the lambda slot
+  bp.sts <- as(sts,"stsBP")
   bp.sts@upperbound <- lambda.hat
   bp.sts@control <- list(k=k,eps=eps,iter=i)
   return(bp.sts)
@@ -295,7 +298,7 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
 #  sts object with upperbound set to the backprojected lambda.
 ######################################################################
 
-backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,2),Tmark=nrow(sts),B=-1,alpha=0.05,verbose=FALSE,lambda0=NULL,eq3a.method="R",hookFun=function(Y,lambda,...) {}),...) {
+backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,2),Tmark=nrow(sts),B=-1,alpha=0.05,verbose=FALSE,lambda0=NULL,eq3a.method=c("R","C"),hookFun=function(stsbp) {}),...) {
 
   #Backprojection only works for univariate time series
   if (ncol(sts)>1) {
@@ -311,7 +314,11 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
   if (is.null(control[["alpha",exact=TRUE]])) { control$alpha <- 0.05 }
   if (is.null(control[["verbose",exact=TRUE]])) { control$verbose <- FALSE }
   if (is.null(control[["lambda0",exact=TRUE]])) { control$lambda0 <- NULL }
-  if (is.null(control[["eq3a.method",exact=TRUE]])) { control$eq3a.method <- "R" }
+  #Which method to use for computing eq3a
+  if (is.null(control[["eq3a.method",exact=TRUE]])) { control$eq3a.method <- "R" } else {
+    control$eq3a.method <- match.arg(control$eq3a.method,c("R","C"))
+  }
+  #Hook function definition
   if (is.null(control[["hookFun",exact=TRUE]])) { control$hookFun <- function(Y,lambda,...) {} }
 
   #If the eps and iter.max arguments are too short, make them length 2.
@@ -384,7 +391,7 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
 
   #Add extra slots
   stsk@ci <- ci
-  stsk@lambda <- lambda
+  stsk@upperbound <- lambda
   stsk@control <- control 
 
 

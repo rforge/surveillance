@@ -9,7 +9,7 @@
 #  dateCol - a character string denoting the column name in case containing
 #            the relevant date variable to aggregate
 #  aggregate.by - aggregation block length given as a string compatible with
-#       seq.Date -- see \link{seq.date} for further details.
+#       seq.Date -- see \link{seq.Date} for further details.
 #
 # Author: Michael Hoehle
 # Date LaMo: 06 Feb 2012

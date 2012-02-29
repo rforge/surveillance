@@ -11,6 +11,7 @@
 \alias{insert.zeroes}
 \alias{wait}
 \alias{init.sts}
+\alias{init.stsBP}
 \alias{merge.list}
 \alias{addFormattedXAxis}
 %Functions from M.Paul
@@ -38,6 +39,7 @@
 \alias{tms.plot}
 %Utility functions
 \alias{formatDate}
+\alias{na2FALSE}
 
 %Weird functions from sp package which produce warnings in R CMD check
 %for the surveillance package (??)

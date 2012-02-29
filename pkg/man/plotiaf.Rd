@@ -44,9 +44,9 @@ plotiaf(twinstim, iaf = c("siaf", "tiaf"), types = 1:nrow(twinstim$qmatrix), xli
     Additional arguments sent to the \code{plot} command.
 }
 }
-\details{
+%\details{
 %%  ~~ If necessary, more details than the description above ~~
-}
+%}
 \value{
   A plot is created -- see e.g. Fig. 5.3 in Meyer (2010). Nothing is returned.
 }
