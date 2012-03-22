@@ -2,7 +2,7 @@
 # Text file containing a list of things to fix or items for additional
 # implementation.
 #
-# $Date: 2010-04-23 10:49:46 +0200 (Fri, 23 Apr 2010) $
+# $Date$
 ######################################################################
 
 
@@ -18,7 +18,8 @@
 ###########
 
 #Open
-21/04/2011 incorporate a NAMESPACE :)
+21/04/2011 incorporate a NAMESPACE :) (as of R 2.14.0 this is obligatory)
+11/11/2011 Author@R field in the ‘DESCRIPTION’ file
 02/11/2011 plot for sts objects which contains daily data as Date obj
 
 

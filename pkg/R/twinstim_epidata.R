@@ -390,7 +390,7 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
       timeRange <- with(object$stgrid, c(start[1], stop[length(stop)]))
       object$events$.obsInfLength <- with(object$events@data, pmin(timeRange[2]-time, eps.t))
     }
-    
+
     # Update .sources
     if (!missing(eps.t) || !missing(eps.s) || !missing(qmatrix)) {
         eventTimes <- object$events$time
@@ -434,26 +434,29 @@ tail.epidataCS <- function (x, n = 6L, ...)
 }
 
 
-print.epidataCS <- function (x, n = 6L, ...)
+print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
 {
     nRowsGrid <- nrow(x$stgrid)
     timeRange <- c(x$stgrid$start[1], x$stgrid$stop[nRowsGrid])
     bboxtxt <- paste(apply(bbox(x$W), 1,
-        function (int) paste("[", paste(format(int), collapse=", "), "]", sep="")
+        function (int) paste("[", paste(format(int, trim=TRUE, digits=digits), collapse=", "), "]", sep="")
         ), collapse = " x ")
     nBlocks <- x$stgrid$BLOCK[nRowsGrid]
     nTiles <- nlevels(x$stgrid$tile)
     typeNames <- levels(x$events$type)
     nEvents <- nrow(x$events@coords)
     cat("\nHistory of an epidemic\n")
-    cat("Observation period:", paste(timeRange, collapse = " -- "), "\n")
+    cat("Observation period:", paste(format(timeRange, trim=TRUE, digits=digits), collapse = " -- "), "\n")
     cat("Observation window (bounding box):", bboxtxt, "\n")
     cat("Spatio-temporal grid (not shown):", nBlocks,
         ngettext(nBlocks, "time block,", "time blocks,"),
         nTiles, ngettext(nTiles, "tile", "tiles"), "\n")
     cat("Types of events:", paste("'",typeNames,"'",sep=""), "\n")
     cat("Overall number of events:", nEvents, "\n\n")
-    print(head(x, n = n))
+    # 'print.SpatialPointsDataFrame' does not pass its "digits" argument on to 'print.data.frame', hence the use of options()
+    odigits <- options(digits=digits)
+    print(head(x, n = n), ...)
+    options(odigits)
     if (n < nEvents) cat("[....]\n")
     cat("\n")
     invisible(x)
@@ -501,9 +504,8 @@ summary.epidataCS <- function (object, ...)
 # respects ani.options "interval" and "nmax"
 
 animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
-    legend.opts = list(), timer.opts = list(), pch = 15:18, col.current = "red",
-    col.I = getOption("epicolor")$I, col.R = getOption("epicolor")$R,
-    col.influence = "#FEE0D2", ...)
+    legend.opts = list(), timer.opts = list(), pch = 15:18,
+    col.current = "red", col.I = "#C16E41", col.R = "#B3B3B3", col.influence = "#FEE0D2", ...)
 {
     library("animation")
     stopifnot(is.numeric(interval), length(interval) == 2L)

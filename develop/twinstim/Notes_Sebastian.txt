@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 | SEBASTIAN'S PERSONAL TODO LIST                                               |
 | This file contains notes of every description.                               |
-| $Date: 2010-11-16 04:08:22 +0100 (Di, 16. Nov 2010) $                        |
+| $Date$                        |
 --------------------------------------------------------------------------------
 
 - Bei NA-Zuordnung von tile eine warning schmeißen statt abzubrechen (abbruch erfolgt zur zeit mit na.fail in buildmmh)
