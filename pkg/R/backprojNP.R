@@ -21,7 +21,7 @@ naninf2zero <- function(x) {x[is.nan(x) | is.infinite(x)] <- 0 ; return(x)}
 
 ## Rcpp inline function to significantly speed up the computation of equation
 ## 3a in the Becker et al. (1991) paper. Created with the help of Daniel
-## Sabanes Bové, University of Zurich.
+## Sabanés Bové, University of Zurich.
 
 ## eq3a <-
 ##     cxxfunction(signature(rlambdaOld="numeric",
@@ -392,6 +392,11 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
   #Add extra slots
   stsk@ci <- ci
   stsk@upperbound <- lambda
+  #<- SM: shouldn't that be stsk@lambda <- lambda???  I get an error here when running the example:
+  #   Error in class(value) <- "matrix" : 
+  #   invalid to set the class to matrix unless the dimension attribute is of length 2 (was 3)
+  # Also: Are lambda[,,b] bootstrap replicates of upperbound?
+  # shouldn't then dim(lambda)[1:2] equal dim(upperbound) (esp. not be transposed)
   stsk@control <- control 
 
 

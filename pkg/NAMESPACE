@@ -1,36 +1,75 @@
-# Started to build namespace for the surveillance package. This might
-# take a while before working correctly so we start by an exportPattern(".")
-
-# Export all names
-exportPattern(".")
-
-#Load C code
-useDynLib("surveillance")
-
-# Import all packages listed as Imports or Depends
-import(
-  intervals,
-  methods,
-  Rcpp,
-  utils,
-  xtable,
-  spc,
-  sp,
-  maptools,
-#  vcd, -- moved this to suggest since it currently does not work on Rforge
-  msm,
-  Matrix,
-  gpclib,
-  spatstat,
-  quadprog
-)
-
-#Surveillance time series
-exportClasses("sts",
-              "stsBP")
+# Started to build namespace for the surveillance package.
 
 
-#twinSIR method
+### Load C code
+
+useDynLib(surveillance)
+
+
+### IMPORTS
+
+import(methods)
+
+# import S3 generics to define own methods
+importFrom(graphics, plot)
+importFrom(stats, simulate, profile, coef, vcov, logLik, AIC, extractAIC)
+importFrom(utils, packageDescription, head, toLatex)
+
+# sp classes, utility functions (bbox, coordinates, dimensions, overlay, ...), plot methods
+import(sp)
+# Note: moved package sp to "Depends:" since this sets plot as generic and it defines
+#       essential classes and methods for surveillance.
+#       if we don't do so, plot(sts) does not work, since plot is not visibly S4 generic
+#       (just try by typing in a fresh R session library("surveillance"); plot),
+#       ALTHOUGH isGeneric("plot") returns TRUE (which, by the way, is the reason why
+#       setGeneric("plot") is not invoked in AllGeneric.R)...
+#       I don't completely understand this matter; perhaps the problem is linked to the fact
+#       that we define both S3 and S4 methods for plot in our package...
+
+# used in algo.glrnb
+importFrom(MASS, glm.nb)
+
+# for colors in sts plots
+importFrom(colorspace, heat_hcl)
+
+# for CUSUM control charts in junchoi.R and algo_cusum.R
+importFrom(spc, xcusum.arl, xcusum.crit)
+
+# for algo.hmm
+importFrom(msm, msm, viterbi.msm)
+
+# twinSIR-specific external functions (for use in computing OSAIC weights by simulation)
+importFrom(MASS, mvrnorm)
+importFrom(quadprog, solve.QP)
+
+# twinstim-specific
+importClassesFrom(gpclib, gpc.poly)
+importMethodsFrom(gpclib, "[", coerce)
+importFrom(gpclib, get.bbox, intersect, append.poly, area.poly, get.pts)
+importFrom(spatstat, as.owin, area.owin, distppl, as.im.function,
+                     disc, shift, marks, spatstat.options, bounding.box)
+importFrom(intervals, Intervals, reduce)
+
+
+### EXPORTS
+
+# This might take a while before working correctly so we start by
+# exporting all variables that do not start with a period
+exportPattern("^[^\\.]")
+
+# Surveillance time series
+exportClasses(sts, stsBP)
+exportMethods(plot)
+exportMethods(coerce)   # as defined in twinstim_helper.R
+
+# general exports
+export(animate)   # new S3-generic
+export(R0)        # new S3-generic
+export(isScalar)  # very basic little helper function
+
+
+### twinSIR-specific
+
 export(cox)
 export(as.epidata)
 export(intersperse)
@@ -60,10 +99,43 @@ S3method(AIC, twinSIR)
 S3method(extractAIC, twinSIR)
 S3method(simulate, twinSIR)
 
-#twinstim methods
+
+### twinstim-specific
+
+export(as.epidataCS)
+export(twinstim)
+# intensityplot
+# simEpidataCS
+#export(as.epidata.epidataCS)  # -> let this be a S3 method
+export(siaf.gaussian, tiaf.exponential)
+
+export(discpoly)
+export(inside.gpc.poly)
+S3method(scale, gpc.poly)
+
+S3method(update, epidataCS)
+S3method(head, epidataCS)
+S3method(print, epidataCS)
+S3method(summary, epidataCS)
+S3method(animate, epidataCS)
+# S3method(print, summary.epidataCS)  # there is no such method yet
+S3method(marks, epidataCS)
+# S3method(plot, epidataCS)  # TODO... type=c("temporal", "spatial")
+
+S3method(print, twinstim)
+S3method(summary, twinstim)
+S3method(print, summary.twinstim)
+S3method(toLatex, summary.twinstim)
+# S3method(plot, twinstim)   # plotiaf, plot.summary.twinstim ?
+S3method(coef, twinstim)
+S3method(vcov, twinstim)
+S3method(logLik, twinstim)
+S3method(simulate, twinstim)
+S3method(R0, twinstim)
 
 
-#hhh methods
+### hhh-specific
+
 export(algo.hhh)
 export(algo.hhh.grid)
 export(create.grid)

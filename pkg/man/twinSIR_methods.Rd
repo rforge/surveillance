@@ -9,7 +9,7 @@
 \alias{logLik.twinSIR}
 
 \title{
-Print, Summary and Extraction Methods for "twinSIR" Objects
+Print, Summary and Extraction Methods for \code{"twinSIR"} Objects
 }
 
 \description{

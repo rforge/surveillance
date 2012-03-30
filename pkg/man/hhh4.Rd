@@ -75,12 +75,12 @@ hhh4(stsObj,
                                 stop.niter = 100),
                verbose = FALSE,
                start=list(fixed=NULL,random=NULL,sd.corr=NULL),
-               data=data.frame(t=epoch(sts)-1)   
+               data=data.frame(t=epoch(stsObj)-1)   
                )
    )
 }
 \arguments{
-  \item{stsObj}{object of class \code{sts} containing the multivariate
+  \item{stsObj}{object of class \code{"\linkS4class{sts}"} containing the multivariate
     count data time series}
   \item{control}{control object, which is a list containing several
     components:

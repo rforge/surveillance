@@ -61,13 +61,14 @@
  is also implemented.
 }
 \author{
-  Author: M. \enc{Höhle}{Hoehle} with contributions from T. Correa, M. Hofmann,
-  C. Lang, M. Paul, A. Riebler, S. Steiner and V. Wimmer
+  Author: M. H\enc{ö}{oe}hle, S. Meyer and M. Paul
+  with contributions from T. Correa, M. Hofmann, C. Lang, A. Riebler,
+  D. Sabanés Bové, S. Steiner, M. Virtanen and V. Wimmer
   
-  Maintainer: Michael \enc{Höhle}{Hoehle} \email{<hoehle@stat.uni-muenchen.de>}
+  Maintainer: Michael H\enc{ö}{oe}hle \email{<hoehle@stat.uni-muenchen.de>}
 }
 \references{
-  surveillance: An R package for the surveillance of infectious diseases (2007), M. \enc{Höhle}{Hoehle}, Computational Statistics, 22(4), pp. 571---582.
+  See \code{citation(package="surveillance")}.
 }
 \keyword{ package }
 \examples{

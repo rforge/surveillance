@@ -21,7 +21,7 @@
 # beta0, beta, gamma, siafpars, tiafpars: these are the parameter subvectors of the 'twinstim'. 'beta' and 'gamma' must be given in the same order as they appear in 'endemic' and 'epidemic', respectively. 'beta0' is either a single endemic intercept or a vector of type-specific endemic intercepts in the same order as in 'qmatrix'.
 # t0: events having occured during (-Inf;t0] are regarded as part of the prehistory H_0 of the process. The time point 't0' must be an element of data$stgrid$start. By default, and also if 't0=NULL', it is the earliest time point of the spatio-temporal grid 'stgrid'.
 # nEvents, T: simulate 'nEvents' events up to time 'T', then stop. By default, and also if 'T=NULL', 'T' equals the last stop time in 'stgrid' (in can not be greater) and 'nEvents' is bounded above by 10000.
-# W: see as.epidataCS. Must have the same proj4string as 'events' and 'tiles'. By default, 'W' is generated automatically by calculating the union of the 'tiles'. This might take a while so it might be useful to create 'W' in advance. It is important that 'W' and 'tiles' cover the same region, because on the one hand offspring is sampled in the spatial influence region of the parent event (which is the intersection of 'W' and a circle of radius the "eps.s" of the parent event), and on the other hand the tiles of the sampled coordinates are determined by overlay with 'tiles'.
+# W: see as.epidataCS. Must have the same proj4string as 'events' and 'tiles'. If not specified (NULL), 'W' is generated automatically by calculating the union of the 'tiles' using maptools::unionSpatialPolygons. This might take a while so it might be useful to create 'W' in advance. It is important that 'W' and 'tiles' cover the same region, because on the one hand offspring is sampled in the spatial influence region of the parent event (which is the intersection of 'W' and a circle of radius the "eps.s" of the parent event), and on the other hand the tiles of the sampled coordinates are determined by overlay with 'tiles'.
 # trace: logical (or integer) indicating if (or how often) the current simulation status should be \code{cat}ed.  Defaults to \code{FALSE}.
 # .allocate: number of rows to initially allocate for the event history; defaults to 500.  Each time the simulated epidemic exceeds the allocated space, the event data.frame will be enlarged by \code{.allocate} rows.
 # .skipChecks, .onlyEvents: these arguments are not meant to be set by the user. They are used by the simulate-method for twinstim objects.
@@ -34,8 +34,7 @@
 simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     events, stgrid, tiles, beta0, beta, gamma, siafpars, tiafpars,
     t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5, nCub,
-    W = unionSpatialPolygons(tiles, IDs = rep.int(1,length(tiles@polygons)), avoidGEOS = TRUE),
-    trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
+    W = NULL, trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
     .skipChecks = FALSE, .onlyEvents = FALSE, ...)
 {
     ptm <- proc.time()[[3]]
@@ -675,10 +674,16 @@ checkSimArgs <- expression(
 
     ### Check class of W, and class, proj4string and names of tiles
 
-    if (missing(W)) {
-        cat("Building W as the union of 'tiles' ...\n")
+    if (is.null(W)) {
+    	if (require("maptools")) {
+            cat("Building W as the union of 'tiles' ...\n")
+            W <- maptools::unionSpatialPolygons(tiles,
+                     IDs = rep.int(1,length(tiles@polygons)),
+                     avoidGEOS = TRUE)
+        } else {
+            stop("automatic generation of 'W' from 'tiles' requires package \"maptools\"")
+        }
     }
-    force(W)   # force evaluation of W
     stopifnot(inherits(W, "SpatialPolygons"), inherits(tiles, "SpatialPolygons"),
               proj4string(tiles) == proj4string(W),
               (tileLevels <- levels(stgrid$tile)) %in% row.names(tiles))
@@ -932,8 +937,7 @@ checkSimArgs <- expression(
 
 simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5, nCub,
-    W = unionSpatialPolygons(tiles, IDs = rep.int(1,length(tiles@polygons)), avoidGEOS = TRUE),
-    trace = FALSE, nCircle2Poly = 32, gmax = NULL, .allocate = 500, simplify = TRUE, ...)
+    W = NULL, trace = FALSE, nCircle2Poly = 32, gmax = NULL, .allocate = 500, simplify = TRUE, ...)
 {
     ptm <- proc.time()[[3]]
     cl <- match.call()

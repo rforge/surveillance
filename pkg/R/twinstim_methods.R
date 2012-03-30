@@ -222,18 +222,10 @@ plotiaf <- function (twinstim, iaf = c("siaf", "tiaf"),
 
 
 
-### Calculates the basic reproduction number R0 for individuals with all marks equal to 0
+### Calculates the basic reproduction number R0 for individuals
+### with marks given in 'newevents' (defaults to all-zero marks)
 
-#Generic function from RLadyBug to compute R0 for a SIR like model
-#Copy/paste to here to make R0 calculations for twinstim model work.
-if ( ! isGeneric( "R0" ) ){
-  fun <- function( object, ... ) standardGeneric( "R0" )
-  setGeneric( "R0", fun )
-}
-
-setOldClass("twinstim")
-setMethod("R0", signature(object = "twinstim"),
-    function (object, newevents, dimyx = spatstat.options("npixel"))
+R0.twinstim <- function (object, newevents, dimyx = spatstat.options("npixel"), ...)
     {
         npars <- object$npars
         if (npars["q"] == 0L) stop("no epidemic component in model")
@@ -305,7 +297,7 @@ setMethod("R0", signature(object = "twinstim"),
         # return R0 values for events in newevents
         gammapred * qSumTypes[newevents$type] * typeScombis$fInt[neweventscombiidxS] * typeTcombis$gInt[neweventscombiidxT]
     }
-)
+
 
 ######################################################################
 # Plot Kolmogorov-Smirnov residual plot

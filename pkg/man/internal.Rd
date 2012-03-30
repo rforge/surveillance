@@ -1,6 +1,11 @@
 %This is just a way to "hide" functions, which the user should not know
 %the proper way is to use NAMESPACE here (TODO!)
+
 \name{surveillance-internal}
+
+% R CMD check also requires documentation for virtual S4 classes set by setOldClass()
+\alias{owin-class}
+
 \alias{anscombeNB}
 \alias{hypgeom2F1special}
 \alias{hypGeomSmall}
@@ -49,9 +54,7 @@
 %twinSIR, twinstim and hhh4 functions which are not documented. This
 %is more like a TODO list!!
 \alias{Lambda}
-\alias{R0,twinstim-method}
 \alias{Ztilde.chibarsq}
-\alias{animate}
 \alias{bdist}
 \alias{checkEvents}
 \alias{checkQ}
@@ -59,8 +62,6 @@
 \alias{checkstgrid}
 \alias{coefficients.twinSIR}
 \alias{convertSTS}
-\alias{dSigma1}
-\alias{dSigma2}
 \alias{determineSources}
 \alias{discpoly}
 \alias{doIt}
@@ -73,7 +74,6 @@
 \alias{inside.gpc.poly}
 \alias{intersectCircle}
 \alias{isClosed}
-\alias{isScalar}
 \alias{likelihood.ci}
 \alias{logScore}
 \alias{marks.epidataCS}

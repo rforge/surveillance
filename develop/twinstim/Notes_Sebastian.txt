@@ -4,6 +4,8 @@
 | $Date$                        |
 --------------------------------------------------------------------------------
 
+- plot.epidataCS (type=c("temporal", "spatial"))
+
 - Bei NA-Zuordnung von tile eine warning schmeißen statt abzubrechen (abbruch erfolgt zur zeit mit na.fail in buildmmh)
 - REPORT argument in simEpidataCS
 - kreise "simplifizieren". geht mit simplify.owin(as.owin(as(kreise, "gpc.poly")), 10) oder http://mapshaper.com/test/demo.html
@@ -40,7 +42,7 @@
 
 
 ### DESCRIPTION file extras for twinstim
-Depends:        sp, gpclib, spatstat (>= 1.17-0), maptools
+Depends:        R (>= 2.10.1), sp, gpclib, spatstat (>= 1.17-0), maptools
 Imports:        intervals
 Suggests: statmod, xtable, animation, RColorBrewer
         3. Continuous spatio-temporal point processes are modeled through

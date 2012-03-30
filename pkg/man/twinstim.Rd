@@ -83,7 +83,13 @@ typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE)
   returned if \code{model = TRUE}).
 }
 \item{nCub}{
-  Determines the accuracy of the cubature of the 'siaf' function. If \code{siaf$Fcircle} is specified, nCub = effRange/eps, where eps is used as pixel width and height in the two-dimensional midpoint rule (see polyCub.midpoint). Thus nCub is the desired number of subdivions of effRange in both dimensions and eps = effRange/nCub. If \code{siaf$Fcircle} is missing, nCub equals the above mentioned eps.
+  Determines the accuracy of the cubature of the \code{siaf} function.
+  If \code{siaf$Fcircle} is specified, \code{nCub} equals \code{effRange}/\code{eps},
+  where \code{eps} is used as pixel width and height in the two-dimensional midpoint rule
+  (see \code{\link{polyCub.midpoint}}). Thus \code{nCub} is the desired number of
+  subdivions of \code{effRange} in both dimensions and \code{eps} equals
+  \code{effRange}/\code{nCub}. If \code{siaf$Fcircle} is missing, \code{nCub} equals
+  the above mentioned \code{eps}.
 }
 \item{partial}{
   Logical indicating if the partial log-likelihood proposed by Diggle et
@@ -182,9 +188,9 @@ typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE)
 }
 }
 \references{
-  A space-time conditional intensity model for invasive meningococcal
-  disease occurrence (2011), S. Meyer, J. Elias and M. H\enc{ö}{oe}hle,
-  Biometrics, Epub ahead of print, DOI: 10.1111/j.1541-0420.2011.01684.x.
+  Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2011). A Space-Time Conditional
+  Intensity Model for Invasive Meningococcal Disease Occurrence.
+  Biometrics, in press. DOI: 10.1111/j.1541-0420.2011.01684.x
   A technical report is available as: http://epub.ub.uni-muenchen.de/11898/
 
   Meyer, S. (2010): Spatio-Temporal Infectious Disease Epidemiology based

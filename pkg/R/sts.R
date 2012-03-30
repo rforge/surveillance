@@ -858,10 +858,10 @@ wait <- function(wait.ms) {
 hcl.colors <- function(x,ncolors=100,use.color=TRUE) {
   if (use.color) {
     #The Zeil-ice colors 
-    GYR <- rev(heat_hcl(ncolors, h=c(0,120), c=c(90,30), l=c(50,90), power=c(0.75, 1.2)))
+    GYR <- rev(colorspace::heat_hcl(ncolors, h=c(0,120), c=c(90,30), l=c(50,90), power=c(0.75, 1.2)))
   } else {
     #Sanity check
-    GYR <- rev(heat_hcl(ncolors, h=c(0,120), c=0, l=c(50,90), power=c(0.75, 1.2)))
+    GYR <- rev(colorspace::heat_hcl(ncolors, h=c(0,120), c=0, l=c(50,90), power=c(0.75, 1.2)))
   }
   return(list(col=GYR,min=0,max=max(x), trans=function(x) return(x)))
 }

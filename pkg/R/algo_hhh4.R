@@ -31,7 +31,7 @@ hhh4 <- function(stsObj,
                                 stop.niter = 100),
                verbose = FALSE,
                start=list(fixed=NULL,random=NULL,sd.corr=NULL), # list with initials, overrides any initial values in formulas
-               data=data.frame(t=epoch(sts)-1)    # data.frame or named list with covariates that are specified in the formulas for the 3 components
+               data=data.frame(t=epoch(stsObj)-1)    # data.frame or named list with covariates that are specified in the formulas for the 3 components
                )
    ){
         
@@ -1528,7 +1528,7 @@ marLogLik <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(any(is.na(sd.corr))){
    cat("WARNING: NAs in variance components\n") 
-    return(NAg)      
+    return(NA)      
   }
   
   
@@ -2288,7 +2288,7 @@ predict.ah4 <- function(object,newSubset=NULL,type=c("response","endemic","epi.o
   if(type=="response") result <-predicted$mean
   else if(type=="endemic") result <- predicted$endemic
   else if(type=="epi.own") result <- predicted$epi.own
-  else if(type=="epi.neighbours") result <- pedicted$epi.neighbours
+  else if(type=="epi.neighbours") result <- predicted$epi.neighbours
 
    return(result)
   

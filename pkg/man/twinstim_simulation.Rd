@@ -21,14 +21,12 @@ Simulation of a Space-Time Point Process based on the 'twinstim' model
 simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     events, stgrid, tiles, beta0, beta, gamma, siafpars, tiafpars,
     t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5, nCub,
-    W = unionSpatialPolygons(tiles, IDs = rep.int(1,length(tiles@polygons)), avoidGEOS = TRUE),
-    trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
+    W = NULL, trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
     .skipChecks = FALSE, .onlyEvents = FALSE,...)
-simulate.twinstim(object, nsim = 1, seed = NULL, data, tiles,
+\method{simulate}{twinstim}(object, nsim = 1, seed = NULL, data, tiles,
     rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5, nCub,
-    W = unionSpatialPolygons(tiles, IDs = rep.int(1,length(tiles@polygons)), avoidGEOS = TRUE),
-    trace = FALSE, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
-simplify = TRUE, ...)
+    W = NULL, trace = FALSE, nCircle2Poly = 32, gmax = NULL,
+    .allocate = 500, simplify = TRUE, ...)
 }
 
 \arguments{
@@ -92,15 +90,18 @@ simplify = TRUE, ...)
     fitting of 'object' is used.  
   }
   \item{W}{
-    W: see as.epidataCS. Must have the same proj4string as 'events' and
-    'tiles'. By default, 'W' is generated automatically by calculating the
-    union of the 'tiles'. This might take a while so it might be useful to
-    create 'W' in advance. It is important that 'W' and 'tiles' cover the
-    same region, because on the one hand offspring is sampled in the
+    W: see as.epidataCS. Must have the same proj4string as \code{events}
+    and \code{tiles}. If not specified (\code{NULL}), \code{W} is generated
+    automatically by calculating the union of the 'tiles' using
+    \code{\link[maptools]{unionSpatialPolygons}}    
+    from package maptools (if available). This automatic generation might
+    take a while so it might be useful to create \code{W} in advance.
+    It is important that \code{W} and \code{tiles} cover the same region,
+    because on the one hand offspring is sampled in the
     spatial influence region of the parent event (which is the
-    intersection of 'W' and a circle of radius the "eps.s" of the parent
-    event), and on the other hand the tiles of the sampled coordinates are
-    determined by overlay with 'tiles'.
+    intersection of \code{W} and a circle of radius the \code{eps.s} of the
+    parent event), and on the other hand the tiles of the sampled coordinates
+    are determined by overlay with \code{tiles}.
   }
   \item{trace}{
     logical (or integer) indicating if (or how often) the current
@@ -148,7 +149,7 @@ simplify = TRUE, ...)
     simulation is stored as an attribute "runtime" to each simulated
     "events".}
   \item{nEvents}{Simulate \code{nEvents} events up to time \code{T}. It is bounded above by 10000.}
-  \item{nCub}{ Determines the accuracy of the cubature of the \code{siaf}' function. If \code{siaf$Fcircle} is specified, nCub = effRange/eps, where eps is used as pixel width and height in the two-dimensional midpoint rule (see polyCub.midpoint). Thus nCub is the desired number of subdivions of effRange in both dimensions and eps = effRange/nCub. If \code{siaf$Fcircle} is missing, nCub equals the above mentioned eps.}
+  \item{nCub}{See \code{link{twinstim}}.}
   \item{nCircle2Poly}{Number of polygons (cake slices) a circle  is
     represented by in the numeric integration.}
   \item{gmax}{Maximal value the temporal interaction function can

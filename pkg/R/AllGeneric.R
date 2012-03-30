@@ -1,14 +1,17 @@
 # generate generic functions needed
 
 #Make summary a generic function
-setGeneric("summary")
+#setGeneric("summary")
+
 #Generate a new generic function for animations
 animate <- function (object, ...) {
     UseMethod("animate")
 }
-if(!isGeneric("animate")) setGeneric("animate",useAsDefault=animate)
+#if(!isGeneric("animate")) setGeneric("animate",useAsDefault=animate)
+#<- SM: we do not need animate to be S4 generic
 
-
+# S3 generic function for the calculation of basic reproduction numbers
+R0 <- function (object, ...) UseMethod("R0")
 
 #Conversion of some other functions
 if(!isGeneric("plot")) setGeneric("plot", useAsDefault=plot)

@@ -17,8 +17,7 @@ Spatio-Temporal animation of an continuous-time continuous-space epidemic
 \usage{
 \method{animate}{epidataCS}(object, interval = c(0,Inf), time.spacing = NULL,
     legend.opts = list(), timer.opts = list(), pch = 15:18, col.current = "red",
-    col.I = getOption("epicolor")$I, col.R = getOption("epicolor")$R,
-    col.influence = "#FEE0D2", ...)
+    col.I = "#C16E41", col.R = "#B3B3B3", col.influence = "#FEE0D2", ...)
 }
 
 \arguments{

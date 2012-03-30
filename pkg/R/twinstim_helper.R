@@ -61,7 +61,9 @@ setAs(from = "SpatialPolygons", to = "gpc.poly", def = function (from)
 
 ### Method for coercion from "owin" (spatstat) to "gpc.poly" (gpclib)
 
-#setOldClass("owin")    # does not work when package "maptools" is loaded, don't fully understand this matter...
+if (!isClass("owin")) {
+	setOldClass("owin")
+} # e.g. package "maptools" already registers "owin" as a virtual S4 class by setClass("owin")
 setAs(from = "owin", to = "gpc.poly", def = function (from)
     {
         pts <- lapply(from$bdry, function (poly) {
@@ -132,7 +134,7 @@ discpoly <- function (center, r, npoly = 64,
 {
     class <- match.arg(class)
     if (class == "owin") {
-        res <- disc(radius = r, center = center, mask = FALSE, npoly = npoly)   # spatstat::disc
+        res <- spatstat::disc(radius = r, center = center, mask = FALSE, npoly = npoly)
         if (hole) {
             res$bdry[[1]]$x <- rev(res$bdry[[1]]$x)
             res$bdry[[1]]$y <- rev(res$bdry[[1]]$y)
@@ -181,7 +183,7 @@ bdist <- function (xy, poly)
         for (j in 1L:nsegs) {
             j1 <- if (j < nsegs) j + 1L else 1L
             seg <- c(polly$x[j], polly$y[j], polly$x[j1], polly$y[j1])
-            result <- pmin(result, distppl(xy, seg))
+            result <- pmin(result, spatstat::distppl(xy, seg))
         }
     }
     return(result)

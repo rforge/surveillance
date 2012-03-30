@@ -606,7 +606,7 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
             iRids <- which(infectious)
             if (sequential) setdiff(iRids, it)
             for(j in iRids) {
-                iR <- shift(object$events@data$.influenceRegion[[j]],
+                iR <- spatstat::shift(object$events@data$.influenceRegion[[j]],
                             vec = s$eventCoords[j,])
                 plot(iR, add = TRUE, col = col.influence, border = NA)
             }

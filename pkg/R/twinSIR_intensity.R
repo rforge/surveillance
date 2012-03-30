@@ -181,7 +181,7 @@ intensityPlot <- function(x, type = c("overall", "individual"),
      wlambdaIDmatrix <- matrix(0, nrow = nTimes, ncol = length(idlevels),
                                dimnames = list(NULL, idlevels))
      for (ID in idlevels) {
-         iddata <- subset(survs, subset = id == ID)
+         iddata <- survs[survs$id == ID,]
          wlambdaIDmatrix[match(iddata$stop, timepoints), ID] <- iddata$wlambda
      }
     
@@ -209,7 +209,7 @@ intensityPlot <- function(x, type = c("overall", "individual"),
         weIDmatrix <- matrix(0, nrow = nTimes, ncol = length(idlevels),
                               dimnames = list(NULL, idlevels))
         for (ID in idlevels) {
-          iddata <- subset(survs, subset = id == ID)
+          iddata <- survs[survs$id == ID,]
           weIDmatrix[match(iddata$stop, timepoints), ID] <- iddata$we
         }
         ##end of bug fix -> cross check with Sebastian

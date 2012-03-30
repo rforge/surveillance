@@ -10,7 +10,6 @@
 \format{A data frame with header.}
 \source{L. Sachs. Angewandte Statistik. Springer Verlag, 7. Auflage, S.446, 1991}
 \examples{
-    require(surveillance)
     data(CIdata)
 }
 \seealso{\code{\link{algo.rki}}}
