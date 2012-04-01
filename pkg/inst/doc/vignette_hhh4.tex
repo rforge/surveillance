@@ -223,12 +223,12 @@ An \sts\ object containing the data is created as follows:
 \begin{Schunk}
 \begin{Sinput}
 > # read in observed number of cases
-> flu.counts <- as.matrix(read.table(system.file("data/counts_flu_ByBw.txt", 
+> flu.counts <- as.matrix(read.table(system.file("extdata/counts_flu_BYBW.txt", 
 +                                       package = "surveillance")))
 > # remove 'X' in column names                                      
 > colnames(flu.counts) <- substring(colnames(flu.counts),first = 2, last = 5)                                      
 > # read in adjacency matrix with elements 1 if two regions share a common border
-> nhood <- as.matrix(read.table(system.file("data/neighourhood_ByBw.txt",
+> nhood <- as.matrix(read.table(system.file("extdata/neighbourhood_BYBW.txt",
 +                                       package = "surveillance")))
 > # visualize adjacency matrix
 > image(Matrix(nhood))
@@ -245,7 +245,7 @@ An \sts\ object containing the data is created as follows:
 > map <- readShapePoly(system.file("shapes/districts_BYBW.shp",
 +                         package = "surveillance"), IDvar = "id")
 > # read in population fractions
-> p <- matrix(read.table(system.file("data/population_2001-12-31_ByBw.txt",
+> p <- matrix(read.table(system.file("extdata/population_2001-12-31_BYBW.txt",
 +                           package = "surveillance"), header = TRUE)$popFrac, 
 +             nrow = nrow(flu.counts), ncol= ncol(flu.counts), byrow = TRUE)
 > # create sts object
@@ -482,7 +482,7 @@ as follows:
 \end{Sinput}
 \begin{Soutput}
 ~1 + sin(2 * pi * t/52) + cos(2 * pi * t/52)
-<environment: 05410270>
+<environment: 0x9c28020>
 \end{Soutput}
 \begin{Sinput}
 > # fit Poisson model

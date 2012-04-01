@@ -215,12 +215,12 @@ cases reported to the RKI~\citep{survstat-fluByBw} in the years 2001--2008.
 An \sts\ object containing the data is created as follows:
 <<eval=F>>=
 # read in observed number of cases
-flu.counts <- as.matrix(read.table(system.file("data/counts_flu_ByBw.txt", 
+flu.counts <- as.matrix(read.table(system.file("extdata/counts_flu_BYBW.txt", 
                                       package = "surveillance")))
 # remove 'X' in column names                                      
 colnames(flu.counts) <- substring(colnames(flu.counts),first = 2, last = 5)                                      
 # read in adjacency matrix with elements 1 if two regions share a common border
-nhood <- as.matrix(read.table(system.file("data/neighourhood_ByBw.txt",
+nhood <- as.matrix(read.table(system.file("extdata/neighbourhood_BYBW.txt",
                                       package = "surveillance")))
 # visualize adjacency matrix
 image(Matrix(nhood))
@@ -230,13 +230,13 @@ image(Matrix(nhood))
 \setkeys{Gin}{width=.5\textwidth}
 <<nhoodByBw, fig=TRUE, echo=F, width=4,height=4>>=
 # read in observed number of cases
-flu.counts <- as.matrix(read.table(system.file("data/counts_flu_ByBw.txt", package = "surveillance")))
+flu.counts <- as.matrix(read.table(system.file("extdata/counts_flu_BYBW.txt", package = "surveillance")))
 # remove 'X' in columnnames                                      
 colnames(flu.counts) <- substring(colnames(flu.counts),first=2,last=5)                                      
 # read in a shapefile of the districts in Bavaria and Baden-Wuerttemberg
 map <- readShapePoly(system.file("shapes/districts_BYBW.shp", package = "surveillance"), IDvar = "id")
 # read in adjacency matrix with elements 1 if two regions share a common border
-nhood <- as.matrix(read.table(system.file("data/neighourhood_ByBw.txt", package = "surveillance")))
+nhood <- as.matrix(read.table(system.file("extdata/neighbourhood_BYBW.txt", package = "surveillance")))
 print(image(Matrix(nhood)))
 @
 \end{center}
@@ -245,7 +245,7 @@ print(image(Matrix(nhood)))
 map <- readShapePoly(system.file("shapes/districts_BYBW.shp",
                         package = "surveillance"), IDvar = "id")
 # read in population fractions
-p <- matrix(read.table(system.file("data/population_2001-12-31_ByBw.txt",
+p <- matrix(read.table(system.file("extdata/population_2001-12-31_BYBW.txt",
                           package = "surveillance"), header = TRUE)$popFrac, 
             nrow = nrow(flu.counts), ncol= ncol(flu.counts), byrow = TRUE)
 # create sts object
@@ -577,7 +577,7 @@ linear trend and $S=3$ seasonal terms in the endemic component and
 a fixed autoregressive parameter $\lambda$ to the influenza data 
 \citep[cf. model B2 in Tab.~3 in][]{paul-held-2011}.
 
-<<eval=F, echo=F>>=
+<<eval=TRUE, echo=F>>=
 # weight matrix w_ji = 1/(No. neighbors of j) if j ~ i, and 0 otherwise
 wji <- neighbourhood(flu)/rowSums(neighbourhood(flu))
 

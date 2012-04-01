@@ -1,8 +1,5 @@
 \name{fluBYBW}
 \alias{fluBYBW}
-\alias{counts_flu_ByBw}
-\alias{neighbourhood_ByBw}
-\alias{population_2001-12-31_ByBw}
 \encoding{latin1}
 
 \title{Influenza in Southern Germany}
