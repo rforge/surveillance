@@ -98,6 +98,16 @@ setReplaceMethod("multinomialTS", "sts", function(x, value) {
  x
 })
 
+### neighbourhood matrix slot 
+if(!isGeneric("neighbourhood")) setGeneric("neighbourhood", function(x) standardGeneric("neighbourhood"))
+setMethod("neighbourhood", "sts", function(x) {
+  return(x@neighbourhood)
+})
+setGeneric("neighbourhood<-", function(x, value) standardGeneric("neighbourhood<-"))
+setReplaceMethod("neighbourhood", "sts", function(x, value) {
+ x@neighbourhood <- value
+ x
+})
 
 
 

@@ -20,8 +20,10 @@
 \alias{population}
 \alias{population<-}
 \alias{population-methods}
+\alias{neighbourhood}
 \alias{neighbourhood<-}
 \alias{neighbourhood-methods}
+\alias{multinomialTS}
 \alias{multinomialTS<-}
 \alias{multinomialTS-methods}
 \title{ Methods }

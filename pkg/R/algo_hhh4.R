@@ -1935,11 +1935,11 @@ updateRegression <- function(theta,sd.corr,model=model,
     theta.new <- res$par
     ll <- - res$objective
   } else if(method == "nlm"){
-    res <- nlm(p=theta, f=regressionParamsMin, sd.corr=sd.corr,model=model,fscale=1,hessian=T,print.level=verbose)
+    res <- nlm(p=theta, f=regressionParamsMin, sd.corr=sd.corr,model=model,fscale=1,hessian=TRUE,print.level=verbose)
     theta.new <- res$estimate
     ll <- - res$minimum
   } else {
-    res <- optim(theta,penLogLik, penScore, sd.corr=sd.corr,model=model,method=method, hessian=T, control=list(fnscale=-1,maxit=1000,trace=verbose))
+    res <- optim(theta,penLogLik, penScore, sd.corr=sd.corr,model=model,method=method, hessian=TRUE, control=list(fnscale=-1,maxit=1000,trace=verbose))
     theta.new <- res$par
     ll <- res$value
   }
@@ -1996,7 +1996,7 @@ updateVariance <- function(sd.corr,theta,model, control=list(scoreTol=1e-5, para
     sd.corr.new <- res$estimate
     ll <- -res$minimum
   } else {
-    res <- optim(sd.corr,marLogLik, marScore, theta=theta, model=model, method=method, hessian=T, control=list(fnscale=-1,maxit=1000,trace=verbose))
+    res <- optim(sd.corr,marLogLik, marScore, theta=theta, model=model, method=method, hessian=TRUE, control=list(fnscale=-1,maxit=1000,trace=verbose))
     sd.corr.new <- res$par  
     ll <- res$value
 
@@ -2216,34 +2216,23 @@ newtonRaphson <- function(x,fn,..., control=list(scoreTol=1e-5, paramTol=1e-8,F.
   if(inherits(try(solve(F),silent=TRUE),"try-error")){ 
     cat("\n\n***************************************\nfisher not regular!\n")
     #print(summary(x))
-    return(list(coefficients=x, loglikelihood=loglik, fisher=F, convergence=22, notpd = notpd, steph = steph))
+    return(list(coefficients=x, loglikelihood=loglik, fisher=FALSE, convergence=22, notpd = notpd, steph = steph))
   }
   
   # check if solution is a maximum (i.e. if fisher is pd )
   eps <- 1e-10
   if(!all(eigen(F,symmetric=TRUE, only.values=TRUE)$values > eps)){
     if(verbose>1) cat("fisher information at solution is not pd\n")
-    return(list(coefficients=x, loglikelihood=loglik, fisher=F, convergence=21, notpd = notpd, steph = steph))
+    return(list(coefficients=x, loglikelihood=loglik, fisher=FALSE, convergence=21, notpd = notpd, steph = steph))
   }
  
   if(verbose>0) 
     cat("number of iterations = ",i," coverged = ", convergence ==0," log-likelihood = ",loglik, " notpd = ", notpd, " steph = ", steph, "\n")
-  result <- list(coefficients=x, loglikelihood=loglik, fisher=F, 
+  result <- list(coefficients=x, loglikelihood=loglik, fisher=FALSE, 
                  convergence=convergence, notpd=notpd, steph=steph,niter=i)
   return(result)
   
 }
-
-# neighbourhood matrix slot 
-if(!isGeneric("neighbourhood")) setGeneric("neighbourhood", function(x) standardGeneric("neighbourhood"))
-setMethod("neighbourhood", "sts", function(x) {
-  return(x@neighbourhood)
-})
-setGeneric("neighbourhood<-", function(x, value) standardGeneric("neighbourhood<-"))
-setReplaceMethod("neighbourhood", "sts", function(x, value) {
- x@neighbourhood <- value
- x
-})
 
 ##############
 addSeason2formula <- function(f=~1,       # formula to start with

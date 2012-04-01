@@ -76,13 +76,13 @@ rps <- function(x,mu,size=NULL,k=40){
 		size <- rep(size,n)
 	
 	res <- sapply(1:n, function(i) rps.one(x=x[i],mu=mu[i],size=size[i],k=k) )
-	matrix(res,ncol=ncol(as.matrix(x)),byrow=F)
+	matrix(res,ncol=ncol(as.matrix(x)),byrow=FALSE)
 }
 
 ##
 ## returns logs, rps,ses and dss in reversed!! order
 ## i.e. the scores for time points n, n-1, n-2,...
-scores <- function(object, unit=NULL,sign=F, individual=F){
+scores <- function(object, unit=NULL,sign=FALSE, individual=FALSE){
 	mu <- object$mean
 	size <- object$psi
 	x <- object$x
@@ -99,7 +99,7 @@ scores <- function(object, unit=NULL,sign=F, individual=F){
 	if(any(is.na(size))){
 		size <- NULL
 	} else if(ncol(size)!=ncol(x)){
-		size <- matrix(exp(size), nrow=nrow(size), ncol=ncol(x),byrow=F)
+		size <- matrix(exp(size), nrow=nrow(size), ncol=ncol(x),byrow=FALSE)
 	} else {
       size <- exp(size)  
    }
@@ -174,7 +174,7 @@ pit <- function(J=10,x,pdistr=pnbinom,...){
 #######################################################
 ## scores1, scores2 - vector with scores from two models
 #########################################################
-permutationTest <- function(score1,score2, nPermutation=9999,plot=F){
+permutationTest <- function(score1,score2, nPermutation=9999,plot=FALSE){
   meanScore1 <- mean(score1)
   meanScore2 <- mean(score2)
   diffObserved <- meanScore1 -meanScore2
@@ -190,13 +190,13 @@ permutationTest <- function(score1,score2, nPermutation=9999,plot=F){
   }
 
   if(plot){
-    hist(diffMean, nclass=50, prob=T,xlab="Difference between means",main="")
+    hist(diffMean, nclass=50, prob=TRUE,xlab="Difference between means",main="")
     abline(v=diffObserved,col=4)
   }
   
   pVal <- (1+sum(abs(diffMean)>=abs(diffObserved)))/(nPermutation+1)
 
-  pTtest <- t.test(score1,score2,paired=T)$p.value
+  pTtest <- t.test(score1,score2,paired=TRUE)$p.value
   
   cat("mean difference=",diffObserved,"\tp(permutation) =",pVal,"\tp(paired t-test) =",pTtest,"\n")
   return(list(diffObs=diffObserved, pVal.permut=pVal,pVal.t=pTtest))
