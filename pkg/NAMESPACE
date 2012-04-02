@@ -62,10 +62,27 @@ exportClasses(sts, stsBP)
 exportMethods(plot)
 exportMethods(coerce)   # as defined in twinstim_helper.R
 
+# generics for sts class defined in sts.R
+exportMethods(epochInYear)  
+exportMethods(year)
+
+# methods for accessing/replacing slots of an sts object (as defined in AllGeneric.R)
+exportMethods(epoch,observed,alarms,upperbound,population,control,multinomialTS,neighbourhood)
+exportMethods("epoch<-","observed<-","alarms<-","upperbound<-","population<-","control<-","multinomialTS<-","neighbourhood<-")
+
 # general exports
 export(animate)   # new S3-generic
 export(R0)        # new S3-generic
 export(isScalar)  # very basic little helper function
+
+
+### conversion between old disProg and new sts classes
+export(disProg2sts)
+export(sts2disProg)
+
+### disProg-specific
+export(create.disProg)
+S3method(plot, disProg)
 
 
 ### twinSIR-specific
@@ -152,14 +169,27 @@ S3method(predict, ahg)
 S3method(residuals, ahg)
 S3method(logLik, ahg)
 
-export(hhh4)
+export(hhh4) 
+# documentation for the following functions is still missing
 export(addSeason2formula)
 export(oneStepAhead)
 export(ranef)
 export(fixef)
+   # include further accessing methods...?
 
 S3method(print, ah4)
 S3method(coef, ah4)
 S3method(predict, ah4)
 S3method(plot, ah4)
+S3method(logLik, ah4)
 
+# TODO: add simulation function for "ah4"
+# (or use stats:::simulate instead?)
+export(simHHH)
+export(simHHH.default)
+S3method(simHHH, ah)
+
+# functions not yet documented, but used in dontrun part of example(hhh4)
+# (maybe these would be better defined as a method for "oneStepAhead(ah4)-objects")
+export(scores)
+export(permutationTest)
