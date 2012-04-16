@@ -338,12 +338,13 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
     cat("Back-projecting with k=",control$k," to get lambda estimate.\n")
   }
   stsk <- backprojNP.fit(sts, incu.pmf.vec=incu.pmf.vec,k=control$k,eps=control$eps[2],iter.max=control$iter.max[2],verbose=control$verbose,lambda0=control$lambda0,hookFun=control$hookFun,eq3a.method=control$eq3a.method)
+  #Fix control slot
+  stsk@control <- control 
 
   #If no bootstrap to do return object right away as stsBP object.
   if (control$B<=0) {
     if (control$verbose) { cat("No bootstrap CIs calculated as requested.\n") }
     stsk <- as(stsk,"stsBP")
-    stsk@control <- control 
     return(stsk)
   }
 
@@ -391,14 +392,8 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
 
   #Add extra slots
   stsk@ci <- ci
-  stsk@upperbound <- lambda
-  #<- SM: shouldn't that be stsk@lambda <- lambda???  I get an error here when running the example:
-  #   Error in class(value) <- "matrix" : 
-  #   invalid to set the class to matrix unless the dimension attribute is of length 2 (was 3)
-  # Also: Are lambda[,,b] bootstrap replicates of upperbound?
-  # shouldn't then dim(lambda)[1:2] equal dim(upperbound) (esp. not be transposed)
-  stsk@control <- control 
-
+  stsk@lambda <- lambda
+  stsk@control <- control
 
   #Done
   return(stsk)
