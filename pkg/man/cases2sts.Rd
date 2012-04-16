@@ -69,9 +69,8 @@ Michael \enc{Höhle}{Hoehle}
 #Load simulated outbreak data. 
 D <- read.table("http://www.stat.uni-muenchen.de/~hoehle/teaching/moid2011/tutorials/cast-backnow/outbreak.txt",header=TRUE,colClasses=c("integer",rep("Date",3)))
 
-debug("cases2sts")
 sts <- cases2sts(D, dateCol="dOnset", aggregate.by="1 day")
-plot(sts,xaxis.years=FALSE,legend.opts=NULL)
+plot(sts,xaxis.years=FALSE,legend.opts=NULL,xlab="time (days)")
 
 }
 
