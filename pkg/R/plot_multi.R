@@ -98,7 +98,7 @@ sumNeighbours <- function(disProgObj){
       neighbours[,i] <- observed[,disProgObj$neighbourhood[,i]==1]
     #more than one neighbour
     else
-      neighbours[,i] <- apply(observed[,disProgObj$neighbourhood[,i]==1], MAR=1, sum)
+      neighbours[,i] <- apply(observed[,disProgObj$neighbourhood[,i]==1], MARGIN=1, sum)
   }
   return(neighbours)
 }
@@ -109,9 +109,9 @@ sumNeighbours <- function(disProgObj){
 ###################################################
 aggregate.disProg <- function(x,...){
   #aggregate observed counts
-  observed <- apply(x$observed,MAR=1,sum)
+  observed <- apply(x$observed,MARGIN=1,sum)
   #aggregate states
-  state <- apply(x$state,MAR=1,sum)
+  state <- apply(x$state,MARGIN=1,sum)
   state[state > 1] <- 1
   
   #create univariate disProg object

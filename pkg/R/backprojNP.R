@@ -325,14 +325,6 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
   if (length(control$eps)==1) control$eps <- rep(control$eps,2)
   if (length(control$iter.max)==1) control$iter.max <- rep(control$iter.max,2)
   
-  #Create wrapper functions for the PMF based on the vector
-  dincu <- function(x) {
-    notInSupport <- x<0 | x>=length(inc.pmf)
-    #Give index -1 to invalid queries
-    x[notInSupport] <- -1
-    return(c(0,inc.pmf)[x+2])
-  }
- 
   #Compute the estimate to report (i.e. use 2nd component of the args)
   if (control$verbose) {
     cat("Back-projecting with k=",control$k," to get lambda estimate.\n")
@@ -361,6 +353,16 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
   #Define object to return
   lambda <- array(NA,dim=c(ncol(sts),nrow(sts),control$B))
 
+  #Define PMF of incubation time which does safe handling of values
+  #outside the support of the incubation time.
+  dincu <- function(x) {
+    notInSupport <- x<0 | x>=length(incu.pmf.vec)
+    #Give index -1 to invalid queries
+    x[notInSupport] <- -1
+    return(c(0,incu.pmf.vec)[x+2])
+  }
+
+  
   #Loop in order to create the sample
   for (b in 1:control$B) {
     if (control$verbose) { cat("Bootstrap sample ",b,"/",control$B,"\n") }
