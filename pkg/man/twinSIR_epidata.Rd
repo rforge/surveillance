@@ -1,5 +1,7 @@
 \name{twinSIR_epidata}
 \alias{as.epidata}
+\alias{as.epidata.default}
+\alias{as.epidata.epidataCS}
 \alias{print.epidata}
 \alias{[.epidata}
 \alias{epidata}
@@ -9,8 +11,8 @@ Class for Epidemic Data Discrete in Space and Continuous in Time
 }
 
 \description{
-  The function \code{as.epidata} converts a matrix or a data frame into an
-  object of \code{\link{class}} \code{"epidata"}.  Objects of this class are
+  The function \code{as.epidata} is used to generate objects
+  of \code{\link{class}} \code{"epidata"}.  Objects of this class are
   specific data frames containing the event history of an epidemic together
   with some additional attributes.  These objects are the basis for fitting
   spatio-temporal epidemic intensity models with the function
@@ -22,8 +24,11 @@ Class for Epidemic Data Discrete in Space and Continuous in Time
 }
 
 \usage{
-as.epidata(data, id.col, start.col, stop.col, atRiskY.col,
-           event.col, Revent.col, coords.cols, f = list())
+as.epidata(data, ...)
+
+\method{as.epidata}{default}(data, id.col, start.col, stop.col, atRiskY.col,
+           event.col, Revent.col, coords.cols, f = list(), ...)
+\method{as.epidata}{epidataCS}(data, tileCentroids, eps = 0.001, ...)
 
 \method{print}{epidata}(x, ...)
 \method{[}{epidata}(x, i, j, drop)
@@ -31,14 +36,14 @@ as.epidata(data, id.col, start.col, stop.col, atRiskY.col,
 
 \arguments{
   \item{data}{
-    a \code{\link{matrix}} or a \code{\link{data.frame}}.  It contains the
-    observed event history in a form similar to \code{Surv(, type="counting")}
-    with additional information (variables) along the process.  It must not be
-    sorted in any specific order; this will be done automatically during 
-    conversion.  The observation period is splitted up into \emph{consecutive} 
-    intervals of constant state - thus constant infection intensities.  The 
-    data frame consists of a block of N (number of individuals) rows 
-    for each of those time intervals (all rows in a block share the same start 
+    For the default method a \code{\link{matrix}} or a \code{\link{data.frame}}.
+    It contains the observed event history in a form similar to 
+    \code{Surv(, type="counting")} with additional information (variables) along 
+    the process.  It must not be sorted in any specific order; this will be done 
+    automatically during conversion.  The observation period is splitted up into 
+    \emph{consecutive} intervals of constant state - thus constant infection 
+    intensities.  The data frame consists of a block of N (number of individuals) 
+    rows for each of those time intervals (all rows in a block share the same start 
     and stop values... therefore the name \dQuote{block}), where there is one 
     row per individual in the block.  Each row describes the (fixed) state of 
     the individual during the interval given by the start and stop columns 
@@ -48,6 +53,11 @@ as.epidata(data, id.col, start.col, stop.col, atRiskY.col,
     \code{event.col} and \code{Revent.col} may be 1, all others are 0.  This
     rule follows the assumption that there are no concurrent events (infections
     or removals).
+    
+    Alternatively, \code{data} may be an object of class \code{"\link{epidataCS}"},
+    i.e. space-continuous epidemic data used in the \code{\link{twinstim}} context,
+    which will be converted (aggregated) to an object of class \code{"epidata"}
+	for use with \code{\link{twinSIR}}.
   }
   \item{id.col}{
     single index of the \code{id} column in \code{data}.  Can be numeric
@@ -97,8 +107,8 @@ as.epidata(data, id.col, start.col, stop.col, atRiskY.col,
     a numeric (by column number) vector, a character (by column name) vector
     or \code{NULL} (in which case epidemic covariates are not calculateable).
     These columns contain the coordinates of the individuals.  It must be
-    emphasized that the functions in this package currently assume \emph{fixed
-    positions} of the individuals during the whole epidemic.  Thus, an
+    emphasized that the functions related to \code{\link{twinSIR}} models currently assume
+    \emph{fixed positions} of the individuals during the whole epidemic.  Thus, an
     individual has the same coordinates in every block.  For simplicity, the
     coordinates are derived from the first time block only (normally the rows 
     with \code{start == 0}).
@@ -123,11 +133,23 @@ as.epidata(data, id.col, start.col, stop.col, atRiskY.col,
     \eqn{\sum_{j \in I(t)} f_m(||s_i - s_j||)}{%
          \sum_{j in I(t)} f[[m]](||s_i - s_j||)}
   }
+  \item{tileCentroids}{
+    a coordinate matrix of the tile centroids the row names of which are the tile levels.
+    This will be the coordinates used for the population (i.e. the tiles from
+    \code{"\link{epidataCS}"}) in the discrete-space \code{\link{twinSIR}} modelling.
+  }
+  \item{eps}{
+  	numeric scalar for breaking tied removal and infection times between different
+  	individuals (tiles), which might occur during conversion from
+  	\code{"\link{epidataCS}"} to \code{"epidata"}. Rather dumb, this is simply done
+  	by subtracting \code{eps} from each tied removal time.
+  	One should consider other ways of breaking the tied event times.
+  }
   \item{x}{
     an object of class \code{"epidata"}.
   }
   \item{\dots}{
-    arguments passed to \code{\link{print.data.frame}}.
+    arguments passed to \code{\link{print.data.frame}}. Currently unused in \code{as.epidata}.
   }
   \item{i,j,drop}{
     arguments passed to \code{\link{[.data.frame}}.
@@ -149,6 +171,14 @@ as.epidata(data, id.col, start.col, stop.col, atRiskY.col,
   will be at risk immediately afterwards, i.e.\ in the following time block.
   Therefore, data of SIS epidemics have to be provided in that form containing
   \dQuote{pseudo-R-events}.
+  
+  Some comments on the conversion from \code{"\link{epidataCS}"} to \code{"epidata"}:
+  the conversion results into SIS epidemics only,
+  i.e. the at-risk indicator is set to 1 immediately after
+  recovery. The lengths of the infectious periods are taken from
+  \code{data$events$eps.t}. There will be no \code{f} columns in the resulting
+  \code{"epidata"}. These must be generated by a subsequent call to
+  \code{as.epidata} with desired \code{f}.
 }
 
 \note{

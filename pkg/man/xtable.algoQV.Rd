@@ -27,9 +27,8 @@
     survResObj <- algo.rki1(disProgObj, control = list(range = 50:200))
 
     # Compute the quality values in a nice formatted way
-    if (require("xtable")) {
-        xtable(algo.quality(survResObj))
-    }
+    library("xtable")
+	xtable(algo.quality(survResObj))
 }
 
 

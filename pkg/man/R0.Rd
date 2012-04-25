@@ -3,7 +3,7 @@
 \alias{R0.twinstim}
 \title{Computes basic reproduction numbers from fitted models}
 \description{
-The S3 generic function \code{R0} defined in package surveillance is intended to
+The S3 generic function \code{R0} defined in package \pkg{surveillance} is intended to
 compute basic reproduction numbers from fitted epidemic models.
 The package currently defines a method for the \code{"\link{twinstim}"} class, which
 computes mean numbers of infections caused by infected individuals depending on the event type
@@ -22,7 +22,7 @@ R0(object, ...)
 a \code{data.frame} of events for which the basic reproduction number should be calculated. It must contain the factor variable \code{type}, the interaction ranges \code{eps.t} and \code{eps.s} and columns for the marks used in the epidemic component of the fitted twinstim object as stored in \code{formula(object)$epidemic}. The coding of the variables must of course be the same as used for fitting. For each row of \code{newevents} the corresponding R0 value is calculated. If \code{newevents} is omitted, then R0 values are returned for each type with all marks set to 0 and assuming the median interaction ranges from \code{object$medianeps}.
 }
   \item{dimyx}{
-	control parameter for the integration of the spatial interaction function by the two-dimensional midpoint rule (see \code{\link{polycub.midpoint}}). It is only relevant if \code{formula(object)$siaf$Fcircle} is undefined (\code{NULL}).
+	control parameter for the integration of the spatial interaction function by the two-dimensional midpoint rule (see \code{\link{polyCub.midpoint}}). It is only relevant if \code{formula(object)$siaf$Fcircle} is undefined (\code{NULL}).
 }
   \item{\dots}{currently unused (argument of the generic).}
 }

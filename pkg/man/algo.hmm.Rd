@@ -5,7 +5,7 @@
   %
   This function implements on-line HMM detection of outbreaks based on
   the retrospective procedure described in Le Strat and Carret (1999).
-  Using the function \code{msm} (library \code{msm}) a specified HMM
+  Using the function \code{\link[msm]{msm}} (from package \pkg{msm}) a specified HMM
   is estimated, the decoding problem, i.e. the most probable state
   configuration, is found by the Viterbi algorithm and the most
   probable state of the last observation is recorded. On-line
@@ -84,7 +84,7 @@
   In case more complicated HMM models are to be fitted it is possible to
   modify the \code{msm} code used in this function. Using
   e.g. \code{AIC} one can select between different models (see the
-  \code{msm} package for further details). 
+  \pkg{msm} package for further details). 
 
   Using the Viterbi algorithms the most probable state configuration
   is obtained for the reference values and if the most probable

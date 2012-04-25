@@ -27,7 +27,7 @@
     License: \tab GPL version 2 (http://www.gnu.org/licenses/gpl.html) \cr
   }
 
-  \code{surveillance} is an \R package implementing statistical methods for the
+  \pkg{surveillance} is an \R package implementing statistical methods for the
   retrospective modeling and prospective change-point detection in time
   series of counts, proportions and categorical data. The main
   application is in the detection of aberrations in routine collected

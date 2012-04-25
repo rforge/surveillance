@@ -109,11 +109,11 @@ scores <- function(object, unit=NULL,sign=FALSE, individual=FALSE){
 	else signXmMu <- NULL
 
 	#compute average scores for unit
-	log.score <- apply(as.matrix(logScore(x=x,mu=mu,size=size)),MAR=2,rev)
-	rp.score <- apply(as.matrix(rps(x=x,mu=mu,size=size)),MAR=2,rev)
-	se.score <- apply(as.matrix(ses(x=x,mu=mu)), MAR=2, rev)
-	nse.score <- apply(as.matrix(nses(x=x,mu=mu,size=size)),MAR=2,rev)
-	ds.score <- apply(as.matrix(dss(x=x, mu=mu, size=size)), MAR=2,rev)
+	log.score <- apply(as.matrix(logScore(x=x,mu=mu,size=size)),MARGIN=2,rev)
+	rp.score <- apply(as.matrix(rps(x=x,mu=mu,size=size)),MARGIN=2,rev)
+	se.score <- apply(as.matrix(ses(x=x,mu=mu)), MARGIN=2, rev)
+	nse.score <- apply(as.matrix(nses(x=x,mu=mu,size=size)),MARGIN=2,rev)
+	ds.score <- apply(as.matrix(dss(x=x, mu=mu, size=size)), MARGIN=2,rev)
 	
 	if(is.null(unit)){
       if(individual){

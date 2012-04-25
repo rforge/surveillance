@@ -13,14 +13,23 @@ animate <- function (object, ...) {
 # S3 generic function for the calculation of basic reproduction numbers
 R0 <- function (object, ...) UseMethod("R0")
 
+# S3 generic function for the generation of epidata objects for twinSIR
+as.epidata <- function (data, ...) UseMethod("as.epidata")
+
 #Conversion of some other functions
 if(!isGeneric("plot")) setGeneric("plot", useAsDefault=plot)
 if(!isGeneric("aggregate")) setGeneric("aggregate", useAsDefault=aggregate)
 
+# register "owin" as class in S4 so we can define methods for it
+if (!isClass("owin")) {
+	# e.g. package "maptools" already registers "owin" as a virtual S4 class by setClass("owin")
+	setOldClass("owin")
+}
+
 
 
 ######################################################################
-#Access and replace functions
+#Access and replace functions for the "sts" class
 ######################################################################
 #epoch slot
 if(!isGeneric("epoch")) setGeneric("epoch", function(x, as.Date=x@epochAsDate) standardGeneric("epoch"))

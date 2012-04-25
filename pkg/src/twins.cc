@@ -321,7 +321,7 @@ double sumI1(const DoubleMatrix& X, int I, int t) {
  *********************************************************************/
 long factorial(long x){
   long fac=1;
-  if(x<0){ REprintf("negative value passed to factorial function\n"); exit(-1);}
+  if(x<0){ Rf_error("negative value passed to factorial function\n");}
   else{
     if(x==0){fac=1;}
     else{
@@ -338,8 +338,7 @@ long factorial(long x){
  *********************************************************************/
 double logit(double y){
   if(y <= 0 || y >= 1){
-    REprintf("y <= 0 or y >= 1 in logit function.\n");
-    exit(-1);
+    Rf_error("y <= 0 or y >= 1 in logit function.\n");
   }
   double logit;
   logit = log(y/(1-y));
@@ -3188,8 +3187,8 @@ extern "C" {
   logfile2.open(logFile2);
   accfile.open(accFile);
 
-  if (!logfile) { REprintf("Error opening the log file.\n");exit(-1);}
-  if (!accfile) { REprintf("Error opening the acc file.\n");exit(-1);}
+  if (!logfile) { Rf_error("Error opening the log file.\n");}
+  if (!accfile) { Rf_error("Error opening the acc file.\n");}
 
   /* Allocate a random number generator -- this is now the R RNG and
      Fix seed of generator to reproduce results (i.e. fetch current seed

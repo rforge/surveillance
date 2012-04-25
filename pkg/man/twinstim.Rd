@@ -221,7 +221,7 @@ allEpiCovNonNA <- !is.na(imdepi$events@data$agegrp) &
 #Define spatial interaction function to be a isotropic bivariate
 #Gaussian with same parameters for both finetypes
 siaf_log1 <- siaf.gaussian(1, logsd = TRUE, density = FALSE, effRangeMult = 6)
-siaf_constant <- siaf.constant
+siaf_constant <- siaf.constant()
 
 #Start values (taken from the best model in fits5 of the Epi/mydata
 #startvalues <-  c(-20.36516096, -0.04926598, 0.26183958, 0.26681968,

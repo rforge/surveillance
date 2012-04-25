@@ -23,6 +23,7 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5, nCub,
     W = NULL, trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
     .skipChecks = FALSE, .onlyEvents = FALSE,...)
+
 \method{simulate}{twinstim}(object, nsim = 1, seed = NULL, data, tiles,
     rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5, nCub,
     W = NULL, trace = FALSE, nCircle2Poly = 32, gmax = NULL,
@@ -94,7 +95,7 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     and \code{tiles}. If not specified (\code{NULL}), \code{W} is generated
     automatically by calculating the union of the 'tiles' using
     \code{\link[maptools]{unionSpatialPolygons}}    
-    from package maptools (if available). This automatic generation might
+    from package \pkg{maptools} (if available). This automatic generation might
     take a while so it might be useful to create \code{W} in advance.
     It is important that \code{W} and \code{tiles} cover the same region,
     because on the one hand offspring is sampled in the

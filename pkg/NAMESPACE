@@ -1,94 +1,160 @@
-# Started to build namespace for the surveillance package.
-
-
 ### Load C code
 
 useDynLib(surveillance)
 
 
-### IMPORTS
+###############
+### IMPORTS ###
+###############
 
 import(methods)
 
-# import S3 generics to define own methods
+
+### import generics to define own methods
+
 importFrom(graphics, plot)
-importFrom(stats, simulate, profile, coef, vcov, logLik, AIC, extractAIC)
+importFrom(stats, simulate, profile, coef, vcov, logLik, AIC, extractAIC, pnorm, cov2cor, residuals, ks.test)
 importFrom(utils, packageDescription, head, toLatex)
+importFrom(xtable, xtable)
 
-# sp classes, utility functions (bbox, coordinates, dimensions, overlay, ...), plot methods
+#importMethodsFrom(stats4, plot)   # import S4-generic
+#<- would be nice, but then gives strange warnings for S3 methods from stats
+#   "Warning: found methods to import for function ‘AIC’ but not the generic itself"
+#   However, we don't need to import it here, because we depend on package sp, which makes plot generic
+
+
+### sp classes, utility functions (bbox, coordinates, dimensions, overlay, ...), plot methods
+# moved package sp to "Depends:" since it defines essential data classes and methods for surveillance
+
 import(sp)
-# Note: moved package sp to "Depends:" since this sets plot as generic and it defines
-#       essential classes and methods for surveillance.
-#       if we don't do so, plot(sts) does not work, since plot is not visibly S4 generic
-#       (just try by typing in a fresh R session library("surveillance"); plot),
-#       ALTHOUGH isGeneric("plot") returns TRUE (which, by the way, is the reason why
-#       setGeneric("plot") is not invoked in AllGeneric.R)...
-#       I don't completely understand this matter; perhaps the problem is linked to the fact
-#       that we define both S3 and S4 methods for plot in our package...
 
-# used in algo.glrnb
-importFrom(MASS, glm.nb)
+
+### disProg-specific
+
+importFrom(MASS, glm.nb)   # for algo.glrnb
+importFrom(msm, msm, viterbi.msm)   # for algo.hmm
+importFrom(spc, xcusum.arl, xcusum.crit)   # for CUSUM control charts in junchoi.R and algo_cusum.R
+
+
+### sts-specific
 
 # for colors in sts plots
 importFrom(colorspace, heat_hcl)
 
-# for CUSUM control charts in junchoi.R and algo_cusum.R
-importFrom(spc, xcusum.arl, xcusum.crit)
 
-# for algo.hmm
-importFrom(msm, msm, viterbi.msm)
+### twinSIR-specific
 
-# twinSIR-specific external functions (for use in computing OSAIC weights by simulation)
+# for use in computing OSAIC weights by simulation
 importFrom(MASS, mvrnorm)
 importFrom(quadprog, solve.QP)
 
-# twinstim-specific
+
+### twinstim-specific
+
 importClassesFrom(gpclib, gpc.poly)
-importMethodsFrom(gpclib, "[", coerce)
-importFrom(gpclib, get.bbox, intersect, append.poly, area.poly, get.pts)
+#importMethodsFrom(gpclib, coerce)   # we don't need to import coerce from gpclib because we import methods
+importMethodsFrom(gpclib, "[", get.bbox, intersect, append.poly, area.poly, get.pts, scale.poly, tristrip)
 importFrom(spatstat, as.owin, area.owin, distppl, as.im.function,
                      disc, shift, marks, spatstat.options, bounding.box)
 importFrom(intervals, Intervals, reduce)
 
 
-### EXPORTS
+
+###############
+### EXPORTS ###
+###############
 
 # This might take a while before working correctly so we start by
 # exporting all variables that do not start with a period
-exportPattern("^[^\\.]")
+#exportPattern("^[^\\.]")
 
-# Surveillance time series
+
+### general exports
+
+export(animate)   # new S3-generic
+export(R0)        # new S3-generic
+export(isScalar)  # very basic little helper function
+export(anscombe.residuals)
+export(magic.dim, primeFactors, bestCombination)   # similar to n2mfrow
+export(isoWeekYear)
+export(refvalIdxByDate)
+export(ks.plot.unif)
+
+# export S4 coerce-methods defined by the package
+exportMethods(coerce)     # from spatial_coerce-methods.R
+
+# numerical integration of two-dimensional function over polygonal domains
+export(polyCub, polyCub.midpoint, polyCub.SV, polyCub.exact.Gauss)
+
+# spatial utilities
+export(discpoly)
+export(inside.gpc.poly)
+exportMethods(scale.poly)   # redefined method for gpc.poly in spatial_stuff.R
+#S3method(scale, gpc.poly)  # alternatively, if defined as S3 method for scale
+export(multiplicity.sp)
+
+export(stcd)
+
+
+### sts(BP)-specific
+
 exportClasses(sts, stsBP)
-exportMethods(plot)
-exportMethods(coerce)   # as defined in twinstim_helper.R
 
 # generics for sts class defined in sts.R
-exportMethods(epochInYear)  
-exportMethods(year)
+exportMethods("[", plot)
+exportMethods(nrow, ncol, dim, colnames, epochInYear, year)
+exportMethods(aggregate)
+exportMethods(as.data.frame)
 
 # methods for accessing/replacing slots of an sts object (as defined in AllGeneric.R)
 exportMethods(epoch,observed,alarms,upperbound,population,control,multinomialTS,neighbourhood)
 exportMethods("epoch<-","observed<-","alarms<-","upperbound<-","population<-","control<-","multinomialTS<-","neighbourhood<-")
 
-# general exports
-export(animate)   # new S3-generic
-export(R0)        # new S3-generic
-export(isScalar)  # very basic little helper function
+export(cases2sts)
+
+export(wrap.algo, farrington, bayes, rki, cusum, glrpois, glrnb, outbreakP)
+export(categoricalCUSUM, pairedbinCUSUM, pairedbinCUSUM.runlength)
+export(nowcast, backprojNP)
+
+
+### disProg-specific
+
+export(create.disProg, create.grid, readData, toFileDisProg)
+S3method(plot, disProg)
+S3method(plot, disProg.one)
+S3method(aggregate, disProg)
+
+export(sim.pointSource, sim.seasonalNoise)
+export(LRCUSUM.runlength, arlCusum, find.kh, findH, hValues, findK)
+exportPattern("^algo\\.")
+export(compMatrix.writeTable, correct53to52, enlargeData)
+export(sumNeighbours)
+export(makePlot)
+
+export(make.design, meanResponse, loglikelihood)
+
+S3method(plot, atwins)
+S3method(plot, survRes)
+S3method(plot, survRes.one)
+S3method(print, algoQV)
+S3method(xtable, algoQV)
+
+export(test, testSim)   # FIXME: do we really want that?
+# if not, then we have to prefix all test() and testSim() calls in the corresponding
+# examples in the Rd files by "surveillance:::"
 
 
 ### conversion between old disProg and new sts classes
+
 export(disProg2sts)
 export(sts2disProg)
-
-### disProg-specific
-export(create.disProg)
-S3method(plot, disProg)
 
 
 ### twinSIR-specific
 
 export(cox)
 export(as.epidata)
+S3method(as.epidata, default)
 export(intersperse)
 export(twinSIR)
 export(intensityPlot)
@@ -115,6 +181,7 @@ S3method(logLik, twinSIR)
 S3method(AIC, twinSIR)
 S3method(extractAIC, twinSIR)
 S3method(simulate, twinSIR)
+S3method(residuals, twinSIR)
 
 
 ### twinstim-specific
@@ -122,13 +189,8 @@ S3method(simulate, twinSIR)
 export(as.epidataCS)
 export(twinstim)
 # intensityplot
-# simEpidataCS
-#export(as.epidata.epidataCS)  # -> let this be a S3 method
-export(siaf.gaussian, tiaf.exponential)
-
-export(discpoly)
-export(inside.gpc.poly)
-S3method(scale, gpc.poly)
+export(simEpidataCS)
+export(siaf.gaussian, siaf.constant, tiaf.exponential, tiaf.constant)
 
 S3method(update, epidataCS)
 S3method(head, epidataCS)
@@ -138,17 +200,23 @@ S3method(animate, epidataCS)
 # S3method(print, summary.epidataCS)  # there is no such method yet
 S3method(marks, epidataCS)
 # S3method(plot, epidataCS)  # TODO... type=c("temporal", "spatial")
+S3method(as.epidata, epidataCS)
 
 S3method(print, twinstim)
 S3method(summary, twinstim)
 S3method(print, summary.twinstim)
 S3method(toLatex, summary.twinstim)
-# S3method(plot, twinstim)   # plotiaf, plot.summary.twinstim ?
+# S3method(plot, twinstim)
+#-> type = c("intensity", "siaf", "tiaf")  -> call intensityPlot (make generic) or plotiaf
+#S3method(profile, twinstim)   # FIXME @Michael: what is the status of this method?
 S3method(coef, twinstim)
 S3method(vcov, twinstim)
 S3method(logLik, twinstim)
 S3method(simulate, twinstim)
 S3method(R0, twinstim)
+S3method(residuals, twinstim)
+
+S3method(print, simEpidataCSlist)
 
 
 ### hhh-specific
@@ -185,11 +253,13 @@ S3method(logLik, ah4)
 
 # TODO: add simulation function for "ah4"
 # (or use stats:::simulate instead?)
-export(simHHH)
-export(simHHH.default)
+export(simHHH, simHHH.default)
+S3method(simHHH, default)
 S3method(simHHH, ah)
 
 # functions not yet documented, but used in dontrun part of example(hhh4)
 # (maybe these would be better defined as a method for "oneStepAhead(ah4)-objects")
 export(scores)
 export(permutationTest)
+export(pit)
+

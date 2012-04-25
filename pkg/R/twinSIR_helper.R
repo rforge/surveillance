@@ -110,7 +110,7 @@ getSummary <- function (object, class)
 # Ztilde.chibarsq <- function(Z,p,W,R)
 # w.chibarsq.sim <- function(p, W, N=1e4) 
 #
-# Both functions are RLadyBug specific internals, no need for documentation
+# Both functions are only used internally, no need for documentation
 # they are used in function .OSAICpenalty  (twinSIR_methods.R)
 ################################################################################
 

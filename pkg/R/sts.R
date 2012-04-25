@@ -39,7 +39,7 @@ init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0
     if(ncol(observed) != ncol(state)){
       #if there is only one state-vector for more than one area, repeat it
       if(ncol(state)==1)
-        state <- ts(matrix(rep(state,nAreas),ncol=nAreas,byrow=FALSE),freq=frequency(observed))
+        state <- ts(matrix(rep(state,nAreas),ncol=nAreas,byrow=FALSE),frequency=frequency(observed))
       else{ 
         cat('wrong dimensions of observed and state \n')
       return(NULL)

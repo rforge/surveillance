@@ -3,13 +3,7 @@
 \docType{class}
 \alias{sts-class}
 %
-% other names
-%\alias{aggregate,sts-method}
-%\alias{plot,sts-method}
-%\alias{plot,sts,missing-method}
-\alias{nrow,sts-method}
-\alias{ncol,sts-method}
-\alias{dim,sts-method}
+% accessing the slots
 \alias{alarms,sts-method}
 \alias{alarms<-,sts-method}
 \alias{upperbound,sts-method}
@@ -18,7 +12,6 @@
 \alias{control<-,sts-method}
 \alias{epoch,sts-method}
 \alias{epoch<-,sts-method}
-\alias{epochInYear,sts-method}
 \alias{observed,sts-method}
 \alias{observed<-,sts-method}
 \alias{population,sts-method}
@@ -27,18 +20,27 @@
 \alias{multinomialTS<-,sts-method}
 \alias{neighbourhood,sts-method}
 \alias{neighbourhood<-,sts-method}
+% other access methods
+\alias{nrow,sts-method}
+\alias{ncol,sts-method}
+\alias{dim,sts-method}
 \alias{colnames,sts,missing,missing-method}
+\alias{epochInYear}
+\alias{epochInYear,sts-method}
+\alias{year}
+\alias{year,sts-method}
+% other methods
 \alias{initialize,sts-method}
 \alias{as.data.frame,sts-method}
 
 \encoding{latin1}
 
-\title{Class "sts" -- surveillance time series}
+\title{Class \code{"sts"} -- surveillance time series}
 
 \description{
 
   This is a rather leightweight class to implement multivariate time
-  series of count used for public health surveillance data. The class
+  series of counts used for public health surveillance data. The class
   captures the time series data as well as the spatial layout of the
   regions, where the data originate from.
 
@@ -142,10 +144,19 @@
 
 \author{M. \enc{Höhle}{Hoehle}}
 \examples{
-  data("ha")
-  shp <- system.file("shapes/berlin.shp",package="surveillance")
-  ha <- disProg2sts(ha, map=readShapePoly(shp,IDvar="SNAME"))
-  plot(ha,type=observed ~ 1 | unit)
-
+  if (require("maptools")) {
+    # load disProg-object "ha" and convert to S4-class "sts"
+    data("ha")
+    shp <- system.file("shapes/berlin.shp",package="surveillance")
+    ha.sts <- disProg2sts(ha, map=maptools::readShapePoly(shp,IDvar="SNAME"))
+  } else {
+    # load pre-built sts-object
+    data("ha.sts")
+    # the only difference is that here German umlauts have been removed from
+    # 'ha.sts@map@data$BEZIRK' for compatibility reasons
+  }
+  
+  plot(ha.sts, type=observed ~ 1 | unit)
+  
 }
 \keyword{classes}

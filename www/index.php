@@ -230,7 +230,9 @@ Höhle</a>, Department of Statistics, University of Munich, Germany
       <li><a href="http://www.biostat.uzh.ch/aboutus/people/mpaul.html">Michaela
 Paul</a>, Institute of Social and Preventive Medicine, University of
 Zurich, Switzerland</li>
-	<li>Sebastian Meyer, Department of Psychiatry and Psychotherapy, Ludwig-Maximilians-Universit&auml;t, M&uuml;nchen, Germany</li> 
+	<li><a href="http://www.biostat.uzh.ch/aboutus/people/smeyer.html">Sebastian
+Meyer</a>, Institute of Social and Preventive Medicine, University of 
+Zurich, Switzerland</li> 
       <li>Former student programmers: C. Lang, Andrea Riebler, Valentin
 Wimmer</li>
       <li>Contributions by: T. Correa, M. Hofmann and S. Steiner</li>

@@ -92,8 +92,9 @@
   imdepi
   head(imdepi,n=2)
 
-  #Event data
-  marks(imdepi)
+  #Access event data through method for spatstat's generic function marks
+  spatstat::marks(imdepi)
+  # if package "spatstat" is attached, then it is enough to write marks(imdepi)
 
   #Summary
   s <- summary(imdepi)

@@ -11,6 +11,8 @@ a proper NAMESPACE.
 
 * Bayesian nowcasting for discrete time count data is implemented in
   the function nowcast.
+  
+* Improved documentation.
 
 
 1.3

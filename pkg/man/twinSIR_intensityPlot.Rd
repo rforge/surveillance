@@ -4,7 +4,7 @@
 \alias{plot.twinSIR}
 
 \title{
-Plotting Paths of Infection Intensities
+Plotting Paths of Infection Intensities for \code{twinSIR} Models
 }
 
 \description{

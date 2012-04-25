@@ -283,7 +283,7 @@ int CalculaLambda(SVEventLst &ev, const double RaioC, const double epslon, std::
 
 extern "C" {
 
-  void SRspacetime(double *x, double *y, double *t, long *n, double *radius,
+  void SRspacetime(double *x, double *y, double *t, int *n, double *radius,
 		   double *epsilon, double *areaA, double *areaAcapBk,
 		   int *cusum, double *threshold, 
 		   double *Rarray, int *idxFirstAlarm, int *idxClusterCenter) {
@@ -292,7 +292,7 @@ extern "C" {
   SVEvent e;
   SVEventLst eList;
   unsigned int i;
-  long j;
+  int j;
   //Fill coordinates of event list
   for(j=0;j<*n;j++){
     e.x = x[j];

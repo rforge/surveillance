@@ -7,25 +7,19 @@
 %% $Date: 2010-07-07 00:12:46 +0200 (Wed, 07 Jul 2010) $
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \encoding{latin1}
-\name{iaf}
+\name{twinstim_iaf}
 \alias{siaf.gaussian}
 \alias{siaf.constant}
 \alias{tiaf.exponential}
 \alias{tiaf.constant}
-%Not documented -- internal functions
-\alias{.checkiaf0}
-\alias{.checknargs3}
-\alias{checksiaf}
-\alias{checktiaf}
-\alias{.parseiaf}
 
 \title{
-  Temporal and spatial interaction function for \code{twinstim} fitting.
+  Temporal and spatial interaction function for \code{twinstim} fitting
 }
 \description{
-  Predefined functional forms for the temporal- and spatio interaction
-  function (f and g, respectively) for use in the twinstim model as
-  described in Meyer et al. (2010). 
+  Predefined functional forms for the temporal and spatial interaction
+  functions (f and g, respectively) for use in the \code{twinstim} model as
+  described in Meyer et al. (2011). 
 }
 \usage{
 siaf.gaussian(nTypes, logsd = TRUE, density = FALSE, effRangeMult = 6, validpars = NULL)
@@ -40,8 +34,17 @@ tiaf.constant()
   constraint. Default: \code{TRUE}}
   \item{density}{Normalize expression (\code{TRUE}) or just use Kernel
   of the density (\code{FALSE}).}
-  \item{effRangeMult}{Determines the effective range for numerical integration in terms of multiples of the parameter, i.e. with \code{effRangeMult=6} numerical integration only considers the 6-sigma area around the event instead of the whole observation region W.}
-  \item{validpars}{See \code{\link{twinstim}}. If \code{logsd = FALSE}, you should either use constrained optimisation (L-BFGS-B) or set \code{validpars} to \code{function (pars) pars > 0}.}
+  \item{effRangeMult}{Determines the effective range for numerical integration
+  in terms of multiples of \eqn{\sigma}, i.e. with \code{effRangeMult=6} numerical
+  integration only considers the 6-sigma area around the event instead of the whole
+  observation region W.}
+  \item{validpars}{See \code{\link{twinstim}}. If \code{logsd = FALSE}, you should
+  either use constrained optimisation (L-BFGS-B) or set \code{validpars} to
+  \code{function (pars) pars > 0}.}
+}
+\value{
+A list containing the interaction function, its derivative, ...
+%TODO
 }
 \references{
   A space-time conditional intensity model for invasive meningococcal
@@ -56,14 +59,8 @@ tiaf.constant()
 \author{
   S. Meyer with documentation by M. \enc{Höhle}{Hoehle}.
 }
-%\note{
-%%%  ~~further notes~~
-%}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-See Also as \code{\link{twinstim}}.
+\code{\link{twinstim}}.
 }
 \examples{
 #Finetype indenepdent spatial interaction function used in the twinstim paper
@@ -72,4 +69,5 @@ siaf_log1 <- siaf.gaussian(1, logsd = TRUE, density = FALSE, effRangeMult = 6)
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{models}
+\keyword{utilities}
 

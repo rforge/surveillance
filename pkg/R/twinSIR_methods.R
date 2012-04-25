@@ -16,7 +16,6 @@ coef.twinSIR <- function (object, ...)
 {
     object$coefficients
 }
-coefficients.twinSIR <- coef.twinSIR
 
 # asymptotic variance-covariance matrix (inverse of fisher information matrix)
 vcov.twinSIR <- function (object, ...)
@@ -426,8 +425,9 @@ profile.twinSIR <- function (fitted, profile, alpha = 0.05,
 ######################################################################
 
 
-residuals.twinSIR <- function(object, plot=TRUE, ...) {
-   #Extract parameters
+residuals.twinSIR <- function(object, plot=TRUE, ...)
+{
+  #Extract parameters
   theta.hat <- coef(object)
 
   #Extract event and stop-times
@@ -438,7 +438,6 @@ residuals.twinSIR <- function(object, plot=TRUE, ...) {
   #Dimensions and zero vector (in case we need it)
   nTimes <- nrow(object$model$X)
   zerovec <- numeric(nTimes)
-  tau <- numeric(length(eventTimes))
 
   # Extract the fitted model params from theta
   px <- ncol(object$model$X)
@@ -467,49 +466,19 @@ residuals.twinSIR <- function(object, plot=TRUE, ...) {
   #Transform to uniform variable
   Y <- diff(tau) # Y <- diff(c(0,tau))
   U <- sort(1-exp(-Y))
-  n <- length(U)
-
-  #Helper function to invert KS test
-  f <- function(x,p) {
-    STATISTIC <- x
-    1 - .C("pkolmogorov2x", p = as.double(STATISTIC), as.integer(n), PACKAGE = "stats")$p - p
-  }
-
-  #Test inversion
-  D95 <- uniroot(f,lower=0,upper=1.3,p=0.05)$root
-  D99 <- uniroot(f,lower=0,upper=1.3,p=0.01)$root
-
-  #Small helper function to invert the K-S test
-  f <- function(x,p) {
-    STATISTIC <- x
-    1 - .C("pkolmogorov2x", p = as.double(STATISTIC), as.integer(n), PACKAGE = "stats")$p - p
-  }
-
-  #Small helper function for plotting a straight line
-  myabline <- function(a,b,x.grid,...) {
-    lines(x.grid, a + b * x.grid, ...)
-  }
-
-  #Kolmogorov-Smirnov error bounds
-  D95 <- uniroot(f,lower=0,upper=1.3,p=0.05)$root
-  D99 <- uniroot(f,lower=0,upper=1.3,p=0.01)$root
 
   #Calculate KS test
-  ks <- ks.test(tau,"punif",0,max(tau),exact=TRUE,alternative="two.sided")
+  ks <- stats::ks.test(U,"punif",exact=TRUE,alternative="two.sided")
 
-  #Ready for plotting#
-  if (plot) {
-    #Figure 10 in Ogata (1988)
-    plot(U, ecdf(U)(U),type="s",xlab=expression(u[(i)]),ylab="Cumulative distribution")
-    rug(U)
-    myabline(a=0,b=1,x.grid=seq(0,1,length=1000),col=1,lwd=2)
-    myabline(a=D95,b=1,x.grid=seq(0,1,length=1000),col=1,lty=2)
-    myabline(a=-D95,b=1,x.grid=seq(0,1,length=1000),col=1,lty=2)
-    myabline(a=D99,b=1,x.grid=seq(0,1,length=1000),col=1,lty=2)
-    myabline(a=-D99,b=1,x.grid=seq(0,1,length=1000),col=1,lty=2)
-  }
+  #return value
+  ret <- list(tau=tau, U=U, ks=ks)
   
-  #Done
-  invisible(list(tau=tau,ks=ks,U=U,D95=D95,D99=D99))
+  #Ready for plotting
+  if (plot) {
+    ks.plot.unif(U, ...)
+    invisible(ret)
+  } else {
+    ret
+  }
 }
 

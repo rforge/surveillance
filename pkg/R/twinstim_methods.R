@@ -161,7 +161,6 @@ print.summary.twinstim <- function (x,
 
 toLatex.summary.twinstim <- function (object, digits = max(3, getOption("digits") - 3), align = "rrrrr", withAIC = TRUE, ...)
 {
-library("xtable")
 ret <- capture.output({
     cat("\\begin{tabular}{", align, "}\n\\hline\n", sep="")
     cat(" & Estimate & Std. Error & $z$ value & $\\P(|Z|>|z|)$ \\\\\n\\hline\n\\hline\n")
@@ -181,7 +180,7 @@ ret <- capture.output({
             tab2 <- as.data.frame(lapply(tab2[,-1], function(x) paste("$",x,"$",sep="")))
             rownames(tab2) <- parnames
             if (length(naps <- grep("e\\.[st]iaf", parnames))) tab2[naps, 3:4] <- ""  # z-value and p-value for siaf and tiaf are NA
-            print(xtable(tab2), only.contents = TRUE, include.colnames = FALSE, sanitize.text.function = identity, hline.after = NULL)
+            print(xtable::xtable(tab2), only.contents = TRUE, include.colnames = FALSE, sanitize.text.function = identity, hline.after = NULL)
             cat("\\hline\n")
         }
     }
@@ -303,55 +302,36 @@ R0.twinstim <- function (object, newevents, dimyx = spatstat.options("npixel"), 
 # Plot Kolmogorov-Smirnov residual plot
 #
 # Parameters:
-#  m - a fitted twinstim model
+#  object - a fitted twinstim model
 #
 # Draws the transformed residuals together with backtransformed
 # 95% Kolmogorov-Smirnov error bounds.
 ######################################################################
 
-residuals.twinstim <- function(object,plot=TRUE,...) {
+residuals.twinstim <- function(object, plot = TRUE, ...)
+{
+  #cumulative intensities
   tau <- object$tau
-  n <- length(tau)
 
   #Transform to uniform variable
   Y <- diff(tau) # Y <- diff(c(0,tau))
   U <- sort(1-exp(-Y))
 
-  #Helper function to invert KS test. pkolmogorov2x is the CDF of
-  #the Kolmogorov test statistic
-  f <- function(x,p) {
-    1 - .C("pkolmogorov2x", p = as.double(x), as.integer(n), PACKAGE = "stats")$p - p
-  }
-
-  #Small helper function to draw a line
-  myabline <- function(a,b,x.grid,...) {
-    lines(x.grid, a + b * x.grid, ...)
-  }
-
-  #Test inversion
-  D95 <- uniroot(f,lower=0,upper=0.1,p=0.05)$root
-  D99 <- uniroot(f,lower=0,upper=0.1,p=0.01)$root
-
+  #Calculate KS test
+  ks <- stats::ks.test(U,"punif",exact=TRUE,alternative="two.sided")
+  
+  #return value
+  ret <- list(tau=tau, U=U, ks=ks)
+  
+  #Ready for plotting
   if (plot) {
-    #Figure 10 in Ogata (1988)
-    #Ready for plotting, but don't produce the plot yet, just set up the
-    #scene
-    plot(U, ecdf(U)(U),xlab=expression(u[i]),ylab="Cumulative distribution",type="n")
-    rug(U)
-    col <- "gray"
-    myabline(a=0,b=1,x.grid=seq(0,1,length=1000),col=col,lwd=2)
-    lines(U, ecdf(U)(U),type="s")
-
-    myabline(a=D95,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
-    myabline(a=-D95,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
-    #myabline(a=D99,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
-    #myabline(a=-D99,b=1,x.grid=seq(0,1,length=1000),col=col,lty=2)
-    legend(x="topleft",lty=2,col=col,"95% KS error bounds")
-    #Done
+    ks.plot.unif(U, ...)
+    invisible(ret)
+  } else {
+    ret
   }
-
-  invisible(list(tau=tau,U=U,D95=D95,D99=D99))
 }
+
 
 ######################################################################
 # Function to compute estimated and profile likelihood based

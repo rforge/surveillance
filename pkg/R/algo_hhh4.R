@@ -499,7 +499,7 @@ ri <- function(type=c("iid","car")[1],
 
 # check specification of formula
 checkFormula <- function(f, env, component){
-  term <- terms.formula(f, special=c("fe","ri"))
+  term <- terms.formula(f, specials=c("fe","ri"))
   # check if there is an overall intercept
   intercept.all <- attr(term, "intercept") == 1
   
@@ -2370,7 +2370,7 @@ plot.ah4 <- function(x,i=1,ylim=NULL, ylab="No. infected",title=NULL,m=NULL,xlab
 
    start <- x$stsObj@start
    start[2] <-  start[2]+1
-  plot(ts(obs,freq=x$stsObj@freq,start=start),ylim=max,ylab=ylab,type="n",las=1,xlab=xlab)
+  plot(ts(obs,frequency=x$stsObj@freq,start=start),ylim=max,ylab=ylab,type="n",las=1,xlab=xlab)
   title(main=title,line=0.5)
 
   if(is.null(m))

@@ -1,9 +1,8 @@
 \name{twinstim_epidataCS_animate}
 \alias{animate.epidataCS}
-\alias{animate.summary.epidataCS}
 
 \title{
-Spatio-Temporal animation of an continuous-time continuous-space epidemic
+Spatio-Temporal Animation of a Continuous-Time Continuous-Space Epidemic
 }
 
 \description{
@@ -11,7 +10,9 @@ Spatio-Temporal animation of an continuous-time continuous-space epidemic
   class \code{"epidataCS"}.  There are two types of animation, see argument 
   \code{time.spacing}.  Besides the direct plotting in the \R session, it is 
   also possible to generate a sequence of graphics files to create animations 
-  outside \R.
+  outside \R.  The function works in the framework of the contributed \R package
+  \pkg{animation} and respects the \code{\link[animation]{ani.options}}
+  \code{"interval"} and \code{"nmax"}.
 }
 
 \usage{
@@ -88,7 +89,7 @@ Sebastian Meyer, Documentation by Michael H\enc{ö}{oe}hle
 \code{\link{plot.epidataCS}} for plotting the evolution of an epidemic by
 the numbers of susceptible, infectious and removed individuals.
 
-%The contributed \R package \code{animation}.
+The contributed \R package \pkg{animation}.
 }
 
 \examples{

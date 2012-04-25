@@ -550,6 +550,10 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
 }
 
 
+### We define no plot-method for simEpidata (as a wrapper for intensityPlot),
+### because we want plot(simEpidataObject) to use the inherited method plot.epidata
+### which shows the evolution of the numbers of individuals in states S, I, and R
+
 
 ################################################################################
 # A 'simulate' method for objects of class "twinSIR".

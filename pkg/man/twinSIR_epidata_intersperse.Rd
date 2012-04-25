@@ -2,7 +2,7 @@
 \alias{intersperse}
 
 \title{
-Impute Blocks for Extra Stops in "epidata" Objects
+Impute Blocks for Extra Stops in \code{"epidata"} Objects
 }
 
 \description{

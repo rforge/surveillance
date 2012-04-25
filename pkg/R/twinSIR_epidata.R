@@ -24,8 +24,9 @@
 # i.e. individuals will be removed and become susceptible directly afterwards
 ################################################################################
 
-as.epidata <- function(data, id.col, start.col, stop.col, atRiskY.col,
-    event.col, Revent.col, coords.cols, f = list())
+# default method (original data in a data.frame)
+as.epidata.default <- function(data, id.col, start.col, stop.col, atRiskY.col,
+    event.col, Revent.col, coords.cols, f = list(), ...)
 {
     cl <- match.call()
     

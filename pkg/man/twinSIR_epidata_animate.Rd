@@ -129,7 +129,7 @@ Sebastian Meyer
 \code{\link{plot.epidata}} for plotting the evolution of an epidemic by
 the numbers of susceptible, infectious and removed individuals.
 
-%The contributed \R package \code{animation}.
+%The contributed \R package \pkg{animation}.
 }
 
 \examples{

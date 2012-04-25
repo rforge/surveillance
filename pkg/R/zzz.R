@@ -13,6 +13,7 @@
   #data("hypGeomSmall",package=pkgname)
 
   # <- those data sets should not be loaded into .GlobalEnv and be visible to the user!
+  # moved CIdata to (internal) sysdata
 }
 
 .onAttach <- function(libname, pkgname)
@@ -31,13 +32,23 @@
 }
 
 
+
 ################################################################################
-# Little helper function checking if its argument is scalar,
-# i.e. a numeric vector of length 1.
+# Little helper functions
 ################################################################################
+
+
+### checking if x is scalar, i.e. a numeric vector of length 1.
 
 isScalar <- function (x) {
     length(x) == 1L && is.vector(x, mode = "numeric")
 }
 
+
+### returns the dot/scalar product of two vectors
+
+dotprod <- function (x,y)
+{
+    sum(x*y)
+}
 

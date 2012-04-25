@@ -6,26 +6,14 @@
 \encoding{latin1}
 \name{twinstim_epidataCS}
 \alias{as.epidataCS} 
-\alias{as.epidata.epidataCS}
 \alias{print.epidataCS}
 \alias{[.epidataCS}
 \alias{epidataCS}
 \alias{update.epidataCS}
+\alias{summary.epidataCS}
 \title{
-  Class for Representing Space-Time Process Data Continuous in Space and
-  Continuous in Time 
+  Class for Representing Continuous Space-Time Point Process Data
 }
-
-%\name{as.epidataCS}
-%\alias{as.epidataCS}
-%\alias{checkEvents}
-%\alias{checkstgrid}
-%\alias{.influenceRegions}
-
-%- Also NEED an '\alias' for EACH other topic documented here.
-%\title{
-%  Create objects representing spatio-temporal data for analysis with twinstim.
-%}
 
 \description{
   Data structure for (c)ontinuous (s)patio-temporal event data, typically
@@ -95,7 +83,7 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes), nCircle2Poly = 32L)
     An object of class \code{SpatialPolygons} indicating the observation
     region. Must have same \code{proj4string} as \code{events} and all
     events must be within W.  The function \code{\link{simplify.owin}} from the
-    package \bold{spatstat} may be useful if polygonal operations take too long
+    package \pkg{spatstat} may be useful if polygonal operations take too long
     or memory is limited.
   }
   \item{qmatrix}{

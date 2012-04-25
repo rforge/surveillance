@@ -40,7 +40,7 @@ int CalculaLambda(SVEventLst &ev, const double RaioC, const double epslon,
 
 
 // Hoehle wrapper function to create SVEvent list
-//void SRspacetime(double *x, double *y, double *t, long *n, double *radius, double *epsilon, double *Rarray);
+//void SRspacetime(double *x, double *y, double *t, int *n, double *radius, double *epsilon, double *Rarray);
 
 
 #endif
