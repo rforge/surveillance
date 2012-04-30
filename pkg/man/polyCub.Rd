@@ -1,3 +1,4 @@
+\encoding{latin1}
 \name{polyCub}
 \alias{polyCub}
 \alias{polyCub.midpoint}
@@ -103,8 +104,8 @@ Abramowitz, M. & Stegun, I. A. (1970). Handbook of Mathematical Functions with F
 Graphs, and Mathematical Tables (9th ed.). New York: Dover Publications.
 
 Meyer, S. (2010): Spatio-Temporal Infectious Disease Epidemiology based
-  on Point Processes. Master Thesis, Ludwig-Maximilians-\enc{UniversitÃ¤t}{Universitaet}
-  MÃ¼nchen. Available as http://epub.ub.uni-muenchen.de/11703/
+  on Point Processes. Master Thesis, Ludwig-Maximilians-Universit\enc{ä}{ae}t
+  München. Available as http://epub.ub.uni-muenchen.de/11703/
 
 Sommariva, A. & Vianello, M. (2007): Product Gauss cubature over polygons
   based on Green's integration formula. Bit Numerical Mathematics, 47 (2), 441-453.

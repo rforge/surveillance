@@ -1,3 +1,4 @@
+\encoding{latin1}
 \name{twinstim_epidataCS_animate}
 \alias{animate.epidataCS}
 
@@ -81,7 +82,7 @@ Spatio-Temporal Animation of a Continuous-Time Continuous-Space Epidemic
 %}
 
 \author{
-Sebastian Meyer, Documentation by Michael H\enc{Ã¶}{oe}hle
+Sebastian Meyer, Documentation by Michael H\enc{ö}{oe}hle
 }
 
 \seealso{

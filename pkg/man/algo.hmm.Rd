@@ -1,3 +1,4 @@
+\encoding{latin1}
 \name{algo.hmm}
 \alias{algo.hmm}
 \title{Hidden Markov Model (HMM) method}
@@ -98,7 +99,7 @@
 
 }
 \seealso{\code{\link[msm:msm]{msm}}}
-\author{M. \enc{Hï¿½hle}{Hoehle}}
+\author{M. \enc{Höhle}{Hoehle}}
 \examples{
 \dontrun{
 set.seed(123)

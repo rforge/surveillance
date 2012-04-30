@@ -1,3 +1,4 @@
+\encoding{latin1}
 \name{R0}
 \alias{R0}
 \alias{R0.twinstim}
@@ -38,7 +39,7 @@ where \eqn{b(\bold{0},\delta)} denotes the disc centred at (0,0)' with radius \e
 numeric vector of estimated basic reproduction numbers from the fitted model \code{object} corresponding to the rows of \code{newevents}.
 }
 \references{
-  Meyer, S., Elias, J. and H\enc{Ã¶}{oe}hle, M. (2011). A Space-Time Conditional
+  Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2011). A Space-Time Conditional
   Intensity Model for Invasive Meningococcal Disease Occurrence.
   Biometrics, in press. DOI: 10.1111/j.1541-0420.2011.01684.x
   A technical report is available as: http://epub.ub.uni-muenchen.de/11898/

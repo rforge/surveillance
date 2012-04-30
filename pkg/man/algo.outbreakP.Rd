@@ -1,3 +1,4 @@
+\encoding{latin1}
 \name{algo.outbreakP}
 \alias{algo.outbreakP}
 \alias{calc.outbreakP.statistic}
@@ -73,7 +74,7 @@
 }
 \source{
  The code is an extended R port of the Java code by Marianne
- \enc{FrisÃ©n}{Frisen} and Linus \enc{SchiÃ¶ler}{Schioeler} from the
+ \enc{Frisén}{Frisen} and Linus \enc{Schiöler}{Schioeler} from the
  CASE project available under the GNU GPL License v3. See
  https://smisvn.smi.se/case/ for further details on the CASE
  project. A manual on how to use an Excel implementation of the method
@@ -81,13 +82,13 @@
 
  The R code contains e.g. the search for NNBA (see details).
 }
-\author{M. \enc{HÃ¶hle}{Hoehle} -- based on Java code by Frisen and \enc{SchiÃ¶ler}{Schioeler}}
+\author{M. \enc{Höhle}{Hoehle} -- based on Java code by Frisen and \enc{Schiöler}{Schioeler}}
 \references{
-\enc{FrisÃ©n}{Frisen}, Andersson and \enc{SchiÃ¶ler}{Schioeler} (2009), Robust
+\enc{Frisén}{Frisen}, Andersson and \enc{Schiöler}{Schioeler} (2009), Robust
 outbreak surveillance of epidemics in Sweden, Statistics in
 Medicine, 28(3):476-493.
 
-\enc{FrisÃ©n}{Frisen} and Andersson (2009) Semiparametric
+\enc{Frisén}{Frisen} and Andersson (2009) Semiparametric
 Surveillance of Monotonic Changes, Sequential Analysis 28(4):434-454.
 }
 \examples{
