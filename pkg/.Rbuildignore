@@ -12,6 +12,8 @@ perlSourceToGetData/*
 ..Rcheck/*
 .Rd2dvi/*
 surveillance_1*
+surveillance-Ex.R
+sysdata/*
 inst/unitTests/report.*
 inst/unitTests/reportSummary.*
 _res.rc*

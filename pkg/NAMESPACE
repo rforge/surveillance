@@ -19,7 +19,7 @@ importFrom(xtable, xtable)
 
 #importMethodsFrom(stats4, plot)   # import S4-generic
 #<- would be nice, but then gives strange warnings for S3 methods from stats
-#   "Warning: found methods to import for function ‘AIC’ but not the generic itself"
+#   "Warning: found methods to import for function 'AIC' but not the generic itself"
 #   However, we don't need to import it here, because we depend on package sp, which makes plot generic
 
 
@@ -130,6 +130,7 @@ exportPattern("^algo\\.")
 export(compMatrix.writeTable, correct53to52, enlargeData)
 export(sumNeighbours)
 export(makePlot)
+export(estimateGLRNbHook)
 
 export(make.design, meanResponse, loglikelihood)
 

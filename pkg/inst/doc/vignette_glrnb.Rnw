@@ -36,7 +36,7 @@
 
 \title{The function 'algo.glrnb' in the R-Package 'surveillance'}
 \author{
-Valentin Wimmer$^{(1,2)}$\thanks{Author of correspondence: Email: \texttt{Valentin.Wimmer@gmx.de}}$\>\>$ and Michael Höhle$^{(1,2)}$ \\
+Valentin Wimmer$^{(1,2)}$\thanks{Author of correspondence: Email: \texttt{Valentin.Wimmer@gmx.de}}$\>\>$ and Michael H\"{o}hle$^{(1,2)}$ \\
 (1) Department of Statistics\\
 University of Munich, Germany\\
 (2) MC-Health - Munich Center of Health Sciences
