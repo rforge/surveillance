@@ -68,13 +68,13 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
   #Create an sts object containing the observed number of counts until s
 #  observed <- table(factor(as.character(D.sub[,dEventCol]), levels=as.character(dateRange)))
 #  sts <- new("sts",epoch=as.numeric(dateRange),observed=matrix(observed,ncol=1),epochAsDate=TRUE,freq=365)
-  sts <- cases2sts(D.sub,dEventCol,aggregate.by=aggregate.by,dRange=dateRange)
+  sts <- linelist2sts(D.sub,dEventCol,aggregate.by=aggregate.by,dRange=dateRange)
   sts <- as(sts,"stsBP")
 
   #Create an object containing the "truth" based on D
 #  observed <- table(factor(as.character(D[,dEventCol]), levels=as.character(dateRange)))
 #  sts.truth <- new("sts",epoch=as.numeric(dateRange),observed=matrix(observed,ncol=1),epochAsDate=TRUE,freq=365)
-  sts.truth <- cases2sts(D,dEventCol,aggregate.by=aggregate.by,dRange=dateRange)
+  sts.truth <- linelist2sts(D,dEventCol,aggregate.by=aggregate.by,dRange=dateRange)
   
   
   #Estimation function for the delay. Standard procedure is to reduce
@@ -181,7 +181,11 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
 
     #Calculate pi estimates (fixed & dynamic)
     pits <- F(diffsti)
-
+    #Safeguard in case pits==0.
+    if (pits==0) {
+      stop(paste(dateRange[i],": Proportion of reported (pits) is zero!"))
+    }
+    
     #List of casts containing probability distributions
     Ps <- list()
     
@@ -250,8 +254,14 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
       }
     } #end if control$score
 
+    ##############################
     #Add casts & ci to stsBP slots
-    sts@upperbound[i,] <- median(yt.support[which.max( cumsum(Ps[[1]])>0.5)])
+    ##############################
+    
+    #Let the cast be the median of the values. In case this value is not unique (??) then take the first value
+    sts@upperbound[i,] <- yt.support[which.max( cumsum(Ps[[1]])>0.5)][1]
+    #Set the prediction interval to the limits of a symmetric 95% equal
+    #tailed prediction interval.
     sts@ci[i,,] <- yt.support[c(which.max(cumsum(Ps[[1]]) > alpha/2),which.max(cumsum(Ps[[1]]) > 1-alpha/2))]
     
 

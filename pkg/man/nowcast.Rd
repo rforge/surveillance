@@ -58,7 +58,7 @@ nowcast(s, t, D, dEventCol = "dHospital", dReportCol = "dReport",
   }
   \item{aggregate.by}{Time scale used for the temporal aggregation of
   the records in the data \code{D}. See 
-  \link{cases2sts} and \link{seq.Date} for further information.}
+  \link{linelist2sts} and \link{seq.Date} for further information.}
   \item{control}{A list with named arguments controlling the
     functionality of the nowcasting.
     \describe{

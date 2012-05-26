@@ -1,10 +1,10 @@
 \encoding{latin1}
-\name{cases2sts}
-\alias{cases2sts}
+\name{linelist2sts}
+\alias{linelist2sts}
 %Internal functions
 
 \title{
-  Convert case information based on dates to an aggregated time series
+  Convert individual case information based on dates into an aggregated time series
 }
 
 \description{
@@ -13,17 +13,17 @@
 }
 
 \usage{
-cases2sts(cases,dateCol,aggregate.by="1 week",dRange=NULL,
+linelist2sts(linelist,dateCol,aggregate.by="1 week",dRange=NULL,
             startYearFormat=switch(aggregate.by,"1 day"="\%V","7 day"="\%V","1 week"="\%V","1 month"="\%Y","3 month"="\%Y"),
            startEpochFormat=switch(aggregate.by,"1 day"="\%j","7 day"="\%V","1 week"="\%V","1 month"="\%m","3 month"="\%Q")
 )
 }
 \arguments{
-  \item{cases}{
+  \item{linelist}{
     A \code{data.frame} containing the line list of cases.
   }
   \item{dateCol}{A character string stating the column name in
-    \code{cases} which contain the case data which are to be
+    \code{linelist} which contain the case data which are to be
     temporally aggregated.
   }
   \item{aggregate.by}{Temporal aggregation level given as a string, see
@@ -58,7 +58,7 @@ Michael \enc{Höhle}{Hoehle}
 }
 
 \note{
-  This implementation is still experimental.
+  This implementation is still experimental, changes might occur in the future.
 }
 
 \seealso{
@@ -69,7 +69,7 @@ Michael \enc{Höhle}{Hoehle}
 #Load simulated outbreak data. 
 D <- read.table("http://www.stat.uni-muenchen.de/~hoehle/teaching/moid2011/tutorials/cast-backnow/outbreak.txt",header=TRUE,colClasses=c("integer",rep("Date",3)))
 
-sts <- cases2sts(D, dateCol="dOnset", aggregate.by="1 day")
+sts <- linelist2sts(D, dateCol="dOnset", aggregate.by="1 day")
 plot(sts,xaxis.years=FALSE,legend.opts=NULL,xlab="time (days)")
 
 }

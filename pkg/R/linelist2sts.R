@@ -5,7 +5,7 @@
 # Note: This function is experimental
 #
 # Parameters:
-#  cases - a data frame containing individual case information per line
+#  linelist - a data frame containing individual case information, one per line
 #  dateCol - a character string denoting the column name in case containing
 #            the relevant date variable to aggregate
 #  aggregate.by - aggregation block length given as a string compatible with
@@ -15,13 +15,13 @@
 # Date LaMo: 06 Feb 2012
 ######################################################################
 
-cases2sts <- function(cases,dateCol,aggregate.by="1 week",dRange=NULL,
+linelist2sts <- function(linelist,dateCol,aggregate.by="1 week",dRange=NULL,
                       startYearFormat=switch(aggregate.by,"1 day"="%V","7 day"="%V","1 week"="%V","1 month"="%Y","3 month"="%Y"),
                       startEpochFormat=switch(aggregate.by,"1 day"="%j","7 day"="%V","1 week"="%V","1 month"="%m","3 month"="%Q")
                       ) {
  #by <- match.arg(by,c("1 day","1 week","1 month","1 year")
   if (is.null(dRange)) {
-    dRange <- range(cases[,dateCol],na.rm=TRUE)
+    dRange <- range(linelist[,dateCol],na.rm=TRUE)
   }
 
   ## #Make sure that if weeks we span the entire data set.
@@ -39,7 +39,7 @@ cases2sts <- function(cases,dateCol,aggregate.by="1 week",dRange=NULL,
 
   #Make a table containing the specific number of cases. Note that this
   #needs to occur using a cut statement
-  lvl <- cut(cases[,dateCol], breaks=dates,right=FALSE)
+  lvl <- cut(linelist[,dateCol], breaks=dates,right=FALSE)
 
   observed <- table(lvl)
   epoch <- as.Date(names(observed))
