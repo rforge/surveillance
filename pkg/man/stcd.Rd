@@ -30,7 +30,7 @@ stcd(x, y,t,radius,epsilon,areaA, areaAcapBk, threshold, cusum=FALSE)
       \Lambda_{k,n}}, where \eqn{\Lambda_{k,n}} denotes the likelihood
     ratio between the in-control and out-of control model. If
     \code{TRUE}, CUSUM test statistic is 
-    used instead. Here, \eqn{R_n = \max_{1\leq k \leq n}
+    used instead. Here, \deqn{R_n = \max_{1\leq k \leq n}
       \Lambda_{k,n}}. Note that this has implications on what threshold
     will sound the alarm (CUSUM threshold needs to be smaller).}
 }

@@ -122,7 +122,9 @@ Michael \enc{Höhle}{Hoehle}
 
 \examples{
 #Load simulated outbreak data.
-D <- read.table("http://www.stat.uni-muenchen.de/~hoehle/teaching/moid2011/tutorials/cast-backnow/outbreak.txt",header=TRUE,colClasses=c("integer",rep("Date",3)))
+url <- paste("http://www.stat.uni-muenchen.de/~hoehle/",
+             "teaching/moid2011/tutorials/cast-backnow/outbreak.txt",sep="")
+D <- read.table(url,header=TRUE,colClasses=c("integer",rep("Date",3)))
  
 s <- as.Date("2011-06-02") ;
 k <- 10 ; l <- 3
@@ -134,7 +136,9 @@ nc <- nowcast(s=s,t=t,D=D,dEventCol="dHospital",dReportCol="dRegister",
               method="bayes.nb",aggregate.by="1 day",control=list(dRange=dRange))
 
 #Show result
-plot(nc,xaxis.years=FALSE,dx.upperbound=0,legend=NULL,lty=c(1,1,1),lwd=c(1,1,2),ylab="Cases",xlab="Time (days)",main="",ylim=c(0,max(nc@ci,na.rm=TRUE)))
+plot(nc,xaxis.years=FALSE,dx.upperbound=0,legend=NULL,lty=c(1,1,1),
+        lwd=c(1,1,2),ylab="Cases",xlab="Time (days)",main="",
+        ylim=c(0,max(nc@ci,na.rm=TRUE)))
 idx <- max(which(!is.na(upperbound(nc))))
 lines( c(idx-0.5,idx+0.5), rep(upperbound(nc)[idx,],2),lwd=2,col="blue")
   

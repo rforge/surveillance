@@ -14,8 +14,10 @@
 
 \usage{
 linelist2sts(linelist,dateCol,aggregate.by="1 week",dRange=NULL,
-            startYearFormat=switch(aggregate.by,"1 day"="\%V","7 day"="\%V","1 week"="\%V","1 month"="\%Y","3 month"="\%Y"),
-           startEpochFormat=switch(aggregate.by,"1 day"="\%j","7 day"="\%V","1 week"="\%V","1 month"="\%m","3 month"="\%Q")
+            startYearFormat=switch(aggregate.by,
+"1 day"="\%V","7 day"="\%V","1 week"="\%V","1 month"="\%Y","3 month"="\%Y"),
+           startEpochFormat=switch(aggregate.by,
+"1 day"="\%j","7 day"="\%V","1 week"="\%V","1 month"="\%m","3 month"="\%Q")
 )
 }
 \arguments{
@@ -66,10 +68,15 @@ Michael \enc{Höhle}{Hoehle}
 }
 
 \examples{
-#Load simulated outbreak data. 
-D <- read.table("http://www.stat.uni-muenchen.de/~hoehle/teaching/moid2011/tutorials/cast-backnow/outbreak.txt",header=TRUE,colClasses=c("integer",rep("Date",3)))
+#Load simulated outbreak data.
+url <- paste("http://www.stat.uni-muenchen.de/~hoehle/",
+             "teaching/moid2011/tutorials/cast-backnow/outbreak.txt",sep="")
+D <- read.table(url,header=TRUE,colClasses=c("integer",rep("Date",3)))
 
+#Convert line list to an sts object
 sts <- linelist2sts(D, dateCol="dOnset", aggregate.by="1 day")
+
+#Plot the result
 plot(sts,xaxis.years=FALSE,legend.opts=NULL,xlab="time (days)")
 
 }
