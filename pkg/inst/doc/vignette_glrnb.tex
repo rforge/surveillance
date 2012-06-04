@@ -36,7 +36,7 @@
 
 \title{The function 'algo.glrnb' in the R-Package 'surveillance'}
 \author{
-Valentin Wimmer$^{(1,2)}$\thanks{Author of correspondence: Email: \texttt{Valentin.Wimmer@gmx.de}}$\>\>$ and Michael Höhle$^{(1,2)}$ \\
+Valentin Wimmer$^{(1,2)}$\thanks{Author of correspondence: Email: \texttt{Valentin.Wimmer@gmx.de}}$\>\>$ and Michael H\"{o}hle$^{(1,2)}$ \\
 (1) Department of Statistics\\
 University of Munich, Germany\\
 (2) MC-Health - Munich Center of Health Sciences
@@ -285,10 +285,11 @@ function ()
         formula <- paste(formula, "+cos(2*", s, "*pi/p*t)+ sin(2*", 
             s, "*pi/p*t)", sep = "")
     }
-    m <- eval(substitute(glm.nb(form, data = data), list(form = as.formula(formula))))
+    m <- eval(substitute(MASS::glm.nb(form, data = data), list(form = as.formula(formula))))
     return(list(mod = m, pred = as.numeric(predict(m, newdata = data.frame(t = range), 
         type = "response"))))
 }
+<environment: namespace:surveillance>
 \end{Soutput}
 \end{Schunk}
 

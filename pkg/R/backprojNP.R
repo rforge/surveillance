@@ -164,7 +164,7 @@ em.step.becker <- function(lambda.old, Y, dincu, pincu, k, incu.pmf, eq3a.method
 #
 # Parameters:
 #  sts - sts object with the observed incidence as "observed" slot
-#  incu.pmf.vec - incubation time pmf as a vector with index 0,..,d_max. Please
+#  incu.pmf - incubation time pmf as a vector with index 0,..,d_max. Please
 #                 note that the support includes zero!
 #  k - smoothing parameter for the EMS algorithm
 #  eps - relative convergence criteration
@@ -179,41 +179,15 @@ em.step.becker <- function(lambda.old, Y, dincu, pincu, k, incu.pmf, eq3a.method
 ######################################################################
 
 
-backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=FALSE,lambda0=NULL,eq3a.method=c("R","C"),hookFun=function(stsbp) {}, ...) {
-
-  #Backprojection only works for univariate time series
-  if (ncol(sts)>1) {
-    warning("Multivariate time series: Backprojection uses same incubation time distribution and eps for the individual time series.")
-  }
+backprojNP.fit <- function(sts, incu.pmf,k=2,eps=1e-5,iter.max=250,verbose=FALSE,lambda0=NULL,eq3a.method=c("R","C"),hookFun=function(stsbp) {}, ...) {
 
   #Determine method
   eq3a.method <- match.arg(eq3a.method, c("R","C"))
 
-  #Create incubation time distribution vectors
-  inc.pmf <- incu.pmf.vec
-  inc.cdf <- cumsum(inc.pmf)
-  
-  #Create wrapper functions for the PMF and CDF based on the vector
-  #However: The function uses the global variable inc.pmf which
-  #apparently is dirty coding. But how to define this function
-  #in an environment where inc.pmf is present?
-  dincu <- function(x) {
-    notInSupport <- x<0 | x>=length(inc.pmf)
-    #Give index -1 to invalid queries
-    x[notInSupport] <- -1
-    return(c(0,inc.pmf)[x+2])
-  }
-
-  pincu <- function(x) {
-    x[x<0] <- -1
-    x[x>=length(inc.cdf)] <- length(inc.cdf)-1
-    return(c(0,inc.cdf)[x+2])
-  }
-
-  
   #Define object to return
   lambda.hat <- matrix(NA,ncol=ncol(sts),nrow=nrow(sts))
-  
+
+  #Loop over all series
   for (j in 1:ncol(sts)) {
     #Inform (if requested) what series we are looking at
     if ((ncol(sts)>1) & verbose) {
@@ -225,23 +199,49 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
 
     #If default behaviour for lambda0 is desired
     if (is.null(lambda0)) {
-      lambda0 <- rep(sum(Y)/length(Y),length(Y))
-    } 
+      lambda0j <- rep(sum(Y)/length(Y),length(Y))
+    } else {
+      lambda0j <- lambda0[,j]
+    }
+
+    #Create incubation time distribution vectors for the j'th series
+    inc.pmf <- as.numeric(incu.pmf[,j])
+    inc.cdf <- cumsum(inc.pmf)
   
+    #Create wrapper functions for the PMF and CDF based on the vector.
+    #These function will be used in the R version of eq3a.
+    #ToDo: The function uses the global variable inc.pmf which
+    #definitely is dirty coding. How to define this function
+    #in an environment where inc.pmf is present?
+    dincu <- function(x) {
+      notInSupport <- x<0 | x>=length(inc.pmf)
+      #Give index -1 to invalid queries
+      x[notInSupport] <- -1
+      return(c(0,inc.pmf)[x+2])
+    }
+    #Cumulative distribution function. Uses global var "inc.cdf"
+    pincu <- function(x) {
+      x[x<0] <- -1
+      x[x>=length(inc.cdf)] <- length(inc.cdf)-1
+      return(c(0,inc.cdf)[x+2])
+    }
+   
     #Iteration counter and convergence indicator
     i <- 0
     stop <- FALSE
-    lambda <- lambda0
+    lambda <- lambda0j
   
     #Loop until stop 
     while (!stop) {
       #Add to counter
       i <- i+1
       lambda.i <- lambda
-      lambda <- em.step.becker(lambda.old=lambda.i,Y=Y,dincu=dincu,pincu=pincu,k=k, incu.pmf=incu.pmf.vec, eq3a.method=eq3a.method)
+      #Perform one step
+      lambda <- em.step.becker(lambda.old=lambda.i,Y=Y,dincu=dincu,pincu=pincu,k=k, incu.pmf=inc.pmf, eq3a.method=eq3a.method)
       
       #check stop
-      #In original paper, but funny as - and + deviations cancel.
+      #In original paper the expression to do so appears funny since
+      #- and + deviations cancel. More realistic:
       #criterion <- abs(sum(res$lambda) - sum(lambda.i))/sum(lambda.i)
       criterion <- sqrt(sum((lambda- lambda.i)^2))/sqrt(sum(lambda.i^2))
 
@@ -251,7 +251,7 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
       #Check whether to stop
       stop <- criterion < eps | (i>iter.max)
       
-      #Call Hook
+      #Call hook function
       stsj <- sts[,j]
       upperbound(stsj) <- matrix(lambda,ncol=1)
       hookFun(stsj, ...)
@@ -278,7 +278,7 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
 # Parameters:
 #
 #  sts - sts object with the observed incidence as "observed" slot
-#  incu.pmf.vec - incubation time pmf as a vector with index 0,..,d_max. Please
+#  incu.pmf - incubation time pmf as a vector with index 0,..,d_max. Please
 #                 note that the support includes zero!
 #  k - smoothing parameter for the EMS algorithm
 #  eps - relative convergence criteration. If a vector of length two
@@ -298,11 +298,23 @@ backprojNP.fit <- function(sts, incu.pmf.vec,k=2,eps=1e-5,iter.max=250,verbose=F
 #  sts object with upperbound set to the backprojected lambda.
 ######################################################################
 
-backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,2),Tmark=nrow(sts),B=-1,alpha=0.05,verbose=FALSE,lambda0=NULL,eq3a.method=c("R","C"),hookFun=function(stsbp) {}),...) {
+backprojNP <- function(sts, incu.pmf,control=list(k=2,eps=rep(0.005,2),iter.max=rep(250,2),Tmark=nrow(sts),B=-1,alpha=0.05,verbose=FALSE,lambda0=NULL,eq3a.method=c("R","C"),hookFun=function(stsbp) {}),...) {
 
-  #Backprojection only works for univariate time series
+  #Check if backprojection is to be done multivariate time series case.
   if (ncol(sts)>1) {
-    warning("Multivariate time series: Backprojection uses same incubation time distribution and eps for the individual time series. This functionality has not been tested.")
+    warning("Multivariate time series: Backprojection uses same eps for the individual time series.")
+  }
+  #Check if incu.pmf vector fits the dimension of the sts object. If not
+  #either replicate it or throw an error.
+  if (is.matrix(incu.pmf)) {
+    if (!ncol(incu.pmf) == ncol(sts)) {
+      stop("Dimensions of sts object and incu.pmf don't match.")
+    }
+  } else {
+    if (ncol(sts)>1) {
+      warning("Backprojection uses same incubation time distribution for the individual time series.")
+    }
+    incu.pmf <- matrix(incu.pmf,ncol=ncol(sts),dimnames=list(NULL,colnames(sts)))
   }
 
   #Fill control object as appropriate and in sync with the default value
@@ -329,7 +341,7 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
   if (control$verbose) {
     cat("Back-projecting with k=",control$k," to get lambda estimate.\n")
   }
-  stsk <- backprojNP.fit(sts, incu.pmf.vec=incu.pmf.vec,k=control$k,eps=control$eps[2],iter.max=control$iter.max[2],verbose=control$verbose,lambda0=control$lambda0,hookFun=control$hookFun,eq3a.method=control$eq3a.method)
+  stsk <- backprojNP.fit(sts, incu.pmf=incu.pmf,k=control$k,eps=control$eps[2],iter.max=control$iter.max[2],verbose=control$verbose,lambda0=control$lambda0,hookFun=control$hookFun,eq3a.method=control$eq3a.method)
   #Fix control slot
   stsk@control <- control 
 
@@ -344,50 +356,52 @@ backprojNP <- function(sts, incu.pmf.vec,control=list(k=2,eps=rep(0.005,2),iter.
   if (control$verbose) {
     cat("Back-projecting with k=",0," to get lambda estimate for parametric bootstrap.\n")
   }
-  sts0 <- backprojNP.fit(sts, incu.pmf.vec=incu.pmf.vec,k=0,eps=control$eps[1],iter.max=control$iter.max[1],verbose=control$verbose,lambda0=control$lambda0,hookFun=control$hookFun, eq3a.method=control$eq3a.method)
+  sts0 <- backprojNP.fit(sts, incu.pmf=incu.pmf,k=0,eps=control$eps[1],iter.max=control$iter.max[1],verbose=control$verbose,lambda0=control$lambda0,hookFun=control$hookFun, eq3a.method=control$eq3a.method)
 
   ###########################################################################
   #Create bootstrap samples and loop for each sample while storing the result
   ###########################################################################
   sts.boot <- sts0
   #Define object to return
-  lambda <- array(NA,dim=c(ncol(sts),nrow(sts),control$B))
+  lambda <- array(NA,dim=c(nrow(sts),ncol(sts),control$B))
 
   #Define PMF of incubation time which does safe handling of values
   #outside the support of the incubation time.
-  dincu <- function(x) {
-    notInSupport <- x<0 | x>=length(incu.pmf.vec)
+  dincu <- function(x,i) {
+    notInSupport <- x<0 | x>=length(incu.pmf[,i])
     #Give index -1 to invalid queries
     x[notInSupport] <- -1
-    return(c(0,incu.pmf.vec)[x+2])
+    return(c(0,incu.pmf[,i])[x+2])
   }
-
   
   #Loop in order to create the sample
   for (b in 1:control$B) {
     if (control$verbose) { cat("Bootstrap sample ",b,"/",control$B,"\n") }
     
-    #Compute convolution for the mean of the observations (matrix wise)
+    #Compute convolution for the mean of the observations 
     mu <- matrix(0, nrow=nrow(sts0), ncol=ncol(sts0))
-    for (t in 1:nrow(mu)) {
-      for (s in 0:(t-1)) {
-        mu[t,] <- mu[t,,drop=FALSE] + upperbound(sts0)[t-s,,drop=FALSE] * dincu(s)
+    #Perform the convolution for each series
+    for (i in 1:ncol(sts)) {
+      for (t in 1:nrow(mu)) {
+        for (s in 0:(t-1)) {
+          mu[t,i] <- mu[t,i] + upperbound(sts0)[t-s,i] * dincu(s,i)
+        }
       }
     }
     
-    #Create new observations in the observed slot
+    #Create new observations in the observed slot.
     observed(sts.boot) <- matrix(rpois(prod(dim(sts.boot)),lambda=mu),ncol=ncol(sts0))
 
     #Run the backprojection on the bootstrap sample. Use original result
     #as starting value.
-    sts.boot <- backprojNP.fit(sts.boot, incu.pmf.vec=incu.pmf.vec,k=control$k,eps=control$eps[2],iter.max=control$iter.max[2],verbose=control$verbose,lambda0=upperbound(stsk),hookFun=control$hookFun, eq3a.method=control$eq3a.method)
-    #Extract the result
+    sts.boot <- backprojNP.fit(sts.boot, incu.pmf=incu.pmf,k=control$k,eps=control$eps[2],iter.max=control$iter.max[2],verbose=control$verbose,lambda0=upperbound(stsk),hookFun=control$hookFun, eq3a.method=control$eq3a.method)
+    #Extract the result of the b'th backprojection
     lambda[,,b] <- upperbound(sts.boot)
   }
 
   #Compute an equal tailed (1-alpha)*100% confidence intervals based on the
-  #bootstrap samples
-  ci <- t(apply(lambda,MARGIN=c(1,2), quantile, p=c(control$alpha/2,1-control$alpha/2))[,1,])
+  #bootstrap samples. The dimension is (ci.low,ci.high) x time x series
+  ci <- apply(lambda,MARGIN=c(1,2), quantile, p=c(control$alpha/2,1-control$alpha/2)) 
 
   #Convert output to stsBP object and add information to the extra slots
   stsk <- as(stsk,"stsBP")

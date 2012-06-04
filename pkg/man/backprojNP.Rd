@@ -40,7 +40,7 @@
 }
 
 \usage{
-backprojNP(sts, incu.pmf.vec, 
+backprojNP(sts, incu.pmf, 
    control = list(k = 2, 
                   eps = rep(0.005,2), 
                   iter.max=rep(250,2), 
@@ -60,11 +60,17 @@ backprojNP(sts, incu.pmf.vec,
     coerced to that class): contains the observed number of symptom
     onsets as a time series. 
   }
-  \item{incu.pmf.vec}{Probability mass function (PMF) of the incubation
-    time. The PMF is specified as a vector with the value of the PMF
-    evaluated at \eqn{0,...,d_max}{0,...,d_max}, i.e. note that the
+  \item{incu.pmf}{Probability mass function (PMF) of the incubation
+    time. The PMF is specified as a vector or matrix with the value of
+    the PMF evaluated at \eqn{0,...,d_max}{0,...,d_max}, i.e. note that the
     support includes zero. The value of \eqn{d_max}{d_max} is
-    automatically calculated as \code{length(incu.pmf.vec)-1}.
+    automatically calculated as \code{length(incu.pmf)-1} or
+    \code{nrow(incu.pmf)-1}. Note that if the sts object has more
+    than one column, then for the backprojection the incubation time is
+    either recycled for all components or, if it is a matrix with
+    the same number of columns as the sts object, the \eqn{k}{k}'th
+    column of \code{incu.pmf} is used for the backprojection of the
+    \eqn{k}{k}'th series.
   }
   \item{control}{A list with named arguments controlling the
     functionality of the non-parametric back-projection.
@@ -208,10 +214,10 @@ plotIt <- function(cur.sts) {
 #Call non-parametric back-projection function with hook function but
 #without bootstrapped confidence intervals
 bpnp.control <- list(k=0,eps=rep(0.005,2), iter.max=rep(250,2),B=-1,hookFun=plotIt,verbose=TRUE)
-system.time(sts.bp <- backprojNP(sts, incu.pmf.vec=inc.pmf,control=bpnp.control, ylim=c(0,max(X,Y))))
+system.time(sts.bp <- backprojNP(sts, incu.pmf=inc.pmf,control=bpnp.control, ylim=c(0,max(X,Y))))
 
 #Fast C version (use argument: eq3a.method="C")! 
-system.time(sts.bp.fast <- backprojNP(sts, incu.pmf.vec=inc.pmf, control=modifyList(bpnp.control,list(eq3a.method="C")), ylim=c(0,max(X,Y))))
+system.time(sts.bp.fast <- backprojNP(sts, incu.pmf=inc.pmf, control=modifyList(bpnp.control,list(eq3a.method="C")), ylim=c(0,max(X,Y))))
 
 #Check if results are equal.
 all.equal(upperbound(sts.bp),upperbound(sts.bp.fast))
@@ -225,9 +231,9 @@ lines(1:length(Y)+0.2,X,col="red",type="h",lty=2)
 #In practice use a realistic value of B=1000 or more.
 bpnp.control2 <- modifyList(bpnp.control, list(hookFun=NULL,k=2,B=100,eq3a.method="C"))
 \dontrun{
-bpnp.control2 <- modifyList(bpnp.control, list(hookFun=NULL,k=2,B=1000,eq3a.method="C")))
+bpnp.control2 <- modifyList(bpnp.control, list(hookFun=NULL,k=2,B=1000,eq3a.method="C"))
 }
-sts.bp2 <- backprojNP(sts, incu.pmf.vec=inc.pmf, control=bpnp.control2)
+sts.bp2 <- backprojNP(sts, incu.pmf=inc.pmf, control=bpnp.control2)
 
 ######################################################################
 # Plot the result. This is currently a manual routine.
@@ -243,7 +249,7 @@ plot.stsBP <- function(stsBP) {
   plot(upperbound(stsBP),type="n",ylim=c(0,maxy), ylab="Cases",xlab="time")
   if (!all(is.na(stsBP@ci))) {
     polygon( c(1:nrow(stsBP),rev(1:nrow(stsBP))),
-             c(stsBP@ci[,2],rev(stsBP@ci[,1])),col="lightgray")
+             c(stsBP@ci[2,,1],rev(stsBP@ci[1,,1])),col="lightgray")
   }
   lines(upperbound(stsBP),type="l",lwd=2)
   legend(x="topright",c(expression(lambda[t])),lty=c(1),col=c(1),fill=c(NA),border=c(NA),lwd=c(2))
