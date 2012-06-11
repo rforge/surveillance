@@ -226,6 +226,20 @@ all.equal(upperbound(sts.bp),upperbound(sts.bp.fast))
 plot(sts.bp,xaxis.years=FALSE,legend=NULL,lwd=c(1,1,2),lty=c(1,1,1))
 lines(1:length(Y)+0.2,X,col="red",type="h",lty=2)
 
+#Do the convolution for the expectation
+mu <- matrix(0,ncol=ncol(sts.bp),nrow=nrow(sts.bp))
+#Loop over all series
+for (j in 1:ncol(sts.bp)) { 
+  #Loop over all time points
+  for (t in 1:nrow(sts.bp)) {
+    #Convolution, note support of inc.pmf starts at zero (move idx by 1)
+    i <- seq_len(t)
+    mu[t,j] <- sum(inc.pmf[t-i+1] * upperbound(sts.bp)[i,j])
+  }
+}
+#Show the fit
+lines(1:nrow(sts.bp)-0.5,mu[,1],col="green",type="s",lwd=3)
+
 #Non-parametric back-projection including boostrap CIs. B=10 is only
 #used for illustration in the documentation example
 #In practice use a realistic value of B=1000 or more.
