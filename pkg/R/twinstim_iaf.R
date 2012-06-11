@@ -221,7 +221,7 @@ tiaf.constant <- function () {
 # deriv: optional derivative of f with respect to the parameters. Takes the same arguments as f but returns a matrix with as many rows as there were coordinates in the input and npars columns. The derivative is necessary for the score function.
 # Fcircle: optional function for fast calculation of the integral of f over a circle with radius r (first argument). Further arguments like f. It must not be vectorized for model fitting (will be passed single radius and single type).
 # effRange: optional function returning the effective range (domain) of f for the given set of parameters such that the circle with radius effRange contains the numerical essential proportion the integral mass, e.g. function (sigma) 6*sigma. The return value must be a vector of length nTypes (effRange for each type). Must be supplied together with Fcircle.
-# simulate: optional function returning a sample drawn from the spatial kernel (i.e. a two-column matrix of 'n' points). The arguments are 'n' (size of the sample), 'pars' (parameter vector of the spatial kernel), and 'type' (a single type of event being generated).
+# simulate: optional function returning a sample drawn from the spatial kernel (i.e. a two-column matrix of 'n' points). The arguments are 'n' (size of the sample), 'pars' (parameter vector of the spatial kernel), and, for marked twinstim, 'type' (a single type of event being generated).
 # npars: number of parameters
 # validpars: a function indicating if a specific parameter vector is valid. Not necessary if npars == 0. If missing or NULL, it will be set to function (pars) TRUE. This function is rarely needed in practice, because usual box constrained parameters can be taken into account by using L-BFGS-B as the optimization method (with arguments 'lower' and 'upper').
 # knots: not implemented. Knots (> 0) of a spatial interaction STEP function of the distance
@@ -254,10 +254,10 @@ checksiaf <- function (f, deriv, Fcircle, effRange, simulate, npars, validpars, 
     #Check if simulation function has proper format
     if (missing(simulate)) simulate <- NULL
     if (!is.null(simulate)) {
-      simulate <- match.fun(simulate)
-      if (length(formals(simulate)) < 3L) {
-        stop("the 'siaf$simulate' function must accept three arguments")
-      }
+      simulate <- .checknargs3(simulate, "siaf$simulate")
+      ## if (length(formals(simulate)) < 3L) {
+      ##   stop("the 'siaf$simulate' function must accept three arguments")
+      ## }
     }
     #Check if the validpars are of correct form
     validpars <- if (!haspars) NULL else if (missing(validpars) || is.null(validpars)) {

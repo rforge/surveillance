@@ -5,6 +5,8 @@
 --------------------------------------------------------------------------------
 
 - plot.epidataCS (type=c("temporal", "spatial"))
+- update.twinstim
+- keep some parameters fixed at initial values
 
 - Bei NA-Zuordnung von tile eine warning schmeißen statt abzubrechen (abbruch erfolgt zur zeit mit na.fail in buildmmh)
 - REPORT argument in simEpidataCS
@@ -15,7 +17,7 @@
 
 - funktion um nachträglich tau zu berechnen, wenn model=TRUE.
 - plot.twinstim (= residual plot or serial correlation plot). call function for a posteriori calculation of tau if tau is not part of the twinstim-object
-- integrate tiebreak functions into RLadyBug
+- integrate tiebreak functions into surveillance
 
 - environments optimieren, damit fits beim speichern nicht soviel speicherplatz beanspruchen.
 - R0-Bug bei Faktorvariablen
@@ -32,13 +34,6 @@
 
 - irgendwie typ-spezifische endemische kovariablen erlauben (influenza!). über "special" kriegt man den intercept nicht typspezifisch. also: eigenes argument typeSpecificEffects = c("(Intercept)", "influenza0")... vorsicht mit kategorialen variablen => ergeben mehrere parameter
 
-
-
-# If we include twinstim in RLadyBug we should add a licence note like e.g. in maptools
-  Note: polygon geometry computations in maptools
-        depend on the package gpclib, which has a
-        restricted licence. It is disabled by default;
-        to enable gpclib, type gpclibPermit()
 
 
 ### DESCRIPTION file extras for twinstim

@@ -1,16 +1,9 @@
-Rnw/*
-make.pl
-tex/*
-surveillance.Rcheck/*
 auto/*
 Makefile
-make.pl
 newsim/*
 develop/*
-perlSourceToGetData/*
 .Rcheck/*
 ..Rcheck/*
-.Rd2dvi/*
 surveillance_1*
 surveillance-Ex.R
 sysdata/*

@@ -200,14 +200,8 @@ typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE)
 \author{
   S. Meyer with documentation by M. \enc{Höhle}{Hoehle}.
 }
-%\note{
-%%%  ~~further notes~~
-%}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-See Also as \code{\link{twinSIR}}.
+\code{\link{twinSIR}}
 }
 \examples{
 #Load invasive meningococcal disease data
