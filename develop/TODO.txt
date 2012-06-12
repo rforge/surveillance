@@ -51,9 +51,12 @@
 ###########
 
 #Open
-24/03/2011 animate using animation package for obejcts of type epidata
+24/03/2011 animate using animation package for objects of type epidata
+           problem is that only one graphics frame is opened and iteratively
+           filled by 'points'; "animation" would need one frame per picture
 05/04/2011 R0 calculations as for twinstim (->Sebastian?)
 05/04/2011 Plot function of epidata objects (->Michael)
+12/06/2012 summary.twinSIR sollte zwischen epi und endemic effects unterscheiden
 
 #Done
 

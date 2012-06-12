@@ -139,7 +139,7 @@ Ztilde.chibarsq <- function(Z,p,W,R)  {
   #Thus using p. 37 we have d = t(Winv) %*% Z.
   #Note: solve.QP$value is only correct up to a constant
   d <- t(Winv) %*% Z
-  theta <- matrix(solve.QP(Dmat = Winv, dvec= d, Amat= t(R),  bvec= rep(0,p),meq=0)$solution,p,1)
+  theta <- matrix(quadprog::solve.QP(Dmat = Winv, dvec= d, Amat= t(R),  bvec= rep(0,p),meq=0)$solution,p,1)
   return(sum(theta > 0))
 }
 

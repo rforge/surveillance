@@ -59,6 +59,11 @@
  multivariate time series of counts. Finally, the fully Bayesian
  approach for univariate time series of counts from Held et al. (2006)
  is also implemented.
+ 
+% \item Likelihood based analysis of infectious disease surveillance data
+%  using a model containing endemic and epidemic components in a counting
+%  process framework (\enc{Höhle}{Hoehle}, 2008). The endemic component can
+%  be modelled through covariates. 
 }
 \author{
   Author: M. H\enc{ö}{oe}hle, S. Meyer and M. Paul
