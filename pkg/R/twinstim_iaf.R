@@ -6,14 +6,42 @@
 ################################################################################
 
 
-### Generates list for Gaussian spatial interaction function
-# nTypes: determines the number of parameters=(log-)standard deviations of the gaussian kernel. In a multitype epidemic, the different types may share the same spatial interaction function (type-invariant), in which case nTypes=1. Otherwise nTypes should equal the number of event types of the epidemic, in which case every type has its own variance parameter.
-# logsd: logical indicating if the gaussian kernel should be reparametrized such that the log-standard deviation is the parameter in question.  This avoids constrained optimisation (L-BFGS-B) or the use of 'validpars'.
-# density: logical. If TRUE, the gaussian spatial interaction function will not be scaled to have maximum value of 1 at the mean c(0,0).
-# effRangeMult: determines the effective range for numerical integration in terms of multiples of the parameter, i.e. with effRangeMult=6 numerical integration only considers the 6-sigma area around the event instead of the whole observation region W.
-# validpars: see 'twinstim'. If logsd = FALSE, you should either use constrained optimisation (L-BFGS-B) or set 'validpars' to function (pars) pars > 0.
+### Function returning specification of constant spatial interaction/dispersal
 
-siaf.gaussian <- function (nTypes, logsd = TRUE, density = FALSE, effRangeMult = 6, validpars = NULL)
+siaf.constant <- function () {
+    res <- list(
+        f = as.function(alist(s=, pars=, types=, rep.int(1, nrow(s))), envir = parent.frame()),
+        deriv = NULL,
+        Fcircle = as.function(alist(r=, pars=, types=, pi*r^2), envir = parent.frame()),
+        simulate = NULL, # will be handled specially in simEpidataCS
+        npars = 0L, validpars = NULL
+    )
+    attr(res, "constant") <- TRUE
+    res
+}
+
+
+### Generates a list specifying a Gaussian spatial interaction function
+## nTypes: determines the number of parameters=(log-)standard deviations of the
+##   Gaussian kernel. In a multitype epidemic, the different types may share the
+##   same spatial interaction function (type-invariant), in which case nTypes=1.
+##   Otherwise nTypes should equal the number of event types of the epidemic, in
+##   which case every type has its own variance parameter.
+## logsd: logical indicating if the gaussian kernel should be reparametrized
+##   such that the log-standard deviation is the parameter in question. This
+##   avoids constrained optimisation (L-BFGS-B) or the use of 'validpars'.
+## density: logical. If TRUE, the isotropic Gaussian density (on R^2) will not
+##   be scaled to have maximum value of 1 at the mean c(0,0).
+## effRangeMult: determines the effective range for numerical integration in
+##   terms of multiples of the parameter, i.e. with effRangeMult=6 numerical
+##   integration only considers the 6-sigma area around the event instead of the
+##   whole observation region W.
+## validpars: see 'twinstim'. If logsd = FALSE, you should either use
+##   constrained optimisation (L-BFGS-B) or set 'validpars' to function (pars)
+##   pars > 0. 
+
+siaf.gaussian <- function (nTypes, logsd = TRUE, density = FALSE,
+                           effRangeMult = 6, validpars = NULL)
 {
     nTypes <- as.integer(nTypes)
     stopifnot(length(nTypes) == 1L, nTypes > 0L, isScalar(effRangeMult))
@@ -90,27 +118,165 @@ siaf.gaussian <- function (nTypes, logsd = TRUE, density = FALSE, effRangeMult =
         )
     ))
 
+    ## set function environments to the global environment
+    environment(f) <- environment(deriv) <- environment(Fcircle) <-
+    environment(effRange) <- environment(simulate) <- .GlobalEnv
+
+    ## return the kernel specification
     list(f=f, deriv=deriv, Fcircle=Fcircle, effRange=effRange,
          simulate=simulate, npars=nTypes, validpars=validpars)
 }
 
 
-### Returns specification of constant spatial interaction
 
-siaf.constant <- function () {
-    res <- list(
-        f = as.function(alist(s=, pars=, types=, rep.int(1, nrow(s))), envir = parent.frame()),
-        deriv = NULL,
-        Fcircle = as.function(alist(r=, pars=, types=, pi*r^2), envir = parent.frame()),
-        simulate = NULL, # will be handled specially in simEpidataCS
-        npars = 0L, validpars = NULL
-    )
-    attr(res, "constant") <- TRUE
-    res
+### Implementation of an isotropic power law kernel, specifically the
+### Lomax distribution, i.e. a shifted Pareto distribution with domain [0;Inf)
+
+## internal helper function: quantile function of the Lomax distribution
+## we could also use VGAM::qlomax (but this would be slightly slower)
+qlomax <- function (p, sigma, alpha) {
+    sigma * ((1-p)^(-1/alpha) - 1)
 }
 
+## density=FALSE returns standardized Lomax kernel, i.e. f(x) = f_Lomax(x)/f(0),
+## such that the kernel function starts at 1. f_Lomax(0) = alpha / sigma
+siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
+                        effRangeProb = 0.99, validpars = NULL)
+{
+    ## for the moment we don't make this type-specific
+    if (nTypes != 1) stop("type-specific shapes are not yet implemented")
+    if (!logpars) stop("only the 'logpars' parametrization is implemented")
 
-### Generates list for Exponential temporal interaction function
+    ## helper expression, note: logpars=c(logscale=logsigma, logshape=logalpha)
+    tmp <- expression(
+        logsigma <- logpars[[1]],  # used "[[" to drop names
+        logalpha <- logpars[[2]],
+        sigma <- exp(logsigma),
+        alpha <- exp(logalpha)
+        )
+
+    ## spatial kernel
+    f <- function (s, logpars) {}
+    body(f) <- as.call(c(as.name("{"),
+        tmp,
+        expression(sLength <- sqrt(rowSums(s^2))),
+        expression(logfvals <- (alpha+1) * (logsigma - log(sLength+sigma))),
+        ##logfvals <- logalpha + alpha*logsigma - (alpha+1)*log(sLength+sigma)
+        if (density) {
+            expression(exp(logfvals + logalpha - logsigma))
+        } else {
+            expression(exp(logfvals))
+        }
+    ))
+
+    ## derivative wrt logpars
+    deriv <- function (s, logpars) {}
+    body(deriv) <- as.call(c(as.name("{"),
+        tmp,
+        expression(sLength <- sqrt(rowSums(s^2))),
+        expression(logsigma.xsigma <- logsigma - log(sLength+sigma)),
+        if (density) {
+            expression(
+                logfac <- logalpha - logsigma + (alpha+1) * logsigma.xsigma,
+                derivlogsigma.part <- (alpha*sLength-sigma) / (sLength+sigma),
+                derivlogalpha.part <- 1 + alpha * logsigma.xsigma
+                )
+        } else {
+            expression(
+                logfac <- (alpha+1) * logsigma.xsigma,
+                derivlogsigma.part <- (alpha+1) * sLength / (sLength+sigma),
+                derivlogalpha.part <- alpha * logsigma.xsigma
+                )
+        },
+        expression(exp(logfac) * cbind(derivlogsigma.part, derivlogalpha.part))
+    ))
+    
+    Fcircle <- function (r, logpars) {}
+    body(Fcircle) <- as.call(c(as.name("{"),
+        tmp,
+        ## integrate standardized f(x) = f_Lomax(x) / f_Lomax(0)
+        expression(
+            logfofr <- (alpha+1) * (logsigma - log(r+sigma)),
+            fofr <- exp(logfofr),
+            basevolume <- pi * r^2 * fofr, # cylinder volume up to height f(r)
+            intfinvsq <- if (alpha == 1) {
+                sigma^2 * (-3 - logfofr + 4*sqrt(fofr) - fofr)
+            } else {
+                (2*sigma^2 *(1-fofr) - r*(alpha+1)*(alpha*r+2*sigma) *fofr) /
+                    alpha / (alpha-1)
+            },
+            int <- basevolume + pi * intfinvsq
+            ),
+         ## if density=TRUE, multiply result by f_Lomax(0)
+         if (density) expression(int * alpha / sigma) else expression(int)
+    ))
+
+    effRange <- function (logpars) {}
+    body(effRange) <- as.call(c(as.name("{"),
+        substitute(qlomax(effRangeProb, exp(logpars[[1]]), exp(logpars[[2]])),
+                   list(effRangeProb=effRangeProb))
+    ))
+    
+    simulate <- function (n, logpars)
+    {
+        ## stopifnot(require("VGAM"))
+        samp1d <- VGAM::rlomax(n, scale=exp(logpars[[1]]),
+                               shape3.q=exp(logpars[[2]]))
+        ## now rotate each point by a random angle to cover all directions
+        theta <- runif(n, 0, 2*pi)
+        samp1d * cbind(cos(theta), sin(theta))
+    }
+
+    ## set function environments to the global environment
+    environment(f) <- environment(deriv) <- environment(Fcircle) <-
+    environment(effRange) <- environment(simulate) <- .GlobalEnv
+
+    ## return the kernel specification
+    list(f=f, deriv=deriv, Fcircle=Fcircle, effRange=effRange,
+         simulate=simulate, npars=2L, validpars=validpars)
+}
+
+## Fcircle_Lomax <- function(r, logpars) {
+##     logsigma <- logpars[[1]]  # used "[[" to drop names
+##     logalpha <- logpars[[2]]
+##     sigma <- exp(logsigma)
+##     alpha <- exp(logalpha)
+##     logfofr <- logalpha + alpha*logsigma - (alpha+1) * log(r+sigma)
+##     fofr <- exp(logfofr)
+##     ## method 1:
+##     Intfinvsq <- function (z, sigma, alpha) {
+##         ## antiderivative of ((f^-1)(z))^2
+##         if (alpha == 1) {
+##             sigma * (log(z) - 4*sqrt(sigma*z) + sigma*z)
+##         } else {
+##             (alpha*sigma^alpha)^(2/(alpha+1)) *
+##                 z^((alpha-1)/(alpha+1))*(alpha+1)/(alpha-1) -
+##                     2*alpha^(1/(alpha+1))*sigma^(1+alpha/(alpha+1)) *
+##                         z^(alpha/(alpha+1))*(alpha+1)/alpha + sigma^2*z
+##         }}
+##     intfinvsq2 <- Intfinvsq(alpha/sigma, sigma, alpha) -
+##         Intfinvsq(fofr, sigma, alpha)
+##     ## method 2 (faster):
+##     intfinvsq <- if (alpha == 1) {
+##         sigma.rsigma <- sigma / (r+sigma)
+##         sigma*(-2*log(sigma.rsigma) -3 +sigma.rsigma*(4-sigma.rsigma))
+##     } else {
+##         intfinvsq.fof0 <- 2*sigma / (alpha-1)
+##         intfinvsq.fofr <- (sigma/(sigma+r))^alpha *
+##             (r*(alpha+1)*(alpha*r+2*sigma)+2*sigma^2) /
+##                 ((alpha-1)*(r+sigma))
+##         intfinvsq.fof0 - intfinvsq.fofr
+##     }
+##     ## check if identical (TODO: drop this check after some time of testing)
+##     if (!isTRUE(all.equal(intfinvsq2, intfinvsq))) {
+##         browser("the two integrations of lomax^-1 differ")
+##     }
+##     base <- pi * r^2 * fofr   # volume of cylinder up to height f(r)
+##     base + pi*intfinvsq
+## }
+
+
+### Returns a list specifying an exponential temporal interaction function
 # nTypes: cf. parameter description for siaf.gaussian
 
 tiaf.exponential <- function (nTypes)

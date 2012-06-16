@@ -191,7 +191,8 @@ export(as.epidataCS)
 export(twinstim)
 # intensityplot
 export(simEpidataCS)
-export(siaf.gaussian, siaf.constant, tiaf.exponential, tiaf.constant)
+export(siaf.constant, siaf.gaussian, siaf.lomax)
+export(tiaf.constant, tiaf.exponential)
 
 S3method(update, epidataCS)
 S3method(head, epidataCS)
