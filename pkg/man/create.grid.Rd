@@ -24,10 +24,11 @@ create.grid(disProgObj, control, params = list(epidemic = c(0.1, 0.9, 5),
    \item{control}{specified model}
 	\item{params}{list of parameters: \code{param=c(lower,upper,length)}
 		\itemize{
-		\item{epidemic}{autoregressive parameters \eqn{\lambda} and \eqn{\phi}. }
-		\item{endemic}{trend and seasonal parameters \eqn{\beta,\gamma_j}. }
-		\item{negbin}{overdispersion parameter for negative binomial model \eqn{\psi}. }
-		} }
+		\item \code{epidemic} autoregressive parameters \eqn{\lambda} and \eqn{\phi}. 
+		\item \code{endemic} trend and seasonal parameters \eqn{\beta, \gamma_j}. 
+		\item \code{negbin} overdispersion parameter for negative binomial model \eqn{\psi}. 
+		} 
+        }
 }
 \value{\item{matrix}{matrix with \code{gridSize} starting values as rows}
        
@@ -46,10 +47,12 @@ cntrl1 <- list(lambda=TRUE, neighbours=TRUE,
 cntrl2 <- list(lambda=TRUE, negbin="single")
 
 # create a grid of initial values for respective parameters
-grid1 <- create.grid(disProgObj, cntrl1, params = list(epidemic=c(0.1,0.9,3), 
-                     endemic=c(-1,1,3)))
-grid2 <- create.grid(disProgObj, cntrl2, params = list(epidemic=c(0.1,0.9,5), 
-                     negbin=c(0.3,12,10)))
+grid1 <- create.grid(disProgObj, cntrl1, 
+                     params = list(epidemic=c(0.1,0.9,3), 
+                                   endemic=c(-1,1,3)))
+grid2 <- create.grid(disProgObj, cntrl2, 
+                     params = list(epidemic=c(0.1,0.9,5), 
+                                   negbin=c(0.3,12,10)))
 
 }
 \keyword{misc}

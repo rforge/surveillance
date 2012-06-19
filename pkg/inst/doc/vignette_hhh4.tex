@@ -1,5 +1,5 @@
-%\VignetteIndexEntry{Getting started with the package}
-%\VignetteKeywords{getting started}
+%\VignetteIndexEntry{Additional documentation of the function hhh4}
+%\VignetteKeyword{getting started}
 %\VignettePackage{surveillance}
 
 \documentclass[a4paper,11pt]{article}
@@ -482,11 +482,11 @@ as follows:
 \end{Sinput}
 \begin{Soutput}
 ~1 + sin(2 * pi * t/52) + cos(2 * pi * t/52)
-<environment: 07b827f0>
+<environment: 0x605ebc8>
 \end{Soutput}
 \begin{Sinput}
 > # fit Poisson model
-> hhh4(meningo, control = list(end = list(f = f_S1), family = "Poisson")) 
+> summary(hhh4(meningo, control = list(end = list(f = f_S1), family = "Poisson")))
 \end{Sinput}
 \begin{Soutput}
 Call: 
@@ -589,7 +589,7 @@ and is fitted with
 +           family = "NegBinM"
 +           )
 > # fit model
-> (result <- hhh4(fluMen, control = m))
+> summary(result <- hhh4(fluMen, control = m))
 \end{Sinput}
 \begin{Soutput}
 Call: 
@@ -679,7 +679,7 @@ a fixed autoregressive parameter $\lambda$ to the influenza data
 +                  family = "NegBin1"
 +                  )
 > # fit model
-> (result.B2 <- hhh4(flu, model.B2))
+> summary(result.B2 <- hhh4(flu, model.B2))
 \end{Sinput}
 \end{Schunk}
 \begin{Schunk}
@@ -691,7 +691,6 @@ Random effects:
             Var    Corr   
 ne.ri(iid)  0.9594        
 end.ri(iid) 0.5094 0.5617 
-
 
 Fixed effects: 
                         Estimates  Std.Error

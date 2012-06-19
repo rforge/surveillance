@@ -51,7 +51,7 @@ meanResponse(theta, designRes)
    The seasonal terms in the predictor can also be expressed as
    \eqn{\gamma_{s} \sin(\omega_s t) + \delta_{s} \cos(\omega_s t) = A_s \sin(\omega_s t + \epsilon_s)}{
     \gamma_s sin(\omega_s * t) + \delta_s cos(\omega_s * t) = A_s sin(\omega_s * t + \epsilon_s)}
-   with amplitude \eqn{A_s=\sqrt{\gamma_s^2 +delta_s^2}}{A_s=sqrt{\gamma_s^2 +delta_s^2}} 
+   with amplitude \eqn{A_s=\sqrt{\gamma_s^2 +\delta_s^2}}{A_s=sqrt{\gamma_s^2 +\delta_s^2}} 
    and phase difference \eqn{\tan(\epsilon_s) = \delta_s / \gamma_s}. The amplitude and
    phase shift can be obtained from a fitted model by specifying \code{amplitudeShift=TRUE}
    in the \code{coef} method.
@@ -90,7 +90,8 @@ meanResponse(theta, designRes)
 
 \author{M. Paul, L. Held}
 
-\keyword{models}
+%\keyword{models}
+\keyword{internal}
 
 \references{
   Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework 
@@ -102,7 +103,3 @@ meanResponse(theta, designRes)
     6250--6267.    
 
 }
-
-
-
-% make.design

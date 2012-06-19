@@ -13,7 +13,7 @@ import(methods)
 ### import generics to define own methods
 
 importFrom(graphics, plot)
-importFrom(stats, simulate, profile, coef, vcov, logLik, AIC, extractAIC, pnorm, cov2cor, residuals, ks.test)
+importFrom(stats, simulate, profile, coef, vcov, logLik, AIC, extractAIC, pnorm, cov2cor, residuals, ks.test, confint)
 importFrom(utils, packageDescription, head, toLatex)
 importFrom(xtable, xtable)
 
@@ -120,6 +120,7 @@ export(nowcast, backprojNP)
 ### disProg-specific
 
 export(create.disProg, create.grid, readData, toFileDisProg)
+S3method(print, disProg)
 S3method(plot, disProg)
 S3method(plot, disProg.one)
 S3method(aggregate, disProg)
@@ -128,11 +129,9 @@ export(sim.pointSource, sim.seasonalNoise)
 export(LRCUSUM.runlength, arlCusum, find.kh, findH, hValues, findK)
 exportPattern("^algo\\.")
 export(compMatrix.writeTable, correct53to52, enlargeData)
-export(sumNeighbours)
 export(makePlot)
 export(estimateGLRNbHook)
 
-export(make.design, meanResponse, loglikelihood)
 
 S3method(plot, atwins)
 S3method(plot, survRes)
@@ -241,27 +240,33 @@ S3method(residuals, ahg)
 S3method(logLik, ahg)
 
 export(hhh4) 
-# documentation for the following functions is still missing
 export(addSeason2formula)
-export(oneStepAhead)
-export(ranef)
-export(fixef)
-   # include further accessing methods...?
+export(ranef)  # S3-generic
+export(fixef)  # S3-generic
 
 S3method(print, ah4)
+S3method(summary, ah4)
 S3method(coef, ah4)
+S3method(logLik, ah4)
+S3method(AIC, ah4)
+S3method(fixef, ah4)
+S3method(ranef, ah4)
+S3method(confint, ah4)
+# include further accessing methods...?
+# documentation for the following functions is still missing
 S3method(predict, ah4)
 S3method(plot, ah4)
-S3method(logLik, ah4)
 
 # TODO: add simulation function for "ah4"
 # (or use stats:::simulate instead?)
 export(simHHH, simHHH.default)
 S3method(simHHH, default)
 S3method(simHHH, ah)
+S3method(simulate, ah4)
 
-# functions not yet documented, but used in dontrun part of example(hhh4)
+# functions not yet documented, but used in (dontrun) part of example(hhh4)
 # (maybe these would be better defined as a method for "oneStepAhead(ah4)-objects")
+export(oneStepAhead)
 export(scores)
 export(permutationTest)
 export(pit)

@@ -1,59 +1,39 @@
 % hhh4
 \name{hhh4}
 \alias{hhh4}
+% functions without documentation atm
 \alias{plot.ah4}
-\alias{oneStepAhead}
 \alias{predict.ah4}
-\alias{coef.ah4}
-\alias{logLik.ah4}
-\alias{print.ah4}
-\alias{interpretControl}
-\alias{checkFormula}
-\alias{ri}
-\alias{fe}
-\alias{isInModel}
-\alias{setControl}
-\alias{addSeason2formula}
-\alias{newtonRaphson}
-\alias{fitHHH}
-\alias{updateVariance}
-\alias{updateRegression}
-\alias{d2Sigma3}
-\alias{dSigma1}
-\alias{dSigma2}
-\alias{dSigma3}
-\alias{d2Sigma1}
-\alias{d2Sigma2}
-\alias{marFisher}
-\alias{marScore}
-\alias{marLogLik}
-\alias{getSigma}
-\alias{getSigmaInv}
-\alias{getSigmaiInv}
-\alias{getSigmai}
-\alias{sqrtOf1pr2}
-\alias{penFisher}
-\alias{penScore}
-\alias{penLogLik}
-\alias{meanHHH}
-\alias{splitParams}
-\alias{weightedSumNE}
-\alias{getCov}
-\alias{getSdCorr}
-\alias{ranef}
-\alias{fixef}
+\alias{oneStepAhead}
+\alias{scores}
+\alias{permutationTest}
+\alias{pit}
 
 \encoding{latin1}
 \title{Random effects HHH model fit as described in Paul and Held (2011)} 
 \description{
-  Fits a Poisson or negative binomial model with mean
-  \eqn{\mu_{it}}{\mu_it} containing endemic and epidemic components
-  to a multivariate time series of counts. The linear predictors may contain
-  random effects. 
+  Fits a Poisson or negative binomial model with conditional mean
+  \deqn{\mu_{it} = \lambda_{it} y_{i,t-1} + 
+                   \phi_{it} \sum_{j\neq i} w_{ji} y_{j,t-1} +
+                   e_{it} \nu_{it}  }{%
+        \mu_it = \lambda_it y_i,t-1 + 
+                 \phi_it sum_(j != i) w_ji y_j,t-1 +
+                   e_it \nu_it  }
+  containing epidemic and endemic components to a multivariate time 
+  series of counts. Here, the three unknown quantities 
+  \itemize{
+  \item \eqn{\lambda_{it}}{\lambda_it} in the autoregressive (\code{ar}) component, 
+  \item \eqn{\phi_{it}}{\phi_it} in the neighbor-driven (\code{ne}) component, and
+  \item \eqn{\nu_{it}}{\nu_it} in the endemic (\code{end}) component,
+  }
+  are decomposed additively on the log scale,
+  \eqn{w_{ji}}{w_ji} are known weights, 
+  and \eqn{e_{it}}{e_it} is a (multiplicative) offset.
+  The linear predictors may contain random effects. 
 }
 \usage{
 hhh4(stsObj, 
-   control = list(
+     control = list(
                ar = list(f = ~ -1,        
                          lag = 1,         
                          weights = NULL,  
@@ -74,8 +54,8 @@ hhh4(stsObj,
                                 stop.tol = 1e-5,
                                 stop.niter = 100),
                verbose = FALSE,
-               start=list(fixed=NULL,random=NULL,sd.corr=NULL),
-               data=data.frame(t=epoch(stsObj)-1)   
+               start = list(fixed=NULL, random=NULL, sd.corr=NULL),
+               data = data.frame(t = epoch(stsObj)-1)   
                )
    )
 }
@@ -88,7 +68,7 @@ hhh4(stsObj,
       \item{\code{ar}}{ Model for the autoregressive component given as
           list with the following components: 
           \describe{
-	  \item{f = ~ -1}{a formula for \eqn{\exp(x'\lambda)\cdot y_{t-1}}{exp(x'\lambda)*y_t-1}}
+	  \item{f = ~ -1}{a formula specifying \eqn{\log(\lambda_{it})}{log(\lambda_it)}}
 	  \item{lag = 1}{autoregression on \eqn{y_{i,t-lag}}{y_i,t-lag}
 	    (currently only \code{lag = 1} is possible)}
 	  \item{weights = NULL}{optional weights, only used if model is
@@ -101,9 +81,7 @@ hhh4(stsObj,
       \item{\code{ne}}{Model for the neighbor-driven component given as
        list with the following components:
 	\describe{
-	  \item{f = ~ -1}{a formula \eqn{\exp(x'\phi) \cdot \sum_j {w_{ji} \cdot
-		y_{j,t-1}}}{exp(x'\phi) * \sum_j {w_ji *
-		y_j,t-1}}}
+	  \item{f = ~ -1}{a formula specifying \eqn{\log(\phi_{it})}{log(\phi_it)}}
 	  \item{lag = 1}{autoregression on \eqn{y_{j,t-lag}}{y_j,t-lag}  
 	    (currently only \code{lag = 1} is possible)}
 	  \item{weights = NULL}{weights \eqn{w_{ji}}{w_ji}, if 
@@ -115,8 +93,8 @@ hhh4(stsObj,
       \item{\code{end}}{Model for the endemic component given as list
 	with the following components
 	\describe{
-	  \item{f = ~ 1}{a formula \eqn{\exp(x'\nu) \cdot n_{it}}{exp(x'\nu) * n_it}}
-	  \item{offset = NULL}{optional multiplicative offset \eqn{n_{it}}{n_it}}
+	  \item{f = ~ 1}{a formula specifying \eqn{\log(\nu_{it})}{log(\nu_it)}}
+	  \item{offset = NULL}{optional multiplicative offset \eqn{e_{it}}{e_it}}
 	  \item{initial = NULL}{vector with initial values for
 	    parameter if \code{f = ~1} (not really used ATM)}
 	}
@@ -124,7 +102,7 @@ hhh4(stsObj,
       \item{\code{family}}{Distributional family -- either Poisson,
 	or the negative Binomial distribution with one common
 	overdispersion parameter for all units (\code{NegBin1}) or a
-	overdispersion parameter for each units (\code{NegBinM}).
+	overdispersion parameter for each unit (\code{NegBinM}).
       }
       \item{\code{subset}}{typically \code{2:nrow(obs)} if model contains
 	autoregression}
@@ -164,13 +142,18 @@ hhh4(stsObj,
 }
 
 \details{
+  For further details see \code{vignette("vignette_hhh4")} and the
+  references.
+}
 
-  Note that for the time being this function performs only modelling of
+\note{
+  For the time being this function performs only modelling of
   the multivariate time series. No surveillance/monitoring functionality
   is available.
-
 }
-\seealso{\code{\link{algo.hhh}}, \code{\link{meanResponse}}}
+\seealso{\code{\link{algo.hhh}}, 
+\code{\link{fe}}, \code{\link{ri}}
+}
 \author{M. Paul and L. Held}
 \examples{
 ######################################################################
@@ -184,94 +167,105 @@ data("fluBYBW")
 
 ###############################################################
 ## generate formula for temporal and seasonal trends
-f.end <- addSeason2formula(f = ~ -1 + ri(type="iid", corr="all") + I((t-208)/100), S=3, period=52)
+f.end <- addSeason2formula(f = ~ -1 + ri(type="iid", corr="all") + 
+                               I((t-208)/100), S=3, period=52)
+
+## details for optimizer
+opt <- list(tech = "nlminb", stop.tol = 1e-5, stop.niter = 200)
 
 ##########################
 ## models 
 # A0
 cntrl_A0 <- list(ar = list(f = ~ -1),
-              end = list(f =f.end, offset = population(fluBYBW)),
-	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
-(res_A0 <- hhh4(fluBYBW,cntrl_A0))
+                 end = list(f =f.end, offset = population(fluBYBW)),
+                 family = "NegBin1", optimizer = opt,
+                 verbose = 1, data = data.frame(t = epoch(fluBYBW)-1))
+summary(res_A0 <- hhh4(fluBYBW,cntrl_A0))
 
 \dontrun{
 # B0
 cntrl_B0 <- list(ar = list(f = ~ 1),
-              end = list(f =f.end, offset = population(fluBYBW)),
-	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 end = list(f =f.end, offset = population(fluBYBW)),
+                 family = "NegBin1", optimizer = opt,
+                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
 res_B0 <- hhh4(fluBYBW,cntrl_B0)               
  
 
 # C0
 cntrl_C0 <- list(ar = list(f = ~ -1 + ri(type="iid", corr="all")),
-              end = list(f =f.end, offset = population(fluBYBW)),
-	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 end = list(f =f.end, offset = population(fluBYBW)),
+                 family = "NegBin1", optimizer = opt,
+                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
 res_C0 <- hhh4(fluBYBW,cntrl_C0)               
 
 
 #A1
+
+# weight matrix w_ji = 1/(No. neighbors of j) if j ~ i, and 0 otherwise
+wji <- neighbourhood(fluBYBW)/rowSums(neighbourhood(fluBYBW))
+
 cntrl_A1 <- list(ar = list(f = ~ -1),
-	      ne = list(f = ~ 1, weights = wji),
-              end = list(f =f.end, offset = population(fluBYBW)),
-	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 ne = list(f = ~ 1, weights = wji),
+                 end = list(f =f.end, offset = population(fluBYBW)),
+                 family = "NegBin1", optimizer = opt,
+                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
 res_A1 <- hhh4(fluBYBW,cntrl_A1)               
 
 
 # B1
 cntrl_B1 <- list(ar = list(f = ~ 1),
-	      ne = list(f = ~ 1, weights = wji),
-              end = list(f =f.end, offset = population(fluBYBW)),
-	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 ne = list(f = ~ 1, weights = wji),
+                 end = list(f =f.end, offset = population(fluBYBW)),
+                 family = "NegBin1", optimizer = opt,
+                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
 res_B1 <- hhh4(fluBYBW,cntrl_B1)               
 
 
 # C1
 cntrl_C1 <- list(ar = list(f = ~ -1 + ri(type="iid", corr="all")),
-	      ne = list(f = ~ 1, weights = wji),
-              end = list(f =f.end, offset = population(fluBYBW)),
-	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 ne = list(f = ~ 1, weights = wji),
+                 end = list(f =f.end, offset = population(fluBYBW)),
+                 family = "NegBin1", optimizer = opt,
+                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
 res_C1 <- hhh4(fluBYBW,cntrl_C1)               
 
 
 #A2
 cntrl_A2 <- list(ar = list(f = ~ -1),
-	      ne = list(f = ~ -1 + ri(type="iid", corr="all"), weights = wji),
-              end = list(f =f.end, offset = population(fluBYBW)),
-	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 ne = list(f = ~ -1 + ri(type="iid",corr="all"), weights=wji),
+                 end = list(f =f.end, offset = population(fluBYBW)),
+                 family = "NegBin1", optimizer = opt,
+                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
 res_A2 <- hhh4(fluBYBW,cntrl_A2)               
 
 
 # B2
 cntrl_B2 <- list(ar = list(f = ~ 1),
-	      ne = list(f = ~ -1 + ri(type="iid", corr="all"), weights = wji),
-              end = list(f =f.end, offset = population(fluBYBW)),
-	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 ne = list(f = ~ -1 + ri(type="iid",corr="all"), weights =wji),
+                 end = list(f =f.end, offset = population(fluBYBW)),
+                 family = "NegBin1", optimizer = opt,
+                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
 res_B2 <- hhh4(fluBYBW,cntrl_B2)               
 
 # C2
 cntrl_C2 <- list(ar = list(f = ~ -1 + ri(type="iid", corr="all")),
-	      ne = list(f = ~ -1 + ri(type="iid", corr="all"), weights = wji),
-              end = list(f =f.end, offset = population(fluBYBW)),
-	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(fluBYBW)-1),
-              start=list(fixed=fixef(res_B0),random=c(rep(0,140),ranef(res_B0)), sd.corr=c(-.5,getSdCorr(res_B0),0)))
+                 ne = list(f = ~ -1 + ri(type="iid",corr="all"), weights =wji),
+                 end = list(f =f.end, offset = population(fluBYBW)),
+                 family = "NegBin1", optimizer = opt,
+                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1),
+                 start=list(fixed=fixef(res_B0),random=c(rep(0,140),
+                         ranef(res_B0)), sd.corr=c(-.5,getSdCorr(res_B0),0)))
 res_C2 <- hhh4(fluBYBW,cntrl_C2)               
 
 
 # D
 cntrl_D <- list(ar = list(f = ~ 1),
-	      ne = list(f = ~ -1 + ri(type="iid"), weights = wji),
-              end = list(f =addSeason2formula(f = ~ -1 + ri(type="car") + I((t-208)/100), S=3, period=52), offset = population(fluBYBW)),
-	      family="NegBin1",optimizer = list(tech = "nlminb",stop.tol = 1e-5,stop.niter = 200),
-              verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                ne = list(f = ~ -1 + ri(type="iid"), weights = wji),
+                end = list(f =addSeason2formula(f = ~ -1 + ri(type="car") + 
+                                             I((t-208)/100), S=3, period=52), 
+                          offset = population(fluBYBW)),
+                family = "NegBin1", optimizer = opt,
+                verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
 res_D <- hhh4(fluBYBW,cntrl_D)               
 
 

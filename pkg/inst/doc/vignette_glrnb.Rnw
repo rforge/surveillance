@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Getting started with the package}
+%\VignetteIndexEntry{Additional documentation of the function algo.glrnb}
 %\VignetteKeywords{getting started}
 %\VignettePackage{surveillance}
 

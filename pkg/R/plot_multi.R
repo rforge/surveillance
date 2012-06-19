@@ -82,7 +82,19 @@ create.disProg <- function(week, observed, state, start=c(2001,1), freq=52, neig
   return(res)
 }
 
+print.disProg <- function(x, ...) {
+  cat( "-- An object of class disProg -- \n" )
+  cat( "freq:\t\t", x$freq,"\n" )
+  cat( "start:\t\t", x$start,"\n" )
+  cat( "dim(observed):\t", dim(x$observed), "\n\n")
 
+  n <- 1
+  cat("Head of observed:\n")
+  print(head(x$observed,n))
+
+  #cat("\nhead of neighbourhood:\n")
+  #print( head(x$neighbourhood,n))
+}
 
 ###################################################
 ### chunk number 2: 

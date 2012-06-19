@@ -1,5 +1,6 @@
 \name{create.disProg}
 \alias{create.disProg}
+\alias{print.disProg}
 \encoding{latin1}
 
 \title{Creating an object of class disProg}
@@ -49,4 +50,3 @@
 
 
 
-% sumNeighbours

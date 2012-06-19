@@ -21,6 +21,9 @@
 21/04/2011 incorporate a NAMESPACE :) (as of R 2.14.0 this is obligatory)
 11/11/2011 Author@R field in the ‘DESCRIPTION’ file
 02/11/2011 plot for sts objects which contains daily data as Date obj
+19/06/2012 move vignettes into a vignettes directory or create .Rinstignore
+           (as of R 2.14.0 the preferred location for vignette sources is
+            directory ‘vignettes’ and not ‘inst/doc’)
 
 
 
@@ -134,6 +137,11 @@ minutes. Possible to fix this??
 # hhh4
 #======================================================================
 #======================================================================
+
+#Open
+- add documentation for oneStepAhead predictions/scores
+- improve and document plot/predict methods
+- profiling of hhh4 ...
 
 
 

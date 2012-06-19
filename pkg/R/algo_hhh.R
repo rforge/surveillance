@@ -1114,6 +1114,7 @@ coef.ahg <- function(object,se=FALSE, amplitudeShift=FALSE, reparamPsi=FALSE,...
 ###################################################
 ### chunk number 11: 
 ###################################################
+## convert between sin/cos and amplitude/shift formulation
 ###################################################
 # y = gamma*sin(omega*t)+delta*cos(omega*t)
 #   =  A*sin(omega*t + phi)
@@ -1136,6 +1137,22 @@ sinCos2amplitudeShift <- function(params){
     return(c(amplitude,shift))
   }
   return(c(sapply(index.sin,one,params=params)))
+}
+
+amplitudeShift2sinCos <- function(params){
+    lengthParams <- length(params)
+    if (lengthParams%%1 != 0) 
+        stop("wrong number of params")
+    index.A <- seq(1, lengthParams, by = 2)
+    one <- function(i = 1, params) {
+        coef.A <- params[i]
+        coef.shift <- params[i + 1]
+        coef.cos <- -coef.A*tan(coef.shift)/sqrt(1+tan(coef.shift)^2)
+        coef.sin <- -coef.A/sqrt(1+tan(coef.shift)^2)
+        return(c(coef.sin,coef.cos))
+    }
+    return(c(sapply(index.A, one, params = params)))
+
 }
 
 ##############################################

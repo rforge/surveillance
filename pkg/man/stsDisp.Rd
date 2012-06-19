@@ -45,7 +45,7 @@
 	  \code{observed} matrix. It is possible to redirect the output
 	  into files, e.g. to generate an animated GIF. See the
 	  examples.}
-	\item{code{alarm ~ time}}{Generates a so called alarmplot for a
+	\item{\code{alarm ~ time}}{Generates a so called alarmplot for a
 	  multivariate \code{sts} object. For each time point and each
 	  series it is shown whether there is an alarm. In case of
 	  hierarchical surveillance the user can pass

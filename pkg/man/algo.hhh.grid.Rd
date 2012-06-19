@@ -21,12 +21,12 @@ algo.hhh.grid(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
 \arguments{
 \item{disProgObj}{object of class \code{disProg}}
 \item{control}{control object:
-      \itemize{
+      \describe{
       \item{\code{lambda}}{If \code{TRUE} an autoregressive 
             parameter \eqn{\lambda} is included, if \code{lambda} is a vector of logicals,
             unit-specific parameters \eqn{\lambda_i} are included. By default, observations \eqn{y_{t-lag}}{y_t-lag}
             at the previous time points, i.e. \eqn{lag=1}, are used for the autoregression. Other lags can be
-            used by specifying \code{lambda} as a vector of integers, see Examples and \code{\link{meanResponse}} for details.}
+            used by specifying \code{lambda} as a vector of integers, see Examples and \code{\link{algo.hhh}} for details.}
       \item{\code{neighbours}}{If \code{TRUE} an autoregressive parameter for 
             adjacent units \eqn{\phi} is included, if \code{neighbours} is a vector of logicals,
             unit-specific parameters \eqn{\phi_i} are included. By default, observations \eqn{y_{t-lag}}{y_t-lag}
@@ -39,7 +39,7 @@ algo.hhh.grid(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
             of integers, each unit \eqn{i} gets its own seasonal parameters }
       \item{\code{negbin}}{if \code{"single"} negative binomial rather than poisson is used,
             if \code{"multiple"} unit-specific overdispersion parameters are used.}
-      \item{\code{proportion}}{see details in \code{\link{meanResponse}} }
+      \item{\code{proportion}}{see details in \code{\link{algo.hhh}} }
       \item{\code{lag.range}}{determines which observations are used to fit the model}
       }}        
       \item{thetastartMatrix}{matrix with initial values for all parameters specified
@@ -58,7 +58,8 @@ algo.hhh.grid(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
         for all (used) starting values}
 }
 
-\seealso{\code{\link{meanResponse}},\code{\link{create.grid}},\code{\link{algo.hhh}}}
+\seealso{\code{\link{algo.hhh}}, \code{\link{create.grid}}
+}
 \author{M. Paul, L. Held}
 \examples{
 \dontrun{

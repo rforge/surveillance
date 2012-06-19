@@ -1,5 +1,5 @@
-%\VignetteIndexEntry{Getting started with the package}
-%\VignetteKeywords{getting started}
+%\VignetteIndexEntry{Additional documentation of the function hhh4}
+%\VignetteKeyword{getting started}
 %\VignettePackage{surveillance}
 
 \documentclass[a4paper,11pt]{article}
@@ -469,7 +469,7 @@ as follows:
 # specify formula object for endemic component
 ( f_S1 <- addSeason2formula(f = ~ 1, S = 1, period = 52) )
 # fit Poisson model
-hhh4(meningo, control = list(end = list(f = f_S1), family = "Poisson")) 
+summary(hhh4(meningo, control = list(end = list(f = f_S1), family = "Poisson")))
 @
 A corresponding negative binomial model is obtained via
 <<eval=T, echo=T>>=
@@ -540,7 +540,7 @@ m <- list(ar = list(f = ~ -1 + fe(1, which=c(TRUE, TRUE))),
 
 
 # fit model
-(result <- hhh4(fluMen, control = m))
+summary(result <- hhh4(fluMen, control = m))
 @
 A plot of the estimated mean for the meningococcal disease data, 
 decomposed into the three components, is obtained with
@@ -622,10 +622,10 @@ model.B2 <- list(ar = list(f = ~ 1),
                  )
 
 # fit model
-(result.B2 <- hhh4(flu, model.B2))
+summary(result.B2 <- hhh4(flu, model.B2))
 @
 <<echo=F>>=
-result.B2
+summary(result.B2)
 @
 Model choice based on information criteria such as AIC or BIC is well
 explored and understood for models that correspond to fixed-effects likelihoods.
