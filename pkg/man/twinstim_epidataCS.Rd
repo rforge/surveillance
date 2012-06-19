@@ -1,16 +1,11 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Author: Michael Höhle based on the in-code documentation of
-%         Sebastian Meyer.
-% $Date: 2010-04-23 10:49:46 +0200 (Fri, 23 Apr 2010) $
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \encoding{latin1}
 \name{twinstim_epidataCS}
 \alias{as.epidataCS} 
-\alias{print.epidataCS}
-\alias{[.epidataCS}
 \alias{epidataCS}
-\alias{update.epidataCS}
-\alias{summary.epidataCS}
+\alias{print.epidataCS}
+\alias{head.epidataCS}
+\alias{tail.epidataCS}
+\alias{marks.epidataCS}
 \title{
   Class for Representing Continuous Space-Time Point Process Data
 }
@@ -25,18 +20,16 @@
   additional attributes such as a spatio-temporal grid of endemic
   covariates. These objects are the basis for fitting 
   spatio-temporal epidemic intensity models with the function
-  \code{\link{twinstim}}. Similarly, the function
-  \code{update.epidataCS} allows one to quickly update certain
-  parameters of an \code{epidataCS} object without having to reconstruct
-  it again.
-  
-  For \code{epidataCS} objects there exist \code{head}, \code{print},
-  \code{summary}, \code{animate} and \code{update} functions.
-  It is also possible to convert the data to \code{epidata} objects
-  for analysis with \code{twinSIR}.
+  \code{\link{twinstim}}.
 }
 \usage{
-as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes), nCircle2Poly = 32L)
+as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
+             nCircle2Poly = 32L, T = NULL)
+
+\method{print}{epidataCS}(x, n = 6L, digits = getOption("digits"), ...)
+\method{head}{epidataCS}(x, n = 6L, ...)
+\method{tail}{epidataCS}(x, n = 6L, ...)
+\method{marks}{epidataCS}(x, ...)
 }
 \arguments{
   \item{events}{
@@ -54,30 +47,28 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes), nCircle2Poly = 32L)
       }
     }
     The \code{data.frame} may contain columns with further marks of
-    the event, e.g. sex, age of infected person (-> epidemic
+    the event, e.g. sex, age of infected individuals (-> epidemic
     covariates).
-
-    Note that the column names "ID", ".obsInfLength", ".bdist",
-    ".influenceRegion", and ".sources" are reserved.
-    \describe{
-      \item{ID}{unique chronological ID for the events.}
-      \item{.obsInfLength}{observed length of the infectious period
-	(being part [0,T])}  
-      \item{.bdist}{minimal distance of the event locations to the boundary}
-      \item{.influenceRegion}{gpc.poly, which is the intersection of W
-	with b(s,eps.s), centered at s} 
-      \item{.sources}{potential sources of infection}
-    }
+    However, note that some auxiliary columns will be added at conversion,
+    whose names \code{"ID"}, \code{".obsInfLength"}, \code{".bdist"},
+    \code{".influenceRegion"}, and \code{".sources"} are reserved.
   }
   \item{stgrid}{
     \code{data.frame} with obligatory columns
     \describe{
       \item{tile}{ID of spatial unit (e.g. id of municipality)}
-      \item{start, stop}{temporal interval}
-      \item{area}{area of the spatial unit (tile)}
+      \item{start, stop}{temporal interval. The \code{stop} column may
+	be missing, in which case it will be auto-generated from the set
+	of \code{start} values and \code{T}.}
+      \item{area}{area of the spatial unit (\code{tile}).
+	Be aware that the unit of this area (e.g., square km) must be consistent
+	with the units of \code{W} and \code{events} as specified in
+	their \code{\link{proj4string}}s.}
     }
-    The remaining columns are endemic covariates. Note that the column
-    name "BLOCK" is reserved (indexing the time intervals of stgrid). 
+    The remaining columns are endemic covariates.
+    However, note that the column name \code{"BLOCK"} is reserved
+    (a column which will be added automatically for indexing the time
+    intervals of \code{stgrid}).  
   }
   \item{W}{
     An object of class \code{SpatialPolygons} indicating the observation
@@ -95,16 +86,46 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes), nCircle2Poly = 32L)
   \item{nCircle2Poly}{
     accuracy (number of edges) of the polygonal approximation of a circle
   }
+  \item{T}{
+    end of observation period (i.e. last \code{stop} time of
+    \code{stgrid}). Must be specified if the start but not the stop
+    times are supplied in \code{stgrid} (=> auto-generation of
+    \code{stop} times).
+  }
+  \item{x}{an object of class \code{epidataCS}.}
+  \item{n}{a single integer. If positive, the first (\code{head}, \code{print})
+    / last (\code{tail}) \code{n} events are extracted. If negative,
+    all but the \code{n} first/last events are extracted.
+  }
+  \item{digits}{minimum number of significant digits to be printed in
+    values.}
+  \item{\dots}{passed to the basic \code{print} method. Unused for \code{marks}.}
 }
 \details{
-  The function is used to generate objects of the class \code{epidataCS}
-  which is the data structure that \code{twinstim} models work on.
+  The function \code{as.epidataCS} is used to generate objects of class
+  \code{"epidataCS"}, which is the data structure that
+  \code{\link{twinstim}} models work on.
+
+  The \code{marks.epidataCS} method (of the generic function
+  \code{marks} defined in package \pkg{spatstat}) returns a
+  \code{data.frame} of the event marks (actually also including time
+  and location of the events).
 }
 \value{
-  An object of class \code{epidataCS} containing th following components
+  An object of class \code{epidataCS} containing the following components
   \describe{
-    \item{events}{See above description. Additionally for each event
-      possible sources are saved in the attribute \code{.sources}. --> Sebastian!}
+    \item{events}{See above description. The added auxiliary columns are:
+    \describe{
+      \item{ID}{unique chronological ID for the events.}
+      \item{.obsInfLength}{observed length of the infectious period
+	(being part [0,T])}  
+      \item{.bdist}{minimal distance of the event locations to the boundary}
+      \item{.influenceRegion}{gpc.poly, which is the intersection of \code{W}
+	with a circle of radius \code{eps.s} centered at the event location.} 
+      \item{.sources}{potential sources of infection}
+    }
+    % TODO: more details
+    }
     \item{stgrid}{See the description of the argument.}
     \item{W}{Observational region as \code{gpc.poly}.}
     \item{qmatrix}{See the description of the \code{qmatrix} argument.}
@@ -122,17 +143,17 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes), nCircle2Poly = 32L)
   Available as http://epub.ub.uni-muenchen.de/11703/
 }
 \author{
-  Sebastian Meyer, Documentation by Michael H\enc{ö}{oe}hle
-}
-\note{
-  The column name \code{"BLOCK"} is a reserved name.  This column will be 
-  added automatically at conversion and the resulting data frame will be 
-  sorted by this column and by id.  Also the names \code{"id"}, \code{"start"},
-  \code{"stop"}, \code{"event"} and \code{"Revent"} are
-  reserved for the respective columns only.
+  Sebastian Meyer, documentation contributions by Michael H\enc{ö}{oe}hle
 }
 \seealso{
-See also \code{\link{twinstim}}, ~~~
+  \code{\link{animate.epidataCS}} for the animation of such an epidemic.
+  There are also \code{\link[=summary.epidataCS]{summary}} and
+  \code{\link[=update.epidataCS]{update}} methods for the
+  \code{"epidataCS"} class.
+  Models for \code{"epidataCS"} can be fitted with \code{\link{twinstim}}.
+  It is also possible to convert the data to \code{\link{epidata}}
+  objects (discrete space) for analysis with \code{\link{twinSIR}}
+  (see \code{\link{as.epidata.epidataCS}}).
 }
 %\examples{
 %#No examples are currently available

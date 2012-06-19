@@ -98,7 +98,6 @@ intersectCircle <- function (Wgpc, center, r, npoly)
     circle <- discpoly(center = center, r = r, npoly = npoly,
                        class = "gpc.poly", hole = FALSE)
     intersection <- intersect(circle, Wgpc)  # this order seems to be faster
-    scale(intersection, center = center)  # -> scale.gpc.poly defined above
+    scale.poly(intersection, center = center) # use scale method as defined above
 }
-
 

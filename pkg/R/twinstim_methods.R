@@ -176,8 +176,8 @@ ret <- capture.output({
             con <- textConnection(tab_char)
             tab2 <- read.table(con, colClasses="character")
             close(con)
-            parnames <- paste("\\texttt{",tab2[,1],"}",sep="")
-            tab2 <- as.data.frame(lapply(tab2[,-1], function(x) paste("$",x,"$",sep="")))
+            parnames <- paste0("\\texttt{",tab2[,1],"}")
+            tab2 <- as.data.frame(lapply(tab2[,-1], function(x) paste0("$",x,"$")))
             rownames(tab2) <- parnames
             if (length(naps <- grep("e\\.[st]iaf", parnames))) tab2[naps, 3:4] <- ""  # z-value and p-value for siaf and tiaf are NA
             print(xtable::xtable(tab2), only.contents = TRUE, include.colnames = FALSE, sanitize.text.function = identity, hline.after = NULL)

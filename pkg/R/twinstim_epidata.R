@@ -32,18 +32,21 @@
 # W: SpatialPolygons. Observation region. Must have same proj4string as events.
 # qmatrix: square indicator matrix (0/1 or TRUE/FALSE) for possible transmission between the event types. will be internally converted to logical. Defaults to an independent spread of the event types.
 # nCircle2Poly: accuracy (number of edges) of the polygonal approximation of a circle
+# T: end of observation period (=last stop time). Must be specified if only the
+#    start but not the stop times are supplied in stgrid (-> auto-generation of stop-times).
 ######################################################################
 
 obligColsNames_events <- c("time", "tile", "type", "eps.t", "eps.s")
 obligColsNames_stgrid <- c("start", "stop", "tile", "area")
 
-as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes), nCircle2Poly = 32)
+as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
+                          nCircle2Poly = 32, T = NULL)
 {
     # Check and SORT events and stgrid
     cat("\nChecking 'events':\n")
     events <- checkEvents(events)
     cat("Checking 'stgrid':\n")
-    stgrid <- checkstgrid(stgrid)
+    stgrid <- checkstgrid(stgrid, T)
 
     # Check qmatrix
     cat("Checking 'qmatrix'...\n")
@@ -223,7 +226,7 @@ checkEvents <- function (events, dropTypes = TRUE)
 
 ### CHECK FUNCTION FOR stgrid ARGUMENT IN as.epidataCS
 
-checkstgrid <- function(stgrid)
+checkstgrid <- function (stgrid, T)
 {
     # Check class
     stopifnot(inherits(stgrid, "data.frame"))
@@ -239,6 +242,14 @@ checkstgrid <- function(stgrid)
     cat("\n")
 
     # Check obligatory columns
+    autostop <- FALSE
+    if (is.null(stgrid[["stop"]])) {
+        if (is.null(T)) stop("'T' must be specified for auto-generation ",
+                             "of 'stop' column in 'stgrid'")
+        stopifnot(isScalar(T))
+        autostop <- TRUE
+        stgrid$stop <- NA_real_
+    }
     obligColsIdx <- match(obligColsNames_stgrid, names(stgrid), nomatch = NA_integer_)
     if (any(obligColsMissing <- is.na(obligColsIdx))) {
         stop("missing obligatory columns in 'stgrid': ",
@@ -249,23 +260,38 @@ checkstgrid <- function(stgrid)
     cat("\tConverting 'tile' into a factor variable...\n")
     stgrid$tile <- factor(stgrid$tile)
 
-    # Transform start/stop times into numeric variables
-    cat("\tConverting 'start' and 'stop' into numeric variables...\n")
+    # Transform start times into numeric variable
     stgrid$start <- as.numeric(stgrid$start)
-    stgrid$stop <- as.numeric(stgrid$stop)
+    
+    stgrid$stop <- if (autostop) {
+        # auto-generate stop times from start times and T
+        cat("\tAuto-generating 'stop' column...\n")
+        starts <- sort(unique(stgrid$start))
+        if (T <= starts[length(starts)]) {
+            stop("'T' must be larger than the last 'start' time in 'stgrid'")
+        }
+        stops <- c(starts[-1], T)
+        stops[match(stgrid$start, starts)]
+    } else {
+        as.numeric(stgrid$stop)
+    }
 
-    # Check start/stop consistency
-    cat("\tChecking start/stop consisteny...\n")
+    # chronological data.frame of unique periods
     histIntervals <- unique(stgrid[c("start", "stop")])
     histIntervals <- histIntervals[order(histIntervals[,1L]),]
     nBlocks <- nrow(histIntervals)
-    if (any(histIntervals[,2L] <= histIntervals[,1L])) {
-        stop("stop times must be greater than start times")
-   }
-    startStopCheck <- histIntervals[-1L,1L] != histIntervals[-nBlocks,2L]
-    if (startStopCheckIdx <- match(TRUE, startStopCheck, nomatch = 0)) {
-        stop("inconsistent start/stop times: time intervals not consecutive ",
-             "at stop time ", histIntervals[startStopCheckIdx,2L])
+
+    if (!autostop) {
+        # Check start/stop consistency
+        cat("\tChecking start/stop consisteny...\n")
+        if (any(histIntervals[,2L] <= histIntervals[,1L])) {
+            stop("stop times must be greater than start times")
+        }
+        startStopCheck <- histIntervals[-1L,1L] != histIntervals[-nBlocks,2L]
+        if (startStopCheckIdx <- match(TRUE, startStopCheck, nomatch = 0)) {
+            stop("inconsistent start/stop times: time intervals not consecutive ",
+                 "at stop time ", histIntervals[startStopCheckIdx,2L])
+        }
     }
 
     # Add BLOCK id
@@ -317,9 +343,9 @@ checkstgrid <- function(stgrid)
         eps <- events$eps.s[i]
         center <- eventCoords[i,]
         res[[i]] <- if (eps > ext) {   # influence region is whole region of W
-                as.owin(scale(Wgpc, center = center))
+                spatstat::as.owin(scale.poly(Wgpc, center = center))
             } else {   # influence region is a subset of W
-                as.owin(intersectCircle(Wgpc, center, eps, npoly))
+                spatstat::as.owin(intersectCircle(Wgpc, center, eps, npoly))
             }
         # if influence region actually is a circle of radius eps, attach eps as attribute
         r <- if (eps <= events$.bdist[i]) eps else NULL
@@ -408,7 +434,7 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
 
 
 
-### extract marks of the events
+### extract marks of the events (actually also including time and tile)
 
 marks.epidataCS <- function (x, ...) {
     markCols <- seq_len(match("BLOCK",names(x$events))-1L)
@@ -417,10 +443,8 @@ marks.epidataCS <- function (x, ...) {
 
 
 
-### print
+### printing methods
 
-# setOldClass(c("epidataCS", "list"))
-# setMethod("head", "epidataCS", function (x, n = 6L, ...)
 head.epidataCS <- function (x, n = 6L, ...)
 {
     visibleCols <- grep("^\\..+", names(x$events@data), invert = TRUE)
@@ -433,13 +457,12 @@ tail.epidataCS <- function (x, n = 6L, ...)
     utils:::tail.data.frame(x$events[visibleCols], n = n, ...)
 }
 
-
 print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
 {
     nRowsGrid <- nrow(x$stgrid)
     timeRange <- c(x$stgrid$start[1], x$stgrid$stop[nRowsGrid])
     bboxtxt <- paste(apply(bbox(x$W), 1,
-        function (int) paste("[", paste(format(int, trim=TRUE, digits=digits), collapse=", "), "]", sep="")
+        function (int) paste0("[", paste(format(int, trim=TRUE, digits=digits), collapse=", "), "]")
         ), collapse = " x ")
     nBlocks <- x$stgrid$BLOCK[nRowsGrid]
     nTiles <- nlevels(x$stgrid$tile)
@@ -451,7 +474,7 @@ print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
     cat("Spatio-temporal grid (not shown):", nBlocks,
         ngettext(nBlocks, "time block,", "time blocks,"),
         nTiles, ngettext(nTiles, "tile", "tiles"), "\n")
-    cat("Types of events:", paste("'",typeNames,"'",sep=""), "\n")
+    cat("Types of events:", paste0("'",typeNames,"'"), "\n")
     cat("Overall number of events:", nEvents, "\n\n")
     # 'print.SpatialPointsDataFrame' does not pass its "digits" argument on to 'print.data.frame', hence the use of options()
     odigits <- options(digits=digits)
@@ -476,6 +499,7 @@ summary.epidataCS <- function (object, ...)
     times <- object$events$time
     nEvents <- length(times)
     timeRange <- with(object$stgrid, c(start[1], stop[length(stop)]))
+    nBlocks <- object$stgrid$BLOCK[nrow(object$stgrid)]
     tiles <- object$events$tile
     bbox <- bbox(object$W)
     tileTable <- c(table(tiles))
@@ -483,16 +507,62 @@ summary.epidataCS <- function (object, ...)
     nTypes <- nlevels(types)
     typeTable <- c(table(types))
     nSources <- sapply(object$events$.sources, length)
+    eps <- object$events@data[c("eps.t", "eps.s")]
+    eventMarks <- marks(object)
 
     removalTimes <- times + object$events$eps.t
-    tps <- sort(unique(c(times, removalTimes)))
+    tps <- sort(unique(c(times, removalTimes[is.finite(removalTimes)])))
     nInfectious <- sapply(tps, function(t) sum(times < t & removalTimes >= t))
     counter <- stepfun(tps, c(0,nInfectious), right = TRUE)
 
-    list(timeRange = timeRange, bbox = bbox, nEvents = nEvents, nTypes = nTypes,
-         eventTimes = times, eventCoords = coords, eventTypes = types,
-         tileTable = tileTable, typeTable = typeTable,
-         counter = counter, nSources = nSources)
+    res <- list(timeRange = timeRange, bbox = bbox, nBlocks = nBlocks,
+                nEvents = nEvents, nTypes = nTypes,
+                eventTimes = times, eventCoords = coords, eventTypes = types,
+                eventRanges = eps, eventMarks = eventMarks, 
+                tileTable = tileTable, typeTable = typeTable,
+                counter = counter, nSources = nSources)
+    class(res) <- "summary.epidataCS"
+    res
+}
+
+print.summary.epidataCS <- function (x, ...)
+{
+    bboxtxt <- paste(apply(x$bbox, 1,
+        function (int) paste0("[", paste(format(int, trim=TRUE), collapse=", "), "]")
+        ), collapse = " x ")
+    cat("\n")
+    cat("Observation period:", paste(format(x$timeRange, trim=TRUE), collapse = " -- "), "\n")
+    cat("Observation window (bounding box):", bboxtxt, "\n")
+    cat("Spatio-temporal grid (not shown):", x$nBlocks,
+        ngettext(x$nBlocks, "time block,", "time blocks,"),
+        length(x$tileTable), ngettext(length(x$tileTable), "tile", "tiles"), "\n")
+    cat("Overall number of events:", x$nEvents,
+        if (x$nTypes==1) "(single type)" else paste0("(",x$nTypes," types)"),
+        "\n")
+    
+    ## if (x$nTypes > 1) {
+    ##     cat(x$nTypes, "types of events:\n")
+    ##     print(as.table(x$typeTable))
+    ## }
+    ## cat("\nTime points of events:\n")
+    ## print(summary(x$eventTimes))
+    ## cat("\nTiles of events:\n")
+    ## print(as.table(x$tileTable))
+    cat("\nSummary of the event marks:\n")
+    print(summary(x$eventMarks))
+
+    cat("Number of potential sources of transmission:\n")
+    if (any(is.finite(unlist(x$eventRanges)))) {
+        print(summary(x$nSources))
+        cat("\nStep function of the number of infectives over time:\n")
+        print(x["counter"])
+    } else {
+        cat("   monotonically increasing like the number of infectives\n",
+            "   because of infinite ranges of interaction ('eps.t' and 'eps.s')\n", sep="")
+    }
+    cat("\n")
+    
+    invisible(x)
 }
 
 
@@ -580,7 +650,7 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
         }
     }
     .info <- format.info(timeGrid)
-    timerformat <- paste("%", .info[1], ".", .info[2], "f", sep = "")
+    timerformat <- paste0("%", .info[1], ".", .info[2], "f")
 
     # animate
     loopIndex <- if (!sequential) timeGrid else {

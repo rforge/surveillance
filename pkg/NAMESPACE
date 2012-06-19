@@ -14,7 +14,7 @@ import(methods)
 
 importFrom(graphics, plot)
 importFrom(stats, simulate, profile, coef, vcov, logLik, AIC, extractAIC, pnorm, cov2cor, residuals, ks.test, confint)
-importFrom(utils, packageDescription, head, toLatex)
+importFrom(utils, packageDescription, head, tail, toLatex)
 importFrom(xtable, xtable)
 
 #importMethodsFrom(stats4, plot)   # import S4-generic
@@ -54,8 +54,9 @@ importFrom(quadprog, solve.QP)
 importClassesFrom(gpclib, gpc.poly)
 #importMethodsFrom(gpclib, coerce)   # we don't need to import coerce from gpclib because we import methods
 importMethodsFrom(gpclib, "[", get.bbox, intersect, append.poly, area.poly, get.pts, scale.poly, tristrip)
-importFrom(spatstat, as.owin, area.owin, distppl, as.im.function,
-                     disc, shift, marks, spatstat.options, bounding.box)
+importFrom(spatstat, as.owin, as.owin.gpc.poly, area.owin, distppl,
+                     as.im.function, disc, shift, shift.owin, plot.owin, marks,
+                     spatstat.options, bounding.box)
 importFrom(intervals, Intervals, reduce)
 
 
@@ -195,11 +196,15 @@ export(tiaf.constant, tiaf.exponential)
 
 S3method(update, epidataCS)
 S3method(head, epidataCS)
+S3method(tail, epidataCS)
 S3method(print, epidataCS)
 S3method(summary, epidataCS)
+S3method(print, summary.epidataCS)
 S3method(animate, epidataCS)
 # S3method(print, summary.epidataCS)  # there is no such method yet
 S3method(marks, epidataCS)
+export(marks.epidataCS)    # we also export it for convenience since the generic
+                           # is only available if package spatstat is loaded
 # S3method(plot, epidataCS)  # TODO... type=c("temporal", "spatial")
 S3method(as.epidata, epidataCS)
 

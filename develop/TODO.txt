@@ -18,13 +18,15 @@
 ###########
 
 #Open
-21/04/2011 incorporate a NAMESPACE :) (as of R 2.14.0 this is obligatory)
-11/11/2011 Author@R field in the ‘DESCRIPTION’ file
+11/11/2011 Author@R field in the ‘DESCRIPTION’ file.
+           CAVE: not supported with R < 2.14.0 => wait some time
 02/11/2011 plot for sts objects which contains daily data as Date obj
 19/06/2012 move vignettes into a vignettes directory or create .Rinstignore
            (as of R 2.14.0 the preferred location for vignette sources is
             directory ‘vignettes’ and not ‘inst/doc’)
 
+#Done
+21/04/2011 incorporate a NAMESPACE :) (as of R 2.14.0 this is obligatory)
 
 
 

@@ -864,7 +864,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
     names(optim.args$par) <- c(
         if (nbeta0 > 1L) {
-            paste("h.type",typeNames,sep="")
+            paste0("h.type",typeNames)
         } else if (nbeta0 == 1L) "h.(Intercept)",
         if (p > 0L) paste("h", colnames(mmhEvents), sep = "."),
         if (hase) paste("e", colnames(mme), sep = "."),
@@ -972,7 +972,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
     if (optimRes$convergence != 0) {
         cat("\nWARNING: OPTIMIZATION ROUTINE DID NOT CONVERGE",
-            if (optimMethod != "nlminb") paste("(code ", optimRes$convergence, ")", sep=""),
+            if (optimMethod != "nlminb") paste0("(code ", optimRes$convergence, ")"),
             "!\n")
         if (!is.null(optimRes$message) && nchar(optimRes$message) > 0L) {
             cat("MESSAGE: \"", optimRes$message, "\"\n", sep="")

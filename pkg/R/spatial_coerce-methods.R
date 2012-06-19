@@ -64,6 +64,7 @@ setAs(from = "SpatialPolygons", to = "gpc.poly", def = function (from)
 
 
 ### Method for coercion from "owin" (spatstat) to "gpc.poly" (gpclib)
+### Coercion the other way round is defined in spatstat::as.owin.gpc.poly
 
 setAs(from = "owin", to = "gpc.poly", def = function (from)
     {

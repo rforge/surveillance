@@ -486,12 +486,12 @@ checktiaf <- function (g, G, deriv, Deriv, npars, validpars, knots)
                 " interaction function in model")
         NULL
     } else if (is.list(iaf)) {
-        ret <- do.call(paste("check",name,sep=""), args = iaf)
+        ret <- do.call(paste0("check",name), args = iaf)
         attr(ret, "constant") <- attr(iaf, "constant")
         ret
     } else if (is.vector(iaf, mode = "numeric")) {
         stop("'knots' are not implemented for '",name,"'")
-        do.call(paste("check",name,sep=""), args = list(knots = iaf))
+        do.call(paste0("check",name), args = list(knots = iaf))
     } else {
         stop("'",name,"' must be NULL (or missing), a list (-> continuous ",
             "function), or numeric (-> knots of step function)")

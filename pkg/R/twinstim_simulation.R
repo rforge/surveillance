@@ -60,7 +60,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
     coefs <- c(
         if (nbeta0 > 1L) {
-            structure(beta0, names=paste("h.type",typeNames,sep=""))
+            structure(beta0, names=paste0("h.type",typeNames))
         } else if (nbeta0 == 1L) structure(beta0, names="h.(Intercept)"),
         if (p > 0L) structure(beta, names=paste("h",colnames(mmh),sep=".")),
         if (hase) structure(gamma, names=paste("e",colnames(mme),sep=".")),
@@ -1025,7 +1025,7 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
         capture.output(gc())
         # run the remaining simulations
         for (i in 2:nsim) {
-            cat("Simulation", sprintf(paste("%",nchar(nsim),"i",sep=""), i), "/", nsim, "...")
+            cat("Simulation", sprintf(paste0("%",nchar(nsim),"i"), i), "/", nsim, "...")
             capture.output(
             resi <- simEpidataCS(endemic, epidemic, siaf, tiaf, object$qmatrix, rmarks,
                 data$events, data$stgrid, tiles, beta0, beta, gamma, siafpars,
