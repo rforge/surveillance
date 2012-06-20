@@ -194,6 +194,7 @@ export(simEpidataCS)
 export(siaf.constant, siaf.gaussian, siaf.lomax)
 export(tiaf.constant, tiaf.exponential)
 
+S3method("[", epidataCS)
 S3method(update, epidataCS)
 S3method(head, epidataCS)
 S3method(tail, epidataCS)

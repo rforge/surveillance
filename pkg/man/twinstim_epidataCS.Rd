@@ -2,6 +2,7 @@
 \name{twinstim_epidataCS}
 \alias{as.epidataCS} 
 \alias{epidataCS}
+\alias{[.epidataCS}
 \alias{print.epidataCS}
 \alias{head.epidataCS}
 \alias{tail.epidataCS}
@@ -13,12 +14,10 @@
 \description{
   Data structure for (c)ontinuous (s)patio-temporal event data, typically
   cases of an infectious disease. The data structure simultaneously
-  contains a spatio-temporal grid of endemic covariates.
+  contains a spatio-temporal grid of endemic covariates and a
+  representation of the observation region.
 
-  Objects of this class are a collection of specific data frames
-  containing the event history of an epidemic together with some
-  additional attributes such as a spatio-temporal grid of endemic
-  covariates. These objects are the basis for fitting 
+  The \code{"epidataCS"} class is the basis for fitting 
   spatio-temporal epidemic intensity models with the function
   \code{\link{twinstim}}.
 }
@@ -29,6 +28,8 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 \method{print}{epidataCS}(x, n = 6L, digits = getOption("digits"), ...)
 \method{head}{epidataCS}(x, n = 6L, ...)
 \method{tail}{epidataCS}(x, n = 6L, ...)
+\method{[}{epidataCS}(x, i, j)
+
 \method{marks}{epidataCS}(x, ...)
 }
 \arguments{
@@ -99,7 +100,16 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   }
   \item{digits}{minimum number of significant digits to be printed in
     values.}
-  \item{\dots}{passed to the basic \code{print} method. Unused for \code{marks}.}
+  \item{\dots}{passed to the basic \code{print} method. Unused for
+    \code{marks}.}
+  \item{i,j}{
+    arguments passed to the
+    \code{\link[=[,SpatialPointsDataFrame-method]{[-method}} for
+    \code{SpatialPointDataFrame}s for subsetting the \code{events}.
+    Only epidemic covariates can be removed from \code{events} by the
+    \code{j} index. The other components of \code{x} (\code{stgrid},
+    \ldots) are retained.
+  }
 }
 \details{
   The function \code{as.epidataCS} is used to generate objects of class

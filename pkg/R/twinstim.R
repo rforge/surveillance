@@ -152,11 +152,14 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
     ### Extract essential information from model frame
 
-    # inmfe=ID=rowindex(data$events@data) is necessary for subsetting
-    # influenceRegion (list object not compatible with model.frame), coordinates and mfhEvents
-    inmfe <- mfe[["(ID)"]]     # I don't use model.extract because it returns named vectors
+    # inmfe=rowindex(data$events@data) is necessary for subsetting
+    # influenceRegion (list object not compatible with model.frame) and
+    # coordinates
+    # CAVE: ID is not necessarily identical to the rowindex of data$events,
+    #       e.g., if working with subsetted epidataCS
+    inmfe <- which(data$events@data$ID %in% mfe[["(ID)"]])
     N <- length(inmfe)   # mfe also contains events of the prehistory
-    eventTimes <- mfe[["(time)"]]
+    eventTimes <- mfe[["(time)"]] # I don't use model.extract since it returns named vectors
     # Indicate events after t0, which are actually part of the process
     # (events in (-Inf;t0] only contribute in sum over infected individuals)
     includes <- which(eventTimes > t0)   # this indexes mfe!
@@ -235,14 +238,14 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     ### Generate endemic model frame and model matrix on event data
 
     mfhEvents <- model.frame(endemic, data = eventsData,
-                             subset = time > t0 & time <= T & ID %in% inmfe,
+                             subset = time>t0 & time<=T & ID %in% mfe[["(ID)"]],
                              na.action = na.fail,
                              # since R 2.10.0 patched also works with endemic = ~1 (see PR#14066)
                              drop.unused.levels = FALSE)
     mmhEvents <- model.matrix(endemic, mfhEvents)
     # exclude intercept from endemic model matrix below, will be treated separately
     if (nbeta0 > 0) mmhEvents <- mmhEvents[,-1,drop=FALSE]
-# stopifnot(nrow(mmhEvents) == Nin)
+    stopifnot(nrow(mmhEvents) == Nin)   # TODO: remove check after some testing
     p <- ncol(mmhEvents)
     hash <- (nbeta0+p) > 0L
 
@@ -401,7 +404,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
     if (hash)
     {
-        ### Calculates the endemic component
+        ### Calculates the endemic component (for i in includes)
         ### h(t_i,s_i,kappa_i) = exp(offset_i + beta_{0,kappa_i} + eta_h(t_i,s_i))
 
         .hEvents <- function (beta0, beta) {}
@@ -417,7 +420,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 expression(eta <- beta0[eventTypes] + eta)   # type-specific intercept
             },
             if (!is.null(offsetEvents)) expression(eta <- offsetEvents + eta),
-            expression(exp(eta))
+            expression(exp(eta))        # Nin-vector
         ))
 
 

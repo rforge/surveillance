@@ -419,17 +419,36 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
 
     # Update .sources
     if (!missing(eps.t) || !missing(eps.s) || !missing(qmatrix)) {
-        eventTimes <- object$events$time
-        removalTimes <- eventTimes + object$events$eps.t
-        eventDists <- as.matrix(dist(object$events@coords, method = "euclidean"))
-        object$events$.sources <- lapply(seq_len(nEvents), function (i) {
-            determineSources(i, eventTimes, removalTimes, eventDists[i,],
-                             object$events$eps.s, object$events$type, object$qmatrix)
-        })
+        object$events$.sources <- determineSources.epidataCS(object)
     }
 
     # Done update.
     return(object)
+}
+
+
+
+### subsetting epidataCS, i.e. select only part of the events,
+### but retain stgrid, W, and qmatrix
+
+"[.epidataCS" <- function (x, i, j)
+{
+    cl <- sys.call()
+    cl[[1]] <- as.name("[")
+    cl[[2]] <- substitute(x$events)
+    x$events <- eval(cl, envir=parent.frame())
+    if (!missing(j)) {                # only epidemic covariates may be selected
+        BLOCKstartEndemicVars <- setdiff(names(x$stgrid),
+            setdiff(obligColsNames_stgrid,"start"))
+        if (!all(obligColsNames_events %in% names(x$events)) ||
+            !all(BLOCKstartEndemicVars %in% names(x$events))) {
+            stop("only epidemic covariates may be removed from 'events'")
+        }
+    }
+    if (!missing(i)) {                  # update .sources
+        x$events$.sources <- determineSources.epidataCS(x)
+    }
+    return(x)
 }
 
 

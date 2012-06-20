@@ -30,26 +30,44 @@ bdist <- function (xy, poly)
 
 
 
-### Determines indexes of potential sources of infection of event i
+### Determines indexes of potential sources of infection
 
-# i only indexes eventTimes, which is an nEvents-vector like all other arguments
+## determine potential sources of the i'th event
+## all arguments but i and qmatrix are nEvents-vectors
+## -> determine potential sources for eventTimes[i], eventsTypes[i] with
+## distances distvec_j = ||s_i - s_j||
 determineSources <- function (i, eventTimes, removalTimes, distvec, eps.s,
     eventTypes = NULL, qmatrix)
 {
     tp <- eventTimes[i]
     type <- eventTypes[i]   # NULL[i] -> NULL
     infectivity <- (eventTimes < tp) & (removalTimes >= tp)
-    #<- eventTimes<tp, not "=" because CIF is left-continuous. Also guarantees no self-infection
+    #<- eventTimes<tp, not "=" because CIF is left-continuous.
+    #Also guarantees no self-infection
     proximity <- as.vector(distvec <= eps.s, mode = "logical")
     #<- as.vector to remove names
     matchType <- if (is.null(eventTypes)) TRUE else {
-        typeInfective <- qmatrix[,type]   # indexing by internal integer code of factor
+        typeInfective <- qmatrix[,type] # indexed by integer code of factor
         #<- logical vector indicating for each type if it could infect type of i
         as.vector(typeInfective, mode = "logical")[eventTypes]
         #<- as.vector to remove names
     }
     # return IDs of potential epidemic sources
     which(infectivity & proximity & matchType)
+}
+
+## determine the .sources for an epidataCS object, i.e.
+## lapply the previous function to all of object$events
+determineSources.epidataCS <- function (object)
+{
+    eventTimes <- object$events$time
+    removalTimes <- eventTimes + object$events$eps.t
+    eventDists <- as.matrix(dist(object$events@coords, method = "euclidean"))
+    lapply(seq_along(eventTimes), function (i) {
+        determineSources(i, eventTimes, removalTimes, eventDists[i,],
+                         object$events$eps.s, object$events$type,
+                         object$qmatrix) 
+    })
 }
 
 
