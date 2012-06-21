@@ -5,7 +5,6 @@
 --------------------------------------------------------------------------------
 
 - plot.epidataCS (type=c("temporal", "spatial"))
-- update.twinstim
 - keep some parameters fixed at initial values
 
 - Bei NA-Zuordnung von tile eine warning schmeißen statt abzubrechen (abbruch erfolgt zur zeit mit na.fail in buildmmh)

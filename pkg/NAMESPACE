@@ -191,7 +191,7 @@ export(as.epidataCS)
 export(twinstim)
 # intensityplot
 export(simEpidataCS)
-export(siaf.constant, siaf.gaussian, siaf.lomax)
+export(siaf.constant, siaf.gaussian, siaf.lomax, qlomax)
 export(tiaf.constant, tiaf.exponential)
 
 S3method("[", epidataCS)
@@ -222,7 +222,6 @@ S3method(logLik, twinstim)
 S3method(simulate, twinstim)
 S3method(R0, twinstim)
 S3method(residuals, twinstim)
-##S3method(update, twinstim)   # TODO: would be nice...
 
 S3method(print, simEpidataCSlist)
 

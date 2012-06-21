@@ -132,10 +132,10 @@ siaf.gaussian <- function (nTypes, logsd = TRUE, density = FALSE,
 ### Implementation of an isotropic power law kernel, specifically the
 ### Lomax distribution, i.e. a shifted Pareto distribution with domain [0;Inf)
 
-## internal helper function: quantile function of the Lomax distribution
+## quantile function of the Lomax distribution
 ## we could also use VGAM::qlomax (but this would be slightly slower)
-qlomax <- function (p, sigma, alpha) {
-    sigma * ((1-p)^(-1/alpha) - 1)
+qlomax <- function (p, scale, shape) {
+    scale * ((1-p)^(-1/shape) - 1)
 }
 
 ## density=FALSE returns standardized Lomax kernel, i.e. f(x) = f_Lomax(x)/f(0),
