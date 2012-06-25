@@ -2,6 +2,7 @@
 \name{hhh4_methods}
 \alias{print.ah4}
 \alias{summary.ah4}
+\alias{print.summary.ah4}
 \alias{logLik.ah4}
 \alias{AIC.ah4}
 \alias{coef.ah4}
@@ -24,8 +25,7 @@ from a call to \code{\link{hhh4}}.
 \usage{
 \method{print}{ah4}(x, digits = max(3, getOption("digits") - 3),
        reparamPsi = TRUE, ...)
-\method{summary}{ah4}(object, digits = max(3, getOption("digits") - 3),
-       reparamPsi = TRUE, ...)
+\method{summary}{ah4}(object, ...)
 
 \method{coef}{ah4}(object, se = FALSE, reparamPsi = TRUE, 
        idx2Exp = NULL, amplitudeShift = FALSE, ...)
@@ -49,8 +49,8 @@ from a call to \code{\link{hhh4}}.
     to a user scale (where zero corresponds to a Poisson distribution). 
   }
   \item{\dots}{
-    For the \code{fixef} and \code{ranef} methods: arguments passed to
-    \code{coef}.\cr
+    For the \code{summary}, \code{fixef} and \code{ranef} methods: 
+    arguments passed to \code{coef}.\cr
     For the remaining methods: unused (argument of the generic).
   }
   \item{se}{logical switch indicating if standard errors are required}

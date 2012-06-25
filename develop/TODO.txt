@@ -144,6 +144,8 @@ minutes. Possible to fix this??
 - add documentation for oneStepAhead predictions/scores
 - improve and document plot/predict methods
 - profiling of hhh4 ...
+- remove redundant elements in control/stsObj/terms to reduce the
+  size of ah4-objects
 
 
 

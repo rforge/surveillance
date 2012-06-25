@@ -31,19 +31,46 @@ print.ah4 <- function (x, digits = max(3, getOption("digits") - 3),reparamPsi=TR
   }
 }
 
-summary.ah4 <- function(object,digits = max(3, getOption("digits") - 3),reparamPsi=TRUE,...){
-  if(!object$convergence)
+summary.ah4 <- function(object, ...){
+  ret <- object[c("call","convergence","dim","loglikelihood","margll","nTime","nUnit")]
+
+  # get estimated covariance matrix of random effects
+  if(object$dim["random"]>0){
+	REmat <- object$Sigma
+	attr(REmat, "correlation") <- cov2cor(REmat)
+	attr(REmat, "sd") <- sqrt(diag(REmat))
+    rownames(REmat) <- colnames(REmat) <- gsub("sd.", "", names(object$Sigma.orig))[grep("sd.", names(object$Sigma.orig))]
+
+	aic <- NULL
+	bic <- NULL
+  } else{
+	REmat <- NULL
+	aic <- AIC(object)
+    bic <- AIC(object,k=log(object$nObs))
+  }
+
+  fe <- fixef(object,se=TRUE, ...)
+  re <- ranef(object)
+
+  ret <- c(ret, list(fixef=fe, ranef=re, REmat=REmat, AIC=aic, BIC=bic))
+  class(ret) <- "summary.ah4"
+  return(ret)
+}
+
+print.summary.ah4 <- function(x, digits = max(3, getOption("digits") - 3), ...){
+  if(!x$convergence){
     cat('Results are not reliable! Try different starting values. \n')
-  else {
-    if(!is.null(object$call)){
-      cat("\nCall: \n", paste(deparse(object$call), sep = "\n", collapse = "\n"), 
+	invisible(x)
+  } else {
+    if(!is.null(x$call)){
+      cat("\nCall: \n", paste(deparse(x$call), sep = "\n", collapse = "\n"), 
         "\n\n", sep = "")
     }
     
-    if(object$dim["random"]>0){
+    if(x$dim["random"]>0){
       cat('Random effects: \n')
-      V <- as.matrix(round(diag(getCov(object)),digits=digits))
-      corr <- round(getCov(object),digits=digits)
+      V <- as.matrix(round(diag(x$REmat),digits=digits))
+      corr <- round(attr(x$REmat, "correlation"),digits=digits)
       corr[upper.tri(corr,diag=TRUE)] <- ""
       V.corr <- cbind(V,corr)
       colnames(V.corr) <- c("Var","Corr",rep("",ncol(V.corr)-2))
@@ -51,28 +78,26 @@ summary.ah4 <- function(object,digits = max(3, getOption("digits") - 3),reparamP
     }
         
     cat('\nFixed effects: \n')
-    coefs <- rbind(coefficients(object, se=TRUE,reparamPsi=reparamPsi)[1:object$dim["fixed"],])
-    
-    print(round(cbind("Estimates"=coefs[,"Estimates"],
-                 "Std.Error"=coefs[,"Std. Error"]),digits=digits),print.gap=2)
+    print(round(x$fixef,digits=digits),print.gap=2)
 
-    if(object$dim["random"]==0){
-      cat('\nlog-likelihood:   ',round(object$loglik,digits=digits-2),'\n')  
-      cat('AIC:              ',round(AIC(object),digits=digits-2),'\n')
-      cat('BIC:              ',round(AIC(object,k=log(object$nObs)),digits=digits-2),'\n\n')
+    if(x$dim["random"]==0){
+      cat('\nlog-likelihood:   ',round(x$loglikelihood,digits=digits-2),'\n')  
+      cat('AIC:              ',round(x$AIC,digits=digits-2),'\n')
+      cat('BIC:              ',round(x$BIC,digits=digits-2),'\n\n')
     } else {
-      cat('\npenalized log-likelihood: ',round(object$loglik,digits=digits-2),'\n')  
-      cat('marginal log-likelihood:  ',round(object$margll,digits=digits-2),'\n\n')        
+      cat('\npenalized log-likelihood: ',round(x$loglikelihood,digits=digits-2),'\n')  
+      cat('marginal log-likelihood:  ',round(x$margll,digits=digits-2),'\n\n')        
     }
     
-    cat('Number of units:         ',object$nUnit,'\n')
-    cat('Number of time points:   ',object$nTime,'\n\n')
+    cat('Number of units:         ',x$nUnit,'\n')
+    cat('Number of time points:   ',x$nTime,'\n\n')
     
-    if(any(coefs[,"Estimates"]== -20)){
-      cat("Warning: coefficients \'",rownames(coefs)[coefs[,"Estimates"]==-20] ,"\' could not be estimated accurately\n\n")
+    if(any(x$fixef[,"Estimates"]== -20)){
+      cat("Warning: coefficients \'",rownames(x$fixef)[x$fixef[,"Estimates"]==-20] ,"\' could not be estimated accurately\n\n")
     }
   }
-
+  
+  invisible(x)
 }
 
 logLik.ah4 <- function(object,...){

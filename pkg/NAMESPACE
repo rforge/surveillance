@@ -250,6 +250,7 @@ export(ranef)  # S3-generic
 export(fixef)  # S3-generic
 
 S3method(print, ah4)
+S3method(print, summary.ah4)
 S3method(summary, ah4)
 S3method(coef, ah4)
 S3method(logLik, ah4)

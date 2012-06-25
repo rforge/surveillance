@@ -31,7 +31,8 @@ hhh4 <- function(stsObj,
                                 stop.niter = 100),
                verbose = FALSE,
                start=list(fixed=NULL,random=NULL,sd.corr=NULL), # list with initials, overrides any initial values in formulas
-               data=data.frame(t=epoch(stsObj)-1)    # data.frame or named list with covariates that are specified in the formulas for the 3 components
+               data=data.frame(t=epoch(stsObj)-1),    # data.frame or named list with covariates that are specified in the formulas for the 3 components
+               keep.terms=FALSE
                )
    ){
         
@@ -150,6 +151,12 @@ hhh4 <- function(stsObj,
   margll <- c(marLogLik(Sigma, thetahat,model))
   Sigma.trans <- getSigmai(head(Sigma,model$nVar),tail(Sigma,model$nCorr),model$nVar)
   
+  if(control$keep.terms){
+	term <- model
+  } else {
+	term <- NULL
+  }
+
   result <- list(coefficients=thetahat, se=se, cov=cov, 
                  Sigma=Sigma.trans,   # estimated covariance matrix
                  Sigma.orig=Sigma,    # variance parameters on original scale
@@ -158,7 +165,7 @@ hhh4 <- function(stsObj,
                  dim=c(fixed=dimFixedEffects,random=dimRandomEffects),
                  loglikelihood=loglik, margll=margll, 
                  convergence=convergence,
-                 fitted.values=fitted, control=control,terms=model, stsObj=stsObj, 
+                 fitted.values=fitted, control=control,terms=term, stsObj=stsObj, 
                  lag=1, nObs=sum(!model$isNA[control$subset,]),nTime=length(model$subset),nUnit=ncol(stsObj))
   
   class(result) <- "ah4"
@@ -308,6 +315,8 @@ setControl <- function(control, stsObj){
       control$start$sd.corr <- NULL 
   }
   
+  if(is.null(control[["keep.terms",exact=TRUE]]))
+    control$keep.terms <- FALSE
         
   control$nTime <- nTime
   control$nUnits <- nUnits
@@ -2140,11 +2149,17 @@ addSeason2formula <- function(f=~1,       # formula to start with
 
 oneStepAhead <- function(result, # result of call to hhh4
                          tp,     # one-step-ahead predictions for time points (tp+1):nrow(stsObj)
-                         verbose=1){
+                         verbose=1,
+                         keep.estimates = FALSE){
   
   stsObj <- result$stsObj
-  model <- result$terms
   control <- result$control
+  if(is.null(result$terms)){
+	# get model terms
+	model <- interpretControl(control,stsObj)
+  } else {
+	model <- result$terms
+  }
   
   # which model: negbin or poisson?
   dimOverdisp <- model$nOverdisp
@@ -2174,11 +2189,14 @@ oneStepAhead <- function(result, # result of call to hhh4
     return(res)
   }
   
- 
-  # save value of log-likelihood (pen+mar) and parameter estimates
-  params <- matrix(NA,nrow=length(tp:nTime)-1,ncol=length(coef(res))+2)
-  # save values of estimated covariance
-  vars <- matrix(NA,nrow=length(tp:nTime)-1,ncol=model$nSigma)
+  if(keep.estimates){
+	# save value of log-likelihood (pen+mar) and parameter estimates
+	params <- matrix(NA,nrow=length(tp:nTime)-1,ncol=length(coef(res))+2)
+	# save values of estimated covariance
+	vars <- matrix(NA,nrow=length(tp:nTime)-1,ncol=model$nSigma)
+  } else {
+	params <- vars <- NULL
+  }
 
   # make one-step ahead prediction for time point tp+1
   for(i in (tp):(nTime-1)) {
@@ -2192,19 +2210,25 @@ oneStepAhead <- function(result, # result of call to hhh4
       # check convergence        
       # do a grid search in case of non-convergence ?
       if(res$convergence){
-      # make one-step ahead prediction for time point tp+1
+        # make one-step ahead prediction for time point tp+1
         pred[i-tp+1,] <- tail(predict(res,newSubset=2:(i+1),type="response"),1)
-        params[i-tp+1,] <- c(res$loglikelihood,res$margll,coef(res,reparamPsi=FALSE))
-        vars[i-tp+1,] <- getSdCorr(res)
+		# get overdispersion parameter
         if(negbin)
           psi[i-tp+1,] <- coef(res, reparamPsi=FALSE)[grep("overdisp",names(coef(res)))]
+		# save parameter estimates
+		if(keep.estimates){
+		  params[i-tp+1,] <- c(res$loglikelihood,res$margll,coef(res,reparamPsi=FALSE))
+		  vars[i-tp+1,] <- getSdCorr(res)
+		}
       } else {
         cat("NO convergence in iteration", i-tp,"\n")
         res <- res.old
       }
   }
    
-  return(list(mean=pred,psi=psi,params=params,variances=vars,x=observed(stsObj[(tp+1):nTime]),result=resN))
+  return(list(mean=pred, psi=psi, x=observed(stsObj[(tp+1):nTime]),
+		      allConverged=all(!is.na(pred)),
+              params=params,variances=vars))
 
 }
 

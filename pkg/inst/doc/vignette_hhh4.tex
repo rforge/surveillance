@@ -482,7 +482,7 @@ as follows:
 \end{Sinput}
 \begin{Soutput}
 ~1 + sin(2 * pi * t/52) + cos(2 * pi * t/52)
-<environment: 0x605ebc8>
+<environment: 0x7e50258>
 \end{Soutput}
 \begin{Sinput}
 > # fit Poisson model
@@ -494,10 +494,10 @@ hhh4(stsObj = meningo, control = list(end = list(f = f_S1), family = "Poisson"))
 
 
 Fixed effects: 
-                        Estimates  Std.Error
-end.1                      2.2648     0.0187
-end.sin(2 * pi * t/52)     0.3619     0.0259
-end.cos(2 * pi * t/52)     0.2605     0.0258
+                        Estimates  Std. Error
+end.1                      2.2648      0.0187
+end.sin(2 * pi * t/52)     0.3619      0.0259
+end.cos(2 * pi * t/52)     0.2605      0.0258
 
 log-likelihood:    -872.09 
 AIC:               1750.19 
@@ -597,22 +597,22 @@ hhh4(stsObj = fluMen, control = m)
 
 
 Fixed effects: 
-                                      Estimates  Std.Error
-ar.1.influenza                          -0.3044     0.0678
-ar.1.meningococcus                      -2.3523     0.5980
-ne.1.meningococcus                      -5.2167     0.2605
-end.1.influenza                          1.0883     0.1653
-end.1.meningococcus                      2.1186     0.0668
-end.sin(2 * pi * t/52).influenza         1.1862     0.2360
-end.sin(2 * pi * t/52).meningococcus     0.2666     0.0397
-end.cos(2 * pi * t/52).influenza         1.5098     0.1467
-end.cos(2 * pi * t/52).meningococcus     0.2290     0.0353
-end.sin(4 * pi * t/52).influenza         0.9192     0.1715
-end.cos(4 * pi * t/52).influenza        -0.1616     0.1799
-end.sin(6 * pi * t/52).influenza         0.3692     0.1500
-end.cos(6 * pi * t/52).influenza        -0.5345     0.1619
-1/overdisp.influenza                     0.2946     0.0358
-1/overdisp.meningococcus                 0.0395     0.0109
+                                      Estimates  Std. Error
+ar.1.influenza                          -0.3044      0.0678
+ar.1.meningococcus                      -2.3523      0.5980
+ne.1.meningococcus                      -5.2167      0.2605
+end.1.influenza                          1.0883      0.1653
+end.1.meningococcus                      2.1186      0.0668
+end.sin(2 * pi * t/52).influenza         1.1862      0.2360
+end.sin(2 * pi * t/52).meningococcus     0.2666      0.0397
+end.cos(2 * pi * t/52).influenza         1.5098      0.1467
+end.cos(2 * pi * t/52).meningococcus     0.2290      0.0353
+end.sin(4 * pi * t/52).influenza         0.9192      0.1715
+end.cos(4 * pi * t/52).influenza        -0.1616      0.1799
+end.sin(6 * pi * t/52).influenza         0.3692      0.1500
+end.cos(6 * pi * t/52).influenza        -0.5345      0.1619
+1/overdisp.influenza                     0.2946      0.0358
+1/overdisp.meningococcus                 0.0395      0.0109
 
 log-likelihood:    -1880.97 
 AIC:               3791.94 
@@ -693,18 +693,18 @@ ne.ri(iid)  0.9594
 end.ri(iid) 0.5094 0.5617 
 
 Fixed effects: 
-                        Estimates  Std.Error
-ar.1                      -0.8976     0.0369
-ne.ri(iid)                -1.5256     0.1035
-end.I((t - 208)/100)       0.5620     0.0235
-end.sin(2 * pi * t/52)     2.1849     0.0985
-end.cos(2 * pi * t/52)     2.3319     0.1224
-end.sin(4 * pi * t/52)     0.4403     0.1053
-end.cos(4 * pi * t/52)    -0.3947     0.0940
-end.sin(6 * pi * t/52)     0.3217     0.0648
-end.cos(6 * pi * t/52)    -0.2647     0.0631
-end.ri(iid)                0.2192     0.1028
-1/overdisp                 1.0991     0.0343
+                        Estimates  Std. Error
+ar.1                      -0.8976      0.0369
+ne.ri(iid)                -1.5256      0.1035
+end.I((t - 208)/100)       0.5620      0.0235
+end.sin(2 * pi * t/52)     2.1849      0.0985
+end.cos(2 * pi * t/52)     2.3319      0.1224
+end.sin(4 * pi * t/52)     0.4403      0.1053
+end.cos(4 * pi * t/52)    -0.3947      0.0940
+end.sin(6 * pi * t/52)     0.3217      0.0648
+end.cos(6 * pi * t/52)    -0.2647      0.0631
+end.ri(iid)                0.2192      0.1028
+1/overdisp                 1.0991      0.0343
 
 penalized log-likelihood:  -18742.42 
 marginal log-likelihood:   -343.26 
@@ -735,6 +735,8 @@ The mean logarithmic and mean ranked probability score are then computed with
 \begin{Sinput}
 > colMeans(scores(pred.B2)[, c("logs", "rps")])
 \end{Sinput}
+\end{Schunk}
+\begin{Schunk}
 \begin{Soutput}
      logs       rps 
 0.5632647 0.4362529 

@@ -55,7 +55,8 @@ hhh4(stsObj,
                                 stop.niter = 100),
                verbose = FALSE,
                start = list(fixed=NULL, random=NULL, sd.corr=NULL),
-               data = data.frame(t = epoch(stsObj)-1)   
+               data = data.frame(t = epoch(stsObj)-1),
+               keep.terms = FALSE
                )
    )
 }
@@ -104,17 +105,19 @@ hhh4(stsObj,
 	overdispersion parameter for all units (\code{NegBin1}) or a
 	overdispersion parameter for each unit (\code{NegBinM}).
       }
-      \item{\code{subset}}{typically \code{2:nrow(obs)} if model contains
+      \item{\code{subset}}{Typically \code{2:nrow(obs)} if model contains
 	autoregression}
-      \item{\code{optimizer}}{ details for used optimizer (\code{nlminb} is 
+      \item{\code{optimizer}}{ Details for used optimizer (\code{nlminb} is 
         default, \code{optim} may also be used)}
       \item{\code{verbose}}{Logical if additional information is to be printed
 	during the computations}
-      \item{\code{start}}{list with initials, overrides any initial
+      \item{\code{start}}{List with initials, overrides any initial
 	values in formulas (this is currently the only way to specify
 	initial values)}
       \item{\code{data}}{ data.frame or named list with covariates that
 	are specified in the formulas for the 3 components}
+      \item{\code{keep.terms}}{ Logical if the terms object used in the fit
+    is to be returned }
     }
   }
 }
@@ -133,9 +136,10 @@ hhh4(stsObj,
   \item{convergence}{logical. Did optimizer converge?}
   \item{fitted.values}{fitted mean values \eqn{\mu_{i,t}}{\mu_it}}
   \item{control}{control object of the fit}
-  \item{terms}{ the terms object used in the fit }
+  \item{terms}{ the terms object used in the fit if \code{keep.terms = TRUE}
+    and \code{NULL} otherwise}
   \item{stsObj}{ the supplied \code{stsObj} }
-  \item{lag}{ specified lag of the autoregression, ATM always \eqn{=1} }
+  \item{lag}{ specified lag of the autoregression, ATM always \eqn{= 1} }
   \item{nObs}{number of observations used for fitting the model}
   \item{nTime}{ number of time points used for fitting the model }
   \item{nUnit}{ number of units (e.g.\ areas) used for fitting the model }

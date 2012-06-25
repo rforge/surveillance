@@ -78,10 +78,6 @@ library("Matrix")
 options(width=70)
 set.seed(247)
 
-#Now part of the package
-#source("../R/algo_hhh4.R")
-#source("../R/scores.R")
-
 ######################################################################
 #Do we need to compute or can we just fetch results
 ######################################################################
@@ -595,12 +591,13 @@ model.B2 <- list(ar = list(f = ~ 1),
 
 if(compute){   
   # this takes quite a while
-  model.B2$verbose <- 1            
   result.B2 <- hhh4(flu, model.B2)
-  
+  s.B2 <- summary(result.B2)
+
   system.time(pred.B2 <- oneStepAhead(result.B2,tp=nrow(flu)-2*52))
+  meanSc.B2 <- colMeans(scores(pred.B2)) 
     
-  save(result.B2, pred.B2, file="hhh4results.RData")
+  save(s.B2, meanSc.B2, file="hhh4results.RData")
 }
 @
 
@@ -625,7 +622,7 @@ model.B2 <- list(ar = list(f = ~ 1),
 summary(result.B2 <- hhh4(flu, model.B2))
 @
 <<echo=F>>=
-summary(result.B2)
+s.B2
 @
 Model choice based on information criteria such as AIC or BIC is well
 explored and understood for models that correspond to fixed-effects likelihoods.
@@ -643,8 +640,11 @@ follows:
 pred.B2 <- oneStepAhead(result.B2, tp = nrow(flu) - 2 * 52)
 @
 The mean logarithmic and mean ranked probability score are then computed with
-<<eval=T>>=
+<<eval=F>>=
 colMeans(scores(pred.B2)[, c("logs", "rps")])
+@
+<<echo=F, eval=T>>=
+meanSc.B2[ c("logs", "rps")]
 @
 
 
