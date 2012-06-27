@@ -306,7 +306,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     # this is just to test consistence with 'beta'
     mmh <- buildmmh(eventData[0L,])
     if (ncol(mmh) != p) {
-        stop("length of 'beta' (", p, ") does not match the 'endemic' specification (", ncol(mmhEvents), ")")
+        stop("length of 'beta' (", p, ") does not match the 'endemic' specification (", ncol(mmh), ")")
     }
 
 
@@ -729,7 +729,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                 .eventType <- sample(typeNames[qmatrix[sourceType,]], 1L)
                 .eventTypeCode <- match(.eventType, typeNames)
                 eventLocationIR <- if (constantsiaf) {
-                        as.matrix(coords(spatstat::runifpoint(1L, win=sourceIR, giveup=1000)))
+                        as.matrix(spatstat::coords(spatstat::runifpoint(1L, win=sourceIR, giveup=1000)))
                     } else {
                         eventInsideIR <- FALSE
                         ntries <- 0L
@@ -982,8 +982,6 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
 
     ### Run the simulation(s)
 
-    if (is.null(seed)) seed <- .Random.seed else set.seed(seed)
-
     # First simulation
     if (nsim > 1L) {
         cat("\nTime at beginning of simulation:", as.character(Sys.time()), "\n")
@@ -1047,6 +1045,7 @@ print.simEpidataCSlist <- function (x, ...)
     simplified <- attr(x, "simplified")
     nsim <- if (simplified) length(x$eventsList) else length(x)
     cat("\n")
-    cat(if (simplified) "Simplified list" else "List", "of", nsim, "simulated epidemics of class \"simEpidataCS\" (not printed)\n\n")
+    cat(if (simplified) "Simplified list" else "List", "of", nsim,
+        "simulated epidemics of class \"simEpidataCS\" (not printed)\n\n")
     invisible(x)
 }

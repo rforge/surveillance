@@ -11,6 +11,7 @@
 ##   11 Jun 2012 (SM): Restored and cleaned up Makefile
 ##   18 Jun 2012 (SM): fixed make manual bug (must first remove old manual.pdf)
 ##   19 Jun 2012 (SM): run check on built package instead of source directory
+##   27 Jun 2012 (SM): added checkUsage recipe (R package codetools)
 ################################################################################
 
 ## Define variable for R executable which enables the use of alternatives,
@@ -47,6 +48,13 @@ check: build
 
 install: ${SYSDATA}
 	$R CMD INSTALL pkg
+
+checkUsage: install
+	echo "library('surveillance'); library('codetools'); \
+	checkUsagePackage('surveillance', suppressFundefMismatch=FALSE, \
+	    suppressLocalUnused=TRUE, suppressNoLocalFun=TRUE, skipWith=TRUE, \
+	    suppressUndefined=FALSE, suppressPartialMatchArgs=FALSE)" \
+	| R --slave --no-save --no-restore
 
 manual:	
 	rm -f manual.pdf

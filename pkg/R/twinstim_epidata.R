@@ -333,7 +333,7 @@ checkstgrid <- function (stgrid, T)
 # If it is actually a circular influence region, then there is an attribute
 # "radius" denoting the radius of the influence region.
 .influenceRegions <- function (events, Wgpc, npoly) {
-    ext <- sqrt(sum(sapply(get.bbox(Wgpc), diff)^2))   # length of the diagonal of the bounding box
+    ext <- sqrt(sum(sapply(gpclib::get.bbox(Wgpc), diff)^2))   # length of the diagonal of the bounding box
     eventCoords <- coordinates(events)
     nEvents <- nrow(eventCoords)
     res <- vector(nEvents, mode = "list")
@@ -348,7 +348,7 @@ checkstgrid <- function (stgrid, T)
         # if influence region actually is a circle of radius eps, attach eps as attribute
         r <- if (eps <= events$.bdist[i]) eps else NULL
         attr(res[[i]], "radius") <- r
-        attr(res[[i]], "area") <- if(is.null(r)) area.owin(res[[i]]) else pi*r^2
+        attr(res[[i]], "area") <- if(is.null(r)) spatstat::area.owin(res[[i]]) else pi*r^2
     }
     attr(res, "nCircle2Poly") <- npoly
     return(res)
@@ -478,7 +478,7 @@ print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
 {
     nRowsGrid <- nrow(x$stgrid)
     timeRange <- c(x$stgrid$start[1], x$stgrid$stop[nRowsGrid])
-    bboxtxt <- paste(apply(bbox(x$W), 1,
+    bboxtxt <- paste(apply(sp::bbox(x$W), 1,
         function (int) paste0("[", paste(format(int, trim=TRUE, digits=digits), collapse=", "), "]")
         ), collapse = " x ")
     nBlocks <- x$stgrid$BLOCK[nRowsGrid]
@@ -518,7 +518,7 @@ summary.epidataCS <- function (object, ...)
     timeRange <- with(object$stgrid, c(start[1], stop[length(stop)]))
     nBlocks <- object$stgrid$BLOCK[nrow(object$stgrid)]
     tiles <- object$events$tile
-    bbox <- bbox(object$W)
+    bbox <- sp::bbox(object$W)
     tileTable <- c(table(tiles))
     types <- object$events$type
     nTypes <- nlevels(types)
@@ -596,8 +596,8 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
 {
     library("animation")
     stopifnot(is.numeric(interval), length(interval) == 2L)
-    sleep <- ani.options("interval")
-    nmax <- ani.options("nmax")
+    sleep <- animation::ani.options("interval")
+    nmax <- animation::ani.options("nmax")
     s <- summary(object)
     removalTimes <- s$eventTimes + object$events$eps.t
     eventCoordsTypes <- cbind(s$eventCoords, type = s$eventTypes)
@@ -818,7 +818,7 @@ as.epidata.epidataCS <- function (data, tileCentroids, eps = 0.001, ...)
     # individual data
     indItimes <- data$events$time
     indRtimes <- indItimes + data$events$eps.t
-    indInts <- Intervals(cbind(indItimes, indRtimes, deparse.level = 0L))
+    indInts <- intervals::Intervals(cbind(indItimes, indRtimes, deparse.level = 0L))
     indTiles <- data$events$tile
 
     # tile data
@@ -826,7 +826,7 @@ as.epidata.epidataCS <- function (data, tileCentroids, eps = 0.001, ...)
     tileInts <- lapply(tileRows, function (rows) {
         if (length(rows)==0L) { matrix(0,0,2) } else if (length(rows)==1L) {
             as.matrix(indInts[rows])
-        } else as.matrix(reduce(indInts[rows]))
+        } else as.matrix(intervals::reduce(indInts[rows]))
     })
     tileNames <- rep(names(tileInts), sapply(tileInts, nrow))
     tileItimes <- unlist(lapply(tileInts, function(ints) ints[,1]), use.names=FALSE)

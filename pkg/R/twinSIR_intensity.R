@@ -1,6 +1,6 @@
 ################################################################################
-# Authors: Sebastian Meyer, Michael Hoehle
-# Date: 02 June 2009, modified 25 Mar 2011
+# Authors: Sebastian Meyer, with contributions by Michael Hoehle
+# Date: 02 June 2009, modified 25 Mar 2011, 27 Jun 2012
 #
 # This file contains functions related to calculating and plotting intensities.
 ################################################################################
@@ -133,7 +133,7 @@ intensityplot_twinSIR <- function(model,
     ## helper function for use with by()
     intensity <- function(iddata, what) {
         # 'iddata' will be a subset of survs, 'what' will be "wlambda" or "we"
-        y <- numeric(nTimes)
+        y <- numeric(nTimes)            # zeroes
         y[match(iddata$stop, timepoints)] <- iddata[[what]]
         y
     }
@@ -144,25 +144,25 @@ intensityplot_twinSIR <- function(model,
     ## Calculate individual _total intensity_ paths
     lambda <- rowSums(eh)
     survs$wlambda <- as.vector(model$weights * lambda)
-    # put individual intensity paths into a matrix [nTimes x n]
-    wlambdaID <- by(data = survs, INDICES = list(id = survs$id),
-                    FUN = intensity, what = "wlambda")
-                    # would use simplify = FALSE here to omit the condition below,
-                    # but this only exists since R 2.8.0 and the default was/is TRUE
-    #hoehle@25.3.11 -- this does not work for hagelloch data where there is
-    #an initial infectious person. Going back to slow but stable -> Sebastian 
-#    wlambdaIDmatrix <- if (is.list(wlambdaID)) {
-#                         as.matrix(as.data.frame(c(wlambdaID), optional = TRUE))
-#                       } else { # wlambdaID is numeric, only if nTimes == 1
-#                         t(as.matrix(wlambdaID))
-#                       }
-#     # alternative way but slower:
-     wlambdaIDmatrix <- matrix(0, nrow = nTimes, ncol = length(idlevels),
-                               dimnames = list(NULL, idlevels))
-     for (ID in idlevels) {
-         iddata <- survs[survs$id == ID,]
-         wlambdaIDmatrix[match(iddata$stop, timepoints), ID] <- iddata$wlambda
-     }
+    
+    ## put individual intensity paths into a matrix [nTimes x n]
+    wlambdaID <- by(data = survs, INDICES = survs["id"],
+                    FUN = intensity, what = "wlambda", simplify = FALSE)
+    # initially infectious individuals (without re-infection) don't appear in
+    # survs, since they are never atRiskY => wlambdaID[[i]] is NULL for such an
+    # individual i but should be a 0-vector of length nTimes
+    initiallyInfected <- names(which(sapply(wlambdaID, is.null)))
+    #if (length(initiallyInfected) > 0L)   # not necessary
+    wlambdaID[initiallyInfected] <- rep(list(numeric(nTimes)), length(initiallyInfected))
+    wlambdaIDmatrix <- as.matrix(as.data.frame(c(wlambdaID), optional = TRUE))
+
+    ## alternative way but slower:
+    ## wlambdaIDmatrix <- matrix(0, nrow = nTimes, ncol = length(idlevels),
+    ##                           dimnames = list(NULL, idlevels))
+    ## for (ID in idlevels) {
+    ##     iddata <- survs[survs$id == ID,]
+    ##     wlambdaIDmatrix[match(iddata$stop, timepoints), ID] <- iddata$wlambda
+    ## }
     
     if (which != "total intensity") {
         ## Calculate individual _epidemic intensity_ paths
@@ -173,25 +173,20 @@ intensityplot_twinSIR <- function(model,
             }
             as.vector(model$weights * eh[,1])
         }
-        # put individual epidemic intensity paths into a matrix [nTimes x n]
+        ## put individual epidemic intensity paths into a matrix [nTimes x n]
         weID <- by(data = survs, INDICES = list(id = survs$id),
-                   FUN = intensity, what = "we")
-                   # would use simplify = FALSE here to omit the condition below,
-                   # but this only exists since R 2.8.0 and the default was/is TRUE
-        #hoehle@25.3.2011 - Does not work if initial infectious in data
-#        weIDmatrix <- if (is.list(weID)) {
-#                        as.matrix(as.data.frame(c(weID), optional = TRUE))
-#                      } else { # weID is numeric, only if nTimes == 1
-#                        t(as.matrix(weID))
-#                      }
-#     #-->hoehle: added alternative code which is slower, but works
-        weIDmatrix <- matrix(0, nrow = nTimes, ncol = length(idlevels),
-                              dimnames = list(NULL, idlevels))
-        for (ID in idlevels) {
-          iddata <- survs[survs$id == ID,]
-          weIDmatrix[match(iddata$stop, timepoints), ID] <- iddata$we
-        }
-        ##end of bug fix -> cross check with Sebastian
+                   FUN = intensity, what = "we", simplify = FALSE)
+        # we have to replace NULL entries by numeric(nTimes) (cf. wlambdaID)
+        weID[initiallyInfected] <- rep(list(numeric(nTimes)), length(initiallyInfected))
+        weIDmatrix <- as.matrix(as.data.frame(c(weID), optional = TRUE))
+
+        ## alternative code which is slower:
+        ## weIDmatrix <- matrix(0, nrow = nTimes, ncol = length(idlevels),
+        ##                       dimnames = list(NULL, idlevels))
+        ## for (ID in idlevels) {
+        ##     iddata <- survs[survs$id == ID,]
+        ##     weIDmatrix[match(iddata$stop, timepoints), ID] <- iddata$we
+        ## }
     }
     
     ## Generate matrix with data for 'matplot'

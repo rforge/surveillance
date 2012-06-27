@@ -32,7 +32,7 @@ setAs(from = "Polygons", to = "gpc.poly", def = function (from)
 
 setAs(from = "gpc.poly", to = "Polygons", def = function (from)
     {
-        srl <- lapply(get.pts(from), function (poly) {
+        srl <- lapply(gpclib::get.pts(from), function (poly) {
             if (isClosed(poly)) {
                 Polygon(cbind(poly$x,poly$y), hole = poly$hole)
             } else {
@@ -55,7 +55,7 @@ setAs(from = "SpatialPolygons", to = "gpc.poly", def = function (from)
         gpc <- new("gpc.poly")
         for (i in seq_along(polygonsList))
         {
-            gpc <- append.poly(gpc, as(polygonsList[[i]], "gpc.poly"))
+            gpc <- gpclib::append.poly(gpc, as(polygonsList[[i]], "gpc.poly"))
         }
         gpc
     }

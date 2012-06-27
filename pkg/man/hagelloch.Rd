@@ -111,13 +111,11 @@ data("hagelloch")
   stateplot(hagelloch, id=c("187"))
 
   \dontrun{
-    #Show a dynamic illustration of the spread of the infection using
-    #the animation package
-    require("animation")
+    #Show a dynamic illustration of the spread of the infection
     animate(hagelloch,time.spacing=0.1,legend.opts=list(x="topleft"),sleep=10/550)
   }
 
-  #For an analysis of the data see also the example of twinSIR.
+  #For an analysis of the data see also the example of twinSIR. (@Michael: TODO)
 }
 
 \references{
@@ -125,7 +123,6 @@ data("hagelloch")
   besonderer Ber\enc{ü}{ue}cksichtgung der statistischen Verh\enc{ä}{ae}ltnisse,
   M.D. Thesis, Eberhard-Karls Universit\enc{ä}{ae}t, T\enc{ü}{ue}bingen.
   Available as \url{http://www.archive.org/details/beitrgezurpatho00pfeigoog}.
-
   
   Oesterle, H. (1992). Statistische Reanalyse einer Masernepidemie 1861
   in Hagelloch, M.D. Thesis, Eberhard-Karls Universit\enc{ä}{ae}at,
@@ -135,6 +132,6 @@ data("hagelloch")
   selection for the 1861 Hagelloch measles epidemic, Biostatistics
   5(2):249-261
 }
-\seealso{\code{\link{twinSIR}},\code{\link{epidata}}}
+\seealso{\code{\link{twinSIR}}, \code{\link{epidata}}}
 \keyword{datasets}
 

@@ -60,7 +60,7 @@ inside.gpc.poly <- function(x, y = NULL, polyregion, mode.checked = FALSE)
 	xy <- xy.coords(x, y, recycle=FALSE)
 	N <- length(xy$x)
     # check for each polygon of polyregion if points are in the polygon
-    locations <- sapply(get.pts(polyregion), function(poly) {
+    locations <- sapply(gpclib::get.pts(polyregion), function (poly) {
         pip <- sp::point.in.polygon(xy$x, xy$y, poly$x, poly$y, mode.checked = mode.checked)
         if (poly$hole) { # if point is inside a hole then attribute -Inf
             ifelse(pip == 1, -Inf, 0)
@@ -102,7 +102,7 @@ intersectCircle <- function (Wgpc, center, r, npoly)
 {
     circle <- discpoly(center = center, r = r, npoly = npoly,
                        class = "gpc.poly", hole = FALSE)
-    intersection <- intersect(circle, Wgpc)  # this order seems to be faster
+    intersection <- gpclib::intersect(circle, Wgpc)  # this order seems to be faster
     scale.poly(intersection, center = center) # use scale method as defined above
 }
 

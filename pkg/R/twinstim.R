@@ -621,7 +621,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 epsTypes <- if (!is.null(siaf$effRange)) {
                         siaf$effRange(siafpars) / nCub
                     } else {
-                        2 * min(eps.s) / spatstat.options("npixel")
+                        2 * min(eps.s) / spatstat::spatstat.options("npixel")
                     }
                 epsTypes <- rep(epsTypes, length.out = nTypes)
                 derivInt <- sapply(1:nsiafpars, function (paridx) {
@@ -914,7 +914,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             initeffRanges <- initeffRangeTypes[eventTypes]
             border <- which(eps.s > bdist & initeffRanges > bdist)
             if (length(border) > 0L) {
-                maxarea <- bounding.box(influenceRegion[border][[which.max(iRareas[border])]])
+                maxarea <- spatstat::bounding.box(influenceRegion[border][[which.max(iRareas[border])]])
                 inithmin <- min(initeffRangeTypes) / nCub
                 ceiling(c(diff(maxarea$xrange), diff(maxarea$yrange)) / inithmin)
             } else NULL

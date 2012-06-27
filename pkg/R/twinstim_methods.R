@@ -199,9 +199,13 @@ ret
 ### Plot evolution of the intensity
 
 intensityplot.twinstim <- function (x, which = c("epidemic proportion", "endemic proportion", 
-    "total intensity"), aggregate = c("space", "time"), ...)
+    "total intensity"), aggregate = c("time", "space"), ...)
 {
+    which <- match.arg(which)
+    aggregate <- match.arg(aggregate)
+    
     stop("not yet implemented")
+    
 }
 
 

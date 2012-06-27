@@ -2,7 +2,9 @@
 \name{R0}
 \alias{R0}
 \alias{R0.twinstim}
+
 \title{Computes basic reproduction numbers from fitted models}
+
 \description{
 The S3 generic function \code{R0} defined in package \pkg{surveillance} is intended to
 compute basic reproduction numbers from fitted epidemic models.
@@ -11,11 +13,13 @@ computes mean numbers of infections caused by infected individuals depending on 
 and marks attached to the individual, which contribute to the infection pressure
 in the epidemic predictor of that class.
 }
+
 \usage{
 R0(object, ...)
 
 \method{R0}{twinstim}(object, newevents, dimyx = spatstat.options("npixel"), ...)
 }
+
 \arguments{
   \item{object}{A fitted epidemic model object for which an \code{R0} method exists.}
   \item{newevents}{
@@ -38,6 +42,7 @@ R0(object, ...)
   }
   \item{\dots}{currently unused (argument of the generic).}
 }
+
 \details{
 For the \code{"\link{twinstim}"} class, the individual-specific mean
 number \eqn{\mu_j} of infections caused by individual \eqn{j} inside its
@@ -52,16 +57,19 @@ radius \eqn{\delta}, \eqn{\eta_j} is the epidemic linear predictor,
 interaction function with interaction range \eqn{\delta}
 (=\code{eps.s}).
 }
+
 \value{
 numeric vector of estimated basic reproduction numbers from the fitted
 model \code{object} corresponding to the rows of \code{newevents}.
 }
+
 \references{
   Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2011). A Space-Time Conditional
   Intensity Model for Invasive Meningococcal Disease Occurrence.
   Biometrics, in press. DOI: 10.1111/j.1541-0420.2011.01684.x
   A technical report is available as: http://epub.ub.uni-muenchen.de/11898/
 }
+
 \author{Sebastian Meyer}
 
 \examples{

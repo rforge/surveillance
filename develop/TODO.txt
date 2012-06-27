@@ -45,22 +45,21 @@
 04/04/2011 osAIC computations by simulation does not work in some
            cases where estimated coefficient is small (global in Hagelloch)
            Problems occur in the quadratic programming (->Michael)
+
+#Fixed
 25/03/2011 intensityPlot in twinSIR does not work if there are initially
            infectious individuals (as in the hagelloch data)
 
-#Fixed
-
 
 ###########
-# Feature
+# Features
 ###########
 
 #Open
-24/03/2011 animate using animation package for objects of type epidata
+24/03/2011 animate using animation package for objects of type "epidata"
            problem is that only one graphics frame is opened and iteratively
            filled by 'points'; "animation" would need one frame per picture
 05/04/2011 R0 calculations as for twinstim (->Sebastian?)
-05/04/2011 Plot function of epidata objects (->Michael)
 12/06/2012 summary.twinSIR sollte zwischen epi und endemic effects unterscheiden
 
 #Done
@@ -120,12 +119,12 @@ minutes. Possible to fix this??
 ##########
 
 #Open issues / feature requests
-- Plot function for epidataCS objects
 - robustification of optim procedure by making it less adaptive -> sebastian
 - Documentation of functions in Rd files; also update references (Biometrics)
 - intensityPlot as in twinSIR, i.e. on W integrated intensity (and its components) as a function of time, grouped by type
 
 #Done
+05/04/2011 Plot function of epidataCS objects
 08/04/2011 (michael): Implemented profile function as in twinSIR.
 12/08/2010 (sebastian): speed-up calculation of tau importantly by only evaluating .siafInt(siafpars) once
 06/08/2010 (sebastian): Lambda(t) function, i.e. cumulative intensity function

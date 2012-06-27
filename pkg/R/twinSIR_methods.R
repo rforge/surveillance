@@ -432,9 +432,6 @@ profile.twinSIR <- function (fitted, profile, alpha = 0.05,
 
 residuals.twinSIR <- function(object, plot=TRUE, ...)
 {
-  #Extract parameters
-  theta.hat <- coef(object)
-
   #Extract event and stop-times
   eventTimes <- attr(object$model$survs,"eventTimes")
   sortedStop <- sort(unique(object$model$survs[,"stop"]))
@@ -444,7 +441,7 @@ residuals.twinSIR <- function(object, plot=TRUE, ...)
   nTimes <- nrow(object$model$X)
   zerovec <- numeric(nTimes)
 
-  # Extract the fitted model params from theta
+  # Extract the fitted model params
   px <- ncol(object$model$X)
   pz <- ncol(object$model$Z)
   theta <- coef(object)
