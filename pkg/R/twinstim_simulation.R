@@ -3,9 +3,7 @@
 ### additive-multiplicative spatio-temporal intensity model of class 'twinstim'.
 ### It basically uses Ogata's modified thinning algorithm
 ### (cf. Daley & Vere-Jones, 2003, Algorithm 7.5.V.).
-###
 ### Author: Sebastian Meyer
-### $Date: 2010-11-16 12:48:57 +0100 (Tue, 16 Nov 2010) $
 ################################################################################
 
 # PARAMS:
@@ -42,12 +40,340 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
 
     #######################
-    ### Check arguments ###
+    ### Check arguments ### (this takes many lines of code ...)
     #######################
 
 
     cat("\nChecking the supplied arguments ...\n")
-    eval(checkSimArgs)
+
+    ### Some simple checks
+
+    if (length(trace) != 1L) stop("'trace' must be a single integer or logical value")
+    trace <- as.integer(trace)
+    if (!isScalar(nCircle2Poly)) stop("'nCircle2Poly' must be scalar")
+    nCircle2Poly <- as.integer(nCircle2Poly)
+    if (!isScalar(.allocate)) stop("'.allocate' must be scalar")
+    .allocate <- as.integer(.allocate)
+    .skipChecks <- as.logical(.skipChecks)
+    .onlyEvents <- as.logical(.onlyEvents)
+
+
+    ### Check formulae
+
+    if (missing(endemic)) endemic <- ~ 0 else stopifnot(inherits(endemic, "formula"))
+    if (missing(epidemic)) epidemic <- ~ 0 else stopifnot(inherits(epidemic, "formula"))
+
+
+    ### Check parameters
+
+    beta0 <- if (missing(beta0)) numeric(0L) else as.vector(beta0, mode="numeric")
+    beta  <- if (missing(beta))  numeric(0L) else as.vector(beta,  mode="numeric")
+    gamma <- if (missing(gamma)) numeric(0L) else as.vector(gamma, mode="numeric")
+    siafpars <- if (missing(siafpars)) numeric(0L) else as.vector(siafpars, mode="numeric")
+    tiafpars <- if (missing(tiafpars)) numeric(0L) else as.vector(tiafpars, mode="numeric")
+    nbeta0 <- length(beta0)
+    p <- length(beta)
+    q <- length(gamma)
+    nsiafpars <- length(siafpars)
+    ntiafpars <- length(tiafpars)
+
+    hase <- q > 0L
+    hassiafpars <- nsiafpars > 0L
+    hastiafpars <- ntiafpars > 0L
+    if (!hase && (hassiafpars | hastiafpars)) {
+        stop("'siafpars' and 'tiafpars' require 'gamma'")
+    }
+
+
+    ### Check qmatrix
+
+    if (missing(qmatrix)) qmatrix <- diag(1)
+    typeNames <- rownames(qmatrix)
+    if (is.null(typeNames)) typeNames <- "1"    # single event type
+    qmatrix <- checkQ(qmatrix, typeNames)
+    nTypes <- length(typeNames)
+    if (nbeta0 > 1L && nbeta0 != nTypes) {
+        stop("'beta0' must have length 0, 1, or 'nrow(qmatrix)'")
+    }
+    qSumTypes <- rowSums(qmatrix)  # how many types can be triggered by each type
+
+
+    ### Check stgrid
+
+    if (!.skipChecks) {
+        cat("Checking 'stgrid':\n")
+        stgrid <- checkstgrid(stgrid[grep("^BLOCK$", names(stgrid), invert=TRUE)])
+    }
+
+
+    ### Check time range
+
+    if (is.null(t0)) t0 <- eval(formals()$t0)
+    if (is.null(T)) T <- eval(formals()$T)
+    if (!isScalar(t0) || !isScalar(T)) {
+        stop("endpoints 't0' and 'T' must be single numbers")
+    }
+    if (T <= t0) {
+        stop("'T' must be greater than 't0'")
+    }
+    stopifnot(t0 >= stgrid$start[1], T <= tail(stgrid$stop,1))
+
+
+    ### Subset stgrid to include actual time range only
+
+    # BLOCK in stgrid such that start time is equal to or just before t0
+    block_t0 <- stgrid$BLOCK[match(TRUE, stgrid$start > t0) - 1L]
+    # BLOCK in stgrid such that stop time is equal to or just after T
+    block_T <- stgrid$BLOCK[match(TRUE, stgrid$stop >= T)]
+    stgrid <- subset(stgrid, BLOCK >= block_t0 & BLOCK <= block_T)
+    stgrid$start[stgrid$BLOCK == block_t0] <- t0
+    stgrid$stop[stgrid$BLOCK == block_T] <- T
+    # matrix of BLOCKS and start times (used later)
+    blockstarts <- with(stgrid,
+        cbind(block_t0:block_T, start[match(block_t0:block_T, BLOCK)])
+    )
+
+
+    ### Check class of W, and class, proj4string and names of tiles
+
+    if (is.null(W)) {
+    	if (require("maptools")) {
+            cat("Building W as the union of 'tiles' ...\n")
+            W <- maptools::unionSpatialPolygons(tiles,
+                     IDs = rep.int(1,length(tiles@polygons)),
+                     avoidGEOS = TRUE)
+        } else {
+            stop("automatic generation of 'W' from 'tiles' requires package \"maptools\"")
+        }
+    }
+    stopifnot(inherits(W, "SpatialPolygons"), inherits(tiles, "SpatialPolygons"),
+              proj4string(tiles) == proj4string(W),
+              (tileLevels <- levels(stgrid$tile)) %in% row.names(tiles))
+
+    # Transform W into a gpc.poly
+    Wgpc <- as(W, "gpc.poly")
+
+
+    ### Check mark-generating function
+
+    epscols <- c("eps.t", "eps.s")
+    unpredMarks <- setdiff(unique(c(if (hase) epscols, all.vars(epidemic))), "type")
+    # <- eps.t and eps.s are also taken to be unpredictable marks
+    rmarks <- if (missing(rmarks) || is.null(rmarks)) NULL else match.fun(rmarks)
+    hasMarks <- !is.null(rmarks)
+    if (hasMarks) {
+        sampleCoordinate <- coordinates(spsample(tiles, n=1L, type="random"))
+        sampleMarks <- rmarks(t0, sampleCoordinate)
+        # should be a one-row data.frame
+        if (!is.data.frame(sampleMarks) || nrow(sampleMarks) != 1L) {
+            stop("'rmarks' must return a one-row data.frame of marks")
+        }
+        if (!all(sapply(sampleMarks, function(x) inherits(x, c("integer","numeric","factor"), which=FALSE)))) {
+            stop("'rmarks' must return \"numeric\", \"integer\" or \"factor\" variables only")
+        }
+        markNames <- names(sampleMarks)
+        if (.idx <- match(FALSE, unpredMarks %in% markNames, nomatch=0L)) {
+            stop("the unpredictable mark '", unpredMarks[.idx], "' is not returned by 'rmarks'")
+        }
+    } else if (length(unpredMarks) > 0L) {
+        stop("missing mark-generating function 'rmarks' for the 'epidemic' component")
+    }
+
+
+    ### Check events (prehistory of the process)
+
+    # empty prehistory
+    eventCoords <- matrix(0, nrow=0L, ncol=2L)
+    eventData <- data.frame(
+        ID   = integer(0L),
+        time = numeric(0L),
+        tile = factor(character(0L), levels=tileLevels),
+        type = factor(character(0L), levels=typeNames),
+        check.rows = FALSE, check.names = FALSE
+    )
+    if (hasMarks) {
+        eventData <- cbind(eventData, sampleMarks[0L,])
+    }
+    Nout <- 0L
+    # do we have a prehistory in 'events'
+    if (!missing(events) && !is.null(events)) {
+        .reservedColsIdx <- match(c("ID",".obsInfLength",".bdist",".influenceRegion",".sources"), names(events))
+        events <- events[setdiff(seq_along(names(events)),.reservedColsIdx)]
+        if (!.skipChecks) {
+            cat("Checking 'events':\n")
+            events <- checkEvents(events, dropTypes = FALSE)
+            # epscols are obligatory in 'checkEvents', which is also appropriate here
+            # because in the case of endemic-only processes we would not need a prehistory at all
+        }
+        # select prehistory of events which are still infective
+        .stillInfective <- with(events@data, time <= t0 & time + eps.t > t0)
+        Nout <- sum(.stillInfective)    # = number of events in the prehistory
+        if (Nout > 0L) {
+            stopifnot(proj4string(events) == proj4string(W))
+            events <- events[.stillInfective,]
+            # check event types
+            events@data$type <- factor(events@data$type, levels=typeNames)
+            if (any(.typeIsNA <- is.na(events@data$type))) {
+                warning("removed unknown event types in 'events'")
+                events <- events[!.typeIsNA,]
+            }
+            eventCoords <- coordinates(events)
+            eventData <- events@data
+            # update ID counter
+            eventData$ID <- 1:Nout
+            # check presence of unpredictable marks
+            if (.idx <- match(FALSE, unpredMarks %in% names(eventData), nomatch=0L)) {
+                stop("missing unpredictable mark '", unpredMarks[.idx], "' in 'events'")
+            }
+            # check type of unpredictable marks
+            for (um in unpredMarks) {
+                if (!identical(class(sampleMarks[[um]]), class(eventData[[um]]))) {
+                    stop("the class of the unpredictable mark '", um, "' in the 'events' prehistory ",
+                         "is not identical to the class returned by 'rmarks'")
+                }
+            }
+            # add marks which are not in epidemic model but which are simulated by 'rmarks'
+            if (length(.add2events <- setdiff(markNames, names(eventData))) > 0L) {
+                eventData <- cbind(eventData, sampleMarks[.add2events])
+                is.na(eventData[.add2events]) <- TRUE
+            }
+            eventData <- eventData[c("ID", "time", "tile", "type", markNames)]
+        } else {
+            .eventstxt <- if (.skipChecks) "data$events" else "events"   # account for simulate.twinstim
+            cat("(no events from '", .eventstxt, "' were considered as prehistory)\n", sep="")
+        }
+    }
+
+
+    ### Build epidemic model matrix
+
+    epidemic <- terms(epidemic, data = eventData, keep.order = TRUE)
+    if (!is.null(attr(epidemic, "offset"))) {
+        warning("offsets are not implemented for the 'epidemic' component")
+    }
+
+    # helper function taking eventData and returning the epidemic model.matrix
+    buildmme <- function (eventData)
+    {
+        mfe <- model.frame(epidemic, data = eventData, na.action = na.fail, drop.unused.levels = FALSE)
+        model.matrix(epidemic, mfe)
+    }
+    mme <- buildmme(eventData)
+
+    if (ncol(mme) != q) {
+        cat(ncol(mme), "epidemic model terms:\t", paste(colnames(mme), collapse="  "), "\n")
+        stop("length of 'gamma' (", q, ") does not match the 'epidemic' specification (", ncol(mme), ")")
+    }
+
+
+    ### Build endemic model matrix
+
+    endemic <- terms(endemic, data = stgrid, keep.order = TRUE)
+
+    # check if we have an endemic component at all
+    hasOffset <- !is.null(attr(endemic, "offset"))
+    hash <- (nbeta0 + p + hasOffset) > 0L
+    if (!hash && !hase) {
+        stop("nothing to do: neither endemic nor epidemic parameters were specified")
+        # actually, the process might be endemic offset-only, which I don't care about ATM
+    }
+
+    # ensure that we have correct contrasts in the endemic component
+    attr(endemic, "intercept") <- as.integer(nbeta0 > 0L)
+
+    # which variables do we have to copy from stgrid?
+    stgridCopyCols <- match(all.vars(endemic), names(stgrid), nomatch = 0L)
+
+    # helper function taking eventData (with time and tile columns) and returning the endemic model.matrix
+    buildmmh <- function (eventData)
+    {
+        # if 'pi' appears in 'endemic' we don't care, and if a true covariate is missing, model.frame will throw an error
+        # attach endemic covariates from 'stgrid' to events
+        gridcellsOfEvents <- integer(nrow(eventData))
+        for (i in seq_along(gridcellsOfEvents)) {
+            gridcellsOfEvents[i] <- gridcellOfEvent(eventData[i,"time"], eventData[i,"tile"], stgrid)
+        }
+        eventData <- cbind(eventData, stgrid[gridcellsOfEvents, stgridCopyCols])
+        # construct model matrix
+        mfhEvents <- model.frame(endemic, data = eventData, na.action = na.fail, drop.unused.levels = FALSE)
+        mmhEvents <- model.matrix(endemic, mfhEvents)
+        # exclude intercept from endemic model matrix below, will be treated separately
+        if (nbeta0 > 0) mmhEvents <- mmhEvents[,-1,drop=FALSE]
+        structure(mmhEvents, offset = model.offset(mfhEvents))
+    }
+
+    # actually, we don't need the endemic model matrix for the events at all
+    # this is just to test consistence with 'beta'
+    mmh <- buildmmh(eventData[0L,])
+    if (ncol(mmh) != p) {
+        stop("length of 'beta' (", p, ") does not match the 'endemic' specification (", ncol(mmhEvents), ")")
+    }
+
+
+    ### Build endemic model matrix on stgrid
+
+    mfhGrid <- model.frame(endemic, data = stgrid, na.action = na.fail, drop.unused.levels = FALSE,
+                           BLOCK = BLOCK, tile = tile, ds = area)
+    # we don't actually need 'tile' in mfhGrid; this is only for easier identification when debugging
+    mmhGrid <- model.matrix(endemic, mfhGrid)
+    # exclude intercept from endemic model matrix below, will be treated separately
+    if (nbeta0 > 0) mmhGrid <- mmhGrid[,-1,drop=FALSE]
+
+    # Extract endemic model components
+    offsetGrid <- model.offset(mfhGrid)
+    gridBlocks <- mfhGrid[["(BLOCK)"]]
+    ds <- mfhGrid[["(ds)"]]
+
+
+    ### Parse interaction functions
+
+    if (hase) {
+
+        ## Check interaction functions
+        siaf <- do.call(".parseiaf", args = alist(siaf))
+        tiaf <- do.call(".parseiaf", args = alist(tiaf))
+
+        ## Spatially constant interaction siaf(s) = 1
+        constantsiaf <- is.null(siaf) || isTRUE(attr(siaf, "constant"))
+        if (constantsiaf) {
+            siaf <- siaf.constant()
+        } else attr(siaf, "constant") <- FALSE
+        if (siaf$npars != nsiafpars) {
+            stop("length of 'siafpars' (", nsiafpars, ") does not match the 'siaf' specification (", siaf$npars, ")")
+        }
+
+        ## Temporally constant interaction tiaf(t) = 1
+        constanttiaf <- is.null(tiaf) || isTRUE(attr(tiaf, "constant"))
+        if (constanttiaf) {
+            tiaf <- tiaf.constant()
+            gmax <- 1L
+        } else attr(tiaf, "constant") <- FALSE
+        if (tiaf$npars != ntiafpars) {
+            stop("length of 'tiafpars' (", ntiafpars, ") does not match the 'tiaf' specification (", tiaf$npars, ")")
+        }
+
+        ## Check nCub
+        if (!constantsiaf) {
+            nCub <- as.integer(nCub)
+            if (any(nCub <= 0L)) {
+                stop("'nCub' must be positive")
+            }
+        }
+
+        ## Check gmax
+        if (is.null(gmax)) {
+            gmax <- max(tiaf$g(rep.int(0,nTypes), tiafpars, 1:nTypes))
+            cat("assuming gmax =", gmax, "\n")
+        } else if (!isScalar(gmax)) {
+            stop("'gmax' must be scalar")
+        }
+
+    } else {
+        if ((!missing(siaf) && !is.null(siaf)) || (!missing(tiaf) && !is.null(tiaf))) {
+            warning("'siaf' and 'tiaf' can only be modelled in conjunction with an 'epidemic' process")
+        }
+        siaf <- tiaf <- NULL
+    }
 
 
     ### print some information on the upcoming simulation
@@ -403,7 +729,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                 .eventType <- sample(typeNames[qmatrix[sourceType,]], 1L)
                 .eventTypeCode <- match(.eventType, typeNames)
                 eventLocationIR <- if (constantsiaf) {
-                        as.matrix(coords(runifpoint(1L, win=sourceIR, giveup=1000)))
+                        as.matrix(coords(spatstat::runifpoint(1L, win=sourceIR, giveup=1000)))
                     } else {
                         eventInsideIR <- FALSE
                         ntries <- 0L
@@ -414,7 +740,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                             }
                             ntries <- ntries + 1L
                             eventLocationIR <- siaf$simulate(1L, siafpars, .eventTypeCode)
-                            eventInsideIR <- inside.owin(eventLocationIR[,1], eventLocationIR[,2], sourceIR)
+                            eventInsideIR <- spatstat::inside.owin(eventLocationIR[,1],
+                                  eventLocationIR[,2], sourceIR)
                         }
                         eventLocationIR
                     }
@@ -575,345 +902,6 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     class(epi) <- c("simEpidataCS", "epidataCS", "list")
     return(epi)
 }
-
-
-
-#######################
-### Check arguments ###
-#######################
-
-checkSimArgs <- expression(
-{
-    ### Some simple checks
-
-    if (length(trace) != 1L) stop("'trace' must be a single integer or logical value")
-    trace <- as.integer(trace)
-    if (!isScalar(nCircle2Poly)) stop("'nCircle2Poly' must be scalar")
-    nCircle2Poly <- as.integer(nCircle2Poly)
-    if (!isScalar(.allocate)) stop("'.allocate' must be scalar")
-    .allocate <- as.integer(.allocate)
-    .skipChecks <- as.logical(.skipChecks)
-    .onlyEvents <- as.logical(.onlyEvents)
-
-
-    ### Check formulae
-
-    if (missing(endemic)) endemic <- ~ 0 else stopifnot(inherits(endemic, "formula"))
-    if (missing(epidemic)) epidemic <- ~ 0 else stopifnot(inherits(epidemic, "formula"))
-
-
-    ### Check parameters
-
-    beta0 <- if (missing(beta0)) numeric(0L) else as.vector(beta0, mode="numeric")
-    beta  <- if (missing(beta))  numeric(0L) else as.vector(beta,  mode="numeric")
-    gamma <- if (missing(gamma)) numeric(0L) else as.vector(gamma, mode="numeric")
-    siafpars <- if (missing(siafpars)) numeric(0L) else as.vector(siafpars, mode="numeric")
-    tiafpars <- if (missing(tiafpars)) numeric(0L) else as.vector(tiafpars, mode="numeric")
-    nbeta0 <- length(beta0)
-    p <- length(beta)
-    q <- length(gamma)
-    nsiafpars <- length(siafpars)
-    ntiafpars <- length(tiafpars)
-
-    hase <- q > 0L
-    hassiafpars <- nsiafpars > 0L
-    hastiafpars <- ntiafpars > 0L
-    if (!hase && (hassiafpars | hastiafpars)) {
-        stop("'siafpars' and 'tiafpars' require 'gamma'")
-    }
-
-
-    ### Check qmatrix
-
-    if (missing(qmatrix)) qmatrix <- diag(1)
-    typeNames <- rownames(qmatrix)
-    if (is.null(typeNames)) typeNames <- "1"    # single event type
-    qmatrix <- checkQ(qmatrix, typeNames)
-    nTypes <- length(typeNames)
-    if (nbeta0 > 1L && nbeta0 != nTypes) {
-        stop("'beta0' must have length 0, 1, or 'nrow(qmatrix)'")
-    }
-    qSumTypes <- rowSums(qmatrix)  # how many types can be triggered by each type
-
-
-    ### Check stgrid
-
-    if (!.skipChecks) {
-        cat("Checking 'stgrid':\n")
-        stgrid <- checkstgrid(stgrid[grep("^BLOCK$", names(stgrid), invert=TRUE)])
-    }
-
-
-    ### Check time range
-
-    if (is.null(t0)) t0 <- eval(formals()$t0)
-    if (is.null(T)) T <- eval(formals()$T)
-    if (!isScalar(t0) || !isScalar(T)) {
-        stop("endpoints 't0' and 'T' must be single numbers")
-    }
-    if (T <= t0) {
-        stop("'T' must be greater than 't0'")
-    }
-    stopifnot(t0 >= stgrid$start[1], T <= tail(stgrid$stop,1))
-
-
-    ### Subset stgrid to include actual time range only
-
-    # BLOCK in stgrid such that start time is equal to or just before t0
-    block_t0 <- stgrid$BLOCK[match(TRUE, stgrid$start > t0) - 1L]
-    # BLOCK in stgrid such that stop time is equal to or just after T
-    block_T <- stgrid$BLOCK[match(TRUE, stgrid$stop >= T)]
-    stgrid <- subset(stgrid, BLOCK >= block_t0 & BLOCK <= block_T)
-    stgrid$start[stgrid$BLOCK == block_t0] <- t0
-    stgrid$stop[stgrid$BLOCK == block_T] <- T
-    # matrix of BLOCKS and start times (used later)
-    blockstarts <- with(stgrid,
-        cbind(block_t0:block_T, start[match(block_t0:block_T, BLOCK)])
-    )
-
-
-    ### Check class of W, and class, proj4string and names of tiles
-
-    if (is.null(W)) {
-    	if (require("maptools")) {
-            cat("Building W as the union of 'tiles' ...\n")
-            W <- maptools::unionSpatialPolygons(tiles,
-                     IDs = rep.int(1,length(tiles@polygons)),
-                     avoidGEOS = TRUE)
-        } else {
-            stop("automatic generation of 'W' from 'tiles' requires package \"maptools\"")
-        }
-    }
-    stopifnot(inherits(W, "SpatialPolygons"), inherits(tiles, "SpatialPolygons"),
-              proj4string(tiles) == proj4string(W),
-              (tileLevels <- levels(stgrid$tile)) %in% row.names(tiles))
-
-    # Transform W into a gpc.poly
-    Wgpc <- as(W, "gpc.poly")
-
-
-    ### Check mark-generating function
-
-    epscols <- c("eps.t", "eps.s")
-    unpredMarks <- setdiff(unique(c(if (hase) epscols, all.vars(epidemic))), "type")
-    # <- eps.t and eps.s are also taken to be unpredictable marks
-    rmarks <- if (missing(rmarks) || is.null(rmarks)) NULL else match.fun(rmarks)
-    hasMarks <- !is.null(rmarks)
-    if (hasMarks) {
-        sampleCoordinate <- coordinates(spsample(tiles, n=1L, type="random"))
-        sampleMarks <- rmarks(t0, sampleCoordinate)
-        # should be a one-row data.frame
-        if (!is.data.frame(sampleMarks) || nrow(sampleMarks) != 1L) {
-            stop("'rmarks' must return a one-row data.frame of marks")
-        }
-        if (!all(sapply(sampleMarks, function(x) inherits(x, c("integer","numeric","factor"), which=FALSE)))) {
-            stop("'rmarks' must return \"numeric\", \"integer\" or \"factor\" variables only")
-        }
-        markNames <- names(sampleMarks)
-        if (.idx <- match(FALSE, unpredMarks %in% markNames, nomatch=0L)) {
-            stop("the unpredictable mark '", unpredMarks[.idx], "' is not returned by 'rmarks'")
-        }
-    } else if (length(unpredMarks) > 0L) {
-        stop("missing mark-generating function 'rmarks' for the 'epidemic' component")
-    }
-
-
-    ### Check events (prehistory of the process)
-
-    # empty prehistory
-    eventCoords <- matrix(0, nrow=0L, ncol=2L)
-    eventData <- data.frame(
-        ID   = integer(0L),
-        time = numeric(0L),
-        tile = factor(character(0L), levels=tileLevels),
-        type = factor(character(0L), levels=typeNames),
-        check.rows = FALSE, check.names = FALSE
-    )
-    if (hasMarks) {
-        eventData <- cbind(eventData, sampleMarks[0L,])
-    }
-    Nout <- 0L
-    # do we have a prehistory in 'events'
-    if (!missing(events) && !is.null(events)) {
-        .reservedColsIdx <- match(c("ID",".obsInfLength",".bdist",".influenceRegion",".sources"), names(events))
-        events <- events[setdiff(seq_along(names(events)),.reservedColsIdx)]
-        if (!.skipChecks) {
-            cat("Checking 'events':\n")
-            events <- checkEvents(events, dropTypes = FALSE)
-            # epscols are obligatory in 'checkEvents', which is also appropriate here
-            # because in the case of endemic-only processes we would not need a prehistory at all
-        }
-        # select prehistory of events which are still infective
-        .stillInfective <- with(events@data, time <= t0 & time + eps.t > t0)
-        Nout <- sum(.stillInfective)    # = number of events in the prehistory
-        if (Nout > 0L) {
-            stopifnot(proj4string(events) == proj4string(W))
-            events <- events[.stillInfective,]
-            # check event types
-            events@data$type <- factor(events@data$type, levels=typeNames)
-            if (any(.typeIsNA <- is.na(events@data$type))) {
-                warning("removed unknown event types in 'events'")
-                events <- events[!.typeIsNA,]
-            }
-            eventCoords <- coordinates(events)
-            eventData <- events@data
-            # update ID counter
-            eventData$ID <- 1:Nout
-            # check presence of unpredictable marks
-            if (.idx <- match(FALSE, unpredMarks %in% names(eventData), nomatch=0L)) {
-                stop("missing unpredictable mark '", unpredMarks[.idx], "' in 'events'")
-            }
-            # check type of unpredictable marks
-            for (um in unpredMarks) {
-                if (!identical(class(sampleMarks[[um]]), class(eventData[[um]]))) {
-                    stop("the class of the unpredictable mark '", um, "' in the 'events' prehistory ",
-                         "is not identical to the class returned by 'rmarks'")
-                }
-            }
-            # add marks which are not in epidemic model but which are simulated by 'rmarks'
-            if (length(.add2events <- setdiff(markNames, names(eventData))) > 0L) {
-                eventData <- cbind(eventData, sampleMarks[.add2events])
-                is.na(eventData[.add2events]) <- TRUE
-            }
-            eventData <- eventData[c("ID", "time", "tile", "type", markNames)]
-        } else {
-            .eventstxt <- if (.skipChecks) "data$events" else "events"   # account for simulate.twinstim
-            cat("(no events from '", .eventstxt, "' were considered as prehistory)\n", sep="")
-        }
-    }
-
-
-    ### Build epidemic model matrix
-
-    epidemic <- terms(epidemic, data = eventData, keep.order = TRUE)
-    if (!is.null(attr(epidemic, "offset"))) {
-        warning("offsets are not implemented for the 'epidemic' component")
-    }
-
-    # helper function taking eventData and returning the epidemic model.matrix
-    buildmme <- function (eventData)
-    {
-        mfe <- model.frame(epidemic, data = eventData, na.action = na.fail, drop.unused.levels = FALSE)
-        model.matrix(epidemic, mfe)
-    }
-    mme <- buildmme(eventData)
-
-    if (ncol(mme) != q) {
-        cat(ncol(mme), "epidemic model terms:\t", paste(colnames(mme), collapse="  "), "\n")
-        stop("length of 'gamma' (", q, ") does not match the 'epidemic' specification (", ncol(mme), ")")
-    }
-
-
-    ### Build endemic model matrix
-
-    endemic <- terms(endemic, data = stgrid, keep.order = TRUE)
-
-    # check if we have an endemic component at all
-    hasOffset <- !is.null(attr(endemic, "offset"))
-    hash <- (nbeta0 + p + hasOffset) > 0L
-    if (!hash && !hase) {
-        stop("nothing to do: neither endemic nor epidemic parameters were specified")
-        # actually, the process might be endemic offset-only, which I don't care about ATM
-    }
-
-    # ensure that we have correct contrasts in the endemic component
-    attr(endemic, "intercept") <- as.integer(nbeta0 > 0L)
-
-    # which variables do we have to copy from stgrid?
-    stgridCopyCols <- match(all.vars(endemic), names(stgrid), nomatch = 0L)
-
-    # helper function taking eventData (with time and tile columns) and returning the endemic model.matrix
-    buildmmh <- function (eventData)
-    {
-        # if 'pi' appears in 'endemic' we don't care, and if a true covariate is missing, model.frame will throw an error
-        # attach endemic covariates from 'stgrid' to events
-        gridcellsOfEvents <- integer(nrow(eventData))
-        for (i in seq_along(gridcellsOfEvents)) {
-            gridcellsOfEvents[i] <- gridcellOfEvent(eventData[i,"time"], eventData[i,"tile"], stgrid)
-        }
-        eventData <- cbind(eventData, stgrid[gridcellsOfEvents, stgridCopyCols])
-        # construct model matrix
-        mfhEvents <- model.frame(endemic, data = eventData, na.action = na.fail, drop.unused.levels = FALSE)
-        mmhEvents <- model.matrix(endemic, mfhEvents)
-        # exclude intercept from endemic model matrix below, will be treated separately
-        if (nbeta0 > 0) mmhEvents <- mmhEvents[,-1,drop=FALSE]
-        structure(mmhEvents, offset = model.offset(mfhEvents))
-    }
-
-    # actually, we don't need the endemic model matrix for the events at all
-    # this is just to test consistence with 'beta'
-    mmh <- buildmmh(eventData[0L,])
-    if (ncol(mmh) != p) {
-        stop("length of 'beta' (", p, ") does not match the 'endemic' specification (", ncol(mmhEvents), ")")
-    }
-
-
-    ### Build endemic model matrix on stgrid
-
-    mfhGrid <- model.frame(endemic, data = stgrid, na.action = na.fail, drop.unused.levels = FALSE,
-                           BLOCK = BLOCK, tile = tile, ds = area)
-    # we don't actually need 'tile' in mfhGrid; this is only for easier identification when debugging
-    mmhGrid <- model.matrix(endemic, mfhGrid)
-    # exclude intercept from endemic model matrix below, will be treated separately
-    if (nbeta0 > 0) mmhGrid <- mmhGrid[,-1,drop=FALSE]
-
-    # Extract endemic model components
-    offsetGrid <- model.offset(mfhGrid)
-    gridBlocks <- mfhGrid[["(BLOCK)"]]
-    ds <- mfhGrid[["(ds)"]]
-
-
-    ### Interaction functions
-
-    if (hase) {
-
-        ## Check interaction functions
-        siaf <- do.call(".parseiaf", args = alist(siaf))
-        tiaf <- do.call(".parseiaf", args = alist(tiaf))
-
-        ## Spatially constant interaction siaf(s) = 1
-        constantsiaf <- is.null(siaf) || isTRUE(attr(siaf, "constant"))
-        if (constantsiaf) {
-            siaf <- siaf.constant()
-        } else attr(siaf, "constant") <- FALSE
-        if (siaf$npars != nsiafpars) {
-            stop("length of 'siafpars' (", nsiafpars, ") does not match the 'siaf' specification (", siaf$npars, ")")
-        }
-
-        ## Temporally constant interaction tiaf(t) = 1
-        constanttiaf <- is.null(tiaf) || isTRUE(attr(tiaf, "constant"))
-        if (constanttiaf) {
-            tiaf <- tiaf.constant()
-            gmax <- 1L
-        } else attr(tiaf, "constant") <- FALSE
-        if (tiaf$npars != ntiafpars) {
-            stop("length of 'tiafpars' (", ntiafpars, ") does not match the 'tiaf' specification (", tiaf$npars, ")")
-        }
-
-        ## Check nCub
-        if (!constantsiaf) {
-            nCub <- as.integer(nCub)
-            if (any(nCub <= 0L)) {
-                stop("'nCub' must be positive")
-            }
-        }
-
-        ## Check gmax
-        if (is.null(gmax)) {
-            gmax <- max(tiaf$g(rep.int(0,nTypes), tiafpars, 1:nTypes))
-            cat("assuming gmax =", gmax, "\n")
-        } else if (!isScalar(gmax)) {
-            stop("'gmax' must be scalar")
-        }
-
-    } else {
-        if ((!missing(siaf) && !is.null(siaf)) || (!missing(tiaf) && !is.null(tiaf))) {
-            warning("'siaf' and 'tiaf' can only be modelled in conjunction with an 'epidemic' process")
-        }
-        siaf <- tiaf <- NULL
-    }
-
-})
 
 
 

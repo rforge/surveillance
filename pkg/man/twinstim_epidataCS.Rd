@@ -1,12 +1,15 @@
 \encoding{latin1}
 \name{twinstim_epidataCS}
-\alias{as.epidataCS} 
 \alias{epidataCS}
-\alias{[.epidataCS}
+\alias{as.epidataCS} 
 \alias{print.epidataCS}
 \alias{head.epidataCS}
 \alias{tail.epidataCS}
+\alias{[.epidataCS}
 \alias{marks.epidataCS}
+\alias{summary.epidataCS}
+\alias{print.summary.epidataCS}
+
 \title{
   Class for Representing Continuous Space-Time Point Process Data
 }
@@ -21,6 +24,7 @@
   spatio-temporal epidemic intensity models with the function
   \code{\link{twinstim}}.
 }
+
 \usage{
 as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
              nCircle2Poly = 32L, T = NULL)
@@ -31,7 +35,11 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 \method{[}{epidataCS}(x, i, j)
 
 \method{marks}{epidataCS}(x, ...)
+
+\method{summary}{epidataCS}(object, ...)
+\method{print}{summary.epidataCS}(x, ...)
 }
+
 \arguments{
   \item{events}{
     \code{SpatialPointsDataFrame} of cases with obligatory columns
@@ -93,7 +101,8 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
     times are supplied in \code{stgrid} (=> auto-generation of
     \code{stop} times).
   }
-  \item{x}{an object of class \code{epidataCS}.}
+  \item{x}{an object of class \code{"epidataCS"} or
+    \code{"summary.epidataCS"}, respectively.}
   \item{n}{a single integer. If positive, the first (\code{head}, \code{print})
     / last (\code{tail}) \code{n} events are extracted. If negative,
     all but the \code{n} first/last events are extracted.
@@ -108,9 +117,10 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
     \code{SpatialPointDataFrame}s for subsetting the \code{events}.
     Only epidemic covariates can be removed from \code{events} by the
     \code{j} index. The other components of \code{x} (\code{stgrid},
-    \ldots) are retained.
-  }
+    \ldots) are retained.}
+  \item{object}{an object of class \code{"epidataCS"}.}
 }
+
 \details{
   The function \code{as.epidataCS} is used to generate objects of class
   \code{"epidataCS"}, which is the data structure that
@@ -120,9 +130,23 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   \code{marks} defined in package \pkg{spatstat}) returns a
   \code{data.frame} of the event marks (actually also including time
   and location of the events).
+
+  The \code{print} method for \code{"epidataCS"} prints some metadata
+  of the epidemic, e.g., the observation period, the dimensions of the
+  spatio-temporal grid, the types of events, and the total number of
+  events. By default, it also prints the first \code{n = 6} rows of the
+  \code{events}.
+  The \code{summary} method (or its \code{print} method) instead prints
+  the metadata along with a \code{summary} of the \code{events} (by
+  column as for \code{data.frame}s), a summary of the number of
+  potential sources of transmission for each event, and the
+  \code{str}ucture of the \code{counter} element of the \code{summary}
+  output, which is a step function of the number of infectious
+  individuals over time.
 }
+
 \value{
-  An object of class \code{epidataCS} containing the following components
+  An object of class \code{epidataCS} contains the following components:
   \describe{
     \item{events}{See above description. The added auxiliary columns are:
     \describe{
@@ -142,6 +166,7 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
     %% ...
   }
 }
+
 \references{
   S. Meyer, J. Elias and M. Höhle (2010): A space-time conditional
   intensity model for infectious disease occurence, Department of
@@ -152,24 +177,25 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   on Point Processes. Master Thesis, Ludwig-Maximilians-\enc{Universität}{Universitaet} München.
   Available as http://epub.ub.uni-muenchen.de/11703/
 }
+
 \author{
   Sebastian Meyer, documentation contributions by Michael H\enc{ö}{oe}hle
 }
+
 \seealso{
   \code{\link{animate.epidataCS}} for the animation of such an epidemic.
-  There are also \code{\link[=summary.epidataCS]{summary}} and
-  \code{\link[=update.epidataCS]{update}} methods for the
+  There is also an \code{\link[=update.epidataCS]{update}} method for the
   \code{"epidataCS"} class.
   Models for \code{"epidataCS"} can be fitted with \code{\link{twinstim}}.
   It is also possible to convert the data to \code{\link{epidata}}
   objects (discrete space) for analysis with \code{\link{twinSIR}}
   (see \code{\link{as.epidata.epidataCS}}).
 }
-%\examples{
-%#No examples are currently available
-%}
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
+
+\examples{
+# TODO: ...
+}
+
 \keyword{spatial}
 \keyword{classes}
 \keyword{manip}

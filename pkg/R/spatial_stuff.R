@@ -73,10 +73,15 @@ inside.gpc.poly <- function(x, y = NULL, polyregion, mode.checked = FALSE)
 
 ## Count number of instances at the same location of a SpatialPoint object
 
-multiplicity.sp <- function (x)
+multiplicity.matrix <- function (x, ...)
 {
-  d <- as.matrix(dist(coordinates(x)))
-  as.integer(rowSums(d==0))
+    distmat <- as.matrix(dist(x))
+    as.integer(rowSums(distmat == 0))
+}
+
+multiplicity.Spatial <- function (x, ...)
+{
+    multiplicity(coordinates(x))
 }
 
 

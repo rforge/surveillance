@@ -235,8 +235,9 @@ simEpidata(formula, data, id.col, I0.col, coords.cols, subset,
   names from \code{data}), which are all obligatory.  These columns are followed
   by all the variables appearing on the rhs of the \code{formula}.  Last but not
   least, the generated columns with epidemic variables corresponding to the
-  functions in the list \code{f} are appended, if \code{length(f)} > 0.  Note
-  that objects of class \code{"simEpidata"} also inherit from class
+  functions in the list \code{f} are appended, if \code{length(f)} > 0.
+
+  Note that objects of class \code{"simEpidata"} also inherit from class
   \code{"\link{epidata}"}, thus all \code{"\link{epidata}"} methods can be
   applied.
   
@@ -272,10 +273,10 @@ Sebastian Meyer and Michael \enc{Höhle}{Hoehle}
 }
 
 \seealso{
-The \code{\link[=plot.epidata]{plot}} method and the function
-\code{\link{animate.epidata}} for plotting and animation of epidemic data,
-respectively.
-\code{\link{intensityPlot}} for plotting the path of the infection intensity.
+The \code{\link{plot.epidata}} and \code{\link{animate.epidata}} methods
+for plotting and animating (simulated) epidemic data, respectively.
+The \code{\link{intensityplot.simEpidata}} method for plotting paths of
+infection intensities.
 
 Function \code{\link{twinSIR}} for fitting spatio-temporal epidemic intensity
 models to epidemic data.
@@ -290,12 +291,15 @@ pop <- data.frame(id=1:n,x=pos[,1], y=pos[,2],
                   gender=sample(0:1, n, replace=TRUE),
                   I0col=rep(0,n),start=rep(0,n),stop=rep(Inf,n))
 
+# Simulate an epidemic in this population
 epi <- simEpidata(cbind(start,stop) ~ cox(gender), 
                   data = pop, 
                   id = "id", I0.col = "I0col", coords.cols = c("x","y"),
                   beta = c(-3), h0 = -2, alpha = c(B1 = 0.1),
                   f = list(B1 = function(u) u <= 1),
                   infPeriod = function(ids) rexp(length(ids), rate=1))
+
+# Plot the numbers of susceptible, infectious and removed individuals
 plot(epi)
 
 # load data of an observed epidemic
@@ -310,10 +314,12 @@ simepi <- simEpidata(cbind(start, stop) ~ cox(z1) + cox(z1):cox(z2),
     infPeriod = function(ids) rexp(length(ids), rate=1), trace = FALSE)
 summary(simepi)
 plot(simepi)
+
 \dontrun{
 animate(simepi)
 }
-intensityPlot(simepi)
+
+intensityplot(simepi)
 
 # load a fitted model object, which must contain the original data 
 # (use 'keep.data = TRUE' in the call of 'twinSIR')
@@ -325,13 +331,15 @@ plot(foofit$data)
 
 ## simulate a new epidemic using the model and parameter estimates of 'foofit'
 ## and set simulation period = observation period
-# with observed infPeriods:
+# with observed infPeriods (i.e. fixed length 3 days):
 simfitepi1 <- simulate(foofit, nsim = 1)[[1]]
 plot(simfitepi1)
-# with new infPeriods:
+# with new infPeriods (simuluated from the Exp(0.3) distribution):
 simfitepi2 <- simulate(foofit, nsim = 1,
                        infPeriod=function(ids) rexp(length(ids), rate=0.3))[[1]]
 plot(simfitepi2)
+intensityplot(simfitepi2, which="total", aggregate=FALSE,
+              col=rgb(0,0,0,alpha=if(getRversion() < "2.7.0") 1 else 0.1))
 }
 
 \keyword{datagen}

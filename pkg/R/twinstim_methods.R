@@ -1,10 +1,7 @@
 ################################################################################
 ### Methods for objects of class "twinstim", specifically:
-### coef (coefficients), vcov, logLik, print, summary, print.summary,
-# plot
-###
+### coef (coefficients), vcov, logLik, print, summary, print.summary, plot
 ### Author: Sebastian Meyer
-### $Date: 2010-11-16 04:08:22 +0100 (Tue, 16 Nov 2010) $
 ################################################################################
 
 coef.twinstim <- function (object, ...)
@@ -40,10 +37,10 @@ print.twinstim <- function (x, digits = max(3, getOption("digits") - 3), ...)
     invisible(x)
 }
 
-summary.twinstim <- function (object,
+summary.twinstim <- function (object, test.iaf = FALSE,
     correlation = FALSE, symbolic.cor = FALSE, ...)
 {
-    ans <- object[c("call", "converged", "counts")] #, "intervals", "nEvents"
+    ans <- object[c("call", "converged", "counts")]
     ans$cov <- vcov(object)
     npars <- object$npars
     coefs <- coef(object)
@@ -51,8 +48,8 @@ summary.twinstim <- function (object,
     q <- npars[3]
     nNotIaf <- nbeta + q
     niafpars <- npars[4] + npars[5]
-    est <- coefs #[1:nNotIaf]
-    se <- sqrt(diag(ans$cov)) #[1:nNotIaf])
+    est <- coefs
+    se <- sqrt(diag(ans$cov))
     zval <- est/se
     pval <- 2 * pnorm(abs(zval), lower.tail = FALSE)
     coefficients <- cbind(est, se, zval, pval)
@@ -61,18 +58,19 @@ summary.twinstim <- function (object,
     ans$coefficients.beta <- coefficients[seq_len(nbeta),,drop=FALSE]
     ans$coefficients.gamma <- coefficients[nbeta+seq_len(q),,drop=FALSE]
     ans$coefficients.iaf <- coefficients[nNotIaf+seq_len(niafpars),,drop=FALSE]
-    # usually, siaf and tiaf parameters are strictly positive,
-    # thus the usual wald test with H0: para=0 is invalid
-    is.na(ans$coefficients.iaf[,3:4]) <- TRUE
+    if (!test.iaf) {
+        ## usually, siaf and tiaf parameters are strictly positive,
+        ## or parametrized on the logscale. In this case the usual wald test
+        ## with H0: para=0 is invalid or meaningless.
+        is.na(ans$coefficients.iaf[,3:4]) <- TRUE
+    }
     # estimated parameter correlation
     if (correlation) {
         ans$correlation <- cov2cor(ans$cov)
         ans$symbolic.cor <- symbolic.cor
     }
     ans$loglik <- logLik(object)
-    ans$aic <- AIC(object) #extractAIC(object, ...)
-#     ans$aic <- as.vector(aic[2L])   # remove 'edf' element
-#     attributes(ans$aic) <- attributes(aic)[c("type", "exact")]
+    ans$aic <- AIC(object)
     ans$runtime <- object$runtime
     class(ans) <- "summary.twinstim"
     ans
@@ -159,7 +157,8 @@ print.summary.twinstim <- function (x,
 
 ### 'cat's the summary in LaTeX code
 
-toLatex.summary.twinstim <- function (object, digits = max(3, getOption("digits") - 3), align = "rrrrr", withAIC = TRUE, ...)
+toLatex.summary.twinstim <- function (object, digits = max(3, getOption("digits") - 3),
+                                      align = "rrrrr", withAIC = TRUE, ...)
 {
 ret <- capture.output({
     cat("\\begin{tabular}{", align, "}\n\\hline\n", sep="")
@@ -171,7 +170,7 @@ ret <- capture.output({
         tab <- get(tabname)
         if (nrow(tab) > 0L) {
             rownames(tab) <- gsub(" ", "", rownames(tab))
-            tab_char <- capture.output(printCoefmat(tab,digits=digits,signif.stars=FALSE))[-1]
+            tab_char <- capture.output(printCoefmat(tab,digits=digits,signif.stars=FALSE,na.print=""))[-1]
             tab_char <- sub("([<]?)[ ]?([0-9]+)e([+-][0-9]+)$", "\\1\\2\\\\cdot{}10^{\\3}", tab_char)
             con <- textConnection(tab_char)
             tab2 <- read.table(con, colClasses="character")
@@ -179,8 +178,8 @@ ret <- capture.output({
             parnames <- paste0("\\texttt{",tab2[,1],"}")
             tab2 <- as.data.frame(lapply(tab2[,-1], function(x) paste0("$",x,"$")))
             rownames(tab2) <- parnames
-            if (length(naps <- grep("e\\.[st]iaf", parnames))) tab2[naps, 3:4] <- ""  # z-value and p-value for siaf and tiaf are NA
-            print(xtable::xtable(tab2), only.contents = TRUE, include.colnames = FALSE, sanitize.text.function = identity, hline.after = NULL)
+            print(xtable::xtable(tab2), only.contents=TRUE, hline.after=NULL,
+                  include.colnames=FALSE, sanitize.text.function=identity)
             cat("\\hline\n")
         }
     }
@@ -197,27 +196,121 @@ ret
 }
 
 
+### Plot evolution of the intensity
 
-### Plots fitted tiaf or isotropic siaf
-
-plotiaf <- function (twinstim, iaf = c("siaf", "tiaf"),
-    types = 1:nrow(twinstim$qmatrix), xlim = c(0,eps), ylim = c(0,1),
-    cols = rainbow(length(types)), lwd = c(2, 1), add = FALSE, ...)
+intensityplot.twinstim <- function (x, which = c("epidemic proportion", "endemic proportion", 
+    "total intensity"), aggregate = c("space", "time"), ...)
 {
-    iaf <- match.arg(iaf)
-    eps <- twinstim$medianeps[if (iaf=="siaf") "spatial" else "temporal"]
-    FUN <- twinstim$formula[[iaf]][[if (iaf=="siaf") "f" else "g"]]
-    coefs <- coef(twinstim)
-    idxpars <- grep(iaf,names(coefs))
-    pars <- coefs[idxpars]
-    cis <- confint(twinstim, idxpars)
-    if (!add) plot(xlim, ylim, type="n", ...)
-    for (i in seq_along(types)) {
-        curve(FUN(if(iaf=="siaf") cbind(x,0) else x, pars, types[i]), add=TRUE, lty=1, col=cols[i], lwd=lwd[1])
-        curve(FUN(if(iaf=="siaf") cbind(x,0) else x, cis[,1], types[i]), add = TRUE, lty=2, col=cols[i], lwd=lwd[2])
-        curve(FUN(if(iaf=="siaf") cbind(x,0) else x, cis[,2], types[i]), add = TRUE, lty=2, col=cols[i], lwd=lwd[2])
-    }
+    stop("not yet implemented")
 }
+
+
+### Plot fitted tiaf or siaf(cbind(0, r)), r=distance
+
+iafplot <- function (object, which = c("siaf", "tiaf"),
+    types = 1:nrow(object$qmatrix),
+    conf.type = if (length(pars) > 1) "bootstrap" else "parbounds",
+    conf.level = 0.95, conf.B = 999,
+    ngrid = 101, col.estimate = rainbow(length(types)), col.conf = col.estimate,
+    alpha.B = 0.15, lwd = c(3,1), lty = c(1,2), xlim = c(0,eps), ylim = c(0,1),
+    add = FALSE, xlab = NULL, ylab = NULL, ...)
+{
+    which <- match.arg(which)
+    eps <- object$medianeps[if (which=="siaf") "spatial" else "temporal"]
+    FUN <- object$formula[[which]][[if (which=="siaf") "f" else "g"]]
+    coefs <- coef(object)
+    idxpars <- grep(which,names(coefs))
+    pars <- coefs[idxpars]
+    force(conf.type)
+    if (length(pars) == 0 || any(is.na(conf.type)) || is.null(conf.type)) {
+        conf.type <- "none"
+    }
+    conf.type <- match.arg(conf.type, choices = c("parbounds", "bootstrap", "none"))
+    
+    if (!add) {
+        if (is.null(xlab)) xlab <- if (which == "siaf") {
+            expression("Distance " * group("||",bold(s)-bold(s)[j],"||") * " from host")
+        } else {
+            expression("Distance " * t-t[j] * " from host")
+        }
+        if (is.null(ylab)) ylab <- if (which == "siaf") {
+            expression(f(group("||",bold(s)-bold(s)[j],"||")))
+        } else {
+            expression(g(t-t[j]))
+        }
+        plot(xlim, ylim, type="n", xlab = xlab, ylab = ylab, ...)
+    }
+    xgrid <- seq(0, xlim[2], length.out=ngrid)
+    
+    for (i in seq_along(types)) {
+        ## select parameters on which to evaluate iaf
+        parSample <- switch(conf.type, parbounds = {
+            cis <- confint(object, idxpars, level=conf.level)
+            ## all combinations of parameter bounds
+            do.call("expand.grid", as.data.frame(t(cis)))
+        }, bootstrap = {
+            ## bootstrapping parameter values
+            if (length(pars) == 1) {
+                as.matrix(c(pars, rnorm(conf.B, mean=pars,
+                                sd=sqrt(vcov(object)[idxpars,idxpars]))))
+            } else {
+                rbind(pars, mvtnorm::rmvnorm(conf.B, mean=pars,
+                                 sigma=vcov(object)[idxpars,idxpars,drop=FALSE]))
+            }
+        })
+        
+        ## add confidence limits
+        if (!is.null(parSample)) {
+            fvalsSample <- apply(parSample, 1, function(pars)
+                                 FUN(if(which=="siaf") cbind(xgrid,0) else xgrid,
+                                     pars, types[i]))
+            lowerupper <- if (conf.type == "parbounds") {
+                t(apply(fvalsSample, 1, range))
+            } else { # bootstrapped parameter values
+                if (is.na(conf.level)) {
+                    stopifnot(alpha.B >= 0, alpha.B <= 1)
+                    .col <- col2rgb(col.conf[i], alpha=TRUE)[,1]
+                    .col["alpha"] <- round(alpha.B*.col["alpha"])
+                    .col <- do.call("rgb", args=c(as.list(.col), maxColorValue = 255))
+                    matlines(x=xgrid, y=fvalsSample, type="l", lty=lty[2],
+                             col=.col, lwd=lwd[2]) # returns NULL
+                } else {
+                    t(apply(fvalsSample, 1, quantile,
+                            probs=c(0,conf.level) + (1-conf.level)/2))
+                }
+            }
+            if (!is.null(lowerupper)) {
+                matlines(x=xgrid, y=lowerupper, type="l", lty=lty[2],
+                         col=col.conf[i], lwd=lwd[2])
+            }
+        }
+        
+        ## add point estimate
+        lines(x=xgrid,
+              y=FUN(if(which=="siaf") cbind(xgrid,0) else xgrid, pars, types[i]),
+              lty=lty[1], col=col.estimate[i], lwd=lwd[1])
+    }
+    invisible()
+}
+
+
+### Plot method for twinstim (wrapper for plotiaf and intensityplot)
+
+plot.twinstim <- function (x, which, ...)
+{
+    cl <- match.call()
+    which <- match.arg(which, choices =
+                       c(eval(formals(intensityplot.twinstim)$which),
+                         eval(formals(iafplot)$which)))
+    FUN <- if (which %in% eval(formals(intensityplot)$which))
+        "intensityplot" else "iafplot"
+    cl[[1]] <- as.name(FUN)
+    eval(cl, envir = parent.frame())
+}
+
+### set defaults for 'which' in 'plot.twinstim'
+## formals(plot.twinstim)$which <- as.call(as.list(c(as.name("c"),
+##     c(eval(formals(intensityplot.twinstim)$which), eval(formals(iafplot)$which)))))
 
 
 

@@ -60,8 +60,10 @@ polyCub.midpoint <- function (polyregion, f, ..., eps = NULL, dimyx = NULL, plot
 ### ILLUSTRATION ###
 if (plot) {
     spatstat::plot.im(IM, axes = TRUE, col=grey(31:4/35), main="")
-    # add evaluation points
-    with(IM, points(expand.grid(xcol, yrow), col=!is.na(v), cex=0.5))
+    # add evaluation points (unsure about spatstat implementation of class "im")
+    # both of the following commands worked with different versions of spatstat
+    #with(IM, points(expand.grid(xcol, yrow), col=!is.na(v), cex=0.5))
+    #with(IM, points(expand.grid(y=yrow, x=xcol)[2:1], col=!is.na(v), cex=0.5))
     plot(polyregion, add = TRUE, poly.args = list(lwd = 2))
 }
 ####################

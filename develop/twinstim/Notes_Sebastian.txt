@@ -4,6 +4,8 @@
 | $Date$                        |
 --------------------------------------------------------------------------------
 
+- is tie breaking really necessary?? if not, events at the same time would not
+  be infectious one another
 - plot.epidataCS (type=c("temporal", "spatial"))
 - keep some parameters fixed at initial values
 

@@ -101,7 +101,7 @@ data("hagelloch")
   #Show case locations as in Neal & Roberts (different scaling) using
   #the data.frame
   coordinates(hagelloch.df) <- c("HNX","HNY")
-  plot(hagelloch.df,xlab="x [m]",ylab="x [m]",pch=15,axes=TRUE,cex=sqrt(multiplicity.sp(hagelloch.df)))
+  plot(hagelloch.df,xlab="x [m]",ylab="x [m]",pch=15,axes=TRUE,cex=sqrt(multiplicity(hagelloch.df)))
 
   #Epicurve
   hist(as.numeric(hagelloch.df$tS),xlab="Time (days)",ylab="Cases",main="")

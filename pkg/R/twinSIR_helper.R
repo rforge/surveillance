@@ -168,3 +168,46 @@ w.chibarsq.sim <- function(p, W, N=1e4) {
   w <- table(factor(sims, levels=0:p))/length(sims)
   return(w)
 }
+
+
+
+################################################################################
+# The helper 'getModel.simEpidata' extracts the model of an object of class
+# "simEpidata" similar to the function 'twinSIR' with model = TRUE,
+# i.e. a list with components survs, X, Z and weights, where atRiskY == 1.
+# The log-baseline h0 is evaluated at start times of intervals only.
+# This function is used in function 'intensityPlot'.
+################################################################################
+
+getModel.simEpidata <- function (object, ...)
+{
+    class(object) <- "data.frame"   # avoid use of [.epidata (not necessary here)
+    config <- attr(object, "config")
+    alpha <- config$alpha
+    beta <- config$beta
+    atRiskY1 <- object$atRiskY == 1
+    simepi1 <- object[atRiskY1,]
+    survs <- simepi1[c("id", "start", "stop", "event")]
+    attr(survs, "eventTimes") <- attr(object, "eventTimes")
+    attr(survs, "timeRange") <- attr(object, "timeRange")
+    X <- as.matrix(simepi1[tail(1:ncol(simepi1), length(alpha))])
+    logbaseline <- sapply(survs$start, FUN = config$h0, simplify = TRUE)
+    Terms <- attr(object, "terms")
+    Z <- read.design(model.frame(Terms, simepi1), Terms)$Z
+    Z <- cbind("cox(logbaseline)" = logbaseline, Z)
+    model <- list(survs = survs, X = X, Z = Z, weights = rep.int(1,nrow(survs)))
+    return(model)
+}
+
+
+### Similar auxiliary method extracting the model component
+### of a fitted 'twinSIR'
+
+getModel.twinSIR <- function (object, ...)
+{
+    if (is.null(model <- object[["model"]])) {
+        stop("'", deparse(substitute(object)), "' does not contain the 'model' ",
+             "component (use 'model = TRUE' when calling 'twinSIR')")
+    }
+    return(model)
+}

@@ -1,29 +1,27 @@
-# generate generic functions needed
 
-#Make summary a generic function
-#setGeneric("summary")
+### Define some functions to be S3 generic
 
-#Generate a new generic function for animations
-animate <- function (object, ...) {
-    UseMethod("animate")
-}
-#if(!isGeneric("animate")) setGeneric("animate",useAsDefault=animate)
-#<- SM: we do not need animate to be S4 generic
-
-# S3 generic function for the calculation of basic reproduction numbers
+animate <- function (object, ...) UseMethod("animate")
 R0 <- function (object, ...) UseMethod("R0")
-
-# S3 generic function for the generation of epidata objects for twinSIR
 as.epidata <- function (data, ...) UseMethod("as.epidata")
+intensityplot <- function (x, ...) UseMethod("intensityplot")
 
-#Conversion of some other functions
+## internal function with methods for "twinSIR" and "simEpidata"
+getModel <- function (object, ...) UseMethod("getModel")
+
+## internal generic with methods for "matrix" and "Spatial"
+multiplicity <- function (x, ...) UseMethod("multiplicity")
+
+
+### Define some function to be S4 generic
+
 if(!isGeneric("plot")) setGeneric("plot", useAsDefault=plot)
 if(!isGeneric("aggregate")) setGeneric("aggregate", useAsDefault=aggregate)
 
-# register "owin" as class in S4 so we can define methods for it
+## Register "owin" as class in S4 so we can define methods for it
+## Note: package "maptools" also registers "owin" as a virtual S4 class by setClass("owin")
 if (!isClass("owin")) {
-	# e.g. package "maptools" already registers "owin" as a virtual S4 class by setClass("owin")
-	setOldClass("owin")
+    setOldClass("owin")
 }
 
 

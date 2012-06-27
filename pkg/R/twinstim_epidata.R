@@ -1,9 +1,7 @@
 ################################################################################
 ### Data structure for CONTINUOUS SPATIO-temporal infectious disease case data
 ### and a spatio-temporal grid of endemic covariates
-###
 ### Author: Sebastian Meyer
-### $Date: 2010-11-15 02:31:05 +0100 (Mon, 15 Nov 2010) $
 ################################################################################
 
 
@@ -633,17 +631,15 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
         TRUE
     } else FALSE
 
-    # helper function determines multiplicity of rows of a numeric matrix
+    # determines multiplicity of rows of a numeric matrix
     # and returns unique rows with appended multiplicity column
-    multunique <- function (table) {
-        distmat <- as.matrix(dist(table))
-        mult <- rowSums(distmat == 0)
-        unique(cbind(table, mult))
-        #which(upper.tri(distmat, diag=FALSE) & distmat == 0, arr.ind = TRUE)
+    countunique <- function (matrix) {
+        count <- multiplicity(matrix)
+        unique(cbind(matrix, count))
     }
     # wrapper for 'points' with specific 'cex' for multiplicity
     multpoints <- function (tableCoordsTypes, col) {
-        tableMult <- multunique(tableCoordsTypes)
+        tableMult <- countunique(tableCoordsTypes)
         points(tableMult[,1:2,drop=FALSE], pch = pch[tableMult[,"type"]],
                col = col, cex = sqrt(1.5*tableMult[,"mult"]/pi) * par("cex"))
     }
@@ -714,7 +710,81 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
 }
 
 
+### plot method for epidataCS
 
+plot.epidataCS <- function (x, aggregate = c("time", "space"), subset, ...)
+{
+    aggregate <- match.arg(aggregate)
+    FUN <- paste("plot.epidataCS", aggregate, sep="_")
+    cl <- match.call()
+    cl[[1]] <- as.name(FUN)
+    cl$aggregate <- NULL
+    eval(cl, envir = parent.frame())
+}
+
+
+### plot.epidataCS(x, aggregate = "time") -> number of cases over time
+## in case t0.Date is specified, hist.Date() is used and breaks must set in ... (e.g. "months")
+
+plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
+    xlim = NULL, ylim = NULL, xlab = "Time", ylab = NULL, col = "white",
+    panel.first = abline(h=axTicks(2), lty=2, col="grey"), ...)
+{
+    timeRange <- with(x$stgrid, c(start[1L], stop[length(stop)]))
+    eventTimes <- if (missing(subset)) x$events$time else {
+        do.call("subset", list(x=substitute(marks.epidataCS(x)),
+                               subset=substitute(subset), select="time",
+                               drop=TRUE), 
+                envir = parent.frame())
+    }
+    if (length(eventTimes) == 0) stop("no events left after 'subset'")
+    if (!is.null(t0.Date)) {
+        stopifnot(inherits(t0.Date, "Date"))
+        t0 <- timeRange[1L]
+        if (is.null(xlim)) xlim <- t0.Date + (timeRange - t0)
+        eventTimes <- t0.Date + (eventTimes - t0)
+    }
+    histdata <- if (is.null(t0.Date)) {
+        hist(eventTimes, plot=FALSE, warn.unused=FALSE, ...)
+    } else {
+        hist(eventTimes, plot=FALSE, ...) # warn.unused=FALSE is hard-coded in hist.Date
+    }
+    if (is.null(xlim)) xlim <- timeRange
+    if (is.null(ylim)) {
+        ylim <- range(0, histdata[[if (freq) "counts" else "density"]])
+    }
+    if (is.null(ylab)) {
+        ylab <- if (freq) "Number of cases" else "Density of cases"
+    }
+    plot(x = xlim, y = ylim, xlab = xlab, ylab = ylab, type = "n")
+    force(panel.first)
+    plot(histdata, freq = freq, add = TRUE, col = col, ...)
+    invisible(histdata)
+}
+
+
+### plot.epidataCS(x, aggregate = "space") -> total number of cases by spatial tile
+
+plot.epidataCS_space <- function (x, subset,
+    cex.fun = function (counts) sqrt(1.5*counts/pi/min(counts)),
+    points.args = list(), ...)
+{
+    events <- if (missing(subset)) x$events else {
+        ## FIXME: subset.Spatial has a bug in sp version 0.9-99
+        ## => do it myself for the moment
+        e <- substitute(subset)
+        r <- eval(e, x$events@data, parent.frame())
+        if (!is.logical(r)) stop("'subset' must evaluate to logical")
+        r <- r & !is.na(r)
+        x$events[r, ]
+    }
+    events@data[["_MULTIPLICITY_"]] <- multiplicity(events)
+    events <- events[!duplicated(coordinates(events)),]
+    plot(x$W, ...)
+    do.call("points", c(alist(x=events, cex=cex.fun(events$"_MULTIPLICITY_")),
+                        points.args))
+    invisible()
+}
 
 
 

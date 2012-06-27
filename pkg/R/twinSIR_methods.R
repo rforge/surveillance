@@ -213,13 +213,18 @@ print.summary.twinSIR <- function (x,
     invisible(x)
 }
 
-plot.twinSIR <- function (x, type = c("overall", "individual"),
-    what = c("epidemic proportion", "endemic proportion", "total intensity"),
-    theta = coef(x), plot = TRUE, add = FALSE, rug.opts = list(), ...)
+
+### Plot method for twinSIR (wrapper for intensityplot)
+
+plot.twinSIR <- function (x, which, ...) # defaults for 'which' are set below
 {
-    intensityPlot(x, type = type, what = what, theta = theta,
-                  plot = plot, add = add, rug.opts = rug.opts, ...)
+    cl <- match.call()
+    cl[[1]] <- as.name("intensityplot")
+    eval(cl, envir = parent.frame())
 }
+
+formals(plot.twinSIR)$which <- formals(intensityplot.twinSIR)$which
+
 
 
 

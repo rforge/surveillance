@@ -82,19 +82,21 @@ Spatio-Temporal Animation of a Continuous-Time Continuous-Space Epidemic
 %}
 
 \author{
-Sebastian Meyer, Documentation by Michael H\enc{ö}{oe}hle
+Sebastian Meyer with documentation by Michael H\enc{ö}{oe}hle
 }
 
 \seealso{
-\code{\link{summary.epidataCS}} for the data, on which the plot is based.
-\code{\link{plot.epidataCS}} for plotting the evolution of an epidemic by
-the numbers of susceptible, infectious and removed individuals.
+The plot is based on the return value of \code{\link{summary.epidataCS}}.
+
+\code{\link{plot.epidataCS}} for plotting the numbers of events by time
+(aggregated over space) or the locations of the events in the
+observation region \code{W} (aggregated over time).
 
 The contributed \R package \pkg{animation}.
 }
 
 \examples{
-  #Currently no examples
+# TODO ...
 }
 
 \keyword{hplot}

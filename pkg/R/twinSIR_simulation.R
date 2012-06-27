@@ -337,7 +337,7 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
                         start = 0, stop = 0, atRiskY = 0,
                         event = 0, Revent = 0, coords, basicVars0, fCovars0)
     # WARNING: if you change the column order, you have to adjust the
-    # hard coded column indexes everywhere below, also in read.model !
+    # hard coded column indexes everywhere below, also in getModel.simEpidata !
     .fIdx <- tail(1:ncol(emptyEvent), nPredEpi)
     .basicIdx <- 7L + ncol(coords) + seq_len(nBasicVars)
     .nrowsEvHist <- .allocate * nObs   # initial size of the event history
@@ -649,33 +649,3 @@ simulate.twinSIR <- function (object, nsim = 1, seed = 1,
     )
 }
 
-
-
-################################################################################
-# The helper function 'read.model' extracts the model of an object of class
-# "simEpidata" similar to the function 'twinSIR' with model = TRUE,
-# i.e. a list with components survs, X, Z and weights, where atRiskY == 1.
-# The log-baseline h0 is evaluated at start times of intervals only.
-# This function is used in function 'intensityPlot'.
-################################################################################
-
-read.model <- function (simepi)
-{
-    stopifnot(inherits(simepi, "simEpidata"))
-    class(simepi) <- "data.frame"   # avoid use of [.epidata (not necessary here)
-    config <- attr(simepi, "config")
-    alpha <- config$alpha
-    beta <- config$beta
-    atRiskY1 <- simepi$atRiskY == 1
-    simepi1 <- simepi[atRiskY1,]
-    survs <- simepi1[c("id", "start", "stop", "event")]
-    attr(survs, "eventTimes") <- attr(simepi, "eventTimes")
-    attr(survs, "timeRange") <- attr(simepi, "timeRange")
-    X <- as.matrix(simepi1[tail(1:ncol(simepi1), length(alpha))])
-    logbaseline <- sapply(survs$start, FUN = config$h0, simplify = TRUE)
-    Terms <- attr(simepi, "terms")
-    Z <- read.design(model.frame(Terms, simepi1), Terms)$Z
-    Z <- cbind("cox(logbaseline)" = logbaseline, Z)
-    model <- list(survs = survs, X = X, Z = Z, weights = rep.int(1,nrow(survs)))
-    return(model)
-}

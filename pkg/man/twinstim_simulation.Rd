@@ -4,12 +4,12 @@
 \alias{simulate.twinstim}
 
 \title{
-Simulation of a Space-Time Point Process based on the 'twinstim' model
+Simulation of a Space-Time Point Process based on the \code{twinstim} model
 }
 
 \description{ This function simulates the event times of a
   self-exiciting spatio-temporal point process. Simulation works via the
-  conditional intensity as defined as described by the twinstim
+  conditional intensity as defined as described by the \code{twinstim}
   modelling class in Meyer et al. (2010).
 
   The \code{\link{simulate}} method for objects of class
@@ -181,70 +181,21 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 }
 
 \author{ 
-Sebastian Meyer and Michael \enc{Höhle}{Hoehle}
+Sebastian Meyer, with contributions by Michael H\enc{ö}{oe}hle
 }
 
 \seealso{
-The \code{\link[=plot.epidata]{plot}} method and the function
-\code{\link{animate.epidata}} for plotting and animation of epidemic data,
-respectively.
-\code{\link{intensityPlot}} for plotting the path of the infection intensity.
+The \code{\link{plot.epidataCS}} and \code{\link{animate.epidataCS}}
+methods for plotting and animating continuous-space epidemic data, respectively.
+The \code{\link{intensityplot}} method for plotting the path of the
+infection intensity (or its two components) in time or space.
 
-Function \code{\link{twinstim}} for fitting spatio-temporal epidemic intensity
-models to epidemic data.
+Function \code{\link{twinstim}} for fitting
+spatio-temporal conditional intensity models to epidemic data.
 }
 
 \examples{
-set.seed(1234)
-# Generate a data frame containing a hypothetic population with 100 individuals
-n <- 100
-pos <- matrix(rnorm(n*2), ncol=2, dimnames=list(NULL, c("x", "y")))
-pop <- data.frame(id=1:n,x=pos[,1], y=pos[,2], 
-                  gender=sample(0:1, n, replace=TRUE),
-                  I0col=rep(0,n),start=rep(0,n),stop=rep(Inf,n))
-
-epi <- simEpidata(cbind(start,stop) ~ cox(gender), 
-                  data = pop, 
-                  id = "id", I0.col = "I0col", coords.cols = c("x","y"),
-                  beta = c(-3), h0 = -2, alpha = c(B1 = 0.1),
-                  f = list(B1 = function(u) u <= 1),
-                  infPeriod = function(ids) rexp(length(ids), rate=1))
-plot(epi)
-
-# load data of an observed epidemic
-data("fooepidata")
-summary(fooepidata)
-
-# simulate a new evolution of the epidemic
-simepi <- simEpidata(cbind(start, stop) ~ cox(z1) + cox(z1):cox(z2),
-    data = fooepidata, 
-    beta = c(1,0.5), h0 = -7, alpha = c(B2 = 0.1, B1 = 0.05),
-    f = list(B1 = function(u) u<=1, B2 = function(u) u>1 & is.finite(u)),
-    infPeriod = function(ids) rexp(length(ids), rate=1), trace = FALSE)
-summary(simepi)
-plot(simepi)
-\dontrun{
-animate(simepi)
-}
-intensityPlot(simepi)
-
-# load a fitted model object, which must contain the original data 
-# (use 'keep.data = TRUE' in the call of 'twinstim')
-data("foofit")
-foofit
-
-# plot original epidemic
-plot(foofit$data)
-
-## simulate a new epidemic using the model and parameter estimates of 'foofit'
-## and set simulation period = observation period
-# with observed infPeriods:
-simfitepi1 <- simulate(foofit, nsim = 1)[[1]]
-plot(simfitepi1)
-# with new infPeriods:
-simfitepi2 <- simulate(foofit, nsim = 1,
-                       infPeriod=function(ids) rexp(length(ids), rate=0.3))[[1]]
-plot(simfitepi2)
+# TODO...
 }
 
 \keyword{datagen}

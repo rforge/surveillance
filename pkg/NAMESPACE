@@ -14,7 +14,7 @@ import(methods)
 
 importFrom(graphics, plot)
 importFrom(stats, simulate, profile, coef, vcov, logLik, AIC, extractAIC, pnorm, cov2cor, residuals, ks.test, confint)
-importFrom(utils, packageDescription, head, tail, toLatex)
+importFrom(utils, packageDescription, head, tail, toLatex, modifyList)
 importFrom(xtable, xtable)
 
 #importMethodsFrom(stats4, plot)   # import S4-generic
@@ -56,7 +56,7 @@ importClassesFrom(gpclib, gpc.poly)
 importMethodsFrom(gpclib, "[", get.bbox, intersect, append.poly, area.poly, get.pts, scale.poly, tristrip)
 importFrom(spatstat, as.owin, as.owin.gpc.poly, area.owin, distppl,
                      as.im.function, disc, shift, shift.owin, plot.owin, marks,
-                     spatstat.options, bounding.box)
+                     spatstat.options, bounding.box, runifpoint, inside.owin)
 importFrom(intervals, Intervals, reduce)
 
 
@@ -72,8 +72,9 @@ importFrom(intervals, Intervals, reduce)
 
 ### general exports
 
-export(animate)   # new S3-generic
-export(R0)        # new S3-generic
+export(animate)          # new S3-generic
+export(R0)               # new S3-generic
+export(intensityplot)    # new S3-generic
 export(isScalar)  # very basic little helper function
 export(anscombe.residuals)
 export(magic.dim, primeFactors, bestCombination)   # similar to n2mfrow
@@ -92,8 +93,13 @@ export(discpoly)
 export(inside.gpc.poly)
 exportMethods(scale.poly)   # redefined method for gpc.poly in spatial_stuff.R
 #S3method(scale, gpc.poly)  # alternatively, if defined as S3 method for scale
-export(multiplicity.sp)
 
+# little helper: multiplicity of points
+export(multiplicity)                    # new S3-generic
+S3method(multiplicity, matrix)
+S3method(multiplicity, Spatial)
+
+# Spatio-temporal cluster detection
 export(stcd)
 
 
@@ -156,9 +162,9 @@ export(sts2disProg)
 export(cox)
 export(as.epidata)
 S3method(as.epidata, default)
+export(as.epidata.default)              # for convenience
 export(intersperse)
 export(twinSIR)
-export(intensityPlot)
 export(stateplot)
 export(simEpidata)
 
@@ -175,6 +181,8 @@ S3method(print, twinSIR)
 S3method(summary, twinSIR)
 S3method(print, summary.twinSIR)
 S3method(plot, twinSIR)
+S3method(intensityplot, twinSIR)
+export(intensityplot.twinSIR)           # for convenience
 S3method(profile, twinSIR)
 S3method(coef, twinSIR)
 S3method(vcov, twinSIR)
@@ -182,44 +190,51 @@ S3method(logLik, twinSIR)
 S3method(AIC, twinSIR)
 S3method(extractAIC, twinSIR)
 S3method(simulate, twinSIR)
+export(simulate.twinSIR)                # for convenience
 S3method(residuals, twinSIR)
+
+S3method(intensityplot, simEpidata)
+export(intensityplot.simEpidata)        # for convenience
 
 
 ### twinstim-specific
 
 export(as.epidataCS)
 export(twinstim)
-# intensityplot
 export(simEpidataCS)
 export(siaf.constant, siaf.gaussian, siaf.lomax, qlomax)
 export(tiaf.constant, tiaf.exponential)
 
 S3method("[", epidataCS)
 S3method(update, epidataCS)
+export(update.epidataCS)                # for convenience
 S3method(head, epidataCS)
 S3method(tail, epidataCS)
 S3method(print, epidataCS)
 S3method(summary, epidataCS)
 S3method(print, summary.epidataCS)
 S3method(animate, epidataCS)
-# S3method(print, summary.epidataCS)  # there is no such method yet
+export(animate.epidataCS)               # for convenience
 S3method(marks, epidataCS)
 export(marks.epidataCS)    # we also export it for convenience since the generic
                            # is only available if package spatstat is loaded
-# S3method(plot, epidataCS)  # TODO... type=c("temporal", "spatial")
+S3method(plot, epidataCS)
 S3method(as.epidata, epidataCS)
+export(as.epidata.epidataCS)            # for convenience
 
 S3method(print, twinstim)
 S3method(summary, twinstim)
 S3method(print, summary.twinstim)
 S3method(toLatex, summary.twinstim)
-# S3method(plot, twinstim)
-#-> type = c("intensity", "siaf", "tiaf")  -> call intensityPlot (make generic) or plotiaf
+S3method(plot, twinstim)
+S3method(intensityplot, twinstim)
+export(intensityplot.twinstim)          # for convenience
 #S3method(profile, twinstim)   # FIXME @Michael: what is the status of this method?
 S3method(coef, twinstim)
 S3method(vcov, twinstim)
 S3method(logLik, twinstim)
 S3method(simulate, twinstim)
+export(simulate.twinstim)               # for convenience
 S3method(R0, twinstim)
 S3method(residuals, twinstim)
 

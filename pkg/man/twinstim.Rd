@@ -1,37 +1,25 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Rd file for function 'twinstim'
-%%
-%% Author: Michael Höhle based on the in-code documentation of
-%%         Sebastian Meyer.
-%% $Date: 2010-07-07 00:12:46 +0200 (Wed, 07 Jul 2010) $
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \encoding{latin1}
 \name{twinstim}
 \alias{twinstim}
-\alias{coef.twinstim}
-\alias{vcov.twinstim}
-\alias{logLik.twinstim}
-\alias{print.twinstim}
-\alias{summary.twinstim}
-\alias{print.summary.twinstim}
-\alias{toLatex.summary.twinstim}
 
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
   Fit a two-component spatio-temporal conditional intensity function model
 }
+
 \description{
   A twinstim model as described in Meyer et al. (2010) is fitted to
   marked spatio-temporal point process data. This constitutes a
   regression approach for conditional intensity function modelling.
 }
+
 \usage{
 twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
-subset, na.action = na.fail, optim.args, nCub, partial = FALSE, finetune
-= TRUE, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop, 1),
-typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE)
+         subset, na.action = na.fail, optim.args, nCub, partial = FALSE,
+         finetune = TRUE,
+         t0 = data$stgrid$start[1], T = tail(data$stgrid$stop, 1),
+         typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
   \item{endemic}{
     Formula for the exponential (Cox-like multiplicative) endemic component. may contain offsets. If \code{~0} there will be no endemic component in the model.
@@ -201,7 +189,9 @@ typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE)
   S. Meyer with documentation by M. \enc{Höhle}{Hoehle}.
 }
 \seealso{
-\code{\link{twinSIR}}
+  \code{\link{twinSIR}} for a discrete space alternative.
+  There is also a \code{\link{simulate.twinstim}} method,
+  which simulates the point process based on the fitted \code{twinstim}.
 }
 \examples{
 #Load invasive meningococcal disease data

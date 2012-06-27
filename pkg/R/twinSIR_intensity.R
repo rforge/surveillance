@@ -109,49 +109,28 @@ Lambda <- function(t, theta, X, Z, survs, weights)
 # as well as with objects of class "twinSIR".
 ################################################################################
 
+# 'model' is the result of getModel(x)
 # if x is of class "twinSIR": theta = (alpha, beta) = (alpha, (h0coefs, betarest)) 
 # if x is of class "simEpidata": theta = (alpha, 1, betarest)
 # per default, the function uses the fitted or true parameters, respectively
-intensityPlot <- function(x, type = c("overall", "individual"),
-    what = c("epidemic proportion", "endemic proportion", "total intensity"),
-    theta = NULL, plot = TRUE, add = FALSE, rug.opts = list(), ...)
+intensityplot_twinSIR <- function(model,
+    which = c("epidemic proportion", "endemic proportion", "total intensity"),
+    aggregate = TRUE, theta = NULL, plot = TRUE, add = FALSE, rug.opts = list(), ...)
 {
-    type <- match.arg(type)
-    what <- match.arg(what)
+    which <- match.arg(which)
     
-    ## Extract model and theta
-    if (inherits(x, "twinSIR")) {
-        if (is.null(model <- x[["model"]])) {
-            stop("'", deparse(substitute(x)), "' does not contain the 'model' ",
-                 "component (use 'model = TRUE' when calling 'twinSIR')")
-        }
-        if (is.null(theta)) {
-            theta <- coef(x)
-        }
-        end <- x$intervals[length(x$intervals)]
-    } else if (inherits(x, "simEpidata")) {
-        message("Note: the (true) baseline hazard is only evaluated",
-                " at the beginning of the time intervals")
-        model <- read.model(x)
-        if (is.null(theta)) {
-            theta <- c(attr(x,"config")$alpha, 1, attr(x,"config")$beta)
-                                               # 1 is for true h0
-        }
-        end <- attr(x, "timeRange")[2L]
-    } else {
-        stop("'x' must inherit from classes \"twinSIR\" or",
-             " \"simEpidata\"")
-    }
+    ## model components
     survs <- model$survs
     start <- attr(survs, "timeRange")[1L]
+    end <- attr(survs, "timeRange")[2L]
     timeIntervals <- unique(survs[c("start", "stop")])
-    timepoints <- unique(c(timeIntervals$stop,end))
+    timepoints <- unique(c(timeIntervals$stop, end))
     # need 'end' here, because model does only contain rows with atRiskY == 1,
     # otherwise would terminate in advance if all individuals have been infected
     nTimes <- length(timepoints)
     idlevels <- levels(survs$id)
     
-    # helper function for use with by()
+    ## helper function for use with by()
     intensity <- function(iddata, what) {
         # 'iddata' will be a subset of survs, 'what' will be "wlambda" or "we"
         y <- numeric(nTimes)
@@ -185,7 +164,7 @@ intensityPlot <- function(x, type = c("overall", "individual"),
          wlambdaIDmatrix[match(iddata$stop, timepoints), ID] <- iddata$wlambda
      }
     
-    if (what != "total intensity") {
+    if (which != "total intensity") {
         ## Calculate individual _epidemic intensity_ paths
         survs$we <- {
             px <- ncol(model$X)
@@ -217,26 +196,26 @@ intensityPlot <- function(x, type = c("overall", "individual"),
     
     ## Generate matrix with data for 'matplot'
     ydata2plot <-
-        if (what == "total intensity") {
-            if (type == "overall") {
+        if (which == "total intensity") {
+            if (aggregate) {
                 rowSums(wlambdaIDmatrix)
             } else {
                 wlambdaIDmatrix
             }
         } else {   # calculate epidemic proportion
-            if (type == "overall") {
+            if (aggregate) {
                 rowSums(weIDmatrix) / rowSums(wlambdaIDmatrix)
             } else {
                 weIDmatrix / wlambdaIDmatrix
             }
         }
-    if (what == "endemic proportion") {
+    if (which == "endemic proportion") {
         ydata2plot <- 1 - ydata2plot
     }
     ydata2plot <- as.matrix(ydata2plot)
-    colnames(ydata2plot) <- if (type == "overall") what else idlevels
+    colnames(ydata2plot) <- if (aggregate) which else idlevels
     
-    if (what != "total intensity") {
+    if (which != "total intensity") {
         # there may be NAs in data2plot where the total intensity equals 0
         # => when calculating proportions we get 0 / 0 = NA
         # we redefine those values to 0. (0-intensity => 0-proportion)
@@ -269,7 +248,7 @@ intensityPlot <- function(x, type = c("overall", "individual"),
         dotargs <- list(...)
         nms <- names(dotargs)
         if(! "xlab" %in% nms) dotargs$xlab <- "time"
-        if(! "ylab" %in% nms) dotargs$ylab <- what
+        if(! "ylab" %in% nms) dotargs$ylab <- which
         if(! "pch" %in% nms) dotargs$pch <- 1
         if(! "lty" %in% nms) dotargs$lty <- 1
         do.call("matplot",
@@ -289,3 +268,42 @@ intensityPlot <- function(x, type = c("overall", "individual"),
         data2plot
     }
 }
+
+
+### intensityplot-methods for objects of classes "twinSIR" and "simEpidata"
+
+intensityplot.twinSIR <- function ()
+{
+    cl <- match.call()
+    cl[[1]] <- as.name("intensityplot_twinSIR")
+    names(cl)[names(cl) == "x"] <- "model"
+    cl$model <- quote(getModel(x))
+
+    if (is.null(theta)) {
+        cl$theta <- quote(coef(x))
+    }
+
+    eval(cl)
+}
+
+intensityplot.simEpidata <- function ()
+{
+    cl <- match.call()
+    cl[[1]] <- as.name("intensityplot_twinSIR")
+    names(cl)[names(cl) == "x"] <- "model"
+    cl$model <- quote(getModel(x))
+
+    if (is.null(theta)) {
+        config <- attr(x, "config")
+        cl$theta <- quote(c(config$alpha, 1, config$beta))   # 1 is for true h0
+    }
+
+    message("Note: the (true) baseline hazard is only evaluated",
+            " at the beginning of the time intervals")
+    eval(cl)
+}
+
+formals(intensityplot.twinSIR) <- formals(intensityplot.simEpidata) <-
+    c(alist(x=), formals(intensityplot_twinSIR)[-1])
+
+

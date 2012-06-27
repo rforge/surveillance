@@ -1,12 +1,13 @@
 \encoding{latin1}
 \name{twinSIR_methods}
-\alias{AIC.twinSIR}
-\alias{extractAIC.twinSIR}
 \alias{print.twinSIR}
 \alias{summary.twinSIR}
+\alias{AIC.twinSIR}
+\alias{extractAIC.twinSIR}
 \alias{coef.twinSIR}
 \alias{vcov.twinSIR}
 \alias{logLik.twinSIR}
+\alias{print.summary.twinSIR}
 
 \title{
 Print, Summary and Extraction Methods for \code{"twinSIR"} Objects
@@ -37,10 +38,16 @@ calculation of the so-called one-sided AIC (OSAIC).
 \method{coef}{twinSIR}(object, ...)
 \method{vcov}{twinSIR}(object, ...)
 \method{logLik}{twinSIR}(object, ...)
+
+\method{print}{summary.twinSIR}(x,
+      digits = max(3, getOption("digits") - 3), symbolic.cor = x$symbolic.cor,
+      signif.stars = getOption("show.signif.stars"), ...)
 }
 
 \arguments{
-  \item{x, object, fit}{an object of class \code{"twinSIR"}.}
+  \item{x, object, fit}{an object of class \code{"twinSIR"}.\cr
+    For the \code{print} method of the \code{summary} method, an object of
+    class \code{"summary.twinSIR"}.}
   \item{digits}{
     integer, used for number formatting with \code{signif()}.  Minimum number of
     significant digits to be printed in values.
@@ -78,6 +85,8 @@ calculation of the so-called one-sided AIC (OSAIC).
     Defaults to 1000 samples.
   }
   \item{scale}{unused (argument of the generic).}
+  \item{signif.stars}{logical. If \code{TRUE}, \dQuote{significance
+      stars} are printed for each coefficient.}
 }
 
 \details{
@@ -109,8 +118,17 @@ calculation of the so-called one-sided AIC (OSAIC).
 }
 
 \value{
-  See the documentation for the generic functions \code{\link{AIC}} and
-  \code{\link{extractAIC}}, respectively.
+  The \code{print} methods return their first argument, invisibly, as
+  they always should. The \code{coef}, \code{vcov}, and \code{logLik}
+  methods return the estimated coefficients, the estimated variance-covariance
+  matrix of the parameters (here, the inverse of the estimate of the
+  expected Fisher information matrix), and the maximum log-likelihood
+  value of the model, respectively.
+  The \code{summary} method returns a list containing some summary
+  statistics of the fitted model, which is nicely printed by the
+  corresponding \code{print} method.
+  For the \code{\link{AIC}} and \code{\link{extractAIC}} methods, see
+  the documentation of the corresponding generic functions.
 }
 
 \references{

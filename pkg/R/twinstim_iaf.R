@@ -1,12 +1,13 @@
 ################################################################################
 ### Spatial/Temporal interaction functions for the epidemic component
-###
 ### Author: Sebastian Meyer
-### $Date: 2010-11-08 21:00:47 +0100 (Mon, 08 Nov 2010) $
 ################################################################################
 
 
 ### Function returning specification of constant spatial interaction/dispersal
+
+## ## to avoid notes in R CMD check ("no visible binding for global variable ...")
+## if (getRversion() >= "2.15.1") utils::globalVariables("r")
 
 siaf.constant <- function () {
     res <- list(
@@ -100,7 +101,8 @@ siaf.gaussian <- function (nTypes, logsd = TRUE, density = FALSE,
             sd <- rep(sds, length.out=type)[type],
             val <- pchisq((r/sd)^2, 2)   # cf. Abramowitz&Stegun formula 26.3.24
         ),
-        if (!density) expression(val <- val * 2*pi*sd^2)
+        if (!density) expression(val <- val * 2*pi*sd^2),
+        expression(val)
     ))
 
     # effective integration range as a function of sd
