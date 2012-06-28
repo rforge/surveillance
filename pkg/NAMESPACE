@@ -227,6 +227,7 @@ S3method(summary, twinstim)
 S3method(print, summary.twinstim)
 S3method(toLatex, summary.twinstim)
 S3method(plot, twinstim)
+export(iafplot)
 S3method(intensityplot, twinstim)
 export(intensityplot.twinstim)          # for convenience
 #S3method(profile, twinstim)   # FIXME @Michael: what is the status of this method?
