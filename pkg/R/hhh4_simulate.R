@@ -21,15 +21,14 @@ simHHH4 <- function(stsObj, # sts object
 	rnbinom(n, mu = mean, size=size)
   }
 
-  # sum of all neighbours
+  # weighted sum of all neighbours
   # params: x - vector with counts
   #         nhood - adjacency matrix, 0= no neighbour
   # returns a vector with the sum of "neighbouring counts" for all areas
-  sumN <- function (x, nhood) {
+  wsumN <- function (x, nhood) {
 	n <- length(x)
 	if(any(nhood>0)){
-	  nhood <- nhood >0
-	  res <- sapply(1:n,function(i) sum(x[nhood[i,]]))
+	  res <- sapply(1:n, function(i) sum(x*nhood[,i]))
 	} else {
 	  res<- rep(0,n)
 	}
@@ -62,7 +61,7 @@ simHHH4 <- function(stsObj, # sts object
 	# simulate data
 	for(t in 1:nTime){
 	  #mu_i,t = lambda*x_i,t-1 +phi*\sum_j~i x_j,t-1 + nu
-	  mu[t,] <- ar[t,] *x[t,] + ne[t,]*sumN(x[t,], nhood) + end[t,]
+	  mu[t,] <- ar[t,] *x[t,] + ne[t,]*wsumN(x[t,], nhood) + end[t,]
 	  x[t+1,] <- rdistr(nUnits, mu[t,])
 	}
   }
@@ -90,8 +89,8 @@ simulate.ah4 <- function(object, # result from a call to hhh4
   # set to zeros if not specified
   if(is.null(nhood)) nhood <- matrix(0,ncol(data),ncol(data))
 
-  if(!is.null(y.start) && length(y.start)!= ncol(object)){
-	stop(paste(sQuote("y.start"), "needs to be of length", ncol(object),".\n"))
+  if(!is.null(y.start) && length(y.start)!= ncol(data)){
+	stop(paste(sQuote("y.start"), "needs to be of length", ncol(data),".\n"))
   }
   
   # get fitted values of the three components
