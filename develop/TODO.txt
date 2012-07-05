@@ -121,10 +121,10 @@ minutes. Possible to fix this??
 #Open issues / feature requests
 - robustification of optim procedure by making it less adaptive -> sebastian
 - Documentation of functions in Rd files; also update references (Biometrics)
-- intensityPlot as in twinSIR, i.e. on W integrated intensity (and its components) as a function of time, grouped by type
 
 #Done
-05/04/2011 Plot function of epidataCS objects
+05/07/2012 (sebastian): intensityPlot as in twinSIR, i.e. on W integrated intensity (and its components) as a function of time, grouped by type
+05/04/2011 (sebastian): Plot method for epidataCS objects
 08/04/2011 (michael): Implemented profile function as in twinSIR.
 12/08/2010 (sebastian): speed-up calculation of tau importantly by only evaluating .siafInt(siafpars) once
 06/08/2010 (sebastian): Lambda(t) function, i.e. cumulative intensity function

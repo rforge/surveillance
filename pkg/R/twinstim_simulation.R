@@ -334,22 +334,22 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         tiaf <- do.call(".parseiaf", args = alist(tiaf))
 
         ## Spatially constant interaction siaf(s) = 1
-        constantsiaf <- is.null(siaf) || isTRUE(attr(siaf, "constant"))
-        if (constantsiaf) {
-            siaf <- siaf.constant()
-        } else attr(siaf, "constant") <- FALSE
+        constantsiaf <- is.null(siaf) || attr(siaf, "constant")
+        if (constantsiaf) siaf <- siaf.constant()
         if (siaf$npars != nsiafpars) {
-            stop("length of 'siafpars' (", nsiafpars, ") does not match the 'siaf' specification (", siaf$npars, ")")
+            stop("length of 'siafpars' (", nsiafpars,
+                 ") does not match the 'siaf' specification (", siaf$npars, ")")
         }
 
         ## Temporally constant interaction tiaf(t) = 1
-        constanttiaf <- is.null(tiaf) || isTRUE(attr(tiaf, "constant"))
+        constanttiaf <- is.null(tiaf) || attr(tiaf, "constant")
         if (constanttiaf) {
             tiaf <- tiaf.constant()
             gmax <- 1L
-        } else attr(tiaf, "constant") <- FALSE
+        }
         if (tiaf$npars != ntiafpars) {
-            stop("length of 'tiafpars' (", ntiafpars, ") does not match the 'tiaf' specification (", tiaf$npars, ")")
+            stop("length of 'tiafpars' (", ntiafpars,
+                 ") does not match the 'tiaf' specification (", tiaf$npars, ")")
         }
 
         ## Check nCub

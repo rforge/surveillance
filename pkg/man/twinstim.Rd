@@ -3,11 +3,11 @@
 \alias{twinstim}
 
 \title{
-  Fit a two-component spatio-temporal conditional intensity function model
+  Fit a Two-Component Spatio-Temporal Conditional Intensity Model
 }
 
 \description{
-  A twinstim model as described in Meyer et al. (2010) is fitted to
+  A \code{twinstim} model as described in Meyer et al. (2010) is fitted to
   marked spatio-temporal point process data. This constitutes a
   regression approach for conditional intensity function modelling.
 }
@@ -17,7 +17,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
          subset, na.action = na.fail, optim.args, nCub, partial = FALSE,
          finetune = TRUE,
          t0 = data$stgrid$start[1], T = tail(data$stgrid$stop, 1),
-         typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE)
+         typeSpecificEndemicIntercept = FALSE, model = FALSE,
+         cumCIF = TRUE, cumCIF.pb = TRUE)
 }
 
 \arguments{
@@ -110,11 +111,12 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     is kept in the workspace and the necessary model frames are still
     available when \code{twinstim} has finished.
   }
-  \item{cumCIF}{Logical (Default: \code{TRUE}) indicating whether to
-  calculate the fitted cumulative intensity at event times. Useful for,
-  e.g. plotting the residuals using
-  \code{\link{residuals.twinstim}}.
+  \item{cumCIF}{Logical (default: \code{TRUE}) indicating whether to
+    calculate the fitted cumulative ground intensity at event times. Useful for,
+    e.g., plotting the residuals using \code{\link{residuals.twinstim}}.
   }
+  \item{cumCIF.pb}{logical indicating if a progress bar should be shown
+    during the calculation of \code{cumCIF}. Defaults to \code{TRUE}.}
 }
 \details{
   The function performs maximum likelihood inference
@@ -128,8 +130,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   A specific add on is the use of the function \code{R0}.
 }
 \value{
-  Returns an S3 object of class "twinstim".
-%%  ~Describe the value returned
+  Returns an S3 object of class \code{"twinstim"}.
 \describe{
   \item{coefficients}{Vector containing the MLE.}
   \item{loglik}{Value of the log-likelihood function at the MLE.}
@@ -175,6 +176,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     the model.}
 }
 }
+
 \references{
   Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2011). A Space-Time Conditional
   Intensity Model for Invasive Meningococcal Disease Occurrence.
@@ -185,14 +187,17 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   on Point Processes. Master Thesis, Ludwig-Maximilians-\enc{Universität}{Universitaet}
   München. Available as http://epub.ub.uni-muenchen.de/11703/
 }
+
 \author{
   S. Meyer with documentation by M. \enc{Höhle}{Hoehle}.
 }
+
 \seealso{
   \code{\link{twinSIR}} for a discrete space alternative.
   There is also a \code{\link{simulate.twinstim}} method,
   which simulates the point process based on the fitted \code{twinstim}.
 }
+
 \examples{
 #Load invasive meningococcal disease data
 data("imdepi")
@@ -243,7 +248,6 @@ summary(imdepi.fit)
 }
 
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
+
 \keyword{models}
 \keyword{optimize}

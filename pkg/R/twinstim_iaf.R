@@ -489,7 +489,7 @@ checktiaf <- function (g, G, deriv, Deriv, npars, validpars, knots)
         NULL
     } else if (is.list(iaf)) {
         ret <- do.call(paste0("check",name), args = iaf)
-        attr(ret, "constant") <- attr(iaf, "constant")
+        attr(ret, "constant") <- isTRUE(attr(iaf, "constant"))
         ret
     } else if (is.vector(iaf, mode = "numeric")) {
         stop("'knots' are not implemented for '",name,"'")

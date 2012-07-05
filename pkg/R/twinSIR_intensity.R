@@ -244,7 +244,6 @@ intensityplot_twinSIR <- function(model,
         nms <- names(dotargs)
         if(! "xlab" %in% nms) dotargs$xlab <- "time"
         if(! "ylab" %in% nms) dotargs$ylab <- which
-        if(! "pch" %in% nms) dotargs$pch <- 1
         if(! "lty" %in% nms) dotargs$lty <- 1
         do.call("matplot",
                 args = c(list(x = c(start, data2plot[,1L]),

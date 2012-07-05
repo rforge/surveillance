@@ -23,11 +23,15 @@
 # T: only use events that occured up to time T. The time point 'T' must be an element of data$stgrid$stop. By default it is the latest time point of the spatio-temporal grid of 'data'.
 # typeSpecificEndemicIntercept: Use type-specific endemic intercepts instead of the global endemic intercept?
 # model: logical. If 'TRUE' the result contains an element 'functions' with the log-likelihood function, and optionally the score function and the fisher information function. The environment of those functions equals the evaluation environment of the fitting function, i.e. it is kept in the workspace and the necessary model frames are still available when 'twinstim' has finished. This might be of interest for a posteriori evaluations of the log-likelihood, e.g. for plotting purposes.
+# cumCIF: should the cumulative ground intensities at the event times be
+# calculated and appended to the result?
+# cumCIF.pb: Should a progress bar for calculating cumCIF be shown?
 
 twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     data, subset, na.action = na.fail, optim.args, nCub, partial = FALSE,
     finetune = TRUE, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
-    typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE)
+    typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE,
+    cumCIF.pb = TRUE)
 {
 
     ####################
@@ -41,8 +45,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     typeSpecificEndemicIntercept <- as.logical(typeSpecificEndemicIntercept)
 
     # Clean the environment when exiting the function
-    on.exit(suppressWarnings(rm(cl, data, eventsData, finetune, fisherinfo, fit, functions,
-        globalEndemicIntercept, inmfe, ll, negll, loglik, mfe, mfhEvents, mfhGrid,
+    on.exit(suppressWarnings(rm(cl, cumCIF, cumCIF.pb, data, eventsData, finetune, fisherinfo, fit,
+        functions, globalEndemicIntercept, inmfe, ll, negll, loglik, mfe, mfhEvents, mfhGrid, model,
         my.na.action, na.action, namesOptimUser, namesOptimArgs, nlminbRes, nmRes, optim.args,
         optimValid, optimControl, partial, partialloglik, ptm, qmatrix, res, sc, negsc, score,
         subset, typeSpecificEndemicIntercept, useScore, inherits = FALSE)))
@@ -260,8 +264,14 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                                # since R 2.10.0 patched also works with endemic = ~1 (see PR#14066)
                                drop.unused.levels = FALSE,
                                BLOCK = BLOCK, tile = tile, dt = stop-start, ds = area)
-                               # 'tile' is actually redundant here, but can help as reference when debugging
+                               # 'tile' is redundant here for fitting, but is
+                               # useful for debugging and intensityplot
         gridBlocks <- mfhGrid[["(BLOCK)"]]
+        if (model) {                    # further data needed for intensityplot
+            gridTiles <- mfhGrid[["(tile)"]]
+            stgridStartsUnique <- unique(data$stgrid$start) # these are sorted
+                                        # and can be indexed by BLOCK
+        }
         mmhGrid <- model.matrix(endemic, mfhGrid)
 
         # exclude intercept from endemic model matrix below, will be treated separately
@@ -295,17 +305,13 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         tiaf <- do.call(".parseiaf", args = alist(tiaf))
 
         ### Spatially constant interaction siaf(s) = 1
-        constantsiaf <- is.null(siaf) || isTRUE(attr(siaf, "constant"))
-        if (constantsiaf) {
-            siaf <- siaf.constant()
-        } else attr(siaf, "constant") <- FALSE
+        constantsiaf <- is.null(siaf) || attr(siaf, "constant")
+        if (constantsiaf) siaf <- siaf.constant()
         nsiafpars <- siaf$npars
 
         ### Temporally constant interaction tiaf(t) = 1
-        constanttiaf <- is.null(tiaf) || isTRUE(attr(tiaf, "constant"))
-        if (constanttiaf) {
-            tiaf <- tiaf.constant()
-        } else attr(tiaf, "constant") <- FALSE
+        constanttiaf <- is.null(tiaf) || attr(tiaf, "constant")
+        if (constanttiaf) tiaf <- tiaf.constant()
         ntiafpars <- tiaf$npars
 
         ### Define function that integrates the two-dimensional 'siaf' function
@@ -478,7 +484,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     }
 
 
-    ### Calculates the two compontens of the integrated intensity function over [0;uppert] x W x K
+    ### Calculates the two components of the integrated intensity function over [0;uppert] x W x K
 
     heIntTWK <- function (beta0, beta, gammapred, siafpars, tiafpars, uppert = NULL) {}
     body(heIntTWK) <- as.call(c(as.name("{"),
@@ -495,7 +501,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 subtimeidx <- if (!is.null(uppert) && isScalar(uppert) && t0 <= uppert && uppert < T) {
                     gIntUpper <- pmin(uppert-eventTimes, eps.t)
                     eventTimes < uppert
-                } else rep(TRUE, N)
+                } else rep.int(TRUE, N)
                 tiafIntUpper <- tiaf$G(gIntUpper[subtimeidx], tiafpars, eventTypes[subtimeidx])
                 tiafIntLower <- tiaf$G(gIntLower[subtimeidx], tiafpars, eventTypes[subtimeidx])
                 tiafInt <- tiafIntUpper - tiafIntLower
@@ -1046,15 +1052,15 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             .siafInt <- function (siafpars) siafIntsFinal
         }
         heIntEvents <- matrix(NA_real_, N, 2L)
-        pb <- txtProgressBar(min=0, max=N, initial=0, style=3)
+        if (cumCIF.pb) pb <- txtProgressBar(min=0, max=N, initial=0, style=3)
         for (i in 1:N) {
             heIntEvents[i,] <- heIntTWK(beta0, beta, gammapred, siafpars, tiafpars, uppert = eventTimes[i])
-            setTxtProgressBar(pb, i)
+            if (cumCIF.pb) setTxtProgressBar(pb, i)
         }
-        close(pb)
+        if (cumCIF.pb) close(pb)
         if (hase) .siafInt <- .siafInt.orig
         LambdaEvents <- rowSums(heIntEvents)
-        names(LambdaEvents) <- rownames(mfe)
+        names(LambdaEvents) <- mfe[["(ID)"]]
         LambdaEvents
     } else NULL
     suppressWarnings(rm(.siafInt.orig, i, pb, heIntEvents, LambdaEvents))

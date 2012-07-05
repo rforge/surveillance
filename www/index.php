@@ -159,12 +159,15 @@ R-Forge:<br>
  href="https://r-forge.r-project.org/projects/surveillance/">https://r-forge.r-project.org/projects/surveillance/</a><br>
       </div>
       <br>
-From this page snapshots of the current development version are
-							   available. For example -- if you are running a recent R version -- you can obtain a binary snapshot of the development version as<br>
+From this page snapshots of the current development version are available.
+For example -- if you are running a recent R version -- you can obtain a
+binary snapshot of the development version as<br>
 
 <div style="text-align: center;"> <tt>install.packages("surveillance",repos="http://r-forge.r-project.org")</tt>.</div>
 
- You can also manually download the <a href="http://r-forge.r-project.org/bin">binary snapshot</a> or the <a href="http://r-forge.r-projec.org/src">source tarball.
+You can also manually download the
+<a href="http://r-forge.r-project.org/bin">binary snapshot</a>
+or the <a href="http://r-forge.r-project.org/src">source tarball</a>.
       <br><p>
 New features:<br>
       <ul>
@@ -227,15 +230,15 @@ further preprints.<br>
       <li><a href="http://www.stat.uni-muenchen.de/%7Ehoehle">Michael
 Höhle</a>, Department of Statistics, University of Munich, Germany
 (Project Admin)</li>
+      <li><a href="http://www.biostat.uzh.ch/aboutus/people/smeyer.html">Sebastian
+Meyer</a>, Institute of Social and Preventive Medicine, University of 
+Zurich, Switzerland</li> 
       <li><a href="http://www.biostat.uzh.ch/aboutus/people/mpaul.html">Michaela
 Paul</a>, Institute of Social and Preventive Medicine, University of
 Zurich, Switzerland</li>
-	<li><a href="http://www.biostat.uzh.ch/aboutus/people/smeyer.html">Sebastian
-Meyer</a>, Institute of Social and Preventive Medicine, University of 
-Zurich, Switzerland</li> 
-      <li>Former student programmers: C. Lang, Andrea Riebler, Valentin
-Wimmer</li>
-      <li>Contributions by: T. Correa, M. Hofmann and S. Steiner</li>
+      <li>Former student programmers: C. Lang, A. Riebler, V. Wimmer</li>
+      <li>Contributions by: T. Correa, M. Hofmann, D. Sabanés Bové, S. Steiner,
+M. Virtanen</li>
     </ul>
   </blockquote>
 </blockquote>

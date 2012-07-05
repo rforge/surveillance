@@ -771,7 +771,7 @@ plot.epidataCS_space <- function (x, subset,
 {
     events <- if (missing(subset)) x$events else {
         ## FIXME: subset.Spatial has a bug in sp version 0.9-99
-        ## => do it myself for the moment
+        ## => reported 26.06.2012 => do it myself until it gets fixed
         e <- substitute(subset)
         r <- eval(e, x$events@data, parent.frame())
         if (!is.logical(r)) stop("'subset' must evaluate to logical")
