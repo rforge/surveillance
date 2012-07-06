@@ -9,7 +9,7 @@
 \alias{RPS}
 
 \title{
-  Nowcasting epidemic curves when case reports arrive with delay
+  Adjust observed epidemic curve for reporting delay of cases
 }
 
 \description{
@@ -20,7 +20,7 @@
 
 \usage{
 nowcast(s, t, D, dEventCol = "dHospital", dReportCol = "dReport",
-          method = c("freq.pi","bayes.nb","bayes.betapi","uniform"),
+          method = c("freq.pi","bayes.nb","bayes.betapi","bayes.bnb","uniform"),
           aggregate.by="1 day",
           control = list(
             dRange = NULL,
@@ -29,7 +29,7 @@ nowcast(s, t, D, dEventCol = "dHospital", dReportCol = "dReport",
             alpha = 0.05,
             y.prior.max = 300,
             B = 1e5, 
-            score = FALSE))
+            score = FALSE, PMF=FALSE, sts.truth=FALSE))
 }
 
 \arguments{
@@ -83,7 +83,14 @@ nowcast(s, t, D, dEventCol = "dHospital", dReportCol = "dReport",
 	the predictive distribution is right-truncated. Default: 300}
       \item{B=1e5}{Number of samples to use in the method
 	\code{"freq.pi"}. Default: 1e5} 
-      \item{score}{Compute scoring rules. Default: \code{FALSE}}
+      \item{score}{Compute scoring rules. Default: \code{FALSE}. The
+  computed scores are found in the \code{control} slot of the result.}
+      \item{PMF}{Boolean whether to teturn the probability mass
+  functions of the individual forecasts (Default: \code{FALSE}). The
+  result can be found in the \code{control} slot of the return object.}
+\item{sts.truth}{Boolean whether to return an sts object containing the
+  true number of counts (ignoring reporting delays). Result would be
+  found in the \code{control} slot.}
       }
     }
   }
@@ -95,7 +102,9 @@ nowcast(s, t, D, dEventCol = "dHospital", dReportCol = "dReport",
 }
 
 \value{
-  \code{nowcast} returns an object of \code{"\linkS4class{stsBP}"}.
+  \code{nowcast} returns an object of \code{"\linkS4class{stsBP}"}. The
+  \code{upperbound} slot contains the median of the method specified at
+  position one of the argument \code{method}.
 }
 
 \references{

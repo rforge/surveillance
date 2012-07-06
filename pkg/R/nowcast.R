@@ -13,7 +13,7 @@
 ######################################################################
 
 nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
-                    method=c("freq.pi","bayes.nb","bayes.betapi","uniform"),
+                    method=c("freq.pi","bayes.nb","bayes.betapi","bayes.bnb","uniform"),
                     aggregate.by="1 day",
                     control=list(
                       dRange=NULL,
@@ -21,7 +21,7 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
                       estimateF="dynamic",
                       alpha=0.05,
                       y.prior.max=300,
-                      B=1e5, score=FALSE)) {
+                      B=1e5, score=FALSE,PMF=FALSE,sts.truth=FALSE)) {
   
   #Check if t<=s
   if (!all(t<=s)) {
@@ -29,7 +29,7 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
   }
 
   #Check that specified methods are all valid
-  method <- match.arg(method,c("freq.pi","bayes.nb","bayes.betapi","uniform"))
+  method <- match.arg(method,c("freq.pi","bayes.nb","bayes.betapi","bayes.bnb","uniform"),several.ok=TRUE)
   
   
   #If there is a specification of dateRange set dMin and dMax accordingly
@@ -44,7 +44,8 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
 
   dateRange <- seq(dMin,dMax,by=aggregate.by)
   timeDelay <- NULL
-  
+
+  #Choose default timeDelay function if none is given.
   if (is.null(control[["timeDelay"]])) {
     timeDelay <- function(d1,d2) {as.numeric(d2-d1)}
   } else {
@@ -75,8 +76,10 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
 #  observed <- table(factor(as.character(D[,dEventCol]), levels=as.character(dateRange)))
 #  sts.truth <- new("sts",epoch=as.numeric(dateRange),observed=matrix(observed,ncol=1),epochAsDate=TRUE,freq=365)
   sts.truth <- linelist2sts(D,dEventCol,aggregate.by=aggregate.by,dRange=dateRange)
-  
-  
+  if (is.null(control[["sts.truth",exact=TRUE]])) {
+    control$sts.truth <- FALSE
+  }
+
   #Estimation function for the delay. Standard procedure is to reduce
   #database to only contain the cases which are available at time s
   if (is.null(control[["estimateF",exact=TRUE]]) || (control[["estimateF",exact=TRUE]] == "dynamic")) {
@@ -104,10 +107,9 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
   #y.prior max including check that y.prior.max is not too small.
   ######################################################################
   if (is.null(control[["y.prior.max",exact=TRUE]])) {
-    y.prior.max=300
-  } else {
-    y.prior.max <- control$y.prior.max
+    control$y.prior.max=300
   }
+  y.prior.max <- control$y.prior.max
   if (2*y.prior.max < max(observed(sts),na.rm=TRUE)) {
     warning("y.prior.max appears too small. Largest observed value is more than 50% of y.prior.max, which -- in case this number is extrapolated -- might cause problems.\n")
   }
@@ -134,6 +136,25 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
   #Initialize scoring rule results - to be saved in control slot -- dirty
   SR <- array(0,dim=c(nrow(sts),length(method),length(scores)))
 
+  #List for storing the PMFs.
+  if (is.null(control[["PMF",exact=TRUE]])) {
+    control$PMF <- FALSE
+  }
+
+  ######################################################################
+  # Done manipulating the control list with default arguments
+  ######################################################################
+  sts@control <- control
+  
+  #Save truth 
+  if (control$sts.truth) {
+    sts@control$sts.truth <- sts.truth
+  } else {
+    sts@control$sts.truth <- NULL
+  }
+
+  sts@control$PMF <- list()
+  
   ######################################################################
   # Helper functions for Bayesian now-casting.
   ######################################################################
@@ -149,6 +170,30 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
   dpits <- function(pits) {
     val <- dbeta(pits, shape1=1/2 + F(diffsti)*ms, shape2=1/2 + ms -  F(diffsti)*ms)
     ifelse(is.finite(val),val,1e99)
+  }
+
+  ######################################################################
+  # Posterior based on the beta-negative binomial distribution
+  ######################################################################
+
+  dbnb <- function(k,n,alpha,beta) {
+    #Check if k's outside the support are requested.
+    neg <- k<0
+    k[neg] <- 0
+    #Calculate the density of the beta-negbin. See Teerapabolarn (2008)
+    num <- lgamma(n+alpha)+lgamma(k+beta)+lgamma(n+k)+lgamma(alpha+beta)
+    den <- lgamma(n+k+alpha+beta)+lgamma(n)+lgamma(k+1)+lgamma(alpha)+lgamma(beta)
+    res <- exp(num-den)
+    res[neg] <- 0
+    return( res)
+  }
+  
+  dpost.bnb <- function(yt) {
+    #Shape parameters of the beta distribution for the proportion p
+    alpha <- 1/2 + F(diffsti)*ms
+    beta  <- 1/2 + ms -  F(diffsti)*ms
+    #Add yt, because the support above is 0,... (i.e. only failures are counted)
+    return(dbnb( yt-yts,n=yts+1,alpha=alpha,beta=beta))
   }
   
   ######################################################################
@@ -181,11 +226,7 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
 
     #Calculate pi estimates (fixed & dynamic)
     pits <- F(diffsti)
-    #Safeguard in case pits==0.
-    if (pits==0) {
-      stop(paste(dateRange[i],": Proportion of reported (pits) is zero!"))
-    }
-    
+
     #List of casts containing probability distributions
     Ps <- list()
     
@@ -194,17 +235,25 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
     ######################################################################
 
     if ("freq.pi" %in% method) {
+      #Proportion reported
+      pi.hat <- F(diffsti)# mean(with(D.sub, delay <= diffsti),na.rm=TRUE)
+      
       #Use that on logit scale we have an asymptotic normal distribution.
       #See, e.g., Lachin (2000), p.17. -- here dynamic estimation
-      pi.hat <- mean(with(D.sub, delay <= diffsti),na.rm=TRUE)
-      se.logit.pi.hat <- sqrt(1/(ms*pi.hat*(1-pi.hat)))
-      #Predictive distribution approach based on asymptotic normal on logit transform)
-      pits.sample <- plogis(rnorm(B , qlogis(pi.hat), sd=se.logit.pi.hat))
-      yts.sample <- round(observed(sts)[i,]/pits.sample)
-      #PMF of the frequentist approach. Add 1/B to all to make sure there are no zeroes
-      Ps[["freq.pi"]] <- (table(factor(yts.sample, levels=yt.support))+1)/(B+length(yt.support))
+      if (pi.hat != 0 & pi.hat != 1) { 
+        se.logit.pi.hat <- sqrt(1/(ms*pi.hat*(1-pi.hat)))
+        #"Frequentisish" predictive distribution approach: based on
+        #asymptotic normal on logit transform.
+        #This only takes uncertainty of estimation into account
+        pits.sample <- plogis(rnorm(B , qlogis(pi.hat), sd=se.logit.pi.hat))
+        yts.sample <- round(observed(sts)[i,]/pits.sample)
+      } else { #no uncertainty
+        yts.sample <- rep(observed(sts)[i,],B)
+      }
+      #PMF of the frequentist approach. Add 1/B to all cells to make sure there are no zeroes (HACK!)
+#      (table(factor(yts.sample, levels=yt.support))+1)/(B+length(yt.support))
+      Ps[["freq.pi"]] <- table(factor(yts.sample, levels=yt.support))/B
     }
-   
 
     ######################################################################
     #For Negbin approximation the posterior is available, but for consistency
@@ -214,8 +263,10 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
     if ("bayes.nb" %in% method) {
       Ps[["bayes.nb"]] <- dpost.nb(yt.support,pits)
     }
-    
+  
+    ######################################################################
     #A really bad forecast -- the uniform
+    ######################################################################
     if ("uniform" %in% method) {
       Ps[["uniform"]] <- rep(1/length(yt.support),length(yt.support))
     }
@@ -241,6 +292,30 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
       Ps[["bayes.betapi"]] <- P.bayes.betapi/sum(P.bayes.betapi)
     }
 
+    ######################################################################
+    # Beta-negative binomial. Should be the same as the bayes.betapi
+    ######################################################################
+
+    if ("bayes.bnb" %in% method) {
+      Ps[["bayes.bnb"]] <- dpost.bnb(yt.support)
+    }
+
+    #Compute as suggested in Brookmeyer and Damiano (1989)
+    #if ("brookmeyer.damiano" %in% method) {
+    #  
+    #}
+    
+    ######################################################################
+    ######################################################################
+    #Done with the computation of PMFs. Now use these for calculation.
+    ######################################################################
+    ######################################################################
+    
+    #Save PMFs if thats requested
+    if (control$PMF) {
+      sts@control$PMF[[as.character(t)]] <- Ps
+    }
+    
     #Evaluate scoring rules, if requested 
     if (control$score) {
       #Infer the true value
@@ -254,14 +329,8 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
       }
     } #end if control$score
 
-    ##############################
-    #Add casts & ci to stsBP slots
-    ##############################
-    
-    #Let the cast be the median of the values. In case this value is not unique (??) then take the first value
-    sts@upperbound[i,] <- yt.support[which.max( cumsum(Ps[[1]])>0.5)][1]
-    #Set the prediction interval to the limits of a symmetric 95% equal
-    #tailed prediction interval.
+    #Add first cast & ci to stsBP slots
+    sts@upperbound[i,] <- median(yt.support[which.max( cumsum(Ps[[1]])>0.5)])
     sts@ci[i,,] <- yt.support[c(which.max(cumsum(Ps[[1]]) > alpha/2),which.max(cumsum(Ps[[1]]) > 1-alpha/2))]
     
 
@@ -274,70 +343,71 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
   } else {
     sts@control$SR <- NULL
   }
+  #Other arguments to save
+  sts@control$yt.support <- yt.support
   
   #Done
   return(sts)
 }
 
-## #Example section
-## example <- function() {
-##   library("surveillance")
+#Example section
+example <- function() {
+  library("surveillance")
 
-##   #Get some data from somewhere
-##   source("nowcast2.R")
-##   D <- loadData()
+  #Get some data from somewhere
+  source("nowcast2.R")
+  D <- loadData()
 
-##   #Test the function
-##   source("nowcast-surveillance.R")
-##   s <- as.Date("2011-06-02") ;
-##   k <- 10
-##   l <- 3
-##   t <- seq(s-k-l+1,s-l,by="1 day")
-##   dRange <- as.Date(c("2011-05-01","2011-07-10"))
-##   #debug("nowcast1")
-##   nc1 <- nowcast1(s=s,t=t,D=D,method="bayes.nb",control=list(dRange=dRange,score=TRUE))
+  #Test the function
+  source("nowcast-surveillance.R")
+  s <- as.Date("2011-06-02") ;
+  k <- 10
+  l <- 3
+  t <- seq(s-k-l+1,s-l,by="1 day")
+  dRange <- as.Date(c("2011-05-01","2011-07-10"))
+  nc1 <- nowcast(s=s,t=t,D=D,method="bayes.nb",control=list(dRange=dRange,score=TRUE))
 
-##   #Sow result
-##   plot(nc1,xaxis.years=FALSE,dx.upperbound=0,legend=NULL,lty=c(1,1,1),lwd=c(1,1,2),ylab="Cases",xlab="Time (days)",main="")
-##   idx <- max(which(!is.na(upperbound(nc1))))
-##   lines( c(idx-0.5,idx+0.5), rep(upperbound(nc1)[idx,],2),lwd=2,col="blue")
+  #Sow result
+  plot(nc1,xaxis.years=FALSE,dx.upperbound=0,legend=NULL,lty=c(1,1,1),lwd=c(1,1,2),ylab="Cases",xlab="Time (days)",main="")
+  idx <- max(which(!is.na(upperbound(nc1))))
+  lines( c(idx-0.5,idx+0.5), rep(upperbound(nc1)[idx,],2),lwd=2,col="blue")
   
-##   ##Show CIs
-##   for (i in 1:nrow(nc1)) {
-##     points(i, upperbound(nc1)[i,], col="indianred")
-##     lines( i+c(-0.3,0.3), rep(nc1@ci[i,,1],2),lty=1,col="indianred2")
-##     lines( i+c(-0.3,0.3), rep(nc1@ci[i,,2],2),lty=1,col="indianred2")
-##     lines( rep(i,each=2), nc1@ci[i,,],lty=2,col="indianred2")
-##   }
-##   #Add "now" on the x-axis
-##   points( as.numeric(s-dRange[1])+1,0,pch=10,cex=1.5,col="red")
+  ##Show CIs
+  for (i in 1:nrow(nc1)) {
+    points(i, upperbound(nc1)[i,], col="indianred")
+    lines( i+c(-0.3,0.3), rep(nc1@ci[i,,1],2),lty=1,col="indianred2")
+    lines( i+c(-0.3,0.3), rep(nc1@ci[i,,2],2),lty=1,col="indianred2")
+    lines( rep(i,each=2), nc1@ci[i,,],lty=2,col="indianred2")
+  }
+  #Add "now" on the x-axis
+  points( as.numeric(s-dRange[1])+1,0,pch=10,cex=1.5,col="red")
 
 
-##   #Same as animation
-## #  scoreRange <- seq(as.Date("2011-05-25"),max(dRange),by="1 day")
-##   scoreRange <- seq(as.Date("2011-05-15"),max(dRange),by="1 day")
-##   for (i in 1:length(scoreRange)) {
-##     s <- scoreRange[i]
-##     t <- seq(s-k-l+1, s-l, by="1 day")
-##     nc1 <- nowcast1(s=s,t=t,D=D,method="bayes.nb",control=list(dRange=dRange))
+  #Same as animation
+#  scoreRange <- seq(as.Date("2011-05-25"),max(dRange),by="1 day")
+  scoreRange <- seq(as.Date("2011-05-15"),max(dRange),by="1 day")
+  for (i in 1:length(scoreRange)) {
+    s <- scoreRange[i]
+    t <- seq(s-k-l+1, s-l, by="1 day")
+    nc1 <- nowcast(s=s,t=t,D=D,method="bayes.nb",control=list(dRange=dRange))
 
-##     #Sow result
-##     plot(nc1,xaxis.years=FALSE,dx.upperbound=0,legend=NULL,lty=c(1,1,1),lwd=c(1,1,2),ylab="Cases",xlab="Time (days)",main="",ylim=c(0,80))
-##     idx <- max(which(!is.na(upperbound(nc1))))
-##     lines( c(idx-0.5,idx+0.5), rep(upperbound(nc1)[idx,],2),lwd=2,col="blue")
+    #Sow result
+    plot(nc1,xaxis.years=FALSE,dx.upperbound=0,legend=NULL,lty=c(1,1,1),lwd=c(1,1,2),ylab="Cases",xlab="Time (days)",main="",ylim=c(0,80))
+    idx <- max(which(!is.na(upperbound(nc1))))
+    lines( c(idx-0.5,idx+0.5), rep(upperbound(nc1)[idx,],2),lwd=2,col="blue")
   
-##      ##Show CIs
-##     for (i in 1:nrow(nc1)) {
-##       points(i, upperbound(nc1)[i,], col="indianred")
-##       lines( i+c(-0.3,0.3), rep(nc1@ci[i,,1],2),lty=1,col="indianred2")
-##       lines( i+c(-0.3,0.3), rep(nc1@ci[i,,2],2),lty=1,col="indianred2")
-##       lines( rep(i,each=2), nc1@ci[i,,],lty=2,col="indianred2")
-##     }
-##     #Add "now" on the x-axis
-##     points( as.numeric(s-dRange[1])+1,0,pch=10,cex=1.5,col="red")
-##     Sys.sleep(0.5)
-##   }
-## }
+     ##Show CIs
+    for (i in 1:nrow(nc1)) {
+      points(i, upperbound(nc1)[i,], col="indianred")
+      lines( i+c(-0.3,0.3), rep(nc1@ci[i,,1],2),lty=1,col="indianred2")
+      lines( i+c(-0.3,0.3), rep(nc1@ci[i,,2],2),lty=1,col="indianred2")
+      lines( rep(i,each=2), nc1@ci[i,,],lty=2,col="indianred2")
+    }
+    #Add "now" on the x-axis
+    points( as.numeric(s-dRange[1])+1,0,pch=10,cex=1.5,col="red")
+    Sys.sleep(0.5)
+  }
+}
 
 
 ######################################################################
