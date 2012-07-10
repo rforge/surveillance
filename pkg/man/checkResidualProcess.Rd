@@ -11,9 +11,10 @@ Check the residual process of a fitted \code{twinSIR} or \code{twinstim}
   residuals should be uniformly distributed if the fitted model
   well describes the true conditional intensity function. Graphically
   check this using \code{\link{ks.plot.unif}}.
-
   The transformation for the residuals \code{tau} is
   \code{1 - exp(-diff(c(0,tau)))} (cf. Ogata, 1988).
+  Another plot inspects the serial correlation between the transformed
+  residuals (scatterplot between u_i and u_{i+1}).
 }
 
 \usage{
@@ -25,9 +26,13 @@ checkResidualProcess(object, plot = TRUE, ...)
     an object of class \code{"\link{twinSIR}"} or \code{"\link{twinstim}"}.
 }
   \item{plot}{
-    logical indicating if a plot of the transformed residuals should be
-    produced by \code{\link{ks.plot.unif}} to check for deviations
-    from the uniform distribution.
+    logical (or integer index) vector indicating if (which) plots of the
+    transformed residuals should be produced. The \code{plot} index 1
+    corresponds to a \code{\link{ks.plot.unif}} to check for deviations
+    of the transformed residuals from the uniform distribution. The
+    \code{plot} index 2 corresponds to a scatterplot of \eqn{u_i} vs.
+    \eqn{u_{i+1}}. Per default, both plots are produced
+    (\code{plot = 1:2}). 
   }
   \item{\dots}{
     further arguments passed to \code{\link{ks.plot.unif}}.

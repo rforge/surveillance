@@ -78,6 +78,7 @@ ks.plot.unif <- function (U, conf.level = 0.95, exact = NULL,
 ######################################################################
 # Check the residual process of fitted twinstim or twinSIR
 # using ks.plot.unif on 1-exp(-diff(tau))
+# and a scatterplot of u_i vs. u_{i+1} to inspect serial correlation
 #
 # Parameters:
 #  object - a fitted twinSIR or twinstim model
@@ -89,24 +90,40 @@ ks.plot.unif <- function (U, conf.level = 0.95, exact = NULL,
 checkResidualProcess <- function (object, plot = TRUE, ...)
 {
     stopifnot(inherits(object, c("twinSIR", "twinstim")))
-
+    
+    ## check plot argument
+    if (is.logical(plot)) plot <- which(rep(plot, length.out = 2)) else {
+        stopifnot(is.vector(plot, mode="numeric"), plot %in% 1:2)
+    }
+    
     ## extract residual process
     tau <- residuals(object)
-  
+    
     ## Transform to uniform variable
     Y <- diff(c(0,tau))
     U <- 1 - exp(-Y)
-
+    
     ## Calculate KS test
     ks <- stats::ks.test(U, "punif", alternative = "two.sided",
                          exact = match.call()[["exact"]])
-  
+    
     ## return value
     ret <- list(tau=tau, U=U, ks=ks)
-  
-    ## Ready for plotting
-    if (plot) {
-        ks.plot.unif(U, ...)
+    
+    ## 2 types of plots
+    plotcalls <- alist(
+                 ## Investigate uniform distribution of U
+                 ks.plot.unif(U, ...),
+                 ## Investigate serial correlation between U_t and U_{t+1} which
+                 ## corresponds to Figure 11 in Ogata (1988)
+                 plot(tail(U,n=-1), head(U,n=-1),
+                      xlab=expression(u[(i)]), ylab=expression(u[i+1]))
+                 )
+    
+    ## eval selected plot calls
+    if (length(plot) > 0L) {
+        par(mfrow=rev(n2mfrow(length(plot))))
+        for (i in plot) eval(plotcalls[[i]])
         invisible(ret)
     } else {
         ret

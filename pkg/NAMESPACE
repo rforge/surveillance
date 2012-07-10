@@ -23,7 +23,7 @@ importFrom(xtable, xtable)
 #   "Warning: found methods to import for function 'AIC' but not the generic itself"
 #   However, we don't need to import it here, because we depend on package sp, which makes plot generic
 
-## essential methods used in different parts of the package
+## basic methods used in different parts of the package
 importFrom(stats, pnorm, cov2cor, ks.test)
 importFrom(utils, packageDescription, modifyList)
 
