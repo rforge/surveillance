@@ -267,9 +267,10 @@ intensityplot.twinstim <- function (x,
         if (is.list(rug.opts)) {
             if (is.null(rug.opts$ticksize)) rug.opts$ticksize <- 0.02
             if (is.null(rug.opts$quiet)) rug.opts$quiet <- TRUE
-            do.call("rug", args = c(alist(x=modelenv$eventTimes), rug.opts))
+            eventTimes.types <- modelenv$eventTimes[modelenv$eventTypes %in% types]
+            do.call("rug", args = c(alist(x=eventTimes.types), rug.opts))
         }
-        invisible()
+        invisible(FUN)
     } else {
         .tiles <- as(tiles, "SpatialPolygons") # we don't need the data here
         
@@ -291,14 +292,6 @@ intensityplot.twinstim <- function (x,
         sgridy <- SpatialPixelsDataFrame(sgrid, data=data.frame(yvals=yvals),
                                          proj4string=.tiles@proj4string)
 
-        ## eventCoords as Spatial object with duplicates counted and removed
-        eventCoords <- SpatialPoints(modelenv$eventCoords,
-                                     proj4string=.tiles@proj4string,
-                                     bbox = .tiles@bbox)
-        eventCoords <- SpatialPointsDataFrame(eventCoords,
-            data.frame(mult = multiplicity(eventCoords)))
-        eventCoords <- eventCoords[!duplicated(coordinates(eventCoords)),]
-        
         ## define sp.layout
         lobjs <- list()
         if (is.list(polygons.args)) {
@@ -309,11 +302,19 @@ intensityplot.twinstim <- function (x,
                               polygons.args)))
         }
         if (is.list(points.args)) {
+            eventCoords.types <- modelenv$eventCoords[modelenv$eventTypes %in% types,,drop=FALSE]
+            ## eventCoords as Spatial object with duplicates counted and removed
+            eventCoords.types <- SpatialPoints(eventCoords.types,
+                                               proj4string=.tiles@proj4string,
+                                               bbox = .tiles@bbox)
+            eventCoords.types <- SpatialPointsDataFrame(eventCoords.types,
+                data.frame(mult = multiplicity(eventCoords.types)))
+            eventCoords.types <- eventCoords.types[!duplicated(coordinates(eventCoords.types)),]
             nms.points <- names(points.args)
             if(! "pch" %in% nms.points) points.args$pch <- 1
             lobjs <- c(lobjs,
-                       list(c(list("sp.points", eventCoords, first=FALSE,
-                                   cex=cex.fun(eventCoords$mult)), points.args)))
+                       list(c(list("sp.points", eventCoords.types, first=FALSE,
+                                   cex=cex.fun(eventCoords.types$mult)), points.args)))
         }
         if ("sp.layout" %in% nms) {
             if (!is.list(dotargs$sp.layout[[1]])) { # let sp.layout be a list of lists
@@ -405,7 +406,7 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
                 tilesOfPoints <- if (is.null(tiles.idcol)) {
                     sapply(tiles@polygons[polygonidxOfPoints], slot, "ID")
                 } else tiles@data[polygonidxOfPoints,tiles.idcol]
-                is.na(tilesOfPoints) <- points.outside
+                is.na(tilesOfPoints) <- points.outside     # resolve hack
                 hInt[tilesOfPoints]       # index by name
             }
         }
@@ -420,7 +421,7 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
             function (tp) {
                 stopifnot(isScalar(tp))
                 tdiff <- tp - modelenv$eventTimes
-                infectivity <- (tdiff > 0) & (modelenv$removalTimes >= tp)
+                infectivity <- qSum_types > 0 & (tdiff > 0) & (modelenv$removalTimes >= tp)
                 if (any(infectivity)) {
                     gsources <- modelenv$tiaf$g(tdiff[infectivity],
                                                 modelenv$tiafpars,
@@ -440,7 +441,7 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
                 stopifnot(is.vector(xy, mode="numeric"), length(xy) == 2L)
                 point <- matrix(xy, nrow=nrow(modelenv$eventCoords), ncol=2L, byrow=TRUE)
                 sdiff <- point - modelenv$eventCoords
-                proximity <- rowSums(sdiff^2) <= modelenv$eps.s^2
+                proximity <- qSum_types > 0 & rowSums(sdiff^2) <= modelenv$eps.s^2
                 if (any(proximity)) {
                     fsources <- modelenv$siaf$f(sdiff[proximity,,drop=FALSE],
                                                 modelenv$siafpars,
@@ -644,39 +645,16 @@ R0.twinstim <- function (object, newevents, dimyx = spatstat.options("npixel"), 
     }
 
 
-######################################################################
-# Plot Kolmogorov-Smirnov residual plot
-#
-# Parameters:
-#  object - a fitted twinstim model
-#
-# Draws the transformed residuals together with backtransformed
-# 95% Kolmogorov-Smirnov error bounds.
-######################################################################
 
-residuals.twinstim <- function(object, plot = TRUE, ...)
+### Extract the "residual process" (cf. Ogata, 1988) of a twinstim, i.e. the
+### fitted cumulative intensity of the ground process at the event times.
+### "generalized residuals similar to those discussed in Cox and Snell (1968)"
+
+residuals.twinstim <- function(object, ...)
 {
-  #cumulative intensities
-  tau <- object$tau
-
-  #Transform to uniform variable
-  Y <- diff(tau) # Y <- diff(c(0,tau))
-  U <- sort(1-exp(-Y))
-
-  #Calculate KS test
-  ks <- stats::ks.test(U,"punif",exact=TRUE,alternative="two.sided")
-  
-  #return value
-  ret <- list(tau=tau, U=U, ks=ks)
-  
-  #Ready for plotting
-  if (plot) {
-    ks.plot.unif(U, ...)
-    invisible(ret)
-  } else {
-    ret
-  }
+  object$tau
 }
+
 
 
 ######################################################################

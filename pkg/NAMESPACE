@@ -10,11 +10,12 @@ useDynLib(surveillance)
 import(methods)
 
 
-### import generics to define own methods
+### general imports
 
+## import generics to define own methods
 importFrom(graphics, plot)
-importFrom(stats, simulate, profile, coef, vcov, logLik, AIC, extractAIC, pnorm, cov2cor, residuals, ks.test, confint)
-importFrom(utils, packageDescription, head, tail, toLatex, modifyList)
+importFrom(stats, coef, vcov, logLik, residuals, confint, AIC, extractAIC, profile, simulate)
+importFrom(utils, head, tail, toLatex)
 importFrom(xtable, xtable)
 
 #importMethodsFrom(stats4, plot)   # import S4-generic
@@ -22,10 +23,12 @@ importFrom(xtable, xtable)
 #   "Warning: found methods to import for function 'AIC' but not the generic itself"
 #   However, we don't need to import it here, because we depend on package sp, which makes plot generic
 
+## essential methods used in different parts of the package
+importFrom(stats, pnorm, cov2cor, ks.test)
+importFrom(utils, packageDescription, modifyList)
 
-### sp classes, utility functions (bbox, coordinates, dimensions, overlay, ...), plot methods
-# moved package sp to "Depends:" since it defines essential data classes and methods for surveillance
-
+## sp classes, utility functions (bbox, coordinates, dimensions, overlay, ...), plot methods
+## (moved package sp to "Depends:" since it defines essential data classes and methods for surveillance)
 import(sp)
 
 
@@ -81,6 +84,7 @@ export(magic.dim, primeFactors, bestCombination)   # similar to n2mfrow
 export(isoWeekYear)
 export(refvalIdxByDate)
 export(ks.plot.unif)
+export(checkResidualProcess)            # for twinstim and twinSIR
 
 # export S4 coerce-methods defined by the package
 exportMethods(coerce)     # from spatial_coerce-methods.R
@@ -228,6 +232,7 @@ S3method(print, summary.twinstim)
 S3method(toLatex, summary.twinstim)
 S3method(plot, twinstim)
 export(iafplot)
+export(intensity.twinstim)
 S3method(intensityplot, twinstim)
 export(intensityplot.twinstim)          # for convenience
 #S3method(profile, twinstim)   # FIXME @Michael: what is the status of this method?

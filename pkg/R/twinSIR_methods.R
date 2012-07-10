@@ -422,15 +422,14 @@ profile.twinSIR <- function (fitted, profile, alpha = 0.05,
   return(list(lp=resProfile, ci.hl=ciProfile, profileObj=profile))
 }
 
+
 ######################################################################
-# Cox-Snell like residuals
-#
-# Parameters:
-#  object - the fitted model to plot the residuals for
+# Extract the "residual process" (cf. Ogata, 1988), i.e. the
+# fitted cumulative intensity at the event times.
+# -> "generalized residuals similar to those discussed in Cox and Snell (1968)"
 ######################################################################
 
-
-residuals.twinSIR <- function(object, plot=TRUE, ...)
+residuals.twinSIR <- function(object, ...)
 {
   #Extract event and stop-times
   eventTimes <- attr(object$model$survs,"eventTimes")
@@ -460,27 +459,10 @@ residuals.twinSIR <- function(object, plot=TRUE, ...)
   dt <- object$model$survs[,"stop"] - object$model$survs[,"start"]
 
   #Easier - no individual summations as they are all summed anyhow afterwards
-  intlambda <- tapply( object$model$weights * lambda* dt, BLOCK, sum)
+  intlambda <- tapply(object$model$weights * lambda* dt, BLOCK, sum)
 
-  #Compute cumulative intensities
+  #Compute cumulative intensities (Ogata (1988): "residual process")
   tau <- cumsum(intlambda)[eventTimesIdx]
-
-  #Transform to uniform variable
-  Y <- diff(tau) # Y <- diff(c(0,tau))
-  U <- sort(1-exp(-Y))
-
-  #Calculate KS test
-  ks <- stats::ks.test(U,"punif",exact=TRUE,alternative="two.sided")
-
-  #return value
-  ret <- list(tau=tau, U=U, ks=ks)
-  
-  #Ready for plotting
-  if (plot) {
-    ks.plot.unif(U, ...)
-    invisible(ret)
-  } else {
-    ret
-  }
+  tau
 }
 
