@@ -87,7 +87,7 @@ ks.plot.unif <- function (U, conf.level = 0.95, exact = NULL,
 # 95% Kolmogorov-Smirnov error bounds.
 ######################################################################
 
-checkResidualProcess <- function (object, plot = TRUE, ...)
+checkResidualProcess <- function (object, plot = 1:2, mfrow = n2mfrow(length(plot)), ...)
 {
     stopifnot(inherits(object, c("twinSIR", "twinstim")))
     
@@ -122,7 +122,7 @@ checkResidualProcess <- function (object, plot = TRUE, ...)
     
     ## eval selected plot calls
     if (length(plot) > 0L) {
-        par(mfrow=rev(n2mfrow(length(plot))))
+        par(mfrow = mfrow)
         for (i in plot) eval(plotcalls[[i]])
         invisible(ret)
     } else {

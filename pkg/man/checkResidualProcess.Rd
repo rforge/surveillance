@@ -18,7 +18,7 @@ Check the residual process of a fitted \code{twinSIR} or \code{twinstim}
 }
 
 \usage{
-checkResidualProcess(object, plot = TRUE, ...)
+checkResidualProcess(object, plot = 1:2, mfrow = n2mfrow(length(plot)), ...)
 }
 
 \arguments{
@@ -31,8 +31,10 @@ checkResidualProcess(object, plot = TRUE, ...)
     corresponds to a \code{\link{ks.plot.unif}} to check for deviations
     of the transformed residuals from the uniform distribution. The
     \code{plot} index 2 corresponds to a scatterplot of \eqn{u_i} vs.
-    \eqn{u_{i+1}}. Per default, both plots are produced
-    (\code{plot = 1:2}). 
+    \eqn{u_{i+1}}. By default (\code{plot = 1:2}), both plots are produced.
+  }
+  \item{mfrow}{
+    see \code{\link{par}} (and \code{\link{n2mfrow}} for the default choice).
   }
   \item{\dots}{
     further arguments passed to \code{\link{ks.plot.unif}}.

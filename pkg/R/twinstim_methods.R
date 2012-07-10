@@ -329,10 +329,6 @@ intensityplot.twinstim <- function (x,
         if (! "xlim" %in% nms) dotargs$xlim <- bbox(.tiles)[1,]
         if (! "ylim" %in% nms) dotargs$ylim <- bbox(.tiles)[2,]
         if (! "scales" %in% nms) dotargs$scales <- list(draw = TRUE)
-
-        ## trellis.par.set(sp.theme(regions = list(col = grey(seq(1,0,length.out=100)))))
-        ## trellis.par.set(layout.widths=list(axis.left = 0.75),
-        ##                 layout.heights=list(axis.top=0, axis.bottom=0.25))
         do.call("spplot", args=c(alist(sgridy, zcol="yvals", sp.layout=lobjs,
                           checkEmptyRC=FALSE), dotargs))
     }
@@ -555,16 +551,12 @@ plot.twinstim <- function (x, which, ...)
     which <- match.arg(which, choices =
                        c(eval(formals(intensityplot.twinstim)$which),
                          eval(formals(iafplot)$which)))
-    FUN <- if (which %in% eval(formals(intensityplot)$which))
+    FUN <- if (which %in% eval(formals(intensityplot.twinstim)$which))
         "intensityplot" else "iafplot"
     cl[[1]] <- as.name(FUN)
     if (FUN == "iafplot") names(cl)[names(cl) == "x"] <- "object"
     eval(cl, envir = parent.frame())
 }
-
-### set defaults for 'which' in 'plot.twinstim'
-## formals(plot.twinstim)$which <- as.call(as.list(c(as.name("c"),
-##     c(eval(formals(intensityplot.twinstim)$which), eval(formals(iafplot)$which)))))
 
 
 
