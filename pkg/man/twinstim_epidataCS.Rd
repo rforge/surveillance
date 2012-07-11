@@ -30,9 +30,10 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
              nCircle2Poly = 32L, T = NULL)
 
 \method{print}{epidataCS}(x, n = 6L, digits = getOption("digits"), ...)
+
 \method{head}{epidataCS}(x, n = 6L, ...)
 \method{tail}{epidataCS}(x, n = 6L, ...)
-\method{[}{epidataCS}(x, i, j)
+\method{[}{epidataCS}(x, i, j, drop = FALSE)
 
 \method{marks}{epidataCS}(x, ...)
 
@@ -109,8 +110,9 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   }
   \item{digits}{minimum number of significant digits to be printed in
     values.}
-  \item{\dots}{passed to the basic \code{print} method. Unused for
-    \code{marks}.}
+  \item{drop, \dots}{unused (arguments of the generics).
+  However, the \code{print} method for class \code{"epidataCS"} passes
+  \dots to the \code{\link{print.data.frame}} method.}
   \item{i,j}{
     arguments passed to the
     \code{\link[=[,SpatialPointsDataFrame-method]{[-method}} for
@@ -125,18 +127,28 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   The function \code{as.epidataCS} is used to generate objects of class
   \code{"epidataCS"}, which is the data structure that
   \code{\link{twinstim}} models work on.
-
+  
+  The \code{head} and \code{tail} methods subset the epidemic data using
+  the extraction method (\code{[}), i.e. they return an object of class
+  \code{"epidataCS"}, which only contains (all but) the first/last
+  \code{n} events. The extraction method for class \code{"epidataCS"}
+  ensures that the subsetted object will be valid, for instance, it
+  updates the auxiliary list of potential transmission paths stored
+  in the object.
+  
   The \code{marks.epidataCS} method (of the generic function
-  \code{marks} defined in package \pkg{spatstat}) returns a
-  \code{data.frame} of the event marks (actually also including time
-  and location of the events).
+  \code{\link[spatstat]{marks}} defined by the package \pkg{spatstat})
+  returns a \code{data.frame} of the event marks (actually also
+  including time and location of the events), disregarding the auxiliary
+  columns from the \code{events} component of the \code{"epidataCS"}
+  object.
 
   The \code{print} method for \code{"epidataCS"} prints some metadata
   of the epidemic, e.g., the observation period, the dimensions of the
   spatio-temporal grid, the types of events, and the total number of
   events. By default, it also prints the first \code{n = 6} rows of the
   \code{events}.
-  The \code{summary} method (or its \code{print} method) instead prints
+  The \code{summary} method (or its \code{print} method) instead returns
   the metadata along with a \code{summary} of the \code{events} (by
   column as for \code{data.frame}s), a summary of the number of
   potential sources of transmission for each event, and the
@@ -183,6 +195,7 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 }
 
 \seealso{
+  \code{\link{plot.epidataCS}} for plotting, and
   \code{\link{animate.epidataCS}} for the animation of such an epidemic.
   There is also an \code{\link[=update.epidataCS]{update}} method for the
   \code{"epidataCS"} class.

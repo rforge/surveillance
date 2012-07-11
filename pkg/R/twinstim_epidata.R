@@ -429,12 +429,12 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
 ### subsetting epidataCS, i.e. select only part of the events,
 ### but retain stgrid, W, and qmatrix
 
-"[.epidataCS" <- function (x, i, j)
+"[.epidataCS" <- function (x, i, j, drop = FALSE)
 {
     cl <- sys.call()
     cl[[1]] <- as.name("[")
     cl[[2]] <- substitute(x$events)
-    x$events <- eval(cl, envir=parent.frame())
+    x$events <- eval(cl, envir=parent.frame()) # use [,SpatialPointsDataFrame-method
     if (!missing(j)) {                # only epidemic covariates may be selected
         BLOCKstartEndemicVars <- setdiff(names(x$stgrid),
             setdiff(obligColsNames_stgrid,"start"))
@@ -444,6 +444,7 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
         }
     }
     if (!missing(i)) {                  # update .sources
+        ## message("updating the list of potential sources of the events...")
         x$events$.sources <- determineSources.epidataCS(x)
     }
     return(x)
@@ -464,14 +465,18 @@ marks.epidataCS <- function (x, ...) {
 
 head.epidataCS <- function (x, n = 6L, ...)
 {
-    visibleCols <- grep("^\\..+", names(x$events@data), invert = TRUE)
-    utils:::head.data.frame(x$events[visibleCols], n = n, ...)
+    utils:::head.data.frame(x, n = n, ...)
 }
 
 tail.epidataCS <- function (x, n = 6L, ...)
 {
-    visibleCols <- grep("^\\..+", names(x$events@data), invert = TRUE)
-    utils:::tail.data.frame(x$events[visibleCols], n = n, ...)
+    # little hack for utils:::tail.data.frame because I don't want to register a
+    # dim-method for class "epidataCS"
+    nrow <- function (x) base::nrow(x$events)
+    my.tail.data.frame <- utils:::tail.data.frame
+    environment(my.tail.data.frame) <- environment()
+    ##<- such that the function uses my local nrow definition
+    my.tail.data.frame(x, n = n, ...)
 }
 
 print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
@@ -493,10 +498,11 @@ print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
         nTiles, ngettext(nTiles, "tile", "tiles"), "\n")
     cat("Types of events:", paste0("'",typeNames,"'"), "\n")
     cat("Overall number of events:", nEvents, "\n\n")
-    # 'print.SpatialPointsDataFrame' does not pass its "digits" argument on to 'print.data.frame', hence the use of options()
-    odigits <- options(digits=digits)
-    print(head(x, n = n), ...)
-    options(odigits)
+    # 'print.SpatialPointsDataFrame' does not pass its "digits" argument on to
+    # 'print.data.frame', hence the use of options()
+    odigits <- options(digits=digits); on.exit(options(odigits))
+    visibleCols <- grep("^\\..+", names(x$events@data), invert = TRUE)
+    print(utils:::head.data.frame(x$events[visibleCols], n = n), ...)
     if (n < nEvents) cat("[....]\n")
     cat("\n")
     invisible(x)
@@ -719,7 +725,7 @@ plot.epidataCS <- function (x, aggregate = c("time", "space"), subset, ...)
     cl <- match.call()
     cl[[1]] <- as.name(FUN)
     cl$aggregate <- NULL
-    eval(cl, envir = parent.frame())
+    eval(cl)
 }
 
 
@@ -732,10 +738,9 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
 {
     timeRange <- with(x$stgrid, c(start[1L], stop[length(stop)]))
     eventTimes <- if (missing(subset)) x$events$time else {
-        do.call("subset", list(x=substitute(marks.epidataCS(x)),
-                               subset=substitute(subset), select="time",
-                               drop=TRUE), 
-                envir = parent.frame())
+        do.call(base::subset, list(x = quote(marks.epidataCS(x)),
+                                   subset = substitute(subset),
+                                   select = "time", drop = TRUE))
     }
     if (length(eventTimes) == 0) stop("no events left after 'subset'")
     if (!is.null(t0.Date)) {
