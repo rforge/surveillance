@@ -647,7 +647,7 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
     multpoints <- function (tableCoordsTypes, col) {
         tableMult <- countunique(tableCoordsTypes)
         points(tableMult[,1:2,drop=FALSE], pch = pch[tableMult[,"type"]],
-               col = col, cex = sqrt(1.5*tableMult[,"mult"]/pi) * par("cex"))
+               col = col, cex = sqrt(1.5*tableMult[,"count"]/pi) * par("cex"))
     }
     # functions returning if events are in status I or R at time t
     I <- function (t) s$eventTimes <= t & removalTimes >= t
@@ -747,7 +747,13 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
         stopifnot(inherits(t0.Date, "Date"))
         t0 <- timeRange[1L]
         if (is.null(xlim)) xlim <- t0.Date + (timeRange - t0)
-        eventTimes <- t0.Date + (eventTimes - t0)
+        eventTimes <- t0.Date + as.integer(eventTimes - t0)
+        ## we need integer dates here because otherwise, if the last event
+        ## occurs on the last day of a month, year, etc. (depending on
+        ## 'breaks') with a fractional date (e.g. as.Date("2009-12-31") + 0.5),
+        ## then the automatic 'breaks' (e.g., breaks = "months") will not cover
+        ## the data (in the example, it will only reach until
+        ## as.Date("2009-12-31")).
     }
     histdata <- if (is.null(t0.Date)) {
         hist(eventTimes, plot=FALSE, warn.unused=FALSE, ...)

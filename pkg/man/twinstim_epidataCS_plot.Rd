@@ -43,10 +43,14 @@ the events in the observation region \code{W} (aggregated over time).
     time (\code{aggregate = "time"}):
     \describe{
       \item{t0.Date}{the beginning of the observation period
-	\code{x$stgrid$start[1]} as \code{\link{Date}}, enabling
+	\code{t0 = x$stgrid$start[1]} as \code{\link{Date}}, enabling
 	a nice x-axis using \code{\link{hist.Date}} and sensible
 	\code{breaks} of the histogram (which must also be specified in
-	this case, e.g., \code{"months"})}
+	this case, e.g., \code{"months"}). The event times then equal
+	\code{t0.Date + as.integer(x$events$time - t0)}, i.e. possible
+	fractional parts of the event times are removed (which ensures that
+	using \code{breaks = "months"} or other automatic types always
+	works).}
       \item{freq}{see \code{\link{hist}}, defaults to \code{TRUE}.}
       \item{xlim,ylim}{\code{NULL} provides automatic axis limits.}
       \item{xlab,ylab}{axis labels (with sensible defaults).}
