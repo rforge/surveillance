@@ -219,9 +219,9 @@ S3method(summary, epidataCS)
 S3method(print, summary.epidataCS)
 S3method(animate, epidataCS)
 export(animate.epidataCS)               # for convenience
+export(marks)                           # as imported from spatstat
 S3method(marks, epidataCS)
-export(marks.epidataCS)    # we also export it for convenience since the generic
-                           # is only available if package spatstat is loaded
+export(marks.epidataCS)            # for convenience since its a foreign generic
 S3method(plot, epidataCS)
 S3method(as.epidata, epidataCS)
 export(as.epidata.epidataCS)            # for convenience

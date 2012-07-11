@@ -9,7 +9,7 @@ intensityplot <- function (x, ...) UseMethod("intensityplot")
 ## internal function with methods for "twinSIR" and "simEpidata"
 getModel <- function (object, ...) UseMethod("getModel")
 
-## internal generic with methods for "matrix" and "Spatial"
+## (rather internal) generic with methods for "matrix" and "Spatial"
 multiplicity <- function (x, ...) UseMethod("multiplicity")
 
 

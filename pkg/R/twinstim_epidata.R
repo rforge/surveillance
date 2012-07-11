@@ -738,7 +738,7 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
 {
     timeRange <- with(x$stgrid, c(start[1L], stop[length(stop)]))
     eventTimes <- if (missing(subset)) x$events$time else {
-        do.call(base::subset, list(x = quote(marks.epidataCS(x)),
+        do.call(base::subset, list(x = quote(marks(x)),
                                    subset = substitute(subset),
                                    select = "time", drop = TRUE))
     }
