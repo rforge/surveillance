@@ -82,6 +82,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
 
     # Are event times covered by stgrid?
     cat("Checking if all events are covered by 'stgrid'...\n")
+    ## FIXME: what about pre-history events? don't need stgrid-data for them
     if (events$time[1] <= timeRange[1] || events$time[nEvents] > timeRange[2]) {
         stop("event times are not covered by 'stgrid': must be in (begin;end]")
     }
@@ -100,7 +101,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     # Calculate distance matrix of events
     cat("Calculating distance matrix of events...\n")
     eventDists <- as.matrix(dist(eventCoords, method = "euclidean"))
-#     diag(eventDists) <- Inf   # infinite distance to oneself (no self-infection), not necessary
+    #diag(eventDists) <- Inf   # infinite distance to oneself (no self-infection), not needed
 
     # Map events to corresponding grid cells
     # Also precalculate possible origins of events (other infected individuals)
@@ -108,6 +109,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
         "determining potential event sources...\n")
     gridcellsOfEvents <- integer(nEvents)
     eventSources <- vector(nEvents, mode = "list")
+    pb <- txtProgressBar(min=0, max=nEvents, initial=0, style=3)
     for (i in seq_len(nEvents)) {
         idx <- gridcellOfEvent(events$time[i], events$tile[i], stgrid)
         if (is.na(idx)) {
@@ -118,7 +120,9 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
         eventSources[[i]] <- determineSources(
             i, events$time, removalTimes, eventDists[i,], events$eps.s, events$type, qmatrix
         )
+        setTxtProgressBar(pb, i)
     }
+    close(pb)
 
     # Attach endemic covariates from stgrid to events
     cat("Attaching endemic covariates from 'stgrid' to 'events'...\n")
@@ -200,8 +204,10 @@ checkEvents <- function (events, dropTypes = TRUE)
     timeIsDuplicated <- duplicated(events$time)
     if (any(timeIsDuplicated)) {
         duplicatedTimes <- unique(events$time[timeIsDuplicated])
-        stop("non-unique event times: concurrent events at time point(s)\n",
-             paste(duplicatedTimes, collapse = ", "))
+        warning("detected non-unique event times: ",
+                "concurrent events at time ",
+                if (length(duplicatedTimes) == 1L) "point " else "points\n",
+                paste(duplicatedTimes, collapse = ", "))
     }
 
     cat("\tSorting events...\n")
@@ -302,8 +308,8 @@ checkstgrid <- function (stgrid, T)
 
     # Check unique BLOCK size
     blocksizes <- table(stgrid$BLOCK)
-    if (any(diff(blocksizes) != 0L)) {
-        warning("different BLOCK sizes")
+    if (length(unique(blocksizes)) > 1L) {
+        stop("'stgrid' is not a full grid: different BLOCK sizes")
     }
 
     # Make BLOCK column the first column, then obligatory columns, then remainders (endemic covariates)
@@ -655,7 +661,7 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
 
     sequential <- is.null(time.spacing)  # plot observed infections sequentially
     if (!sequential) stopifnot(length(time.spacing) == 1L)
-    timeGrid <- if (sequential) s$eventTimes else {
+    timeGrid <- if (sequential) unique(s$eventTimes) else {
         start <- max(s$timeRange[1], interval[1])
         end <- min(interval[2], s$timeRange[2],
             max(removalTimes) + if (is.na(time.spacing)) 0 else time.spacing)
@@ -828,6 +834,7 @@ as.epidata.epidataCS <- function (data, tileCentroids, eps = 0.001, ...)
     ### now determine "events" with respect to the tiles
     # individual data
     indItimes <- data$events$time
+    if (anyDuplicated(indItimes)) stop("'data$events' has concurrent event times")
     indRtimes <- indItimes + data$events$eps.t
     indInts <- intervals::Intervals(cbind(indItimes, indRtimes, deparse.level = 0L))
     indTiles <- data$events$tile

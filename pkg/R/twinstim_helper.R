@@ -98,14 +98,20 @@ checkQ <- function (qmatrix, typeNames)
 
 
 ### Get row index of 'stgrid' where an event is located (spatio-temporally)
-# here, search BLOCK such that t in (start;stop], i.e. an event at 'stop' is
-# still attributed to the previous interval
+### Here, search BLOCK such that t in (start;stop], i.e. an event at 'stop' is
+### still attributed to the previous interval
 
 gridcellOfEvent <- function (t, tilename, stgrid)
 {
-    idx <- with(stgrid, which(tile == tilename & start < t & stop >= t))
-    # faster alternative for a one-length factor 'tile', but the above using 'tilename' is less error-prone...
-    #idx <- which(stgrid$start < tp & stgrid$stop >= tp)[tile]   # index by numeric code of 'tile'
+    ## idx <- with(stgrid, which(tile == tilename & start < t & stop >= t))
+    
+    ## ~5x faster alternative assuming a full BLOCK x tile grid, which is
+    ## sorted by BLOCK and tile (tile varying first), specifically there must be
+    ## all levels(stgrid$tile) in every BLOCK in that order;
+    ## this structure is guaranteed by checkstgrid()
+    blockstart <- match(TRUE, stgrid$stop >= t)
+    idx <- blockstart + match(tilename, levels(stgrid$tile)) - 1L
+    
     lidx <- length(idx)
     if (lidx == 0L) NA_integer_ else if (lidx == 1L) idx else {
         stop("'stgrid' has overlapping spatio-temporal grid cells")
