@@ -63,9 +63,11 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
 
   Exceptionally, the \code{method} argument may also be \code{"nlminb"}, in
   which case the \code{\link{nlminb}} optimizer is used. This is also the
-  default. In this case, the only control parameters available are
+  default. In this case, the only parameters available in the
+  \code{optim.args$control} list are
   \code{maxit}, \code{REPORT}, \code{abstol}, and \code{reltol}, which are
-  passed appropriately to \code{\link{nlminb}}.
+  passed appropriately to \code{\link{nlminb}}. Furthermore, there is no
+  \code{hessian} argument for \code{nlminb}.
 
   If \code{optim.args} is \code{NULL}, then no optimization will be performed
   but the necessary functions will be returned in a list (similar to what is

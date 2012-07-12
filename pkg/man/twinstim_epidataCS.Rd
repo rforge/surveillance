@@ -6,6 +6,9 @@
 \alias{head.epidataCS}
 \alias{tail.epidataCS}
 \alias{[.epidataCS}
+\alias{marks}              % to make R CMD check happy (the generic
+                           % marks is imported from spatstat and then
+                           % exported (unchanged) -> documentation required)
 \alias{marks.epidataCS}
 \alias{summary.epidataCS}
 \alias{print.summary.epidataCS}
