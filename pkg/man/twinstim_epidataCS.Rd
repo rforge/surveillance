@@ -62,9 +62,11 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
     The \code{data.frame} may contain columns with further marks of
     the event, e.g. sex, age of infected individuals (-> epidemic
     covariates).
-    However, note that some auxiliary columns will be added at conversion,
-    whose names \code{"ID"}, \code{".obsInfLength"}, \code{".bdist"},
-    \code{".influenceRegion"}, and \code{".sources"} are reserved.
+    However, note that some auxiliary columns will be added at conversion
+    whose names are reserved: \code{"ID"}, \code{".obsInfLength"},
+    \code{".bdist"}, \code{".influenceRegion"}, and \code{".sources"},
+    as well as \code{"start"}, \code{"BLOCK"}, and all endemic
+    covariates' names from \code{stgrid}.
   }
   \item{stgrid}{
     \code{data.frame} with obligatory columns

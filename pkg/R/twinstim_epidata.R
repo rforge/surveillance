@@ -36,6 +36,9 @@
 
 obligColsNames_events <- c("time", "tile", "type", "eps.t", "eps.s")
 obligColsNames_stgrid <- c("start", "stop", "tile", "area")
+reservedColsNames_events <- c("ID", ".obsInfLength", ".bdist",
+                              ".influenceRegion", ".sources", "BLOCK", "start")
+reservedColsNames_stgrid <- c("BLOCK")
 
 as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
                           nCircle2Poly = 32, T = NULL)
@@ -99,7 +102,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     removalTimes <- events$time + events$eps.t
 
     # Calculate distance matrix of events
-    cat("Calculating distance matrix of events...\n")
+    cat("Calculating euclidean distance matrix of events...\n")
     eventDists <- as.matrix(dist(eventCoords, method = "euclidean"))
     #diag(eventDists) <- Inf   # infinite distance to oneself (no self-infection), not needed
 
@@ -128,6 +131,15 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     cat("Attaching endemic covariates from 'stgrid' to 'events'...\n")
     stgridIgnoreCols <- match(setdiff(obligColsNames_stgrid, "start"), names(stgrid))
     copyCols <- setdiff(seq_along(stgrid), stgridIgnoreCols)
+    reservedColsIdx <- na.omit(match(names(stgrid)[copyCols], names(events@data),
+                                     nomatch=NA_integer_))
+    if (length(reservedColsIdx) > 0L) {
+        warning("in 'events@data', the existing columns with names of endemic ",
+                "covariates from 'stgrid' (",
+                paste0("'", names(events@data)[reservedColsIdx], "'", collapse=", "),
+                ") have been replaced")
+        events@data <- events@data[-reservedColsIdx]
+    }
     events@data <- cbind(events@data, stgrid[gridcellsOfEvents, copyCols])
 
     # Calculate observed infection length = min(T-time, eps.t) for use in log-likelihood
@@ -186,9 +198,19 @@ checkEvents <- function (events, dropTypes = TRUE)
     # Check obligatory columns
     obligColsIdx <- match(obligColsNames_events, names(events), nomatch = NA_integer_)
     if (any(obligColsMissing <- is.na(obligColsIdx))) {
-        stop("missing obligatory columns in 'events': ",
+        stop("missing obligatory columns in 'events@data': ",
             paste(obligColsNames_events[obligColsMissing], collapse = ", "))
     }
+
+    # Check other columns on reserved names
+    reservedColsIdx <- na.omit(match(reservedColsNames_events, names(events),
+                                     nomatch=NA_integer_))
+    if (length(reservedColsIdx) > 0L) {
+        warning("in 'events@data', the existing columns with reserved names (",
+                paste0("'", names(events)[reservedColsIdx], "'", collapse=", "),
+                ") have been replaced")
+        events@data <- events@data[-reservedColsIdx]
+    }    
 
     # Check that influence radii are numeric and positive
     cat("\tChecking 'eps.t' and 'eps.s' columns...\n")
@@ -216,6 +238,7 @@ checkEvents <- function (events, dropTypes = TRUE)
 
     # Make ID column the first column, then obligatory columns then remainders (epidemic covariates)
     IDcolIdx <- match("ID", names(events))
+    obligColsIdx <- match(obligColsNames_events, names(events))
     covarColsIdx <- setdiff(seq_along(events@data), c(IDcolIdx, obligColsIdx))
     events <- events[c(IDcolIdx, obligColsIdx, covarColsIdx)]
 
@@ -260,6 +283,16 @@ checkstgrid <- function (stgrid, T)
             paste(obligColsNames_stgrid[obligColsMissing], collapse = ", "))
     }
 
+    # Check other columns on reserved names
+    reservedColsIdx <- na.omit(match(reservedColsNames_stgrid, names(stgrid),
+                                     nomatch=NA_integer_))
+    if (length(reservedColsIdx) > 0L) {
+        warning("in 'stgrid', the existing columns with reserved names (",
+                paste0("'", names(stgrid)[reservedColsIdx], "'", collapse=", "),
+                ") have been replaced")
+        stgrid <- stgrid[-reservedColsIdx]
+    }
+
     # Transform tile into a factor variable (also removing unused levels if it was a factor)
     cat("\tConverting 'tile' into a factor variable...\n")
     stgrid$tile <- factor(stgrid$tile)
@@ -299,22 +332,20 @@ checkstgrid <- function (stgrid, T)
     }
 
     # Add BLOCK id
-    cat("\tChecking if the grid is rectangular (all time-space combinations)...\n")
-    if ("BLOCK" %in% names(stgrid)) {
-        warning("in data.frame 'stgrid' the column name 'BLOCK' is reserved, ",
-                "existing column has been replaced")
-    }
     stgrid$BLOCK <- match(stgrid$start, histIntervals[,1L])
 
-    # Check unique BLOCK size
+    # Check that we have a full BLOCK x tile grid
+    cat("\tChecking if the grid is rectangular (all time-space combinations)...\n")
     blocksizes <- table(stgrid$BLOCK)
-    if (length(unique(blocksizes)) > 1L) {
-        stop("'stgrid' is not a full grid: different BLOCK sizes")
+    tiletable <- table(stgrid$tile)
+    if (length(unique(blocksizes)) > 1L || length(unique(tiletable)) > 1L) {
+        stop("'stgrid' is not a full grid")
     }
 
     # Make BLOCK column the first column, then obligatory columns, then remainders (endemic covariates)
     cat("\tSorting the grid by time and tile...\n")
     BLOCKcolIdx <- match("BLOCK", names(stgrid))
+    obligColsIdx <- match(obligColsNames_stgrid, names(stgrid))
     covarColsIdx <- setdiff(seq_along(stgrid), c(BLOCKcolIdx, obligColsIdx))
     stgrid <- stgrid[c(BLOCKcolIdx, obligColsIdx, covarColsIdx)]
 
@@ -786,6 +817,7 @@ plot.epidataCS_space <- function (x, subset,
     cex.fun = function (counts) sqrt(1.5*counts/pi/min(counts)),
     points.args = list(), ...)
 {
+    stopifnot(is.list(points.args))
     events <- if (missing(subset)) x$events else {
         ## FIXME: subset.Spatial has a bug in sp version 0.9-99
         ## => reported 26.06.2012 => do it myself until it gets fixed
@@ -797,9 +829,13 @@ plot.epidataCS_space <- function (x, subset,
     }
     events@data[["_MULTIPLICITY_"]] <- multiplicity(events)
     events <- events[!duplicated(coordinates(events)),]
+    pointcex <- cex.fun(events$"_MULTIPLICITY_")
+    if (!is.null(points.args[["cex"]])) {
+        pointcex <- pointcex * points.args$cex
+        points.args$cex <- NULL
+    }
     plot(x$W, ...)
-    do.call("points", c(alist(x=events, cex=cex.fun(events$"_MULTIPLICITY_")),
-                        points.args))
+    do.call("points", c(alist(x=events, cex=pointcex), points.args))
     invisible()
 }
 

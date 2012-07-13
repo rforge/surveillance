@@ -1,8 +1,5 @@
-\name{plot.epidataCS}
+\name{twinstim_epidataCS_plot}
 \alias{plot.epidataCS}
-% + internal functions:
-\alias{plot.epidataCS_time}
-\alias{plot.epidataCS_space}
 
 \title{
 Plotting the Events of an Epidemic over Time and Space
@@ -67,7 +64,9 @@ the events in the observation region \code{W} (aggregated over time).
       \item{cex.fun}{function which takes a vector of counts of events
 	at each unique location and returns a (vector of) \code{cex}
 	value(s) for the sizes of the \code{points} at the event locations.}
-      \item{points.args}{further arguments passed to \code{\link{points}}.}
+      \item{points.args}{further arguments passed to
+        \code{\link{points}}. An argument \code{cex} here multiplies the
+        sizes obtained from \code{cex.fun}.}
       \item{\dots}{further arguments passed to the \code{plot}-method
 	for \code{"\linkS4class{SpatialPolygons}"}, which draws the
 	observation region \code{x$W}.}
