@@ -51,6 +51,7 @@ the events in the observation region \code{W} (aggregated over time).
       \item{freq}{see \code{\link{hist}}, defaults to \code{TRUE}.}
       \item{xlim,ylim}{\code{NULL} provides automatic axis limits.}
       \item{xlab,ylab}{axis labels (with sensible defaults).}
+      \item{main}{main title of the plot, defaults to \code{NULL}.}
       \item{col}{fill colour for the bars of the histogram, default to \code{"white"}}
       \item{panel.first}{expression that should be evaluated after the
 	plotting window has been set up but before the histogram is plotted.
@@ -67,6 +68,9 @@ the events in the observation region \code{W} (aggregated over time).
       \item{points.args}{further arguments passed to
         \code{\link{points}}. An argument \code{cex} here multiplies the
         sizes obtained from \code{cex.fun}.}
+      \item{colTypes}{colour vector for the different event types.
+	Defaults to colours from the \code{\link{rainbow}} palette. They are
+	only used if \code{col} is missing in \code{points.args}.}
       \item{\dots}{further arguments passed to the \code{plot}-method
 	for \code{"\linkS4class{SpatialPolygons}"}, which draws the
 	observation region \code{x$W}.}

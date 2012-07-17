@@ -4,9 +4,11 @@
 \alias{polyCub.midpoint}
 \alias{polyCub.SV}
 \alias{polyCub.exact.Gauss}
+
 \title{
-Methods for Two-Dimensional Numerical Integration over a Polygonal Domain
+  Two-Dimensional Numerical Integration over a Polygonal Domain
 }
+
 \description{
 The functions documented here will numerically integrate a two-dimensional
 function over a polygonal domain. The first method uses the classical midpoint rule
@@ -22,6 +24,7 @@ triangulation of the polygonal domain and appropriate evaluations of
 See Section 3.2 of Meyer (2010) for a more detailed description and benchmark
 experiment of those three (among others).
 }
+
 \usage{
 polyCub(polyregion, f, method = c("SV", "midpoint", "exact.Gauss"), ..., plot = FALSE)
 
@@ -29,6 +32,7 @@ polyCub.midpoint(polyregion, f, ..., eps = NULL, dimyx = NULL, plot = FALSE)
 polyCub.SV(polyregion, f, ..., N, a = 0, plot = FALSE)
 polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
 }
+
 \arguments{
   \item{polyregion}{
     a polygon representing the integration domain.
@@ -83,36 +87,42 @@ polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
     logical indicating if an illustrative plot of the numerical integration should be produced.
   }
 }
+
 \value{
-The approximated value of the integral of \code{f} over \code{polyregion}.
+  The approximated value of the integral of \code{f} over \code{polyregion}.
+  
+  For the \code{polyCub.exact.Gauss} method, two attributes are appended to the integral value:
+  \describe{
+    \item{nEval}{number of triangles over which the standard bivariate normal density had to be integrated,
+      i.e. number of calls to \code{\link[mvtnorm]{pmvnorm}} and \code{\link[stats]{pnorm}}, the former of
+      which being the most time-consuming operation.
+    }
+    \item{error}{
+      Approximate absolute integration error steming from the error introduced by the \code{nEval}
+      \code{\link[mvtnorm]{pmvnorm}} evaluations. For this reason, the cubature method is in fact only
+      quasi-exact (as is the \code{pmvnorm} function).
+    }
+  }
+}
 
-For the \code{polyCub.exact.Gauss} method, two attributes are appended to the integral value:
-\describe{
-\item{nEval}{number of triangles over which the standard bivariate normal density had to be integrated,
-i.e. number of calls to \code{\link[mvtnorm]{pmvnorm}} and \code{\link[stats]{pnorm}}, the former of
-which being the most time-consuming operation.
-}
-\item{error}{
-Approximate absolute integration error steming from the error introduced by the \code{nEval}
-\code{\link[mvtnorm]{pmvnorm}} evaluations. For this reason, the cubature method is in fact only
-quasi-exact (as is the \code{pmvnorm} function).
-}
-}
-}
 \references{
-Abramowitz, M. & Stegun, I. A. (1970). Handbook of Mathematical Functions with Formulas,
-Graphs, and Mathematical Tables (9th ed.). New York: Dover Publications.
+  Abramowitz, M. and Stegun, I. A. (1970). Handbook of Mathematical Functions with Formulas,
+  Graphs, and Mathematical Tables (9th ed.). New York: Dover Publications.
 
-Meyer, S. (2010): Spatio-Temporal Infectious Disease Epidemiology based
-  on Point Processes. Master Thesis, Ludwig-Maximilians-Universit\enc{ä}{ae}t
-  München. Available as http://epub.ub.uni-muenchen.de/11703/
-
-Sommariva, A. & Vianello, M. (2007): Product Gauss cubature over polygons
+  Meyer, S. (2010):
+  Spatio-Temporal Infectious Disease Epidemiology based on Point Processes.
+  Master's Thesis, Ludwig-Maximilians-Universit\enc{ä}{ae}t
+  M\enc{ü}{ue}nchen.
+  Available as \url{http://epub.ub.uni-muenchen.de/11703/}
+  
+  Sommariva, A. and Vianello, M. (2007): Product Gauss cubature over polygons
   based on Green's integration formula. Bit Numerical Mathematics, 47 (2), 441-453.
 }
+
 \author{
    Sebastian Meyer
 }
+
 \note{
 The \R implementation of the product Gauss cubature in \code{polycub.SV} is based on the
 corresponding MATLAB code (\code{polygauss}) by Sommariva & Vianello (2007); but it
@@ -120,6 +130,7 @@ only covers the case of \dQuote{simple} polygons. The efficiency rotation also p
 by Sommariva & Vianello (2007) is not implemented here since it does in general only apply
 to convex polygons.
 }
+
 \examples{
 # two-dimensional function to integrate (here: isotropic Gaussian density with zero mean)
 f <- function (s, sigma = 5) exp(-rowSums(s^2)/2/sigma^2) / (2*pi*sigma^2)
@@ -164,6 +175,7 @@ if (require("mvtnorm")) {
     print(polyCub.exact.Gauss(disc.owin, mean=c(0,0), Sigma=5^2*diag(2), plot=TRUE), digits=16)
 }
 }
+
 \keyword{math}
 \keyword{utilities}
 \keyword{spatial}

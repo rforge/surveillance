@@ -7,123 +7,150 @@
 }
 
 \description{
-  A \code{twinstim} model as described in Meyer et al. (2010) is fitted to
+  A \code{twinstim} model as described in Meyer et al. (2012) is fitted to
   marked spatio-temporal point process data. This constitutes a
   regression approach for conditional intensity function modelling.
 }
 
 \usage{
-twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
-         subset, na.action = na.fail, optim.args, nCub, partial = FALSE,
-         finetune = TRUE,
-         t0 = data$stgrid$start[1], T = tail(data$stgrid$stop, 1),
-         typeSpecificEndemicIntercept = FALSE, model = FALSE,
-         cumCIF = TRUE, cumCIF.pb = TRUE)
+twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
+         data, subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
+         na.action = na.fail, nCub, nCub.adaptive = TRUE, partial = FALSE,
+         optim.args, finetune = TRUE, model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE)
 }
 
 \arguments{
   \item{endemic}{
-    Formula for the exponential (Cox-like multiplicative) endemic component. may contain offsets. If \code{~0} there will be no endemic component in the model.
-}
+    formula for the exponential (Cox-like multiplicative) endemic
+    component. May contain offsets (to be marked by the special function
+    \code{offset}).  If omitted or \code{~0} there will be no endemic
+    component in the model.  A type-specific endemic intercept can be
+    requested by including the term \code{(1|type)} in the formula.
+  }
   \item{epidemic}{
-    Formula representing the epidemic model for the event-specific covariates determining infectivity. offsets are not implemented. If \code{~0} there will be no epidemic component in the model.
-}
+    formula representing the epidemic model for the event-specific
+    covariates (marks) determining infectivity. Offsets are not
+    implemented here. If omitted or \code{~0} there will be no epidemic
+    component in the model.
+  }
   \item{siaf}{
-    Spatial interaction functions. May be \code{NULL} (or missing), a list
-    (continous function) or numeric (knots of a step function).
-}
-\item{tiaf}{
-    Temporal interaction functions. May be \code{NULL} (or missing), a list
-    (continous function) or numeric (knots of a step function).
-}
+    spatial interaction function. May be \code{NULL} (or missing,
+    corresponding to constant infectivity independent of the spatial
+    distance from the host), a list (specifying a continuous kernel, as
+    e.g., returned by \code{\link{siaf.gaussian}} or
+    \code{\link{siaf.lomax}}), or numeric (knots of a step function). 
+  }
+  \item{tiaf}{
+    temporal interaction function. May be \code{NULL} (or missing,
+    corresponding to constant infectivity independent of the temporal
+    distance from the host), a list (specifying a continuous function,
+    as e.g., returned by \code{\link{tiaf.exponential}}), or numeric
+    (knots of a step function). 
+  }
   \item{qmatrix}{
-    Square indicator matrix (0/1 or \code{TRUE}/\code{FALSE}) for
+    square indicator matrix (0/1 or \code{TRUE}/\code{FALSE}) for
     possible transmission between the event types. Will be internally
-    converted to logical. Defaults to the Q matrix specified in data.
-}
+    converted to logical. Defaults to the \eqn{Q} matrix specified in
+    \code{data}.
+  }
   \item{data}{
-    An \code{epidataCS} object.
-}
-\item{subset}{
-  Logical expression indicating events to keep: missing values are
-  taken as false. The expression is evaluated in the context of the
-  \code{data$events@data} \code{data.frame}
-}
-\item{na.action}{
-  How to deal with missing values in \code{data$events}. Do not use
-  \code{\link{na.pass}}. Missing values in the spatio-temporal grid
-  \code{data$stgrid} are not accepted.
-}
-\item{optim.args}{
-  \code{NULL} or an argument list passed to \code{\link{optim}} containing
-  at least the element \code{par}, the start values of the parameters in
-  the order \code{par = c(endemic, epidemic, siaf, tiaf)}.
-  Note that \code{optim} receives the negative log-likelihood for minimization
-  (thus, if used, \code{optim.args$control$fnscale} should be positive).
-
-  Exceptionally, the \code{method} argument may also be \code{"nlminb"}, in
-  which case the \code{\link{nlminb}} optimizer is used. This is also the
-  default. In this case, the only parameters available in the
-  \code{optim.args$control} list are
-  \code{maxit}, \code{REPORT}, \code{abstol}, and \code{reltol}, which are
-  passed appropriately to \code{\link{nlminb}}. Furthermore, there is no
-  \code{hessian} argument for \code{nlminb}.
-
-  If \code{optim.args} is \code{NULL}, then no optimization will be performed
-  but the necessary functions will be returned in a list (similar to what is
-  returned if \code{model = TRUE}).
-}
-\item{nCub}{
-  Determines the accuracy of the cubature of the \code{siaf} function.
-  If \code{siaf$Fcircle} is specified, \code{nCub} equals \code{effRange}/\code{eps},
-  where \code{eps} is used as pixel width and height in the two-dimensional midpoint rule
-  (see \code{\link{polyCub.midpoint}}). Thus \code{nCub} is the desired number of
-  subdivions of \code{effRange} in both dimensions and \code{eps} equals
-  \code{effRange}/\code{nCub}. If \code{siaf$Fcircle} is missing, \code{nCub} equals
-  the above mentioned \code{eps}.
-}
-\item{partial}{
-  Logical indicating if the partial log-likelihood proposed by Diggle et
-  al. (2009) should be used.
-}
-\item{finetune}{
-  Logical indicating if a second maximisation should be performed with
-  robust Nelder-Mead optim using as starting point the resulting
-  parameters from the first maximisation. Default value is TRUE.
-}
-\item{t0}{
-  Events having occured during (-Inf;t0] are regarded as part of the
-  prehistory H_0 of the process. The time point 't0' must be an element
-  of data$stgrid$start. By default it is the earliest time point of the
-  spatio-temporal grid of 'data'.
-}
-\item{T}{
-  Only use events that occured up to time T. The time point 'T' must be
-  an element of data$stgrid$stop. By default it is the latest time point
-  of the spatio-temporal grid of 'data'.
-}
-\item{typeSpecificEndemicIntercept}{
-  Use type-specific endemic intercepts instead of the global endemic intercept?
-}
+    an object of class \code{"\link{epidataCS}"}.
+  }
+  \item{subset}{
+    an optional vector evaluating to logical indicating a subset of
+    \code{data$events} to keep. Missing values are
+    taken as \code{FALSE}. The expression is evaluated in the context of the
+    \code{data$events@data} \code{data.frame}, i.e. columns of this
+    \code{data.frame} may be referenced directly by name.
+  }
+  \item{t0, T}{
+    events having occured during (-Inf;t0] are regarded as part of the
+    prehistory \eqn{H_0} of the process. Only events that occured in the
+    interval (t0; T] are considered in the likelihood.
+    The time point \code{t0} (\code{T}) must
+    be an element of \code{data$stgrid$start} (\code{data$stgrid$stop}).
+    The default time range covers the whole spatio-temporal grid
+    of endemic covariates.
+  }
+  \item{na.action}{
+    how to deal with missing values in \code{data$events}? Do not use
+    \code{\link{na.pass}}. Missing values in the spatio-temporal grid
+    \code{data$stgrid} are not accepted.
+  }
+  \item{nCub, nCub.adaptive}{
+    determines the accuracy of the numerical cubature of the \code{siaf}
+    function. If \code{siaf$Fcircle} and \code{siaf$effRange} are both
+    specified and \code{nCub.adaptive = TRUE}, then \code{nCub} equals
+    \code{siaf$effRange}/\code{eps}, where \code{eps} is used as pixel
+    width and height in the two-dimensional midpoint rule (see
+    \code{\link{polyCub.midpoint}}). Thus \code{nCub} is the desired
+    number of subdivions of the effective integration range in both
+    dimensions and \code{eps} equals \code{effRange}/\code{nCub} (e.g.,
+    if 6\eqn{\sigma} is used as the effective integration range of the
+    Gaussian \code{siaf} kernel, and \code{nCub = 24}, then a bandwidth
+    of \eqn{\sigma / 4} is used in the midpoint rule.\cr
+    If \code{siaf$Fcircle} or \code{siaf$effRange} is unspecified or
+    \code{nCub.adaptive = FALSE}, then \code{nCub} equals the above
+    mentioned \code{eps} in \code{polyCub.midpoint} (may also be a
+    vector of length 2 in this case to specify different bandwidths in
+    the x and y directions, see \code{\link[spatstat]{as.mask}}.
+  }
+  \item{partial}{
+    logical indicating if a partial log-likelihood similar to the approach
+    by Diggle et al. (2010) should be used.
+  }
+  \item{optim.args}{
+    \code{NULL} or an argument list passed to \code{\link{optim}} containing
+    at least the element \code{par}, the start values of the parameters in
+    the order \code{par = c(endemic, epidemic, siaf, tiaf)}.
+    Note that \code{optim} receives the negative log-likelihood for minimization
+    (thus, if used, \code{optim.args$control$fnscale} should be positive).
+    
+    Exceptionally, the \code{method} argument may also be \code{"nlminb"}, in
+    which case the \code{\link{nlminb}} optimizer is used. This is also the
+    default. In this case, the only parameters available in the
+    \code{optim.args$control} list are
+    \code{maxit}, \code{REPORT}, \code{abstol}, and \code{reltol}, which are
+    passed appropriately to \code{\link{nlminb}}. Furthermore, there is no
+    \code{hessian} argument for \code{nlminb}.
+    
+    If \code{optim.args} is \code{NULL}, then no optimization will be performed
+    but the necessary functions will be returned in a list (similar to what is
+    returned if \code{model = TRUE}).
+  }
+  \item{finetune}{
+    logical indicating if a second maximisation should be performed with
+    robust Nelder-Mead \code{optim} using the resulting
+    parameters from the first maximisation as starting point.
+  }
   \item{model}{
-    Logical. If \code{TRUE} the result contains an element \code{functions} with
-    the log-likelihood function, and optionally the score function and
-    the fisher information function. The environment of those functions
-    equals the evaluation environment of the fitting function, i.e. it
-    is kept in the workspace and the necessary model frames are still
-    available when \code{twinstim} has finished.
+    logical. If \code{TRUE} the result contains an element \code{functions} with
+    the log-likelihood function (or partial log-likelihood function, if
+    \code{partial = TRUE}), and optionally the score function and
+    the fisher information function (not for the partial likelihood, and
+    only if \code{siaf} and \code{tiaf} provide the necessary
+    derivatives).
+    The environment of those functions equals the evaluation environment
+    of the fitting function, i.e. it is kept in the workspace and the
+    necessary model frames are still available when \code{twinstim} has
+    finished.  The environment is also set as an attribute of the
+    \code{twinstim} result.
   }
-  \item{cumCIF}{Logical (default: \code{TRUE}) indicating whether to
-    calculate the fitted cumulative ground intensity at event times. Useful for,
-    e.g., plotting the residuals using \code{\link{residuals.twinstim}}.
+  \item{cumCIF}{
+    logical (default: \code{TRUE}) indicating whether to
+    calculate the fitted cumulative ground intensity at event times.
+    This is the residual process, see \code{\link{residuals.twinstim}}.
   }
-  \item{cumCIF.pb}{logical indicating if a progress bar should be shown
-    during the calculation of \code{cumCIF}. Defaults to \code{TRUE}.}
+  \item{cumCIF.pb}{
+    logical indicating if a progress bar should be shown
+    during the calculation of \code{cumCIF}. Defaults to \code{TRUE}.
+  }
 }
+
 \details{
   The function performs maximum likelihood inference
   for the additive-multiplicative spatio-temporal intensity model
-  described in Meyer et al. (2010). It uses 'nlminb' as the default optimizer
+  described in Meyer et al. (2012). It uses 'nlminb' as the default optimizer
   (Newton-algorithm) and returns an object of class \code{twinstim}.
   Such ojects have working \code{print},
   \code{plot} and \code{summary} functions. The output of can again be
@@ -131,67 +158,87 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   fit functions such as \code{coef}, \code{vcov} and \code{logLik} work.
   A specific add on is the use of the function \code{R0}.
 }
+
 \value{
-  Returns an S3 object of class \code{"twinstim"}.
-\describe{
-  \item{coefficients}{Vector containing the MLE.}
-  \item{loglik}{Value of the log-likelihood function at the MLE.}
-  \item{partial}{If \code{FALSE}, the fit is based on the full likelihood.
-    If \code{TRUE} then a partial likelihood approach was used.}
-  \item{counts}{Number of log-likelihood and score evaluations during \code{optim}.}
-  \item{coverged}{Logical.}
-  \item{fisherinfo}{Expected Fisher information evaluated at the
-    MLE. Only part of the output if \code{partial} is \code{FALSE} and if
-    spatial and temporal interaction functions are provided with their
-    derivatives.}
-  \item{method}{Name of the optimizing function used to determine the MLE.}
-  \item{fisherinfo.observed}{Observed Fisher information matrix
+  Returns an S3 object of class \code{"twinstim"}, which is a list with
+  the following components:
+  
+  \item{coefficients}{vector containing the MLE.}
+  \item{loglik}{value of the log-likelihood function at the MLE with a
+    logical attribute \code{"partial"} indicating if the partial
+    likelihood was used.}
+  \item{counts}{Number of log-likelihood and score evaluations during
+    optimization.}
+  \item{method}{Name of the optimizer used to determine the MLE.}
+  \item{nCub, nCub.adaptive}{see the \dQuote{Arguments} section above.}
+  \item{converged}{logical indicating if the optimizer converged.}
+  \item{fisherinfo}{expected Fisher information evaluated at the
+    MLE. Only part of the output for full likelihood inference
+    (\code{partial = FALSE}) and if spatial and temporal interaction
+    functions are provided with their derivatives.}
+  \item{fisherinfo.observed}{observed Fisher information matrix
     evaluated at the value of the MLE. Obtained as the negative Hessian.
     This is only part of the result if \code{optim.args$method} is not
     \code{"nlminb"} (i.e. \code{optim} is used) and if it was requested by setting
     \code{hessian=TRUE} in \code{optim.args}.}
-  \item{fitted}{Fitted values of the conditional intensity at the events.}
-  \item{fittedComponents}{Matrix with columns \code{"h"} and \code{"e"} containing
-    the fitted values of the endemic and epidemic components, respectively.}
-  \item{tau}{Fitted cumulative intensities at the events, i.e.\ the transformed
-    time points used in the residual analysis of point process models.}
-  \item{npars}{Description of 'comp2'}
-  \item{qmatrix}{Description of 'comp2'}
-  \item{medianeps}{???}
-  \item{formula}{A list containing four components
-    \describe{
-      \item{endemic}{Formula used to specify the endemic component.}
-      \item{epidemic}{Formula used to specify the epidemic component.}
-      \item{siaf}{Formula used to specify the spatial interaction
-	function.}
-      \item{tiaf}{Formula used to specify the temporal interaction function.}
-    }
+  \item{fitted}{fitted values of the conditional intensity function at the events.}
+  \item{fittedComponents}{two-column matrix with columns \code{"h"} and
+    \code{"e"} containing the fitted values of the endemic and epidemic
+    components, respectively. (\code{rowSums(fittedComponents) == fitted}).}
+  \item{tau}{fitted cumulative ground intensities at the event times.
+    Only calculated and returned if \code{cumCIF = TRUE}.
+    This is the \dQuote{residual process} of the model, see
+    \code{\link{residuals.twinstim}}.}
+  \item{R0}{estimated basic reproduction number for each event. This
+    equals the spatio-temporal integral of the epidemic intensity over
+    the observation domain (t0;T] x W for each event.}
+  \item{npars}{vector describing the lengths of the 5 parameter
+    subvectors: endemic intercept(s) \eqn{\beta_0(\kappa)}, endemic
+    coefficients \eqn{\beta}, epidemic coefficients \eqn{\gamma},
+    parameters of the \code{siaf} kernel, and parameters of the
+    \code{tiaf} kernel.}
+  \item{qmatrix}{the \code{qmatrix} associated with the epidemic
+    \code{data} as supplied in the model call.}
+  \item{bbox}{the bounding box of \code{data$W}.}
+  \item{timeRange}{the time range used for fitting: \code{c(t0,T)}.}
+  \item{formula}{a list containing the four main parts of the model
+    specification: \code{endemic}, \code{epidemic}, \code{siaf}, and
+    \code{tiaf}.}
+  \item{functions}{if \code{model=TRUE} this is a \code{list} with
+    components \code{ll}, \code{sc} and \code{fi}, which are functions
+    evaluating the log-likelihood, the score function and the expected
+    Fisher information for a parameter vector \eqn{\theta}. The
+    \code{environment} of these function is the model environment, which
+    is thus retained in the workspace if \code{model=TRUE}.
   }
-  \item{functions}{If \code{model=TRUE} this is a \code{list} with
-  components \code{ll}, \code{sc} and \code{fi} containing objects of
-  type \code{function} containing functions for evaluating the
-  likelihood, the score and the expected fisher information for a
-  parameter vector \eqn{\theta}{theta}.
-  }
-  \item{call}{The matched call.}
-  \item{runtime}{Contains the \code{proc.time} queried time taken to fit
-    the model.}
-}
+  \item{call}{the matched call.}
+  \item{runtime}{contains the \code{\link{proc.time}} queried time taken
+    to fit the model.}
+
+  If \code{model=TRUE}, the model evaluation environment is assigned to
+  this list and can thus be queried by calling \code{environment()} on
+  the result.
 }
 
 \references{
-  Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2011). A Space-Time Conditional
-  Intensity Model for Invasive Meningococcal Disease Occurrence.
-  Biometrics, in press. DOI: 10.1111/j.1541-0420.2011.01684.x
-  A technical report is available as: http://epub.ub.uni-muenchen.de/11898/
-
-  Meyer, S. (2010): Spatio-Temporal Infectious Disease Epidemiology based
-  on Point Processes. Master Thesis, Ludwig-Maximilians-\enc{Universität}{Universitaet}
-  München. Available as http://epub.ub.uni-muenchen.de/11703/
+  Diggle, P. J., Kaimi, I. & Abellana, R. (2010):
+  Partial-likelihood analysis of spatio-temporal point-process data.
+  \emph{Biometrics}, 66, 347-354.
+  
+  Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2012):
+  A space-time conditional intensity model for invasive meningococcal
+  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.
+  DOI-Link: \url{http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x}
+  
+  Meyer, S. (2010):
+  Spatio-Temporal Infectious Disease Epidemiology based on Point Processes.
+  Master's Thesis, Ludwig-Maximilians-Universit\enc{ä}{ae}t
+  M\enc{ü}{ue}nchen.
+  Available as \url{http://epub.ub.uni-muenchen.de/11703/}
 }
 
 \author{
-  S. Meyer with documentation by M. \enc{Höhle}{Hoehle}.
+  S. Meyer with documentation contributions by M. \enc{Höhle}{Hoehle}.
 }
 
 \seealso{
@@ -201,10 +248,13 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
 }
 
 \examples{
-#Load invasive meningococcal disease data
+# Load invasive meningococcal disease data
 data("imdepi")
 
-\dontrun{
+# TODO...
+
+\dontshow{
+TODO <- function () {
 #Indicator - we only take cases with all necessary covariates observed
 allEpiCovNonNA <- !is.na(imdepi$events@data$agegrp) &
                      !is.na(imdepi$events@data$type)
@@ -214,7 +264,7 @@ allEpiCovNonNA <- !is.na(imdepi$events@data$agegrp) &
 siaf_log1 <- siaf.gaussian(1, logsd = TRUE, density = FALSE, effRangeMult = 6)
 siaf_constant <- siaf.constant()
 
-#Start values (taken from the best model in fits5 of the Epi/mydata
+#Start values (taken from the best model in fits5 of the Epi/mydata)
 #startvalues <-  c(-20.36516096, -0.04926598, 0.26183958, 0.26681968,
 #-12.57458928, 0.64631559, -0.18675885, -0.84955802, 2.82866154)
 #Crude intercept estimate -> if model only has an endemic component with
@@ -247,6 +297,7 @@ imdepi.fit1 <- twinstim(endemic  = ~1 + offset(log(popdensity)) + I(start/365) +
 
 
 summary(imdepi.fit)
+}
 }
 
 }

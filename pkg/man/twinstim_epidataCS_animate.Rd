@@ -72,8 +72,8 @@ Spatio-Temporal Animation of a Continuous-Time Continuous-Space Epidemic
   \item{col.influence}{Color with which influence region is drawn. Use
   \code{NA} if no influence regions should be drawn.}
   \item{\dots}{
-    further graphical parameters passed to the basic call of \code{plot}, e.g.\
-    \code{las}, \code{cex.axis} (etc.) and \code{mgp}.
+    further graphical parameters passed to the plot-method of the
+    \code{\link{SpatialPolygons-class}}.
   }
 }
 

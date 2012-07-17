@@ -1,66 +1,81 @@
-\name{imdepi}
-\docType{data}
-\alias{imdepi}
 \encoding{latin1}
+\docType{data}
+\name{imdepi}
+\alias{imdepi}
 
-\title{Occurrence of invasive meningococcal disease in Germany}
-\description{Data on the spatio-temporal location of 636 cases of two
-  specific finetypes of invasive meningococcal diseases in
-  Germany. 
+\title{
+  Occurrence of invasive meningococcal disease in Germany
 }
-\usage{imdepi}
+
+\description{
+  Data on the spatio-temporal location of 636 cases of invasive
+  meningococcal disease caused by two specific meningococcal finetypes
+  in Germany. 
+}
+\usage{
+data(imdepi)
+}
 \format{
   Loading the data in \code{imdepi} gives an object of type
-  \code{epidataCS} with entries \code{events}, \code{stgrid}, \code{W}
-  and \code{qmatrix}. See 'details' for further information.
+  \code{"\link{epidataCS}"} (a list with components \code{events},
+  \code{stgrid}, \code{W} and \code{qmatrix}).
 }
 \details{
-  The dataset contains a slightly modified version of the data used in
-  Meyer et al. (2010) represented as an \code{epidataCS} object. 
+  The dataset contains a slightly modified version of the data analyzed in
+  Meyer et al. (2012) represented as an \code{"epidataCS"} object. 
 
-  The \code{events} entry is a \code{SpatialPointsDataFrame} object
+  The \code{events} entry is a \code{\link{SpatialPointsDataFrame}} object
   (ETSR89 projection, i.e. EPSG code 3035, with unit 'km') containing
   the 636 events, each with the following entries:
   \describe{
     \item{ID}{Unique identifier of the case.}
     \item{time}{Time of the case occurrence measured in number of days since origin.}
-    \item{tile}{Tile number in the spatio-temporal covariate grid, which
-      the event is contained in. This corresponds to one of the 413
-      districts of Germany..
+    \item{tile}{Tile ID in the spatio-temporal grid (\code{stgrid}) of
+      endemic covariates, where the event is contained in.
+      This corresponds to one of the 413 districts of Germany.
     }
-    \item{type}{Event finetype, a factor with levels 'B' and 'C'}
-    \item{eps.t}{Maximal temporal interaction range for the event.}
-    \item{eps.s}{Maximal spatial interaction range for the event.}
-    \item{sex}{Sex of the case, i.e. a factor with levels 'male' or 'female'.}
+    \item{type}{Event finetype, a factor with levels \code{"B"} and \code{"C"}.}
+    \item{eps.t}{Maximal temporal interaction range for the event in
+      days. Here set to 30 days.}
+    \item{eps.s}{Maximal spatial interaction range for the event in km.
+      Here set to 200 km.}
+    \item{sex}{Sex of the case, i.e. a factor with levels \code{"male"}
+      and \code{"female"}.} 
     \item{agegrp}{Factor giving the age group of the case,
-      i.e. 0-2, 3-18 and >=19. Note: for a a number of cases this
+      i.e. 0-2, 3-18 or >=19. Note: for a small number of cases this
       information is not available (\code{NA}).}
-    \item{start}{Start time (in days since origin) of the cell in the
-      spatio-temporal endemic covariate grid, which the event belongs to.}
+    \item{BLOCK,start}{Block ID and start time (in days since origin) of
+      the cell in the spatio-temporal endemic covariate grid, which the
+      event belongs to.} 
     \item{popdensity}{Population density at the location of the event
       (corresponds to population density of the district where the event is
       located).}
   }
+  There are further columns attached to the events' data whose
+  names begin with a . (dot): These are auxiliary columns created during
+  conversion to the \code{"epidataCS"} class and are necessary for
+  fitting the data with \code{twinstim}.
   
-  With \code{coordinates(imdepi$events)} one obtains the (x,y) location
+  With \code{coordinates(imdepi$events)} one obtains the (x,y) locations
   of the events. The identifier in \code{tile} is indexed according to
-  the German official municipality key ('Amtlicher
-  Gemeindeschl\enc{ü}{ue}ssel'). See
-  \url{https://secure.wikimedia.org/wikipedia/de/wiki/Amtlicher_Gemeindeschl\%C3\%BCssel} for details.
-
-    
+  the German official municipality key (
+  \dQuote{Amtlicher Gemeindeschl\enc{ü}{ue}ssel}). See
+  \url{http://de.wikipedia.org/wiki/Amtlicher_Gemeindeschl\%C3\%BCssel}
+  for details.
+  
   Entry \code{stgrid} contains the spatio-temporal grid of endemic
-  covariate information. In addition to the usual bookeeping variables
+  covariate information. In addition to the usual bookkeeping variables
   this includes:
   \describe{
-    \item{area}{Area of the district according to }
-    \item{popdensity}{Population density computed from DESTATIS
-      (Federal Statistical Office) information (Date: 31.12.2008) on
-      communities level (LAU2) aggregated to district level (NUTS3).}
+    \item{area}{Area of the district \code{tile} in square kilometers.}
+    \item{popdensity}{Population density (inhabitants per square
+      kilometer) computed from DESTATIS (Federal Statistical Office)
+      information (Date: 31.12.2008) on communities level (LAU2)
+      aggregated to district level (NUTS3).} 
   }
   
-  The entry \code{W} contains the observation windows as a
-  \code{SpatialPolygons} object. In this case the boundaries of
+  The entry \code{W} contains the observation window as a
+  \code{\link{SpatialPolygons}} object. In this case the boundaries of
   Germany (simplified polygon to enhance speed).
   
   The entry \code{qmatrix} is a \eqn{2\times 2}{2 x 2} identity matrix
@@ -72,51 +87,84 @@
   Department of Hygiene and Microbiology,
   Julius-Maximilians-Universit\enc{ä}{ae}t W\enc{ü}{ue}rzburg, Germany.
   Thanks to Dr. Johannes Elias and Prof. Dr. Ulrich Vogel from the NRZM
-  for providing the IMD event data. See
-  \url{http://www.meningococcus.de/}
+  for providing the IMD event data. See \url{http://www.meningococcus.de/}
   and \url{http://episcangis.hygiene.uni-wuerzburg.de/} for further
   details about the IMD event data.
 }
 
 \references{
-  S. Meyer, J. Elias and M. H\enc{ö}{oe}hle (2011), A space-time conditional
-  intensity model for invasive meningococcal, Biometrics, Epub ahead of
-  print. Note: A technical report is available as
-  http://epub.ub.uni-muenchen.de/11898/ 
+  Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2012):
+  A space-time conditional intensity model for invasive meningococcal
+  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.
+  DOI-Link: \url{http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x}
+
+  Meyer, S. (2010):
+  Spatio-Temporal Infectious Disease Epidemiology based on Point Processes.
+  Master's Thesis, Ludwig-Maximilians-Universit\enc{ä}{ae}t
+  M\enc{ü}{ue}nchen.
+  Available as \url{http://epub.ub.uni-muenchen.de/11703/}
+}
+
+\seealso{
+  class \code{"\link{epidataCS}"}
 }
 
 \examples{
   data("imdepi")
 
-  #Basic information
-  imdepi
-  head(imdepi,n=2)
+  # Basic information
+  print(imdepi, n=3)
 
-  #Access event data
-  marks.epidataCS(imdepi)
-  # if package "spatstat" is attached, then marks(imdepi) also works
+  # What is an epidataCS-object?
+  str(imdepi, max.level=3)
+  names(imdepi$events@data)
+  # => events data.frame has hidden columns
+  sapply(imdepi$events@data, class)
+  # marks and print methods ignore these auxiliary columns
 
-  #Summary
+  # the [-method subsets the 'events' component (thereby taking care of
+  # the validity of the epidataCS object, for instance the hidden
+  # auxiliary column .sources and qmatrix)
+  imdepiB <- imdepi[imdepi$events$type == "B",]
+  imdepiB
+
+  # select only the last 10 events
+  tail(imdepi, n=10)   # there is also a corresponding 'head' method
+
+  # Access event marks
+  str(marks(imdepi))
+
+  # there is an update-method which assures that the object remains valid
+  # when changing parameters like eps.s, eps.t or qmatrix
+  update(imdepi, eps.t = 20)
+
+  # Summary
   s <- summary(imdepi)
+  s
   str(s)
 
-  # type frequencies
-  s$typeTable
-
   # weekly step function of number of infectives
-  plot(s$counter, xlab = "Time [days]", ylab = "Number of infected individuals", main = "Time series of IMD")
+  plot(s$counter, xlab = "Time [days]",
+       ylab = "Number of infectious individuals",
+       main = "Time series of IMD assuming 30 days infectious period")
 
   # distribution of number of potential sources of infection
-  oldpar <- par()
-  par(mfrow=c(1,2), las=1)
+  opar <- par(mfrow=c(1,2), las=1)
   for (type in c("B","C")) {
-    plot(100*prop.table(table(s$nSources[s$eventType==type])),
+    plot(100*prop.table(table(s$nSources[s$eventTypes==type])),
     xlim=range(s$nSources), xlab = "Number of potential epidemic sources",
     ylab = "Proportion of events [\%]")
   }
-  par(oldpar)
+  par(opar)
 
-  #Plot the spatial dimension of the object
+  # a histogram of the number of events along time (using the
+  # plot-method for the epidataCS-class, see ?plot.epidataCS)
+  opar <- par(mfrow = c(2,1))
+  plot(imdepi, aggregate = "time", subset = type == "B", main = "Finetype B")
+  plot(imdepi, aggregate = "time", subset = type == "C", main = "Finetype C")
+  par(opar)
+
+  # Plot the spatial distribution of the events in W
   plot(imdepi$W)
   col <- c("darkblue","indianred2")
   pch <- c(3,4)
@@ -125,26 +173,20 @@
     legend(x="topleft",levels(events$type),col=col, pch=pch,title="Finetype")
   })
 
+  # somehow easier: use the plot-method for the epidataCS class
+  plot(imdepi, aggregate="space", points.args=list(cex=0.5), axes=TRUE)
+  title(xlab = "x [km]", ylab = "y [km]")
+
   \dontrun{
-    #Show a dynamic illustration of the spatio-temporal dynamics of the
-    #spread using the animation package
-    require("animation")
-    ani.options(interval = 0, nmax = 999)
+    # Show a dynamic illustration of the spatio-temporal dynamics of the
+    # spread using the animation package
+    library("animation")
+    ani.options(interval = 0.1)   # used for Sys.sleep
 
-    #Create an epidataCS subset containing only a single type
-    imdepi.type <-  lapply(c("B","C"), function(type) {
-        foo <- imdepi
-        foo$events <- foo$events[foo$events$type == "B",]
-       return(foo)
-    })
-
-    #Animate one of them
-    animate(imdepi.type[[1]], time.spacing = 10, pch = c(15,17),
-                          main="IMD dynamics", axes=FALSE, xlab="", ylab="")
-
+    # Animate the first year of type B with a step size of 7 days
+    animate(imdepiB, interval=c(0,365), time.spacing=7)
   }
 }
 
-\seealso{\code{\link{epidataCS}}}
 \keyword{datasets}
 

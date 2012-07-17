@@ -36,8 +36,8 @@
 
 obligColsNames_events <- c("time", "tile", "type", "eps.t", "eps.s")
 obligColsNames_stgrid <- c("start", "stop", "tile", "area")
-reservedColsNames_events <- c("ID", ".obsInfLength", ".bdist",
-                              ".influenceRegion", ".sources", "BLOCK", "start")
+reservedColsNames_events <- c("ID", ".obsInfLength", ".sources", ".bdist",
+                              ".influenceRegion", "BLOCK", "start")
 reservedColsNames_stgrid <- c("BLOCK")
 
 as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
@@ -464,7 +464,8 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
 
 
 ### subsetting epidataCS, i.e. select only part of the events,
-### but retain stgrid, W, and qmatrix
+### but retain stgrid and W. If any event types disappear due to subsetting,
+### these types will be dropped from the factor levels and from qmatrix
 
 "[.epidataCS" <- function (x, i, j, drop = FALSE)
 {
@@ -480,9 +481,19 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
             stop("only epidemic covariates may be removed from 'events'")
         }
     }
-    if (!missing(i)) {                  # update .sources
-        ## message("updating the list of potential sources of the events...")
+    if (!missing(i)) {
+        ## update .sources
         x$events$.sources <- determineSources.epidataCS(x)
+        ## update types and qmatrix (a type could have disappeared)
+        x$events$type <- x$events$type[drop=TRUE]
+        typeNames <- levels(x$events$type)
+        if (!identical(rownames(x$qmatrix), typeNames)) {
+            message("Note: dropped type(s) ",
+                    paste0("\"", setdiff(rownames(x$qmatrix), typeNames), "\"",
+                           collapse = ", "))
+            typesIdx <- match(typeNames, rownames(x$qmatrix))
+            x$qmatrix <- x$qmatrix[typesIdx, typesIdx, drop = FALSE]
+        }
     }
     return(x)
 }
@@ -492,8 +503,11 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
 ### extract marks of the events (actually also including time and tile)
 
 marks.epidataCS <- function (x, ...) {
-    markCols <- seq_len(match("BLOCK",names(x$events))-1L)
-    as.data.frame(x$events[markCols])
+    noEventMarks <- setdiff(reservedColsNames_events, "ID")
+    endemicCovars <- setdiff(names(x$stgrid),
+        c(reservedColsNames_stgrid, obligColsNames_stgrid))
+    idxnonmarks <- match(c(noEventMarks, endemicCovars), names(x$events))
+    as.data.frame(x$events[-idxnonmarks])
 }
 
 
@@ -502,6 +516,9 @@ marks.epidataCS <- function (x, ...) {
 
 head.epidataCS <- function (x, n = 6L, ...)
 {
+    ## cl <- match.call()
+    ## cl[[1]] <- quote(utils:::head.data.frame)
+    ## eval(cl, parent.frame())
     utils:::head.data.frame(x, n = n, ...)
 }
 
@@ -635,7 +652,8 @@ print.summary.epidataCS <- function (x, ...)
 
 animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
     legend.opts = list(), timer.opts = list(), pch = 15:18,
-    col.current = "red", col.I = "#C16E41", col.R = "#B3B3B3", col.influence = "#FEE0D2", ...)
+    col.current = "red", col.I = "#C16E41", col.R = "#B3B3B3",
+    col.influence = "#FEE0D2", ...)
 {
     library("animation")
     stopifnot(is.numeric(interval), length(interval) == 2L)
@@ -770,8 +788,8 @@ plot.epidataCS <- function (x, aggregate = c("time", "space"), subset, ...)
 ## in case t0.Date is specified, hist.Date() is used and breaks must set in ... (e.g. "months")
 
 plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
-    xlim = NULL, ylim = NULL, xlab = "Time", ylab = NULL, col = "white",
-    panel.first = abline(h=axTicks(2), lty=2, col="grey"), ...)
+    xlim = NULL, ylim = NULL, xlab = "Time", ylab = NULL, main = NULL,
+    col = "white", panel.first = abline(h=axTicks(2), lty=2, col="grey"), ...)
 {
     timeRange <- with(x$stgrid, c(start[1L], stop[length(stop)]))
     eventTimes <- if (missing(subset)) x$events$time else {
@@ -804,7 +822,7 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
     if (is.null(ylab)) {
         ylab <- if (freq) "Number of cases" else "Density of cases"
     }
-    plot(x = xlim, y = ylim, xlab = xlab, ylab = ylab, type = "n")
+    plot(x = xlim, y = ylim, xlab = xlab, ylab = ylab, main = main, type = "n")
     force(panel.first)
     plot(histdata, freq = freq, add = TRUE, col = col, ...)
     invisible(histdata)
@@ -815,7 +833,7 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
 
 plot.epidataCS_space <- function (x, subset,
     cex.fun = function (counts) sqrt(1.5*counts/pi/min(counts)),
-    points.args = list(), ...)
+    points.args = list(), colTypes = rainbow(nlevels(x$events$type)), ...)
 {
     stopifnot(is.list(points.args))
     events <- if (missing(subset)) x$events else {
@@ -833,6 +851,9 @@ plot.epidataCS_space <- function (x, subset,
     if (!is.null(points.args[["cex"]])) {
         pointcex <- pointcex * points.args$cex
         points.args$cex <- NULL
+    }
+    if (is.null(points.args[["col"]])) {
+        points.args$col <- colTypes[x$events$type]
     }
     plot(x$W, ...)
     do.call("points", c(alist(x=events, cex=pointcex), points.args))

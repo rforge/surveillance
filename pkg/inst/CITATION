@@ -37,21 +37,23 @@ citEntry(
 		"doi: 10.1002/sim.4177")
 )
 
-### For twinstim: Article in Biometrics (2011)
+### For twinstim: Article in Biometrics (2012)
 citEntry(
 	header = "If twinstim() is used, cite:",
 	entry = "Article",
 	author = personList(as.person("Sebastian Meyer"), as.person("Johannes Elias"), as.person("Michael Höhle")),
-	title = "A Space-Time Conditional Intensity Model for Invasive Meningococcal Disease Occurrence",
+	title = "A space-time conditional intensity model for invasive meningococcal disease occurrence",
 	journal = "Biometrics",
 	issn = "1541-0420",
-	year = "2011",
-	volume = "in press (Early View online)",
+	year = "2012",
+	volume = "68",
+	number = "2",
+	pages = "607--616",
 	doi = "10.1111/j.1541-0420.2011.01684.x",
 	textVersion = paste(
-		"Meyer, S., Elias, J. and Höhle, M. (2011).",
-		"A Space-Time Conditional Intensity Model for Invasive Meningococcal Disease Occurrence.",
-		"Biometrics, in press.",
+		"Meyer, S., Elias, J. and Höhle, M. (2012).",
+		"A space-time conditional intensity model for invasive meningococcal disease occurrence.",
+		"Biometrics, 68(2), 607-616.",
 		"doi: 10.1111/j.1541-0420.2011.01684.x")
 )
 

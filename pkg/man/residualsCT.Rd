@@ -28,6 +28,20 @@ Cox and Snell (1968).
   \item{\dots}{unused (argument of the generic).}
 }
 
+\details{
+  For objects of class \code{twinstim}, the residuals may already be
+  stored in the object as component \code{object$tau} if the model was
+  fitted with \code{cumCIF = TRUE}. In this case, the \code{residuals}
+  method just extracts these values.  Otherwise, the residuals have to
+  be calculated, which is only possible with access to the model
+  environment, i.e. \code{object} must have been fitted with
+  \code{model = TRUE}. The calulcated residuals are then also appended
+  to \code{object} for future use. However, if \code{cumCIF} and
+  \code{model} were both set to true in the \code{object} fit, then it
+  is not possible to calculate the residuals and the method returns an
+  error.
+}
+
 \value{
 Numeric vector of length the number of events of the corresponding point
 process fitted by \code{object}. This is the observed residual process.

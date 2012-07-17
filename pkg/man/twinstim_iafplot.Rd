@@ -79,11 +79,13 @@ iafplot(object, which = c("siaf", "tiaf"),
     estimates (first element) and confidence limits (second element),
     respectively. 
   }
-  \item{xlim}{
-    Vector of length two containing the x-axis limit of the plot.
-  }
-  \item{ylim}{
-    Vector of length two containing the y-axis limit of the plot.
+  \item{xlim, ylim}{
+    Vectors of length two containing the x- and y-axis limit of the
+    plot. The default y-axis ranges from 0 to 1.
+    The default x-axis ranges from 0 to the length of the
+    observation period (\code{which="tiaf"}) or the length of the
+    diagonale of the bounding box of the observation region
+    (\code{which="siaf"}), respectively.
   }
   \item{add}{
     Add to an existing plot?
@@ -97,13 +99,15 @@ iafplot(object, which = c("siaf", "tiaf"),
 }
 
 \value{
-  A plot is created -- see e.g. Fig. 5.3 in Meyer (2010). Nothing is returned.
+  A plot is created -- see e.g. Figure 3(b) in Meyer et al. (2012).
+  \code{NULL} is returned (invisibly).
 }
 
 \references{
- Meyer, S. (2010): Spatio-Temporal Infectious Disease Epidemiology based
- on Point Processes. Master Thesis, Ludwig-Maximilians-\enc{Universität}{Universitaet}
- München. Available as http://epub.ub.uni-muenchen.de/11703/
+  Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2012):
+  A space-time conditional intensity model for invasive meningococcal
+  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.
+  DOI-Link: \url{http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x}
 }
 
 \author{

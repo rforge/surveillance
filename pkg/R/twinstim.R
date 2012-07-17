@@ -4,34 +4,14 @@
 ### It uses 'nlminb' as the default optimizer (Newton-algorithm).
 ###
 ### Author: Sebastian Meyer
-### $Date: 2010-11-16 04:08:22 +0100 (Tue, 16 Nov 2010) $
+### $Date$
 ################################################################################
 
-# PARAMS:
-# endemic: formula for the exponential (Cox-like multiplicative) endemic component. may contain offsets. If ~0 there will be no endemic component in the model
-# epidemic: formula representing the epidemic model for the event-specific covariates determining infectivity. offsets are not implemented. If ~0 there will be no epidemic component in the model.
-# siaf, tiaf: spatial/temporal interaction functions. May be NULL (or missing), a list (continous function) or numeric (knots of a step function)
-# qmatrix: square indicator matrix (0/1 or TRUE/FALSE) for possible transmission between the event types. will be internally converted to logical. Defaults to the Q matrix specified in data.
-# data: epidataCS object
-# subset: logical expression indicating events to keep: missing values are taken as false. the expression is evaluated in the context of the data$events@data data.frame
-# na.action: how to deal with missing values in 'data$events'. Do not use 'na.pass'. Missing values in the spatio-temporal grid 'data$stgrid' are not accepted.
-# optim.args: NULL or an argument list passed to 'optim' containing at least the element 'par', the start values of the parameters in the order par = c(endemic, epidemic, siaf, tiaf). Note that 'optim' receives the negative log-likelihood for minimization (thus, if used, control$fnscale should be positive). Exceptionally, the 'method' argument may also be "nlminb", in which case the 'nlminb' optimizer is used. This is also the default. If 'optim.args' is NULL then no optimization will be performed but the necessary functions will be returned in a list (similar to 'model = TRUE').
-#  nCub - determines the accuracy of the cubature of the 'siaf' function. If siaf$Fcircle is specified, nCub = effRange/eps, where eps is used as pixel width and height in the two-dimensional midpoint rule (see polyCub.midpoint). Thus nCub is the desired number of subdivions of effRange in both dimensions and eps = effRange/nCub. If siaf$Fcircle is missing, nCub equals the above mentioned eps.
-# partial: logical indicating if the partial log-likelihood proposed by Diggle et al. (2009) should be used.
-# finetune: logical indicating if a second maximisation should be performed with robust Nelder-Mead optim using as starting point the resulting parameters from the first maximisation. Default to TRUE.
-# t0: events having occured during (-Inf;t0] are regarded as part of the prehistory H_0 of the process. The time point 't0' must be an element of data$stgrid$start. By default it is the earliest time point of the spatio-temporal grid of 'data'.
-# T: only use events that occured up to time T. The time point 'T' must be an element of data$stgrid$stop. By default it is the latest time point of the spatio-temporal grid of 'data'.
-# typeSpecificEndemicIntercept: Use type-specific endemic intercepts instead of the global endemic intercept?
-# model: logical. If 'TRUE' the result contains an element 'functions' with the log-likelihood function, and optionally the score function and the fisher information function. The environment of those functions equals the evaluation environment of the fitting function, i.e. it is kept in the workspace and the necessary model frames are still available when 'twinstim' has finished. This might be of interest for a posteriori evaluations of the log-likelihood, e.g. for plotting purposes.
-# cumCIF: should the cumulative ground intensities at the event times be
-# calculated and appended to the result?
-# cumCIF.pb: Should a progress bar for calculating cumCIF be shown?
 
 twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
-    data, subset, na.action = na.fail, optim.args, nCub, partial = FALSE,
-    finetune = TRUE, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
-    typeSpecificEndemicIntercept = FALSE, model = FALSE, cumCIF = TRUE,
-    cumCIF.pb = TRUE)
+    data, subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
+    na.action = na.fail, nCub, nCub.adaptive = TRUE, partial = FALSE,
+    optim.args, finetune = TRUE, model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE)
 {
 
     ####################
@@ -42,14 +22,15 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     cl <- match.call()
     partial <- as.logical(partial)
     finetune <- if (partial) FALSE else as.logical(finetune)
-    typeSpecificEndemicIntercept <- as.logical(typeSpecificEndemicIntercept)
 
     # Clean the environment when exiting the function
-    on.exit(suppressWarnings(rm(cl, cumCIF, cumCIF.pb, data, eventsData, finetune, fisherinfo, fit,
-        functions, globalEndemicIntercept, inmfe, ll, negll, loglik, mfe, mfhEvents, mfhGrid, model,
-        my.na.action, na.action, namesOptimUser, namesOptimArgs, nlminbRes, nmRes, optim.args,
-        optimValid, optimControl, partial, partialloglik, ptm, qmatrix, res, sc, negsc, score,
-        subset, typeSpecificEndemicIntercept, useScore, inherits = FALSE)))
+    on.exit(suppressWarnings(rm(cl, cumCIF, cumCIF.pb, data, eventsData,
+        finetune, fisherinfo, fit, functions, globalEndemicIntercept, inmfe, ll,
+        negll, loglik, mfe, mfhEvents, mfhGrid, model, my.na.action, na.action,
+        namesOptimUser, namesOptimArgs, nlminbRes, nmRes, optim.args, 
+        optimValid, optimControl, partial, partialloglik, ptm, qmatrix, res, sc,
+        negsc, score, subset, typeSpecificEndemicIntercept, useScore,
+        inherits = FALSE)))
 
 
     ### Verify that 'data' inherits from "epidataCS"
@@ -211,7 +192,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             determineSources(i, eventTimes, removalTimes, eventDists[i,], eps.s, eventTypes, qmatrix)
         })
         # calculate sum_{k=1}^K q_{kappa_j,k} for all j = 1:N
-        qSum <- rowSums(qmatrix)[eventTypes]   # N-vector
+        qSum <- unname(rowSums(qmatrix)[eventTypes])   # N-vector
     } else message("no epidemic component in model")
 
 
@@ -231,6 +212,14 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     }
     endemic <- terms(endemic, data = data$stgrid, keep.order = TRUE)
 
+    ## check for type-specific endemic intercept and remove it from the formula
+    ## (will be handled separately)
+    typeSpecificEndemicIntercept <- "1 | type" %in% attr(endemic, "term.labels")
+    if (typeSpecificEndemicIntercept) {
+        endemic <- update(endemic, ~ . - (1|type)) # this drops the terms attributes
+        endemic <- terms(endemic, data = data$stgrid, keep.order = TRUE)
+    }
+
     globalEndemicIntercept <- if (typeSpecificEndemicIntercept) {
             attr(endemic, "intercept") <- 1L   # we need this to ensure that we have correct contrasts
             FALSE
@@ -244,7 +233,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     mfhEvents <- model.frame(endemic, data = eventsData,
                              subset = time>t0 & time<=T & ID %in% mfe[["(ID)"]],
                              na.action = na.fail,
-                             # since R 2.10.0 patched also works with endemic = ~1 (see PR#14066)
+                             # since R 2.10.0 patched also works with
+                             # endemic = ~1 (see PR#14066)
                              drop.unused.levels = FALSE)
     mmhEvents <- model.matrix(endemic, mfhEvents)
     # exclude intercept from endemic model matrix below, will be treated separately
@@ -261,17 +251,18 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         mfhGrid <- model.frame(endemic, data = data$stgrid,
                                subset = start >= t0 & stop <= T,
                                na.action = na.fail,
-                               # since R 2.10.0 patched also works with endemic = ~1 (see PR#14066)
+                               # since R 2.10.0 patched also works with
+                               # endemic = ~1 (see PR#14066)
                                drop.unused.levels = FALSE,
                                BLOCK = BLOCK, tile = tile, dt = stop-start, ds = area)
                                # 'tile' is redundant here for fitting, but is
-                               # useful for debugging and intensityplot
+                               # useful for debugging and necessary for post. intensityplots
         gridBlocks <- mfhGrid[["(BLOCK)"]]
-        if (model) {                    # further data needed for intensityplot
-            gridTiles <- mfhGrid[["(tile)"]]
-            stgridStartsUnique <- unique(data$stgrid$start) # these are sorted
-                                        # and can be indexed by BLOCK
-        }
+        histIntervals <- unique(data$stgrid[c("BLOCK", "start", "stop")]) # sorted
+        rownames(histIntervals) <- NULL
+        histIntervals <- histIntervals[histIntervals$start >= t0 &
+                                       histIntervals$stop <= T,]
+        gridTiles <- mfhGrid[["(tile)"]] # only needed for intensityplot
         mmhGrid <- model.matrix(endemic, mfhGrid)
 
         # exclude intercept from endemic model matrix below, will be treated separately
@@ -318,22 +309,44 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         ### over the influence regions of the events
         .siafInt <-
             if (constantsiaf) {
+                nCub.adaptive <- FALSE
                 function (siafpars) iRareas
-            } else if (is.null(siaf$Fcircle)) { # if siaf$Fcircle is not available
+            } else if (is.null(siaf$Fcircle)) { # if siaf$Fcircle not available
+                nCub.adaptive <- FALSE
                 function (siafpars) {
                     siafInts <- sapply(1:N, function (i) {
-                        polyCub.midpoint(influenceRegion[[i]], siaf$f, siafpars, eventTypes[i], eps = nCub)
+                        polyCub.midpoint(influenceRegion[[i]], siaf$f,
+                                         siafpars, eventTypes[i], eps = nCub)
                     })
                     siafInts
                 }
-            } else { # fast integration over circular domains !
+            } else if (is.null(siaf$effRange)) { # use Fcircle but only delta-trick
+                nCub.adaptive <- FALSE
                 function (siafpars) {
+                    ## Compute the integral of 'siaf' over each influence region
+                    siafInts <- numeric(N)
+                    for(i in 1:N) {
+                        eps <- eps.s[i]
+                        bdisti <- bdist[i]
+                        siafInts[i] <- if (eps <= bdisti) {
+                                ## influence region is completely inside W
+                                siaf$Fcircle(eps, siafpars, eventTypes[i])
+                            } else {
+                                ## numerically integrate over polygonal influence region
+                                polyCub.midpoint(influenceRegion[[i]], siaf$f,
+                                    siafpars, eventTypes[i], eps = nCub)
+                            }
+                    }
+                    siafInts
+                }
+            } else { # fast integration over circular domains !
+                .ret <- function (siafpars) {
                     # Compute computationally effective range of the 'siaf' function
                     # for the current 'siafpars' for each event (type)
                     effRangeTypes <- rep(siaf$effRange(siafpars),length.out=nTypes)
                     effRanges <- effRangeTypes[eventTypes]   # N-vector
                     # automatic choice of h (pixel spacing in image)
-                    hs <- effRanges / nCub   # could e.g. equal sigma
+                    hs <- effRanges / nCub
                     # Compute the integral of 'siaf' over each influence region
                     siafInts <- numeric(N)
                     for(i in 1:N) {
@@ -354,11 +367,17 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                     }
                     siafInts
                 }
+                if (!nCub.adaptive) {
+                    body(.ret)[[grep("^hs <-", body(.ret))]] <-
+                        quote(hs <- rep(nCub, length.out = N))
+                }
+                .ret
             }
+        suppressWarnings(rm(.ret))
 
         ### Check nCub
         if (!constantsiaf) {
-            nCub <- as.integer(nCub)
+            stopifnot(is.vector(nCub, mode="numeric"))
             if (any(nCub <= 0L)) {
                 stop("'nCub' must be positive")
             }
@@ -437,9 +456,9 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             expression(
                 subtimeidx <- if (!is.null(uppert) && isScalar(uppert) && t0 <= uppert && uppert < T) {
                     if (uppert == t0) return(0)
-                    idx <- match(TRUE, data$stgrid$stop >= uppert)
-                    firstBlockBeyondUpper <- data$stgrid$BLOCK[idx]
-                    newdt <- uppert - data$stgrid$start[idx]
+                    idx <- match(TRUE, histIntervals$stop >= uppert)
+                    firstBlockBeyondUpper <- histIntervals$BLOCK[idx]
+                    newdt <- uppert - histIntervals$start[idx]
                     dt[gridBlocks == firstBlockBeyondUpper] <- newdt
                     gridBlocks <= firstBlockBeyondUpper
                 } else NULL
@@ -484,28 +503,35 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     }
 
 
-    ### Calculates the two components of the integrated intensity function over [0;uppert] x W x K
+    ### Calculates the two components of the integrated intensity function
+    ### over [0;uppert] x W x K
 
-    heIntTWK <- function (beta0, beta, gammapred, siafpars, tiafpars, uppert = NULL) {}
+    heIntTWK <- function (beta0, beta, gammapred, siafpars, tiafpars,
+                          uppert = NULL) {}
     body(heIntTWK) <- as.call(c(as.name("{"),
         if (hash) { # endemic component
             expression({
                 hIntTW <- .hIntTW(beta, uppert = uppert)
-                fact <- if (nbeta0 > 1L) sum(exp(beta0)) else if (nbeta0 == 1L) nTypes*exp(unname(beta0)) else nTypes
+                .beta0 <- rep(if (nbeta0==0L) 0 else beta0, length.out = nTypes)
+                fact <- sum(exp(.beta0))
                 hInt <- fact * hIntTW
             })
         } else { expression(hInt <- 0) },
         if (hase) { # epidemic component
             expression({
                 siafInt <- .siafInt(siafpars) # N-vector
-                subtimeidx <- if (!is.null(uppert) && isScalar(uppert) && t0 <= uppert && uppert < T) {
+                subtimeidx <- if (!is.null(uppert) && isScalar(uppert) &&
+                                  t0 <= uppert && uppert < T) {
                     gIntUpper <- pmin(uppert-eventTimes, eps.t)
                     eventTimes < uppert
                 } else rep.int(TRUE, N)
-                tiafIntUpper <- tiaf$G(gIntUpper[subtimeidx], tiafpars, eventTypes[subtimeidx])
-                tiafIntLower <- tiaf$G(gIntLower[subtimeidx], tiafpars, eventTypes[subtimeidx])
+                tiafIntUpper <- tiaf$G(gIntUpper[subtimeidx], tiafpars,
+                                       eventTypes[subtimeidx])
+                tiafIntLower <- tiaf$G(gIntLower[subtimeidx], tiafpars,
+                                       eventTypes[subtimeidx])
                 tiafInt <- tiafIntUpper - tiafIntLower
-                eInt <- sum(qSum[subtimeidx] * gammapred[subtimeidx] * siafInt[subtimeidx] * tiafInt)
+                eInt <- sum(qSum[subtimeidx] * gammapred[subtimeidx] *
+                            siafInt[subtimeidx] * tiafInt)
             })
         } else expression(eInt <- 0),
         expression(c(hInt, eInt))
@@ -624,7 +650,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             score_siafpars <- if (hassiafpars) local({
                 nom <- .eEvents(gammapred, siafpars, tiafpars, ncolsRes=nsiafpars, f=siaf$deriv)  # Ninxnsiafpars matrix
                 sEventsSum <- colSums(nom / lambdaEvents)
-                epsTypes <- if (!is.null(siaf$effRange)) {
+                epsTypes <- if (nCub.adaptive) {
                         siaf$effRange(siafpars) / nCub
                     } else {
                         2 * min(eps.s) / spatstat::spatstat.options("npixel")
@@ -915,21 +941,32 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     print(optimArgs$par)
     if (hassiafpars && !is.null(siaf$Fcircle)) {
         .maxnpixels <- local({
-            initsiaf <- optimArgs$par[grep("^e\\.siaf", names(optimArgs$par))]
-            initeffRangeTypes <- rep(siaf$effRange(initsiaf),length.out=nTypes)
-            initeffRanges <- initeffRangeTypes[eventTypes]
-            border <- which(eps.s > bdist & initeffRanges > bdist)
-            if (length(border) > 0L) {
-                maxarea <- spatstat::bounding.box(influenceRegion[border][[which.max(iRareas[border])]])
-                inithmin <- min(initeffRangeTypes) / nCub
-                ceiling(c(diff(maxarea$xrange), diff(maxarea$yrange)) / inithmin)
-            } else NULL
+            if (nCub.adaptive) {
+                initsiaf <- optimArgs$par[grep("^e\\.siaf", names(optimArgs$par))]
+                initeffRangeTypes <- rep(siaf$effRange(initsiaf),length.out=nTypes)
+                initeffRanges <- initeffRangeTypes[eventTypes]
+                border <- which(eps.s > bdist & initeffRanges > bdist) # here we integrate
+                if (length(border) > 0L) {
+                    maxarea <- spatstat::bounding.box(influenceRegion[border][[which.max(iRareas[border])]])
+                    inithmin <- min(initeffRangeTypes) / nCub
+                    ceiling(c(diff(maxarea$xrange), diff(maxarea$yrange)) / inithmin)
+                } else NULL
+            } else {
+                border <- which(eps.s > bdist) # for these events we must integrate
+                if (length(border) > 0L) {
+                    maxarea <- spatstat::bounding.box(influenceRegion[border][[which.max(iRareas[border])]])
+                    ceiling(c(diff(maxarea$xrange), diff(maxarea$yrange)) / nCub)
+                } else NULL
+            }
         })
         if (!is.null(.maxnpixels) && prod(.maxnpixels) > 10000) {
             cat("\nNOTE: the initial values of the 'e.siaf' parameters potentially require up to",
                 "\n     ", .maxnpixels[1], "x", .maxnpixels[2], "pixels for the midpoint cubature.",
                 "If iterations are slow,",
-                "\n      consider other values increasing 'eps=siaf$effRange(siafpars)/nCub'.\n\n")
+                "\n      consider increasing",
+                if (nCub.adaptive) {
+                    "'eps = siaf$effRange(siafpars) / nCub'."
+                } else "'nCub'.", "\n\n")
         }
     }
     optimRes1 <- if (optimMethod == "nlminb") {
@@ -1004,11 +1041,14 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
     ### Set up list object to be returned
 
-    fit <- list( coefficients = optimRes$par,
-        loglik = structure(optimRes$value, partial = partial),
-        counts = optimRes1$counts + if (finetune) optimRes$counts else 0L,
-        method = optimRes$method, #added by hoehle 07.04.2011
-        converged = (optimRes$convergence == 0) )
+    fit <- list(
+           coefficients = optimRes$par,
+           loglik = structure(optimRes$value, partial = partial),
+           counts = optimRes1$counts + if (finetune) optimRes$counts else 0L,
+           method = optimMethod, nCub = nCub, nCub.adaptive = nCub.adaptive,
+           ## nCub and nCub.adaptive are queried for default eps in R0.twinstim
+           converged = (optimRes$convergence == 0)
+           )
 
 
     ### Add Fisher information matrices
@@ -1025,62 +1065,93 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     ### Add fitted intensity values and integrated intensities at events
 
     # final coefficients
-    theta   <- fit$coefficients
-    beta0   <- theta[seq_len(nbeta0)]
-    beta    <- theta[nbeta0+seq_len(p)]
+    theta    <- fit$coefficients
+    beta0    <- theta[seq_len(nbeta0)]
+    beta     <- theta[nbeta0+seq_len(p)]
     gamma    <- theta[nbeta0+p+seq_len(q)]
     siafpars <- theta[nbeta0+p+q+seq_len(nsiafpars)]
     tiafpars <- theta[nbeta0+p+q+nsiafpars+seq_len(ntiafpars)]
 
+    # final siaf and tiaf integrals over influence regions / periods
+    # and final gammapred (also used by intensity.twinstim)
+    if (hase) {
+        gammapred <- drop(exp(mme %*% gamma)) # N-vector
+        siafInt <- .siafInt(siafpars)
+        tiafInt <- local({
+            tiafIntUpper <- tiaf$G(gIntUpper, tiafpars, eventTypes)
+            tiafIntLower <- tiaf$G(gIntLower, tiafpars, eventTypes)
+            tiafIntUpper - tiafIntLower
+        })
+    }
+    
     # fitted intensities
     hEvents <- if (hash) .hEvents(unname(beta0), beta) else rep.int(0, Nin)
     eEvents <- if (hase) {
-            gammapred <- drop(exp(mme %*% gamma)) # N-vector
             .eEvents(gammapred, siafpars, tiafpars) # Nin-vector! (only 'includes' here)
         } else rep.int(0, Nin)
     fit$fitted <- hEvents + eEvents   # = lambdaEvents  # Nin-vector
     fit$fittedComponents <- cbind(h = hEvents, e = eEvents)
     rm(hEvents, eEvents)
-
-    # cumulative intensities at event times
-    fit$tau <- if (cumCIF) {
-        cat("\nCalculating the fitted cumulative intensities at events...\n")
+    
+    # calculate cumulative ground intensities at event times
+    LambdagEvents <- function (cumCIF.pb = TRUE)
+    {
         if (hase) {
-            # tiny hack such that siaf integrals are not evaluated N-fold
-            siafIntsFinal <- .siafInt(siafpars)
+            ## tiny hack such that siaf integrals are not evaluated N-fold
             .siafInt.orig <- .siafInt
-            .siafInt <- function (siafpars) siafIntsFinal
+            .siafInt <<- function (siafpars) siafInt
         }
-        heIntEvents <- matrix(NA_real_, N, 2L)
-        if (cumCIF.pb) pb <- txtProgressBar(min=0, max=N, initial=0, style=3)
-        for (i in 1:N) {
-            heIntEvents[i,] <- heIntTWK(beta0, beta, gammapred, siafpars, tiafpars, uppert = eventTimes[i])
+        heIntEvents <- matrix(NA_real_, Nin, 2L)
+        if (cumCIF.pb) pb <- txtProgressBar(min=0, max=Nin, initial=0, style=3)
+        for (i in 1:Nin) {
+            heIntEvents[i,] <- heIntTWK(beta0, beta, gammapred, siafpars,
+                                        tiafpars, uppert = eventTimes[includes[i]])
             if (cumCIF.pb) setTxtProgressBar(pb, i)
         }
         if (cumCIF.pb) close(pb)
-        if (hase) .siafInt <- .siafInt.orig
-        LambdaEvents <- rowSums(heIntEvents)
-        names(LambdaEvents) <- mfe[["(ID)"]]
-        LambdaEvents
-    } else NULL
-    suppressWarnings(rm(.siafInt.orig, i, pb, heIntEvents, LambdaEvents))
+        if (hase) .siafInt <<- .siafInt.orig
+        LambdagEvents <- rowSums(heIntEvents)
+        names(LambdagEvents) <- rownames(mmhEvents) # this is NULL if only h.intercept
+                                                    # (cf. bug report #14992)
+        if (is.null(names(LambdagEvents))) names(LambdagEvents) <- rownames(mme)
+        LambdagEvents
+    }
+    if (cumCIF) {
+        cat("\nCalculating the fitted cumulative intensities at events...\n")
+        fit$tau <- LambdagEvents(cumCIF.pb)
+    }
 
+    # calculate observed R0's: mu_j = spatio-temporal integral of e_j(t,s) over
+    # the observation domain (t0;T] x W (not whole R+ x R^2)
+    fit$R0 <- if (hase) qSum * gammapred * siafInt * tiafInt else rep.int(0, N)
+    names(fit$R0) <- rownames(mfe)
 
+    
     ### Append model information
 
     fit$npars <- c(nbeta0 = nbeta0, p = p,
                    q = q, nsiafpars = nsiafpars, ntiafpars = ntiafpars)
     fit$qmatrix <- qmatrix   # -> information about nTypes and typeNames
-    fit$timeRange <- c(t0, T)    # -> for simulate.twinstim's defaults
-    fit$medianeps <- c(spatial = median(mfe[["(eps.s)"]]), temporal = median(mfe[["(eps.t)"]]))
+    fit$bbox <- sp::bbox(data$W)        # for completeness and for iafplot
+    fit$timeRange <- c(t0, T)           # for simulate.twinstim's defaults
+    ## fit$medianeps <- c(spatial = median(mfe[["(eps.s)"]]),
+    ##                    temporal = median(mfe[["(eps.t)"]]))
     if (!model) {
-        # Link formulae to the global environment such that the evaluation environment will be dropped at the end
+        # Link formulae to the global environment such that the evaluation
+        # environment will be dropped at the end
         environment(epidemic) <- environment(endemic) <- globalenv()
     }
-    fit$formula <- list(endemic = formula(endemic), epidemic = formula(epidemic),
-                        siaf = siaf, tiaf = tiaf)
+    # if typeSpecificEndemicIntercept, re-add this to the endemic formula
+    fit$formula <- list(
+                   endemic = if (typeSpecificEndemicIntercept) {
+                       update(formula(endemic), ~ (1|type) + .)
+                   } else formula(endemic),
+                   epidemic = formula(epidemic),
+                   siaf = siaf, tiaf = tiaf
+                   )
     if (model) {
         fit$functions <- functions
+        environment(fit) <- environment()
     }
 
     ### Return object of class "twinstim"

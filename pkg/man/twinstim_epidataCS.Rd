@@ -144,9 +144,9 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   The \code{marks.epidataCS} method (of the generic function
   \code{\link[spatstat]{marks}} defined by the package \pkg{spatstat})
   returns a \code{data.frame} of the event marks (actually also
-  including time and location of the events), disregarding the auxiliary
-  columns from the \code{events} component of the \code{"epidataCS"}
-  object.
+  including time and location of the events), disregarding endemic
+  covariates and the auxiliary columns from the \code{events} component
+  of the \code{"epidataCS"} object.
 
   The \code{print} method for \code{"epidataCS"} prints some metadata
   of the epidemic, e.g., the observation period, the dimensions of the
@@ -185,14 +185,16 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 }
 
 \references{
-  S. Meyer, J. Elias and M. Höhle (2010): A space-time conditional
-  intensity model for infectious disease occurence, Department of
-  Statistics: Technical Reports, No. 95, 27 pages, 2010.
-  Available as http://epub.ub.uni-muenchen.de/11898/
-  
-  Meyer, S. (2010): Spatio-Temporal Infectious Disease Epidemiology based
-  on Point Processes. Master Thesis, Ludwig-Maximilians-\enc{Universität}{Universitaet} München.
-  Available as http://epub.ub.uni-muenchen.de/11703/
+  Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2012):
+  A space-time conditional intensity model for invasive meningococcal
+  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.
+  DOI-Link: \url{http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x}
+
+  Meyer, S. (2010):
+  Spatio-Temporal Infectious Disease Epidemiology based on Point Processes.
+  Master's Thesis, Ludwig-Maximilians-Universit\enc{ä}{ae}t
+  M\enc{ü}{ue}nchen.
+  Available as \url{http://epub.ub.uni-muenchen.de/11703/}
 }
 
 \author{

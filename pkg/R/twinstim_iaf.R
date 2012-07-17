@@ -410,29 +410,27 @@ checksiaf <- function (f, deriv, Fcircle, effRange, simulate, npars, validpars, 
     haspars <- npars > 0L
     if (!haspars || missing(deriv)) deriv <- NULL
     if (!is.null(deriv)) deriv <- .checknargs3(deriv, "siaf$deriv")
-    if (missing(Fcircle)) Fcircle <- NULL
-    if (is.null(Fcircle) || missing(effRange)) effRange <- NULL
-    if (!is.null(Fcircle)) {
-        Fcircle <- .checknargs3(Fcircle, "siaf$Fcircle")
+    if (missing(Fcircle) || is.null(Fcircle)) {
+        Fcircle <- NULL
+        effRange <- NULL
+    }
+    if (!is.null(Fcircle)) Fcircle <- .checknargs3(Fcircle, "siaf$Fcircle")
+    if (missing(effRange)) effRange <- NULL
+    if (!is.null(effRange)) {
         effRange <- match.fun(effRange)
-      }
-    if (!is.null(effRange) && length(formals(effRange)) < 1L) {
-        stop("the 'siaf$effRange' function must accept a parameter vector")
+        if (length(formals(effRange)) < 1L) {
+            stop("the 'siaf$effRange' function must accept a parameter vector")
+        }
     }
-    #Check if simulation function has proper format
+    ## Check if simulation function has proper format
     if (missing(simulate)) simulate <- NULL
-    if (!is.null(simulate)) {
-      simulate <- .checknargs3(simulate, "siaf$simulate")
-      ## if (length(formals(simulate)) < 3L) {
-      ##   stop("the 'siaf$simulate' function must accept three arguments")
-      ## }
-    }
-    #Check if the validpars are of correct form
+    if (!is.null(simulate)) simulate <- .checknargs3(simulate, "siaf$simulate")
+    ## Check if the validpars are of correct form
     validpars <- if (!haspars) NULL else if (missing(validpars) || is.null(validpars)) {
-      as.function(alist(pars=, TRUE), envir = parent.frame(3))
+        as.function(alist(pars=, TRUE), envir = parent.frame(3))
     } else match.fun(validpars)
     .checkiaf0(f, npars, validpars, "siaf")
-    #Done, return result.
+    ## Done, return result.
     list(f = f, deriv = deriv, Fcircle = Fcircle, effRange = effRange,
          simulate = simulate, npars = npars, validpars = validpars)
 }
