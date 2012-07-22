@@ -38,7 +38,7 @@ polyCub.midpoint <- function (polyregion, f, ..., eps = NULL, dimyx = NULL, plot
 {
     # as.im needs seperate x and y arguments
     fxy <- function (x, y, ...) f(cbind(x,y), ...)
-    
+
     # calculate pixel values of fxy
 # hoehle - 10 Apr 2011 - problem in new spatstat, if eps too large the
 # try does not work anymore and the function interrupts. Hence, a crude
@@ -48,14 +48,19 @@ polyCub.midpoint <- function (polyregion, f, ..., eps = NULL, dimyx = NULL, plot
 # sebastian - 23 Apr 2012 - these hidden limits are dangerous
 # and i cannot observe any problem with spatstat here.
 # so we just let the function do its work... (fingers crossed)
-    IM <- try(spatstat::as.im.function(X = fxy, W = polyregion, ..., eps = eps, dimyx = dimyx), silent = TRUE)
+    IM <- tryCatch(
+          spatstat::as.im.function(X = fxy, W = polyregion, ...,
+                                   eps = eps, dimyx = dimyx),
+          error = function (e) {
+              ## if eps was to small such that the dimensions of the image would
+              ## be too big then the operation matrix(TRUE, nr, nc) throws an
+              ## error. (try e.g. devnull <- matrix(TRUE, 1e6,1e6))
+              ## unfortunately, it is not clear what we should do in this
+              ## case... => stop
+              stop("inapplicable choice of bandwidth (eps=", format(eps),
+                   ") in midpoint rule:\n", e)
+          })
     
-    # if eps was to small such that the dimensions of the image would be too big
-    # then the operation matrix(TRUE, nr, nc) throws an error. (try e.g. devnull <- matrix(TRUE, 1e6,1e6))
-    # unfortunately, it is not clear what we should do in this case... => stop
-    if (inherits(IM, "try-error")) {
-        stop("inapplicable choice of bandwidth (eps) in midpoint rule:\n", IM)
-    }
     
 ### ILLUSTRATION ###
 if (plot) {

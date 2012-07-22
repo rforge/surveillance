@@ -6,6 +6,7 @@
 \alias{head.epidataCS}
 \alias{tail.epidataCS}
 \alias{[.epidataCS}
+\alias{subset.epidataCS}
 \alias{marks}              % to make R CMD check happy (the generic
                            % marks is imported from spatstat and then
                            % exported (unchanged) -> documentation required)
@@ -37,6 +38,7 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 \method{head}{epidataCS}(x, n = 6L, ...)
 \method{tail}{epidataCS}(x, n = 6L, ...)
 \method{[}{epidataCS}(x, i, j, drop = FALSE)
+\method{subset}{epidataCS}(x, subset, select, drop = FALSE, ...)
 
 \method{marks}{epidataCS}(x, ...)
 
@@ -115,16 +117,19 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   }
   \item{digits}{minimum number of significant digits to be printed in
     values.}
-  \item{drop, \dots}{unused (arguments of the generics).
-  However, the \code{print} method for class \code{"epidataCS"} passes
-  \dots to the \code{\link{print.data.frame}} method.}
   \item{i,j}{
     arguments passed to the
     \code{\link[=[,SpatialPointsDataFrame-method]{[-method}} for
-    \code{SpatialPointDataFrame}s for subsetting the \code{events}.
+    \code{SpatialPointDataFrame}s for subsetting the \code{events} (not
+    \code{stgrid} or \code{W}).
     Only epidemic covariates can be removed from \code{events} by the
     \code{j} index. The other components of \code{x} (\code{stgrid},
     \ldots) are retained.}
+  \item{drop, \dots}{unused (arguments of the generics).
+    However, the \code{print} method for class \code{"epidataCS"} passes
+    \dots to the \code{\link{print.data.frame}} method.}
+  \item{subset, select}{arguments used to subset the \code{events} from
+    an \code{"epidataCS"} object like in \code{\link{subset.data.frame}}.}
   \item{object}{an object of class \code{"epidataCS"}.}
 }
 
@@ -139,7 +144,9 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   \code{n} events. The extraction method for class \code{"epidataCS"}
   ensures that the subsetted object will be valid, for instance, it
   updates the auxiliary list of potential transmission paths stored
-  in the object.
+  in the object. This \code{[}-method is also the basis for the
+  \code{subset.epidataCS}-method, which is implemented similar to the
+  \code{\link{subset.data.frame}}-method.
   
   The \code{marks.epidataCS} method (of the generic function
   \code{\link[spatstat]{marks}} defined by the package \pkg{spatstat})

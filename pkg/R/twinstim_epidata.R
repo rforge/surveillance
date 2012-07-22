@@ -426,12 +426,12 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
     }
 
     # Check nCircle2Poly
-    if (missing(nCircle2Poly)) {
-        nCircle2Poly <- attr(object$events$.influenceRegion, "nCircle2Poly")
+    nCircle2Poly <- if (missing(nCircle2Poly)) {
+        attr(object$events$.influenceRegion, "nCircle2Poly")
     } else {
         stopifnot(isScalar(nCircle2Poly))
-        nCircle2Poly <- as.integer(nCircle2Poly)
-        ir2update <- rep(TRUE, nEvents)
+        ir2update <- rep.int(TRUE, nEvents)
+        as.integer(nCircle2Poly)
     }
 
     # Update influenceRegions of events
@@ -469,10 +469,20 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
 
 "[.epidataCS" <- function (x, i, j, drop = FALSE)
 {
+    ## Store nCircle2Poly attribute of x$events$.influenceRegion since this will
+    ## be dropped when subsetting
+    nCircle2Poly <- attr(x$events$.influenceRegion, "nCircle2Poly")
+
+    ## apply [,SpatialPointsDataFrame-method
     cl <- sys.call()
     cl[[1]] <- as.name("[")
     cl[[2]] <- substitute(x$events)
-    x$events <- eval(cl, envir=parent.frame()) # use [,SpatialPointsDataFrame-method
+    x$events <- eval(cl, envir=parent.frame())
+
+    ## restore nCircle2Poly attribute
+    attr(x$events$.influenceRegion, "nCircle2Poly") <- nCircle2Poly
+    
+    ## assure valid epidataCS after subsetting
     if (!missing(j)) {                # only epidemic covariates may be selected
         BLOCKstartEndemicVars <- setdiff(names(x$stgrid),
             setdiff(obligColsNames_stgrid,"start"))
@@ -495,7 +505,35 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
             x$qmatrix <- x$qmatrix[typesIdx, typesIdx, drop = FALSE]
         }
     }
+
+    ## Done
     return(x)
+}
+
+
+## subset method is copied from base::subset.data.frame with slight
+## modifications only
+## FIXME: when the bug in sp::subset.Spatial discovered in sp version 0.9-99
+## has been removed we can embed this method
+subset.epidataCS <- function (x, subset, select, drop = FALSE, ...)
+{
+    if (missing(subset)) 
+        r <- TRUE
+    else {
+        e <- substitute(subset)
+        r <- eval(e, x$events@data, parent.frame()) # HERE IS A MOD
+        if (!is.logical(r)) 
+            stop("'subset' must evaluate to logical")
+        r <- r & !is.na(r)
+    }
+    if (missing(select)) 
+        vars <- TRUE
+    else {
+        nl <- as.list(seq_along(x$events@data)) # HERE IS A MOD
+        names(nl) <- names(x$events@data)       # HERE IS A MOD
+        vars <- eval(substitute(select), nl, parent.frame())
+    }
+    x[r, vars, drop = drop]       # this calls the [.epidataCS-method from above
 }
 
 

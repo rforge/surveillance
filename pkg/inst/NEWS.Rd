@@ -23,27 +23,45 @@
       \item Methods for cubature over polygonal domains can now also visualize what
             they do.  There is also a new quasi-exact method for cubature of the
             bivariate normal density over polygonal domains.  The
-	    function \code{polyCub()} is a wrapper for the different methods.
+	    function \code{polyCub()} is a wrapper for the different
+	    methods.
+      \item \code{residuals.twinstim()} and \code{residuals.twinSIR()}:
+	    extract the \dQuote{residual process}, see \cite{Ogata
+            (1988)}. The residuals of \code{"twinSIR"} and
+            \code{"twinstim"} models may be checked graphically by the new 
+            function \code{checkResidualProcess()}.
+      \item Many new features for the \code{"twinstim"} class of
+            self-exciting spatio-temporal point process models (see
+	    below).
     }
   }
-  \subsection{New methods for working with \code{"twinstim"} models}{
+  \subsection{NEW FEATURES AND SIGNIFICANT CHANGES FOR \code{"twinstim"}}{
     \itemize{
-      \item New predefined spatial kernel: the Lomax power law kernel \code{siaf.lomax()}
-      \item \code{as.epidataCS()} now auto-generates the stop-column if this is missing
-      \item \code{print}-method for class \code{"summary.epidataCS"}
-      \item \code{[}-method for \code{"epidataCS"} (subsetting \code{...$events})
-      \item \code{plot}-method for \code{"epidataCS"}
+      \item Modified arguments of \code{twinstim()}: new ordering, new
+            argument \code{nCub.adaptive}, removed argument
+	    \code{typeSpecificEndemicIntercept} (which is now specified as part of
+	    the \code{endemic} formula as \code{(1|type)}).
+      \item Completely rewrote the \code{R0}-method (calculate \dQuote{trimmed} and
+            \dQuote{untrimmed} \eqn{R_0} values)
+      \item The \dQuote{trimmed} \code{R0} values are now part of the
+            result of the model fit, as well as \code{bbox(W)}. The
+	    model evaluation environment is now set as attribute of the
+	    result if \code{model=TRUE}.
+      \item New predefined spatial kernel: the Lomax power law kernel
+            \code{siaf.lomax()}
       \item \code{plot}-methods for \code{"twinstim"}
             (\code{intensityplot()} and \code{iafplot()})
-      \item \code{residuals.twinstim()} and \code{residuals.twinSIR()}:
-	    extract the \dQuote{residual process}, see \cite{Ogata (1988)}
-      \item graphical \code{checkResidualProcess} (also works for fitted
-            \code{"twinSIR"} models)
+      \item \code{as.epidataCS()} now auto-generates the stop-column if this is missing
+      \item \code{print}-method for class \code{"summary.epidataCS"}
+      \item \code{[}- and subset-method for \code{"epidataCS"}
+            (subsetting \code{...$events})
+      \item \code{plot}-method for \code{"epidataCS"}
     }
   }
   \subsection{MINOR CHANGES}{
     \itemize{
       \item Improved documentation for the new functionalities.
+      \item Updated references.
       \item \code{twinSIR}'s \code{intensityPlot} is now a method of the
             new S3-generic function \code{intensityplot}.
     }
@@ -95,8 +113,8 @@
       to the coordinates method when plotting the map slot.
     \item Minor proof-reading of the documentation.
     \item Added an argument \code{"extraMSMargs"} to the algo.hmm function.
-    \item Fixed bug in outbreakP when having observations equal to zero
-      in the beginning. Here, \\hat\{\\mu\}^\{C1\} in (5) of Frisen et al (2008)
+    \item Fixed bug in \code{outbreakP()} when having observations equal to zero
+      in the beginning. Here, \eqn{\hat{\mu}^{C1}} in (5) of \cite{Frisen et al (2008)}
       is zero and hence the log-based summation in the code failed.
       Changed to product as in the original code, which however might be
       less numerically stable.
@@ -107,7 +125,7 @@
 
 \section{Changes in surveillance version 1.2-1 (2010-06-10)}{
   \itemize{
-    \item Added algo.outbreakP (Frisen & Andersson, 2009) providing a
+    \item Added \code{algo.outbreakP()} (\cite{Frisen & Andersson, 2009}) providing a
       semiparametric approach for outbreak detection for Poisson
       distributed variables.
     \item Added a pure \R function for extracting ISO week and year from Date
@@ -116,9 +134,9 @@
       as this is not implemented for \code{"format.Date"} on Windows.
       Thanks to Ashley Ford,  University of Warwick, UK for identifying
       this Windows specific bug.
-    \item For algo.farrington a faster fit routine \code{"algo.farrington.fitGLM.fast"}
+    \item For \code{algo.farrington()} a faster fit routine \code{"algo.farrington.fitGLM.fast"}
       has been provided by Mikko Virtanen, National Institute for Health
-      and Welfare, Finland. The new function calls glm.fit
+      and Welfare, Finland. The new function calls \code{glm.fit()}
       directly, which gives a doubling of speed for long series. However, if one
       wants to process the fitted model output some of the GLM routines might
       not work on this output. For backwards compability the argument
@@ -129,9 +147,10 @@
 
 \section{Changes in surveillance version 1.1-6 (2010-05-25)}{
   \itemize{
-    \item a few minor bug fixes
-    \item small improvements on the twins function by Daniel Sabanes Bove
-      fixing the segmentation fault issue of the function on Ubuntu.
+    \item A few minor bug fixes
+    \item Small improvements in the C-implementation of the \code{twins()}
+      function by Daniel Sabanés Bové fixing the segmentation fault
+      issue on 64-bit architectures. 
   }
 }
 

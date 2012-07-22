@@ -23,6 +23,17 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     partial <- as.logical(partial)
     finetune <- if (partial) FALSE else as.logical(finetune)
 
+    ## # Collect polyCub.midpoint warnings (and apply unique on them at the end)
+    ## .POLYCUB.WARNINGS <- NULL
+    ## .polyCub <- function (...) {
+    ##     int <- withCallingHandlers(
+    ##            polyCub.midpoint(...),
+    ##            warning = function (w) {
+    ##                .POLYCUB.WARNINGS <<- c(.POLYCUB.WARNINGS, list(w))
+    ##                invokeRestart("muffleWarning")
+    ##            })
+    ## }
+    
     # Clean the environment when exiting the function
     on.exit(suppressWarnings(rm(cl, cumCIF, cumCIF.pb, data, eventsData,
         finetune, fisherinfo, fit, functions, globalEndemicIntercept, inmfe, ll,
@@ -297,12 +308,18 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
         ### Spatially constant interaction siaf(s) = 1
         constantsiaf <- is.null(siaf) || attr(siaf, "constant")
-        if (constantsiaf) siaf <- siaf.constant()
+        if (constantsiaf) {
+            message("assuming constant spatial interaction 'siaf.constant()'")
+            siaf <- siaf.constant()
+        }
         nsiafpars <- siaf$npars
 
         ### Temporally constant interaction tiaf(t) = 1
         constanttiaf <- is.null(tiaf) || attr(tiaf, "constant")
-        if (constanttiaf) tiaf <- tiaf.constant()
+        if (constanttiaf) {
+            message("assuming constant temporal interaction 'tiaf.constant()'")
+            tiaf <- tiaf.constant()
+        }
         ntiafpars <- tiaf$npars
 
         ### Define function that integrates the two-dimensional 'siaf' function
@@ -311,7 +328,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             if (constantsiaf) {
                 nCub.adaptive <- FALSE
                 function (siafpars) iRareas
-            } else if (is.null(siaf$Fcircle)) { # if siaf$Fcircle not available
+            } else if (is.null(siaf$Fcircle) || # if siaf$Fcircle not available
+                       (is.null(siaf$effRange) && all(eps.s > bdist))) {
                 nCub.adaptive <- FALSE
                 function (siafpars) {
                     siafInts <- sapply(1:N, function (i) {
@@ -334,7 +352,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                             } else {
                                 ## numerically integrate over polygonal influence region
                                 polyCub.midpoint(influenceRegion[[i]], siaf$f,
-                                    siafpars, eventTypes[i], eps = nCub)
+                                                 siafpars, eventTypes[i], eps = nCub)
                             }
                     }
                     siafInts
@@ -362,7 +380,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                             } else {
                                 # integrate over polygonal influence region
                                 polyCub.midpoint(influenceRegion[[i]], siaf$f,
-                                    siafpars, eventTypes[i], eps = hs[i])
+                                                 siafpars, eventTypes[i], eps = hs[i])
                             }
                     }
                     siafInts
@@ -652,14 +670,14 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 sEventsSum <- colSums(nom / lambdaEvents)
                 epsTypes <- if (nCub.adaptive) {
                         siaf$effRange(siafpars) / nCub
-                    } else {
-                        2 * min(eps.s) / spatstat::spatstat.options("npixel")
-                    }
+                    } else nCub
+                        ## 2 * min(eps.s) / spatstat::spatstat.options("npixel")
+                        ## ## this does not work with eps.s = Inf
                 epsTypes <- rep(epsTypes, length.out = nTypes)
                 derivInt <- sapply(1:nsiafpars, function (paridx) {
                     sapply(1:N, function (i) {
                         polyCub.midpoint(influenceRegion[[i]], function (s) {
-                        siaf$deriv(s, siafpars, eventTypes[i])[,paridx,drop=TRUE]
+                            siaf$deriv(s, siafpars, eventTypes[i])[,paridx,drop=TRUE]
                         }, eps = epsTypes[eventTypes[i]])
                     })
                 })  # Nxnsiafpars matrix
@@ -972,7 +990,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     optimRes1 <- if (optimMethod == "nlminb") {
             nlminbControl <- optimArgs$control[c("maxit","REPORT","abstol","reltol")]
             names(nlminbControl) <- c("iter.max", "trace", "abs.tol", "rel.tol")
-            if (optimArgs$control$trace == 0L) nlminbControl$trace <- 0L else {
+            if (optimArgs$control$trace == 0L) nlminbControl$trace <- 0L
+            if (nlminbControl$trace > 0L) {
                 cat("negative log-likelihood and parameters ")
                 if (nlminbControl$trace == 1L) cat("in each iteration") else {
                     cat("every", nlminbControl$trace, "iterations") }
@@ -1037,6 +1056,11 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     ##############
     ### Return ###
     ##############
+
+
+    ## ### Issue collected polyCub.midpoint warnings
+    
+    ## sapply(unique(.POLYCUB.WARNINGS), warning)
 
 
     ### Set up list object to be returned
