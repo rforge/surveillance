@@ -100,7 +100,7 @@ exportMethods(scale.poly)   # redefined method for gpc.poly in spatial_stuff.R
 
 # little helper: multiplicity of points
 export(multiplicity)                    # new S3-generic
-S3method(multiplicity, matrix)
+S3method(multiplicity, default)
 S3method(multiplicity, Spatial)
 
 # Spatio-temporal cluster detection

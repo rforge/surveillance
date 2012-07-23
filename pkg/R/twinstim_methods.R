@@ -209,7 +209,7 @@ intensityplot.twinstim <- function (x,
 {
     ## check arguments
     if (is.null(environment(x))) {
-        stop("'x' is missing the model environment -- re-fit with 'model=TRUE'")
+        stop("'", substitute(x), "' is missing the model environment -- re-fit with 'model=TRUE'")
     }
     which <- match.arg(which)
     aggregate <- match.arg(aggregate)

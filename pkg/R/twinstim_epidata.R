@@ -732,9 +732,9 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
 
     # determines multiplicity of rows of a numeric matrix
     # and returns unique rows with appended multiplicity column
-    countunique <- function (matrix) {
-        count <- multiplicity(matrix)
-        unique(cbind(matrix, count))
+    countunique <- function (mat) {
+        count <- multiplicity(mat)
+        unique(cbind(mat, count))
     }
     # wrapper for 'points' with specific 'cex' for multiplicity
     multpoints <- function (tableCoordsTypes, col) {

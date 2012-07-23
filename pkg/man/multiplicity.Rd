@@ -1,6 +1,6 @@
 \name{multiplicity}
 \alias{multiplicity}
-\alias{multiplicity.matrix}
+\alias{multiplicity.default}
 \alias{multiplicity.Spatial}
 
 \title{
@@ -10,8 +10,8 @@ Count Number of Instances of Points
 \description{
   The \code{multiplicity} S3-generic function defined in
   \pkg{surveillance} is intended as a simple auxiliary function, which
-  counts the number of instances of each row in a \code{matrix}, or of
-  each point in a \code{Spatial} object.
+  counts the number of instances of each row in a numeric \code{matrix} (or
+  \code{data.frame}), or of each point in a \code{Spatial} object.
   Indeed, this just computes the distance matrix of the rows (points),
   and then counts the number of zeroes in each row.
 }
@@ -19,14 +19,15 @@ Count Number of Instances of Points
 \usage{
 multiplicity(x, ...)
 
-\method{multiplicity}{matrix}(x, ...)
+\method{multiplicity}{default}(x, ...)
 \method{multiplicity}{Spatial}(x, ...)
 }
 
 \arguments{
   \item{x}{
     an object, for which a \code{multiplicity} method is defined, e.g.
-    a matrix or an object of class \code{"\linkS4class{SpatialPoints}"}.
+    a numeric matrix (or anything coercible to it by \code{as.matrix})
+    or an object of class \code{"\linkS4class{SpatialPoints}"}. 
   }
   \item{\dots}{currently unused.}
 }
@@ -54,6 +55,6 @@ countunique <- function (matrix) {
 }
 countunique(foo)
 }
+
 \keyword{utilities}
 \keyword{spatial}
-
