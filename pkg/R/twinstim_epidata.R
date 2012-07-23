@@ -870,8 +870,8 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
 ### plot.epidataCS(x, aggregate = "space") -> total number of cases by spatial tile
 
 plot.epidataCS_space <- function (x, subset,
-    cex.fun = function (counts) sqrt(1.5*counts/pi/min(counts)),
-    points.args = list(), colTypes = rainbow(nlevels(x$events$type)), ...)
+    cex.fun = sqrt, points.args = list(cex=0.5),
+    colTypes = rainbow(nlevels(x$events$type)), ...)
 {
     stopifnot(is.list(points.args))
     events <- if (missing(subset)) x$events else {
@@ -886,10 +886,8 @@ plot.epidataCS_space <- function (x, subset,
     events@data[["_MULTIPLICITY_"]] <- multiplicity(events)
     events <- events[!duplicated(coordinates(events)),]
     pointcex <- cex.fun(events$"_MULTIPLICITY_")
-    if (!is.null(points.args[["cex"]])) {
-        pointcex <- pointcex * points.args$cex
-        points.args$cex <- NULL
-    }
+    pointcex <- pointcex * points.args$cex
+    points.args$cex <- NULL
     if (is.null(points.args[["col"]])) {
         points.args$col <- colTypes[x$events$type]
     }

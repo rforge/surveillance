@@ -63,11 +63,14 @@ the events in the observation region \code{W} (aggregated over time).
     For plotting the locations of the events in the observation region:
     \describe{
       \item{cex.fun}{function which takes a vector of counts of events
-	at each unique location and returns a (vector of) \code{cex}
-	value(s) for the sizes of the \code{points} at the event locations.}
-      \item{points.args}{further arguments passed to
-        \code{\link{points}}. An argument \code{cex} here multiplies the
-        sizes obtained from \code{cex.fun}.}
+	at each unique location and returns a vector of \code{cex}
+	values for the sizes of the corresponding \code{points}.
+	Defaults to the \code{sqrt()} function, which for the default
+	circular \code{pch=1} means that the area of each point is
+	proportional to the number of events at its location.}
+      \item{points.args}{a list of further arguments passed to
+        \code{\link{points}}. An argument \code{cex} (default: 0.5) in
+	this list multiplies the sizes obtained from \code{cex.fun}.}
       \item{colTypes}{colour vector for the different event types.
 	Defaults to colours from the \code{\link{rainbow}} palette. They are
 	only used if \code{col} is missing in \code{points.args}.}

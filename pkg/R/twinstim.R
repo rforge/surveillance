@@ -10,7 +10,7 @@
 
 twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     data, subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
-    na.action = na.fail, nCub, nCub.adaptive = TRUE, partial = FALSE,
+    na.action = na.fail, nCub, nCub.adaptive = FALSE, partial = FALSE,
     optim.args, finetune = TRUE, model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE)
 {
 
@@ -392,6 +392,10 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 .ret
             }
         suppressWarnings(rm(.ret))
+        if (isTRUE(cl[["nCub.adaptive"]]) && !nCub.adaptive) {
+            message("'nCub.adaptive' only works in conjunction with ",
+                    "specified 'siaf$effRange()'")
+        }
 
         ### Check nCub
         if (!constantsiaf) {

@@ -15,7 +15,7 @@
 \usage{
 twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
          data, subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
-         na.action = na.fail, nCub, nCub.adaptive = TRUE, partial = FALSE,
+         na.action = na.fail, nCub, nCub.adaptive = FALSE, partial = FALSE,
          optim.args, finetune = TRUE, model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE)
 }
 
@@ -80,19 +80,22 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
   \item{nCub, nCub.adaptive}{
     determines the accuracy of the numerical cubature of the \code{siaf}
     function. If \code{siaf$Fcircle} and \code{siaf$effRange} are both
-    specified and \code{nCub.adaptive = TRUE}, then \code{nCub} equals
-    \code{siaf$effRange}/\code{eps}, where \code{eps} is used as pixel
+    specified and \code{nCub.adaptive = TRUE}, then \code{nCub} is
+    interpreted as 
+    \code{siaf$effRange()}/\code{eps}, where \code{eps} is used as pixel
     width and height in the two-dimensional midpoint rule (see
     \code{\link{polyCub.midpoint}}). Thus \code{nCub} is the desired
     number of subdivions of the effective integration range in both
-    dimensions and \code{eps} equals \code{effRange}/\code{nCub} (e.g.,
+    dimensions (for the current \code{siaf} parameters during
+    optimisation), and \code{eps} thus equals
+    \code{siaf$effRange()}/\code{nCub} (e.g.,
     if 6\eqn{\sigma} is used as the effective integration range of the
     Gaussian \code{siaf} kernel, and \code{nCub = 24}, then a bandwidth
     of \eqn{\sigma / 4} is used in the midpoint rule.\cr
     If \code{siaf$Fcircle} or \code{siaf$effRange} is unspecified or
     \code{nCub.adaptive = FALSE}, then \code{nCub} equals the above
-    mentioned \code{eps} in \code{polyCub.midpoint} (may also be a
-    vector of length 2 in this case to specify different bandwidths in
+    mentioned \code{eps} in \code{polyCub.midpoint} (in this case may
+    also be a vector of length 2 to specify different bandwidths in
     the x and y directions, see \code{\link[spatstat]{as.mask}}.
   }
   \item{partial}{

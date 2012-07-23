@@ -410,12 +410,15 @@ checksiaf <- function (f, deriv, Fcircle, effRange, simulate, npars, validpars, 
     haspars <- npars > 0L
     if (!haspars || missing(deriv)) deriv <- NULL
     if (!is.null(deriv)) deriv <- .checknargs3(deriv, "siaf$deriv")
+    if (missing(effRange)) effRange <- NULL
     if (missing(Fcircle) || is.null(Fcircle)) {
         Fcircle <- NULL
-        effRange <- NULL
+        if (!is.null(effRange)) {
+            message("'siaf$effRange' only works in conjunction with 'siaf$Fcircle'")
+            effRange <- NULL
+        }
     }
     if (!is.null(Fcircle)) Fcircle <- .checknargs3(Fcircle, "siaf$Fcircle")
-    if (missing(effRange)) effRange <- NULL
     if (!is.null(effRange)) {
         effRange <- match.fun(effRange)
         if (length(formals(effRange)) < 1L) {
