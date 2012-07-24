@@ -7,7 +7,7 @@ Spatio-Temporal Animation of a Continuous-Time Continuous-Space Epidemic
 }
 
 \description{
-  Function for the animation of epidemic data, i.e.\ objects inheriting from 
+  Function for the animation of epidemic data, i.e. objects inheriting from 
   class \code{"epidataCS"}.  There are two types of animation, see argument 
   \code{time.spacing}.  Besides the direct plotting in the \R session, it is 
   also possible to generate a sequence of graphics files to create animations 
@@ -53,7 +53,7 @@ Spatio-Temporal Animation of a Continuous-Time Continuous-Space Epidemic
   \item{timer.opts}{
     either a list of arguments passed to the \code{\link{legend}} function or
     \code{NULL} (or \code{NA}), in which case no timer will be plotted.  All 
-    necessary arguments have sensible defaults and need not be specified, i.e.\
+    necessary arguments have sensible defaults and need not be specified, i.e.
     \describe{
       \item{\code{x}:}{\code{"bottomright"}}
       \item{\code{title}:}{\code{"time"}}

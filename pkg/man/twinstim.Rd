@@ -13,10 +13,11 @@
 }
 
 \usage{
-twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
-         data, subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
+twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
+         subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
          na.action = na.fail, nCub, nCub.adaptive = FALSE, partial = FALSE,
-         optim.args, finetune = TRUE, model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE)
+         optim.args, finetune = FALSE,
+         model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE)
 }
 
 \arguments{
@@ -187,7 +188,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
   \item{fitted}{fitted values of the conditional intensity function at the events.}
   \item{fittedComponents}{two-column matrix with columns \code{"h"} and
     \code{"e"} containing the fitted values of the endemic and epidemic
-    components, respectively. (\code{rowSums(fittedComponents) == fitted}).}
+    components, respectively. (Note that
+    \code{rowSums(fittedComponents) == fitted}.)}
   \item{tau}{fitted cumulative ground intensities at the event times.
     Only calculated and returned if \code{cumCIF = TRUE}.
     This is the \dQuote{residual process} of the model, see
@@ -230,13 +232,13 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
   
   Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2012):
   A space-time conditional intensity model for invasive meningococcal
-  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.
+  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.\cr
   DOI-Link: \url{http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x}
   
   Meyer, S. (2010):
   Spatio-Temporal Infectious Disease Epidemiology based on Point Processes.
   Master's Thesis, Ludwig-Maximilians-Universit\enc{ä}{ae}t
-  M\enc{ü}{ue}nchen.
+  M\enc{ü}{ue}nchen.\cr
   Available as \url{http://epub.ub.uni-muenchen.de/11703/}
 }
 

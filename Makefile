@@ -57,8 +57,7 @@ checkUsage: install
 	| R --slave --no-save --no-restore
 
 manual:	
-	rm -f manual.pdf
-	$R CMD Rd2pdf --batch --output=manual.pdf pkg
+	$R CMD Rd2pdf --batch --force --output=manual.pdf pkg
 
 # macsrc:
 # 	cd src ; gcc-4.0 -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -no-cpp-precomp -I/Library/Frameworks/R.framework/Resources/include -I/Library/Frameworks/R.framework/Resources/include/i386  -msse3  -D__NO_MATH_INLINES  -fPIC  -g -O2 -Wall -pedantic -c surveillance.c -o surveillance.o

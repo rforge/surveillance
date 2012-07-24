@@ -39,7 +39,7 @@ iafplot(object, which = c("siaf", "tiaf"),
     \code{conf.B} parameter values (vectors) are sampled from the
     asymptotic (multivariate) normal distribution of the ML estimate(s) of the
     interaction function parameters; the interaction function is then
-    evaluated on the grid of \code{ngrid} x-values (i.e.\ temporal or
+    evaluated on the grid of \code{ngrid} x-values (i.e. temporal or
     spatial distances from the host) for each parameter realization to
     obtain a \code{conf.level} confidence interval at each point of the x-grid.
     If \code{"parbounds"}, the \code{conf.level} Wald confidence
@@ -106,7 +106,7 @@ iafplot(object, which = c("siaf", "tiaf"),
 \references{
   Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2012):
   A space-time conditional intensity model for invasive meningococcal
-  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.
+  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.\cr
   DOI-Link: \url{http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x}
 }
 

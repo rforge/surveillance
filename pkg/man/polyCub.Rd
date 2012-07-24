@@ -112,7 +112,7 @@ polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
   Meyer, S. (2010):
   Spatio-Temporal Infectious Disease Epidemiology based on Point Processes.
   Master's Thesis, Ludwig-Maximilians-Universit\enc{ä}{ae}t
-  M\enc{ü}{ue}nchen.
+  M\enc{ü}{ue}nchen.\cr
   Available as \url{http://epub.ub.uni-muenchen.de/11703/}
   
   Sommariva, A. and Vianello, M. (2007): Product Gauss cubature over polygons
@@ -124,11 +124,11 @@ polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
 }
 
 \note{
-The \R implementation of the product Gauss cubature in \code{polycub.SV} is based on the
-corresponding MATLAB code (\code{polygauss}) by Sommariva & Vianello (2007); but it
-only covers the case of \dQuote{simple} polygons. The efficiency rotation also proposed
-by Sommariva & Vianello (2007) is not implemented here since it does in general only apply
-to convex polygons.
+  The \R implementation of the product Gauss cubature in \code{polycub.SV} is
+  based on the corresponding MATLAB code (\code{polygauss}) by Sommariva &
+  Vianello (2007); but it only covers the case of \dQuote{simple} polygons. The
+  efficiency rotation also proposed by Sommariva & Vianello (2007) is not
+  implemented here since it does in general only apply to convex polygons.
 }
 
 \examples{

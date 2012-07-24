@@ -62,7 +62,7 @@ is just a wrapper for the \code{intensityplot} method.
   \item{plot}{
     logical indicating if a plot is desired, defaults to \code{TRUE}.
     Otherwise, only the data of the plot will be returned.  Especially with
-    \code{aggregate = FALSE} and many individuals one might e.g.\ consider to 
+    \code{aggregate = FALSE} and many individuals one might e.g. consider to 
     plot a subset of the individual intensity paths only or do some further
     calculations/analysis of the infection intensities.
   }
@@ -84,7 +84,7 @@ is just a wrapper for the \code{intensityplot} method.
     \code{intensityplot.twinSIR}.
     For the \code{intensityplot} methods, further graphical parameters
     passed to the function \code{\link{matplot}}, 
-    e.g.\ \code{lty}, \code{lwd}, \code{col}, \code{xlab}, \code{ylab} and
+    e.g. \code{lty}, \code{lwd}, \code{col}, \code{xlab}, \code{ylab} and
     \code{main}.  Note that the \code{matplot} arguments \code{x}, \code{y},
     \code{type} and \code{add} are implicit and can not be specified here.
   }
@@ -102,7 +102,7 @@ is just a wrapper for the \code{intensityplot} method.
 }
 
 \references{
-  \enc{HÃ¶hle}{Hoehle}, M. (2009),
+  \enc{Höhle}{Hoehle}, M. (2009),
   Additive-Multiplicative Regression Models for Spatio-Temporal
   Epidemics, Biometrical Journal, 51(6):961-978.
 }
@@ -112,7 +112,7 @@ Sebastian Meyer
 }
 
 \seealso{
-\code{\link{twinSIR}} or \enc{HÃ¶hle}{Hoehle} (2009) for a more detailed
+\code{\link{twinSIR}} or \enc{Höhle}{Hoehle} (2009) for a more detailed
 description of the intensity model.
 \code{\link{simulate.twinSIR}} for the simulation of epidemic data
 according to a \code{twinSIR} specification.

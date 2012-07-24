@@ -1,42 +1,51 @@
 \name{discpoly}
 \alias{discpoly}
 \title{
-Generate a Polygon Representing a Disc/Circle (in Planar Coordinates)
+  Generate a Polygon Representing a Disc/Circle (in Planar Coordinates)
 }
+
 \description{
-This functions generates a circle/disc represented as a polygon of one of three
-possible data classes: \code{"\link[gpclib:gpc.poly-class]{gpc.poly}"},
-\code{"\link[spatstat]{owin}"}, and \code{"\link[sp:Polygon-class]{Polygon}"}.
+  This functions generates a circle/disc represented as a polygon of one of three
+  possible data classes: \code{"\link[gpclib:gpc.poly-class]{gpc.poly}"},
+  \code{"\link[spatstat]{owin}"}, and \code{"\link[sp:Polygon-class]{Polygon}"}.
 }
+
 \usage{
-discpoly(center, r, npoly = 64, class = c("gpc.poly", "owin", "Polygon"), hole = FALSE)
+discpoly(center, r, npoly = 64, class = c("gpc.poly", "owin", "Polygon"),
+         hole = FALSE)
 }
+
 \arguments{
   \item{center}{
-	numeric vector of length two. Center coordinates of the circle.
-}
+    numeric vector of length two. Center coordinates of the circle.
+  }
   \item{r}{
-	numeric scalar. Radius of the circle.
-}
+    numeric scalar. Radius of the circle.
+  }
   \item{npoly}{
-	integer. Number of edges of the polygonal approximation to the circle.
-}
+    integer. Number of edges of the polygonal approximation to the circle.
+  }
   \item{class}{
-	Which class of polygon should be generated?
-}
+    Which class of polygon should be generated?
+  }
   \item{hole}{
-	logical. \code{hole} flag of the polygon.
+    logical. \code{hole} flag of the polygon.
+  }
 }
-}
+
 \value{
-	Polygon of class \code{class} representing a circle/disc with \code{npoly} edges accuracy.
+  Polygon of class \code{class} representing a circle/disc with
+  \code{npoly} edges accuracy. 
 }
+
 \author{
-    Sebastian Meyer
+  Sebastian Meyer
 }
+
 \seealso{
-	\link[spatstat]{disc} in package \pkg{spatstat}.
+  \link[spatstat]{disc} in package \pkg{spatstat}.
 }
+
 \examples{
 # Construct circle with increasing accuracy and of different spatial classes
 disc1 <- discpoly(c(0,0), 5, npoly=4, class = "gpc.poly")
@@ -56,6 +65,6 @@ lines(disc3, col=3)
 # if one only wants to draw a circle one could just use
 symbols(0,0, circles=5, inches=FALSE, add=TRUE, fg=4)
 }
+
 \keyword{spatial}
 \keyword{datagen}
-

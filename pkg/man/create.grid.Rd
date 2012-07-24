@@ -12,7 +12,7 @@
        overdispersion parameter \eqn{\psi} must be positive.  
        Only one sequence of initial values is considered for the autregressive,
        endemic and overdispersion parameters to create the grid,
-       e.g.\ initial values are the same
+       e.g. initial values are the same
        for each one of the seasonal and trend parameters. 
 }
 \usage{
@@ -30,8 +30,8 @@ create.grid(disProgObj, control, params = list(epidemic = c(0.1, 0.9, 5),
 		} 
         }
 }
-\value{\item{matrix}{matrix with \code{gridSize} starting values as rows}
-       
+\value{
+  \item{matrix}{matrix with \code{gridSize} starting values as rows}     
 }
 \seealso{\code{\link{algo.hhh.grid}}}
 \author{M. Paul}
@@ -56,7 +56,3 @@ grid2 <- create.grid(disProgObj, cntrl2,
 
 }
 \keyword{misc}
-
-
-
-% loglikelihood

@@ -32,7 +32,7 @@ twinSIR(formula, data, weights, subset,
   }
   \item{weights}{
     an optional vector of weights to be used in the fitting process.  Should be
-    \code{NULL} (the default, i.e.\ all observations have unit weight) or a
+    \code{NULL} (the default, i.e. all observations have unit weight) or a
     numeric vector.
   }
   \item{subset}{
@@ -255,7 +255,7 @@ Michael \enc{Höhle}{Hoehle} and Sebastian Meyer
 
 \note{
 There are some restrictions to modelling the infection intensity
-without a baseline hazard rate, i.e.\ without an intercept in the
+without a baseline hazard rate, i.e. without an intercept in the
 \code{formula}.  
 Reason: At some point, the optimization algorithm L-BFGS-B tries to set all 
 transmission parameters \eqn{\alpha} to the boundary value 0 and to calculate

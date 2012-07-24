@@ -44,7 +44,7 @@ nowcast(s, t, D, dEventCol = "dHospital", dReportCol = "dReport",
     the projections are to be done. One needs to ensure t <= s.
   }
   \item{D}{A data frame with one row per case -- for each case on needs
-  information on the day of the event (e.g.\ hospitalization) and the
+  information on the day of the event (e.g. hospitalization) and the
   day of report of this event.
   }
   \item{dEventCol}{The name of the column in \code{D} which contains the

@@ -11,7 +11,7 @@
 twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     data, subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
     na.action = na.fail, nCub, nCub.adaptive = FALSE, partial = FALSE,
-    optim.args, finetune = TRUE, model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE)
+    optim.args, finetune = FALSE, model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE)
 {
 
     ####################

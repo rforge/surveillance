@@ -27,7 +27,7 @@ class \code{"twinstim"} is just a wrapper for these two functions.
     character. Which characteristic of the conditional intensity should
     be plotted? Possible values are the ones allowed in
     the functions \code{\link{iafplot}} and
-    \code{\link{intensityplot.twinstim}}, e.g.\ \code{"siaf"}, or
+    \code{\link{intensityplot.twinstim}}, e.g. \code{"siaf"}, or
     \code{"epidemic proportion"}. Partial matching is applied.
   }
   \item{\dots}{

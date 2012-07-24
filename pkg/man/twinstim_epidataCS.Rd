@@ -191,16 +191,32 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   }
 }
 
+\note{
+  The more detailed the observation region \code{W} is the slower the
+  operations will be. Often it can be advantageous to sacrifice some detail
+  for speed by reducing polygon complexity using, e.g., the
+  Douglas and Peucker (1973) reduction method available at
+  \url{http://mapshaper.com/test/demo.html} or as function \code{dp()}
+  in the (slightly outdated) package \pkg{shapefiles}, or by passing by
+  \pkg{spatstat}'s \code{\link[spatstat]{simplify.owin}} procedure.
+}
+
 \references{
+  Douglas, D. H. and Peucker, T. K. (1973):
+  Algorithms for the reduction of the number of points required to
+  represent a digitized line or its caricature.
+  \emph{Cartographica: The International Journal for Geographic
+  Information and Geovisualization}, \bold{10}, 112-122
+
   Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2012):
   A space-time conditional intensity model for invasive meningococcal
-  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.
+  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.\cr
   DOI-Link: \url{http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x}
 
   Meyer, S. (2010):
   Spatio-Temporal Infectious Disease Epidemiology based on Point Processes.
   Master's Thesis, Ludwig-Maximilians-Universit\enc{ä}{ae}t
-  M\enc{ü}{ue}nchen.
+  M\enc{ü}{ue}nchen.\cr
   Available as \url{http://epub.ub.uni-muenchen.de/11703/}
 }
 

@@ -31,11 +31,11 @@ Summarizing an Epidemic
 \value{
   A list with the following components:
   \item{type}{
-    character string.  Compartmental type of the epidemic, i.e.\ one of "SIR",
+    character string.  Compartmental type of the epidemic, i.e. one of "SIR",
     "SI", "SIS" or "SIRS".
   }
   \item{size}{
-    integer.  Size of the epidemic, i.e.\ the number of initially susceptible
+    integer.  Size of the epidemic, i.e. the number of initially susceptible
     individuals, which became infected during the course of the epidemic.
   }
   \item{initiallyInfected}{
@@ -44,7 +44,7 @@ Summarizing an Epidemic
   }
   \item{neverInfected}{
     factor (with the same levels as the \code{id} column in the \code{"epidata"}
-    object).  Set of never infected individuals, i.e.\ individuals, which were 
+    object).  Set of never infected individuals, i.e. individuals, which were 
     neither initially infected nor infected during the course of the epidemic.
   }
   \item{coordinates}{

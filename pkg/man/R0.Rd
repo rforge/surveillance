@@ -93,13 +93,13 @@ the observation period \eqn{(t_0;T]} (i.e. over
 \value{
 numeric vector of estimated basic reproduction numbers from the fitted
 model \code{object} corresponding to the rows of \code{newevents} (if
-supplied) or the original fitted events.
+supplied) or the original fitted events including events of the prehistory.
 }
 
 \references{
   Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2012):
   A space-time conditional intensity model for invasive meningococcal
-  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.
+  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.\cr
   DOI-Link: \url{http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x}
 }
 

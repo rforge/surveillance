@@ -16,7 +16,7 @@ Class for Epidemic Data Discrete in Space and Continuous in Time
   specific data frames containing the event history of an epidemic together
   with some additional attributes.  These objects are the basis for fitting
   spatio-temporal epidemic intensity models with the function
-  \code{\link{twinSIR}}.  Note that the spatial information itself, i.e.\
+  \code{\link{twinSIR}}.  Note that the spatial information itself, i.e.
   the positions of the individuals, is assumed to be constant over time.  
   Besides epidemics following the SIR compartmental model, also data from SI,
   SIRS and SIS epidemics may be supplied.  Inference for the infectious process
@@ -70,7 +70,7 @@ as.epidata(data, ...)
     (by column number) or character (by column name).
     The \code{start} column contains the (numeric) time points of the beginnings
     of the consecutive time intervals of the event history.  The minimum value
-    in this column, i.e.\ the start of the observation period should be 0.
+    in this column, i.e. the start of the observation period should be 0.
   }
   \item{stop.col}{
     single index of the \code{stop} column in \code{data}.  Can be numeric
@@ -168,7 +168,7 @@ as.epidata(data, ...)
   
   SIS epidemics are implemented as SIRS epidemics where the length of the
   removal period equals 0.  This means that an individual, which has an R-event
-  will be at risk immediately afterwards, i.e.\ in the following time block.
+  will be at risk immediately afterwards, i.e. in the following time block.
   Therefore, data of SIS epidemics have to be provided in that form containing
   \dQuote{pseudo-R-events}.
   

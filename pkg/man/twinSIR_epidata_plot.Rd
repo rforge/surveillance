@@ -65,7 +65,7 @@ stateplot(x, id, ...)
   \item{legend.opts}{
     either a list of arguments passed to the \code{\link{legend}} function or
     \code{NULL} (or \code{NA}), in which case no legend will be plotted.  All
-    necessary arguments have sensible defaults and need not be specified, i.e.\
+    necessary arguments have sensible defaults and need not be specified, i.e.
     \describe{
       \item{\code{x}:}{\code{"topright"}}
       \item{\code{legend}:}{\code{c("susceptible", "infectious", "removed")}}
@@ -105,7 +105,7 @@ stateplot(x, id, ...)
   }
   \item{\dots}{
     For \code{plot.summary.epidata}: further graphical parameters passed to 
-    \code{plot}, \code{lines} and \code{axis}, e.g.\ \code{main}, \code{las}, 
+    \code{plot}, \code{lines} and \code{axis}, e.g. \code{main}, \code{las}, 
     \code{cex.axis} (etc.) and \code{mgp}.\cr
     For \code{plot.epidata}: arguments passed to \code{plot.summary.epidata}.\cr
     For \code{stateplot}: arguments passed to \code{\link{plot.stepfun}} or

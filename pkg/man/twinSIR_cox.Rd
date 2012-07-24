@@ -8,7 +8,7 @@ Identify Endemic Components in an Intensity Model
 \description{
 The special function \code{cox} marks terms in formulae of the functions
 \code{\link{twinSIR}} and \code{\link{simEpidata}} as endemic components,
-i.e.\ variables acting multiplicatively on the baseline infection intensity.
+i.e. variables acting multiplicatively on the baseline infection intensity.
 
 Technically, this function is implemented as \code{function(x) {x}} and
 defined as \dQuote{special} in \code{\link{terms.formula}}.
