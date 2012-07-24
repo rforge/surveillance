@@ -16,6 +16,9 @@
   Nowcasting can help to obtain up-to-date information on epidemic
   trends during an outbreak situation, when reports about important
   indicators (such as hospitalizations) only arrive with delay.
+  Note: This function is experimental and currently does not deal
+  with right-truncation of the observations. An improved version is to
+  be expected.
 }
 
 \usage{
