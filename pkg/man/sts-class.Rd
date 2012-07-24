@@ -39,7 +39,7 @@
 
 \description{
 
-  This is a rather leightweight class to implement multivariate time
+  This is a leightweight S4 class to implement multivariate time
   series of counts used for public health surveillance data. The class
   captures the time series data as well as the spatial layout of the
   regions, where the data originate from.
@@ -49,13 +49,15 @@
 \section{Slots}{
   \describe{
     \item{\code{epoch}:}{Object of class \code{numeric} or specifying
-  the time of observation. In old versions of the package this used to
-  be the week numbers. However, can be day or month as well depending on
-  the \code{freq} argument. Furthermore, if \code{epochAsDate=TRUE} then
-  it is the \code{as.numeric} representation of \code{Date} objects
-  giving the exact date of the observation. Note: This slot used to be
-  called \code{week} but has been renamed to reflect the greater
-  flexibility in the choice of observation time.}
+      the time of observation. In old versions of the package this used to
+      be the week numbers. However, depending on
+      the \code{freq} argument, it can now be day or month as
+      well. Furthermore, if \code{epochAsDate=TRUE} then 
+      it is the \code{as.numeric} representation of \code{Date} objects
+      giving the exact date of the observation. Note: This slot used to be
+      called \code{week} in earlier versions of the package, but has now been
+      renamed to reflect the greater 
+      flexibility in the choice of observation time.}
     \item{\code{freq}:}{If weekly data \code{freq} corresponds to 52, in
       case of monthly data \code{freq} is 12.}
     \item{\code{start}:}{vector of length two denoting the year and the
