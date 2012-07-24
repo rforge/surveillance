@@ -17,7 +17,8 @@
   algo.farrington(disProgObj, control=list(range=NULL, b=3, w=3,
   reweight=TRUE,verbose=FALSE,alpha=0.01,trend=TRUE,limit54=c(5,4),
   powertrans="2/3",
-  fitFun=c("algo.farrington.fitGLM.fast","algo.farrington.fitGLM","algo.farrington.fitGLM.populationOffset")))
+  fitFun=c("algo.farrington.fitGLM.fast","algo.farrington.fitGLM",
+           "algo.farrington.fitGLM.populationOffset")))
 }
 \arguments{
 \item{disProgObj}{object of class disProgObj (including the \code{observed} and the \code{state} time series.)}

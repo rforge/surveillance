@@ -134,8 +134,11 @@ twinSIR(formula, data, weights, subset,
 
 \details{  
   A model is specified through the \code{formula}, which has the form
-  \code{~ epidemicTerm1 + epidemicTerm2 + cox(endemicVar1) * cox(endemicVar2)},
-  i.e.\ the right hand side has the usual form as in \code{\link{lm}} with
+  
+  \code{~ epidemicTerm1 + epidemicTerm2 + cox(endemicVar1) *
+    cox(endemicVar2)},
+  
+  i.e. the right hand side has the usual form as in \code{\link{lm}} with
   some variables marked as being endemic by the special function
   \code{\link{cox}}.  The left hand side of the formula is empty and will be
   set internally to \code{cbind(start, stop, event)}, which is similar to

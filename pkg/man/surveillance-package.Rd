@@ -10,11 +10,11 @@
 
   A package implementing statistical methods for the modeling and
   change-point detection in time series of counts, proportions and
-  categorical data. Focus is on outbreak detection in count data time
-  series originating from public health surveillance of infectious
-  diseases, but applications could just as well originate from
-  environmetrics, reliability engineering, econometrics or social
-  sciences.
+  categorical data. Focus is on the modelling and change-point detection
+  in count data time series or point-processes originating from public
+  health surveillance of infectious diseases, but applications could
+  just as well originate from environmetrics, reliability engineering,
+  econometrics or social sciences.
  
 } 
 
@@ -27,15 +27,16 @@
     License: \tab GPL version 2 (http://www.gnu.org/licenses/gpl.html) \cr
   }
 
-  \pkg{surveillance} is an \R package implementing statistical methods for the
-  retrospective modeling and prospective change-point detection in time
-  series of counts, proportions and categorical data. The main
+  \pkg{surveillance} is an \R package implementing statistical methods
+  for the retrospective modeling and prospective change-point detection
+  in time series of counts, proportions and categorical data. The main
   application is in the detection of aberrations in routine collected
   public health data seen as univariate and multivariate time series of
-  counts, but applications could just as well originate from
-  environmetrics, econometrics or social sciences. As many methods rely
-  on statistical process control methodology, the package is thus also
-  relevant to quality control and reliability engineering.
+  counts or point-processes. However, applications could just as well
+  originate from environmetrics, econometrics or social sciences. As
+  many methods rely on statistical process control methodology, the
+  package is thus also relevant to quality control and reliability
+  engineering.
 
   The fundamental data structure of the package is an S4 class
  \code{sts} wrapping observations, monitoring results and date handling
@@ -55,15 +56,18 @@
  temporal, spatial or spatio-temporal fashion.
 
  Furthermore, inference methods for the retrospective infectious disease
- model in Held et al. (2005) and Paul et al. (2008) handling
- multivariate time series of counts. Finally, the fully Bayesian
- approach for univariate time series of counts from Held et al. (2006)
- is also implemented.
- 
-% \item Likelihood based analysis of infectious disease surveillance data
-%  using a model containing endemic and epidemic components in a counting
-%  process framework (\enc{Höhle}{Hoehle}, 2008). The endemic component can
-%  be modelled through covariates. 
+ model in Held et al. (2005), Paul et al. (2008) ("algo.hhh") and Paul
+ and Held (2011) ("hhh4") handling multivariate time series of
+ counts. Furthermore, the fully Bayesian approach for univariate time
+ series of counts from Held et al. (2006) ("twins") is also implemented
+ Self-exciting spatio-temporal point processes are modeled through
+ additive-multiplicative conditional intensities as described in Höhle
+ (2009) ("twinSIR") and Meyer et al (2012) ("twinstim").
+
+ Altogether, the package contains several real-world datasets, the
+ ability to simulate outbreak data, visualize the results of the
+ monitoring in temporal, spatial or spatio-temporal fashion.
+
 }
 \author{
   Author: M. H\enc{ö}{oe}hle, S. Meyer and M. Paul

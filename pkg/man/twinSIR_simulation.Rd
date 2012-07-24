@@ -72,7 +72,7 @@ simEpidata(formula, data, id.col, I0.col, coords.cols, subset,
     single index of the \code{I0} column in \code{data}.  Can be numeric
     (by column number), character (by column name) or \code{NULL}.\cr
     The \code{I0} column indicates if an individual is initially infectious,
-    i.e.\ it is already infectious at the beginning of the first time block.
+    i.e. it is already infectious at the beginning of the first time block.
     Setting \code{I0.col = NULL} is short for \dQuote{there are no initially
     infectious individuals}. Otherwise, the variable must be logical or in
     0/1-coding.  As this variable is constant over time the initially
@@ -144,7 +144,7 @@ simEpidata(formula, data, id.col, I0.col, coords.cols, subset,
          \sum_{j in I(t)} f[[m]](||s_i - s_j||)}
   }
   \item{alpha}{
-    numeric vector of length equal the number of epidemic terms, i.e.\ the
+    numeric vector of length equal the number of epidemic terms, i.e. the
     number of distance functions in \code{f}.  It contains the effects of the
     epidemic predictor in the same order as the distance functions in \code{f}
     or, if names are supplied, matching to the distance functions will be done
@@ -152,7 +152,7 @@ simEpidata(formula, data, id.col, I0.col, coords.cols, subset,
   }
   \item{infPeriod}{
     a function generating lengths of infectious periods.  It should take one
-    parameter (e.g.\ \code{ids}), which is a character vector of id's of 
+    parameter (e.g. \code{ids}), which is a character vector of id's of 
     individuals, and return appropriate infection periods for those
     individuals.  Therefore, the value of the function should be of length
     \code{length(ids)}.  For example, for independent and identically
@@ -163,13 +163,16 @@ simEpidata(formula, data, id.col, I0.col, coords.cols, subset,
     For the \code{simulate} method of class \code{"twinSIR"} only, this can
     also be \code{NULL} (the default), which means that the observed infectious
     periods of infected individuals are re-used when simulating a new epidemic
-    and individuals with missing infectious periods (i.e.\ infection and 
+    and individuals with missing infectious periods (i.e. infection and 
     recovery was not observed) are attributed to the mean observed
     infectious period.
     
     Note that it is even possible to simulate an SI-epidemic by setting
-    \code{infPeriod = function (x) {Inf}}: once an individual became
-    infected it spreads the disease forever, i.e.\ it will never be removed.
+
+    \code{infPeriod = function (x) {Inf}}
+
+    In other words: once an individual became
+    infected it spreads the disease forever, i.e. it will never be removed.
   }
   \item{remPeriod}{
     a function generating lengths of removal periods.  Per default, once an
@@ -180,7 +183,7 @@ simEpidata(formula, data, id.col, I0.col, coords.cols, subset,
   }
   \item{end}{
     a single positive numeric value specifying the time point at which the
-    simulation should be forced to end.  By default, this is \code{Inf}, i.e.\
+    simulation should be forced to end.  By default, this is \code{Inf}, i.e.
     the simulation continues until there is no susceptible individual left.\cr
     For the \code{simulate} method of class \code{"twinSIR"} the default is
     to have equal simulation and observation periods.
@@ -214,8 +217,10 @@ simEpidata(formula, data, id.col, I0.col, coords.cols, subset,
 
 \details{
   A model is specified through the \code{formula}, which has the form
+
   \code{cbind(start, stop) ~ cox(endemicVar1) * cox(endemicVar2)},
-  i.e.\ the right hand side has the usual form as in \code{\link{lm}}, but
+  
+  i.e. the right hand side has the usual form as in \code{\link{lm}}, but
   all variables are marked as being endemic by the special function
   \code{\link{cox}}.  The effects of those predictor terms are specified by
   \code{beta}.  The left hand side of the formula denotes the start

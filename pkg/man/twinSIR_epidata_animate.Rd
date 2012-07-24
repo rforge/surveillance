@@ -7,7 +7,7 @@ Spatio-Temporal Animation of an Epidemic
 }
 
 \description{
-  Function for the animation of epidemic data, i.e.\ objects inheriting from 
+  Function for the animation of epidemic data, i.e. objects inheriting from 
   class \code{"epidata"}.  This only works with 1- or 2-dimensional coordinates 
   and is not useful if some individuals share the same coordinates 
   (overlapping).  There are two types of animation, see argument 
@@ -70,7 +70,7 @@ Spatio-Temporal Animation of an Epidemic
   \item{legend.opts}{
     either a list of arguments passed to the \code{\link{legend}} function or
     \code{NULL} (or \code{NA}), in which case no legend will be plotted.  All 
-    necessary arguments have sensible defaults and need not be specified, i.e.\
+    necessary arguments have sensible defaults and need not be specified, i.e.
     \describe{
       \item{\code{x}:}{\code{"topright"}}
       \item{\code{legend}:}{\code{c("susceptible", "infectious", "removed")}}
@@ -81,7 +81,7 @@ Spatio-Temporal Animation of an Epidemic
   \item{timer.opts}{
     either a list of arguments passed to the \code{\link{legend}} function or
     \code{NULL} (or \code{NA}), in which case no timer will be plotted.  All 
-    necessary arguments have sensible defaults and need not be specified, i.e.\
+    necessary arguments have sensible defaults and need not be specified, i.e.
     \describe{
       \item{\code{x}:}{\code{"bottomright"}}
       \item{\code{title}:}{\code{"time"}}
@@ -102,16 +102,20 @@ Spatio-Temporal Animation of an Epidemic
     \code{\link{dev.print}}, which then is executed at each time point of the
     grid defined by \code{time.spacing}.  Note that this only works with
     \code{time.spacing} not being \code{NULL}.  Essentially, this is used for 
-    saving the produced snapshots to files, e.g.\ \code{generate.snapshots = %
+    saving the produced snapshots to files, e.g.
+
+    \code{generate.snapshots = %
     list(device=pdf, file=quote(paste("epidemic_",sprintf(form,t0),".pdf",%
-    sep="")))} will store the animation steps in pdf-files in the current
+    sep="")))}
+
+    will store the animation steps in pdf-files in the current
     working directory, where the file names each end with the time point
     represented by the corresponding plot.  Because the variables \code{t0} and
     \code{form} are evaluated inside the function the \code{file} argument is
     \code{quote}d.
   }
   \item{\dots}{
-    further graphical parameters passed to the basic call of \code{plot}, e.g.\
+    further graphical parameters passed to the basic call of \code{plot}, e.g.
     \code{las}, \code{cex.axis} (etc.) and \code{mgp}.
   }
 }

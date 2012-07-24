@@ -85,12 +85,14 @@ coefList <- lapply(names, function(name) {
 
 #Profile object (necessary to specify a more loose convergence
 #criterion). Speed things up by using do.ltildeprofile=FALSE (the default)
-prof <- profile(imdepi.fit, coefList,control=list(fnscale=-1,maxit=50,reltol=0.1,REPORT=1,trace=5),do.ltildeprofile=TRUE)
+prof <- profile(imdepi.fit, coefList,control=list(fnscale=-1,maxit=50,
+   reltol=0.1,REPORT=1,trace=5),do.ltildeprofile=TRUE)
 
 #Plot result for one variable
 par(mfrow=c(1,2))
 for (name in names) {
-  with(as.data.frame(prof$lp[[name]]),matplot(grid,cbind(profile,estimated,wald),type="l",xlab=name,ylab="loglik"))
+  with(as.data.frame(prof$lp[[name]]),matplot(grid,cbind(profile,estimated,wald),
+    type="l",xlab=name,ylab="loglik"))
   legend(x="bottomleft",c("profile","estimated","wald"),lty=1:3,col=1:3)
 }
 }

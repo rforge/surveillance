@@ -107,7 +107,8 @@ upperbound(outbreakP(mysts, control=list(range=1:length(y),k=100,
 #Graphical illustration with number-needed-before-alarm (NNBA) upperbound.
 res <- outbreakP(mysts, control=list(range=1:length(y),k=100, 
            ret="cases"))
-plot(res,dx.upperbound=0,lwd=c(1,1,3),legend.opts=list(legend=c("Infected","NNBA","Outbreak","Alarm"),horiz=TRUE))
+plot(res,dx.upperbound=0,lwd=c(1,1,3),legend.opts=list(legend=c("Infected",
+      "NNBA","Outbreak","Alarm"),horiz=TRUE))
 
 }
 

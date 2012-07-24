@@ -217,7 +217,8 @@ bpnp.control <- list(k=0,eps=rep(0.005,2), iter.max=rep(250,2),B=-1,hookFun=plot
 system.time(sts.bp <- backprojNP(sts, incu.pmf=inc.pmf,control=bpnp.control, ylim=c(0,max(X,Y))))
 
 #Fast C version (use argument: eq3a.method="C")! 
-system.time(sts.bp.fast <- backprojNP(sts, incu.pmf=inc.pmf, control=modifyList(bpnp.control,list(eq3a.method="C")), ylim=c(0,max(X,Y))))
+system.time(sts.bp.fast <- backprojNP(sts, incu.pmf=inc.pmf,
+    control=modifyList(bpnp.control,list(eq3a.method="C")), ylim=c(0,max(X,Y))))
 
 #Check if results are equal.
 all.equal(upperbound(sts.bp),upperbound(sts.bp.fast))
