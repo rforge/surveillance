@@ -38,7 +38,7 @@ Description: A package implementing statistical methods for the modeling and
         The package contains several real-world datasets, the ability to
         simulate outbreak data, visualize the results of the monitoring in
         temporal, spatial or spatio-temporal fashion.
-Maintainer: Michael Höhle <hoehle@stat.uni-muenchen.de>
+Maintainer: Michael Höhle <Michael.Hoehle@stat.uni-muenchen.de>
 License: GPL-2
 URL: http://surveillance.r-forge.r-project.org/
 ZipData: no

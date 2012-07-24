@@ -1,0 +1,20 @@
+                 "state" "nOfexaminedChildren" "withVaccDocument" "MMR1" "MMR2"
+    "Baden-Wuerttemberg"               104046              0.921   0.937  0.787
+                "Bayern"               131898              0.934   0.917  0.757
+                "Berlin"                27400              0.919   0.938  0.836
+           "Brandenburg"                22755              0.935   0.971  0.898
+                "Bremen"                 5571              0.869   0.946  0.769
+               "Hamburg"                11711              0.917   0.939  0.840
+                "Hessen"                61882              0.924   0.948  0.812
+"Mecklenburg-Vorpommern"                13216              0.921   0.975  0.916
+         "Niedersachsen"                82916              0.912   0.954  0.816
+   "Nordrhein-Westfalen"               175765              0.885   0.952  0.816
+       "Rheinland-Pfalz"                41723              0.914   0.949  0.808
+              "Saarland"                 9492              0.911   0.952  0.856
+               "Sachsen"                31731              0.939   0.973  0.850
+        "Sachsen-Anhalt"                17215              0.926   0.977  0.898
+    "Schleswig-Holstein"                28747              0.898   0.947  0.836
+            "Thueringen"                18164              0.946   0.974  0.883
+                 "Total"               784232              0.914   0.945  0.832
+          "West Germany"               681151              0.911   0.941  0.801
+          "East Germany"               103081              0.935   0.974  0.885
