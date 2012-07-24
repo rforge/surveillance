@@ -116,7 +116,7 @@ twinSIR(formula, data, weights, subset,
     \code{lambda.smooth}, the penalty matrix \eqn{K} and the list of used
     distance functions \code{f} (from \code{attributes(data)}) should be
     returned for further computation.  This defaults to \code{TRUE} as this
-    information is necessary e.g.\ in the \code{profile} and \code{plot} 
+    information is necessary e.g. in the \code{profile} and \code{plot} 
     methods.
   }
   \item{keep.data}{
