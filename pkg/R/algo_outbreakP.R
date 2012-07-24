@@ -7,7 +7,7 @@
 # Alarm statistic at end time n is returned.
 #
 # Author:
-# Michael Höhle <hoehle@stat.uni-muenchen.de>
+# Michael Hoehle <hoehle@stat.uni-muenchen.de>
 #
 # R port of the Java code by Marianne Frisen & Linus Schioler from
 # the CASE project. See https://smisvn.smi.se/case/

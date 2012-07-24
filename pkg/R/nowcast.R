@@ -350,64 +350,64 @@ nowcast <- function(s,t,D,dEventCol="dHospital",dReportCol="dReport",
   return(sts)
 }
 
-#Example section
-example <- function() {
-  library("surveillance")
+## #Example section
+## example <- function() {
+##   library("surveillance")
 
-  #Get some data from somewhere
-  source("nowcast2.R")
-  D <- loadData()
+##   #Get some data from somewhere
+##   source("nowcast2.R")
+##   D <- loadData()
 
-  #Test the function
-  source("nowcast-surveillance.R")
-  s <- as.Date("2011-06-02") ;
-  k <- 10
-  l <- 3
-  t <- seq(s-k-l+1,s-l,by="1 day")
-  dRange <- as.Date(c("2011-05-01","2011-07-10"))
-  nc1 <- nowcast(s=s,t=t,D=D,method="bayes.nb",control=list(dRange=dRange,score=TRUE))
+##   #Test the function
+##   source("nowcast-surveillance.R")
+##   s <- as.Date("2011-06-02") ;
+##   k <- 10
+##   l <- 3
+##   t <- seq(s-k-l+1,s-l,by="1 day")
+##   dRange <- as.Date(c("2011-05-01","2011-07-10"))
+##   nc1 <- nowcast(s=s,t=t,D=D,method="bayes.nb",control=list(dRange=dRange,score=TRUE))
 
-  #Sow result
-  plot(nc1,xaxis.years=FALSE,dx.upperbound=0,legend=NULL,lty=c(1,1,1),lwd=c(1,1,2),ylab="Cases",xlab="Time (days)",main="")
-  idx <- max(which(!is.na(upperbound(nc1))))
-  lines( c(idx-0.5,idx+0.5), rep(upperbound(nc1)[idx,],2),lwd=2,col="blue")
+##   #Sow result
+##   plot(nc1,xaxis.years=FALSE,dx.upperbound=0,legend=NULL,lty=c(1,1,1),lwd=c(1,1,2),ylab="Cases",xlab="Time (days)",main="")
+##   idx <- max(which(!is.na(upperbound(nc1))))
+##   lines( c(idx-0.5,idx+0.5), rep(upperbound(nc1)[idx,],2),lwd=2,col="blue")
   
-  ##Show CIs
-  for (i in 1:nrow(nc1)) {
-    points(i, upperbound(nc1)[i,], col="indianred")
-    lines( i+c(-0.3,0.3), rep(nc1@ci[i,,1],2),lty=1,col="indianred2")
-    lines( i+c(-0.3,0.3), rep(nc1@ci[i,,2],2),lty=1,col="indianred2")
-    lines( rep(i,each=2), nc1@ci[i,,],lty=2,col="indianred2")
-  }
-  #Add "now" on the x-axis
-  points( as.numeric(s-dRange[1])+1,0,pch=10,cex=1.5,col="red")
+##   ##Show CIs
+##   for (i in 1:nrow(nc1)) {
+##     points(i, upperbound(nc1)[i,], col="indianred")
+##     lines( i+c(-0.3,0.3), rep(nc1@ci[i,,1],2),lty=1,col="indianred2")
+##     lines( i+c(-0.3,0.3), rep(nc1@ci[i,,2],2),lty=1,col="indianred2")
+##     lines( rep(i,each=2), nc1@ci[i,,],lty=2,col="indianred2")
+##   }
+##   #Add "now" on the x-axis
+##   points( as.numeric(s-dRange[1])+1,0,pch=10,cex=1.5,col="red")
 
 
-  #Same as animation
-#  scoreRange <- seq(as.Date("2011-05-25"),max(dRange),by="1 day")
-  scoreRange <- seq(as.Date("2011-05-15"),max(dRange),by="1 day")
-  for (i in 1:length(scoreRange)) {
-    s <- scoreRange[i]
-    t <- seq(s-k-l+1, s-l, by="1 day")
-    nc1 <- nowcast(s=s,t=t,D=D,method="bayes.nb",control=list(dRange=dRange))
+##   #Same as animation
+## #  scoreRange <- seq(as.Date("2011-05-25"),max(dRange),by="1 day")
+##   scoreRange <- seq(as.Date("2011-05-15"),max(dRange),by="1 day")
+##   for (i in 1:length(scoreRange)) {
+##     s <- scoreRange[i]
+##     t <- seq(s-k-l+1, s-l, by="1 day")
+##     nc1 <- nowcast(s=s,t=t,D=D,method="bayes.nb",control=list(dRange=dRange))
 
-    #Sow result
-    plot(nc1,xaxis.years=FALSE,dx.upperbound=0,legend=NULL,lty=c(1,1,1),lwd=c(1,1,2),ylab="Cases",xlab="Time (days)",main="",ylim=c(0,80))
-    idx <- max(which(!is.na(upperbound(nc1))))
-    lines( c(idx-0.5,idx+0.5), rep(upperbound(nc1)[idx,],2),lwd=2,col="blue")
+##     #Sow result
+##     plot(nc1,xaxis.years=FALSE,dx.upperbound=0,legend=NULL,lty=c(1,1,1),lwd=c(1,1,2),ylab="Cases",xlab="Time (days)",main="",ylim=c(0,80))
+##     idx <- max(which(!is.na(upperbound(nc1))))
+##     lines( c(idx-0.5,idx+0.5), rep(upperbound(nc1)[idx,],2),lwd=2,col="blue")
   
-     ##Show CIs
-    for (i in 1:nrow(nc1)) {
-      points(i, upperbound(nc1)[i,], col="indianred")
-      lines( i+c(-0.3,0.3), rep(nc1@ci[i,,1],2),lty=1,col="indianred2")
-      lines( i+c(-0.3,0.3), rep(nc1@ci[i,,2],2),lty=1,col="indianred2")
-      lines( rep(i,each=2), nc1@ci[i,,],lty=2,col="indianred2")
-    }
-    #Add "now" on the x-axis
-    points( as.numeric(s-dRange[1])+1,0,pch=10,cex=1.5,col="red")
-    Sys.sleep(0.5)
-  }
-}
+##      ##Show CIs
+##     for (i in 1:nrow(nc1)) {
+##       points(i, upperbound(nc1)[i,], col="indianred")
+##       lines( i+c(-0.3,0.3), rep(nc1@ci[i,,1],2),lty=1,col="indianred2")
+##       lines( i+c(-0.3,0.3), rep(nc1@ci[i,,2],2),lty=1,col="indianred2")
+##       lines( rep(i,each=2), nc1@ci[i,,],lty=2,col="indianred2")
+##     }
+##     #Add "now" on the x-axis
+##     points( as.numeric(s-dRange[1])+1,0,pch=10,cex=1.5,col="red")
+##     Sys.sleep(0.5)
+##   }
+## }
 
 
 ######################################################################

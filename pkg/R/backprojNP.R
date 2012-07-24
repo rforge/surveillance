@@ -21,7 +21,7 @@ naninf2zero <- function(x) {x[is.nan(x) | is.infinite(x)] <- 0 ; return(x)}
 
 ## Rcpp inline function to significantly speed up the computation of equation
 ## 3a in the Becker et al. (1991) paper. Created with the help of Daniel
-## Sabanés Bové, University of Zurich.
+## Sabanes Bove, University of Zurich.
 
 ## eq3a <-
 ##     cxxfunction(signature(rlambdaOld="numeric",
