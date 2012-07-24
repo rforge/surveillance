@@ -67,14 +67,6 @@ options(SweaveHooks=list(fig=function() par(mar=c(5,4,4,0),cex.axis=1.5,cex.lab=
 options(width=70)
 set.seed(247)
 
-######################################################################
-#Do we need to compute or can we just fetch results
-######################################################################
-compute <- !file.exists(".Rresults")
-#compute <- TRUE
-#load computed results
-if(!compute) load(".Rresults")
-print(paste("Doing computations: ",compute,sep=""))
 @ 
 
 

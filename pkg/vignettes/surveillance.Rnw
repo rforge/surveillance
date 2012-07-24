@@ -93,8 +93,8 @@ print(paste("Doing computations: ",compute,sep=""))
 {\large Disclaimer}: This vignette reflects package state at version
 1.2 and is hence somewhat outdated. New functionality has been added
 to the package: this includes the \texttt{hhh4}, \texttt{twinSIR} and
-\text{twinstim} modelling and the \texttt{glrnb} outbreak detection. A
-description of the the \texttt{hhh4} modelling can be found in its own
+\texttt{twinstim} modelling and the \texttt{glrnb} outbreak detection. A
+description of the \texttt{hhh4} modelling can be found in its own
 vignette \verb+vignette_hhh4+, \texttt{glrnb} is described in
 \verb+vignette_glrnb+. Furthermore, use of the new S4 class \texttt{sts}
 instead of \texttt{disProg} is encouraged to encapsulate the data.
