@@ -60,10 +60,10 @@ set.seed(1234)
 ######################################################################
 #Do we need to compute or can we just fetch results
 ######################################################################
-compute <- !file.exists(".Rresults")
+compute <- !file.exists("surveillance-cache.RData")
 #compute <- TRUE
 #load computed results
-if(!compute) load(".Rresults")
+if(!compute) load("surveillance-cache.RData")
 print(paste("Doing computations: ",compute,sep=""))
 
 @ 
@@ -681,7 +681,8 @@ print(measles.hhh.grid,3)
 
 <<echo=F>>=
 #save computed results
-save(list=c("sts.cdc","sts.farrington","acall","res","res.survstat","control","ten.surv",ls(pattern="measles")),file=".Rresults")
+save(list=c("sts.cdc","sts.farrington","acall","res","res.survstat","control","ten.surv",ls(pattern="measles")),
+     file="surveillance-cache.RData")
 @
 
 
