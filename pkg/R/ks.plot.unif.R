@@ -122,7 +122,7 @@ checkResidualProcess <- function (object, plot = 1:2, mfrow = n2mfrow(length(plo
     
     ## eval selected plot calls
     if (length(plot) > 0L) {
-        par(mfrow = mfrow)
+        opar <- par(mfrow = mfrow); on.exit(par(opar))
         for (i in plot) eval(plotcalls[[i]])
         invisible(ret)
     } else {
