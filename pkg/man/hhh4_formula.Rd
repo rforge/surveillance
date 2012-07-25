@@ -63,7 +63,7 @@ intercept must be excluded with \code{-1}.
 \examples{
 \dontrun{
 # some calls of the fitting function 'hhh4': 
-# see vignette("vignette_hhh4") for further details
+# see vignette("hhh4") for further details
 
 ## Ex: univariate time series of meningococcal infections in Germany
 # Negative binomial model with

@@ -4,8 +4,6 @@
 % functions without documentation atm
 \alias{plot.ah4}
 \alias{predict.ah4}
-\alias{oneStepAhead}
-\alias{scores}
 \alias{permutationTest}
 \alias{pit}
 
@@ -146,7 +144,7 @@ hhh4(stsObj,
 }
 
 \details{
-  For further details see \code{vignette("vignette_hhh4")} and the
+  For further details see \code{vignette("hhh4")} and the
   references.
 }
 
@@ -315,71 +313,6 @@ cntrl_D <- list(ar = list(f = ~ 1),
                 family = "NegBin1", optimizer = opt,
                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
 res_D <- hhh4(fluBYBW,cntrl_D)               
-
-
-#####################################################################
-## do 1-step ahead predictions
-#####################################################################
-tp <- nrow(fluBYBW)-2*52
-
-val_A0 <- oneStepAhead(res_A0,tp=tp) 
-val_B0 <- oneStepAhead(res_B0,tp=tp) 
-val_C0 <- oneStepAhead(res_C0,tp=tp) 
-
-val_A1 <- oneStepAhead(res_A1,tp=tp) 
-val_B1 <- oneStepAhead(res_B1,tp=tp) 
-val_C1 <- oneStepAhead(res_C1,tp=tp) 
-
-val_A2 <- oneStepAhead(res_A2,tp=tp) 
-val_B2 <- oneStepAhead(res_B2,tp=tp) 
-val_C2 <- oneStepAhead(res_C2,tp=tp) 
-
-val_D <- oneStepAhead(res_D,tp=tp) 
-
-
-##################################
-## compute scores
-################################
-
-#scores
-vals <- ls(pattern="val_")
-
-nam <- substring(vals,first=5,last=6)
-
-uni <- NULL
-indiv <- TRUE
-
-scores_i <- list()
-meanScores <- NULL
-for(i in seq(along.with=vals)){
-  sc <- scores(get(vals[i]),unit=uni, individual=indiv)
-  scores_i[[i]] <- sc
-  meanScores <- rbind(meanScores,colMeans(sc))
-}
-
-names(scores_i) <- nam
-rownames(meanScores) <- nam
-
-##comparison with best model B2 
-
-compareWithBest <- function(best, whichModels, whichScores=1:3, nPermut=9999, seed=1234){
-  set.seed(seed)
-  pVals <- NULL
-  for(score in whichScores){
-    p <- c()
-    for(model in whichModels){
-      if(model==best) p <- c(p,NA)
-      else p <- c(p,permutationTest(scores_i[[model]][,score],scores_i[[best]][,score],
-     plot=TRUE,nPermutation=nPermut)$pVal.permut)
-    }  
-    pVals <- cbind(pVals,p)
-  }
-  return(pVals)
-}
-
-
-pVals_flu <- compareWithBest(best=6, whichModels=1:10,seed=2059710987)
-rownames(pVals_flu) <- nam
 
 }
 }

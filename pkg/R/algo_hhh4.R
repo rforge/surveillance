@@ -2155,7 +2155,7 @@ addSeason2formula <- function(f=~1,       # formula to start with
 
 oneStepAhead <- function(result, # result of call to hhh4
                          tp,     # one-step-ahead predictions for time points (tp+1):nrow(stsObj)
-                         verbose=1,
+                         verbose=TRUE,
                          keep.estimates = FALSE){
   
   stsObj <- result$stsObj
