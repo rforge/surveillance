@@ -127,19 +127,19 @@ modelling and prospective change-point detection in the resulting surveillance
 time series. A recent introduction to the package with focus on outbreak 
 detection methods is given by \cite{hoehle-mazick-2010}.
 
-This document illustrates the functionality of the function \hhh\
-for the modelling of univariate and multivariate time series 
-of infectious disease counts. 
-The function is currently incorporated in the development version of 
-\surveillance\ available from \url{http://surveillance.r-forge.r-project.org/}.
-Section~\ref{sec:data} introduces the S4 class data structure used to store 
-surveillance time series data within the package. Access and 
-visualization methods are outlined by means of built-in data sets.
-In Section~\ref{sec:model}, the statistical modelling approach by 
-\cite{held-etal-2005} and further model extensions are described. 
-After the general function call and arguments 
-are shown, the detailed usage of \hhh\ is demonstrated in 
-Section~\ref{sec:hhh} using data introduced in Section~\ref{sec:data}. 
+This document illustrates the functionality of the function \hhh\ for
+the modelling of univariate and multivariate time series of infectious
+disease counts.  The function is currently incorporated in the
+development version of \surveillance\ available from
+R-Forge\footnote{\url{http://surveillance.r-forge.r-project.org/}}.
+Section~\ref{sec:data} introduces the S4 class data structure used to
+store surveillance time series data within the package. Access and
+visualization methods are outlined by means of built-in data sets.  In
+Section~\ref{sec:model}, the statistical modelling approach by
+\cite{held-etal-2005} and further model extensions are described.
+After the general function call and arguments are shown, the detailed
+usage of \hhh\ is demonstrated in Section~\ref{sec:hhh} using data
+introduced in Section~\ref{sec:data}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  DATA
@@ -168,15 +168,16 @@ Additionally, the slot \code{populationFrac} contains a $T\times I$ matrix
 representing population fractions in unit $i$ at time $t$.
 
 
-The package \surveillance\ contains a number of time series in the \code{data}
-directory. Most data sets originate from the SurvStat@RKI database 
-(\url{http://www3.rki.de/SurvStat}), maintained by the Robert Koch Institute 
-(RKI), Germany. Selected data sets will be analyzed in Section~\ref{sec:hhh} 
-and are introduced in the following. Note that many of the built-in datasets 
-are stored in the S3 class data structure \code{disProg}. 
-They can be easily converted into the S4 \sts\ data structure using
-the function \code{disProg2sts}. The resulting \sts\ object can be accessed 
-similar as standard \code{matrix} objects and allows easy temporal and spatial
+The package \surveillance\ contains a number of time series in the
+\code{data} directory. Most data sets originate from the SurvStat@RKI
+database\footnote{\url{http://www3.rki.de/SurvStat}}, maintained by
+the Robert Koch Institute (RKI), Germany. Selected data sets will be
+analyzed in Section~\ref{sec:hhh} and are introduced in the
+following. Note that many of the built-in datasets are stored in the
+S3 class data structure \code{disProg}.  They can be easily converted
+into the S4 \sts\ data structure using the function
+\code{disProg2sts}. The resulting \sts\ object can be accessed similar
+as standard \code{matrix} objects and allows easy temporal and spatial
 aggregation as will be shown in the remainder of this section. \\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
