@@ -1,4 +1,5 @@
 %\VignetteIndexEntry{Additional documentation of the function hhh4}
+%\VignetteDepends{surveillance, maptools, Matrix}
 %\VignetteKeyword{getting started}
 %\VignettePackage{surveillance}
 
@@ -42,7 +43,7 @@
 \title{The function `hhh4' in the R-package `surveillance'}  %'
 \author{
 Michaela Paul\thanks{Author of correspondence: Email: \texttt{michaela.paul@ifspm.uzh.ch}}\\
-Biostatistics Unit\\
+Division of Biostatistics\\
 Institute of Social and Preventive Medicine\\
 University of Zurich, Switzerland
 } 
@@ -52,7 +53,7 @@ University of Zurich, Switzerland
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Sweave 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\SweaveOpts{prefix.string=figs/vignette_hhh4, width=10,height=4.5, keep.source=T, strip.white=true}
+\SweaveOpts{prefix.string=figs/hhh4, width=10,height=4.5, keep.source=T, strip.white=true}
 \setkeys{Gin}{width=1\textwidth} 
 
 \definecolor{Sinput}{rgb}{0,0,0.56}
@@ -78,12 +79,18 @@ library("Matrix")
 options(width=70)
 set.seed(247)
 
+#####################################################################
+# create directory figs if it does not exist
+#####################################################################
+if(!file.exists("figs/")) dir.create("figs/")
+
+
 ######################################################################
 #Do we need to compute or can we just fetch results
 ######################################################################
-compute <- !file.exists("hhh4results.RData")
+compute <- !file.exists("hhh4-cache.RData")
 #load computed results
-if(!compute) load("hhh4results.RData")
+if(!compute) load("hhh4-cache.RData")
 print(paste("Doing computations: ",compute,sep=""))
 @ 
 
@@ -590,14 +597,14 @@ model.B2 <- list(ar = list(f = ~ 1),
 
 
 if(compute){   
-  # this takes quite a while
+  # this is time-consuming...
   result.B2 <- hhh4(flu, model.B2)
   s.B2 <- summary(result.B2)
 
   system.time(pred.B2 <- oneStepAhead(result.B2,tp=nrow(flu)-2*52))
   meanSc.B2 <- colMeans(scores(pred.B2)) 
     
-  save(s.B2, meanSc.B2, file="hhh4results.RData")
+  save(s.B2, meanSc.B2, file="hhh4-cache.RData")
 }
 @
 

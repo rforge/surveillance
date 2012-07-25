@@ -1,6 +1,7 @@
 %\VignetteIndexEntry{Additional documentation of the function algo.glrnb}
 %\VignetteKeywords{getting started}
 %\VignettePackage{surveillance}
+%\VignetteDepends{surveillance}
 
 \documentclass[a4paper,11pt]{article}
 \usepackage{natbib}
@@ -66,6 +67,11 @@ library(xtable)
 options(SweaveHooks=list(fig=function() par(mar=c(5,4,4,0),cex.axis=1.5,cex.lab=1.5,cex.main=1.5)))
 options(width=70)
 set.seed(247)
+
+#####################################################################
+# create directory figs if it does not exist
+#####################################################################
+if(!file.exists("figs/")) dir.create("figs/")
 
 @ 
 

@@ -1,6 +1,7 @@
 %\VignetteIndexEntry{Getting started with the package}
 %\VignetteKeywords{getting started}
 %\VignettePackage{surveillance}
+%\VignetteDepends{surveillance}
 
 \documentclass[a4paper,11pt]{article}
 \usepackage{natbib}
@@ -57,6 +58,11 @@ options(SweaveHooks=list(fig=function() par(mar=c(5,4,4,0),cex.axis=1.5,cex.lab=
 options(width=70)
 set.seed(1234)
 
+#####################################################################
+# create directory figs if it does not exist
+#####################################################################
+if(!file.exists("figs/")) dir.create("figs/")
+
 ######################################################################
 #Do we need to compute or can we just fetch results
 ######################################################################
@@ -95,8 +101,8 @@ print(paste("Doing computations: ",compute,sep=""))
 to the package: this includes the \texttt{hhh4}, \texttt{twinSIR} and
 \texttt{twinstim} modelling and the \texttt{glrnb} outbreak detection. A
 description of the \texttt{hhh4} modelling can be found in its own
-vignette \verb+vignette_hhh4+, \texttt{glrnb} is described in
-\verb+vignette_glrnb+. Furthermore, use of the new S4 class \texttt{sts}
+vignette \verb+vignette("hhh4")+, \texttt{glrnb} is described in
+\verb+vignette("glrnb")+. Furthermore, use of the new S4 class \texttt{sts}
 instead of \texttt{disProg} is encouraged to encapsulate the data.
 
 \section{Introduction}\label{sec:intro}
@@ -572,7 +578,7 @@ elements 1 if two areas share a common border and is 0 otherwise.
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=0.5\textwidth]{figs/weseremsmap2}
+  \includegraphics[width=0.5\textwidth]{map-weserems}
   \caption{Map of the administrative district ``Weser-Ems''}     
   \label{fig:map}
 \end{figure}
@@ -681,8 +687,10 @@ print(measles.hhh.grid,3)
 
 <<echo=F>>=
 #save computed results
+if(compute){
 save(list=c("sts.cdc","sts.farrington","acall","res","res.survstat","control","ten.surv",ls(pattern="measles")),
      file="surveillance-cache.RData")
+}
 @
 
 
