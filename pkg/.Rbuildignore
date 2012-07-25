@@ -11,9 +11,4 @@ twins.log
 twins.log.acc
 twins.log2
 
-.*/vignettes/\.Rresults$
-\.\.pdf
-
-
-
 ^auto
