@@ -112,14 +112,11 @@ and Paul et. al (2008).
 
 # univariate time series: salmonella agona cases 
 data(salmonella.agona)
-salmonella <- create.disProg(week=1:length(salmonella.agona$observed),
-                             observed=salmonella.agona$observed, 
-                             state=salmonella.agona$state)
 
 model1 <- list(lambda=TRUE, linear=TRUE, 
                nseason=1, negbin="single")
                
-algo.hhh(salmonella, control=model1)
+algo.hhh(salmonella.agona, control=model1)
 
 # multivariate time series: 
 # measles cases in Lower Saxony, Germany
@@ -128,17 +125,12 @@ data(measles.weser)
 # same model as above
 algo.hhh(measles.weser, control=model1)
 
-# different starting values for 
-# theta = (lambda, beta, gamma_1, gamma_2, psi)
-startValues <- c(0.1, rep(0, 3), 1)
-algo.hhh(measles.weser, control=model1, 
-                 thetastart=startValues)
-
 # include autoregressive parameter phi for adjacent "Kreise"
-model2 <- list(lambda=TRUE, neighbours=TRUE, 
-               linear=FALSE, nseason=1, 
-               negbin="single")
-algo.hhh(measles.weser, control=model2)
+# specifiy start values for theta
+model2 <- list(lambda = TRUE, neighbours = TRUE, 
+               linear = FALSE, nseason = 1, 
+               negbin = "single")
+algo.hhh(measles.weser, control = model2, thetastart = rep(0, 20) )
                   
 ## weekly counts of influenza and meningococcal infections 
 ## in Germany, 2001-2006

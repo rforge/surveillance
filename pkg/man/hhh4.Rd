@@ -108,7 +108,7 @@ hhh4(stsObj,
       \item{\code{subset}}{Typically \code{2:nrow(obs)} if model contains
 	autoregression}
       \item{\code{optimizer}}{ Details for used optimizer (\code{nlminb} is 
-        default, \code{optim} may also be used)}
+        default, the methods specified in the \code{method} argument of \code{\link{optim}} may also be used)}
       \item{\code{verbose}}{Logical if additional information is to be printed
 	during the computations}
       \item{\code{start}}{List with initials, overrides any initial
@@ -160,14 +160,59 @@ hhh4(stsObj,
 }
 \author{M. Paul and L. Held}
 \examples{
+#####################################################################
+# Fit some models from ?algo.hhh
+#####################################################################
+
+## univariate salmonella agona data
+data(salmonella.agona)
+# convert to sts class
+salmonella <- disProg2sts(salmonella.agona)
+
+# generate formula for temporal and seasonal trends
+f.end <- addSeason2formula(f = ~ 1 + t, S=1, period=52)
+model1 <- list(ar = list(f = ~ 1), end = list(f =f.end),
+               family = "NegBin1")
+# run model
+res <- hhh4(salmonella, model1)
+summary(res, idx2Exp=1, amplitudeShift=TRUE)
+
+## multivariate time series: 
+# measles cases in Lower Saxony, Germany
+data(measles.weser)
+measles <- disProg2sts(measles.weser)
+
+# same model as above
+summary(hhh4(measles, control=model1))
+
+# now use region-specific intercepts in endemic component
+f.end2 <- addSeason2formula(f = ~ -1 + fe(1, which=rep(TRUE, ncol(measles))) + t,
+                            S = 1, period = 52)
+model2 <- list(ar = list(f = ~ 1), 
+               end = list(f = f.end2, offset = population(measles)),
+               family = "NegBin1")
+# run model
+summary(hhh4(measles, control=model2), idx2Exp=1, amplitudeShift=TRUE)
+
+# include autoregressive parameter phi for adjacent "Kreise"
+# no linear trend in endemic component
+f.end3 <- addSeason2formula(f = ~ -1 + fe(1, which=rep(TRUE, ncol(measles))), 
+                            S = 1, period = 52)
+model3 <- list(ar = list(f = ~ 1),
+               ne = list(f = ~1),
+               end = list(f = f.end3, offset= population(measles)),
+               family = "NegBin1")
+# run model
+summary(hhh4(measles, control=model3), idx2Exp=1:2, amplitudeShift=TRUE)
+
+\dontrun{
 ######################################################################
 # Fit the models from the Paul & Held (2011) paper for the influenza data
-# from Bavaria and Baden-Wuerttemberg. For further documentation see
-# also the vignette
+# from Bavaria and Baden-Wuerttemberg (this takes some time!)
+# For further documentation see also the vignette.
 ######################################################################
 
 data("fluBYBW") 
-
 
 ###############################################################
 ## generate formula for temporal and seasonal trends
@@ -186,7 +231,6 @@ cntrl_A0 <- list(ar = list(f = ~ -1),
                  verbose = 1, data = data.frame(t = epoch(fluBYBW)-1))
 summary(res_A0 <- hhh4(fluBYBW,cntrl_A0))
 
-\dontrun{
 # B0
 cntrl_B0 <- list(ar = list(f = ~ 1),
                  end = list(f =f.end, offset = population(fluBYBW)),
@@ -258,7 +302,7 @@ cntrl_C2 <- list(ar = list(f = ~ -1 + ri(type="iid", corr="all")),
                  family = "NegBin1", optimizer = opt,
                  verbose=1, data=data.frame(t=epoch(fluBYBW)-1),
                  start=list(fixed=fixef(res_B0),random=c(rep(0,140),
-                         ranef(res_B0)), sd.corr=c(-.5,getSdCorr(res_B0),0)))
+                         ranef(res_B0)), sd.corr=c(-.5,res_B0$Sigma.orig,0)))
 res_C2 <- hhh4(fluBYBW,cntrl_C2)               
 
 

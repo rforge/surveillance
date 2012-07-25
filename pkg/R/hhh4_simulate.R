@@ -60,7 +60,7 @@ simHHH4 <- function(stsObj, # sts object
   } else {
 	# simulate data
 	for(t in 1:nTime){
-	  #mu_i,t = lambda*x_i,t-1 +phi*\sum_j~i x_j,t-1 + nu
+	  #mu_i,t = lambda*x_i,t-1 +phi*\sum_j~i wji*x_j,t-1 + nu
 	  mu[t,] <- ar[t,] *x[t,] + ne[t,]*wsumN(x[t,], nhood) + end[t,]
 	  x[t+1,] <- rdistr(nUnits, mu[t,])
 	}

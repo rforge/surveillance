@@ -60,6 +60,8 @@ algo.hhh <- function(disProgObj,
                            max(c(-lags,0), na.rm=TRUE))
   }
 
+  # check if observed is a vector and convert to matrix if necessary
+  if(is.vector(disProgObj$observed)) disProgObj$observed <- as.matrix(disProgObj$observed)
   n <- nrow(disProgObj$observed)
   nareas <- ncol(disProgObj$observed)
 
@@ -844,8 +846,12 @@ make.design <- function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
 
   Y <- matrix(data[t.min:t.max,],nrow=length(t.min:t.max),ncol=nareas)
   
-  # population sizes n_{i,t} 
-  population <- matrix(disProgObj$populationFrac[t.min:t.max,],nrow=length(t.min:t.max),ncol=nareas)
+  # population sizes n_{i,t}
+  if(is.null(disProgObj$populationFrac)){
+	population <- matrix(1, nrow=length(t.min:t.max),ncol=nareas)
+  } else {
+	population <- matrix(disProgObj$populationFrac[t.min:t.max,],nrow=length(t.min:t.max),ncol=nareas)
+  }
 
   # observed counts at time point t-lag
   # NOTE: the same lag (the maximum lag) is used for all areas
@@ -877,7 +883,12 @@ make.design <- function(disProgObj, control=list(lambda=TRUE, neighbours=FALSE,
   # now define design matrix (for trend and seasonality) for each time point
 
   #t<- disProgObj$week[t.min:t.max]
-  t<- disProgObj$week[(t.min:t.max)-1]
+  # if no $week is given 
+  if(is.null(disProgObj$week)){
+	t <- (t.min:t.max)-1
+  } else {
+	t<- disProgObj$week[(t.min:t.max)-1]
+  }
   #t <- t - mean(t)
 
   form<-function(mod=ifelse(dimTrend == 0,"~-1","~-1+t"),
@@ -1618,6 +1629,7 @@ jacobian <- function(thetahat, designRes){
   nseason <- designRes$control$nseason
   
   alpha <- colnames(designRes$disProgObj$observed)
+  if(is.null(alpha)) alpha <- paste("obs",1:nareas, sep="")
   thetaNames <- c(thetaNames, alpha)
 
   if(dimLambda >0){

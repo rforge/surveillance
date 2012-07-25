@@ -1608,16 +1608,23 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   # go through all variance components
   for(i in 1:dimSigma){
+	# compute first derivative of the penalized Fisher info (-> of Sigma^-1) 
+    # with respect to the i-th element of Sigma (= kronecker prod. of Sigmai and identity matrix)
+	# Harville Ch15, Eq. 8.15: (d/d i)S^-1 = - S^-1 * (d/d i) S * S^-1
     SigmaiInv.d1i <- Sigmai.inv %*% d1Sigma[,,i]
     dSi <- -SigmaiInv.d1i %*% Sigmai.inv
     dS.i <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,Sigmai=dSi)
-                      
+    
+	# compute second derivatives
     for(j in i:dimSigma){
+	  # compute (d/d j) S^-1
       SigmaiInv.d1j <- Sigmai.inv %*% d1Sigma[,,j]
       dSj <- -SigmaiInv.d1j %*% Sigmai.inv
       dS.j <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,Sigmai=dSj)
+	  # compute (d/di dj) S^-1
       dS.ij <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,Sigmai=d2Sigma[[i]][,,j])
       
+	  # compute second derivatives of Sigma^-1 (Harville Ch15, Eq 9.2)
       d2S <- (- Sigmai.inv %*% d2Sigma[[i]][,,j] + 
                SigmaiInv.d1i %*% SigmaiInv.d1j +
                SigmaiInv.d1j %*% SigmaiInv.d1i) %*% Sigmai.inv 
@@ -1817,7 +1824,7 @@ updateRegression <- function(theta,sd.corr,model=model,
     if(is.null(trace)) trace <- 1
     res <- nlminb(start=theta, objective=ll, gradient=gr, hessian=penFisher, 
                   sd.corr=sd.corr,model=model, 
-                  control=list(trace=trace,abs.tol=1e-20,rel.tol=1e-10,x.tol=1.5e-8, iter.max=15), 
+                  control=list(trace=trace,abs.tol=1e-20,rel.tol=1e-10,x.tol=1.5e-8, iter.max=control$niter), 
                   lower=lowerBound,
                   scale=scale,...)
     theta.new <- res$par
@@ -1876,7 +1883,7 @@ updateVariance <- function(sd.corr,theta,model, control=list(scoreTol=1e-5, para
     if(is.null(trace)) trace <- 1
     res <- nlminb(start=sd.corr, objective=ll, gradient=gr, hessian=marFisher,
                  theta=theta, model=model,
-                 control=list(trace=trace, iter.max=15),scale=scale,...)
+                 control=list(trace=trace, iter.max=control$niter),scale=scale,...)
     sd.corr.new <- res$par
     ll <- -res$objective
   } else if(method == "nlm"){
@@ -1934,7 +1941,6 @@ fitHHH <- function(theta,sd.corr,model, control=list(tol=1e-5,niter=15),
       diag(parReg$fisher.unpen) <- diag(parReg$fisher.unpen)+1e-2
     } else theta <- parReg$par
     
-    if(0) points(theta, col=i)
     # update variance components
     parVar <- updateVariance(sd.corr=sd.corr,theta=theta, model=model, fisher.unpen=parReg$fisher.unpen,     
                                control=cntrl.update,verbose=verbose, method=method)
