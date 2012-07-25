@@ -213,15 +213,11 @@ plotIt <- function(cur.sts) {
 
 #Call non-parametric back-projection function with hook function but
 #without bootstrapped confidence intervals
-bpnp.control <- list(k=0,eps=rep(0.005,2), iter.max=rep(250,2),B=-1,hookFun=plotIt,verbose=TRUE)
-system.time(sts.bp <- backprojNP(sts, incu.pmf=inc.pmf,control=bpnp.control, ylim=c(0,max(X,Y))))
+bpnp.control <- list(k=0,eps=rep(0.005,2),iter.max=rep(250,2),B=-1,hookFun=plotIt,verbose=TRUE)
 
 #Fast C version (use argument: eq3a.method="C")! 
-system.time(sts.bp.fast <- backprojNP(sts, incu.pmf=inc.pmf,
+system.time(sts.bp <- backprojNP(sts, incu.pmf=inc.pmf,
     control=modifyList(bpnp.control,list(eq3a.method="C")), ylim=c(0,max(X,Y))))
-
-#Check if results are equal.
-all.equal(upperbound(sts.bp),upperbound(sts.bp.fast))
 
 #Show result
 plot(sts.bp,xaxis.years=FALSE,legend=NULL,lwd=c(1,1,2),lty=c(1,1,1))
@@ -235,7 +231,7 @@ for (j in 1:ncol(sts.bp)) {
   for (t in 1:nrow(sts.bp)) {
     #Convolution, note support of inc.pmf starts at zero (move idx by 1)
     i <- seq_len(t)
-    mu[t,j] <- sum(inc.pmf[t-i+1] * upperbound(sts.bp)[i,j])
+    mu[t,j] <- sum(inc.pmf[t-i+1] * upperbound(sts.bp)[i,j],na.rm=TRUE)
   }
 }
 #Show the fit
@@ -244,7 +240,7 @@ lines(1:nrow(sts.bp)-0.5,mu[,1],col="green",type="s",lwd=3)
 #Non-parametric back-projection including boostrap CIs. B=10 is only
 #used for illustration in the documentation example
 #In practice use a realistic value of B=1000 or more.
-bpnp.control2 <- modifyList(bpnp.control, list(hookFun=NULL,k=2,B=100,eq3a.method="C"))
+bpnp.control2 <- modifyList(bpnp.control, list(hookFun=NULL,k=2,B=10,eq3a.method="C"))
 \dontrun{
 bpnp.control2 <- modifyList(bpnp.control, list(hookFun=NULL,k=2,B=1000,eq3a.method="C"))
 }
