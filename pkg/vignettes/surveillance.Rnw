@@ -66,11 +66,12 @@ if(!file.exists("figs/")) dir.create("figs/")
 ######################################################################
 #Do we need to compute or can we just fetch results
 ######################################################################
-compute <- !file.exists("surveillance-cache.RData")
+CACHEFILE <- "surveillance-cache.RData"
+compute <- !file.exists(CACHEFILE)
 #compute <- TRUE
 #load computed results
-if(!compute) load("surveillance-cache.RData")
-print(paste("Doing computations: ",compute,sep=""))
+if(!compute) load(CACHEFILE)
+print(paste("Doing computations:", compute))
 
 @ 
 
@@ -686,10 +687,11 @@ print(measles.hhh.grid,3)
 @
 
 <<echo=F>>=
-#save computed results
-if(compute){
-save(list=c("sts.cdc","sts.farrington","acall","res","res.survstat","control","ten.surv",ls(pattern="measles")),
-     file="surveillance-cache.RData")
+if (compute) { # save computed results
+    save(list=c("sts.cdc","sts.farrington","acall","res","res.survstat",
+                "control","ten.surv",ls(pattern="measles")),
+         file=CACHEFILE)
+    tools::resaveRdaFiles(CACHEFILE)
 }
 @
 
