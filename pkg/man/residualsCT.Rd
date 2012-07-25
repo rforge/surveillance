@@ -3,7 +3,7 @@
 \alias{residuals.twinstim}
 
 \title{
-Extract Cox-Snell-like residuals of a fitted point process
+Extract Cox-Snell-like Residuals of a Fitted Point Process
 }
 
 \description{
@@ -68,7 +68,11 @@ process fitted by \code{object}. This is the observed residual process.
 }
 
 \examples{
-#TODO
+## Load the twinSIR() fit
+data("foofit")
+residuals(foofit)
+## these residuals are, e.g., used by checkResidualProcess()
+checkResidualProcess(foofit)
 }
 
 \keyword{methods}

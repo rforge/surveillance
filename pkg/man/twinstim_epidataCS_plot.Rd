@@ -7,8 +7,9 @@ Plotting the Events of an Epidemic over Time and Space
 
 \description{
 The \code{plot} method for class \code{"epidataCS"} either plots the
-number of events over time (aggregated over space), or the locations of
-the events in the observation region \code{W} (aggregated over time).
+number of events along the time axis (aggregated over space) using
+\code{hist()}, or the locations of the events in the observation region
+\code{W} (aggregated over time).
 }
 
 \usage{
@@ -35,9 +36,9 @@ the events in the observation region \code{W} (aggregated over time).
   }
   \item{\dots}{
     The following graphical parameters are available depending on the
-    value of \code{aggregate}.\cr
-    For plotting the number of events over
-    time (\code{aggregate = "time"}):
+    value of \code{aggregate}.
+    
+    For plotting the number of events over time (\code{aggregate = "time"}):
     \describe{
       \item{t0.Date}{the beginning of the observation period
 	\code{t0 = x$stgrid$start[1]} as \code{\link{Date}}, enabling
@@ -60,7 +61,8 @@ the events in the observation region \code{W} (aggregated over time).
 	\code{\link{hist.Date}}, respectively.}
     }
 
-    For plotting the locations of the events in the observation region:
+    For plotting the locations of the events in the observation region
+    (\code{aggregate = "space"}):
     \describe{
       \item{cex.fun}{function which takes a vector of counts of events
 	at each unique location and returns a vector of \code{cex}
@@ -95,7 +97,14 @@ Sebastian Meyer
 }
 
 \examples{
-# TODO ...
+data("imdepi")
+
+## show the occurrence of events along the time axis (-> histogram)
+plot(imdepi, aggregate = "time", subset = type == "B",
+     main = "Time series of events of the serogroup B finetype")
+
+## show the distribution in space
+plot(imdepi, aggregate = "space", colTypes = 1:2)
 }
 
 \keyword{hplot}

@@ -48,51 +48,56 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 
 \arguments{
   \item{events}{
-    \code{SpatialPointsDataFrame} of cases with obligatory columns
+    \code{"\linkS4class{SpatialPointsDataFrame}"} of cases with the
+    following columns (in the \code{events@data} \code{data.frame}):
     \describe{
-      \item{time}{Time point of event.}
-      \item{tile}{Reference to the spatial unit (tile) in \code{stgrid},
+      \item{time}{time point of event. Will be converted to a numeric
+        variable by \code{as.numeric}.}
+      \item{tile}{reference to the spatial unit (tile) in \code{stgrid},
 	where the event is located.}
       \item{type}{optional type of event in a marked \code{twinstim}
-	model. Type will be converted to a factor variable.}
-      \item{eps.t}{Maximal temporal influence radius (e.g. length of
+	model. Will be converted to a factor variable dropping unused
+        levels. If missing, all events will be attribute the single type 1.}
+      \item{eps.t}{maximum temporal influence radius (e.g. length of
 	infectious period, time to culling, etc.), may be \code{Inf}.}
-      \item{eps.s}{Maximal spatial influence radius (e.g. 100 [km]),
-      may be \code{Inf}.
-      }
+      \item{eps.s}{maximum spatial influence radius (e.g. 100 [km]),
+        may be \code{Inf}.}
     }
     The \code{data.frame} may contain columns with further marks of
-    the event, e.g. sex, age of infected individuals (-> epidemic
-    covariates).
-    However, note that some auxiliary columns will be added at conversion
+    the events, e.g. sex, age of infected individuals, which may
+    be used as epidemic covariates influencing infectiousness.
+    Note that some auxiliary columns will be added at conversion
     whose names are reserved: \code{"ID"}, \code{".obsInfLength"},
     \code{".bdist"}, \code{".influenceRegion"}, and \code{".sources"},
     as well as \code{"start"}, \code{"BLOCK"}, and all endemic
     covariates' names from \code{stgrid}.
   }
   \item{stgrid}{
-    \code{data.frame} with obligatory columns
+    \code{data.frame} with the following columns:
     \describe{
-      \item{tile}{ID of spatial unit (e.g. id of municipality)}
-      \item{start, stop}{temporal interval. The \code{stop} column may
+      \item{tile}{ID of spatial unit (e.g. id of municipality). It will
+        be converted to a factor variable (dropping unused levels if it
+        already was one).}
+      \item{start, stop}{temporal interval (converted to numeric
+        variables by \code{as.numeric}). The \code{stop} column may
 	be missing, in which case it will be auto-generated from the set
 	of \code{start} values and \code{T}.}
       \item{area}{area of the spatial unit (\code{tile}).
 	Be aware that the unit of this area (e.g., square km) must be consistent
-	with the units of \code{W} and \code{events} as specified in
-	their \code{\link{proj4string}}s.}
+	with the units of \code{W} and \code{events} (as specified in
+	their \code{\link{proj4string}}s, if they have projected coordinates).}
     }
     The remaining columns are endemic covariates.
-    However, note that the column name \code{"BLOCK"} is reserved
+    Note that the column name \code{"BLOCK"} is reserved
     (a column which will be added automatically for indexing the time
     intervals of \code{stgrid}).  
   }
   \item{W}{
-    An object of class \code{SpatialPolygons} indicating the observation
-    region. Must have same \code{proj4string} as \code{events} and all
-    events must be within W.  The function \code{\link{simplify.owin}} from the
-    package \pkg{spatstat} may be useful if polygonal operations take too long
-    or memory is limited.
+    an object of class \code{"\linkS4class{SpatialPolygons}"} indicating the
+    observation region. Must have the same \code{proj4string} as \code{events}
+    and all events must be within W.  The function \code{\link{simplify.owin}} 
+    from the package \pkg{spatstat} may be useful if polygonal operations take
+    too long or memory is limited (see also the \dQuote{Note} section below).
   }
   \item{qmatrix}{
     square indicator matrix (0/1 or TRUE/FALSE) for possible
@@ -170,25 +175,39 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 }
 
 \value{
-  An object of class \code{epidataCS} contains the following components:
-  \describe{
-    \item{events}{See above description. The added auxiliary columns are:
+  An object of class \code{"epidataCS"} is a list containing the
+  following components: 
+  \item{events}{see the description of the argument.
+    The input \code{events} are checked for requirements, sorted
+    chronologically and attributed an ID. The columns are in the following
+    order: ID, obligatory event columns, event marks, the columns \code{BLOCK},
+    \code{start} and endemic covariates copied from \code{stgrid},
+    and finally, hidden auxiliary columns. 
+    The added auxiliary columns are:
     \describe{
-      \item{ID}{unique chronological ID for the events.}
       \item{.obsInfLength}{observed length of the infectious period
-	(being part [0,T])}  
-      \item{.bdist}{minimal distance of the event locations to the boundary}
-      \item{.influenceRegion}{gpc.poly, which is the intersection of \code{W}
-	with a circle of radius \code{eps.s} centered at the event location.} 
-      \item{.sources}{potential sources of infection}
-    }
-    % TODO: more details
-    }
-    \item{stgrid}{See the description of the argument.}
-    \item{W}{Observational region as \code{gpc.poly}.}
-    \item{qmatrix}{See the description of the \code{qmatrix} argument.}
-    %% ...
+	(being part [0,T]), i.e. \code{pmin(T-time, eps.t)}.}
+      \item{.sources}{a list of numeric vectors of potential sources of
+        infection (wrt the interaction ranges eps.s and eps.t) for each
+        event. Currently row numbers are used as index, not the ID's.}
+      \item{.bdist}{minimal distance of the event locations to the
+        polygonal boundary \code{W}.}
+      \item{.influenceRegion}{a list of influence regions represented by
+        objects of the \pkg{spatstat} class \code{"owin"}. For each
+        event, this is the intersection of \code{W} with a (polygonal)
+        circle of radius \code{eps.s} centered at the event location.
+        The list has \code{nCircle2Poly} set as an attribute.}
+      }
   }
+  \item{stgrid}{see the description of the argument. The spatio-temporal
+    grid of endemic covariates is sorted by time interval (indexed by the
+    added variable \code{BLOCK}) and region (\code{tile}). It is a
+    full \code{BLOCK} x \code{tile} grid.}
+  \item{W}{observation region as \code{SpatialPolygons} (see the
+    argument description).}
+  \item{qmatrix}{see the description of the argument. The
+    \code{\link{storage.mode}} of the indicator matrix is set to logical
+    and the \code{dimnames} are set to the levels of the event types.}
 }
 
 \note{
@@ -236,7 +255,72 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 }
 
 \examples{
-# TODO: ...
+## load "imdepi" example data (which is an object of class "epidataCS")
+data(imdepi)
+
+## take a look at the data object
+print(imdepi, n=5, digits=2)
+s <- summary(imdepi)
+s
+plot(s$counter, xlab = "Time [days]",
+     ylab="Number of infectious individuals",
+     main=paste("Time series of the number of infectious individuals",
+                "assuming an infectious period of 30 days", sep="\n"))
+plot(table(s$nSources), xlab="Number of \"close\" infective individuals",
+     ylab="Number of events",
+     main=paste("Distribution of the number of potential sources",
+                "assuming an interaction range of 200 km and 30 days",
+                sep="\n"))
+## the summary object contains further information
+str(s)
+
+## see the help on the imdepi dataset for more insight
+
+## extraction methods subset the 'events' component
+## (thereby taking care of the validity of the epidataCS object,
+## for instance the hidden auxiliary column .sources and qmatrix)
+imdepi[101:200, -match("sex", names(imdepi$events))]
+tail(imdepi, n=4)           # reduce the epidemic to the last 4 events
+subset(imdepi, type=="B")   # only consider event type B
+
+
+### now reconstruct the object from its components
+
+## (Simplified) observation region (as SpatialPolygons)
+W <- imdepi$W
+summary(W)
+
+## events
+events <- marks(imdepi)[,-1]
+coordinates(events) <- c("x", "y")    # promote to a SpatialPointsDataFrame
+proj4string(events) <- proj4string(W) # ETRS89 projection (+units=km)
+summary(events)
+
+## plot W with events
+plot(W, axes=TRUE)
+title(xlab="x [km]", ylab="y [km]")
+points(events, pch=unclass(events$type), cex=0.5, col=unclass(events$type))
+legend("topright", legend=levels(events$type), title="Type",
+       pch=1:2, col=1:2)
+
+## endemic covariates
+stgrid <- imdepi$stgrid[,-1]
+
+## indicator matrix for possible transmission between event types
+qmatrix <- imdepi$qmatrix
+qmatrix
+
+## now construct an object of class "epidataCS" from these components
+imdepi_repro <- as.epidataCS(events, stgrid, W, qmatrix, nCircle2Poly=32)
+
+\dontshow{
+#isTRUE(all.equal(imdepi, imdepi_repro))
+## should be equal as long as the internal structures of the embedded
+## classes (SpatialPolygons, etc.) don't change
+}
+
+## take a look into the internal structure of an epidataCS-object
+str(imdepi, max.level=4)
 }
 
 \keyword{spatial}

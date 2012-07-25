@@ -5,8 +5,8 @@ Check the residual process of a fitted \code{twinSIR} or \code{twinstim}
 }
 
 \description{
-  Transform the residual process (cf.
-  \code{\link[=residuals.twinstim]{residuals}} method for classes
+  Transform the residual process (cf. the
+  \code{\link[=residuals.twinstim]{residuals}} methods for classes
   \code{"twinSIR"} and \code{"twinstim"}) such that the transformed
   residuals should be uniformly distributed if the fitted model
   well describes the true conditional intensity function. Graphically
@@ -72,7 +72,9 @@ checkResidualProcess(object, plot = 1:2, mfrow = n2mfrow(length(plot)), ...)
 }
 
 \examples{
-## TODO...
+## load the twinSIR() fit
+data("foofit")
+checkResidualProcess(foofit)
 }
 
 \keyword{dplot}
