@@ -57,8 +57,8 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
 
     cat("Checking 'W' and 'nCircle2Poly'...\n")
     # Check class and proj4string of W
-    stopifnot(inherits(W, "SpatialPolygons"),
-              proj4string(W) == proj4string(events))
+    W <- as(W, "SpatialPolygons")
+    stopifnot(proj4string(W) == proj4string(events))
     # Check nCircle2Poly
     stopifnot(isScalar(nCircle2Poly))
     nCircle2Poly <- as.integer(nCircle2Poly)
@@ -689,14 +689,20 @@ print.summary.epidataCS <- function (x, ...)
 # respects ani.options "interval" and "nmax"
 
 animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
-    legend.opts = list(), timer.opts = list(), pch = 15:18,
-    col.current = "red", col.I = "#C16E41", col.R = "#B3B3B3",
+    nmax = NULL, sleep = NULL, legend.opts = list(), timer.opts = list(),
+    pch = 15:18, col.current = "red", col.I = "#C16E41", col.R = "#B3B3B3",
     col.influence = "#FEE0D2", ...)
 {
-    library("animation")
     stopifnot(is.numeric(interval), length(interval) == 2L)
-    sleep <- animation::ani.options("interval")
-    nmax <- animation::ani.options("nmax")
+    with.animation <- suppressWarnings(require("animation"))
+    if (is.null(sleep)) {
+        sleep <- if (with.animation) animation::ani.options("interval") else 0.1
+        ## we cannot set this as default function argument, because we don't
+        ## want to depend on package "animation" (surveillance only suggests it)
+    }
+    if (is.null(nmax)) {
+        nmax <- if (with.animation) animation::ani.options("nmax") else Inf
+    }
     s <- summary(object)
     removalTimes <- s$eventTimes + object$events$eps.t
     eventCoordsTypes <- cbind(s$eventCoords, type = s$eventTypes)
@@ -710,10 +716,10 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
         if (is.null(legend.opts$title))  legend.opts$title <-
             if (multitype) "type" else "state"
         if (is.null(legend.opts$legend)) { legend.opts$legend <-
-            if (multitype) typeNames else c("infectious", "removed")
+            if (multitype) typeNames else c("infectious", if (!is.na(col.R)) "removed")
         }
         if (is.null(legend.opts$col)) { legend.opts$col <-
-            if (multitype) col.current else c(col.I, col.R)
+            if (multitype) col.current else c(col.I, if (!is.na(col.R)) col.R)
         }
         if (is.null(legend.opts$pch)) legend.opts$pch <- pch
         TRUE
@@ -753,6 +759,9 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
         end <- min(interval[2], s$timeRange[2],
             max(removalTimes) + if (is.na(time.spacing)) 0 else time.spacing)
         if (is.na(time.spacing)) {
+            if (!is.finite(nmax)) {
+                stop("with 'time.spacing=NA', 'nmax' must be finite")
+            }
             seq(from = start, to = end, length.out = nmax)
         } else {
             tps <- seq(from = start, to = end, by = time.spacing)
