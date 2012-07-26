@@ -228,10 +228,12 @@ public health</a> [<a href="http://epub.ub.uni-muenchen.de/2093/">preprint</a>].
  href="http://www.stat.uni-muenchen.de/%7Ehoehle/pubs/">here</a> for
 further preprints.<br>
       </li>
-      <li>Sometimes one picture says more than 1000 words:</li>
-      <img src="survlr.png" align="middle">
+      <li>Sometimes pictures says more than 1000 words:</li>
+      <code>algo.glrnb</code>
+      <img src="survlr.png" align="middle"><br>
+      <code>twinSIR</code>
 <!--  convert -density 100x100 mpbb-intensity.pdf mpbb-intensity.png -->
-      <img src="mpbb-intensity.png" align="middle>
+      <img src="mpbb-intensity.png" align="middle><br>
     </ul>
   </blockquote>
 </blockquote>
