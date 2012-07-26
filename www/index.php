@@ -112,6 +112,7 @@ models described in
         <ul>
           <li><code>algo.hhh </code>- Held et al. (2005) and Paul et
 al. (2008)</li>
+    <li><code>hhh4</code>- Paul and Held (2011)
           <li><code>algo.twins</code> - Held et al. (2006)</li>
         </ul>
       </li>
@@ -229,6 +230,8 @@ further preprints.<br>
       </li>
       <li>Sometimes one picture says more than 1000 words:</li>
       <img src="survlr.png" align="middle">
+<!--  convert -density 100x100 mpbb-intensity.pdf mpbb-intensity.png -->
+      <img src="mpbb-intensity.png" align="middle>
     </ul>
   </blockquote>
 </blockquote>
