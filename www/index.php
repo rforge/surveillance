@@ -128,7 +128,7 @@ CUSUMs is available as function <code>LRCUSUM.runlength.</code></li>
 <li> Retrospective continuous time modelling and simulation of epidemic phenomena (experimental from version 1.3-0 on):  
 <ul>
 <li><code>twinSIR</code> - continuous-time and discrete-space modelling as described in H&ouml;hle (2009). The <code>epidata</code> class provides the appropriate data structure for such data.
-<li><code>twinstim</code> - continuous-time and continuous-space modelling as desribed in Meyer et al. (2010) and as caputred by the <code>epidataCS</code> data class.
+<li><code>twinstim</code> - continuous-time and continuous-space modelling as desribed in Meyer et al. (2012). The <code>epidataCS</code> data provides a novel data class for point-referenced space-time data.
 </ul>
       <li>Prospective space-time cluster detection:</li>
       <ul>
@@ -148,7 +148,7 @@ under the GPL conditions.</li>
 <b>Download:</b>
 <blockquote>
   <blockquote>
-    <blockquote> The <tt>surveillance</tt> package (version 1.2-1) is
+    <blockquote> The <tt>surveillance</tt> package (version 1.4-1) is
 available for download from <a
  href="http://cran.r-project.org/web/packages/surveillance/">CRAN</a>.<br>
 Current package development, help-forum and bugtracking is hosted
@@ -184,7 +184,7 @@ file in the current distribution</li>
 <blockquote>
   <blockquote>
     <ul>
-      <li>A good (but slightly old) introduction to the package is
+      <li>A good (but slightly outdated) introduction to the package is
 provided in the paper <a
  href="http://dx.doi.org/10.1007/s00180-007-0074-8"><span
  style="font-family: monospace;">surveillance</span>: An R package for
@@ -198,11 +198,20 @@ M. Höhle and A. Mazick, To appear in T. Kass-Hout and X. Zhang (Eds.)
 Biosurveillance: A Health Protection Priority, CRC Press. [<a
 							   href="http://www.stat.uni-muenchen.de/%7Ehoehle/pubs/hoehle_mazick2009-preprint.pdf">preprint</a>]. Note: As ISO 8601 handling is not fully implemented in R on Windows the demo("biosurvbook") will only run with package version >= 1.2, where a workaround was implemented.</li>
       <li>An overview of statistical methods and implementational usage
-is given the course notes of the short course on <a
+is given the course notes of several courses on the package, e.g.
+the course notes
+of the lecture
+<a href="http://www.statistik.lmu.de/~hoehle/teaching/moid2011/moid.pdf">
+Temporal and spatio-temporal modelling of infectious
+diseases
+</a>
+at the Department of Statistics, University of Munich, Oct 10-13, 2011 or
+the shortcourse  <a
  href="http://www.stat.uni-muenchen.de/%7Ehoehle/surv-short/index.html">Statistical
 surveillance of infectious diseases</a> held at the Department of
 Statistics, Universidade Federal de Minas Gerais (UFMG), Belo
-Horizonte, Brazil, Nov 27-28, 2008.</li>
+Horizonte, Brazil, Nov 27-28, 2008. 
+</li>
       <li><a href="hoehle-surveillance.pdf">Invited talk</a> held at
 the ESCAIDE satellite workshop on <ii>Computer supported outbreak
 detection and signal management</ii> (<a href="hoehle-surveillance.R">R-File</a>,
