@@ -108,7 +108,7 @@
             That means continuous-time discrete-space \acronym{SIR} models.
       \item Support for \code{"twinstim"} models as described in
             \cite{Meyer et al (2012)}. That means continuous-time
-            continuous-space infectious models .
+            continuous-space infectious disease models.
       \item Added functionality for non-parametric back projection
             (\code{backprojNP()}) and 
             now-casting (\code{nowcast()}) based on \code{"sts"} objects.

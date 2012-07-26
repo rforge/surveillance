@@ -129,7 +129,9 @@ CUSUMs is available as function <code>LRCUSUM.runlength.</code></li>
 <li> Retrospective continuous time modelling and simulation of epidemic phenomena (experimental from version 1.3-0 on):  
 <ul>
 <li><code>twinSIR</code> - continuous-time and discrete-space modelling as described in H&ouml;hle (2009). The <code>epidata</code> class provides the appropriate data structure for such data.
-<li><code>twinstim</code> - continuous-time and continuous-space modelling as desribed in Meyer et al. (2012). The <code>epidataCS</code> data provides a novel data class for point-referenced space-time data.
+<li><code>twinstim</code> - continuous-time and continuous-space modelling as desribed in
+<a href="http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x">Meyer et al. (2012)</a>.
+The <code>epidataCS</code> data provides a novel data class for point-referenced space-time data.
 </ul>
       <li>Prospective space-time cluster detection:</li>
       <ul>
@@ -173,7 +175,7 @@ or the <a href="http://r-forge.r-project.org/src">source tarball</a>.
 New features:<br>
       <ul>
         <li>See <a
- href="https://r-forge.r-project.org/scm/viewvc.php/pkg/NEWS.Rd?view=markup&root=surveillance">NEWS</a>
+ href="https://r-forge.r-project.org/scm/viewvc.php/pkg/inst/NEWS.Rd?view=markup&root=surveillance">NEWS</a>
 file in the current distribution</li>
       </ul>
       <ul>
@@ -233,10 +235,11 @@ further preprints.<br>
       <img src="survlr.png" align="middle"><br>
       <code>twinSIR</code>
 <!--  convert -density 100x100 mpbb-intensity.pdf mpbb-intensity.png -->
-      <img src="mpbb-intensity.png" align="middle><br>
+      <img src="mpbb-intensity.png" align="middle"><br>
     </ul>
   </blockquote>
 </blockquote>
+
 <hr><b>Developers:</b>
 <blockquote>
   <blockquote>
@@ -256,6 +259,7 @@ M. Virtanen</li>
     </ul>
   </blockquote>
 </blockquote>
+
 <hr><b>Financial support:</b>
 <blockquote>
   <blockquote> The development of models and algorithms implemented in
