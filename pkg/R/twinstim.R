@@ -326,6 +326,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         ### over the influence regions of the events
         .siafInt <-
             if (constantsiaf) {
+                nCub <- NA_real_
                 nCub.adaptive <- FALSE
                 function (siafpars) iRareas
             } else if (is.null(siaf$Fcircle) || # if siaf$Fcircle not available
@@ -392,16 +393,16 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 .ret
             }
         suppressWarnings(rm(.ret))
-        if (isTRUE(cl[["nCub.adaptive"]]) && !nCub.adaptive) {
-            message("'nCub.adaptive' only works in conjunction with ",
-                    "specified 'siaf$effRange()'")
-        }
 
         ### Check nCub
         if (!constantsiaf) {
             stopifnot(is.vector(nCub, mode="numeric"))
             if (any(nCub <= 0L)) {
                 stop("'nCub' must be positive")
+            }
+            if (isTRUE(cl[["nCub.adaptive"]]) && !nCub.adaptive) {
+                message("'nCub.adaptive' only works in conjunction with ",
+                        "specified 'siaf$effRange()'")
             }
         }
 
