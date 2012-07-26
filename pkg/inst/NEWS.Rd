@@ -5,7 +5,16 @@
 \title{News for Package 'surveillance'}
 \encoding{latin1}
 
-\section{Changes in surveillance version 1.4}{
+\section{Changes in surveillance version 1.4-2}{
+  \subsection{NEW FEATURES}{
+    
+  }
+  \subsection{BUG FIXES}{
+
+  }
+}
+
+\section{Changes in surveillance version 1.4 (2012-07-26)}{
   \subsection{SYNOPSIS}{
     \itemize{
       \item Besides minor bug fixes, additional functionality has entered the package

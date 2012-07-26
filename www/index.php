@@ -172,7 +172,7 @@ or the <a href="http://r-forge.r-project.org/src">source tarball</a>.
 New features:<br>
       <ul>
         <li>See <a
- href="https://r-forge.r-project.org/scm/viewvc.php/pkg/NEWS?view=markup&root=surveillance">NEWS</a>
+ href="https://r-forge.r-project.org/scm/viewvc.php/pkg/NEWS.Rd?view=markup&root=surveillance">NEWS</a>
 file in the current distribution</li>
       </ul>
       <ul>
