@@ -68,7 +68,7 @@ data(imdepi)
   for details.
   
   The data component \code{stgrid} contains the spatio-temporal grid of 
-  endemic covariate information. In addition to the usual bookkeeping 
+  endemic covariate information. In addition to the usual bookkeeping
   variables this includes:
   \describe{
     \item{area:}{Area of the district \code{tile} in square kilometers.}
@@ -77,6 +77,10 @@ data(imdepi)
       information (Date: 31.12.2008) on communities level (LAU2)
       aggregated to district level (NUTS3).} 
   }
+  We have actually not included any time-dependent covariates here, we
+  just established this grid with a (reduced -> fast) temporal
+  resolution of monthly intervals so that we can model endemic time
+  trends and seasonality (in this discretized time).
   
   The entry \code{W} contains the observation window as a
   \code{\link{SpatialPolygons}} object. In this case the boundaries of
@@ -154,7 +158,7 @@ s <- summary(imdepi)
 s
 str(s)
 
-# weekly step function of number of infectives
+# Step function of number of infectives
 plot(s$counter, xlab = "Time [days]",
      ylab = "Number of infectious individuals",
      main = "Time series of IMD assuming 30 days infectious period")
@@ -196,4 +200,3 @@ title(xlab = "x [km]", ylab = "y [km]")
 }
 
 \keyword{datasets}
-
