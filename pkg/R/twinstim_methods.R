@@ -756,7 +756,8 @@ residuals.twinstim <- function (object, ...)
           stop("residuals not available; re-fit the model with 'cumCIF = TRUE'")
       } else {
           modelenv <- environment(object)
-          cat("'object' was fit with disabled 'cumCIF' -> calculate it now...\n")
+          cat("'", substitute(object), "' was fit with disabled 'cumCIF'",
+              " -> calculate it now...\n", sep="")
           res <- with(modelenv, LambdagEvents(cumCIF.pb = TRUE))
           cat("Done.\n")
           try({

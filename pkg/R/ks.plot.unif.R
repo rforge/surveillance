@@ -97,7 +97,8 @@ checkResidualProcess <- function (object, plot = 1:2, mfrow = n2mfrow(length(plo
     }
     
     ## extract residual process
-    tau <- residuals(object)
+    tau <- do.call("residuals", args = list(substitute(object)),
+                   envir = parent.frame())
     
     ## Transform to uniform variable
     Y <- diff(c(0,tau))
