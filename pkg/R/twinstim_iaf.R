@@ -11,9 +11,9 @@
 
 siaf.constant <- function () {
     res <- list(
-        f = as.function(alist(s=, pars=, types=, rep.int(1, nrow(s))), envir = parent.frame()),
+        f = as.function(alist(s=, pars=, types=, rep.int(1, nrow(s))), envir = .GlobalEnv),
         deriv = NULL,
-        Fcircle = as.function(alist(r=, pars=, types=, pi*r^2), envir = parent.frame()),
+        Fcircle = as.function(alist(r=, pars=, types=, pi*r^2), envir = .GlobalEnv),
         simulate = NULL, # will be handled specially in simEpidataCS
         npars = 0L, validpars = NULL
     )
@@ -319,8 +319,8 @@ tiaf.exponential <- function (nTypes)
 
 tiaf.constant <- function () {
     res <- list(
-        g = as.function(alist(t=, pars=, types=, rep.int(1, length(t))), envir = parent.frame()),
-        G = as.function(alist(t=, pars=, types=, t), envir = parent.frame()),
+        g = as.function(alist(t=, pars=, types=, rep.int(1, length(t))), envir = .GlobalEnv),
+        G = as.function(alist(t=, pars=, types=, t), envir = .GlobalEnv),
         deriv = NULL, Deriv = NULL, npars = 0L, validpars = NULL
     )
     attr(res, "constant") <- TRUE
@@ -430,8 +430,9 @@ checksiaf <- function (f, deriv, Fcircle, effRange, simulate, npars, validpars, 
     if (!is.null(simulate)) simulate <- .checknargs3(simulate, "siaf$simulate")
     ## Check if the validpars are of correct form
     validpars <- if (!haspars) NULL else if (missing(validpars) || is.null(validpars)) {
-        as.function(alist(pars=, TRUE), envir = parent.frame(3))
+        as.function(alist(pars=, TRUE), envir = .GlobalEnv)
     } else match.fun(validpars)
+    ## Check if the siaf has value 1 at (0,0)
     .checkiaf0(f, npars, validpars, "siaf")
     ## Done, return result.
     list(f = f, deriv = deriv, Fcircle = Fcircle, effRange = effRange,
@@ -470,8 +471,9 @@ checktiaf <- function (g, G, deriv, Deriv, npars, validpars, knots)
     if (!is.null(deriv)) deriv <- .checknargs3(deriv, "tiaf$deriv")
     if (!is.null(Deriv)) Deriv <- .checknargs3(Deriv, "tiaf$Deriv")
     validpars <- if (!haspars) NULL else if (missing(validpars) || is.null(validpars)) {
-            as.function(alist(pars=, TRUE), envir = parent.frame(3))
+            as.function(alist(pars=, TRUE), envir = .GlobalEnv)
         } else match.fun(validpars)
+    ## Check if the tiaf has value 1 at the origin
     .checkiaf0(g, npars, validpars, "tiaf")
     list(g = g, G = G, deriv = deriv, Deriv = Deriv, npars = npars, validpars = validpars)
 }
