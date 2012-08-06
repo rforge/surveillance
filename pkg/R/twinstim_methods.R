@@ -170,14 +170,20 @@ ret <- capture.output({
         tab <- get(tabname)
         if (nrow(tab) > 0L) {
             rownames(tab) <- gsub(" ", "", rownames(tab))
-            tab_char <- capture.output(printCoefmat(tab,digits=digits,signif.stars=FALSE,na.print=""))[-1]
-            tab_char <- sub("([<]?)[ ]?([0-9]+)e([+-][0-9]+)$", "\\1\\2\\\\cdot{}10^{\\3}", tab_char)
+            tab_char <- capture.output(
+                        printCoefmat(tab,digits=digits,signif.stars=FALSE,na.print="NA")
+                        )[-1]
+            tab_char <- sub("([<]?)[ ]?([0-9]+)e([+-][0-9]+)$",
+                            "\\1\\2\\\\cdot{}10^{\\3}",
+                            tab_char)
             con <- textConnection(tab_char)
             tab2 <- read.table(con, colClasses="character")
             close(con)
-            parnames <- paste0("\\texttt{",tab2[,1],"}")
-            tab2 <- as.data.frame(lapply(tab2[,-1], function(x) paste0("$",x,"$")))
-            rownames(tab2) <- parnames
+            rownames(tab2) <- paste0("\\texttt{",tab2[,1],"}")
+            tab2 <- tab2[,-1]
+            tab2[] <- lapply(tab2, function(x) {
+                ifelse(is.na(x), "", paste0("$",x,"$")) # (test.iaf=FALSE)
+            })
             print(xtable::xtable(tab2), only.contents=TRUE, hline.after=NULL,
                   include.colnames=FALSE, sanitize.text.function=identity)
             cat("\\hline\n")
