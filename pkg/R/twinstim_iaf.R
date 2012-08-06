@@ -485,9 +485,10 @@ checktiaf <- function (g, G, deriv, Deriv, npars, validpars, knots)
 {
     name <- as.character(substitute(iaf))
     if (missing(iaf) || is.null(iaf)) {
-        message("no ", switch(name, siaf="spatial", tiaf="temporal"),
-                " interaction function in model")
-        NULL
+        message("assuming constant ",
+                switch(name, siaf="spatial", tiaf="temporal"),
+                " interaction '", name, ".constant()'")
+        do.call(paste(name, "constant", sep="."), args=alist())
     } else if (is.list(iaf)) {
         ret <- do.call(paste0("check",name), args = iaf)
         attr(ret, "constant") <- isTRUE(attr(iaf, "constant"))

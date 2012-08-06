@@ -303,27 +303,19 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     if (hase) {
 
         ### Check interaction functions
-        siaf <- do.call(".parseiaf", args = alist(siaf))
-        tiaf <- do.call(".parseiaf", args = alist(tiaf))
 
-        ### Spatially constant interaction siaf(s) = 1
-        constantsiaf <- is.null(siaf) || attr(siaf, "constant")
-        if (constantsiaf) {
-            message("assuming constant spatial interaction 'siaf.constant()'")
-            siaf <- siaf.constant()
-        }
+        siaf <- do.call(".parseiaf", args = alist(siaf))
+        constantsiaf <- attr(siaf, "constant")
         nsiafpars <- siaf$npars
 
-        ### Temporally constant interaction tiaf(t) = 1
-        constanttiaf <- is.null(tiaf) || attr(tiaf, "constant")
-        if (constanttiaf) {
-            message("assuming constant temporal interaction 'tiaf.constant()'")
-            tiaf <- tiaf.constant()
-        }
+        tiaf <- do.call(".parseiaf", args = alist(tiaf))
+        constanttiaf <- attr(tiaf, "constant")
         ntiafpars <- tiaf$npars
+
 
         ### Define function that integrates the two-dimensional 'siaf' function
         ### over the influence regions of the events
+        
         .siafInt <-
             if (constantsiaf) {
                 nCub <- NA_real_
@@ -397,7 +389,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         ### Check nCub
         if (!constantsiaf) {
             stopifnot(is.vector(nCub, mode="numeric"))
-            if (any(nCub <= 0L)) {
+            if (any(is.na(nCub) | nCub <= 0L)) {
                 stop("'nCub' must be positive")
             }
             if (isTRUE(cl[["nCub.adaptive"]]) && !nCub.adaptive) {
@@ -409,6 +401,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     } else {
         siaf <- tiaf <- NULL
         nsiafpars <- ntiafpars <- 0L
+        nCub <- nCub.adaptive <- NULL
     }
 
     hassiafpars <- nsiafpars > 0L
@@ -940,7 +933,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     optim.args$control <- optimControl
     # default arguments
     optimArgs <- alist(par = optim.args$par, fn = negll, gr = negsc,
-                       method = if (partial) "Nelder-Mead" else "BFGS",
+                       method = if (partial) "Nelder-Mead" else "nlminb",
                        lower = -Inf, upper = Inf,
                        control = list(), hessian = partial | !useScore)
     # user arguments
@@ -959,7 +952,9 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     ### Call 'optim' or 'nlminb' (default) with the above arguments
 
     cat("\nminimizing the negative", if (partial) "partial", "log-likelihood",
-        "using", if (optimMethod!="nlminb") "'optim's", optimMethod, "...\n")
+        "using", if (optimMethod == "nlminb") "'nlminb()'" else {
+            paste0("'optim()'s \"", optimMethod, "\"")
+        }, "...\n")
     cat("initial parameters:\n")
     print(optimArgs$par)
     if (hassiafpars && !is.null(siaf$Fcircle)) {
@@ -1010,7 +1005,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             # I therefore use 1e-6, which is also the default in package nlme (see lmeControl).
             nlminbControl <- nlminbControl[!sapply(nlminbControl, is.null)]
             nlminbRes <- nlminb(start = optimArgs$par, objective = negll,
-                   gradient = negsc, hessian = fisherinfo,  # hessian only used if gradient not NULL
+                   gradient = negsc, hessian = fisherinfo, # CAVE: _neg_ll
+                   # hessian only used if gradient not NULL
                    control = nlminbControl,
                    lower = optimArgs$lower, upper = optimArgs$upper)
             nlminbRes$value <- -nlminbRes$objective
