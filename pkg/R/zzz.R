@@ -54,3 +54,19 @@ dotprod <- function (x,y)
     sum(x*y)
 }
 
+
+### Function 'base::paste0()' only exists as of R version 2.15.0
+### Define it as a wrapper for base::paste() for older versions
+
+if (getRversion() < "2.15.0" || R.version$"svn rev" < 57795 ||
+    !exists("paste0", baseenv())) {
+    paste0 <- function (..., collapse = NULL) {
+        ## the naive way: paste(..., sep = "", collapse = collapse)
+        ## probably better: establish appropriate paste() call:
+        cl <- match.call()
+        names(cl) <- sub("sep", "", names(cl)) # no sep argument
+        cl$sep <- ""
+        cl[[1]] <- as.name("paste")
+        eval(cl, envir = parent.frame())
+    }
+}
