@@ -313,6 +313,19 @@ plot(x=fit3$intervals, y=coef(fit3)[c(3,3:11)], type="S")
 
 ### -> for more sophisticated intensity plots, see 'plot.twinSIR'
 plot(fit3)
+
+\dontshow{
+### TODO (@Michael): Analysis of the 1861 hagelloch measles epidemic
+data(hagelloch)
+m <- twinSIR(~c1 + c2 + household + local1, data = hagelloch)
+#FIXME: what is "local1"? what is "local"? what about c1, c2, household?
+#       describe this on the help page of data(hagelloch)?
+#FIXME: there are no functions to generate c1 and c2 in attr(hagelloch, "f")
+#       which implies that the simulate-method doesn't work for this model
+summary(m)
+plot(m, which = "total intensity")
+plot(m, which = "epidemic proportion")
+}
 }
 
 \keyword{models}
