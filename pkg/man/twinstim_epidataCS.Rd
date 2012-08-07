@@ -274,7 +274,7 @@ plot(table(s$nSources), xlab="Number of \"close\" infective individuals",
 ## the summary object contains further information
 str(s)
 
-## see the help on the imdepi dataset for more insight
+## see the help page on the 'imdepi' dataset for more insight
 
 ## extraction methods subset the 'events' component
 ## (thereby taking care of the validity of the epidataCS object,
@@ -311,10 +311,10 @@ qmatrix <- imdepi$qmatrix
 qmatrix
 
 ## now construct an object of class "epidataCS" from these components
-imdepi_repro <- as.epidataCS(events, stgrid, W, qmatrix, nCircle2Poly=32)
+myimdepi <- as.epidataCS(events, stgrid, W, qmatrix, nCircle2Poly=16)
 
 \dontshow{
-#isTRUE(all.equal(imdepi, imdepi_repro))
+#isTRUE(all.equal(imdepi, myimdepi))
 ## should be equal as long as the internal structures of the embedded
 ## classes (SpatialPolygons, etc.) don't change
 }

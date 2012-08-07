@@ -608,8 +608,8 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE,
         } else {    # untrimmed version (spatio-temporal integral over R+ x R^2)
             ## extract relevant data from model environment
             if (is.null(modelenv <- environment(object))) {
-                stop("need model environment for untrimmed R0 of fitted events",
-                     " -- re-fit 'object' with 'model=TRUE'")
+                stop("need model environment for untrimmed R0 of fitted events\n",
+                     " -- re-fit with 'model=TRUE'")
             }
             eventTypes <- modelenv$eventTypes
             eps.t <- modelenv$eps.t

@@ -2,24 +2,31 @@
 \docType{data}
 \name{imdepi}
 \alias{imdepi}
+\alias{imdepifit}
 
 \title{
   Occurrence of Invasive Meningococcal Disease in Germany
 }
 
 \description{
-  Data on the spatio-temporal location of 636 cases of invasive
-  meningococcal disease caused by two specific meningococcal finetypes
-  in Germany. 
+  \code{imdepi} contains data on the spatio-temporal location of 636
+  cases of invasive meningococcal disease caused by two specific
+  meningococcal finetypes in Germany.
+  \code{imdepifit} contains a model fit to the \code{imdepi} data. 
 }
+
 \usage{
 data(imdepi)
+data(imdepifit)
 }
+
 \format{
-  Loading the data in \code{imdepi} gives an object of type
+  \code{imdepi} is an object of class
   \code{"\link{epidataCS}"} (a list with components \code{events},
   \code{stgrid}, \code{W} and \code{qmatrix}).
+  \code{imdepifit} is an object of class \code{"\link{twinstim}"}.
 }
+
 \details{
   The dataset contains a slightly modified version of the data analyzed in
   Meyer et al. (2012) represented as an \code{"epidataCS"} object, which
@@ -96,6 +103,9 @@ data(imdepi)
   
   The entry \code{qmatrix} is a \eqn{2\times 2}{2 x 2} identity matrix
   indicating that no transmission between the two finetypes can occur.
+
+  The code used to produce the \code{imdepifit} can be found at the end
+  of the examples section below.
 }
 
 \source{
@@ -122,7 +132,8 @@ data(imdepi)
 }
 
 \seealso{
-  class \code{"\link{epidataCS}"}
+  the data class \code{"\link{epidataCS}"}, and function
+  \code{\link{twinstim}} for model fitting. 
 }
 
 \examples{
@@ -196,6 +207,18 @@ title(xlab = "x [km]", ylab = "y [km]")
   # Show a dynamic illustration of the spatio-temporal dynamics of the 
   # spread during the first year of type B with a step size of 7 days
   animate(imdepiB, interval=c(0,365), time.spacing=7, sleep=0.1)
+}
+
+
+\dontrun{
+### data(imdepifit) is obtained as
+imdepifit <- twinstim(
+    endemic = ~1 + offset(log(popdensity)) + I(start/365) + 
+        sin(start * 2 * pi/365) + cos(start * 2 * pi/365),
+    epidemic = ~1 + type + agegrp, siaf = siaf.gaussian(1, logsd = TRUE),
+    data = imdepi, subset = !is.na(agegrp), nCub = 24, nCub.adaptive = TRUE, 
+    optim.args = list(par = c(-20, -0.041, 0.24, 0.35, -17, 0, 0, 0, 2.8)),
+    model = FALSE, cumCIF = TRUE)
 }
 }
 

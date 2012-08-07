@@ -106,7 +106,31 @@ Sebastian Meyer
 }
 
 \examples{
-# TODO ...
+# load a fit of the 'imdepi' data, see the example in ?twinstim
+data(imdepifit)
+
+# print method
+imdepifit
+
+# extract point estimates
+coef(imdepifit)
+
+# variance-covariance matrix of endemic parameters
+# (inverse of expected Fisher information)
+unname(vcov(imdepifit)[1:4,1:4])
+
+# the default confint() method may be used for Wald CI's
+confint(imdepifit, parm="e.typeC", level=0.95)
+
+# log-likelihood and AIC of the fitted model
+logLik(imdepifit)
+AIC(imdepifit)
+
+# summary method
+summary(imdepifit, test.iaf=FALSE, correlation=TRUE, symbolic.cor=TRUE)
+
+# create LaTeX code of coefficient table
+toLatex(summary(imdepifit), withAIC=FALSE)
 }
 
 \keyword{methods}
