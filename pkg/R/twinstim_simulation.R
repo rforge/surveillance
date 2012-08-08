@@ -9,13 +9,13 @@
 # CAVE: the type of contrasts for factor variables has to be set through options("contrasts")
 
 ### TODO: if epidemic-only process (!hash), we actually don't need stgrid
-###       the function is not yet arranged for endemic-only or epidemic-only settings
+###       the function is not yet arranged for epidemic-only settings
 
 simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     events, stgrid, tiles, beta0, beta, gamma, siafpars, tiafpars,
     t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5, nCub,
     W = NULL, trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
-    .skipChecks = FALSE, .onlyEvents = FALSE, ...)
+    .skipChecks = FALSE, .onlyEvents = FALSE)
 {
     ptm <- proc.time()[[3]]
     cl <- match.call()
@@ -116,8 +116,10 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     )
 
 
-    ### Check class of W, and class, proj4string and names of tiles
+    ### Check class, proj4string and names of tiles and W
 
+    stopifnot(inherits(tiles, "SpatialPolygons"),
+              (tileLevels <- levels(stgrid$tile)) %in% row.names(tiles))
     if (is.null(W)) {
     	if (require("maptools")) {
             cat("Building W as the union of 'tiles' ...\n")
@@ -127,10 +129,10 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         } else {
             stop("automatic generation of 'W' from 'tiles' requires package \"maptools\"")
         }
+    } else {
+        stopifnot(inherits(W, "SpatialPolygons"),
+                  identical(proj4string(tiles), proj4string(W)))
     }
-    stopifnot(inherits(W, "SpatialPolygons"), inherits(tiles, "SpatialPolygons"),
-              proj4string(tiles) == proj4string(W),
-              (tileLevels <- levels(stgrid$tile)) %in% row.names(tiles))
 
     # Transform W into a gpc.poly
     Wgpc <- as(W, "gpc.poly")
@@ -324,22 +326,15 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
         ## Check interaction functions
         siaf <- do.call(".parseiaf", args = alist(siaf))
-        tiaf <- do.call(".parseiaf", args = alist(tiaf))
-
-        ## Spatially constant interaction siaf(s) = 1
-        constantsiaf <- is.null(siaf) || attr(siaf, "constant")
-        if (constantsiaf) siaf <- siaf.constant()
+        constantsiaf <- attr(siaf, "constant")
         if (siaf$npars != nsiafpars) {
             stop("length of 'siafpars' (", nsiafpars,
                  ") does not match the 'siaf' specification (", siaf$npars, ")")
         }
-
-        ## Temporally constant interaction tiaf(t) = 1
-        constanttiaf <- is.null(tiaf) || attr(tiaf, "constant")
-        if (constanttiaf) {
-            tiaf <- tiaf.constant()
-            gmax <- 1L
-        }
+        
+        tiaf <- do.call(".parseiaf", args = alist(tiaf))
+        constanttiaf <- attr(tiaf, "constant")
+        if (constanttiaf) gmax <- 1L
         if (tiaf$npars != ntiafpars) {
             stop("length of 'tiafpars' (", ntiafpars,
                  ") does not match the 'tiaf' specification (", tiaf$npars, ")")
@@ -347,8 +342,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
         ## Check nCub
         if (!constantsiaf) {
-            nCub <- as.integer(nCub)
-            if (any(nCub <= 0L)) {
+            stopifnot(is.vector(nCub, mode="numeric"))
+            if (any(is.na(nCub) | nCub <= 0L)) {
                 stop("'nCub' must be positive")
             }
         }
@@ -362,7 +357,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         }
 
     } else {
-        if ((!missing(siaf) && !is.null(siaf)) || (!missing(tiaf) && !is.null(tiaf))) {
+        if ((!missing(siaf) && !is.null(siaf)) ||
+            (!missing(tiaf) && !is.null(tiaf))) {
             warning("'siaf' and 'tiaf' can only be modelled in conjunction with an 'epidemic' process")
         }
         siaf <- tiaf <- NULL
@@ -411,15 +407,13 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     ### calculate terms appearing in the epidemic component (the lambdag function uses eTerms)
 
     # compute computationally effective range of the 'siaf' function
-    if (!constantsiaf && !is.null(siaf$Fcircle)) {
+    if (hase && !constantsiaf && !is.null(siaf$Fcircle)) {
         effRangeTypes <- rep(siaf$effRange(siafpars), length.out = nTypes)
     }
 
     # helper function evaluating the epidemic terms of the ground intensity for a specific set of events
     eTermsCalc <- function (eventData, eventCoords)
     {
-        # epidemic model matrix (will be multiplied with gamma)
-        mme <- buildmme(eventData)
         # distance to the border (required for siafInt below, and for epidataCS)
         .bdist <- bdist(eventCoords, Wgpc)
         # spatial influence regions of the events
@@ -432,7 +426,15 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
             Wgpc = Wgpc,
             npoly = nCircle2Poly
         ) else list()
+        # epidemic terms
+        if (!hase) {
+            return(list(matrix(NA_real_, length(.influenceRegion), 3L),
+                        .bdist, .influenceRegion))
+        }
+        # epidemic model matrix (will be multiplied with gamma)
+        mme <- buildmme(eventData)
         # integrate the two-dimensional 'siaf' function over the influence region
+        # FIXME: update as in twinstim (nCub.adaptive, Fcircle without effRange, ...)
         siafInt <- if (length(.influenceRegion) == 0L) numeric(0L) else if (constantsiaf) {
                 sapply(.influenceRegion, attr, "area")
             } else if (is.null(siaf$Fcircle)) { # if siaf$Fcircle is not available
@@ -485,7 +487,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         hIntWKt <- hIntWK[[as.character(tBLOCK)]]
 
         ## epidemic part
-        if (length(infectives) == 0L) ejIntWt <- numeric(0L) else {
+        ejIntWt <- if (!hase || length(infectives) == 0L) numeric(0L) else {
             eTerms <- eTerms[infectives,,drop=FALSE]
             gTerm <- if (upper) {
                     rep.int(gmax, length(infectives))
@@ -495,8 +497,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                     tiaf$g(t-times, tiafpars, types)
                 }
             # ejIntWt only for infectives, others have 0
-            ejIntWt <- apply(cbind(eTerms,gTerm), 1, prod)
-            names(ejIntWt) <- infectives
+            structure(apply(cbind(eTerms,gTerm), 1, prod), names = infectives)
         }
 
         c("0"=hIntWKt, ejIntWt)   # endemic component has index "0" !
@@ -506,7 +507,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     ### helper function calculating the integral of lambdag from oldct to ct
     ### during simulation; it depends on the current values of the simulation
 
-    add2Lambdag <- if (constanttiaf) {
+    add2Lambdag <- if (!hase || constanttiaf) {
             function () lambdagUpper * (ct-oldct)
         } else function () {
             # old endemic ground intensity * passed time
@@ -711,9 +712,14 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                 stgrididx <- which(gridBlocks == tBLOCK)
                 .eventTile <- sample(stgrid$tile[stgrididx], 1L, prob=dsexpeta[stgrididx])  # this is a factor
                 # in spsample it is not guaranteed that the sample will consists of exactly n=1 point
-                while(inherits(
-                    eventLocationSP <- try(spsample(tiles[as.character(.eventTile),], n=1L, type="random"), silent = TRUE)
-                , "try-error")) {}  # if no point is sampled (very unlikely though) we would get an error
+                while(
+                inherits(eventLocationSP <- try(
+                    spsample(tiles[as.character(.eventTile),],
+                             n=1L, type="random"),
+                    silent = TRUE), "try-error")) {}
+                # if no point is sampled (very unlikely though), there would be
+                # an error; FIXME: this error catching could yield an infinite
+                # loop if there is another error which always appears
                 .eventLocation <- coordinates(eventLocationSP)[1L,,drop=FALSE]
             } else {    # i.e. source is one of the currently infective individuals
                 sourceType <- eventMatrix[.eventSource,"type"]
@@ -765,7 +771,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
             .offsetEvent <- attr(.mmhEvent, "offset")
             if (!is.null(.offsetEvent)) .etaEvent <- .offsetEvent + .etaEvent
             .lambdah <- exp(.etaEvent)
-            .lambdae <- if (length(.sources) > 0L) {
+            .lambdae <- if (hase && length(.sources) > 0L) {
                 .sdiffs <- .eventLocation[rep.int(1L,length(.sources)),,drop=FALSE] - eventCoords[.sources,,drop=FALSE]
                 .fSources <- siaf$f(.sdiffs, siafpars, eventMatrix[.sources,"type"])
                 .gSources <- tiaf$g(ct - eventMatrix[.sources,"time"], tiafpars, eventMatrix[.sources,"type"])
@@ -914,7 +920,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 ### TODO: actually stgrid's of simulations might have different time ranges when nEvents is active -> atm, simplify ignores this
 
 simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
-    rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5, nCub,
+    rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5, nCub = object$nCub,
     W = NULL, trace = FALSE, nCircle2Poly = 32, gmax = NULL, .allocate = 500, simplify = TRUE, ...)
 {
     ptm <- proc.time()[[3]]
@@ -950,8 +956,6 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     epidemic <- formula(object)$epidemic
     # we don't need any reference to the original twinstim evaluation environment
     environment(endemic) <- environment(epidemic) <- globalenv()
-    siaf     <- formula(object)$siaf
-    tiaf     <- formula(object)$tiaf
     if (is.null(rmarks)) {
         observedMarks <- subset(marks(data), subset = time > t0 & time <= T)
         observedMarks <- observedMarks[match("eps.t", names(observedMarks)):(ncol(observedMarks)-2L)]
@@ -972,16 +976,26 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
 
     ### Run the simulation(s)
 
+    # establish call
+    simcall <- call("simEpidataCS", endemic=endemic, epidemic=epidemic,
+                    siaf=quote(formula(object)$siaf),
+                    tiaf=quote(formula(object)$tiaf),
+                    qmatrix=quote(object$qmatrix),
+                    rmarks=quote(rmarks), events=quote(data$events),
+                    stgrid=quote(data$stgrid), tiles=quote(tiles), beta0=beta0,
+                    beta=beta, gamma=gamma, siafpars=siafpars,
+                    tiafpars=tiafpars, t0=t0, T=T, nEvents=nEvents, nCub=nCub,
+                    W=quote(W), trace=trace, nCircle2Poly=nCircle2Poly,
+                    gmax=gmax, .allocate=.allocate,
+                    .skipChecks=TRUE, .onlyEvents=FALSE)
+    
     # First simulation
     if (nsim > 1L) {
         cat("\nTime at beginning of simulation:", as.character(Sys.time()), "\n")
         cat("Simulation 1 /", nsim, "...\n")
         cat("-------------------------------------------------------------------------------\n")
     }
-    res <- simEpidataCS(endemic, epidemic, siaf, tiaf, object$qmatrix, rmarks,
-                        data$events, data$stgrid, tiles, beta0, beta, gamma, siafpars,
-                        tiafpars, t0, T, nEvents, nCub, W, trace, nCircle2Poly,
-                        gmax, .allocate, .skipChecks = TRUE)
+    res <- eval(simcall)
     if (nsim > 1L) {
         cat("\n-------------------------------------------------------------------------------\n")
         cat("Runtime of first simulation:", res$runtime, "seconds\n")
@@ -1000,14 +1014,10 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
         # force garbage collection
         capture.output(gc())
         # run the remaining simulations
+        simcall$.onlyEvents <- simplify
         for (i in 2:nsim) {
             cat("Simulation", sprintf(paste0("%",nchar(nsim),"i"), i), "/", nsim, "...")
-            capture.output(
-            resi <- simEpidataCS(endemic, epidemic, siaf, tiaf, object$qmatrix, rmarks,
-                data$events, data$stgrid, tiles, beta0, beta, gamma, siafpars,
-                tiafpars, t0, T, nEvents, nCub, W, trace, nCircle2Poly,
-                gmax, .allocate, .skipChecks = TRUE, .onlyEvents = simplify)
-            )
+            capture.output(resi <- eval(simcall))
             cat("\tsimulated", if (simplify) sum(!is.na(resi$source)) else sum(!is.na(resi$events$source)),
                 "events up to time", if (simplify) attr(resi,"timeRange")[2] else resi$timeRange[2], "\n")
             if (simplify) res$eventsList[[i]] <- resi else res[[i]] <- resi
@@ -1038,4 +1048,37 @@ print.simEpidataCSlist <- function (x, ...)
     cat(if (simplified) "Simplified list" else "List", "of", nsim,
         "simulated epidemics of class \"simEpidataCS\" (not printed)\n\n")
     invisible(x)
+}
+
+"[[.simEpidataCSlist" <- function (x, i) {
+    simplified <- attr(x, "simplified")
+    if (simplified) {
+        x <- unclass(x)
+        x$eventsList <- x$eventsList[[i]]
+        names(x)[names(x) == "eventsList"] <- "events"
+        x <- append(x, list(timeRange = attr(x$events, "timeRange")), after=4L)
+        x$runtime <- attr(x$events, "runtime")
+        attr(x$events, "timeRange") <- attr(x$events, "runtime") <- NULL
+        class(x) <- c("simEpidataCS", "epidataCS", "list")
+        x
+    } else NextMethod("[[")
+}
+
+plot.simEpidataCSlist <- function (x,
+    which = NULL, mfrow = n2mfrow(length(which)),
+    main = paste("Simulated epidemic", which),
+    aggregate = c("time", "space"), subset, ...)
+{
+    simplified <- attr(x, "simplified")
+    nsim <- if (simplified) length(x$eventsList) else length(x)
+    if (is.null(which)) {
+        which <- seq_len(nsim)
+        if (nsim > 4) which <- sample(which, 4L)
+    }
+    opar <- par(mfrow = mfrow); on.exit(par(opar))
+    main <- rep(main, length.out=length(which))
+    for (i in which) {
+        do.call("plot", args=list(x=quote(x[[i]]), aggregate=aggregate,
+                        subset=substitute(subset), main = main[i], ...))
+    }
 }

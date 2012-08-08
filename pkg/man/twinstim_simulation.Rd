@@ -23,10 +23,10 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     events, stgrid, tiles, beta0, beta, gamma, siafpars, tiafpars,
     t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5, nCub,
     W = NULL, trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
-    .skipChecks = FALSE, .onlyEvents = FALSE,...)
+    .skipChecks = FALSE, .onlyEvents = FALSE)
 
 \method{simulate}{twinstim}(object, nsim = 1, seed = NULL, data, tiles,
-    rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5, nCub,
+    rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5, nCub = object$nCub,
     W = NULL, trace = FALSE, nCircle2Poly = 32, gmax = NULL,
     .allocate = 500, simplify = TRUE, ...)
 }
@@ -153,9 +153,10 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     to the first of the \code{nsim} simulations.
   }
   \item{.allocate}{
-    number of rows to initially allocate for the event history; defaults to
-    500.  Each time the simulated epidemic exceeds the allocated space,
-    the event data.frame will be enlarged by \code{.allocate} rows.
+    number of rows (events) to initially allocate for the event history;
+    defaults to 500.  Each time the simulated epidemic exceeds the
+    allocated space, the event \code{data.frame} will be enlarged by
+    \code{.allocate} rows.
   }
   \item{.skipChecks,.onlyEvents}{
     these logical arguments are not meant to be set by the user.
@@ -232,7 +233,7 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   algorithm is. Often it can be advantageous to sacrifice some detail
   for speed by reducing polygon complexity using, e.g., the
   Douglas and Peucker (1973) reduction method available at
-  \url{http://mapshaper.com/test/demo.html} or as function \code{dp()}
+  \url{MapShaper.org} or as function \code{dp()}
   in the (slightly outdated) package \pkg{shapefiles}, or by passing by
   \pkg{spatstat}'s \code{\link[spatstat]{simplify.owin}} procedure.
 }
@@ -273,7 +274,45 @@ spatio-temporal conditional intensity models to epidemic data.
 }
 
 \examples{
-# TODO...
+data(imdepi)
+data(imdepifit)
+
+## load borders of Germany's districts (obtained from the
+## Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, Germany,
+## www.geodatenzentrum.de), simplified by the "special" Visvalingam
+## algorithm (level=60\%) using www.MapShaper.org:
+load(system.file("shapes", "districtsD.RData", package="surveillance"))
+plot(districtsD)
+plot(stateD, add=TRUE, border=2, lwd=2)
+# 'stateD' is the union of the polygons in 'districtsD'
+# (created by maptools::unionSpatialPolygons)
+
+## simulate 2 "epidemics" from an endemic-only model
+m_noepi <- update(imdepifit, epidemic=~0,
+    optim.args=list(par=coef(imdepifit)[1:4]), model=FALSE, cumCIF=FALSE)
+mysim <- simulate(m_noepi, nsim=2, seed=399, data=imdepi,
+    tiles=districtsD, W=stateD, t0=31, T=365, trace=20, nCircle2Poly=16,
+    .allocate=100, simplify=TRUE)
+
+# extract the first realization -> object of class simEpidataCS
+mysim1 <- mysim[[1]]
+plot(mysim1, aggregate="space")
+
+# use the plot-method for simEpidataCSlist's
+plot(mysim, aggregate="time", subset=type=="B")
+
+\dontshow{
+## simulate 1 realization from the simplest epidemic model (intercept-only)
+m0 <- update(imdepifit, epidemic=~1, siaf=NULL,
+    optim.args=list(par=coef(imdepifit)[1:5]), model=FALSE, cumCIF=FALSE)
+mysim0 <- simulate(m0, seed=826, data=imdepi,
+    tiles=districtsD, W=stateD, t0=31, T=365, trace=50)
+}
+
+## simulate 1 realization from the imdepifit-model
+simimdepifit <- simulate(imdepifit, seed=1, data=imdepi,
+    tiles=districtsD, W=stateD, t0=31, T=365, trace=50)
+summary(simimdepifit)
 }
 
 \keyword{datagen}

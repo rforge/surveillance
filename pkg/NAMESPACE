@@ -59,6 +59,9 @@ importClassesFrom(gpclib, gpc.poly)
 importMethodsFrom(gpclib, "[", get.bbox, intersect, append.poly, get.pts, scale.poly, tristrip)
 importFrom(spatstat, as.owin, as.owin.gpc.poly, coords, coords.ppp, area.owin, distppl,
                      as.im.function, disc, shift, shift.owin, plot.owin, marks,
+                     marks.ppp, markformat.default, # required for runifpoint() in
+                                        # simulate.twinstim because spatstat
+                                        # does not register its S3 methods 
                      bounding.box, runifpoint, inside.owin)
 importFrom(intervals, Intervals, reduce)
 
@@ -220,7 +223,7 @@ S3method(summary, epidataCS)
 S3method(print, summary.epidataCS)
 S3method(animate, epidataCS)
 export(animate.epidataCS)               # for convenience
-export(marks)                           # as imported from spatstat
+export(marks, marks.ppp, markformat.default) # as imported from spatstat
 S3method(marks, epidataCS)
 export(marks.epidataCS)            # for convenience since its a foreign generic
 S3method(plot, epidataCS)
@@ -236,7 +239,7 @@ export(iafplot)
 export(intensity.twinstim)
 S3method(intensityplot, twinstim)
 export(intensityplot.twinstim)          # for convenience
-#S3method(profile, twinstim)   # FIXME @Michael: what is the status of this method?
+S3method(profile, twinstim)
 S3method(coef, twinstim)
 S3method(vcov, twinstim)
 S3method(logLik, twinstim)
@@ -246,6 +249,8 @@ S3method(R0, twinstim)
 S3method(residuals, twinstim)
 
 S3method(print, simEpidataCSlist)
+S3method("[[", simEpidataCSlist)
+S3method(plot, simEpidataCSlist)
 
 
 ### hhh-specific

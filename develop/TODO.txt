@@ -46,14 +46,19 @@
 ########
 
 #Open
-05/04/2011 simulation does not work on the fitted Hagelloch data (->Sebastian?)
-04/04/2011 osAIC computations by simulation does not work in some
-           cases where estimated coefficient is small (global in Hagelloch)
-           Problems occur in the quadratic programming (->Michael)
+04/04/2011 osAIC computation by simulation does not work in some
+           cases where estimated coefficient is small (global in Hagelloch):
+           m <- twinSIR(~ household + local1 + global1, data=hagelloch)
+           AIC(m, nsim=10)   # sometimes this works, sometimes not (-> NA)
+           Problems occur in the quadratic programming:
+           Error in quadprog::solve.QP(Dmat = Winv, dvec = d, Amat = t(R), bvec = rep(0,  : 
+             constraints are inconsistent, no solution!
 
 #Fixed
 25/03/2011 intensityPlot in twinSIR does not work if there are initially
            infectious individuals (as in the hagelloch data)
+07/08/2012 simulation does not work on the fitted Hagelloch data. More
+           specifically, it does not work when there are no endemic covariates.
 
 
 ###########
@@ -61,14 +66,12 @@
 ###########
 
 #Open
-24/03/2011 animate using animation package for objects of type "epidata"
-           problem is that only one graphics frame is opened and iteratively
-           filled by 'points'; "animation" would need one frame per picture
-05/04/2011 R0 calculations as for twinstim (->Sebastian?)
-12/06/2012 summary.twinSIR sollte zwischen epi und endemic effects unterscheiden
+05/04/2011 R0 calculations as for twinstim:
+           how can we derive R0 in a twinSIR model? (-> Michael)
+07/08/2012 analysis of hagelloch data in twinSIR examples (-> Michael)
 
 #Done
-
+07/08/2012 animate using animation package for objects of type "epidata"
 
 
 
@@ -84,57 +87,44 @@
 
 #Open
 
-- 21/10/2010 R0 on an object containing agegrp as a factor variable
-             in the epidemic component apparently does not work.
-- 15/04/2011 Simulate on a twinstim object without siaf (i.e. siaf=NULL)
-             does not work. Reproducible code:
-
-	     #Note - no siaf is used.
-	     m <-twinstim(endemic  = endemic, epidemic = epidemic,
-                  data = imdepi, subset = allEpiCovNonNA,
-                  optim.args = optim.args, finetune=FALSE, model=TRUE,
-                  nCub = 24,
-                  typeSpecificEndemicIntercept = FALSE)
-            stpp <- simulate(m, nsim=1, data = imdepi, tiles = kreise, t0 = 0, T = 300, W = W, nCub=24)
-
-- 15/04/2011 Using siaf=siaf.constant in twinstim  does not work. Is this intended?
-- 16/04/2011 Use of finetune=TRUE appears not to lead to convergence. How to fix this?
-- 11/10/2011 twinstim example imdepi.fit0 does not work (no convergence)
-
-#Closed:
-
+#Fixed
 29/07/2010>> Summary/print fuer twinstim Objekte, die mit do.call
-  erzeugt worden sind scheint nicht zu funktionieren.
-  Siehe analyses-joint fuer Beispiele.
+             erzeugt worden sind scheint nicht zu funktionieren.
+             Siehe analyses-joint fuer Beispiele.
 30/07/2010-fix>> alist
-
 30/07/2010>> imdepi$events@data -- see email
-
 30/07/2010>> Fitting twinstim models with epidemic component given by:
-        epidemic=~ 0 -- see email.
-
+             epidemic=~ 0 -- see email.
 10/08/2010 computing the cumulative intensity function at the end of
-the fit is VERY slow if model contains siaf component.  E.g. for best
-model having siaf_1 it takes about 60-90 minutes while the fit takes 5
-minutes. Possible to fix this??
+           the fit is VERY slow if model contains siaf component.  E.g. for best
+           model having siaf_1 it takes about 60-90 minutes while the fit takes 5
+           minutes. Possible to fix this??
+16/04/2011 Use of finetune=TRUE appears not to lead to convergence. How to fix
+           this? -> try with new argument nCub.adaptive=FALSE
+xx/07/2012 R0 on an object containing agegrp as a factor variable
+           in the epidemic component apparently does not work.
+           -> new R0 implementation
+07/08/2012 Simulate on a twinstim object without siaf (i.e. siaf=NULL)
+      	   does not work. -> seems to work now after a bunch of bug fixes
 
 
-###########
+##########
 # Features
 ##########
 
 #Open issues / feature requests
-- robustification of optim procedure by making it less adaptive -> sebastian
-- Documentation of functions in Rd files; also update references (Biometrics)
+- implement step function support for interaction kernels
 
 #Done
-05/07/2012 (sebastian): intensityPlot as in twinSIR, i.e. on W integrated intensity (and its components) as a function of time, grouped by type
+06/08/2010 (sebastian): Lambda(t) function, i.e. cumulative intensity function
+12/08/2010 (sebastian): speed-up calculation of tau importantly by only evaluating .siafInt(siafpars) once
+08/11/2010 (sebastian): Implementation of simulation algorithm
 05/04/2011 (sebastian): Plot method for epidataCS objects
 08/04/2011 (michael): Implemented profile function as in twinSIR.
-12/08/2010 (sebastian): speed-up calculation of tau importantly by only evaluating .siafInt(siafpars) once
-06/08/2010 (sebastian): Lambda(t) function, i.e. cumulative intensity function
-08/11/2010 (sebastian): Implementation of simulation algorithm
-
+05/07/2012 (sebastian): intensityPlot as in twinSIR, i.e. on W integrated intensity (and its components) as a function of time, grouped by type
+xx/07/2012 (sebastian): robustification of optim procedure by making it less
+adaptive (nCub.adaptive can be set to FALSE)
+xx/07/2012 (sebastian): Documentation of functions in Rd files; also update references (Biometrics)
 
 
 

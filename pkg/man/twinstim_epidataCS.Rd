@@ -7,9 +7,11 @@
 \alias{tail.epidataCS}
 \alias{[.epidataCS}
 \alias{subset.epidataCS}
-\alias{marks}              % to make R CMD check happy (the generic
-                           % marks is imported from spatstat and then
-                           % exported (unchanged) -> documentation required)
+\alias{marks}	       % to make R CMD check happy (the generic
+                       % marks is imported from spatstat and then
+                       % exported (unchanged) -> documentation required)
+\alias{marks.ppp}               % dito
+\alias{markformat.default}      % dito
 \alias{marks.epidataCS}
 \alias{summary.epidataCS}
 \alias{print.summary.epidataCS}
@@ -215,7 +217,7 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   operations will be. Often it can be advantageous to sacrifice some detail
   for speed by reducing polygon complexity using, e.g., the
   Douglas and Peucker (1973) reduction method available at
-  \url{http://mapshaper.com/test/demo.html} or as function \code{dp()}
+  \url{MapShaper.org} or as function \code{dp()}
   in the (slightly outdated) package \pkg{shapefiles}, or by passing by
   \pkg{spatstat}'s \code{\link[spatstat]{simplify.owin}} procedure.
 }
