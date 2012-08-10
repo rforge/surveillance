@@ -35,8 +35,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     component in the model.
   }
   \item{siaf}{
-    spatial interaction function. May be \code{NULL} (or missing,
-    corresponding to \code{siaf.constant()}, i.e. constant infectivity
+    spatial interaction function. May be \code{NULL} or missing
+    (corresponding to \code{siaf.constant()}, i.e. constant infectivity 
     independent of the spatial distance from the host), a list
     (specifying a continuous kernel, as e.g., returned by the functions
     \code{\link{siaf.gaussian}} or \code{\link{siaf.lomax}}), or numeric
@@ -197,8 +197,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   \item{fitted}{fitted values of the conditional intensity function at the events.}
   \item{fittedComponents}{two-column matrix with columns \code{"h"} and
     \code{"e"} containing the fitted values of the endemic and epidemic
-    components, respectively. (Note that
-    \code{rowSums(fittedComponents) == fitted}.)}
+    components, respectively.\cr
+    (Note that \code{rowSums(fittedComponents) == fitted}.)}
   \item{tau}{fitted cumulative ground intensities at the event times.
     Only calculated and returned if \code{cumCIF = TRUE}.
     This is the \dQuote{residual process} of the model, see

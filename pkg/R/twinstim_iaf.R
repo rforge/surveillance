@@ -37,7 +37,7 @@ siaf.constant <- function () {
 ##   terms of multiples of the parameter, i.e. with effRangeMult=6 numerical
 ##   integration only considers the 6-sigma area around the event instead of the
 ##   whole observation region W.
-## validpars: see 'twinstim'. If logsd = FALSE, you should either use
+## validpars: If logsd = FALSE, you should either use
 ##   constrained optimisation (L-BFGS-B) or set 'validpars' to function (pars)
 ##   pars > 0. 
 

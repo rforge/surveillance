@@ -603,9 +603,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 sEventsSum <- colSums(nom / lambdaEvents)
                 epsTypes <- if (nCub.adaptive) {
                         siaf$effRange(siafpars) / nCub
+                        ## FIXME: this bandwidth is actually not adapted for siaf$deriv
                     } else nCub
-                        ## 2 * min(eps.s) / spatstat::spatstat.options("npixel")
-                        ## ## this does not work with eps.s = Inf
                 epsTypes <- rep(epsTypes, length.out = nTypes)
                 derivInt <- sapply(1:nsiafpars, function (paridx) {
                     sapply(1:N, function (i) {

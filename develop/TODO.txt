@@ -114,6 +114,7 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 
 #Open issues / feature requests
 - implement step function support for interaction kernels
+- intensityplot-method for simEpidataCS (through twinstim(*, optim.args=NULL)??)
 
 #Done
 06/08/2010 (sebastian): Lambda(t) function, i.e. cumulative intensity function
