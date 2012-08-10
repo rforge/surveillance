@@ -302,8 +302,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
     if (hase) {
 
-        ### Check interaction functions
-
+        ## Check interaction functions
         siaf <- do.call(".parseiaf", args = alist(siaf))
         constantsiaf <- attr(siaf, "constant")
         nsiafpars <- siaf$npars
@@ -312,81 +311,13 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         constanttiaf <- attr(tiaf, "constant")
         ntiafpars <- tiaf$npars
 
+        ## Define function that integrates the two-dimensional 'siaf' function
+        ## over the influence regions of the events
+        .siafInt <- .siafIntFUN(siaf = siaf, nCub.adaptive = nCub.adaptive,
+                                noCircularIR = all(eps.s > bdist))
+        ## CAVE: nCub or nCub.adaptive might have been fixed by the above call
 
-        ### Define function that integrates the two-dimensional 'siaf' function
-        ### over the influence regions of the events
-        
-        .siafInt <-
-            if (constantsiaf) {
-                nCub <- NA_real_
-                nCub.adaptive <- FALSE
-                function (siafpars) iRareas
-            } else if (is.null(siaf$Fcircle) || # if siaf$Fcircle not available
-                       (is.null(siaf$effRange) && all(eps.s > bdist))) {
-                nCub.adaptive <- FALSE
-                function (siafpars) {
-                    siafInts <- sapply(1:N, function (i) {
-                        polyCub.midpoint(influenceRegion[[i]], siaf$f,
-                                         siafpars, eventTypes[i], eps = nCub)
-                    })
-                    siafInts
-                }
-            } else if (is.null(siaf$effRange)) { # use Fcircle but only delta-trick
-                nCub.adaptive <- FALSE
-                function (siafpars) {
-                    ## Compute the integral of 'siaf' over each influence region
-                    siafInts <- numeric(N)
-                    for(i in 1:N) {
-                        eps <- eps.s[i]
-                        bdisti <- bdist[i]
-                        siafInts[i] <- if (eps <= bdisti) {
-                                ## influence region is completely inside W
-                                siaf$Fcircle(eps, siafpars, eventTypes[i])
-                            } else {
-                                ## numerically integrate over polygonal influence region
-                                polyCub.midpoint(influenceRegion[[i]], siaf$f,
-                                                 siafpars, eventTypes[i], eps = nCub)
-                            }
-                    }
-                    siafInts
-                }
-            } else { # fast integration over circular domains !
-                .ret <- function (siafpars) {
-                    # Compute computationally effective range of the 'siaf' function
-                    # for the current 'siafpars' for each event (type)
-                    effRangeTypes <- rep(siaf$effRange(siafpars),length.out=nTypes)
-                    effRanges <- effRangeTypes[eventTypes]   # N-vector
-                    # automatic choice of h (pixel spacing in image)
-                    hs <- effRanges / nCub
-                    # Compute the integral of 'siaf' over each influence region
-                    siafInts <- numeric(N)
-                    for(i in 1:N) {
-                        eps <- eps.s[i]
-                        bdisti <- bdist[i]
-                        effRange <- effRanges[i]
-                        siafInts[i] <- if (effRange <= bdisti) {
-                                # effective region ("6 sigma") completely inside W
-                                siaf$Fcircle(min(eps,effRange), siafpars, eventTypes[i])
-                            } else if (eps <= bdisti) {
-                                # influence region is completely inside W
-                                siaf$Fcircle(eps, siafpars, eventTypes[i])
-                            } else {
-                                # integrate over polygonal influence region
-                                polyCub.midpoint(influenceRegion[[i]], siaf$f,
-                                                 siafpars, eventTypes[i], eps = hs[i])
-                            }
-                    }
-                    siafInts
-                }
-                if (!nCub.adaptive) {
-                    body(.ret)[[grep("^hs <-", body(.ret))]] <-
-                        quote(hs <- rep(nCub, length.out = N))
-                }
-                .ret
-            }
-        suppressWarnings(rm(.ret))
-
-        ### Check nCub
+        ## Check nCub
         if (!constantsiaf) {
             stopifnot(is.vector(nCub, mode="numeric"))
             if (any(is.na(nCub) | nCub <= 0L)) {
@@ -399,6 +330,10 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         }
 
     } else {
+        if (!missing(siaf) && !is.null(siaf))
+            warning("'siaf' can only be modelled in conjunction with an 'epidemic' process")
+        if (!missing(tiaf) && !is.null(tiaf))
+            warning("'tiaf' can only be modelled in conjunction with an 'epidemic' process")
         siaf <- tiaf <- NULL
         nsiafpars <- ntiafpars <- 0L
         nCub <- nCub.adaptive <- NULL
