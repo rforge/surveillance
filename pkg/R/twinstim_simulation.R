@@ -6,10 +6,10 @@
 ### Author: Sebastian Meyer
 ################################################################################
 
-# CAVE: the type of contrasts for factor variables has to be set through options("contrasts")
-
-### TODO: if epidemic-only process (!hash), we actually don't need stgrid
-###       the function is not yet arranged for epidemic-only settings
+### CAVE:
+### - the type of contrasts for factor variables has to be set through options("contrasts")
+### - if epidemic-only process (!hash), we actually don't need stgrid
+###   (the function is not arranged for epidemic-only settings)
 
 simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     events, stgrid, tiles, beta0, beta, gamma, siafpars, tiafpars,
@@ -698,15 +698,20 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                 .eventType <- sample(typeNames, 1L, prob=if (nbeta0 > 1L) exp(beta0))
                 stgrididx <- which(gridBlocks == tBLOCK)
                 .eventTile <- sample(stgrid$tile[stgrididx], 1L, prob=dsexpeta[stgrididx])  # this is a factor
-                # in spsample it is not guaranteed that the sample will consists of exactly n=1 point
+                # spsample doesn't guarantee that the sample will consist of exactly n points
+                # if no point is sampled (very unlikely though), there would be an error
+                ntries <- 1L
                 while(
                 inherits(eventLocationSP <- try(
                     spsample(tiles[as.character(.eventTile),],
                              n=1L, type="random"),
-                    silent = TRUE), "try-error")) {}
-                # if no point is sampled (very unlikely though), there would be
-                # an error; FIXME: this error catching could yield an infinite
-                # loop if there is another error which always appears
+                    silent = TRUE), "try-error")) {
+                    if (ntries >= 1000) {
+                        stop("'spsample()' did not succeed in sampling a random point ",
+                             "in tile '", as.character(.eventTile), "'")
+                    }
+                    ntries <- ntries + 1L
+                }
                 .eventLocation <- coordinates(eventLocationSP)[1L,,drop=FALSE]
             } else {    # i.e. source is one of the currently infective individuals
                 sourceType <- eventMatrix[.eventSource,"type"]
@@ -720,9 +725,9 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                         eventInsideIR <- FALSE
                         ntries <- 0L
                         while(!eventInsideIR) {
-                            if (ntries >= 1000) { # TODO: throw warning, skip to next event?
-                                cat("rejection sampling of event location seems difficult...\n")
-                                browser()
+                            if (ntries >= 1000) {
+                                stop("event location sampled by siaf$simulate() was ",
+                                     "rejected 1000 times (outside influence region)")
                             }
                             ntries <- ntries + 1L
                             eventLocationIR <- siaf$simulate(1L, siafpars, .eventTypeCode)
@@ -795,8 +800,12 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         T <- ct
         # clip stgrid to effective time range of simulation
         stgrid <- subset(stgrid, start <= T)
+        cat("Maximum number of events (nEvents=", nEvents,
+            ") reached @t = ", T, "\n", sep="")
+    } else {
+        cat("Simulation has ended @t =", T, "with", j-1L-Nout,
+            "simulated events.\n")
     }
-    cat("Simulation has ended @t =", T, "with", j-1L-Nout, "simulated events.\n")
 
 
 
@@ -904,7 +913,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 # A 'simulate' method for objects of class "twinstim".
 ################################################################################
 
-### TODO: actually stgrid's of simulations might have different time ranges when nEvents is active -> atm, simplify ignores this
+### FIXME: actually stgrid's of simulations might have different time ranges
+###        when nEvents is active -> atm, simplify ignores this
 
 simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5,
@@ -1007,8 +1017,12 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
         for (i in 2:nsim) {
             cat("Simulation", sprintf(paste0("%",nchar(nsim),"i"), i), "/", nsim, "...")
             capture.output(resi <- eval(simcall))
-            cat("\tsimulated", if (simplify) sum(!is.na(resi$source)) else sum(!is.na(resi$events$source)),
-                "events up to time", if (simplify) attr(resi,"timeRange")[2] else resi$timeRange[2], "\n")
+            .nEvents <- if (simplify) sum(!is.na(resi$source)) else {
+                sum(!is.na(resi$events$source))
+            }
+            .T <- if (simplify) attr(resi,"timeRange")[2] else resi$timeRange[2]
+            cat("\tsimulated", .nEvents, "events", if (nEvents == .nEvents)
+                "(reached maximum)", "up to time", .T, "\n")
             if (simplify) res$eventsList[[i]] <- resi else res[[i]] <- resi
         }
         cat("\nDone (", as.character(Sys.time()), ").\n", sep="")

@@ -250,7 +250,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     mmhEvents <- model.matrix(endemic, mfhEvents)
     # exclude intercept from endemic model matrix below, will be treated separately
     if (nbeta0 > 0) mmhEvents <- mmhEvents[,-1,drop=FALSE]
-    stopifnot(nrow(mmhEvents) == Nin)   # TODO: remove check after some testing
+    #stopifnot(nrow(mmhEvents) == Nin)
     p <- ncol(mmhEvents)
     hash <- (nbeta0+p) > 0L
 

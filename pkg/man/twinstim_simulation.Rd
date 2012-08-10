@@ -37,7 +37,9 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   \item{endemic}{
     see \code{\link{twinstim}}. Note that type-specific endemic
     intercepts are specified by \code{beta0} here, not by the term
-    \code{(1|type)}. 
+    \code{(1|type)}. Note also that simulation is not arranged for
+    epidemic-only models, thus \code{endemic} should not be set to
+    \code{~0}.
   }
   \item{epidemic}{
     see \code{\link{twinstim}}. Marks appearing in this formula must
@@ -125,13 +127,13 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     fitting of the \code{"twinstim"} \code{object}.
   }
   \item{T, nEvents}{
-    simulate \code{nEvents} events up to time \code{T},
+    simulate a maximum of \code{nEvents} events up to time \code{T},
     then stop. For \code{simEpidataCS}, by default, and also if
     \code{T=NULL}, \code{T} equals the last stop time in \code{stgrid}
     (it cannot be greater) and \code{nEvents} is bounded above by 10000.
     For the \code{simulate.twinstim} method, \code{T=NULL} means to use
     the same same time range as for the fitting of the \code{"twinstim"}
-    \code{object}.
+    \code{object}. 
   } 
   \item{W}{
     see \code{\link{as.epidataCS}}. Must have the same
@@ -228,6 +230,18 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   a single object of class \code{"simEpidataCS"}, but with \code{events}
   replaced by an \code{eventsList} containing the \code{events} returned
   by each of the simulations.
+
+  The \code{stgrid} component of the returned \code{"simEpidataCS"}
+  will be truncated to the actual end of the simulation, which might
+  be \eqn{<T}, if the upper bound \code{nEvents} is reached during
+  simulation.
+  
+  CAVE: Currently, \code{simplify=TRUE} in \code{simulate.twinstim}
+  ignores that multiple simulated epidemics
+  (\code{nsim > 1}) may have different \code{stgrid} 
+  time ranges. In a \code{"simEpidataCSlist"}, the \code{stgrid} shared
+  by all of the simulated epidemics is just the \code{stgrid}
+  returned by the \emph{first} simulation.
 }
 
 \note{
@@ -286,11 +300,11 @@ plot(stateD, add=TRUE, border=2, lwd=2)
 # 'stateD' is the union of the polygons in 'districtsD'
 # (created by maptools::unionSpatialPolygons)
 
-## simulate 2 "epidemics" from an endemic-only model
-m_noepi <- update(imdepifit, epidemic=~0,
+## simulate two "epidemics" from an endemic-only model (during a short period)
+m_noepi <- update(imdepifit, epidemic=~0, siaf=NULL,
     optim.args=list(par=coef(imdepifit)[1:4]), model=FALSE, cumCIF=FALSE)
 mysim <- simulate(m_noepi, nsim=2, seed=399, data=imdepi,
-    tiles=districtsD, W=stateD, t0=31, T=365, trace=20, nCircle2Poly=16,
+    tiles=districtsD, W=stateD, t0=31, T=182, trace=20, nCircle2Poly=16,
     .allocate=100, simplify=TRUE)
 
 # extract the first realization -> object of class simEpidataCS
@@ -301,16 +315,17 @@ plot(mysim1, aggregate="space")
 plot(mysim, aggregate="time", subset=type=="B")
 
 \dontshow{
+## only for testing purposes:
 ## simulate 1 realization from the simplest epidemic model (intercept-only)
 m0 <- update(imdepifit, epidemic=~1, siaf=NULL,
     optim.args=list(par=coef(imdepifit)[1:5]), model=FALSE, cumCIF=FALSE)
 mysim0 <- simulate(m0, seed=826, data=imdepi,
-    tiles=districtsD, W=stateD, t0=31, T=365, trace=50)
+    tiles=districtsD, W=stateD, t0=31, T=60, trace=FALSE)
 }
 
 ## simulate 1 realization from the imdepifit-model
 simimdepifit <- simulate(imdepifit, seed=1, data=imdepi,
-    tiles=districtsD, W=stateD, t0=31, T=365, trace=50)
+    tiles=districtsD, W=stateD, t0=31, T=182, trace=50)
 summary(simimdepifit)
 }
 

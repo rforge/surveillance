@@ -163,7 +163,7 @@ data(imdepifit)
 imdepifit_model <- update(imdepifit, model=TRUE, cumCIF=FALSE,
     optim.args=list(par=coef(imdepifit)))
 \dontshow{
-# FIXME: refit with model=TRUE with all parameters fixed at initial values
+# FIXME (speed-up!!): refit with model=TRUE with all parameters fixed at initial values
 }
 
 ## path of the total intensity

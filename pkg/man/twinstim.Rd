@@ -312,14 +312,14 @@ summary(m_noepi)
 
 m0 <- update(m_noepi,
     epidemic = ~1,
-    optim.args = list(par=c(coef(m_noepi),0)),
+    optim.args = list(par=c(coef(m_noepi),-10)),
     model = TRUE
 )
 
 \dontrun{
 ## NOTE: optim's BFGS would not identify the epidemic intercept
 m0_BFGS <- update(m_noepi, epidemic = ~1,
-    optim.args = list(par=c(coef(m_noepi),0), method="BFGS"))
+    optim.args = list(par=c(coef(m_noepi),-10), method="BFGS"))
 format(cbind(coef(m0), coef(m0_BFGS)), digits=3, scientific=FALSE)
 m0_BFGS$fisherinfo   # singular Fisher information matrix here
 m0$fisherinfo

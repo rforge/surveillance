@@ -269,7 +269,7 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
 ##                 ((alpha-1)*(r+sigma))
 ##         intfinvsq.fof0 - intfinvsq.fofr
 ##     }
-##     ## check if identical (TODO: drop this check after some time of testing)
+##     ## check if identical
 ##     if (!isTRUE(all.equal(intfinvsq2, intfinvsq))) {
 ##         browser("the two integrations of lomax^-1 differ")
 ##     }

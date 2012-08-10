@@ -16,11 +16,6 @@
 # models. Furthermore, one can simulate data from the cox-model:
 # no removal (i.e. infPeriod = function(ids) rep(Inf, length(ids)) and
 # no epidemic component (i.e. no alpha and no f).
-#
-# TODO: 
-# optimisation: precalculation of f[[m]](distances) may be faster. This depends
-#               on the complexity of the functions in f and on the number of
-#               iterations (which is unknown beforehand...).
 ################################################################################
 
 simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
