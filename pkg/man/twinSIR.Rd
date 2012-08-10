@@ -323,8 +323,6 @@ m <- twinSIR(~c1 + c2 + household + local1, data = hagelloch)
 #FIXME: there are no functions to generate c1 and c2 in attr(hagelloch, "f")
 #       which implies that the simulate-method doesn't work for this model
 summary(m)
-plot(m, which = "total intensity")
-plot(m, which = "epidemic proportion")
 }
 }
 

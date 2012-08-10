@@ -92,10 +92,11 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     desired number of subdivions of the effective integration range in
     both dimensions (for the current \code{siaf} parameters during
     optimisation), and \code{eps} thus equals
-    \code{siaf$effRange()}/\code{nCub} (e.g.,
-    if 6\eqn{\sigma} is used as the effective integration range of the
-    Gaussian \code{siaf} kernel, and \code{nCub = 24}, then a bandwidth
-    of \eqn{\sigma / 4} is used in the midpoint rule.\cr
+    \code{siaf$effRange()}/\code{nCub}. This is intended and especially
+    useful for the Gaussian \code{\link[=siaf.gaussian]{siaf}} kernel:
+    if, e.g., 6\eqn{\sigma} is used as the effective integration range
+    and \code{nCub = 24}, then a bandwidth of \eqn{\sigma / 4} is used
+    in the midpoint rule.\cr 
     If \code{siaf$Fcircle} or \code{siaf$effRange} is unspecified or
     \code{nCub.adaptive = FALSE}, then \code{nCub} equals the above
     mentioned \code{eps} in \code{polyCub.midpoint} (in this case may

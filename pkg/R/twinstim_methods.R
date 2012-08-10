@@ -209,9 +209,8 @@ intensityplot.twinstim <- function (x,
     aggregate = c("time", "space"),
     types = 1:nrow(x$qmatrix), tiles, tiles.idcol = NULL,
     plot = TRUE, add = FALSE, tgrid = 101, rug.opts = list(),
-    sgrid = 128, polygons.args = list(), points.args = list(),
-    cex.fun = function (counts) sqrt(1.5*counts/pi/min(counts)),
-    ...)
+    sgrid = 128, polygons.args = list(), points.args = list(cex=0.5),
+    cex.fun = sqrt, ...)
 {
     ## check arguments
     if (is.null(environment(x))) {
@@ -318,9 +317,12 @@ intensityplot.twinstim <- function (x,
             eventCoords.types <- eventCoords.types[!duplicated(coordinates(eventCoords.types)),]
             nms.points <- names(points.args)
             if(! "pch" %in% nms.points) points.args$pch <- 1
+            pointcex <- cex.fun(eventCoords.types$mult)
+            pointcex <- pointcex * points.args$cex
+            points.args$cex <- NULL
             lobjs <- c(lobjs,
                        list(c(list("sp.points", eventCoords.types, first=FALSE,
-                                   cex=cex.fun(eventCoords.types$mult)), points.args)))
+                                   cex=pointcex), points.args)))
         }
         if ("sp.layout" %in% nms) {
             if (!is.list(dotargs$sp.layout[[1]])) { # let sp.layout be a list of lists
