@@ -13,7 +13,8 @@
 
 simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     events, stgrid, tiles, beta0, beta, gamma, siafpars, tiafpars,
-    t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5, nCub,
+    t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5,
+    nCub, nCub.adaptive = FALSE,
     W = NULL, trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
     .skipChecks = FALSE, .onlyEvents = FALSE)
 {
@@ -340,11 +341,26 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                  ") does not match the 'tiaf' specification (", tiaf$npars, ")")
         }
 
+        ## Define function that integrates the two-dimensional 'siaf' function
+        ## over the influence regions of the events
+        if (!constantsiaf && !is.null(siaf$Fcircle) && !is.null(siaf$effRange))
+        {
+            ## pre-compute effective range of the 'siaf' (used by .siafInt)
+            effRangeTypes <- rep(siaf$effRange(siafpars), length.out = nTypes)
+        }
+        .siafInt <- .siafIntFUN(siaf = siaf, nCub.adaptive = nCub.adaptive,
+                                noCircularIR = FALSE) # not certain beforehand
+        ## CAVE: nCub or nCub.adaptive might have been fixed by the above call
+
         ## Check nCub
         if (!constantsiaf) {
             stopifnot(is.vector(nCub, mode="numeric"))
             if (any(is.na(nCub) | nCub <= 0L)) {
                 stop("'nCub' must be positive")
+            }
+            if (isTRUE(cl[["nCub.adaptive"]]) && !nCub.adaptive) {
+                message("'nCub.adaptive' only works in conjunction with ",
+                        "specified 'siaf$effRange()'")
             }
         }
 
@@ -357,11 +373,12 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         }
 
     } else {
-        if ((!missing(siaf) && !is.null(siaf)) ||
-            (!missing(tiaf) && !is.null(tiaf))) {
-            warning("'siaf' and 'tiaf' can only be modelled in conjunction with an 'epidemic' process")
-        }
+        if (!missing(siaf) && !is.null(siaf))
+            warning("'siaf' can only be modelled in conjunction with an 'epidemic' process")
+        if (!missing(tiaf) && !is.null(tiaf))
+            warning("'tiaf' can only be modelled in conjunction with an 'epidemic' process")
         siaf <- tiaf <- NULL
+        nCub <- nCub.adaptive <- NULL
     }
 
 
@@ -404,23 +421,21 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     #<- is a named vector with names referencing BLOCK in stgrid
 
 
-    ### calculate terms appearing in the epidemic component (the lambdag function uses eTerms)
-
-    # compute computationally effective range of the 'siaf' function
-    if (hase && !constantsiaf && !is.null(siaf$Fcircle)) {
-        effRangeTypes <- rep(siaf$effRange(siafpars), length.out = nTypes)
-    }
-
-    # helper function evaluating the epidemic terms of the ground intensity for a specific set of events
+    ### helper function evaluating the epidemic terms of the ground intensity
+    ### for a specific set of events (the lambdag function uses eTerms)
+    
     eTermsCalc <- function (eventData, eventCoords)
     {
+        # extract some marks from the eventData
+        eventTypes <- as.integer(eventData$type)
+        eps.s <- eventData$eps.s
         # distance to the border (required for siafInt below, and for epidataCS)
-        .bdist <- bdist(eventCoords, Wgpc)
+        bdist <- bdist(eventCoords, Wgpc)
         # spatial influence regions of the events
-        .influenceRegion <- if (nrow(eventCoords) > 0L) .influenceRegions(
+        influenceRegion <- if (nrow(eventCoords) > 0L) .influenceRegions(
             events = SpatialPointsDataFrame(
                 coords = eventCoords,
-                data = data.frame(eps.s = eventData$eps.s, .bdist = .bdist),
+                data = data.frame(eps.s = eps.s, .bdist = bdist),
                 match.ID = FALSE
             ),
             Wgpc = Wgpc,
@@ -428,52 +443,24 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         ) else list()
         # epidemic terms
         if (!hase) {
-            return(list(matrix(NA_real_, length(.influenceRegion), 3L),
-                        .bdist, .influenceRegion))
+            return(list(matrix(NA_real_, length(influenceRegion), 3L),
+                        bdist, influenceRegion))
         }
         # epidemic model matrix (will be multiplied with gamma)
         mme <- buildmme(eventData)
         # integrate the two-dimensional 'siaf' function over the influence region
-        # FIXME: update as in twinstim (nCub.adaptive, Fcircle without effRange, ...)
-        siafInt <- if (length(.influenceRegion) == 0L) numeric(0L) else if (constantsiaf) {
-                sapply(.influenceRegion, attr, "area")
-            } else if (is.null(siaf$Fcircle)) { # if siaf$Fcircle is not available
-                sapply(seq_along(.influenceRegion), function (i) {
-                    polyCub.midpoint(.influenceRegion[[i]], siaf$f, siafpars, as.integer(eventData[i,"type"]), eps = nCub)
-                })
-            } else { # fast integration over circular domains !
-                # effRange of each event
-                effRanges <- effRangeTypes[eventData$type]
-                # automatic choice of h (pixel spacing in image)
-                hs <- effRanges / nCub   # could e.g. equal sigma
-                # Compute the integral of 'siaf' over each influence region
-                siafInts <- numeric(length(.influenceRegion))
-                for(i in seq_along(siafInts)) {
-                    eps <- eventData$eps.s[i]
-                    bdisti <- .bdist[i]
-                    effRange <- effRanges[i]
-                    siafInts[i] <- if (effRange <= bdisti) {
-                            # effective region ("6 sigma") completely inside W
-                            siaf$Fcircle(min(eps,effRange), siafpars, as.integer(eventData[i,"type"]))
-                        } else if (eps <= bdisti) {
-                            # influence region is completely inside W
-                            siaf$Fcircle(eps, siafpars, as.integer(eventData[i,"type"]))
-                        } else {
-                            # integrate over polygonal influence region
-                            polyCub.midpoint(.influenceRegion[[i]], siaf$f,
-                                siafpars, as.integer(eventData[i,"type"]), eps = hs[i])
-                        }
-                }
-                siafInts
-            }
+        siafInts <- if (length(influenceRegion) == 0L) numeric(0L) else {
+            environment(.siafInt) <- environment()
+            .siafInt(siafpars)
+        }
         # Matrix of terms in the epidemic component
         eTerms <- cbind(
             qSum = qSumTypes[eventData$type],
             expeta = exp(drop(mme %*% gamma)),
-            siafInt = siafInt
+            siafInt = siafInts
         )
         # Return
-        list(eTerms, .bdist, .influenceRegion)
+        list(eTerms, bdist, influenceRegion)
     }
 
 
@@ -920,7 +907,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 ### TODO: actually stgrid's of simulations might have different time ranges when nEvents is active -> atm, simplify ignores this
 
 simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
-    rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5, nCub = object$nCub,
+    rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5,
+    nCub = object$nCub, nCub.adaptive = object$nCub.adaptive,
     W = NULL, trace = FALSE, nCircle2Poly = 32, gmax = NULL, .allocate = 500, simplify = TRUE, ...)
 {
     ptm <- proc.time()[[3]]
@@ -984,7 +972,8 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
                     rmarks=quote(rmarks), events=quote(data$events),
                     stgrid=quote(data$stgrid), tiles=quote(tiles), beta0=beta0,
                     beta=beta, gamma=gamma, siafpars=siafpars,
-                    tiafpars=tiafpars, t0=t0, T=T, nEvents=nEvents, nCub=nCub,
+                    tiafpars=tiafpars, t0=t0, T=T, nEvents=nEvents,
+                    nCub=nCub, nCub.adaptive=nCub.adaptive,
                     W=quote(W), trace=trace, nCircle2Poly=nCircle2Poly,
                     gmax=gmax, .allocate=.allocate,
                     .skipChecks=TRUE, .onlyEvents=FALSE)
