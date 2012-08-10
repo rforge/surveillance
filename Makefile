@@ -12,6 +12,7 @@
 ##   18 Jun 2012 (SM): fixed make manual bug (must first remove old manual.pdf)
 ##   19 Jun 2012 (SM): run check on built package instead of source directory
 ##   27 Jun 2012 (SM): added checkUsage recipe (R package codetools)
+##    9 Aug 2012 (SM): added --timings for R CMD check
 ################################################################################
 
 ## Define variable for R executable which enables the use of alternatives,
@@ -43,8 +44,11 @@ ${SYSDATA}: pkg/sysdata/sysdata.R
 	mv pkg/sysdata/sysdata.rda $@
 
 check: build
-	$R CMD check --as-cran surveillance_${VERSION}.tar.gz
+	$R CMD check --as-cran --timings surveillance_${VERSION}.tar.gz
 ## further option: --use-gct (for better detection of memory bugs/segfaults)
+	echo "timings <- read.table(\"surveillance.Rcheck/surveillance-Ex.timings\", header=TRUE, row.names=\"name\"); \
+	timings <- timings[order(timings$$elapsed, decreasing=TRUE),\"elapsed\",drop=FALSE]; \
+	cat(capture.output(subset(timings, elapsed > 1)), sep=\"\n\")" | $R --slave --vanilla
 
 install: ${SYSDATA}
 	$R CMD INSTALL pkg
@@ -54,7 +58,7 @@ checkUsage: install
 	checkUsagePackage('surveillance', suppressFundefMismatch=FALSE, \
 	    suppressLocalUnused=TRUE, suppressNoLocalFun=TRUE, skipWith=TRUE, \
 	    suppressUndefined=FALSE, suppressPartialMatchArgs=FALSE)" \
-	| R --slave --no-save --no-restore
+	| $R --slave --no-save --no-restore
 
 manual:	
 	$R CMD Rd2pdf --batch --force --output=manual.pdf pkg
