@@ -14,7 +14,8 @@ import(methods)
 
 ## import generics to define own methods
 importFrom(graphics, plot)
-importFrom(stats, coef, vcov, logLik, residuals, confint, AIC, extractAIC, profile, simulate)
+importFrom(stats, coef, vcov, logLik, residuals, confint, AIC, extractAIC,
+           profile, simulate) # we actually _depend_ on stats (for ks.plot.unif)
 importFrom(utils, head, tail, toLatex)
 importFrom(xtable, xtable)
 

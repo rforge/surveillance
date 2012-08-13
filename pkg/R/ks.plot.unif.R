@@ -1,7 +1,9 @@
 #################
 # Plot the empirical distribution function of a sample from U(0,1)
-# together with a confidence band of the corresponding K-S-test
-# large parts are taken from stats::ks.test
+# together with a confidence band of the corresponding K-S-test.
+#
+# Large parts are taken from stats::ks.test, which has
+# copyright 1995-2012 by The R Core Team under GPL-2 (or later)
 #
 # Parameters:
 #    U - numeric vector containing the sample (NA's are silently removed)
@@ -30,8 +32,8 @@ ks.plot.unif <- function (U, conf.level = 0.95, exact = NULL,
     ## pkolmogorov2x is the CDF of the Kolmogorov test statistic
     f <- if (exact) {
         function (x, p) {               # x is the test statistic
-            PVAL <- 1 - .C("pkolmogorov2x", p = as.double(x), as.integer(n),
-                           PACKAGE = "stats")$p
+            PVAL <- 1 - .C(stats:::C_pkolmogorov2x, p = as.double(x),
+                           as.integer(n), PACKAGE = "stats")$p
             PVAL - p
         }
     } else {

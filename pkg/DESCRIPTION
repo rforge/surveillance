@@ -5,9 +5,9 @@ Date: 2012-08-10
 Author: M. Höhle, S. Meyer and M. Paul with contributions from T. Correa, M.
         Hofmann, C. Lang, A. Riebler, D. Sabanés Bové, S. Steiner, M. Virtanen
         and V. Wimmer
-Depends: R (>= 2.10.1), methods, Rcpp, sp
-Imports: graphics, stats, utils, MASS, colorspace, xtable, spc, msm, quadprog,
-        gpclib, spatstat (>= 1.17-0), intervals 
+Depends: R (>= 2.10.1), stats, methods, Rcpp, sp
+Imports: graphics, utils, MASS, colorspace, xtable, spc, msm, quadprog,
+        gpclib, spatstat (>= 1.17-0), intervals
 LinkingTo: Rcpp
 Suggests: Matrix, mvtnorm, RUnit, digest, coda, gamlss, splancs, statmod,
         animation, RColorBrewer, vcd, maptools, VGAM 
