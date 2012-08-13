@@ -511,10 +511,13 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
 }
 
 
-## subset method is copied from base::subset.data.frame with slight
-## modifications only
-## FIXME: when the bug in sp::subset.Spatial discovered in sp version 0.9-99
-## has been removed we can embed this method
+## The subset method for epidataCS-objects is adapted from
+## base::subset.data.frame (authored by Peter 
+## Dalgaard and Brian Ripley, Copyright (C) 1995-2012
+## The R Core Team) with slight modifications only
+
+## FIXME: when the bug in sp::subset.Spatial, which we have reported for sp
+## version 0.9-99 has been removed we can embed this method
 subset.epidataCS <- function (x, subset, select, drop = FALSE, ...)
 {
     if (missing(subset)) 

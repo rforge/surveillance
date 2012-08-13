@@ -925,7 +925,8 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     cl <- match.call()
 
 
-    ### Determine seed (copied from stats:::simulate.lm)
+    ### Determine seed (this part is copied from stats:::simulate.lm with
+    ### Copyright (C) 1995-2012 The R Core Team)
 
     if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
         runif(1)
