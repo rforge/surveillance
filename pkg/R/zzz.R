@@ -70,3 +70,26 @@ if (getRversion() < "2.15.0" || R.version$"svn rev" < 57795 ||
         eval(cl, envir = parent.frame())
     }
 }
+
+
+### Function which modifies a list _call_ according to another one similar to
+### what the function utils::modifyList (by Deepayan Sarkar) does for list objects
+## modifyListcall is used by update.twinstim
+
+is.listcall <- function (x)
+{
+    is.call(x) &&
+    as.character(x[[1]]) %in% c("list", "alist")
+}
+
+modifyListcall <- function (x, val)
+{
+    stopifnot(is.listcall(x), is.listcall(val))
+    xnames <- names(x)[-1]
+    for (v in names(val)[nzchar(names(val))]) {
+        x[[v]] <-
+            if (v %in% xnames && is.listcall(x[[v]]) && is.listcall(val[[v]]))
+                modifyListcall(x[[v]], val[[v]]) else val[[v]]
+    }
+    x
+}

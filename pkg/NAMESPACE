@@ -15,7 +15,7 @@ import(methods)
 ## import generics to define own methods
 importFrom(graphics, plot)
 importFrom(stats, coef, vcov, logLik, residuals, confint, AIC, extractAIC,
-           profile, simulate) # we actually _depend_ on stats (for ks.plot.unif)
+           profile, simulate, update) # we actually _depend_ on stats (for ks.plot.unif)
 importFrom(utils, head, tail, toLatex)
 importFrom(xtable, xtable)
 
@@ -25,7 +25,7 @@ importFrom(xtable, xtable)
 #   However, we don't need to import it here, because we depend on package sp, which makes plot generic
 
 ## basic methods used in different parts of the package
-importFrom(stats, pnorm, cov2cor, ks.test)
+importFrom(stats, pnorm, cov2cor, ks.test, formula)
 importFrom(utils, packageDescription, modifyList)
 
 ## sp classes, utility functions (bbox, coordinates, dimensions, overlay, ...), plot methods
@@ -248,6 +248,7 @@ S3method(simulate, twinstim)
 export(simulate.twinstim)               # for convenience
 S3method(R0, twinstim)
 S3method(residuals, twinstim)
+S3method(update, twinstim)
 
 S3method(print, simEpidataCSlist)
 S3method("[[", simEpidataCSlist)

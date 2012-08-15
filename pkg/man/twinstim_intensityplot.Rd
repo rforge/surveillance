@@ -157,26 +157,24 @@ intensity.twinstim(x,
 }
 
 \examples{
-# for the intensityplot we need the model environment (-> refit)
 data(imdepi)
 data(imdepifit)
-imdepifit_model <- update(imdepifit, model=TRUE, cumCIF=FALSE,
-    optim.args=list(par=coef(imdepifit)))
-\dontshow{
-# FIXME (speed-up!!): refit with model=TRUE with all parameters fixed at initial values
-}
+
+# for the intensityplot we need the model environment, which can be
+# easily added by the intelligent update method (no need to refit the model)
+imdepifit <- update(imdepifit, model=TRUE)
 
 ## path of the total intensity
 opar <- par(mfrow=c(2,1))
-intensityplot(imdepifit_model, which="total intensity",
+intensityplot(imdepifit, which="total intensity",
               aggregate="time", tgrid=500)
 plot(imdepi, breaks=100)
 par(opar)
 
 ## path of the proportion of the epidemic component by event
-intensityplot(imdepifit_model, which="epidemic proportion",
+intensityplot(imdepifit, which="epidemic proportion",
               aggregate="time", tgrid=500, types=1)
-intensityplot(imdepifit_model, which="epidemic proportion",
+intensityplot(imdepifit, which="epidemic proportion",
               aggregate="time", tgrid=500, types=2, add=TRUE, col=2)
 legend("topright", legend=levels(imdepi$events$type), lty=1, col=1:2,
        title = "event type")
@@ -189,11 +187,11 @@ legend("topright", legend=levels(imdepi$events$type), lty=1, col=1:2,
 load(system.file("shapes", "districtsD.RData", package="surveillance"))
 if (require("maptools")) {
     # total intensity
-    intensityplot(imdepifit_model, which="total intensity",
+    intensityplot(imdepifit, which="total intensity",
                   aggregate="space", tiles=districtsD, sgrid=2000)
     # epidemic proportion by type
     maps_epiprop <- lapply(1:2, function (type) {
-        intensityplot(imdepifit_model, which="epidemic", aggregate="space",
+        intensityplot(imdepifit, which="epidemic", aggregate="space",
                       types=type, tiles=districtsD, sgrid=1000,
                       at=seq(0,1,by=0.1), col.regions=rev(heat.colors(20)))
     })

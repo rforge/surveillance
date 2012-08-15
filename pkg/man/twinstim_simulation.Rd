@@ -314,15 +314,6 @@ plot(mysim1, aggregate="space")
 # use the plot-method for simEpidataCSlist's
 plot(mysim, aggregate="time", subset=type=="B")
 
-\dontshow{
-## only for testing purposes:
-## simulate 1 realization from the simplest epidemic model (intercept-only)
-m0 <- update(imdepifit, epidemic=~1, siaf=NULL,
-    optim.args=list(par=coef(imdepifit)[1:5]), model=FALSE, cumCIF=FALSE)
-mysim0 <- simulate(m0, seed=826, data=imdepi,
-    tiles=districtsD, W=stateD, t0=31, T=60, trace=FALSE)
-}
-
 ## simulate 1 realization from the imdepifit-model
 simimdepifit <- simulate(imdepifit, seed=1, data=imdepi,
     tiles=districtsD, W=stateD, t0=31, T=182, trace=50)

@@ -112,9 +112,20 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     at least the element \code{par}, the start values of the parameters in
     the order \code{par = c(endemic, epidemic, siaf, tiaf)}.
     Note that \code{optim} receives the negative log-likelihood for minimization
-    (thus, if used, \code{optim.args$control$fnscale} should be positive).
+    (thus, if used, \code{optim.args$control$fnscale} should be
+    positive).
+
+    There may be an extra component \code{fixed} in the
+    \code{optim.args} list, which determines which parameters should stick
+    to their initial (\code{par}) values. This can be specified by a
+    logical vector of the same length as the \code{par} component, by an
+    integer vector indexing \code{par} or by a character vector following
+    the \code{twinstim} naming conventions (e.g. \code{"h.(Intercept)"} for
+    the endemic intercept, \code{"e.siaf.1"} for the first \code{siaf}
+    parameter).
     
-    Importantly, the \code{method} argument may also be \code{"nlminb"}, in
+    Importantly, the \code{method} argument in the \code{optim.args}
+    list may also be \code{"nlminb"}, in 
     which case the \code{\link{nlminb}} optimizer is used. This is also the
     default. In this case, not only the score function but also the
     expected Fisher information is used during optimization (as
@@ -124,8 +135,9 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     For \code{method="nlminb"}, the only parameters available in the
     \code{optim.args$control} list are
     \code{maxit}, \code{REPORT} (default: 5), \code{abstol}, and
-    \code{reltol}, which are passed appropriately to \code{\link{nlminb}}.
-    There is no \code{hessian} argument for \code{nlminb}.
+    \code{reltol} (default: \code{1e-6}), which are passed appropriately
+    to \code{\link{nlminb}}. There is no \code{hessian} argument for
+    \code{nlminb}.
     
     If \code{optim.args} is \code{NULL}, then no optimization will be performed
     but the necessary functions will be returned in a list (similar to what is
@@ -281,14 +293,14 @@ data("imdepi")
 ## (rate of homogeneous Poisson process scaled for population density)
 popdensity.overall <- with(subset(imdepi$stgrid, BLOCK == 1),
     weighted.mean(popdensity, area))
-popdensity.overall   # pop. density in Germany is about 230 inhabitants/km^2
+popdensity.overall   # pop. density in Germany is ~230 inhabitants/km^2
 W.area <- with(subset(imdepi$stgrid, BLOCK == 1), sum(area))
 W.area               # area of Germany is about 357100 km^2
 # this should actually be the same as
 sum(sapply(imdepi$W@polygons, slot, "area"))
 # which here is not exactly the case because of polygon simplification
 
-# -> start value for the endemic intercept
+## start value for the endemic intercept
 h.intercept <- with(summary(imdepi),
     log(nEvents/popdensity.overall/diff(timeRange)/W.area))
 
@@ -299,27 +311,34 @@ m_noepi <- twinstim(
     data = imdepi, subset = !is.na(agegrp),
     optim.args = list(par=c(h.intercept,rep(0,3)),
                       method="nlminb", control = list(REPORT=1)),
-    model = FALSE, cumCIF = FALSE   # for reasons of speed of the example
+    model = FALSE, cumCIF = FALSE   # for reasons of speed
 )
 
 ## look at the model summary
 summary(m_noepi)
+
+## type-dependent endemic intercept?
+m_noepi_type <- update(m_noepi,
+                       endemic = ~(1|type) + .,
+                       optim.args=list(par=coef(m_noepi)[c(1,1:4)]))
+summary(m_noepi_type)
+
+# LR-test for a type-dependent intercept in the endemic-only model
+pchisq(2*(logLik(m_noepi_type)-logLik(m_noepi)), df=1, lower.tail=FALSE)
 
 
 ### add an epidemic component with just the intercept, i.e.
 ### assuming uniform dispersal in time and space up to a distance of
 ### eps.s = 200 km and eps.t = 30 days (see summary(imdepi))
 
-m0 <- update(m_noepi,
-    epidemic = ~1,
-    optim.args = list(par=c(coef(m_noepi),-10)),
-    model = TRUE
-)
+m0 <- update(m_noepi, epidemic = ~1,
+             optim.args = list(par=c(coef(m_noepi),-10)), model = TRUE)
 
 \dontrun{
 ## NOTE: optim's BFGS would not identify the epidemic intercept
 m0_BFGS <- update(m_noepi, epidemic = ~1,
-    optim.args = list(par=c(coef(m_noepi),-10), method="BFGS"))
+                  optim.args = list(par=c(coef(m_noepi),-10),
+                                    method="BFGS"))
 format(cbind(coef(m0), coef(m0_BFGS)), digits=3, scientific=FALSE)
 m0_BFGS$fisherinfo   # singular Fisher information matrix here
 m0$fisherinfo
@@ -335,6 +354,9 @@ s
 # output the table of coefficients as LaTeX code
 toLatex(s, digits=2, withAIC=FALSE)
 
+## the default confint-method can be used for Wald-CI's
+confint(m0, level=0.95)
+
 ## same (untrimmed) R0 estimate for every event (epidemic intercept only)
 summary(R0(m0, trimmed=FALSE))
 
@@ -343,7 +365,7 @@ plot(m0, "total intensity", tgrid=1000)
 plot(m0, "epidemic proportion", tgrid=1000)
 
 \dontrun{
-## extract the "residual process" integrating over space (takes some seconds)
+## extract "residual process" integrating over space (takes some seconds)
 res <- residuals(m0)
 # if the model describes the true CIF well _in the temporal dimension_,
 # then this residual process should behave like a stationary Poisson
@@ -360,14 +382,16 @@ sort(sapply(environment(m0), object.size))
 
 
 ### try with spatially decreasing interaction kernel
-### this takes considerably longer than for constant spatial dispersal
+## Likelihood evaluation takes much longer than for constant spatial spread
+## Here we use the kernel of an isotropic bivariate Gaussian with same
+## standard deviation for both finetypes
 
-# Use the kernel of an isotropic bivariate Gaussian with same standard
-# deviation for both finetypes as the spatial interaction function
 m1 <- update(m0,
     siaf = siaf.gaussian(1, logsd = TRUE),
-    optim.args = list(par=c(coef(m0), 4), control=list(REPORT=1)),
-                                     #|-> exp(4) = sigma = 55 km
+    optim.args = list(par=c(coef(m0), 2.8),  # exp(2.8) = sigma = 16 km
+                      fixed="e.siaf.1"),
+                      # for reasons of speed of the example, the siaf
+                      # parameter log(sigma) is fixed to 2.8 here
     nCub = 24, nCub.adaptive = TRUE  # use adaptive eps=6*sigma/24=sigma/4
 )
 
@@ -375,20 +399,19 @@ AIC(m_noepi, m0, m1)   # further improvement
 summary(m1, test.iaf=FALSE)   # nonsense to test H0: log(sigma) = 0
 plot(m1, "siaf", xlim=c(0,200), types=1)   # the same for types=2
 
-\dontrun{
-### add epidemic covariates (this takes a minute or so)
+
+### add epidemic covariates
+
 m2 <- update(m1,
     epidemic = ~ 1 + type + agegrp,
     optim.args = list(par=c(coef(m0), 0, 0, 0, coef(m1)["e.siaf.1"]))
 )
+
 AIC(m1, m2)   # further improvement
 summary(m2)
-plot(m2, "total", tgrid=1000)
-plot(m2, "epidemic", tgrid=1000)
-plot(m2, "siaf", xlim=c(0,200), types=1)   # the same for types=2
+
 # look at estimated R0 values by event type
 tapply(R0(m2), imdepi$events@data[names(R0(m2)), "type"], summary)
-}
 }
 
 \keyword{models}

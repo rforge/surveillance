@@ -354,16 +354,18 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
               !anyDuplicated(types))
 
     ## model environment
-    modelenv <- environment(x)            # for the functions to be returned
-    parent.env(modelenv) <- environment()   # => 'types' is visible inside with(modelenv,...)
-    ## attach(modelenv, name="_mylocalenv_", warn.conflicts=FALSE) # for nicer coding
-    ## on.exit(detach("_mylocalenv_"))     # unload model environment at the end
-    qmatrix <- x$qmatrix                    # not part of modelenv
+    modelenv <- environment(x)          # for the functions to be returned
+    thisenv <- environment()
+    parent.env(thisenv) <- modelenv     # objects of modelenv become visible
+    ## CAVE: The R manual says:
+    ## "The replacement function ‘parent.env<-’ is extremely dangerous [...].
+    ##  It may be removed in the near future."
+    qmatrix <- x$qmatrix                # not part of modelenv
     force(types)                        # evaluate types before rm(x)
     rm(x)                               # don't need this anymore
     
     ## endemic component on the spatial or temporal grid
-    hInt <- with(modelenv, {
+    hInt <-
         if (hash) {
             eta <- drop(mmhGrid %*% beta)
             if (!is.null(offsetGrid)) eta <- offsetGrid + eta
@@ -381,17 +383,16 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
             } else nlevels(gridTiles)
             rep.int(0, ngrid)
         }
-    })
 
     ## endemic component as a function of time or location
-    hIntFUN <- if (modelenv$hash) {
+    hIntFUN <- if (hash) {
         if (aggregate == "time") {
             function (tp) {
                 stopifnot(isScalar(tp))
-                if (tp == modelenv$t0) hInt[1L] else {
-                    starts <- modelenv$histIntervals$start
-                    idx <- match(TRUE, c(starts,modelenv$T) >= tp) - 1L
-                    block <- modelenv$histIntervals$BLOCK[idx]
+                if (tp == t0) hInt[1L] else {
+                    starts <- histIntervals$start
+                    idx <- match(TRUE, c(starts,T) >= tp) - 1L
+                    block <- histIntervals$BLOCK[idx]
                     hInt[as.character(block)]
                 }
             }
@@ -400,7 +401,7 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
             tilesIDs <- if (is.null(tiles.idcol)) {
                 sapply(tiles@polygons, slot, "ID")
             } else tiles@data[[tiles.idcol]]
-            if (!all(levels(modelenv$gridTiles) %in% tilesIDs)) {
+            if (!all(levels(gridTiles) %in% tilesIDs)) {
                 stop("'tiles' is incomplete for 'x' (check 'tiles.idcol')")
             }
             .tiles <- as(tiles, "SpatialPolygons") # for over-method (drop data)
@@ -419,34 +420,34 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
     } else function (...) 0
 
     ## epidemic component
-    eInt <- if (modelenv$hase) {
-        qSum_types <- rowSums(qmatrix[,types,drop=FALSE])[modelenv$eventTypes]
-        fact <- qSum_types * modelenv$gammapred
+    eInt <- if (hase) {
+        qSum_types <- rowSums(qmatrix[,types,drop=FALSE])[eventTypes]
+        fact <- qSum_types * gammapred
         if (aggregate == "time") {      # as a function of time (int over W & types)
-            factS <- fact * modelenv$siafInt
+            factS <- fact * siafInt
             function (tp) {
                 stopifnot(isScalar(tp))
-                tdiff <- tp - modelenv$eventTimes
-                infectivity <- qSum_types > 0 & (tdiff > 0) & (modelenv$removalTimes >= tp)
+                tdiff <- tp - eventTimes
+                infectivity <- qSum_types > 0 & (tdiff > 0) & (removalTimes >= tp)
                 if (any(infectivity)) {
-                    gsources <- modelenv$tiaf$g(tdiff[infectivity],
-                                                modelenv$tiafpars,
-                                                modelenv$eventTypes[infectivity])
+                    gsources <- tiaf$g(tdiff[infectivity],
+                                       tiafpars,
+                                       eventTypes[infectivity])
                     intWj <- factS[infectivity] * gsources
                     sum(intWj)
                 } else 0
             }
         } else {                        # as a function of location (int over time and types)
-            factT <- fact * modelenv$tiafInt
+            factT <- fact * tiafInt
             function (xy) {
                 stopifnot(is.vector(xy, mode="numeric"), length(xy) == 2L)
-                point <- matrix(xy, nrow=nrow(modelenv$eventCoords), ncol=2L, byrow=TRUE)
-                sdiff <- point - modelenv$eventCoords
-                proximity <- qSum_types > 0 & rowSums(sdiff^2) <= modelenv$eps.s^2
+                point <- matrix(xy, nrow=nrow(eventCoords), ncol=2L, byrow=TRUE)
+                sdiff <- point - eventCoords
+                proximity <- qSum_types > 0 & rowSums(sdiff^2) <= eps.s^2
                 if (any(proximity)) {
-                    fsources <- modelenv$siaf$f(sdiff[proximity,,drop=FALSE],
-                                                modelenv$siafpars,
-                                                modelenv$eventTypes[proximity])
+                    fsources <- siaf$f(sdiff[proximity,,drop=FALSE],
+                                       siafpars,
+                                       eventTypes[proximity])
                     intTj <- factT[proximity] * fsources
                     sum(intTj)
                 } else 0
@@ -760,10 +761,9 @@ residuals.twinstim <- function (object, ...)
 {
   res <- object$tau
   if (is.null(res)) {
-      if (is.null(environment(object))) {
+      if (is.null(modelenv <- environment(object))) {
           stop("residuals not available; re-fit the model with 'cumCIF = TRUE'")
       } else {
-          modelenv <- environment(object)
           cat("'", substitute(object), "' was fit with disabled 'cumCIF'",
               " -> calculate it now...\n", sep="")
           res <- with(modelenv, LambdagEvents(cumCIF.pb = TRUE))
@@ -921,3 +921,73 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
 }
 
 
+
+### update-method for the twinstim-class
+## stats::update.default would also work but is not adapted to the specific
+## structure of twinstim: optim.args (use modifyList), two formulae, model, ...
+## However, this specific method is inspired by and copies parts of the
+## update.default method from the stats package developed by The R Core Team
+
+update.twinstim <- function (object, endemic, epidemic, optim.args, model,
+                             ..., evaluate = TRUE)
+{
+    call <- object$call
+    thiscall <- match.call(expand.dots=FALSE)
+
+    if (!missing(model)) {
+        call$model <- model
+        ## Special case: update model component only
+        if (evaluate &&
+            all(names(thiscall)[-1] %in% c("object", "model", "evaluate"))) {
+            if (model) {                # add model environment
+                call$optim.args$par <- coef(object)
+                call$optim.args$fixed <- seq_along(coef(object))
+                call$cumCIF <- FALSE
+                cat("Setting up the model environment ...\n")
+                capture.output(suppressMessages(
+                    objectWithModel <- eval(call, parent.frame())
+                ))
+                cat("Done.\n")
+                object$formula <- objectWithModel$formula
+                object$functions <- objectWithModel$functions
+                ## CAVE: order of components of the twinstim-object
+                object <- object[c(1:match("formula", names(object)),
+                                 match(c("functions", "call", "runtime"), names(object)))]
+                environment(object) <- environment(objectWithModel)
+                ## re-add class attribute (dropped on re-ordering)
+                class(object) <- "twinstim"
+            } else {                    # remove model environment
+                environment(object$formula$epidemic) <-
+                    environment(object$formula$endemic) <- .GlobalEnv
+                object$functions <- NULL
+                environment(object) <- NULL
+            }
+            object$call$model <- model
+            return(object)
+        }
+    }
+    if (!missing(endemic))
+        call$endemic <- stats::update.formula(formula(object)$endemic, endemic)
+    if (!missing(epidemic))
+        call$epidemic <- stats::update.formula(formula(object)$epidemic, epidemic)
+    if (!missing(optim.args)) {
+        oldargs <- call$optim.args
+        call$optim.args <-
+            if (is.listcall(oldargs) && is.list(optim.args)) {
+                modifyListcall(oldargs, thiscall$optim.args)
+            } else thiscall$optim.args
+    }
+    extras <- thiscall$...
+    ## CAVE: the remainder is copied from stats::update.default (as at R-2.15.0)
+    if(length(extras)) {
+	existing <- !is.na(match(names(extras), names(call)))
+	## do these individually to allow NULL to remove entries.
+	for (a in names(extras)[existing]) call[[a]] <- extras[[a]]
+	if(any(!existing)) {
+	    call <- c(as.list(call), extras[!existing])
+	    call <- as.call(call)
+	}
+    }
+    if(evaluate) eval(call, parent.frame())
+    else call
+}
