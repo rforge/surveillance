@@ -12,7 +12,7 @@
     \itemize{
       \item This is mainly a patch release for the \code{twinstim}-related
       functionality of the package.
-      Apart from that, the package is now again compatible with older
+      \item Apart from that, the package is now again compatible with older
       releases of \R (< 2.15.0) as intended (by defining \code{paste0()} in
       the package namespace if it is not found in \R \pkg{base} at
       installation of the \pkg{surveillance} package).
@@ -21,19 +21,22 @@
   
   \subsection{NEW FEATURES}{
     \itemize{
-      \item More thorough documentation of \code{twinstim}-related
-      functions \emph{including many examples}.
-      \item \code{animate.epidata} is now compatible with the
-      \pkg{animation} package.
+      \item Important new \code{twinstim()}-feature: fix parameters
+      during optimization.
+      \item Useful \code{update}-method for \code{"twinstim"}-objects.
       \item New \code{[[}- and \code{plot}-methods for
       \code{"simEpidataCSlist"}-objects.
+      \item \code{animate.epidata} is now compatible with the
+      \pkg{animation} package.
+      \item More thorough documentation of \code{"twinstim"}-related
+      functions \emph{including many examples}.
     }
   }
   
   \subsection{BUG FIXES (\code{"twinstim"}-related)}{
     \itemize{
       \item \code{nlminb} (instead of \code{optim}'s \code{"BFGS"}) is
-      now the default optimizer (as already documented)
+      now the default optimizer (as already documented).
       \item The \code{twinstim}-argument \code{nCub} can now be omitted when
       using \code{siaf.constant()} (as documented) and is internally set to
       \code{NA_real_} in this case. Furthermore, \code{nCub} and

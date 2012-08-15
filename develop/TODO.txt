@@ -126,6 +126,7 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 xx/07/2012 (sebastian): robustification of optim procedure by making it less
 adaptive (nCub.adaptive can be set to FALSE)
 xx/07/2012 (sebastian): Documentation of functions in Rd files; also update references (Biometrics)
+15/08/2012 (sebastian): added support for fixed parameters
 
 
 
