@@ -358,7 +358,7 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
     thisenv <- environment()
     parent.env(thisenv) <- modelenv     # objects of modelenv become visible
     ## CAVE: The R manual says:
-    ## "The replacement function ‘parent.env<-’ is extremely dangerous [...].
+    ## "The replacement function "parent.env<-" is extremely dangerous [...].
     ##  It may be removed in the near future."
     qmatrix <- x$qmatrix                # not part of modelenv
     force(types)                        # evaluate types before rm(x)
