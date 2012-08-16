@@ -141,9 +141,10 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
     ### Check mark-generating function
 
-    epscols <- c("eps.t", "eps.s")
-    unpredMarks <- setdiff(unique(c(if (hase) epscols, all.vars(epidemic))), "type")
-    # <- eps.t and eps.s are also taken to be unpredictable marks
+    unpredMarks <- if (hase) {
+        # eps.t and eps.s are also taken to be unpredictable marks
+        unique(c("eps.t", "eps.s", setdiff(all.vars(epidemic), "type")))
+    } else character(0L)
     rmarks <- if (missing(rmarks) || is.null(rmarks)) NULL else match.fun(rmarks)
     hasMarks <- !is.null(rmarks)
     if (hasMarks) {
@@ -268,7 +269,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         "1 | type" %in% attr(endemic, "term.labels") || nbeta0 > 1
     if (typeSpecificEndemicIntercept) {
         endemic <- update(endemic, ~ . - (1|type)) # this drops the terms attributes
-        endemic <- terms(endemic, data = data$stgrid, keep.order = TRUE)
+        endemic <- terms(endemic, data = stgrid, keep.order = TRUE)
         if (nbeta0 < 1L) {
             stop("for type-specific endemic intercepts, 'beta0' must be longer than 1")
         }

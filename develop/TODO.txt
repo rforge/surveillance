@@ -14,6 +14,18 @@
 
 #Open
 26/07/2012 Fix pictex figure in surveillance.Rnw vignette
+15/08/2012 package rgeos fails to load if surveillance and then maptools have
+           been loaded before:
+	   library("surveillance"); library("maptools"); library("rgeos")
+	   gives
+	   Error : package slot missing from signature for generic ‘plot’
+	   and classes gpc.poly, ANY
+	   cannot use with duplicate class names (the package may need to be re-installed)
+	   Error: package/namespace load failed for ‘rgeos’
+	   This seems to be related to the fact that rgeos also
+	   contains an implementation of the gpc.poly class. However,
+	   library("gpclib"); library("maptools"); library("rgeos")
+	   works...
 
 #Done
 
