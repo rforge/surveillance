@@ -51,15 +51,20 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 \arguments{
   \item{events}{
     \code{"\linkS4class{SpatialPointsDataFrame}"} of cases with the
-    following columns (in the \code{events@data} \code{data.frame}):
+    following obligatory columns (in the \code{events@data}
+    \code{data.frame}): 
     \describe{
       \item{time}{time point of event. Will be converted to a numeric
-        variable by \code{as.numeric}.}
-      \item{tile}{reference to the spatial unit (tile) in \code{stgrid},
+        variable by \code{as.numeric}. There should be no concurrent
+        events and the event times must be covered by \code{stgrid},
+        i.e. belong to the time interval \eqn{(t_0,T]}, where \eqn{t_0}
+        is \code{min(stgrid$start)} and \code{T} is described below.}
+      \item{tile}{reference to the spatial region (tile) in \code{stgrid},
 	where the event is located.}
       \item{type}{optional type of event in a marked \code{twinstim}
 	model. Will be converted to a factor variable dropping unused
-        levels. If missing, all events will be attribute the single type 1.}
+        levels. If missing, all events will be attribute the single type
+        \code{"1"}.}
       \item{eps.t}{maximum \emph{temporal} influence radius (e.g. length of
 	infectious period, time to culling, etc.); must be positive and
         may be \code{Inf}.} 
@@ -75,17 +80,28 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
     as well as \code{"start"}, \code{"BLOCK"}, and all endemic
     covariates' names from \code{stgrid}.
   }
+
   \item{stgrid}{
-    \code{data.frame} with the following columns:
+    \code{data.frame} describing endemic covariates on a full
+    spatio-temporal region x interval grid (e.g., district x week),
+    which is a decomposition of the observation region \code{W} and
+    period \eqn{t_0,T}. This means that for every combination of spatial
+    region and time interval there must be exactly one row in this
+    \code{data.frame}, that the union of the spatial tiles equals
+    \code{W}, the union of the time intervals equals \eqn{t_0,T}, and
+    that regions (and intervals) are non-overlapping.
+    There are the following obligatory columns: 
     \describe{
-      \item{tile}{ID of spatial unit (e.g. id of municipality). It will
+      \item{tile}{ID of the spatial region (e.g., district ID). It will
         be converted to a factor variable (dropping unused levels if it
         already was one).}
-      \item{start, stop}{temporal interval (converted to numeric
-        variables by \code{as.numeric}). The \code{stop} column may
+      \item{start, stop}{columns describing the consecutive temporal
+        intervals (converted to numeric variables by \code{as.numeric}).
+        The \code{start} time of an interval must be equal to the
+        \code{stop} time of the previous interval. The \code{stop} column may
 	be missing, in which case it will be auto-generated from the set
 	of \code{start} values and \code{T}.}
-      \item{area}{area of the spatial unit (\code{tile}).
+      \item{area}{area of the spatial region (\code{tile}).
 	Be aware that the unit of this area (e.g., square km) must be consistent
 	with the units of \code{W} and \code{events} (as specified in
 	their \code{\link{proj4string}}s, if they have projected coordinates).}
@@ -95,36 +111,45 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
     (a column which will be added automatically for indexing the time
     intervals of \code{stgrid}).  
   }
+
   \item{W}{
     an object of class \code{"\linkS4class{SpatialPolygons}"} indicating the
     observation region. Must have the same \code{proj4string} as \code{events}
-    and all events must be within W.  The function \code{\link{simplify.owin}} 
+    and all events must be within \code{W}.
+    The function \code{\link{simplify.owin}} 
     from the package \pkg{spatstat} may be useful if polygonal operations take
     too long or memory is limited (see also the \dQuote{Note} section below).
   }
+
   \item{qmatrix}{
-    square indicator matrix (0/1 or TRUE/FALSE) for possible
+    square indicator matrix (0/1 or \code{FALSE}/\code{TRUE}) for possible
     transmission between the event types. The matrix will be internally
-    converted to logical. Defaults to an independent spread of the event
+    converted to \code{logical}. Defaults to an independent spread of the event
     types, i.e. the identity matrix. 
   }
+
   \item{nCircle2Poly}{
-    accuracy (number of edges) of the polygonal approximation of a circle
+    accuracy (number of edges) of the polygonal approximation of a circle.
   }
+
   \item{T}{
     end of observation period (i.e. last \code{stop} time of
     \code{stgrid}). Must be specified if the start but not the stop
     times are supplied in \code{stgrid} (=> auto-generation of
     \code{stop} times).
   }
+
   \item{x}{an object of class \code{"epidataCS"} or
     \code{"summary.epidataCS"}, respectively.}
+
   \item{n}{a single integer. If positive, the first (\code{head}, \code{print})
     / last (\code{tail}) \code{n} events are extracted. If negative,
     all but the \code{n} first/last events are extracted.
   }
+
   \item{digits}{minimum number of significant digits to be printed in
     values.}
+
   \item{i,j}{
     arguments passed to the
     \code{\link[=[,SpatialPointsDataFrame-method]{[-method}} for
@@ -133,11 +158,14 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
     Only epidemic covariates can be removed from \code{events} by the
     \code{j} index. The other components of \code{x} (\code{stgrid},
     \ldots) are retained.}
+
   \item{drop, \dots}{unused (arguments of the generics).
     However, the \code{print} method for class \code{"epidataCS"} passes
     \dots to the \code{\link{print.data.frame}} method.}
+
   \item{subset, select}{arguments used to subset the \code{events} from
     an \code{"epidataCS"} object like in \code{\link{subset.data.frame}}.}
+
   \item{object}{an object of class \code{"epidataCS"}.}
 }
 
@@ -243,7 +271,8 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 }
 
 \author{
-  Sebastian Meyer, documentation contributions by Michael H\enc{ö}{oe}hle
+  Sebastian Meyer with documentation contributions by Michael
+  H\enc{ö}{oe}hle and Mayeul Kauffmann.
 }
 
 \seealso{

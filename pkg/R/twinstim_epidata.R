@@ -87,7 +87,8 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     cat("Checking if all events are covered by 'stgrid'...\n")
     ## FIXME: what about pre-history events? don't need stgrid-data for them
     if (events$time[1] <= timeRange[1] || events$time[nEvents] > timeRange[2]) {
-        stop("event times are not covered by 'stgrid': must be in (begin;end]")
+        stop("event times are not covered by 'stgrid': must be in (",
+             timeRange[1L],",",timeRange[2L],"]")
     }
 
     # Are all events$tile references really part of the stgrid?

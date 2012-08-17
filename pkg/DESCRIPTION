@@ -3,8 +3,9 @@ Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomen
 Version: 1.4-2
 Date: 2012-08-17
 Author: M. Höhle, S. Meyer and M. Paul with contributions from T. Correa, M.
-        Hofmann, C. Lang, A. Riebler, D. Sabanés Bové, S. Steiner, M. Virtanen
-        and V. Wimmer. A few code segments are modified versions of code by
+        Hofmann, M. Kauffmann, C. Lang, A. Riebler, D. Sabanés Bové,
+        S. Steiner, M. Virtanen, and V. Wimmer.
+        A few code segments are modified versions of code by
         The R Core Team (available under GPL-2).
 Depends: R (>= 2.10.1), stats, methods, Rcpp, sp
 Imports: graphics, utils, MASS, colorspace, xtable, spc, msm, quadprog,

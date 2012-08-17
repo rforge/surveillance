@@ -22,11 +22,12 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
 
 \arguments{
   \item{endemic}{
-    formula for the exponential (Cox-like multiplicative) endemic
-    component. May contain offsets (to be marked by the special function
-    \code{offset}).  If omitted or \code{~0} there will be no endemic
-    component in the model.  A type-specific endemic intercept can be
-    requested by including the term \code{(1|type)} in the formula.
+    right-hand side formula for the exponential (Cox-like
+    multiplicative) endemic component. May contain offsets (to be marked
+    by the special function \code{offset}).  If omitted or \code{~0}
+    there will be no endemic component in the model.  A type-specific
+    endemic intercept can be requested by including the term
+    \code{(1|type)} in the formula.
   }
   \item{epidemic}{
     formula representing the epidemic model for the event-specific
@@ -50,10 +51,10 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     (knots of a step function). 
   }
   \item{qmatrix}{
-    square indicator matrix (0/1 or \code{TRUE}/\code{FALSE}) for
-    possible transmission between the event types. Will be internally
-    converted to logical. Defaults to the \eqn{Q} matrix specified in
-    \code{data}.
+    square indicator matrix (0/1 or \code{FALSE}/\code{TRUE}) for
+    possible transmission between the event types. The matrix will be
+    internally converted to \code{logical}. Defaults to the \eqn{Q} matrix
+    specified in \code{data}.
   }
   \item{data}{
     an object of class \code{"\link{epidataCS}"}.
@@ -104,8 +105,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     the x and y directions, see \code{\link[spatstat]{as.mask}}.
   }
   \item{partial}{
-    logical indicating if a partial log-likelihood similar to the approach
-    by Diggle et al. (2010) should be used.
+    logical indicating if a partial likelihood similar to the approach
+    by Diggle et al. (2010) should be used (default is \code{FALSE}).
   }
   \item{optim.args}{
     \code{NULL} or an argument list passed to \code{\link{optim}} containing
@@ -146,7 +147,10 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   \item{finetune}{
     logical indicating if a second maximisation should be performed with
     robust Nelder-Mead \code{optim} using the resulting
-    parameters from the first maximisation as starting point.
+    parameters from the first maximisation as starting point. This
+    argument is only considered if \code{partial = FALSE} and the
+    default is to not conduct a second maximization (in most cases this
+    does not improve upon the MLE).
   }
   \item{model}{
     logical. If \code{TRUE} the result contains an element \code{functions} with
@@ -175,13 +179,18 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
 \details{
   The function performs maximum likelihood inference
   for the additive-multiplicative spatio-temporal intensity model
-  described in Meyer et al. (2012). It uses 'nlminb' as the default optimizer
-  (Newton-algorithm) and returns an object of class \code{twinstim}.
-  Such ojects have working \code{print},
-  \code{plot} and \code{summary} functions. The output of can again be
-  processed by the \code{toLatex} function. Furthermore, the usual model
-  fit functions such as \code{coef}, \code{vcov} and \code{logLik} work.
-  A specific add on is the use of the function \code{R0}.
+  described in Meyer et al. (2012). It uses \code{\link{nlminb}} as the
+  default optimizer and returns an object of class \code{twinstim}. 
+  Such objects have \code{print}, \code{\link[=plot.twinstim]{plot}} and
+  \code{\link[=summary.twinstim]{summary}} methods.
+  The output of the \code{summary} can be
+  processed by the \code{\link[=toLatex.summary.twinstim]{toLatex}}
+  function. Furthermore, the usual model 
+  fit methods such as \code{coef}, \code{vcov}, \code{logLik},
+  \code{\link[=residuals.twinstim]{residuals}}, and
+  \code{update} are implemented. 
+  A specific add-on is the use of the functions \code{\link{R0}} and
+  \code{\link[=simulate.twinstim]{simulate}}.
 }
 
 \value{
@@ -273,7 +282,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
 }
 
 \author{
-  Sebastian Meyer with documentation contributions by Michael H\enc{ö}{oe}hle.
+  Sebastian Meyer with documentation contributions by Michael
+  H\enc{ö}{oe}hle and Mayeul Kauffmann.
 }
 
 \seealso{
