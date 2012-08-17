@@ -629,7 +629,7 @@ summary.epidataCS <- function (object, ...)
 
     removalTimes <- times + object$events$eps.t
     tps <- sort(unique(c(times, removalTimes[is.finite(removalTimes)])))
-    nInfectious <- sapply(tps, function(t) sum(times < t & removalTimes >= t))
+    nInfectious <- sapply(tps, function(t) sum(times <= t & removalTimes > t))
     counter <- stepfun(tps, c(0,nInfectious), right = TRUE)
 
     res <- list(timeRange = timeRange, bbox = bbox, nBlocks = nBlocks,

@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.4-2 (2012-08-10)}{
+\section{Changes in surveillance version 1.4-2 (2012-08-17)}{
   
   \subsection{SYNOPSIS}{
     \itemize{
@@ -26,6 +26,14 @@
       \item Useful \code{update}-method for \code{"twinstim"}-objects.
       \item New \code{[[}- and \code{plot}-methods for
       \code{"simEpidataCSlist"}-objects.
+      \item \code{simEpidataCS()} received tiny bug fixes and is now
+      able to simulate from epidemic-only models.
+      \item \code{R0}-method for \code{"simEpidataCS"}-objects (actually
+      a wrapper for \code{R0.twinstim()}).
+      \item Removed \code{dimyx} and \code{eps} arguments from
+      \code{R0.twinstim()}; now uses \code{nCub} and
+      \code{nCub.adaptive} from the fitted model and applies the same
+      (numerical) integration method.
       \item \code{animate.epidata} is now compatible with the
       \pkg{animation} package.
       \item More thorough documentation of \code{"twinstim"}-related
@@ -48,6 +56,9 @@
       \code{"epidataCS"} no longer assume that the \code{BLOCK} index
       starts at 1, which may not be the case when using a subset in
       \code{simulate.twinstim()}.
+      \item The \code{"counter"} step function returned by
+      \code{summary.epidataCS()} does no longer produce false
+      numbers of infectives (they were lagged by one timepoint).
       \item \code{plot.epidataCS()} now resolves \dots correctly and
       the argument \code{colTypes} takes care of a possible
       \code{subset}.
@@ -88,6 +99,9 @@
       \item \code{simulate.twinstim} uses \code{nCub} and
       \code{nCub.adaptive} from fitted object as defaults.
       \item Removed the \dots-argument from \code{simEpidataCS()}.
+      \item The coefficients returned by \code{simEpidataCS()} are now stored
+      in a vector rather than a list for compatibility with
+      \code{"twinstim"}-methods. 
       \item Argument \code{cex.fun} of \code{intensityplot.twinstim()} now
       defaults to the \code{sqrt} function (as in \code{plot.epidataCS()}.
     }

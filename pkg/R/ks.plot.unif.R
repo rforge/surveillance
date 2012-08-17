@@ -16,11 +16,11 @@
 #  http://www.r-project.org/Licenses/
 #
 # Parts of the code are taken from stats::ks.test, which has
-# copyright 1995-2012 by The R Core Team under GPL-2 (or later). Furthermore,
-# the C function calls are taken from
-# http://svn.r-project.org/R/trunk/src/library/stats/src/ks.c which similarly
-# is copyright Copyright (C) 1999-2009 by the R Core Team and available
-# under GPL-2. Somehwat disguised in their code is a reference
+# copyright 1995-2012 by The R Core Team under GPL-2 (or later).
+# Furthermore, the C function calls are taken from
+# http://svn.r-project.org/R/trunk/src/library/stats/src/ks.c (as at 2012-08-16),
+# which similarly is Copyright (C) 1999-2009 by the R Core Team 
+# and available under GPL-2. Somewhat disguised in their code is a reference
 # that parts of their code uses code published in
 # George Marsaglia and Wai Wan Tsang and Jingbo Wang (2003),
 # "Evaluating Kolmogorov's distribution".

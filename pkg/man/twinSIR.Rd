@@ -278,7 +278,7 @@ vector \code{par} must not be the zero vector.
 and \code{\link{simulate.twinSIR}} for the simulation of epidemics following
 the fitted model.
 
-Furthermore, the standard extraction methods \code{\link[=coef.twinSIR]{coef}}, 
+Furthermore, the standard extraction methods
 \code{\link[=vcov.twinSIR]{vcov}}, \code{\link[=logLik.twinSIR]{logLik}},
 \code{\link[=AIC.twinSIR]{AIC}} and
 \code{\link[=extractAIC.twinSIR]{extractAIC}} are implemented for

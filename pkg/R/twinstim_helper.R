@@ -225,3 +225,32 @@ gridcellOfEvent <- function (t, tilename, stgrid)
     environment(FUN) <- parent.frame()
     FUN
 }
+
+
+### Helper function, which constructs the function that integrates the 'tiaf'.
+### The returned function is defined in the callers environment, where the
+### variables used in the function are available (inside twinstim() or
+### simEpidataCS()).
+
+.tiafIntFUN <- function ()
+{
+    ## the following variables are unused here, because the environment of
+    ## FUN will be set to the parent.frame(), where the variables exist
+    ## they are only included to avoid the notes in R CMD check 
+    gIntLower <- gIntUpper <- eventTypes <- tiaf <- NULL
+    
+    ## from, to and type may be vectors of compatible lengths
+    FUN <- function(tiafpars, from = gIntLower, to = gIntUpper,
+                    type = eventTypes, G = tiaf$G)
+    {
+        tiafIntUpper <- G(to, tiafpars, type)
+        tiafIntLower <- G(from, tiafpars, type)
+        tiafIntUpper - tiafIntLower
+    }
+    
+    ## set the environment of the tiafInt function to the callers environment
+    ## (i.e. inside twinstim() or simEpidataCS())
+    ## where the default argument values are defined
+    environment(FUN) <- parent.frame()
+    FUN
+}

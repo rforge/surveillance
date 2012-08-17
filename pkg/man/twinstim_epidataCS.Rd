@@ -60,10 +60,11 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
       \item{type}{optional type of event in a marked \code{twinstim}
 	model. Will be converted to a factor variable dropping unused
         levels. If missing, all events will be attribute the single type 1.}
-      \item{eps.t}{maximum temporal influence radius (e.g. length of
-	infectious period, time to culling, etc.), may be \code{Inf}.}
-      \item{eps.s}{maximum spatial influence radius (e.g. 100 [km]),
-        may be \code{Inf}.}
+      \item{eps.t}{maximum \emph{temporal} influence radius (e.g. length of
+	infectious period, time to culling, etc.); must be positive and
+        may be \code{Inf}.} 
+      \item{eps.s}{maximum \emph{spatial} influence radius (e.g. 100 [km]);
+        must be positive and may be \code{Inf}.}
     }
     The \code{data.frame} may contain columns with further marks of
     the events, e.g. sex, age of infected individuals, which may

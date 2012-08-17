@@ -4,10 +4,11 @@
 ### Author: Sebastian Meyer
 ################################################################################
 
-coef.twinstim <- function (object, ...)
-{
-    object$coefficients
-}
+### don't need a specific coef-method (identical to stats:::coef.default)
+## coef.twinstim <- function (object, ...)
+## {
+##     object$coefficients
+## }
 
 # asymptotic variance-covariance matrix (inverse of fisher information matrix)
 vcov.twinstim <- function (object, ...)
@@ -358,7 +359,7 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
     thisenv <- environment()
     parent.env(thisenv) <- modelenv     # objects of modelenv become visible
     ## CAVE: The R manual says:
-    ## "The replacement function "parent.env<-" is extremely dangerous [...].
+    ## "The replacement function 'parent.env<-' is extremely dangerous [...].
     ##  It may be removed in the near future."
     qmatrix <- x$qmatrix                # not part of modelenv
     force(types)                        # evaluate types before rm(x)
@@ -573,8 +574,7 @@ plot.twinstim <- function (x, which, ...)
 ### Calculates the basic reproduction number R0 for individuals
 ### with marks given in 'newevents'
 
-R0.twinstim <- function (object, newevents, trimmed = TRUE,
-                         dimyx = NULL, eps = NULL, ...)
+R0.twinstim <- function (object, newevents, trimmed = TRUE, ...)
 {
     ## extract model information
     npars <- object$npars
@@ -591,18 +591,11 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE,
     nTypes <- length(typeNames)
     types <- seq_len(nTypes)
     form <- formula(object)
-    Fcircle <- form$siaf$Fcircle
-    G <- form$tiaf$G
+    siaf <- form$siaf
+    tiaf <- form$tiaf
     coefs <- coef(object)
     tiafpars <- coefs[sum(npars[1:4]) + seq_len(npars["ntiafpars"])]
     siafpars <- coefs[sum(npars[1:3]) + seq_len(npars["nsiafpars"])]
-    ## nCub.adaptive <- !is.null(form$siaf$effRange) &&
-    ##                         (is.null(object$call$nCub.adaptive) ||
-    ##                          object$call$nCub.adaptive)
-    if (is.null(eps) && !object$nCub.adaptive) {
-        ## try(nCub <- eval(object$call$nCub, parent.frame()))
-        eps <- object$nCub
-    }
     
     if (missing(newevents)) {
         ## if no newevents are supplied, use original events
@@ -666,48 +659,36 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE,
     qSumTypes <- rowSums(object$qmatrix)
     qSum <- unname(qSumTypes[eventTypes])
 
-    ## calculate R0 values
-    if (trimmed) {                      # calculate trimmed R0 for newevents
+
+    ## calculate remaining factors of the R0 formula, i.e. siafInt and tiafInt
+    
+    if (trimmed) {                      # trimmed R0 for newevents
         
         ## integral of g over the observed infectious periods
-        tiafInt <- local({
-            gIntUpper <- pmin(T - eventTimes, eps.t)
-            gIntLower <- pmax(0, t0 - eventTimes)
-            stopifnot(gIntUpper > gIntLower)
-            tiafIntUpper <- G(gIntUpper, tiafpars, eventTypes)
-            tiafIntLower <- G(gIntLower, tiafpars, eventTypes)
-            tiafIntUpper - tiafIntLower
-        })
+        .tiafInt <- .tiafIntFUN()
+        gIntUpper <- pmin(T - eventTimes, eps.t)
+        gIntLower <- pmax(0, t0 - eventTimes)
+        tiafInt <- .tiafInt(tiafpars, from=gIntLower, to=gIntUpper,
+                            type=eventTypes, G=tiaf$G)
         ## integral of f over the influenceRegion
+        bdist <- newevents[[".bdist"]]
         influenceRegion <- newevents[[".influenceRegion"]]
         if (is.null(influenceRegion)) {
             stop("missing \".influenceRegion\" component in 'newevents'")
         }
-        siafInt <- if (attr(form$siaf, "constant")) {
-            sapply(influenceRegion, spatstat::area.owin)
-        } else if (is.null(Fcircle)) {
-            sapply(1:nrow(newevents), function (i) {
-                polyCub.midpoint(influenceRegion[[i]], form$siaf$f,
-                                 siafpars, eventTypes[i], dimyx=dimyx, eps=eps)
-            })
-        } else {
-            bdist <- newevents[[".bdist"]]
+        noCircularIR <- if (is.null(bdist)) FALSE else all(eps.s > bdist)
+        if (attr(form$siaf, "constant")) {
+            iRareas <- sapply(influenceRegion, spatstat::area.owin)
+            ## will be used by .siafInt()
+        } else if (! (is.null(siaf$Fcircle) ||
+               (is.null(siaf$effRange) && noCircularIR))) {
             if (is.null(bdist)) {
                 stop("missing \".bdist\" component in 'newevents'")
             }
-            sapply(1:nrow(newevents), function (i) {
-                if (eps.s[i] <= bdist[i]) {
-                    ## influence region is completely inside W
-                    Fcircle(eps.s[i], siafpars, eventTypes[i])
-                } else {
-                    ## numerically integrate over polygonal influence region
-                    polyCub.midpoint(influenceRegion[[i]], form$siaf$f,
-                                     siafpars, eventTypes[i],
-                                     dimyx=dimyx, eps=eps)
-                }
-            })
         }
-        qSum * gammapred * siafInt * tiafInt
+        nCub <- object$nCub
+        .siafInt <- .siafIntFUN(siaf, nCub.adaptive=object$nCub.adaptive, noCircularIR=noCircularIR)
+        siafInt <- .siafInt(siafpars)
         
     } else {                     # untrimmed R0 for original events or newevents
 
@@ -721,20 +702,19 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE,
         typeTcombis <- expand.grid(type=types, eps.t=unique(eps.t),
                                    KEEP.OUT.ATTRS=FALSE)
         typeTcombis$gInt <-
-            with(typeTcombis, G(eps.t, tiafpars, type)) -
-                G(rep.int(0,nTypes), tiafpars, types)[typeTcombis$type]
+            with(typeTcombis, tiaf$G(eps.t, tiafpars, type)) -
+                tiaf$G(rep.int(0,nTypes), tiafpars, types)[typeTcombis$type]
         
         typeScombis <- expand.grid(type=types, eps.s=unique(eps.s),
                                    KEEP.OUT.ATTRS=FALSE)
         typeScombis$fInt <- apply(typeScombis, MARGIN=1, FUN=function (type_eps.s) {
             type <- type_eps.s[1]
             eps.s <- type_eps.s[2]
-            if (is.null(Fcircle)) {
+            if (is.null(siaf$Fcircle)) { # implies that nCub was non-adaptive
                 polyCub.midpoint(discpoly(c(0,0), eps.s, class="owin"),
-                                 form$siaf$f, siafpars, type,
-                                 dimyx=dimyx, eps=eps)
+                                 form$siaf$f, siafpars, type, eps=object$nCub)
             } else {
-                Fcircle(eps.s, siafpars, type)
+                siaf$Fcircle(eps.s, siafpars, type)
             }
         })
         
@@ -743,12 +723,15 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE,
                                  with(typeScombis,paste(type,eps.s,sep=".")))
         eventscombiidxT <- match(paste(eventTypes,eps.t,sep="."),
                                  with(typeTcombis,paste(type,eps.t,sep=".")))
+
+        siafInt <- typeScombis$fInt[eventscombiidxS]
+        tiafInt <- typeTcombis$gInt[eventscombiidxT]
         
-        ## return untrimmed R0 values
-        qSum * gammapred *
-            typeScombis$fInt[eventscombiidxS] *
-                typeTcombis$gInt[eventscombiidxT]
     }
+
+    ## return R0 values
+    R0s <- qSum * gammapred * siafInt * tiafInt
+    R0s
 }
 
 

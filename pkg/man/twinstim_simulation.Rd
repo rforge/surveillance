@@ -37,9 +37,7 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   \item{endemic}{
     see \code{\link{twinstim}}. Note that type-specific endemic
     intercepts are specified by \code{beta0} here, not by the term
-    \code{(1|type)}. Note also that simulation is not arranged for
-    epidemic-only models, thus \code{endemic} should not be set to
-    \code{~0}.
+    \code{(1|type)}.
   }
   \item{epidemic}{
     see \code{\link{twinstim}}. Marks appearing in this formula must
@@ -74,8 +72,8 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     function of single time (1st arg) and location
     (2nd arg) returning a one-row \code{data.frame} of marks (named
     according to the variables in \code{epidemic}) for an event at this
-    point. This includes the columns \code{eps.s} and \code{eps.t}, i.e.
-    the values of the spatial and temporal interaction ranges at this
+    point. This must include the columns \code{eps.s} and \code{eps.t}, 
+    i.e. the values of the spatial and temporal interaction ranges at this
     point. Only \code{"numeric"} and \code{"factor"} columns are
     allowed. Assure that factor variables are coded equally 
     (same levels and level order) for each new sample. If there is no
@@ -89,7 +87,9 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   \item{events}{
     \code{NULL} or missing (default) in case of an empty prehistory,
     or a \code{\link{SpatialPointsDataFrame}} containing events of the
-    prehistory (-Inf;\code{t0}] of the process (having the same
+    prehistory (-Inf;\code{t0}] of the process (required for the
+    epidemic to start in case of no endemic component in the model).
+    The \code{SpatialPointsDataFrame} must have the same
     \code{proj4string} as \code{tiles} and \code{W}). The attached
     \code{data.fram}e (data slot) must contain the typical 
     columns as described in \code{\link{as.epidataCS}} (\code{time},

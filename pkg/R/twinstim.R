@@ -311,15 +311,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         ntiafpars <- tiaf$npars
 
         ## Define function that integrates the 'tiaf' function
-        ## (from, to and type may be vectors of compatible lengths)
-        .tiafInt <- function (tiafpars,
-            from = gIntLower, to = gIntUpper, type = eventTypes)
-        {
-            tiafIntUpper <- tiaf$G(to, tiafpars, type)
-            tiafIntLower <- tiaf$G(from, tiafpars, type)
-            tiafIntUpper - tiafIntLower
-        }
-        
+        .tiafInt <- .tiafIntFUN()
+
         ## Define function that integrates the two-dimensional 'siaf' function
         ## over the influence regions of the events
         .siafInt <- .siafIntFUN(siaf = siaf, nCub.adaptive = nCub.adaptive,
@@ -487,9 +480,10 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 if (!is.null(uppert)) { # && isScalar(uppert) && t0 <= uppert && uppert < T
                     gIntUpper <- pmin(uppert-eventTimes, eps.t)
                     subtimeidx <- eventTimes < uppert
-                    tiafIntSub <- .tiafInt(tiafpars, gIntLower[subtimeidx],
-                                           gIntUpper[subtimeidx],
-                                           eventTypes[subtimeidx])
+                    tiafIntSub <- .tiafInt(tiafpars,
+                                           from = gIntLower[subtimeidx],
+                                           to   = gIntUpper[subtimeidx],
+                                           type = eventTypes[subtimeidx])
                     eInt <- sum(qSum[subtimeidx] * gammapred[subtimeidx] *
                                 siafInt[subtimeidx] * tiafIntSub)
                 } else {
@@ -979,7 +973,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             .tiafInt.orig <- .tiafInt
             body(.tiafInt) <- expression(
                 if (nargs() == 1L) tiafInt else
-                .tiafInt.orig(tiafpars, from, to, type)
+                .tiafInt.orig(tiafpars, from, to, type, G)
             )
             ## restore the original function at the end
             on.exit({
