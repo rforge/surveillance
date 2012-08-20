@@ -181,7 +181,7 @@ legend("topright", legend=levels(imdepi$events$type), lty=1, col=1:2,
 
 ## spatial shape of the intensity (aggregated over time)
 # load borders of Germany's districts (obtained from the
-# Bundesamt fÃ¼r Kartographie und GeodÃ¤sie, Frankfurt am Main, Germany,
+# Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, Germany,
 # www.geodatenzentrum.de), simplified by the "special" Visvalingam
 # algorithm (level=60\%) using www.MapShaper.org:
 load(system.file("shapes", "districtsD.RData", package="surveillance"))
