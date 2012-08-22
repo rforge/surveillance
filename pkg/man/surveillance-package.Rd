@@ -32,7 +32,7 @@
   logistic and multinomial logistic modelling is also included.
   Continuous self-exciting spatio-temporal point processes are modeled
   through additive-multiplicative conditional intensities as described in
-  Höhle (2009) ("twinSIR", discrete space) and Meyer et al (2012)
+  H\enc{ö}{oe}hle (2009) ("twinSIR", discrete space) and Meyer et al (2012)
   ("twinstim", continuous space).
   The package contains several real-world datasets, the ability to
   simulate outbreak data, visualize the results of the monitoring in
@@ -65,14 +65,14 @@
   for multivariate time series. Currently the package contains
   implementations typical outbreak detection procedures such as Stroup et
   al. (1989), Farrington et al., (1996), Rossi et al. (1999), Rogerson
-  and Yamada (2001), a Bayesian approach (\enc{Höhle}{Hoehle}, 2007),
-  negative binomial CUSUM methods (\enc{Höhle}{Hoehle} and Mazick, 2009), and a
-  detector based on generalized likelihood ratios (\enc{Höhle}{Hoehle}
+  and Yamada (2001), a Bayesian approach (H\enc{ö}{oe}hle, 2007),
+  negative binomial CUSUM methods (H\enc{ö}{oe}hle and Mazick, 2009), and a
+  detector based on generalized likelihood ratios (H\enc{ö}{oe}hle
   and Paul, 2008). However, also CUSUMs for the prospective change-point
   detection in binomial, beta-binomial and multinomial time series is
   covered based on generalized linear modelling.  This includes
   e.g. paired binary CUSUM described by Steiner et al. (1999) or paired
-  comparison Bradley-Terry modelling described in \enc{Höhle}{Hoehle}
+  comparison Bradley-Terry modelling described in H\enc{ö}{oe}hle
   (2010). The package contains several real-world datasets, the ability
   to simulate outbreak data, visualize the results of the monitoring in
   temporal, spatial or spatio-temporal fashion.
@@ -83,8 +83,8 @@
   counts. Furthermore, the fully Bayesian approach for univariate time
   series of counts from Held et al. (2006) ("twins") is also implemented
   Self-exciting spatio-temporal point processes are modeled through
-  additive-multiplicative conditional intensities as described in Höhle
-  (2009) ("twinSIR") and Meyer et al (2012) ("twinstim").
+  additive-multiplicative conditional intensities as described in
+  H\enc{ö}{oe}hle (2009) ("twinSIR") and Meyer et al (2012) ("twinstim").
 
   Altogether, the package contains several real-world datasets, the
   ability to simulate outbreak data, visualize the results of the
@@ -92,15 +92,15 @@
 }
 
 \section{Acknowledgements}{
-  T. Correa, M. Hofmann, C. Lang, A. Riebler, D. Sabanés Bové,
-  S. Steiner, M. Virtanen, and V. Wimmer made substantial contributions
-  of code.
+  T. Correa, M. Hofmann, C. Lang, A. Riebler,
+  D. Saban\enc{é}{e}s Bov\enc{é}{e}, S. Steiner, M. Virtanen,
+  and V. Wimmer made substantial contributions of code.
 
   The authors would like to thank the following people for ideas,
   discussions, testing and feedback:
   Doris Altmann, Johannes Dreesman, Johannes Elias, Mayeul Kauffmann,
-  Marcos Prates, Christopher W. Ryan, Klaus Stark, Yann Le Strat, André
-  Michael Toschke, Achim Zeileis.
+  Marcos Prates, Barry Rowlingson, Christopher W. Ryan, Klaus Stark,
+  Yann Le Strat, Andr\enc{é}{e} Michael Toschke, Achim Zeileis.
 }
 \author{
   Michael H\enc{ö}{oe}hle, Sebastian Meyer, and Michaela Paul
