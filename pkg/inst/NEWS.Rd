@@ -35,7 +35,7 @@
       \code{nCub.adaptive} from the fitted model and applies the same
       (numerical) integration method.
       \item \code{animate.epidata} is now compatible with the
-      \pkg{animation} package.
+      \CRANpkg{animation} package.
       \item More thorough documentation of \code{"twinstim"}-related
       functions \emph{including many examples}.
     }
@@ -68,7 +68,7 @@
       argument \code{nCub.adaptive}).
       \item Fixed problem with \code{simEpidataCS()} related to missing
       \file{NAMESPACE} imports (and re-exports) of \code{marks.ppp} and
-      \code{markformat.default} from \pkg{spatstat}, which are required
+      \code{markformat.default} from \CRANpkg{spatstat}, which are required
       for \code{spatstat::runifpoint()} to work, probably because
       \pkg{spatstat} currently does not register its S3-methods.
       \item Improved error handling in \code{simEpidataCS()}. Removed a
