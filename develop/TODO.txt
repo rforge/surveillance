@@ -126,6 +126,8 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 
 #Open issues / feature requests
 - implement step function support for interaction kernels
+- allow for spatial "prehistory", i.e. events outside of W as possible sources
+  in the epidemic component only, but otherwise not part of the likelihood
 - intensityplot-method for simEpidataCS (through twinstim(*, optim.args=NULL)??)
 
 #Done

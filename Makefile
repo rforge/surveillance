@@ -13,6 +13,7 @@
 ##   19 Jun 2012 (SM): run check on built package instead of source directory
 ##   27 Jun 2012 (SM): added checkUsage recipe (R package codetools)
 ##    9 Aug 2012 (SM): added --timings for R CMD check
+##   27 Aug 2012 (SM): install from built .tar.gz (which includes vignettes)
 ################################################################################
 
 ## Define variable for R executable which enables the use of alternatives,
@@ -50,8 +51,8 @@ check: build
 	timings <- timings[order(timings$$elapsed, decreasing=TRUE),\"elapsed\",drop=FALSE]; \
 	cat(capture.output(subset(timings, elapsed > 1)), sep=\"\n\")" | $R --slave --vanilla
 
-install: ${SYSDATA}
-	$R CMD INSTALL pkg
+install: build
+	$R CMD INSTALL surveillance_${VERSION}.tar.gz
 
 checkUsage: install
 	echo "library('surveillance'); library('codetools'); \
