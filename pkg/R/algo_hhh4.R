@@ -1113,7 +1113,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
     
     dPsidPsi <- function(){
         dPsi <- psi*(psigamma(psiPlusY)-psigamma(psi) +log(psi)+1 - log(psiPlusMu) -psi/psiPlusMu -Y/psiPlusMu)
-        psi*(psigamma(psiPlusY,1)*psi - psigamma(psi,1)*psi + 1 - psi/psiPlusMu - psi*(meanTotal-Y)/psiPlusMu2) +dPsi*psi
+        psi*(psigamma(psiPlusY,1)*psi - psigamma(psi,1)*psi + 1 - psi/psiPlusMu - psi*(meanTotal-Y)/psiPlusMu2) +dPsi
     }
     
   } else {
@@ -1833,6 +1833,8 @@ updateRegression <- function(theta,sd.corr,model=model,
     res <- nlm(p=theta, f=regressionParamsMin, sd.corr=sd.corr,model=model,fscale=1,hessian=TRUE,print.level=verbose)
     theta.new <- res$estimate
     ll <- - res$minimum
+	# nlm returns convergence status in $code, 1-2 indicate convergence, 2-5 indicate non-convergence
+	res$convergence <- as.numeric(res$code >2)
   } else {
     res <- optim(theta,penLogLik, penScore, sd.corr=sd.corr,model=model,method=method, hessian=TRUE, control=list(fnscale=-1,maxit=1000,trace=verbose))
     theta.new <- res$par
@@ -1890,6 +1892,8 @@ updateVariance <- function(sd.corr,theta,model, control=list(scoreTol=1e-5, para
     res <- nlm(p=sd.corr, f=varianceParamsMin, theta=theta, model=model,fscale=1,hessian=TRUE, print.level=verbose,...)
     sd.corr.new <- res$estimate
     ll <- -res$minimum
+	# nlm returns convergence status in $code, 1-2 indicate convergence, 2-5 indicate non-convergence
+	res$convergence <- as.numeric(res$code >2)
   } else {
     res <- optim(sd.corr,marLogLik, marScore, theta=theta, model=model, method=method, hessian=TRUE, control=list(fnscale=-1,maxit=1000,trace=verbose))
     sd.corr.new <- res$par  

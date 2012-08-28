@@ -92,7 +92,7 @@
 }
 
 \section{Acknowledgements}{
-  T. Correa, M. Hofmann, C. Lang, A. Riebler,
+  T. Correa, L. Held, M. Hofmann, C. Lang, A. Riebler,
   D. Saban\enc{é}{e}s Bov\enc{é}{e}, S. Steiner, M. Virtanen,
   and V. Wimmer made substantial contributions of code.
 

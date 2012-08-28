@@ -254,7 +254,7 @@ Zurich, Switzerland</li>
 Paul</a>, Institute of Social and Preventive Medicine, University of
 Zurich, Switzerland</li>
       <li>Former student programmers: C. Lang, A. Riebler, V. Wimmer</li>
-      <li>Contributions by: T. Correa, M. Hofmann, D. Sabanés Bové, S. Steiner,
+      <li>Contributions by: T. Correa, L. Held, M. Hofmann, D. Sabanés Bové, S. Steiner,
 M. Virtanen</li>
     </ul>
   </blockquote>
