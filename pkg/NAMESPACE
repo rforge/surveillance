@@ -91,6 +91,7 @@ export(ks.plot.unif)
 export(checkResidualProcess)            # for twinstim and twinSIR
 
 # export S4 coerce-methods defined by the package
+#exportClasses(owin)      # FIXME: Should we export the virtual S4 class owin?
 exportMethods(coerce)     # from spatial_coerce-methods.R
 
 # numerical integration of two-dimensional function over polygonal domains

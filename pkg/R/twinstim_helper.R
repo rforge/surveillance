@@ -254,3 +254,22 @@ gridcellOfEvent <- function (t, tilename, stgrid)
     environment(FUN) <- parent.frame()
     FUN
 }
+
+
+### rename control arguments with optim names to have names compatible with nlminb
+
+control2nlminb <- function (control, defaults)
+{
+    renamelist <- cbind(optim  = c("maxit", "REPORT", "abstol", "reltol"),
+                        nlminb = c("iter.max", "trace", "abs.tol", "rel.tol"))
+    for (i in which(renamelist[,"optim"] %in% names(control))) {
+        fromname <- renamelist[i, "optim"]
+        toname <- renamelist[i, "nlminb"]
+        if (is.null(control[[toname]])) {
+            control[[toname]] <- control[[fromname]]
+        }
+        control[[fromname]] <- NULL
+    }
+    defaults[names(control)] <- control
+    defaults
+}

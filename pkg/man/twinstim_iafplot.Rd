@@ -128,14 +128,32 @@ iafplot(imdepifit, "siaf", add=TRUE, types=1, col.estimate=0, ngrid=500,
      conf.type="bootstrap", col.conf=2)
 
 \dontshow{
+\dontrun{
 ## FIXME: fit model with 2-parameter Lomax kernel as siaf (this takes a
 ##        while and does not converge properly...)
-#data(imdepi)
-#imdepifit_lomax <- update(imdepifit,
-#    siaf = siaf.lomax(1),
-#    optim.args = list(par=c(coef(imdepifit), 0), control=list(REPORT=1)),
-#    nCub = 3, nCub.adaptive = FALSE, model = FALSE, cumCIF = FALSE
-#)
+data(imdepi)
+imdepifit_lomax <- update(imdepifit,
+    siaf = siaf.lomax(1),
+    optim.args = list(par=c(coef(imdepifit), 0), fixed=1:4,
+                      control=list(REPORT=1)),
+    nCub = 3, nCub.adaptive = FALSE, model = FALSE, cumCIF = FALSE)
+# false convergence
+imdepifit_lomax2 <- update(imdepifit_lomax, optim.args=list(hessian=FALSE))
+# false convergence
+imdepifit_lomax_noepicovars <- update(imdepifit_lomax, epidemic = ~1,
+optim.args=list(par=c(coef(imdepifit)[grep("(type|agegrp)",
+names(coef(imdepifit)), invert=TRUE)], 0)))
+# false convergence: loglik much greater (-6214), f approaches point mass in 0
+# fit with step fun while decreasing delta, look at loglik
+loglikdelta <- sapply(10^seq(0,-12, by=-2),
+  #smaller eps cannot be modelled this way (radius for iR too small)
+  function(delta) {
+    logLik(update(imdepifit_lomax, data=update(imdepi, eps.s=delta),
+    epidemic = ~1, siaf=siaf.constant(),
+    optim.args=list(par=coef(imdepifit)[1:5], control=list(trace=0))))
+  })
+# full convergence: loglik increases with decreasing delta... WHY?
+}
 }
 }
 

@@ -22,6 +22,11 @@ if(!isGeneric("aggregate")) setGeneric("aggregate", useAsDefault=aggregate)
 ## Note: package "maptools" also registers "owin" as a virtual S4 class by setClass("owin")
 if (!isClass("owin")) {
     setOldClass("owin")
+    ## on unloadNamespace("surveillance"), this leads to the Warning message:
+    ## In FUN(X[[2L]], ...) :
+    ## Created a package name, ‘2012-08-28 17:36:02’, when none found
+    ## should the setOldClass-call better be part of .onLoad() ?
+    ## Alternative: setClass("owin") like in "maptools" would not produce this warning
 }
 
 

@@ -107,6 +107,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   \item{partial}{
     logical indicating if a partial likelihood similar to the approach
     by Diggle et al. (2010) should be used (default is \code{FALSE}).
+    Note that the partial likelihood implementation is not well tested.
   }
   \item{optim.args}{
     \code{NULL} or an argument list passed to \code{\link{optim}} containing
@@ -114,8 +115,14 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     the order \code{par = c(endemic, epidemic, siaf, tiaf)}.
     Note that \code{optim} receives the negative log-likelihood for minimization
     (thus, if used, \code{optim.args$control$fnscale} should be
-    positive).
+    positive). The \code{hessian} argument defaults to \code{TRUE} and
+    in the \code{control} list, \code{trace}ing is enabled with
+    \code{REPORT=5} by default. 
 
+    For the \code{partial} likelihood, the analytic score function and
+    the Fisher information are not implemented and the default is to use
+    robust \code{method="Nelder-Mead"} optimization.
+    
     There may be an extra component \code{fixed} in the
     \code{optim.args} list, which determines which parameters should stick
     to their initial (\code{par}) values. This can be specified by a
@@ -128,17 +135,26 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     Importantly, the \code{method} argument in the \code{optim.args}
     list may also be \code{"nlminb"}, in 
     which case the \code{\link{nlminb}} optimizer is used. This is also the
-    default. In this case, not only the score function but also the
-    expected Fisher information is used during optimization (as
+    default for full likelihood inference.
+    In this case, not only the score function but also the
+    \emph{expected} Fisher information can be used during optimization (as
     estimated by what Martinussen and Scheike (2006, p. 64) call the
     \dQuote{optional variation process}, or see Rathbun (1996, equation
-    (4.7))). In our experience this gives better convergence than \code{optim}.
-    For \code{method="nlminb"}, the only parameters available in the
-    \code{optim.args$control} list are
-    \code{maxit}, \code{REPORT} (default: 5), \code{abstol}, and
-    \code{reltol} (default: \code{1e-6}), which are passed appropriately
-    to \code{\link{nlminb}}. There is no \code{hessian} argument for
-    \code{nlminb}.
+    (4.7))). In our experience this gives better convergence than
+    \code{optim}'s methods.
+    For \code{method="nlminb"}, the following parameters of the
+    \code{optim.args$control} list may be named like for
+    \code{optim} and are renamed appropriatly:
+    \code{maxit} (-> \code{iter.max}), \code{REPORT} (-> \code{trace},
+    default: 5), \code{abstol} (-> \code{abs.tol}), and
+    \code{reltol} (-> \code{rel.tol}, default: \code{1e-6}).
+    For \code{nlminb}, a logical \code{hessian} argument indicates if
+    the negative \emph{expected} Fisher information matrix should be
+    used as the Hessian during optimization (otherwise a numerical
+    approximation is used).
+
+    Similary, \code{method="nlm"} should also work but is not
+    recommended here.
     
     If \code{optim.args} is \code{NULL}, then no optimization will be performed
     but the necessary functions will be returned in a list (similar to what is
@@ -155,9 +171,9 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   \item{model}{
     logical. If \code{TRUE} the result contains an element \code{functions} with
     the log-likelihood function (or partial log-likelihood function, if
-    \code{partial = TRUE}), and optionally the score function and
-    the Fisher information function (not for the partial likelihood, and
-    only if \code{siaf} and \code{tiaf} provide the necessary
+    \code{partial = TRUE}), and optionally the score and
+    the expected Fisher information functions (not for the partial likelihood,
+    and only if \code{siaf} and \code{tiaf} provide the necessary
     derivatives).
     The environment of those functions equals the evaluation environment
     of the fitting function, i.e. it is kept in the workspace and the
@@ -201,19 +217,19 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   \item{loglik}{value of the log-likelihood function at the MLE with a
     logical attribute \code{"partial"} indicating if the partial
     likelihood was used.}
-  \item{counts}{Number of log-likelihood and score evaluations during
+  \item{counts}{number of log-likelihood and score evaluations during
     optimization.}
-  \item{method}{Name of the optimizer used to determine the MLE.}
+  \item{method}{name of the optimizer used to determine the MLE.}
   \item{nCub, nCub.adaptive}{see the \dQuote{Arguments} section above.}
   \item{converged}{logical indicating if the optimizer converged.}
-  \item{fisherinfo}{expected Fisher information evaluated at the
+  \item{fisherinfo}{\emph{expected} Fisher information evaluated at the
     MLE. Only part of the output for full likelihood inference
     (\code{partial = FALSE}) and if spatial and temporal interaction
     functions are provided with their derivatives.}
   \item{fisherinfo.observed}{observed Fisher information matrix
     evaluated at the value of the MLE. Obtained as the negative Hessian.
     This is only part of the result if \code{optim.args$method} is not
-    \code{"nlminb"} (i.e. \code{optim} is used) and if it was requested by setting
+    \code{"nlminb"} and if it was requested by setting
     \code{hessian=TRUE} in \code{optim.args}.}
   \item{fitted}{fitted values of the conditional intensity function at the events.}
   \item{fittedComponents}{two-column matrix with columns \code{"h"} and

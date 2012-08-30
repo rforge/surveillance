@@ -87,9 +87,9 @@ modifyListcall <- function (x, val)
     stopifnot(is.listcall(x), is.listcall(val))
     xnames <- names(x)[-1]
     for (v in names(val)[nzchar(names(val))]) {
-        x[[v]] <-
-            if (v %in% xnames && is.listcall(x[[v]]) && is.listcall(val[[v]]))
-                modifyListcall(x[[v]], val[[v]]) else val[[v]]
+        xv <- if (v %in% xnames && is.listcall(x[[v]]) && is.listcall(val[[v]]))
+            modifyListcall(x[[v]], val[[v]]) else val[[v]]
+        x[v] <- list(xv)                # allows for NULL value of val[[v]]
     }
     x
 }

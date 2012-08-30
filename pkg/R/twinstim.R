@@ -39,7 +39,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         eventDists, eventsData, finetune, neghess, fisherinfo, fit, fixed,
         functions, globalEndemicIntercept, inmfe, initpars, ll, negll, loglik,
         mfe, mfhEvents, mfhGrid, model, my.na.action, na.action, namesOptimUser,
-        namesOptimArgs, nlminbControl, nlminbRes, nmRes, optim.args, optimArgs, 
+        namesOptimArgs, nlminbControl, nlminbRes, nlmObjective, nlmControl,
+        nlmRes, nmRes, optim.args, optimArgs, 
         optimControl, optimMethod, optimRes, optimRes1, optimValid, partial,
         partialloglik, ptm, qmatrix, res, negsc, score, subset, tmpexpr,
         typeSpecificEndemicIntercept, useScore, whichfixed, 
@@ -994,16 +995,11 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
         ## Configure the optim procedure (check optim.args)
 
-        # default control arguments
-        optimControl <- list(trace = 1L, REPORT = 5L)
-        # merge with user control arguments
-        optimControl[names(optim.args[["control"]])] <- optim.args[["control"]]
-        optim.args$control <- optimControl
         # default arguments
         optimArgs <- alist(par =, fn = negll, gr = negsc,
                            method = if (partial) "Nelder-Mead" else "nlminb",
                            lower = -Inf, upper = Inf,
-                           control = list(), hessian = partial | !useScore)
+                           control = list(), hessian = TRUE)
         # user arguments
         namesOptimArgs <- names(optimArgs)
         namesOptimUser <- names(optim.args)
@@ -1017,39 +1013,69 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         optimMethod <- eval(optimArgs$method)
 
 
-        ## Call 'optim' or 'nlminb' (default) with the above arguments
+        ## Call 'optim', 'nlminb', or 'nlm' with the above arguments
 
         cat("\nminimizing the negative", if (partial) "partial", "log-likelihood",
-            "using", if (optimMethod == "nlminb") "'nlminb()'" else {
+            "using", if (optimMethod %in% c("nlm", "nlminb"))
+            paste0("'",optimMethod,"()'") else {
                 paste0("'optim()'s \"", optimMethod, "\"")
             }, "...\n")
         cat("initial parameters:\n")
         print(optimArgs$par)
         optimRes1 <- if (optimMethod == "nlminb") {
-            nlminbControl <- optimArgs$control[c("maxit","REPORT","abstol","reltol")]
-            names(nlminbControl) <- c("iter.max", "trace", "abs.tol", "rel.tol")
-            if (optimArgs$control$trace == 0L) nlminbControl$trace <- 0L
+            nlminbControl <- control2nlminb(optimArgs$control,
+                                            defaults = list(trace=5L, rel.tol=1e-6))
+            ## sqrt(.Machine$double.eps) is the default reltol used in optim,
+            ## which usually equals about 1.49e-08.
+            ## The default rel.tol of nlminb (1e-10) seems too small
+            ## (nlminb often does not finish despite no "relevant" change in loglik).
+            ## I therefore use 1e-6, which is also the default in package nlme
+            ## (see 'lmeControl').
             if (nlminbControl$trace > 0L) {
                 cat("negative log-likelihood and parameters ")
                 if (nlminbControl$trace == 1L) cat("in each iteration") else {
                     cat("every", nlminbControl$trace, "iterations") }
                 cat(":\n")
             }
-            if (is.null(nlminbControl$rel.tol)) nlminbControl$rel.tol <- 1e-6
-            ## sqrt(.Machine$double.eps) is the default reltol used in optim,
-            ## which usually equals about 1.49e-08.
-            ## The default rel.tol of nlminb (1e-10) seems too small
-            ## (nlminb often does not finish despite no "relevant" change in loglik).
-            ## I therefore use 1e-6, which is also the default in package nlme (see lmeControl).
-            nlminbControl <- nlminbControl[!sapply(nlminbControl, is.null)]
             nlminbRes <- nlminb(start = optimArgs$par, objective = negll,
-                                gradient = negsc, hessian = neghess,
+                                gradient = negsc,
+                                hessian = if (optimArgs$hessian) neghess else NULL,
                                 control = nlminbControl,
                                 lower = optimArgs$lower, upper = optimArgs$upper)
             nlminbRes$value <- -nlminbRes$objective
             nlminbRes$counts <- nlminbRes$evaluations
             nlminbRes
+        } else if (optimMethod == "nlm") {
+            nlmObjective <- function (theta) {
+                value <- negll(theta)
+                grad <- negsc(theta)
+                #hess <- neghess(theta)
+                structure(value, gradient = grad)#, hessian = hess)
+            }
+            nlmControl <- optimArgs$control
+            if (is.null(nlmControl[["print.level"]])) {
+                nlmControl$print.level <- min(nlmControl$trace, 2L)
+            }
+            nlmControl$trace <- nlmControl$REPORT <- NULL
+            if (is.null(nlmControl[["iterlim"]])) {
+                nlmControl$iterlim <- nlmControl$maxit
+            }
+            nlmControl$maxit <- NULL
+            nlmControl$check.analyticals <- FALSE
+            ##<- we use the negative _expected_ Fisher information as the Hessian,
+            ##   which is of course different from the true Hessian (=neg. obs. Fisher info)
+            nlmRes <- do.call("nlm", c(alist(f = nlmObjective, p = optimArgs$par,
+                                             hessian = optimArgs$hessian),
+                                             nlmControl))
+            names(nlmRes)[names(nlmRes) == "estimate"] <- "par"
+            nlmRes$value <- -nlmRes$minimum
+            nlmRes$counts <- rep.int(nlmRes$iterations, 2L)
+            nlmRes$convergence <- if (nlmRes$code %in% 1:2) 0L else nlmRes$code
+            nlmRes
         } else {
+            optimControl <- list(trace=1L, REPORT=5L) # default control arguments
+            optimControl[names(optimArgs$control)] <- optimArgs$control
+            optimArgs$control <- optimControl
             if (finetune) optimArgs$hessian <- FALSE
             res <- do.call("optim", optimArgs)
             res$value <- -res$value
@@ -1075,9 +1101,10 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
         if (optimRes$convergence != 0) {
             cat("\nWARNING: OPTIMIZATION ROUTINE DID NOT CONVERGE",
-                if (optimMethod != "nlminb") paste0("(code ", optimRes$convergence, ")"),
+                if (finetune || optimMethod != "nlminb")
+                paste0("(code ", optimRes$convergence, ")"),
                 "!\n")
-            if (!is.null(optimRes$message) && nchar(optimRes$message) > 0L) {
+            if (!is.null(optimRes$message) && nzchar(optimRes$message)) {
                 cat("MESSAGE: \"", optimRes$message, "\"\n", sep="")
             }
         }
@@ -1113,7 +1140,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
            loglik = structure(if (all(fixed)) ll(initpars) else optimRes$value,
                               partial = partial),
            counts = if (all(fixed)) c("function"=1L, "gradient"=0L) else {
-               optimRes1$counts + if (finetune) optimRes$counts else 0L
+               optimRes1$counts + if (finetune) optimRes$counts else c(0L, 0L)
            },
            method = if (all(fixed)) NA_character_ else optimMethod,
            nCub = nCub, nCub.adaptive = nCub.adaptive,
@@ -1129,7 +1156,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
     # If requested, add observed fisher info (= negative hessian at maximum)
     if (any(!fixed) && !is.null(optimRes$hessian)) {
-        fit$fisherinfo.observed <- -optimRes$hessian
+        fit$fisherinfo.observed <- optimRes$hessian
+        ## no "-" here because we optimized the negative log-likelihood
     }
 
 
