@@ -24,7 +24,7 @@ if (!isClass("owin")) {
     setOldClass("owin")
     ## on unloadNamespace("surveillance"), this leads to the Warning message:
     ## In FUN(X[[2L]], ...) :
-    ## Created a package name, ‘2012-08-28 17:36:02’, when none found
+    ## Created a package name, '2012-08-28 17:36:02', when none found
     ## should the setOldClass-call better be part of .onLoad() ?
     ## Alternative: setClass("owin") like in "maptools" would not produce this warning
 }

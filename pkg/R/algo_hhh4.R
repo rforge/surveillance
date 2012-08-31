@@ -526,6 +526,8 @@ checkFormula <- function(f, env, component){
   
   # find out fixed effects without "fe()" specification
   fe.raw <- grep("fe(*)|ri(*)", attr(term,"term.labels"), invert=TRUE)
+  ## FIXME: this also matches terms like "fest", "risiko". better:
+  ## fe.raw <- setdiff(1:nVars, unlist(attr(term, "specials")))
   # evaluate covariates
   if(length(fe.raw)>0){
     for(i in fe.raw)

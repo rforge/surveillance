@@ -132,6 +132,10 @@ coef.ah4 <- function(object,se=FALSE, reparamPsi=TRUE, idx2Exp=NULL, amplitudeSh
     psi.names <- names(coefs)[index]
     # change labels
     names(coefs)[index] <- paste("1/",psi.names,sep="")
+    ##<- FIXME: don't we obtain the actual overdispersion parameter if we
+    ##reparamPsi, i.e. it should be named overdisp? By contrast, if reparamPsi=FALSE,
+    ##the internal parametrization would be reported, i.e. -log(overdisp) and
+    ##should be named as such.
     
     #transform psi coefficients
     coefs[index] <- exp(-coefs[index])
