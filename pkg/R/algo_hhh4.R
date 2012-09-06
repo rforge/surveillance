@@ -583,11 +583,11 @@ interpretControl <- function(control, stsObj){
   # create response
   Y <- observed(stsObj)
   
-  Ym1 <- rbind(matrix(NA,control$ar$lag,nUnits),head(Y, nTime-control$ar$lag)) 
+  Ym1 <- rbind(matrix(NA_integer_,control$ar$lag,nUnits),head(Y, nTime-control$ar$lag))
   
   if(control$ne$inModel){
     Ym1.ne <- weightedSumNE(stsObj, control$ne$weights)$neighbours
-    Ym1.ne <- rbind(matrix(NA,control$ne$lag,nUnits),head(Ym1.ne, nTime-control$ne$lag))
+    Ym1.ne <- rbind(matrix(NA_real_,control$ne$lag,nUnits),head(Ym1.ne, nTime-control$ne$lag))
   } else {
     Ym1.ne <- 1
   }
@@ -823,7 +823,7 @@ meanHHH <- function(theta, model){
   computePartMean <- function(component, isNA, subset){
   
     pred <- nullMatrix <- toMatrix(0)
-    pred[isNA] <- NA
+    is.na(pred) <- isNA
     
     if(!any(comp==component)) return(pred[subset,])
     
@@ -846,7 +846,7 @@ meanHHH <- function(theta, model){
     }
     mean <- exp(pred)*offsets[[component]]
     
-    mean[isNA] <-NA
+    is.na(mean) <- isNA
     return(mean[subset,])
   } 
   
@@ -912,8 +912,8 @@ penLogLik <- function(theta, sd.corr, model){
 
 penScore <- function(theta, sd.corr, model){
   
-  if(any(is.na(theta) | !is.finite(theta))){ 
-    return(rep(NA,length(theta)))
+  if(any(!is.finite(theta))){           # finite means not +-Inf and not missing
+    return(rep.int(NA_real_,length(theta)))
   }
   
   # unpack 
@@ -1026,7 +1026,7 @@ penScore <- function(theta, sd.corr, model){
     
     if(any(is.na(grPsi))){
       warning("derivatives for psi not computable\n")
-      return(rep(NA,length(theta)))
+      return(rep.int(NA_real_,length(theta)))
     }
     
   } else {
@@ -1418,7 +1418,7 @@ marLogLik <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(any(is.na(sd.corr))){
    cat("WARNING: NAs in variance components\n") 
-    return(NA)      
+    return(NA_real_)
   }
   
   
@@ -1444,7 +1444,7 @@ marLogLik <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING: penalized Fisher is singular!\n")
-    return(NA)  
+    return(NA_real_)
   }
    
   F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]
@@ -1475,7 +1475,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   dimSigma <- model$nSigma
   
   if(dimSigma == 0){
-    return(rep(NA,dimVar))
+    return(rep.int(NA_real_,dimVar))
   }
   
     sd <- head(sd.corr,dimVar)
@@ -1483,7 +1483,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(any(is.na(sd.corr))){
    cat("WARNING: NAs in variance components\n") 
-    return(rep(NA,dimVar))
+    return(rep.int(NA_real_,dimVar))
   }
   
   
@@ -1509,7 +1509,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING: penalized Fisher is singular!\n")
-    return(rep(NA,dimVar))
+    return(rep.int(NA_real_,dimVar))
   }
    
   F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]
@@ -1519,7 +1519,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
    
   ## compute marginal score and fisher for each variance component
   # initialize score and fisher info
-  marg.score <- rep(NA,dimSigma)
+  marg.score <- rep.int(NA_real_,dimSigma)
   
   ## specify functions for derivatives
   deriv1 <- switch(dimVar,dSigma1, dSigma2, dSigma3)
@@ -1552,15 +1552,15 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   dimSigma <- model$nSigma
   
   if(dimSigma == 0){
-    return(matrix(NA,dimVar,dimVar))   
+    return(matrix(NA_real_,dimVar,dimVar))   
   }
   
     sd <- head(sd.corr,dimVar)
     corr <- tail(sd.corr,dimCorr)
   
   if(any(is.na(sd.corr))){
-   cat("WARNING: NAs in variance components\n") 
-    return(matrix(NA,dimVar,dimVar))   
+    cat("WARNING: NAs in variance components\n") 
+    return(matrix(NA_real_,dimVar,dimVar))   
   }
   
   
@@ -1586,7 +1586,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING: penalized Fisher is singular!\n")
-    return(matrix(NA,dimVar,dimVar))   
+    return(matrix(NA_real_,dimVar,dimVar))   
   }
    
   F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]
@@ -1594,7 +1594,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   pars <- splitParams(theta,model)  
   randomEffects <- pars$random
 
-  marg.hesse <- matrix(NA,dimSigma,dimSigma)
+  marg.hesse <- matrix(NA_real_,dimSigma,dimSigma)
   
   ## specify functions for derivatives
   deriv1 <- switch(dimVar,dSigma1, dSigma2, dSigma3)
@@ -1859,7 +1859,7 @@ updateVariance <- function(sd.corr,theta,model, control=list(scoreTol=1e-5, para
   # only fixed effects => no variance 
   if(model$nSigma ==0){
     if(verbose>0) cat("No update for variance components\n\n")
-    return(list(par=sd.corr,ll=NA,rel.tol=0,convergence=0))
+    return(list(par=sd.corr,ll=NA_real_,rel.tol=0,convergence=0))
   }
   
   varianceParamsMin <-  function(sd.corr,...){
@@ -1908,7 +1908,7 @@ updateVariance <- function(sd.corr,theta,model, control=list(scoreTol=1e-5, para
     cat("WARNING: at least one variance estimates not a number, no update of variance\n")
     sd.corr.new[is.na(sd.corr.new)] <- -.5
     ll <- c(marLogLik(sd.corr,theta,model))
-    return(list(par=sd.corr,ll=ll, rel.tol=NA, convergence=99) ) 
+    return(list(par=sd.corr,ll=ll, rel.tol=NA_real_, convergence=99) ) 
   
   } 
   
@@ -1996,7 +1996,6 @@ newtonRaphson <- function(x,fn,..., control=list(scoreTol=1e-5, paramTol=1e-8,F.
   steph <- notpd <- 0
   convergence <- 99
   i <- 0
-  x.new <- NA
   
   rel.tol <- function(x,xnew){
     sqrt(sum((xnew-x)^2)/sum(x^2))
@@ -2178,8 +2177,8 @@ oneStepAhead <- function(result, # result of call to hhh4
   negbin <- dimOverdisp>0
 
   nTime <- nrow(stsObj)
-  pred <- matrix(NA,nrow=length(tp:nTime)-1,ncol=ncol(stsObj))
-  psi <- matrix(NA,nrow=length(tp:nTime)-1,ncol=ifelse(dimOverdisp>1,ncol(stsObj),1))
+  pred <- matrix(NA_real_,nrow=length(tp:nTime)-1,ncol=ncol(stsObj))
+  psi <- matrix(NA_real_,nrow=length(tp:nTime)-1,ncol=ifelse(dimOverdisp>1,ncol(stsObj),1))
     
   res <- resN <- result
   coefs <- coef(res,reparamPsi=FALSE)
@@ -2203,9 +2202,9 @@ oneStepAhead <- function(result, # result of call to hhh4
   
   if(keep.estimates){
 	# save value of log-likelihood (pen+mar) and parameter estimates
-	params <- matrix(NA,nrow=length(tp:nTime)-1,ncol=length(coef(res))+2)
+	params <- matrix(NA_real_,nrow=length(tp:nTime)-1,ncol=length(coef(res))+2)
 	# save values of estimated covariance
-	vars <- matrix(NA,nrow=length(tp:nTime)-1,ncol=model$nSigma)
+	vars <- matrix(NA_real_,nrow=length(tp:nTime)-1,ncol=model$nSigma)
   } else {
 	params <- vars <- NULL
   }
