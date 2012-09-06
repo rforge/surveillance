@@ -391,7 +391,7 @@ fe <- function(x,          # covariate
   if(!is.null(initial) & length(initial) !=dim.fe){
     stop("Initial values for \'",deparse(substitute(x)),"\' must be of length ",dim.fe,"\n")
   } else if(is.null(initial)){
-    initial <- rep(0,dim.fe)
+    initial <- rep.int(0,dim.fe)
   }
   
   summ <- ifelse(unitSpecific,"colSums","sum")
@@ -1475,15 +1475,15 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   dimSigma <- model$nSigma
   
   if(dimSigma == 0){
-    return(rep.int(NA_real_,dimVar))
+    return(numeric(0L))
   }
   
     sd <- head(sd.corr,dimVar)
     corr <- tail(sd.corr,dimCorr)
   
   if(any(is.na(sd.corr))){
-   cat("WARNING: NAs in variance components\n") 
-    return(rep.int(NA_real_,dimVar))
+    cat("WARNING: NAs in variance components\n") 
+    return(rep.int(NA_real_,dimSigma))
   }
   
   
@@ -1509,7 +1509,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING: penalized Fisher is singular!\n")
-    return(rep.int(NA_real_,dimVar))
+    return(rep.int(NA_real_,dimSigma))
   }
    
   F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]
@@ -1552,7 +1552,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   dimSigma <- model$nSigma
   
   if(dimSigma == 0){
-    return(matrix(NA_real_,dimVar,dimVar))   
+    return(matrix(NA_real_,dimSigma,dimSigma))   
   }
   
     sd <- head(sd.corr,dimVar)
@@ -1560,7 +1560,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(any(is.na(sd.corr))){
     cat("WARNING: NAs in variance components\n") 
-    return(matrix(NA_real_,dimVar,dimVar))   
+    return(matrix(NA_real_,dimSigma,dimSigma))   
   }
   
   
@@ -1586,7 +1586,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING: penalized Fisher is singular!\n")
-    return(matrix(NA_real_,dimVar,dimVar))   
+    return(matrix(NA_real_,dimSigma,dimSigma))   
   }
    
   F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]
@@ -1606,7 +1606,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
  
   # 2nd derivatives of log determinant
-  d2logDet <- diag(c(rep(0,dimVar),-dimBlocks[1]*(corr^2-1)/(corr^2+1)^2),dimSigma)
+  d2logDet <- diag(c(rep.int(0,dimVar),-dimBlocks[1]*(corr^2-1)/(corr^2+1)^2),dimSigma)
   
   # go through all variance components
   for(i in 1:dimSigma){
@@ -1806,7 +1806,7 @@ updateRegression <- function(theta,sd.corr,model=model,
   }
 
   
-  lowerBound <- rep(-Inf,model$nFE + model$nOverdisp + model$nRE)
+  lowerBound <- rep.int(-Inf, model$nFE + model$nOverdisp + model$nRE)
   indexAR <- c(grep("ar.ri",model$namesFE), grep("ar.1",model$namesFE),
                grep("ne.ri",model$namesFE), grep("ne.1",model$namesFE)) 
   lowerBound[indexAR] <- -20
