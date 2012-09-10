@@ -23,6 +23,7 @@
 \usepackage{relsize}
 \usepackage{epsfig}
 \usepackage{comment}
+\usepackage[english]{babel}
 
 \usepackage{pdfpages}
 
@@ -129,9 +130,8 @@ detection methods is given by \cite{hoehle-mazick-2010}.
 
 This document illustrates the functionality of the function \hhh\ for
 the modelling of univariate and multivariate time series of infectious
-disease counts.  The function is currently incorporated in the
-development version of \surveillance\ available from
-R-Forge\footnote{\url{http://surveillance.r-forge.r-project.org/}}.
+disease counts.  It is part of the \surveillance\ package as 
+of version 1.3. 
 Section~\ref{sec:data} introduces the S4 class data structure used to
 store surveillance time series data within the package. Access and
 visualization methods are outlined by means of built-in data sets.  In
@@ -174,7 +174,7 @@ database\footnote{\url{http://www3.rki.de/SurvStat}}, maintained by
 the Robert Koch Institute (RKI), Germany. Selected data sets will be
 analyzed in Section~\ref{sec:hhh} and are introduced in the
 following. Note that many of the built-in datasets are stored in the
-S3 class data structure \code{disProg}.  They can be easily converted
+S3 class data structure \mbox{\code{disProg}}.  They can be easily converted
 into the S4 \sts\ data structure using the function
 \code{disProg2sts}. The resulting \sts\ object can be accessed similar
 as standard \code{matrix} objects and allows easy temporal and spatial
@@ -342,7 +342,7 @@ describing the onset of the sine wave.
 
 To account for overdispersion, the Poisson model may be replaced by
 a negative binomial model. Then, the conditional mean $\mu_t$ remains
-the same but the conditional variance increases to $\mu_t (1+\mu_t/\psi)$
+the same but the conditional variance increases to $\mu_t (1+\mu_t \psi)$
 with additional unknown overdispersion parameter $\psi>0$.
 
 The model is extended to multivariate time series $\{y_{it}\}$ in 

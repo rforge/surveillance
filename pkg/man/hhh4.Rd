@@ -17,8 +17,11 @@
         \mu_it = \lambda_it y_i,t-1 + 
                  \phi_it sum_(j != i) w_ji y_j,t-1 +
                    e_it \nu_it  }
-  containing epidemic and endemic components to a multivariate time 
-  series of counts. Here, the three unknown quantities 
+  containing epidemic and endemic components to a multivariate time series
+  of counts. In the case of a negative binomial model, the conditional 
+  variance is \eqn{\mu_{it}(1+\psi\mu_{it})}{\mu_it(1+\psi*\mu_it)} 
+  with overdispersion parameter \eqn{\psi}. 
+  The three unknown quantities of the mean \eqn{\mu_{it}}{\mu_it}
   \itemize{
   \item \eqn{\lambda_{it}}{\lambda_it} in the autoregressive (\code{ar}) component, 
   \item \eqn{\phi_{it}}{\phi_it} in the neighbor-driven (\code{ne}) component, and

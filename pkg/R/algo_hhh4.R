@@ -84,6 +84,7 @@ hhh4 <- function(stsObj,
         cat("Algorithm has NOT converged. \n")
       res <- myoptim
       res$convergence <- FALSE
+	  res$call <- match.call()
       class(res) <- "ah4"
       return(res)
   }
@@ -97,6 +98,7 @@ hhh4 <- function(stsObj,
     }
     res <- myoptim
     res$convergence <- FALSE
+	res$call <- match.call()
     class(res) <- "ah4"
     return(res)
   }
@@ -127,6 +129,7 @@ hhh4 <- function(stsObj,
     }
     res <- myoptim
     res$convergence <- FALSE
+	res$call <- match.call()
     class(res) <- "ah4"
     return(res)
   }
@@ -139,6 +142,7 @@ hhh4 <- function(stsObj,
     }
     res <- myoptim
     res$convergence <- FALSE
+	res$call <- match.call()
     class(res) <- "ah4"
     return(res)
   }
@@ -525,9 +529,12 @@ checkFormula <- function(f, env, component){
   }
   
   # find out fixed effects without "fe()" specification
-  fe.raw <- grep("fe(*)|ri(*)", attr(term,"term.labels"), invert=TRUE)
-  ## FIXME: this also matches terms like "fest", "risiko". better:
-  ## fe.raw <- setdiff(1:nVars, unlist(attr(term, "specials")))
+  # (only if there are variables in addition to an intercept "1")
+  if(nVars >0){
+	fe.raw <- setdiff(1:nVars, unlist(attr(term, "specials")))
+  } else {
+	fe.raw <- numeric(0)
+  }
   # evaluate covariates
   if(length(fe.raw)>0){
     for(i in fe.raw)
@@ -678,9 +685,9 @@ interpretControl <- function(control, stsObj){
   }
 
   if(dim.overdisp>1){
-    names.overdisp <- paste("overdisp", colnames(stsObj), sep=".")
+    names.overdisp <- paste(paste("-log(overdisp", colnames(stsObj), sep=".") ,")", sep="")
   } else {
-    names.overdisp <- rep("overdisp",dim.overdisp)  # dim.overdisp may be 0
+    names.overdisp <- rep("-log(overdisp)",dim.overdisp)  # dim.overdisp may be 0
   }
   names(initial.fe.overdisp) <- c(names.fe,names.overdisp)
   initial.theta <- c(initial.fe.overdisp,initial.re)
@@ -1410,7 +1417,7 @@ marLogLik <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   dimSigma <- model$nSigma
   
   if(dimSigma == 0){
-    return(Inf)
+    return(-Inf)
   }
   
     sd <- head(sd.corr,dimVar)
@@ -1444,7 +1451,7 @@ marLogLik <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING: penalized Fisher is singular!\n")
-    return(NA_real_)
+    return(NA_real_) 
   }
    
   F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]

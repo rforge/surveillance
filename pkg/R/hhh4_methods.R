@@ -32,6 +32,12 @@ print.ah4 <- function (x, digits = max(3, getOption("digits") - 3),reparamPsi=TR
 }
 
 summary.ah4 <- function(object, ...){
+  # do not summarize results in case of non-convergence
+  if(!object$convergence){
+    cat('Results are not reliable! Try different starting values. \n')
+	return(invisible(object))
+  }
+
   ret <- object[c("call","convergence","dim","loglikelihood","margll","nTime","nUnit")]
 
   # get estimated covariance matrix of random effects
@@ -128,14 +134,10 @@ coef.ah4 <- function(object,se=FALSE, reparamPsi=TRUE, idx2Exp=NULL, amplitudeSh
 
   if(reparamPsi & object$control$family!="Poisson"){
     #extract psi coefficients
-    index <- grep("overdisp",names(coefs))
+    index <- grep("-log(overdisp",names(coefs), fixed=TRUE)
     psi.names <- names(coefs)[index]
-    # change labels
-    names(coefs)[index] <- paste("1/",psi.names,sep="")
-    ##<- FIXME: don't we obtain the actual overdispersion parameter if we
-    ##reparamPsi, i.e. it should be named overdisp? By contrast, if reparamPsi=FALSE,
-    ##the internal parametrization would be reported, i.e. -log(overdisp) and
-    ##should be named as such.
+    # change labels from "-log(overdisp.xxx)" to "overdisp.xxx"
+    names(coefs)[index] <- substr(psi.names, start=6, stop=nchar(psi.names)-1)
     
     #transform psi coefficients
     coefs[index] <- exp(-coefs[index])
