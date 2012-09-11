@@ -213,11 +213,14 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
          if (density) expression(int * alpha / sigma) else expression(int)
     ))
 
-    effRange <- function (logpars) {}
-    body(effRange) <- as.call(c(as.name("{"),
-        substitute(qlomax(effRangeProb, exp(logpars[[1]]), exp(logpars[[2]])),
-                   list(effRangeProb=effRangeProb))
-    ))
+    effRange <- if (isScalar(effRangeProb)) {
+        effRange <- function (logpars) {}
+        body(effRange) <- as.call(c(as.name("{"),
+            substitute(qlomax(effRangeProb, exp(logpars[[1]]), exp(logpars[[2]])),
+                       list(effRangeProb=effRangeProb))
+        ))
+        effRange
+    } else NULL
     
     simulate <- function (n, logpars)
     {
@@ -231,7 +234,8 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
 
     ## set function environments to the global environment
     environment(f) <- environment(deriv) <- environment(Fcircle) <-
-    environment(effRange) <- environment(simulate) <- .GlobalEnv
+        environment(simulate) <- .GlobalEnv
+    if (is.function(effRange)) environment(effRange) <- .GlobalEnv
 
     ## return the kernel specification
     list(f=f, deriv=deriv, Fcircle=Fcircle, effRange=effRange,

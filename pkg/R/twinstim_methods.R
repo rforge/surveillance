@@ -210,7 +210,7 @@ intensityplot.twinstim <- function (x,
     aggregate = c("time", "space"),
     types = 1:nrow(x$qmatrix), tiles, tiles.idcol = NULL,
     plot = TRUE, add = FALSE, tgrid = 101, rug.opts = list(),
-    sgrid = 128, polygons.args = list(), points.args = list(cex=0.5),
+    sgrid = 128, polygons.args = list(), points.args = list(),
     cex.fun = sqrt, ...)
 {
     ## check arguments
@@ -316,8 +316,7 @@ intensityplot.twinstim <- function (x,
             eventCoords.types <- SpatialPointsDataFrame(eventCoords.types,
                 data.frame(mult = multiplicity(eventCoords.types)))
             eventCoords.types <- eventCoords.types[!duplicated(coordinates(eventCoords.types)),]
-            nms.points <- names(points.args)
-            if(! "pch" %in% nms.points) points.args$pch <- 1
+            points.args <- modifyList(list(pch=1, cex=0.5), points.args)
             pointcex <- cex.fun(eventCoords.types$mult)
             pointcex <- pointcex * points.args$cex
             points.args$cex <- NULL
@@ -955,10 +954,13 @@ update.twinstim <- function (object, endemic, epidemic, optim.args, model,
         call$epidemic <- stats::update.formula(formula(object)$epidemic, epidemic)
     if (!missing(optim.args)) {
         oldargs <- call$optim.args
-        call$optim.args <-
-            if (is.listcall(oldargs) && is.list(optim.args)) {
+        call$optim.args <- if (is.list(optim.args)) {
+            if (is.listcall(oldargs)) {
                 modifyListcall(oldargs, thiscall$optim.args)
-            } else thiscall$optim.args
+            } else {                    # i.e. is.list(oldargs)
+                modifyList(oldargs, optim.args)
+            }
+        } else thiscall$optim.args
     }
     extras <- thiscall$...
     ## CAVE: the remainder is copied from stats::update.default (as at R-2.15.0)

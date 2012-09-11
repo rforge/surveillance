@@ -79,9 +79,10 @@ tiaf.exponential(nTypes)
     of the whole observation region \code{W}.
   }
   \item{effRangeProb}{
-    determines the effective range for numerical integration
-    in terms of the corresponding quantile of the univariate Lomax
-    distribution.
+    numeric scalar in \eqn{(0,1)}, which determines the effective range for
+    numerical integration in terms of the corresponding quantile of the
+    univariate Lomax distribution. May also be \code{NULL} which disables
+    the integral approximation with an effective integration range.
   }
   \item{validpars}{
     function taking one argument, the parameter vector, indicating if it

@@ -22,7 +22,7 @@ location (integrated over the other dimension).
     aggregate = c("time", "space"), types = 1:nrow(x$qmatrix),
     tiles, tiles.idcol = NULL, plot = TRUE, add = FALSE,
     tgrid = 101, rug.opts = list(),
-    sgrid = 128, polygons.args = list(), points.args = list(cex=0.5),
+    sgrid = 128, polygons.args = list(), points.args = list(),
     cex.fun = sqrt, ...)
 
 intensity.twinstim(x,
