@@ -463,43 +463,89 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
 ### Plot fitted tiaf or siaf(cbind(0, r)), r=distance
 
 iafplot <- function (object, which = c("siaf", "tiaf"),
-    types = 1:nrow(object$qmatrix),
+    types = 1:nrow(object$qmatrix), scaled = FALSE,
     conf.type = if (length(pars) > 1) "bootstrap" else "parbounds",
     conf.level = 0.95, conf.B = 999,
-    ngrid = 101, col.estimate = rainbow(length(types)), col.conf = col.estimate,
-    alpha.B = 0.15, lwd = c(3,1), lty = c(1,2), xlim = c(0,eps), ylim = c(0,1),
+    xgrid = 101, col.estimate = rainbow(length(types)), col.conf = col.estimate,
+    alpha.B = 0.15, lwd = c(3,1), lty = c(1,2), xlim = NULL, ylim = NULL,
     add = FALSE, xlab = NULL, ylab = NULL, ...)
 {
     which <- match.arg(which)
-    eps <- if (which == "siaf") {
-        sqrt(sum((object$bbox[,"max"] - object$bbox[,"min"])^2))
-    } else {
-        diff(object$timeRange)
-    }
-    FUN <- object$formula[[which]][[if (which=="siaf") "f" else "g"]]
+    IAF <- object$formula[[which]][[if (which=="siaf") "f" else "g"]]
     coefs <- coef(object)
-    idxpars <- grep(which,names(coefs))
-    pars <- coefs[idxpars]
-    force(conf.type)
+    ## epidemic intercept (case of no intercept is not addressed atm)
+    if (scaled) {
+        idxgamma0 <- match("e.(Intercept)", names(coefs), nomatch=0L)
+        if (idxgamma0 == 0L) {
+            message("no scaling due to missing epidemic intercept")
+            scaled <- FALSE
+        }
+    } else idxgamma0 <- 0L              # if no scaling, gamma0 is 0-length
+    gamma0 <- coefs[idxgamma0]
+    ## parameters of the interaction function
+    idxiafpars <- grep(paste0("^e\\.",which), names(coefs))
+    iafpars <- coefs[idxiafpars]
+    ## concatenate parameters
+    idxpars <- c(idxgamma0, idxiafpars)
+    pars <- c(gamma0, iafpars)
+    ## type of confidence band
+    force(conf.type)                    # per default depends on 'pars'
     if (length(pars) == 0 || any(is.na(conf.type)) || is.null(conf.type)) {
         conf.type <- "none"
     }
-    conf.type <- match.arg(conf.type, choices = c("parbounds", "bootstrap", "none"))
+    conf.type <- match.arg(conf.type,
+                           choices = c("parbounds", "bootstrap", "none"))
+
+    ## add intercept-factor to IAF if scaled=TRUE
+    FUN <- if (scaled) {
+        function (x, pars, types) {
+            gamma0 <- pars[1L]
+            iafpars <- pars[-1L]
+            exp(gamma0) * IAF(x, iafpars, types)
+        }
+    } else IAF
     
+    ## grid of x-values (t or ||s||) on which FUN will be evaluated
+    if (is.null(xlim)) {
+        xmax <- if (which == "siaf") {
+            sqrt(sum((object$bbox[,"max"] - object$bbox[,"min"])^2))
+        } else {
+            diff(object$timeRange)
+        }
+        xlim <- c(0, xmax)
+    }
+    xgrid <- if (isScalar(xgrid)) {
+        seq(0, xlim[2], length.out=xgrid)
+    } else {
+        stopifnot(!is.na(xgrid), is.vector(xgrid, mode="numeric"))
+        ## xgrid-specification overrides default xlim
+        if (is.null(match.call()$xlim)) xlim <- c(0, max(xgrid))
+        sort(xgrid)
+    }
+    
+    ## initialize plotting frame
     if (!add) {
+        if (is.null(ylim)) ylim <- c(0, if (scaled) exp(gamma0) else 1)
         if (is.null(xlab)) xlab <- if (which == "siaf") {
-            expression("Distance " * group("||",bold(s)-bold(s)[j],"||") * " from host")
+            expression("Distance " * group("||",bold(s)-bold(s)[j],"||") *
+                " from host")
         } else {
             expression("Distance " * t-t[j] * " from host")
         }
-        if (is.null(ylab)) ylab <- if (which == "siaf") {
-            expression(f(group("||",bold(s)-bold(s)[j],"||")))
-        } else {
-            expression(g(t-t[j]))
+        if (is.null(ylab)) {
+            ylab <- if (which == "siaf") {
+                expression(f(group("||",bold(s)-bold(s)[j],"||")))
+            } else {
+                expression(g(t-t[j]))
+            }
+            if (scaled) {
+                ylab <- as.expression(as.call(list(quote(paste),
+                    quote(e^{gamma[0]}), quote(phantom() %.% phantom()),
+                    ylab[[1]])))
+            }
         }
         plot(xlim, ylim, type="n", xlab = xlab, ylab = ylab, ...)
     }
-    xgrid <- seq(0, xlim[2], length.out=ngrid)
     
     for (i in seq_along(types)) {
         ## select parameters on which to evaluate iaf
@@ -514,13 +560,13 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
                                 sd=sqrt(vcov(object)[idxpars,idxpars]))))
             } else {
                 rbind(pars, mvtnorm::rmvnorm(conf.B, mean=pars,
-                                 sigma=vcov(object)[idxpars,idxpars,drop=FALSE]))
+                      sigma=vcov(object)[idxpars,idxpars,drop=FALSE]))
             }
         })
         
         ## add confidence limits
         if (!is.null(parSample)) {
-            fvalsSample <- apply(parSample, 1, function(pars)
+            fvalsSample <- apply(parSample, 1, function (pars)
                                  FUN(if(which=="siaf") cbind(xgrid,0) else xgrid,
                                      pars, types[i]))
             lowerupper <- if (conf.type == "parbounds") {
@@ -530,7 +576,8 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
                     stopifnot(alpha.B >= 0, alpha.B <= 1)
                     .col <- col2rgb(col.conf[i], alpha=TRUE)[,1]
                     .col["alpha"] <- round(alpha.B*.col["alpha"])
-                    .col <- do.call("rgb", args=c(as.list(.col), maxColorValue = 255))
+                    .col <- do.call("rgb", args=c(as.list(.col),
+                                           maxColorValue = 255))
                     matlines(x=xgrid, y=fvalsSample, type="l", lty=lty[2],
                              col=.col, lwd=lwd[2]) # returns NULL
                 } else {

@@ -304,7 +304,7 @@ plot(stateD, add=TRUE, border=2, lwd=2)
 m_noepi <- update(imdepifit, epidemic=~0, siaf=NULL,
     optim.args=list(par=coef(imdepifit)[1:4]), model=FALSE, cumCIF=FALSE)
 mysim <- simulate(m_noepi, nsim=2, seed=399, data=imdepi,
-    tiles=districtsD, W=stateD, t0=31, T=182, trace=20, nCircle2Poly=16,
+    tiles=districtsD, W=stateD, t0=31, T=91, trace=20, nCircle2Poly=16,
     .allocate=100, simplify=TRUE)
 
 # extract the first realization -> object of class simEpidataCS
@@ -314,9 +314,9 @@ plot(mysim1, aggregate="space")
 # use the plot-method for simEpidataCSlist's
 plot(mysim, aggregate="time", subset=type=="B")
 
-## simulate 1 realization from the imdepifit-model
+## simulate one realization from the imdepifit-model (during a short period)
 simimdepifit <- simulate(imdepifit, seed=1, data=imdepi,
-    tiles=districtsD, W=stateD, t0=31, T=182, trace=50)
+    tiles=districtsD, W=stateD, t0=31, T=91, trace=50)
 summary(simimdepifit)
 }
 
