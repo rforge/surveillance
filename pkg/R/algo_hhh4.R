@@ -1098,7 +1098,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
   pars <- splitParams(theta,model)
   #ensure overdispersion param is positive
   psi <- exp(pars$overdisp)             # this is actually 1/overdisp
-  if(dimPsi > 1) {
+  if (dimPsi > 1) {
     psi <- matrix(psi,ncol=model$nUnits, nrow=model$nTime, byrow=TRUE)[subset,,drop=FALSE]
   }
   #random effects
@@ -1107,27 +1107,29 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
   Sigma.inv <- getSigmaInv(sd, corr, model$nVar, dimBlock)
   
   ## helper functions for derivatives:
-  if(dimPsi>0) { # negbin
+  if (dimPsi > 0) { # negbin
     psiPlusY <- psi + Y
     psiPlusMu <- psi + meanTotal
     psiPlusMu2 <- psiPlusMu^2    
     deriv2HHH <- function(dTheta_l,dTheta_k,dTheta_lk){
-        dTheta_l*dTheta_k*(psi/psiPlusMu2 - Y/(meanTotal^2) + Y/psiPlusMu2) + dTheta_lk*(-psi/psiPlusMu +Y/meanTotal - Y/psiPlusMu) 
+        dTheta_l*dTheta_k*(psi/psiPlusMu2 - Y/(meanTotal^2) + Y/psiPlusMu2) +
+            dTheta_lk*(-psi/psiPlusMu +Y/meanTotal - Y/psiPlusMu)
     }
     dThetadPsi <- function(dTheta){
         psi*(-dTheta/psiPlusMu + (psi + Y)*dTheta/psiPlusMu2)
     }
     dPsidPsi <- function(){
-        dPsi <- psi*(digamma(psiPlusY)-digamma(psi) +log(psi)+1 - log(psiPlusMu) -psi/psiPlusMu -Y/psiPlusMu)
-        psi*(trigamma(psiPlusY)*psi - trigamma(psi)*psi + 1 - psi/psiPlusMu - psi*(meanTotal-Y)/psiPlusMu2) +dPsi
+        dPsi <- psi * (digamma(psiPlusY)-digamma(psi) +log(psi)+1 -
+                       log(psiPlusMu) -psi/psiPlusMu -Y/psiPlusMu) 
+        psi * (trigamma(psiPlusY)*psi - trigamma(psi)*psi + 1 - psi/psiPlusMu -
+               psi*(meanTotal-Y)/psiPlusMu2) + dPsi
     }
-    
   } else { # poisson
     deriv2HHH <- function(dTheta_l,dTheta_k,dTheta_lk){
         -Y*dTheta_l*dTheta_k/(meanTotal^2) + (Y/meanTotal-1)*dTheta_lk
     }
   }
-     
+  
   # go through groups of parameters and compute the hessian of each component
   computeFisher <- function(mean.comp, subset){
     # initialize hessian
@@ -1138,6 +1140,12 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
     hessian.FE.Psi <- matrix(0,dimFE, dimPsi)
     hessian.Psi.RE <- matrix(0,dimPsi, dimRE+dimPsi)
 
+    if (dimPsi > 0) { # d l(theta,x) /dpsi dpsi
+        hessian.Psi.RE[,seq_len(dimPsi)] <- if (dimPsi == 1) {
+            sum(dPsidPsi(), na.rm=TRUE)
+        } else diag(colSums(dPsidPsi(), na.rm=TRUE))
+    }
+    
     ##
     i.fixed <- function(){
       if(random.j){
@@ -1221,13 +1229,6 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
       
       random.i <- term["random",i][[1]]
       unitSpecific.i <- term["unitSpecific",i][[1]]
-      
-      ## d l(theta,x) /dpsi dpsi
-      if(dimPsi==1){
-         hessian.Psi.RE[1,1] <- sum(dPsidPsi(), na.rm=TRUE)
-      } else if(dimPsi >1){
-         hessian.Psi.RE[, 1:dimPsi] <- diag(colSums(dPsidPsi(), na.rm=TRUE))
-      } 
       
       if(random.i){
         Z.i <- term["Z.intercept",i][[1]]   

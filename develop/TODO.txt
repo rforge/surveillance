@@ -26,6 +26,7 @@
 	   contains an implementation of the gpc.poly class. However,
 	   library("gpclib"); library("maptools"); library("rgeos")
 	   works...
+12/09/2012 more package tests
 
 #Done
 
