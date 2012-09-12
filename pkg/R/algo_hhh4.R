@@ -1022,7 +1022,7 @@ penScore <- function(theta, sd.corr, model){
   
   # gradient for overdispersionParameter psi
   if(model$nOverdisp > 0){
-    dPsi <- psi*(psigamma(Y+psi)-psigamma(psi) +log(psi)+1 - log(psiPlusMu) -psi/psiPlusMu -Y/psiPlusMu)
+    dPsi <- psi*(digamma(Y+psi)-digamma(psi) +log(psi)+1 - log(psiPlusMu) -psi/psiPlusMu -Y/psiPlusMu)
     
     # multiple psi_i's or single psi?
     if(model$nOverdisp > 1){
@@ -1121,8 +1121,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
     }
     
     dPsidPsi <- function(){
-        dPsi <- psi*(psigamma(psiPlusY)-psigamma(psi) +log(psi)+1 - log(psiPlusMu) -psi/psiPlusMu -Y/psiPlusMu)
-        psi*(psigamma(psiPlusY,1)*psi - psigamma(psi,1)*psi + 1 - psi/psiPlusMu - psi*(meanTotal-Y)/psiPlusMu2) +dPsi
+        dPsi <- psi*(digamma(psiPlusY)-digamma(psi) +log(psi)+1 - log(psiPlusMu) -psi/psiPlusMu -Y/psiPlusMu)
+        psi*(trigamma(psiPlusY)*psi - trigamma(psi)*psi + 1 - psi/psiPlusMu - psi*(meanTotal-Y)/psiPlusMu2) +dPsi
     }
     
   } else {
