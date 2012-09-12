@@ -208,7 +208,7 @@ setControl <- function(control, stsObj){
     
     # currently only lag=1 considered
     if(control$ar$lag !=1) stop("\'ar$lag\' must be 1\n")
-    # check wheter f is a matrix or a formula
+    # check whether f is a matrix or a formula
     if(is.matrix(control$ar$f)){
       #use identity matrix if weight matrix is missing
       if(is.null(control$ar$weights)) control$ar$weights <- diag(1, nUnits)
@@ -469,8 +469,9 @@ ri <- function(type=c("iid","car")[1],
     # for a the factorisation of the penalty matrix K = LL'
     L <- svdK$u[,-dimK] %*% diag(sqrt(svdK$d[-dimK]))            #* only use non-zero eigenvalues
     
-    # Z = L(L'L)^-1
-    Z <- L%*%solve(t(L)%*%L)
+    # Z = L(L'L)^-1, i.e. L'Z = I, i.e. Z = (L')^-1
+    #Z <- L %*% solve(t(L)%*%L)
+    Z <- solve(t(L))                    # numerically advantegeous
     
     dim.re <- dimK-1
     mult <- "%*%"
@@ -728,8 +729,8 @@ getCov <- function(x){
   Sigma <- x$Sigma
   corr <- cov2cor(Sigma)
   diag(corr) <- diag(Sigma)
-  rownames(corr) <- colnames(corr) <- gsub("sd.","",names(x$Sigma.orig))[grep("sd.",names(x$Sigma.orig))]
-
+  rownames(corr) <- colnames(corr) <-
+      sub("^sd\\.","",names(x$Sigma.orig))[grep("^sd\\.",names(x$Sigma.orig))]
   return(corr)
 }
 
@@ -903,7 +904,9 @@ penLogLik <- function(theta, sd.corr, model){
     dimBlock<- model$rankRE[model$rankRE>0]
     Sigma.inv <- getSigmaInv(sd, corr, model$nVar, dimBlock)
     
-    lpen <- -.5*(t(randomEffects)%*%Sigma.inv%*%randomEffects)
+    ##lpen <- -.5*(t(randomEffects)%*%Sigma.inv%*%randomEffects)
+    ## the following implementation takes ~85% less computing time !
+    lpen <- -0.5 * crossprod(randomEffects, Sigma.inv) %*% randomEffects
     
   } 
   
@@ -1094,8 +1097,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
 
   pars <- splitParams(theta,model)
   #ensure overdispersion param is positive
-  psi <- exp(pars$overdisp)
-  if(model$nOverdisp > 1) {
+  psi <- exp(pars$overdisp)             # this is actually 1/overdisp
+  if(dimPsi > 1) {
     psi <- matrix(psi,ncol=model$nUnits, nrow=model$nTime, byrow=TRUE)[subset,,drop=FALSE]
   }
   #random effects
@@ -1103,30 +1106,23 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
   dimBlock<- model$rankRE[model$rankRE>0]
   Sigma.inv <- getSigmaInv(sd, corr, model$nVar, dimBlock)
   
- 
   ## helper functions for derivatives:
-  # negbin model or poisson model
-  if(model$nOverdisp>0){
+  if(dimPsi>0) { # negbin
     psiPlusY <- psi + Y
     psiPlusMu <- psi + meanTotal
-    psiPlusMu2 <- psiPlusMu^2
-    
-    # helper function for derivatives: negbin
+    psiPlusMu2 <- psiPlusMu^2    
     deriv2HHH <- function(dTheta_l,dTheta_k,dTheta_lk){
         dTheta_l*dTheta_k*(psi/psiPlusMu2 - Y/(meanTotal^2) + Y/psiPlusMu2) + dTheta_lk*(-psi/psiPlusMu +Y/meanTotal - Y/psiPlusMu) 
     }
-    
     dThetadPsi <- function(dTheta){
         psi*(-dTheta/psiPlusMu + (psi + Y)*dTheta/psiPlusMu2)
     }
-    
     dPsidPsi <- function(){
         dPsi <- psi*(digamma(psiPlusY)-digamma(psi) +log(psi)+1 - log(psiPlusMu) -psi/psiPlusMu -Y/psiPlusMu)
         psi*(trigamma(psiPlusY)*psi - trigamma(psi)*psi + 1 - psi/psiPlusMu - psi*(meanTotal-Y)/psiPlusMu2) +dPsi
     }
     
-  } else {
-    # helper function for derivatives: poisson
+  } else { # poisson
     deriv2HHH <- function(dTheta_l,dTheta_k,dTheta_lk){
         -Y*dTheta_l*dTheta_k/(meanTotal^2) + (Y/meanTotal-1)*dTheta_lk
     }
@@ -1248,6 +1244,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
           dPsi[isNA] <- 0
           hessian.FE.Psi[idxFE==i,]<- colSums( dPsi)
           hessian.Psi.RE[,c(FALSE,idxRE==i)] <- diag(colSums( dPsi%m%Z.i))
+          ##<- FIXME:   [,c(rep.int(FALSE, dimPsi),idxRE==i)] ???
         }
         
       } else if(unitSpecific.i){
@@ -1314,7 +1311,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
     return(fisher)
   } 
 
-  fisher<- computeFisher(mean.comp=list(ar=mu.ar, ne=mu.ne,end=mu.end),subset=subset)
+  fisher <- computeFisher(mean.comp = list(ar=mu.ar, ne=mu.ne,end=mu.end),
+                          subset = subset)
  
   
   if(dimRE >0){
@@ -1344,44 +1342,40 @@ getSigmai <- function(sd,    # vector of length dim with stdev's
                       ){
   if(dim==0) return(NULL)
                       
-  D <- diag(exp(sd),dim)
-  if(length(correlation)>0){
-    L <- diag(1,dim,dim)
-    L[2,1:2] <- c(correlation[1],1)/sqrtOf1pr2(correlation[1])
-    if(dim==3){
-      L[3,] <- c(correlation[2:3],1)/sqrtOf1pr2(correlation[2])
-      L[3,2:3] <- L[3,2:3]/sqrtOf1pr2(correlation[3])
-    }
-  } else{
-    L <- diag(1,dim)
+  Sigma.i <- if (length(correlation) == 0L) diag(exp(2*sd), dim) else {
+      D <- diag(exp(sd), dim)
+      L <- diag(nrow=dim)
+      L[2,1:2] <- c(correlation[1],1)/sqrtOf1pr2(correlation[1])
+      if (dim==3) {
+          L[3,] <- c(correlation[2:3],1)/sqrtOf1pr2(correlation[2])
+          L[3,2:3] <- L[3,2:3]/sqrtOf1pr2(correlation[3])
+      }
+      D %*% tcrossprod(L) %*% D  # ~75% quicker than D %*% L %*% t(L) %*% D
   }
-  Sigma.i <- D%*%L%*%t(L)%*%D
   return(Sigma.i)                     
 }
 
 getSigmaiInv <- function(sd,    # vector of length dim with stdev's
-                      correlation, # vector of length dim with correlation parameters, =0 if un-correlated
-                      dim
-                      ){
-                      
-  if(dim==0) return(NULL)                     
-  r <- correlation
-                     
-  Dinv <- diag(exp(-sd),dim)
-  if(length(correlation)>0){
-    L <- diag(1,dim,dim)
-    L[2,1:2] <- c(-r[1],sqrtOf1pr2(r[1]))
-    if(dim==3){
-      L[3,1] <- r[1]*r[3]-r[2]*sqrtOf1pr2(r[3])
-      L[3,2] <- -L[2,2]*r[3]
-      L[3,3] <- sqrtOf1pr2(r[2])*sqrtOf1pr2(r[3])
-    }
-  } else{
-    L <- diag(1,dim)
+                         correlation, # vector of length dim with correlation parameters, =0 if un-correlated
+                         dim
+                         ){
+    
+  if(dim==0) return(NULL) 
+  
+  Sigma.i.inv <- if (length(correlation) == 0L) diag(exp(-2*sd), dim) else {
+      r <- correlation
+      Dinv <- diag(exp(-sd), dim)
+      L <- diag(nrow=dim)
+      L[2,1:2] <- c(-r[1],sqrtOf1pr2(r[1]))
+      if(dim==3){
+          L[3,1] <- r[1]*r[3]-r[2]*sqrtOf1pr2(r[3])
+          L[3,2] <- -L[2,2]*r[3]
+          L[3,3] <- sqrtOf1pr2(r[2])*sqrtOf1pr2(r[3])
+      }
+      Dinv %*% crossprod(L) %*% Dinv  # ~75% quicker than Dinv %*% t(L) %*% L %*% Dinv
   }
-
-  Sigma.i.inv <- Dinv%*%t(L)%*%L%*%Dinv   
-  return(Sigma.i.inv)                     
+  
+  return(Sigma.i.inv)
 }
 
 #* allow blockdiagonal matrix blockdiag(A,B), with A=kronecker product, B=diagonal matrix?
@@ -1463,7 +1457,10 @@ marLogLik <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   # penalized part of likelihood
   # compute -0.5*log(|Sigma|) - 0.5*RE' %*% Sigma.inv %*% RE
   # where -0.5*log(|Sigma|) = -dim(RE_i)*[Sum(sd_i) -0.5*log(1+corr_i^2)]
-  loglik.pen <- sum(-dimBlocks*sd) - 0.5*(t(randomEffects)%*%Sigma.inv%*%randomEffects)
+  ##lpen <- -0.5*(t(randomEffects)%*%Sigma.inv%*%randomEffects)
+  ## the following implementation takes ~85% less computing time !
+  lpen <- -0.5 * crossprod(randomEffects, Sigma.inv) %*% randomEffects
+  loglik.pen <- sum(-dimBlocks*sd) + lpen
   if(dimCorr >0){
     loglik.pen <- loglik.pen + 0.5*dimBlocks[1]*sum(log(1+corr^2))
   }
@@ -1542,12 +1539,13 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   # go through all variance components
   for(i in 1:dimSigma){
-    dSi <- -Sigmai.inv %*% d1Sigma[,,i] %*% Sigmai.inv
+    dSi <- -Sigmai.inv %*% d1Sigma[,,i] %*% Sigmai.inv # CAVE: sign
     dS.i <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,Sigmai=dSi)
-    marg.score[i] <- d1logDet[i] - 
-                      0.5* t(randomEffects)%*% dS.i %*% randomEffects -
-                      0.5* sum(diag(F.inv.RE %*% dS.i))                     
-  }  
+    #dlpen.i <- -0.5* t(randomEffects) %*% dS.i %*% randomEffects
+    # ~85% faster implementation using crossprod() avoiding "slow" t():
+    dlpen.i <- -0.5 * crossprod(randomEffects, dS.i) %*% randomEffects
+    marg.score[i] <- d1logDet[i] + dlpen.i - 0.5*sum(diag(F.inv.RE %*% dS.i))
+  }
   
   return(marg.score)
 }
@@ -1631,7 +1629,9 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
       dSj <- -SigmaiInv.d1j %*% Sigmai.inv
       dS.j <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,Sigmai=dSj)
 	  # compute (d/di dj) S^-1
-      dS.ij <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,Sigmai=d2Sigma[[i]][,,j])
+      dS.ij <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,
+                        Sigmai=d2Sigma[[i]][,,j])
+      ##<- FIXME: dS.ij is currently nowhere used... Redundant?
       
 	  # compute second derivatives of Sigma^-1 (Harville Ch15, Eq 9.2)
       d2S <- (- Sigmai.inv %*% d2Sigma[[i]][,,j] + 
@@ -1639,10 +1639,14 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
                SigmaiInv.d1j %*% SigmaiInv.d1i) %*% Sigmai.inv 
                
       dSij <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,Sigmai=d2S)
+
+      #d2lpen.i <- -0.5* t(randomEffects) %*% dSij %*% randomEffects
+      # ~85% faster implementation using crossprod() avoiding "slow" t():
+      d2lpen.i <- -0.5 * crossprod(randomEffects, dSij) %*% randomEffects
       
-      marg.hesse[i,j] <- marg.hesse[j,i] <- d2logDet[i,j] -
-                        0.5* t(randomEffects) %*% dSij %*% randomEffects -
-                        0.5* sum(diag(-F.inv.RE %*% dS.j %*% F.inv.RE %*% dS.i + F.inv.RE %*% dSij))    
+      marg.hesse[i,j] <- marg.hesse[j,i] <- d2logDet[i,j] + d2lpen.i -
+          0.5* sum(diag(-F.inv.RE %*% dS.j %*% F.inv.RE %*% dS.i +
+                        F.inv.RE %*% dSij))
     }
     
   }  
@@ -1791,18 +1795,6 @@ d2Sigma3 <- function(sd,corr, d1){
 updateRegression <- function(theta,sd.corr,model=model, 
                              control=list(scoreTol=1e-5, paramTol=1e-8,F.inc=0.01, stepFrac=0.5,niter=30,scale.par=1), 
                              verbose=0, method="nlminb",...){
-  regressionParams <- function(theta,...){
-    ll <- penLogLik(theta,...)
-    attr(ll,"score") <- penScore(theta,...)
-    attr(ll,"fisher") <- penFisher(theta,...)
-    return(ll)
-  }
-  regressionParamsMin <- function(theta,...){
-    ll <- - penLogLik(theta,...)
-    attr(ll,"gradient") <- - penScore(theta,...)
-    attr(ll,"hessian") <- penFisher(theta,...)
-    return(ll)  
-  }
   
   if(any(is.na(sd.corr))){
     cat("WARNING: at least one variance estimates not a number\n")
@@ -1823,6 +1815,13 @@ updateRegression <- function(theta,sd.corr,model=model,
   
   # estimate regression coefficients (fixed + random)
   if(method=="nr"){
+    # objective function
+    regressionParams <- function(theta,...){
+      ll <- penLogLik(theta,...)
+      attr(ll,"score") <- penScore(theta,...)
+      attr(ll,"fisher") <- penFisher(theta,...)
+      return(ll)
+    }
     res <- newtonRaphson(x=theta,fn=regressionParams,sd.corr=sd.corr,model=model,control=control,verbose=verbose)
     theta.new <- res$coefficients
     ll <- res$loglik
@@ -1839,6 +1838,13 @@ updateRegression <- function(theta,sd.corr,model=model,
     theta.new <- res$par
     ll <- - res$objective
   } else if(method == "nlm"){
+    # objective function
+    regressionParamsMin <- function(theta,...){
+      ll <- - penLogLik(theta,...)
+      attr(ll,"gradient") <- - penScore(theta,...)
+      attr(ll,"hessian") <- penFisher(theta,...)
+      return(ll)  
+    }
     res <- nlm(p=theta, f=regressionParamsMin, sd.corr=sd.corr,model=model,fscale=1,hessian=TRUE,print.level=verbose)
     theta.new <- res$estimate
     ll <- - res$minimum
@@ -1869,14 +1875,6 @@ updateVariance <- function(sd.corr,theta,model, control=list(scoreTol=1e-5, para
     return(list(par=sd.corr,ll=NA_real_,rel.tol=0,convergence=0))
   }
   
-  varianceParamsMin <-  function(sd.corr,...){
-    ll <- - marLogLik(sd.corr,...)
-    attr(ll,"gradient") <- - marScore(sd.corr,...)
-    attr(ll,"hessian") <- marFisher(sd.corr,...)
-    return(ll)  
-  }
-  
-  
   scale <- control$scale.var
   if(is.null(scale)) scale <- 1
 
@@ -1898,6 +1896,12 @@ updateVariance <- function(sd.corr,theta,model, control=list(scoreTol=1e-5, para
     sd.corr.new <- res$par
     ll <- -res$objective
   } else if(method == "nlm"){
+    varianceParamsMin <-  function(sd.corr,...){
+      ll <- - marLogLik(sd.corr,...)
+      attr(ll,"gradient") <- - marScore(sd.corr,...)
+      attr(ll,"hessian") <- marFisher(sd.corr,...)
+      return(ll)  
+    }
     res <- nlm(p=sd.corr, f=varianceParamsMin, theta=theta, model=model,fscale=1,hessian=TRUE, print.level=verbose,...)
     sd.corr.new <- res$estimate
     ll <- -res$minimum
