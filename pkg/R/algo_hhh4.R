@@ -469,9 +469,8 @@ ri <- function(type=c("iid","car")[1],
     # for a the factorisation of the penalty matrix K = LL'
     L <- svdK$u[,-dimK] %*% diag(sqrt(svdK$d[-dimK]))            #* only use non-zero eigenvalues
     
-    # Z = L(L'L)^-1, i.e. L'Z = I, i.e. Z = (L')^-1
-    #Z <- L %*% solve(t(L)%*%L)
-    Z <- solve(t(L))                    # numerically advantegeous
+    # Z = L(L'L)^-1, which can't be simplified to Z=(L')^-1 as L is not square
+    Z <- L %*% solve(t(L)%*%L)
     
     dim.re <- dimK-1
     mult <- "%*%"
