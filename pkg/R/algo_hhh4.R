@@ -1552,7 +1552,10 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
     #dlpen.i <- -0.5* t(randomEffects) %*% dS.i %*% randomEffects
     # ~85% faster implementation using crossprod() avoiding "slow" t():
     dlpen.i <- -0.5 * crossprod(randomEffects, dS.i) %*% randomEffects
-    marg.score[i] <- d1logDet[i] + dlpen.i - 0.5*sum(diag(F.inv.RE %*% dS.i))
+    #tr.d1logDetF <- sum(diag(F.inv.RE %*% dS.i))
+    tr.d1logDetF <- sum(F.inv.RE * dS.i)   # since dS.i is symmetric
+    #<- needs 1/100 (!) of the computation time of sum(diag(F.inv.RE %*% dS.i))
+    marg.score[i] <- d1logDet[i] + dlpen.i - 0.5 * tr.d1logDetF
   }
   
   return(marg.score)
@@ -1651,10 +1654,12 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
       #d2lpen.i <- -0.5* t(randomEffects) %*% dSij %*% randomEffects
       # ~85% faster implementation using crossprod() avoiding "slow" t():
       d2lpen.i <- -0.5 * crossprod(randomEffects, dSij) %*% randomEffects
+
+      tr.d2logDetF <- sum(diag(-F.inv.RE %*% dS.j %*% F.inv.RE %*% dS.i +
+                               F.inv.RE %*% dSij))
       
-      marg.hesse[i,j] <- marg.hesse[j,i] <- d2logDet[i,j] + d2lpen.i -
-          0.5* sum(diag(-F.inv.RE %*% dS.j %*% F.inv.RE %*% dS.i +
-                        F.inv.RE %*% dSij))
+      marg.hesse[i,j] <- marg.hesse[j,i] <-
+          d2logDet[i,j] + d2lpen.i - 0.5 * tr.d2logDetF
     }
     
   }  
