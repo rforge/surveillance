@@ -14,30 +14,52 @@
 ##   27 Jun 2012 (SM): added checkUsage recipe (R package codetools)
 ##    9 Aug 2012 (SM): added --timings for R CMD check
 ##   27 Aug 2012 (SM): install from built .tar.gz (which includes vignettes)
+##   14 Sep 2012 (SM): automatic date in DESCRIPTION file
 ################################################################################
 
-## Define variable for R executable which enables the use of alternatives,
+## Define variable for R and sed script which enables the use of alternatives,
 ## e.g., 'make check R=R-devel'
 R = R
+sed = sed
 
 ## sysdata file
 SYSDATA := pkg/R/sysdata.rda
+DESCRIPTION := pkg/DESCRIPTION
 
 ## package version
-VERSION := $(strip $(shell grep "Version:" pkg/DESCRIPTION | cut -f 2 -d ":"))
+VERSION := $(strip $(shell grep "^Version:" ${DESCRIPTION} | cut -f 2 -d ":"))
+
+## svn revision number
+#REVISION := $(strip $(shell svnversion pkg))
+#<-CAVE: would look like 411M because of modified working copy
+#=> use svn:keywords Rev file property for revision and modify date on build
+#   such that the rev property will be updated too
+
+## Date field of DESCRIPTION file
+#DATE := $(shell date +%F)
+# DESCRIPTION (esp. the Rev property) would not be updated across multiple
+# revisions on the same day => use date _and_ time
+DATE := $(shell date --rfc-3339=seconds)
+# alternative: svn last changed date (date info would be lagged by one revision)
+#LASTCHANGEDDATE := $(shell svn info pkg | grep "^Last Changed Date:" | \
+#                     grep -E -o "[0-9]{4}-[0-9]{2}-[0-9]{2}")
+# alternative: most recent file modification date (but this includes unversioned
+# files and re-savings of files without actually changing their contents)
+#$(shell find . -printf "%TY-%Tm-%Td\n" | sort -nr | head -n 1)
 
 ## phony targets
-.PHONY: clean build check install manual
-
-
-
-build: clean ${SYSDATA}
-	$R CMD build --no-resave-data --compact-vignettes pkg 
-#--resave-data also compresses data/*.txt -> readData("k1",week53to52=TRUE) would no longer work
+.PHONY: clean build check install manual ${DESCRIPTION}
 
 clean:
 	cd pkg/src; rm -f *.o *.so *.dll symbols.rds
 	rm -f pkg/*/.Rhistory
+
+build: clean ${SYSDATA} ${DESCRIPTION}
+	$R CMD build --no-resave-data --compact-vignettes pkg
+
+## update date in DESCRIPTION file
+${DESCRIPTION}:
+	$(sed) -i "s/^\(Date:\)[^\r]*/\1 ${DATE}/" $@
 
 ## Save internal datasets from pkg/sysdata/ into pkg/R/sysdata.rda
 ${SYSDATA}: pkg/sysdata/sysdata.R
@@ -63,7 +85,3 @@ checkUsage: install
 
 manual:	
 	$R CMD Rd2pdf --batch --force --output=manual.pdf pkg
-
-# macsrc:
-# 	cd src ; gcc-4.0 -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -no-cpp-precomp -I/Library/Frameworks/R.framework/Resources/include -I/Library/Frameworks/R.framework/Resources/include/i386  -msse3  -D__NO_MATH_INLINES  -fPIC  -g -O2 -Wall -pedantic -c surveillance.c -o surveillance.o
-
