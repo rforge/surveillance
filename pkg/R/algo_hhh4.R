@@ -1655,8 +1655,12 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
       # ~85% faster implementation using crossprod() avoiding "slow" t():
       d2lpen.i <- -0.5 * crossprod(randomEffects, dSij) %*% randomEffects
 
-      tr.d2logDetF <- sum(diag(-F.inv.RE %*% dS.j %*% F.inv.RE %*% dS.i +
-                               F.inv.RE %*% dSij))
+      #tr.d2logDetF <- sum(diag(-F.inv.RE %*% dS.j %*% F.inv.RE %*% dS.i +
+      #                         F.inv.RE %*% dSij))
+      # speed-up: tr(F.inv.RE %*% dSij) simply equals sum(F.inv.RE * dSij)
+      # the trace of the 4 matrices product may be accelerated using "sparsity"
+      mpart <- F.inv.RE %*% dS.j %*% F.inv.RE %*% dS.i
+      tr.d2logDetF <- -sum(diag(mpart)) + sum(F.inv.RE * dSij)
       
       marg.hesse[i,j] <- marg.hesse[j,i] <-
           d2logDet[i,j] + d2lpen.i - 0.5 * tr.d2logDetF
