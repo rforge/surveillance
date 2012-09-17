@@ -154,7 +154,7 @@ hhh4 <- function(stsObj,
   if(convergence & verbose)
     cat("Algorithm converged \n")
   
-  margll <- marLogLik(Sigma, thetahat,model)
+  margll <- marLogLik(Sigma, thetahat, model)
   Sigma.trans <- getSigmai(head(Sigma,model$nVar),tail(Sigma,model$nCorr),model$nVar)
   
   if(control$keep.terms){
@@ -963,7 +963,7 @@ penScore <- function(theta, sd.corr, model){
   }
   #random effects
   randomEffects <- pars$random
-  dimBlock<- model$rankRE[model$rankRE>0]
+  dimBlock <- model$rankRE[model$rankRE>0]
   Sigma.inv <- getSigmaInv(sd, corr, model$nVar, dimBlock)
 
   ############################################################
@@ -971,16 +971,17 @@ penScore <- function(theta, sd.corr, model){
   # negbin model or poisson model
   if(model$nOverdisp > 0){
     psiPlusMu <- psi + meanTotal
+    psiYpsiMu <- (psi+Y) / psiPlusMu
     
     # helper function for derivatives: negbin
     derivHHH <- function(dmu){
-      (-psi/psiPlusMu +Y/meanTotal -Y/psiPlusMu)*dmu
+      (Y/meanTotal - psiYpsiMu) * dmu
     }
-      
+    
   } else {
     # helper function for derivatives: poisson
     derivHHH <- function(dmu){
-      Y *(dmu/meanTotal) - dmu
+      Y * (dmu/meanTotal) - dmu
     }
 
   }
@@ -1028,7 +1029,7 @@ penScore <- function(theta, sd.corr, model){
   
   # gradient for overdispersionParameter psi
   if(model$nOverdisp > 0){
-    dPsi <- psi*(digamma(Y+psi)-digamma(psi) +log(psi)+1 - log(psiPlusMu) -psi/psiPlusMu -Y/psiPlusMu)
+    dPsi <- psi*(digamma(Y+psi)-digamma(psi) +log(psi)+1 -log(psiPlusMu) -psiYpsiMu)
     
     # multiple psi_i's or single psi?
     if(model$nOverdisp > 1){
@@ -1113,19 +1114,23 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
   if (dimPsi > 0) { # negbin
     psiPlusY <- psi + Y
     psiPlusMu <- psi + meanTotal
-    psiPlusMu2 <- psiPlusMu^2    
+    psiPlusMu2 <- psiPlusMu^2
+    psiYpsiMu <- psiPlusY / psiPlusMu
+    psiYpsiMu2 <- psiPlusY / psiPlusMu2
+    deriv2HHH.fac1 <- psiYpsiMu2 - Y / (meanTotal^2)
+    deriv2HHH.fac2 <- Y / meanTotal - psiYpsiMu
     deriv2HHH <- function(dTheta_l,dTheta_k,dTheta_lk){
-        dTheta_l*dTheta_k*(psi/psiPlusMu2 - Y/(meanTotal^2) + Y/psiPlusMu2) +
-            dTheta_lk*(-psi/psiPlusMu +Y/meanTotal - Y/psiPlusMu)
+        dTheta_l*dTheta_k*deriv2HHH.fac1 + dTheta_lk*deriv2HHH.fac2
     }
+    dThetadPsi.fac <- psi * (psiYpsiMu2 - 1/psiPlusMu)
     dThetadPsi <- function(dTheta){
-        psi*(-dTheta/psiPlusMu + (psi + Y)*dTheta/psiPlusMu2)
+        dThetadPsi.fac * dTheta
     }
     dPsidPsi <- function(){
         dPsi <- psi * (digamma(psiPlusY)-digamma(psi) +log(psi)+1 -
-                       log(psiPlusMu) -psi/psiPlusMu -Y/psiPlusMu) 
-        psi * (trigamma(psiPlusY)*psi - trigamma(psi)*psi + 1 - psi/psiPlusMu -
-               psi*(meanTotal-Y)/psiPlusMu2) + dPsi
+                       log(psiPlusMu) - psiYpsiMu)
+        psi^2 * (trigamma(psiPlusY) - trigamma(psi) + 1/psi - 1/psiPlusMu -
+                 (meanTotal-Y)/psiPlusMu2) + dPsi
     }
   } else { # poisson
     deriv2HHH <- function(dTheta_l,dTheta_k,dTheta_lk){
@@ -1411,8 +1416,8 @@ getSigma <- function(sd, correlation, dimSigma, dimBlocks, Sigmai=NULL){
 }
 
 # approximate marginal likelihood for variance components
-marLogLik <- function(sd.corr, theta,  model, fisher.unpen=NULL){
-  
+marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL){
+
   dimVar <- model$nVar
   dimCorr <- model$nCorr
   dimSigma <- model$nSigma
@@ -1421,14 +1426,13 @@ marLogLik <- function(sd.corr, theta,  model, fisher.unpen=NULL){
     return(-Inf)
   }
   
-    sd <- head(sd.corr,dimVar)
-    corr <- tail(sd.corr,dimCorr)
+  sd <- head(sd.corr,dimVar)
+  corr <- tail(sd.corr,dimCorr)
   
   if(any(is.na(sd.corr))){
    cat("WARNING: NAs in variance components\n") 
     return(NA_real_)
   }
-  
   
   dimFE <- model$nFE
   dimOver <- model$nOverdisp
@@ -1437,29 +1441,17 @@ marLogLik <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   dimBlocks<- model$rankRE[model$rankRE>0]
   Sigma.inv <- getSigmaInv(sd, corr, dimVar, dimBlocks)
-  
-  
+
   # if not given, calculate unpenalized part of fisher info 
   if(is.null(fisher.unpen)){
     fisher.unpen <- attr(penFisher(theta, sd.corr, model,attributes=TRUE), "fisher")
   }
-  
   # add penalty to fisher
   fisher <- fisher.unpen 
   fisher[-(1:dimFE.O),-(1:dimFE.O)] <- fisher[-(1:dimFE.O),-(1:dimFE.O)] + Sigma.inv
   
-  F.inv <- try(solve(fisher),silent=TRUE)
-  
-  if(inherits(F.inv,"try-error")){
-    cat("\n WARNING: penalized Fisher is singular!\n")
-    return(NA_real_) 
-  }
-   
-  F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)] # FIXME: F.inv.RE is unused here
-  
   pars <- splitParams(theta,model)  
   randomEffects <- pars$random
-
   
   # penalized part of likelihood
   # compute -0.5*log(|Sigma|) - 0.5*RE' %*% Sigma.inv %*% RE
@@ -1490,8 +1482,8 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
     return(numeric(0L))
   }
   
-    sd <- head(sd.corr,dimVar)
-    corr <- tail(sd.corr,dimCorr)
+  sd <- head(sd.corr,dimVar)
+  corr <- tail(sd.corr,dimCorr)
   
   if(any(is.na(sd.corr))){
     cat("WARNING: NAs in variance components\n") 
@@ -1534,7 +1526,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   marg.score <- rep.int(NA_real_,dimSigma)
   
   ## specify functions for derivatives
-  deriv1 <- switch(dimVar,dSigma1, dSigma2, dSigma3)
+  deriv1 <- switch(dimVar, dSigma1, dSigma2, dSigma3)
   
   d1Sigma <- deriv1(sd, corr)
   Sigmai.inv <- getSigmaiInv(sd, corr, dimVar)
@@ -1725,7 +1717,8 @@ d2Sigma2 <- function(sd,corr, d1){
     
     
   if(length(corr)>0){
-    result$dcorr1[2,1,3] <- result$dcorr1[1,2,3] <- -(3*corr[1]*exp(sum(sd[1:2])))/(sqrtOf1pr2(corr[1])^5)
+    result$dcorr1[2,1,3] <- result$dcorr1[1,2,3] <-
+        -(3*corr[1]*exp(sum(sd[1:2])))/(sqrtOf1pr2(corr[1])^5)
   }
   
   return(result)
@@ -1781,7 +1774,7 @@ d2Sigma3 <- function(sd,corr, d1){
   result$dsd3[,,3]<- d1[,,3]
   result$dsd3[3,3,3] <- 2*d1[3,3,3]#
   
-  dSigma <- diag(4*exp(2*sd))
+  dSigma <- diag(4*exp(2*sd))           # FIXME: this is actually unused... Why?
   if(length(corr)>0){
     result$dsd1[2:3,2:3,4] <-  0
     result$dsd1[2:3,2:3,5] <-  0
@@ -1818,8 +1811,8 @@ d2Sigma3 <- function(sd,corr, d1){
 }
 
 
-updateRegression <- function(theta, sd.corr, model, control,
-                             verbose=0, method="nlminb"){
+updateRegression <- function(theta, sd.corr, model,
+                             control, verbose=0, method="nlminb"){
   
   if(any(is.na(sd.corr))){
     cat("WARNING: at least one variance estimates not a number\n")
@@ -1890,8 +1883,8 @@ updateRegression <- function(theta, sd.corr, model, control,
 }
 
 
-updateVariance <- function(sd.corr, theta, model, control,
-                           verbose=0, method="nlminb", ...)
+updateVariance <- function(sd.corr, theta, model, fisher.unpen,
+                           control, verbose=0, method="nlminb")
 {
   # only fixed effects => no variance 
   if(model$nSigma ==0){
@@ -1902,8 +1895,9 @@ updateVariance <- function(sd.corr, theta, model, control,
   # estimate variance components
   if(method == "nr"){
     # FIXME: shouldn't 'fn' for newtonRaphson() return score and fisher attributes?
-    res <- newtonRaphson(x=sd.corr, fn=marLogLik, theta=theta, model=model,
-                         control=control, verbose=control$verbose, ...)
+    res <- newtonRaphson(x=sd.corr, fn=marLogLik,
+                         theta=theta, model=model, fisher.unpen=fisher.unpen,
+                         control=control, verbose=control$verbose)
     sd.corr.new <- res$coefficients
     ll <- res$loglik
   } else if(method == "nlminb"){
@@ -1911,7 +1905,8 @@ updateVariance <- function(sd.corr, theta, model, control,
     gr <- function(sd.corr,...) { - marScore(sd.corr,...)}
     scale <- control[["scale"]]; control$scale <- NULL
     res <- nlminb(start=sd.corr, objective=ll, gradient=gr, hessian=marFisher,
-                  theta=theta, model=model, control=control, scale=scale, ...)
+                  theta=theta, model=model, fisher.unpen=fisher.unpen,
+                  control=control, scale=scale)
     sd.corr.new <- res$par
     ll <- -res$objective
   } else if(method == "nlm"){
@@ -1919,20 +1914,22 @@ updateVariance <- function(sd.corr, theta, model, control,
       ll <- - marLogLik(sd.corr,...)
       attr(ll,"gradient") <- - marScore(sd.corr,...)
       attr(ll,"hessian") <- marFisher(sd.corr,...)
-      return(ll)  
+      return(ll)
     }
-    res <- nlm(p=sd.corr, f=varianceParamsMin, theta=theta, model=model,
+    res <- nlm(p=sd.corr, f=varianceParamsMin,
+               theta=theta, model=model, fisher.unpen=fisher.unpen,
                hessian=TRUE, # FIXME: why request hessian if it won't be used?
-               print.level=control[["print.level"]], iterlim=control[["iterlim"]], ...)
+               print.level=control[["print.level"]], iterlim=control[["iterlim"]])
     sd.corr.new <- res$estimate
     ll <- -res$minimum
     # nlm returns convergence status in $code, 1-2 indicate convergence,
     # 3-5 indicate non-convergence
     res$convergence <- as.numeric(res$code >2)
   } else {
-    res <- optim(sd.corr, marLogLik, marScore, theta=theta, model=model,
-                 method=method, hessian=TRUE, # FIXME: why request hessian if it won't be used?
-                 control=control)
+    res <- optim(sd.corr, marLogLik, marScore,
+                 theta=theta, model=model, fisher.unpen=fisher.unpen,
+                 method=method, control=control,
+                 hessian=TRUE) # FIXME: why request hessian if it won't be used?
     sd.corr.new <- res$par  
     ll <- res$value
   }
@@ -2207,12 +2204,11 @@ addSeason2formula <- function(f=~1,       # formula to start with
   
   f <- deparse(f)
   # create formula
-  if(max(S)>0 & length(S)==1){
+  if(max(S)>0 && length(S)==1){
     for(i in 1:S){
       f <- paste(f,"+sin(",2*i,"*pi*t/",period,")+cos(",2*i,"*pi*t/",period,")",sep="")
     }
   } else {
-    nSeason <- length(S)
     for(i in 1:max(S)){
       which <- paste(i <= S,collapse=",")
       f <- paste(f,"+ fe( sin(",2*i,"*pi*t/",period,"), which=c(",which,")) + fe( cos(",2*i,"*pi*t/",period,"), which=c(",which,"))",sep="")
@@ -2224,7 +2220,7 @@ addSeason2formula <- function(f=~1,       # formula to start with
 
 oneStepAhead <- function(result, # result of call to hhh4
                          tp,     # one-step-ahead predictions for time points (tp+1):nrow(stsObj)
-                         verbose=TRUE,
+                         verbose=TRUE,  # FIXME: this is currently unused
                          keep.estimates = FALSE){
   
   stsObj <- result$stsObj
@@ -2245,21 +2241,19 @@ oneStepAhead <- function(result, # result of call to hhh4
   psi <- matrix(NA_real_,nrow=length(tp:nTime)-1,ncol=ifelse(dimOverdisp>1,ncol(stsObj),1))
     
   res <- resN <- result
-  coefs <- coef(res,reparamPsi=FALSE)
-  control.i<-control
   
   which <- 1
   search2 <- function(i,which){
-    control.i$subset <- 2:i
+    control$subset <- 2:i
     
     if(which==1){
       #starting values of previous time point i-1
-      control.i$start <- list(fixed=fixef(res.old),random=ranef(res.old),sd.corr=getSdCorr(res.old))
+      control$start <- list(fixed=fixef(res.old),random=ranef(res.old),sd.corr=getSdCorr(res.old))
     } else {
       #starting values of last time point
-      control.i$start <- list(fixed=fixef(resN),random=ranef(resN),sd.corr=getSdCorr(resN))
+      control$start <- list(fixed=fixef(resN),random=ranef(resN),sd.corr=getSdCorr(resN))
     }
-    res <- hhh4(stsObj,control.i)  
+    res <- hhh4(stsObj,control)  
 
     return(res)
   }
