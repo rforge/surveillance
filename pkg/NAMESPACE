@@ -46,6 +46,13 @@ importFrom(spc, xcusum.arl, xcusum.crit)   # for CUSUM control charts in junchoi
 importFrom(colorspace, heat_hcl)
 
 
+### hhh4-specific
+
+importClassesFrom(Matrix, ddiMatrix)
+importMethodsFrom(Matrix, coerce, diag, forceSymmetric, solve)
+## sparse matrix methods provide a significant speed-up in marFisher
+
+
 ### twinSIR-specific
 
 # for use in computing OSAIC weights by simulation

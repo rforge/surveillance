@@ -552,22 +552,21 @@ checkFormula <- function(f, env, component){
   }
   
   res <- cbind(res) # ensure res has matrix dimensions
-  intercept.fe <- sum(unlist(res["intercept",]))==1
-  if(sum(unlist(res["intercept",])) > 1) stop("There can only be one intercept in the formula ",deparse(substitute(f)),"\n")
+  if(sum(unlist(res["intercept",])) > 1) {
+    stop("There can only be one intercept in the formula ", deparse(substitute(f)))
+  }
   
   # random effects
   RI <- attr(term, "specials")$ri
-  
-  intercept.ri <- !is.null(RI)
+
   if(length(RI)>1){
-    stop("There can only be one random intercept in the formula ",deparse(substitute(f)),"\n")
+    stop("There can only be one random intercept in the formula ",deparse(substitute(f)))
   }
   if(!is.null(RI)){
     for(i in RI){
       res <- cbind(res,c(eval(vars[[i+1]], envir=env),list(offsetComp=component)))
     }      
   }
-  
   
   return(res)
 }
@@ -1052,7 +1051,7 @@ penScore <- function(theta, sd.corr, model){
   ##------------------------------------------------
   if(dimRE >0){
     # penalty of score function
-    s.pen <- Sigma.inv %*% randomEffects
+    s.pen <- c(Sigma.inv %*% randomEffects)
     # unpenalized score function for random effects
     grRandom <- gradients$re
     
@@ -1175,7 +1174,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
         hessian.FE.RE[idxFE==i,idxRE==j] <<- diag(dIJ)[ which.i, ]
         
       } else if(unitSpecific.j){
-        which.ij <- (which.i & which.j)
+        which.ij <- (which.i & which.j) # FIXME: this is actually unused...?
         dIJ <- diag(colSums(didj,na.rm=TRUE))[ which.i, which.j ] 
       } else {
         dIJ <- colSums(didj,na.rm=TRUE)[ which.i ]
@@ -1189,7 +1188,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
         Z.j <- term["Z.intercept",j][[1]]  
         "%mj%" <- get(term["mult",j][[1]])
         hessian.FE.RE[idxFE==i,idxRE==j] <<- colSums( didj %mj% Z.j)
-        
+
+        ## FIXME: use %m% or %mj% in what follows?
         if(length(Z.j)==1 & length(Z.i)==1){
           Z <- Z.i*Z.j
           hessian.RE.RE[which(idxRE==i),idxRE==j] <<- diag(colSums( didj %m% Z))
@@ -1305,8 +1305,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
     ## fill lower triangle of hessians and combine them
     ########################################################
     hessian <- rbind(cbind(hessian.FE.FE,hessian.FE.Psi,hessian.FE.RE),
-                    cbind(matrix(0,dimPsi,dimFE),hessian.Psi.RE),
-                    cbind(matrix(0,dimRE,dimFE+dimPsi),hessian.RE.RE))
+                     cbind(matrix(0,dimPsi,dimFE),hessian.Psi.RE),
+                     cbind(matrix(0,dimRE,dimFE+dimPsi),hessian.RE.RE))
           
     diagHessian <- diag(hessian)
     hessian[lower.tri(hessian)] <- 0    #* only use upper.tri?
@@ -1339,7 +1339,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE){
 }
 
 #################################################
-sqrtOf1pr2 <- function(r){ sqrt(1+r^2)}
+sqrtOf1pr2 <- function(r){ sqrt(1+r^2) }
 
 getSigmai <- function(sd,    # vector of length dim with stdev's
                       correlation, # vector of length dim with correlation parameters, =0 if un-correlated
@@ -1455,7 +1455,7 @@ marLogLik <- function(sd.corr, theta,  model, fisher.unpen=NULL){
     return(NA_real_) 
   }
    
-  F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]
+  F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)] # FIXME: F.inv.RE is unused here
   
   pars <- splitParams(theta,model)  
   randomEffects <- pars$random
@@ -1555,7 +1555,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
     #tr.d1logDetF <- sum(diag(F.inv.RE %*% dS.i))
     tr.d1logDetF <- sum(F.inv.RE * dS.i)   # since dS.i is symmetric
     #<- needs 1/100 (!) of the computation time of sum(diag(F.inv.RE %*% dS.i))
-    marg.score[i] <- d1logDet[i] + dlpen.i - 0.5 * tr.d1logDetF
+    marg.score[i] <- d1logDet[i] + c(dlpen.i) - 0.5 * tr.d1logDetF
   }
   
   return(marg.score)
@@ -1623,44 +1623,52 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
  
   # 2nd derivatives of log determinant
   d2logDet <- diag(c(rep.int(0,dimVar),-dimBlocks[1]*(corr^2-1)/(corr^2+1)^2),dimSigma)
+
+  # function to convert dS.i and dS.j matrices to sparse matrix objects
+  dS2sparse <- if (dimCorr > 0) function (x) {
+      Matrix::forceSymmetric(as(x, "sparseMatrix")) # dS.i & dS.j are symmetric
+  } else function (x) { #as(x, "diagonalMatrix")
+      new("ddiMatrix", Dim = dim(x), diag = "N", x = diag(x))
+  }
   
   # go through all variance components
   for(i in 1:dimSigma){
-	# compute first derivative of the penalized Fisher info (-> of Sigma^-1) 
+    # compute first derivative of the penalized Fisher info (-> of Sigma^-1) 
     # with respect to the i-th element of Sigma (= kronecker prod. of Sigmai and identity matrix)
-	# Harville Ch15, Eq. 8.15: (d/d i)S^-1 = - S^-1 * (d/d i) S * S^-1
+    # Harville Ch15, Eq. 8.15: (d/d i)S^-1 = - S^-1 * (d/d i) S * S^-1
     SigmaiInv.d1i <- Sigmai.inv %*% d1Sigma[,,i]
     dSi <- -SigmaiInv.d1i %*% Sigmai.inv
     dS.i <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,Sigmai=dSi)
+    dS.i <- dS2sparse(dS.i)
     
-	# compute second derivatives
+    # compute second derivatives
     for(j in i:dimSigma){
-	  # compute (d/d j) S^-1
+      # compute (d/d j) S^-1
       SigmaiInv.d1j <- Sigmai.inv %*% d1Sigma[,,j]
       dSj <- -SigmaiInv.d1j %*% Sigmai.inv
       dS.j <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,Sigmai=dSj)
-	  # compute (d/di dj) S^-1
+      dS.j <- dS2sparse(dS.j)
+      # compute (d/di dj) S^-1
       dS.ij <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,
                         Sigmai=d2Sigma[[i]][,,j])
       ##<- FIXME: dS.ij is currently nowhere used... Redundant?
       
-	  # compute second derivatives of Sigma^-1 (Harville Ch15, Eq 9.2)
+      # compute second derivatives of Sigma^-1 (Harville Ch15, Eq 9.2)
       d2S <- (- Sigmai.inv %*% d2Sigma[[i]][,,j] + 
                SigmaiInv.d1i %*% SigmaiInv.d1j +
                SigmaiInv.d1j %*% SigmaiInv.d1i) %*% Sigmai.inv 
-               
+      
       dSij <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,Sigmai=d2S)
 
       #d2lpen.i <- -0.5* t(randomEffects) %*% dSij %*% randomEffects
       # ~85% faster implementation using crossprod() avoiding "slow" t():
       d2lpen.i <- -0.5 * crossprod(randomEffects, dSij) %*% randomEffects
 
-      #tr.d2logDetF <- sum(diag(-F.inv.RE %*% dS.j %*% F.inv.RE %*% dS.i +
-      #                         F.inv.RE %*% dSij))
-      # speed-up: tr(F.inv.RE %*% dSij) simply equals sum(F.inv.RE * dSij)
-      # the trace of the 4 matrices product may be accelerated using "sparsity"
       mpart <- F.inv.RE %*% dS.j %*% F.inv.RE %*% dS.i
-      tr.d2logDetF <- -sum(diag(mpart)) + sum(F.inv.RE * dSij)
+      #tr.d2logDetF <- sum(diag(-mpart + F.inv.RE %*% dSij))
+      # speed-ups: - tr(F.inv.RE %*% dSij) simply equals sum(F.inv.RE * dSij)
+      #            - accelerate matrix product by sparse matrices dS.i and dS.j
+      tr.d2logDetF <- -sum(Matrix::diag(mpart)) + sum(F.inv.RE * dSij)
       
       marg.hesse[i,j] <- marg.hesse[j,i] <-
           d2logDet[i,j] + d2lpen.i - 0.5 * tr.d2logDetF
@@ -1668,7 +1676,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
     
   }  
   
- marg.Fisher <- as.matrix(-marg.hesse)
+  marg.Fisher <- as.matrix(-marg.hesse)
    
   return(marg.Fisher)
 }
