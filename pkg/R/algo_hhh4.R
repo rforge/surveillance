@@ -1598,6 +1598,9 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   }
    
   F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]
+  ## declare F.inv.RE as a symmetric matrix?
+  ##F.inv.RE <- new("dsyMatrix", Dim = dim(F.inv.RE), x = c(F.inv.RE))
+  ## -> no, F.inv.RE %*% dS.i becomes actually slower (dS.i is a "sparseMatrix")
   
   pars <- splitParams(theta,model)  
   randomEffects <- pars$random
@@ -1656,10 +1659,14 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
       # ~85% faster implementation using crossprod() avoiding "slow" t():
       d2lpen.i <- -0.5 * crossprod(randomEffects, dSij) %*% randomEffects
 
-      mpart <- F.inv.RE %*% dS.j %*% F.inv.RE %*% dS.i
-      #tr.d2logDetF <- sum(diag(-mpart + F.inv.RE %*% dSij))
-      # speed-ups: - tr(F.inv.RE %*% dSij) simply equals sum(F.inv.RE * dSij)
-      #            - accelerate matrix product by sparse matrices dS.i and dS.j
+      mpart1 <- dS.j %*% F.inv.RE  # 3 times as fast as the other way round
+      mpart2 <- dS.i %*% F.inv.RE
+      mpart <- mpart1 %*% mpart2
+      ## speed-ups: - tr(F.inv.RE %*% dSij) simply equals sum(F.inv.RE * dSij)
+      ##            - accelerate matrix product by sparse matrices dS.i and dS.j
+      ##            - use cyclic permutation of trace:
+      ##              tr(F.inv.RE %*% dS.j %*% F.inv.RE %*% dS.i) =
+      ##              tr(dS.j %*% F.inv.RE %*% dS.i %*% F.inv.RE)
       tr.d2logDetF <- -sum(Matrix::diag(mpart)) + sum(F.inv.RE * dSij)
       
       marg.hesse[i,j] <- marg.hesse[j,i] <-
@@ -1869,17 +1876,15 @@ updateRegression <- function(theta, sd.corr, model,
     ll <- res$value
   }
   
-  fisher.unpen <- attr(penFisher(theta.new,sd.corr=sd.corr,model=model,attributes=TRUE), "fisher")
-  ll.unpen <- sum(attr(penLogLik(theta.new,sd.corr=sd.corr,model=model,attributes=TRUE), "loglik"))
-  
   rel.tol <-  max(abs(theta.new - theta))/max(abs(theta))
   
   if(verbose>0){
-    cat("Update for regression parameters:  max|x_0 - x_1| / |x_0|= ", rel.tol,"",ifelse(res$convergence==0,"\n\n", "\nWARNING: algorithm did NOT converge\n\n"))
+    cat("Update for regression parameters:  max|x_0 - x_1| / |x_0|= ", rel.tol,
+        ifelse(res$convergence==0,"\n\n", "\nWARNING: algorithm did NOT converge\n\n"))
     print(res$message)
   }  
         
-  return(list(par=theta.new, ll=ll, fisher.unpen=fisher.unpen,ll.unpen=ll.unpen, rel.tol=rel.tol, convergence=res$convergence))
+  return(list(par=theta.new, ll=ll, rel.tol=rel.tol, convergence=res$convergence))
 }
 
 
@@ -1933,7 +1938,7 @@ updateVariance <- function(sd.corr, theta, model, fisher.unpen,
     sd.corr.new <- res$par  
     ll <- res$value
   }
-    
+  
   if(any(is.na(sd.corr.new))){
     cat("WARNING: at least one variance estimates not a number, no update of variance\n")
     sd.corr.new[is.na(sd.corr.new)] <- -.5
@@ -1993,26 +1998,28 @@ fitHHH <- function(theta, sd.corr, model,
     parReg <- updateRegression(theta=theta, sd.corr=sd.corr, model=model,
                                control=cntrl.update.reg, verbose=verbose,
                                method=method)
-    
-    if(parReg$convergence!=0 & verbose>0)
+    theta <- parReg$par
+    fisher.unpen <- attr(penFisher(theta, sd.corr, model, attributes=TRUE),
+                         "fisher")
+
+    if(parReg$convergence!=0 && verbose>0)
       cat("Update of regression coefficients in iteration ",i," failed\n")
     if(parReg$convergence >20 && shrinkage){
-      theta <- parReg$par
-     cat("\n\n***************************************\nshrinkage", 0.1*theta[abs(theta)>10],"\n")
+      cat("\n\n***************************************\nshrinkage",
+          0.1*theta[abs(theta)>10],"\n")
       theta[abs(theta)>10] <- 0.1*theta[abs(theta)>10]
-      diag(parReg$fisher.unpen) <- diag(parReg$fisher.unpen)+1e-2
-    } else theta <- parReg$par
+      diag(fisher.unpen) <- diag(fisher.unpen)+1e-2
+    }
     
     # update variance components
     parVar <- updateVariance(sd.corr=sd.corr, theta=theta, model=model,
-                             fisher.unpen=parReg$fisher.unpen,
+                             fisher.unpen=fisher.unpen,
                              control=cntrl.update.var, verbose=verbose,
                              method=method)
+    sd.corr <- parVar$par
     
     if(parVar$convergence!=0 & verbose>0)
       cat("Update of variance components in iteration ",i," failed\n")
-    #if(parVar$convergence==0)
-      sd.corr <- parVar$par
     
     # convergence ?
     if( (parReg$rel.tol < cntrl.stop$tol) && (parVar$rel.tol < cntrl.stop$tol)
