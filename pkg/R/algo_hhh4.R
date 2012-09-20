@@ -8,6 +8,11 @@
 # - formula formulation is experimental and not yet implemented in full generality 
 # - do some profiling...
 
+## FIXME: it is not intended that hhh4 be called without specifying the control
+## list. Thus, the default formal argument list is actually not used,
+## the defaults are set internally by setControl.
+## Proposition: define hhh4 just as function(stsObj, control)
+
 hhh4 <- function(stsObj, 
    control = list(
                ar = list(f = ~ -1,        # a formula " exp(x'lamba)*y_t-1 " (ToDo: or a matrix " Lambda %*% y_t-1 ")
@@ -26,9 +31,9 @@ hhh4 <- function(stsObj,
                           ),
                family = c("Poisson","NegBin1","NegBinM")[1],
                subset = 2:nrow(stsObj),             # typically 2:nrow(obs) if model contains autoregression
-               optimizer = list(tech = "nlminb",    # details for used optimizer (nlminb is default, optim may also be used)
-                                stop.tol = 1e-5,
-                                stop.niter = 100),
+               optimizer = list(stop = list(tol=1e-5, niter=100), # control arguments for optimizers
+                                regression = list(method="nlminb"),
+                                variance = list(method="nlminb")),
                verbose = FALSE,
                start=list(fixed=NULL,random=NULL,sd.corr=NULL), # list with initials, overrides any initial values in formulas
                data=data.frame(t=epoch(stsObj)-1),    # data.frame or named list with covariates that are specified in the formulas for the 3 components
@@ -71,12 +76,11 @@ hhh4 <- function(stsObj,
     stop("invalid initial values\n")
 
   ## maximize loglikelihood 
-  cntrl.update <- list()   #* atm these control arguments are not adjusteable by the user
-  cntrl.stop <- list(tol   = control$optimizer$stop.tol,
-                     niter = control$optimizer$stop.niter)
   myoptim <- fitHHH(theta=theta.start,sd.corr=Sigma.start, model=model,
-                    cntrl.stop=cntrl.stop, cntrl.update=cntrl.update,
-                    verbose=verbose, method=control$optimizer$tech)
+                    cntrl.stop       = control$optimizer$stop,
+                    cntrl.regression = control$optimizer$regression,
+                    cntrl.variance   = control$optimizer$variance,
+                    verbose=verbose)
                  
                  
   if(myoptim$convergence==0){
@@ -303,7 +307,9 @@ setControl <- function(control, stsObj){
   
   if(is.null(control[["optimizer"]])) control$optimizer <- list()
   control$optimizer <- modifyList(
-                       list(tech="nlminb", stop.tol=1e-5, stop.niter=100),
+                       list(stop       = list(tol=1e-5, niter=100),
+                            regression = list(method="nlminb"),
+                            variance   = list(method="nlminb")),
                        control[["optimizer"]])
 
   if(is.null(control[["verbose",exact=TRUE]]))
@@ -1512,7 +1518,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   F.inv <- try(solve(fisher),silent=TRUE)
   
   if(inherits(F.inv,"try-error")){
-    cat("\n WARNING: penalized Fisher is singular!\n")
+    cat("\n WARNING (in marScore): penalized Fisher is singular!\n")
     return(rep.int(NA_real_,dimSigma))
   }
    
@@ -1593,7 +1599,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   F.inv <- try(solve(fisher),silent=TRUE)
   
   if(inherits(F.inv,"try-error")){
-    cat("\n WARNING: penalized Fisher is singular!\n")
+    cat("\n WARNING (in marFisher): penalized Fisher is singular!\n")
     return(matrix(NA_real_,dimSigma,dimSigma))   
   }
    
@@ -1861,7 +1867,6 @@ updateRegression <- function(theta, sd.corr, model,
       return(ll)  
     }
     res <- nlm(p=theta, f=regressionParamsMin, sd.corr=sd.corr, model=model,
-               hessian=TRUE, # FIXME: why request hessian if it won't be used?
                print.level=control[["print.level"]], iterlim=control[["iterlim"]])
     theta.new <- res$estimate
     ll <- - res$minimum
@@ -1870,8 +1875,7 @@ updateRegression <- function(theta, sd.corr, model,
     res$convergence <- as.numeric(res$code >2)
   } else {
     res <- optim(theta, penLogLik, penScore, sd.corr=sd.corr, model=model,
-                 method=method, hessian=TRUE, # FIXME: why request hessian if it won't be used?
-                 control=control)
+                 method=method, control=control)
     theta.new <- res$par
     ll <- res$value
   }
@@ -1923,7 +1927,6 @@ updateVariance <- function(sd.corr, theta, model, fisher.unpen,
     }
     res <- nlm(p=sd.corr, f=varianceParamsMin,
                theta=theta, model=model, fisher.unpen=fisher.unpen,
-               hessian=TRUE, # FIXME: why request hessian if it won't be used?
                print.level=control[["print.level"]], iterlim=control[["iterlim"]])
     sd.corr.new <- res$estimate
     ll <- -res$minimum
@@ -1933,8 +1936,7 @@ updateVariance <- function(sd.corr, theta, model, fisher.unpen,
   } else {
     res <- optim(sd.corr, marLogLik, marScore,
                  theta=theta, model=model, fisher.unpen=fisher.unpen,
-                 method=method, control=control,
-                 hessian=TRUE) # FIXME: why request hessian if it won't be used?
+                 method=method, control=control)
     sd.corr.new <- res$par  
     ll <- res$value
   }
@@ -1956,10 +1958,39 @@ updateVariance <- function(sd.corr, theta, model, fisher.unpen,
 }
 
 
+## default control arguments for updates
+defaultOptimControl <- function (reg.method = "nlminb",
+                                 var.method = "nlminb",
+                                 reg.lowerBound = -Inf, verbose = 0,
+                                 var.lowerBound=-5, var.upperBound=5)
+{
+    defaults.nr <- list(scoreTol=1e-5, paramTol=1e-7, F.inc=0.01, stepFrac=0.5,
+                        niter=20, verbose=verbose)
+    defaults.nlminb <- list(iter.max=20, scale=1, trace=if(verbose %in% 0:2)
+                            c(0,0,5)[verbose+1] else 1)
+    defaults.nlminb.reg <- list(lower=reg.lowerBound)
+    defaults.nlm <- list(iterlim=100, print.level=if(verbose %in% 0:2)
+                         c(0,0,1)[verbose+1] else 2)
+    defaults.optim <- list(fnscale=-1, trace=max(0,verbose-1))
+    defaults.optim.reg <- list(lower=if (reg.method=="L-BFGS-B")
+        reg.lowerBound else -Inf)
+    defaults.optim.var <- if (var.method=="Brent") # if length(sd.corr)==1
+        list(lower=var.lowerBound, upper=var.upperBound) else list()
+    regression <- switch(reg.method, "nr" = defaults.nr, "nlm" = defaults.nlm,
+                         "nlminb" = c(defaults.nlminb, defaults.nlminb.reg),
+                         c(defaults.optim, defaults.optim.reg))
+    variance <- switch(var.method, "nr" = defaults.nr, "nlm" = defaults.nlm,
+                       "nlminb" = defaults.nlminb,
+                       c(defaults.optim, defaults.optim.var))
+    list(regression = regression, variance = variance)
+}
+
 
 fitHHH <- function(theta, sd.corr, model,
-                   cntrl.stop=list(tol=1e-5, niter=100), cntrl.update=list(),
-                   verbose=0, shrinkage=FALSE, method="nlminb"){
+                   cntrl.stop=list(tol=1e-5, niter=100),
+                   cntrl.regression=list(method="nlminb"),
+                   cntrl.variance=list(method="nlminb"),
+                   verbose=0, shrinkage=FALSE){
   
   convergence <- 99
   i <- 0
@@ -1972,32 +2003,30 @@ fitHHH <- function(theta, sd.corr, model,
   indexAR <- c(grep("ar.ri",model$namesFE), grep("ar.1",model$namesFE),
                grep("ne.ri",model$namesFE), grep("ne.1",model$namesFE))
   lowerBound[indexAR] <- -20
+
+  # control arguments
+  reg.method <- cntrl.regression$method; cntrl.regression$method <- NULL
+  var.method <- cntrl.variance$method; cntrl.variance$method <- NULL
+  if (length(sd.corr) == 1L && var.method == "Nelder-Mead")
+      var.method <- "Brent"
+  defaults <- defaultOptimControl(reg.method=reg.method, var.method=var.method,
+                                  reg.lowerBound=lowerBound, verbose=verbose)
+  cntrl.update.reg <- modifyList(defaults$regression, cntrl.regression)
+  cntrl.update.var <- modifyList(defaults$variance, cntrl.variance)
+  if (!is.null(cntrl.update.reg$fnscale) && cntrl.update.reg$fnscale > 0) {
+      cntrl.update.reg$fnscale <- -cntrl.update.reg$fnscale
+  }
+  if (!is.null(cntrl.update.var$fnscale) && cntrl.update.var$fnscale > 0) {
+      cntrl.update.var$fnscale <- -cntrl.update.var$fnscale
+  }
   
-  # default control arguments for updates
-  cntrl.update.default <- list(reg=list(), var=list())
-  cntrl.update.default <- modifyList(cntrl.update.default, switch(method,
-      "nr" = list(scoreTol=1e-5, paramTol=1e-7, F.inc=0.01, stepFrac=0.5,
-                  niter=20, verbose=verbose),
-      "nlminb" = list(iter.max=20, scale=1,
-                      trace=if(verbose %in% 0:2) switch(verbose+1,0,0,5) else 1,
-                      reg=list(abs.tol=1e-20, rel.tol=1e-10, x.tol=1.5e-8,
-                               lower=lowerBound)),
-      "nlm" = list(iterlim=100,
-                   print.level=if(verbose %in% 0:2) switch(verbose+1,0,0,1) else 2),
-      list(fnscale=-1, maxit=1000, trace=verbose)   # for the optim methods
-  ))
-  # arguments specific to updateRegression() or updateVariance() may be passed
-  # in the "reg" and "var" lists and will override common arguments
-  cntrl.update <- modifyList(cntrl.update.default, cntrl.update)
-  cntrl.update.reg <- modifyList(cntrl.update[-(1:2)], cntrl.update$reg)
-  cntrl.update.var <- modifyList(cntrl.update[-(1:2)], cntrl.update$var)
   
   while(convergence != 0 && (i < cntrl.stop$niter)){
     i <- i+1
     # update regression coefficients
     parReg <- updateRegression(theta=theta, sd.corr=sd.corr, model=model,
                                control=cntrl.update.reg, verbose=verbose,
-                               method=method)
+                               method=reg.method)
     theta <- parReg$par
     fisher.unpen <- attr(penFisher(theta, sd.corr, model, attributes=TRUE),
                          "fisher")
@@ -2015,7 +2044,7 @@ fitHHH <- function(theta, sd.corr, model,
     parVar <- updateVariance(sd.corr=sd.corr, theta=theta, model=model,
                              fisher.unpen=fisher.unpen,
                              control=cntrl.update.var, verbose=verbose,
-                             method=method)
+                             method=var.method)
     sd.corr <- parVar$par
     
     if(parVar$convergence!=0 & verbose>0)
@@ -2029,7 +2058,8 @@ fitHHH <- function(theta, sd.corr, model,
   
   ll <- penLogLik(theta=theta,sd.corr=sd.corr,model=model)
   fisher <- penFisher(theta=theta,sd.corr=sd.corr,model=model)
-  fisher.var <- marFisher(sd.corr=sd.corr,theta=theta,model=model)
+  fisher.var <- marFisher(sd.corr=sd.corr,theta=theta,model=model,
+                          fisher.unpen=fisher.unpen)
   
   return(list(fixef=head(theta,dimFE),ranef=tail(theta,dimRE),sd.corr=sd.corr,
               loglik=ll, fisher=fisher, fisherVar=fisher.var,
