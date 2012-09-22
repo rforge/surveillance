@@ -1,4 +1,5 @@
 % hhh4
+\encoding{latin1}
 \name{hhh4}
 \alias{hhh4}
 % functions without documentation atm
@@ -7,8 +8,8 @@
 \alias{permutationTest}
 \alias{pit}
 
-\encoding{latin1}
 \title{Random effects HHH model fit as described in Paul and Held (2011)} 
+
 \description{
   Fits a Poisson or negative binomial model with conditional mean
   \deqn{\mu_{it} = \lambda_{it} y_{i,t-1} + 
@@ -32,6 +33,7 @@
   and \eqn{e_{it}}{e_it} is a (multiplicative) offset.
   The linear predictors may contain random effects. 
 }
+
 \usage{
 hhh4(stsObj, 
      control = list(
@@ -50,10 +52,10 @@ hhh4(stsObj,
                           initial = NULL   
                           ),
                family = c("Poisson","NegBin1","NegBinM")[1],
-               subset = 2:nrow(stsObj),             
-               optimizer = list(tech = "nlminb",    
-                                stop.tol = 1e-5,
-                                stop.niter = 100),
+               subset = 2:nrow(stsObj),
+               optimizer = list(stop = list(tol=1e-5, niter=100),
+                                regression = list(method="nlminb"),
+                                variance = list(method="nlminb")),
                verbose = FALSE,
                start = list(fixed=NULL, random=NULL, sd.corr=NULL),
                data = data.frame(t = epoch(stsObj)-1),
@@ -61,6 +63,7 @@ hhh4(stsObj,
                )
    )
 }
+
 \arguments{
   \item{stsObj}{object of class \code{"\linkS4class{sts}"} containing the multivariate
     count data time series}
@@ -108,8 +111,16 @@ hhh4(stsObj,
       }
       \item{\code{subset}}{Typically \code{2:nrow(obs)} if model contains
 	autoregression}
-      \item{\code{optimizer}}{ Details for used optimizer (\code{nlminb} is 
-        default, the methods specified in the \code{method} argument of \code{\link{optim}} may also be used)}
+      \item{\code{optimizer}}{Stop criteria for the outer
+	optimization of regression and variance parameters as well as
+	control arguments for the single optimizers. \code{nlminb} is
+	the default engine (taking advantage of the implemented
+	analytical score vector and Fisher information matrix), however,
+	the methods specified in the \code{method} argument of
+	\code{\link{optim}} may also be used. Especially for the
+	variance updates, Nelder-Mead is also attractive. Control
+	arguments for the optimizer may be passed as part of the
+	\code{"regression"} or \code{"variance"} lists.} 
       \item{\code{verbose}}{Logical if additional information is to be printed
 	during the computations}
       \item{\code{start}}{List with initials, overrides any initial
@@ -221,7 +232,9 @@ f.end <- addSeason2formula(f = ~ -1 + ri(type="iid", corr="all") +
                                I((t-208)/100), S=3, period=52)
 
 ## details for optimizer
-opt <- list(tech = "nlminb", stop.tol = 1e-5, stop.niter = 200)
+opt <- list(stop = list(tol=1e-5, niter=200),
+            regression = list(method="nlminb"),
+            variance = list(method="nlminb"))
 
 ##########################
 ## models 

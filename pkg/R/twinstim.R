@@ -1,10 +1,11 @@
 ################################################################################
 ### Function 'twinstim' performs maximum likelihood inference
-### for the additive-multiplicative spatio-temporal intensity model.
-### It uses 'nlminb' as the default optimizer (Newton-algorithm).
+### for the additive-multiplicative spatio-temporal intensity model
+### described in Meyer et al (2012).
 ###
 ### Author: Sebastian Meyer
-### $Date$
+### $Rev$
+### $Date: 2012-08-30 14:34:39 +0200 (Don, 30 Aug 2012) $
 ################################################################################
 
 
