@@ -96,9 +96,6 @@ hhh4 <- function(stsObj,
   cov <- try(solve(fisher), silent=TRUE) # approximation to inverted fisher info
 
   ## check various types of non-convergence
-  if(loglik==0){                        # FIXME: Why is this a problem?
-    convergence <- FALSE
-  }
   if(inherits(cov, "try-error")){ # fisher info is singular
     cat("Fisher info singular!\n")
     convergence <- FALSE
@@ -219,12 +216,11 @@ setControl <- function(control, stsObj){
       stop("\'ne$f\' must be a formula\n")
     } 
     if(is.null(control$ne[["lag", exact = TRUE]])) control$ne$lag <- 1
-    if(is.null(control$ne[["weights", exact = TRUE]])){
-      control$ne$weights <- NULL
-    } else if(!is.matrix(control$ne$weights)){
-      stop("\'ne$weights\' must be a square matrix of size ",nUnits,"\n")        
-    } else if(any(dim(control$ne$weights) != nUnits)){ # FIXME: what about W_t?
-      stop("\'ne$weights\' must be a square matrix of size ",nUnits,"\n")    
+    if(!is.null(control$ne[["weights", exact = TRUE]])){
+        if(!is.matrix(control$ne$weights) ||
+           any(dim(control$ne$weights) != nUnits)){ # TODO: what about W_t?
+            stop("\'ne$weights\' must be a square matrix of size ",nUnits,"\n")
+        }
     }
     if(is.null(control$ne[["initial", exact = TRUE]])) control$ne$initial <- NULL 
     
@@ -239,9 +235,10 @@ setControl <- function(control, stsObj){
     
     # if no weight is specified, the nhood-matrix of the stsObj is used
     if(is.null(control$ne$weights)){
-      w <- neighbourhood(stsObj)
-      diag(w) <- 0                      # FIXME: this should always be asserted
-      control$ne$weights <- w
+      control$ne$weights <- neighbourhood(stsObj)
+      diag(control$ne$weights) <- 0
+    } else if(any(!diag(control$ne$weights) %in% 0)){
+        stop("'diag(ne$weights)' must only contain zeroes")
     }
   }
   
@@ -1151,7 +1148,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
     hessian.RE.RE <- matrix(0,dimRE,dimRE)
     
     hessian.FE.Psi <- matrix(0,dimFE, dimPsi)
-    hessian.Psi.RE <- matrix(0,dimPsi, dimRE+dimPsi)
+    hessian.Psi.RE <- matrix(0,dimPsi, dimPsi+dimRE)
 
     if (dimPsi > 0) { # d l(theta,x) /dpsi dpsi
         hessian.Psi.RE[,seq_len(dimPsi)] <- if (dimPsi == 1) {
@@ -1164,10 +1161,9 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
       if(random.j){
         Z.j <- term["Z.intercept",j][[1]]  
         "%m%" <- get(term["mult",j][[1]])
-        dIJ <- colSums(didj %m% Z.j)      # didj must not contain NA's (all NA's set to 0)
-        hessian.FE.RE[idxFE==i,idxRE==j] <<- dIJ
-        dIJ <-sum(dIJ)
-        
+        hessian.FE.RE[idxFE==i,idxRE==j] <<- colSums(didj %m% Z.j)
+        ##<- didj must not contain NA's (all NA's set to 0)
+        dIJ <- sum(didj,na.rm=TRUE)     # fixed on 24/09/2012
       } else if(unitSpecific.j){
         dIJ <- colSums(didj,na.rm=TRUE)[ which.j ]
       } else {
@@ -1199,7 +1195,6 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         "%mj%" <- get(term["mult",j][[1]])
         hessian.FE.RE[idxFE==i,idxRE==j] <<- colSums( didj %mj% Z.j)
 
-        ## FIXME: use %m% or %mj% in what follows?
         if(length(Z.j)==1 & length(Z.i)==1){
           Z <- Z.i*Z.j
           hessian.RE.RE[which(idxRE==i),idxRE==j] <<- diag(colSums( didj %m% Z))
@@ -1258,8 +1253,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
           dPsi<- dThetadPsi(m.Xit)
           dPsi[isNA] <- 0
           hessian.FE.Psi[idxFE==i,]<- colSums( dPsi)
-          hessian.Psi.RE[,c(FALSE,idxRE==i)] <- diag(colSums( dPsi%m%Z.i))
-          ##<- FIXME:   [,c(rep.int(FALSE, dimPsi),idxRE==i)] ???
+          hessian.Psi.RE[,c(rep.int(FALSE, dimPsi),idxRE==i)] <- diag(colSums( dPsi%m%Z.i))
         }
         
       } else if(unitSpecific.i){
@@ -1647,9 +1641,8 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
       dS.j <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,Sigmai=dSj)
       dS.j <- dS2sparse(dS.j)
       # compute (d/di dj) S^-1
-      dS.ij <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,
-                        Sigmai=d2Sigma[[i]][,,j])
-      ##<- FIXME: dS.ij is currently nowhere used... Redundant?
+      #dS.ij <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,
+      #                  Sigmai=d2Sigma[[i]][,,j])
       
       # compute second derivatives of Sigma^-1 (Harville Ch15, Eq 9.2)
       d2S <- (- Sigmai.inv %*% d2Sigma[[i]][,,j] + 
@@ -1784,7 +1777,6 @@ d2Sigma3 <- function(sd,corr, d1){
   result$dsd3[,,3]<- d1[,,3]
   result$dsd3[3,3,3] <- 2*d1[3,3,3]#
   
-  dSigma <- diag(4*exp(2*sd))           # FIXME: this is actually unused... Why?
   if(length(corr)>0){
     result$dsd1[2:3,2:3,4] <-  0
     result$dsd1[2:3,2:3,5] <-  0

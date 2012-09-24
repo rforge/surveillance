@@ -71,6 +71,7 @@ init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0
 
     if (is.null(neighbourhood))
       neighbourhood <- matrix(NA,nrow=ncol(observed),ncol=ncol(observed))
+      #diag(neighbourhood) <- 0   # shouldn't we always define the diag as 0?
     if (is.null(alarm)) 
       alarm      <- matrix(NA,nrow=dim(observed)[1],ncol=dim(observed)[2])
     if (is.null(upperbound))
@@ -203,7 +204,7 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
     #There is no clever way to aggregate the upperbounds
     x@upperbound <- matrix(NA,ncol=ncol(x@alarm),nrow=nrow(x@alarm))
     x@populationFrac <- as.matrix(apply(x@populationFrac, MARGIN=1, sum))#>0
-    x@neighbourhood <- matrix(1,nrow=1,ncol=1)
+    x@neighbourhood <- matrix(1,nrow=1,ncol=1) # wouldn't 0 be more appropriate?
   }
 
   #validObject(x) #just a check
