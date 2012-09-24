@@ -48,6 +48,7 @@ importFrom(colorspace, heat_hcl)
 
 ### hhh4-specific
 
+importFrom(MASS, ginv)
 importClassesFrom(Matrix, ddiMatrix)
 importMethodsFrom(Matrix, coerce, diag, forceSymmetric, solve)
 ## sparse matrix methods provide a significant speed-up in marFisher

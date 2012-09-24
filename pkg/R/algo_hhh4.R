@@ -12,6 +12,9 @@
 # - formula formulation is experimental and not yet implemented in full generality 
 # - do some profiling...
 
+## Error message issued in loglik, score and fisher functions upon NA parameters
+ADVICEONERROR <- "\n  Try different starting values or another optimizer.\n"
+
 ## FIXME: it is not intended that hhh4 be called without specifying the control
 ## list. Thus, the default formal argument list is actually not used,
 ## the defaults are set internally by setControl.
@@ -110,7 +113,7 @@ hhh4 <- function(stsObj,
       thetastring <- paste(round(thetahat,2), collapse=", ")
       thetastring <- strwrap(thetastring, exdent=10, prefix="\n", initial="")
       cat("theta = (", thetastring, ")\n")
-      cat('WARNING: Results are not reliable! Try different starting values.\n')
+      cat("WARNING: Results are not reliable!", ADVICEONERROR)
       res <- myoptim
       res$convergence <- convergence
       res$call <- match.call()
@@ -866,8 +869,8 @@ meanHHH <- function(theta, model){
 }
 
 ############################################
-penLogLik <- function(theta, sd.corr, model, attributes=FALSE){
-
+penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
+{
   # unpack 
   Y <- model$response[model$subset,,drop=FALSE]
   ddistr <- model$family
@@ -925,11 +928,9 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE){
 }
 
 
-penScore <- function(theta, sd.corr, model){
-  
-  if(any(!is.finite(theta))){           # finite means not +-Inf and not missing
-    return(rep.int(NA_real_,length(theta)))
-  }
+penScore <- function(theta, sd.corr, model)
+{
+  if(any(is.na(theta))) stop("NAs in regression parameters.", ADVICEONERROR)
   
   # unpack 
   subset <- model$subset
@@ -1068,11 +1069,13 @@ penScore <- function(theta, sd.corr, model){
   res <- c(gradients$fe, grPsi ,grRandom)
   
   return(res)
-
 }
 
-penFisher <- function(theta, sd.corr, model, attributes=FALSE){
-   
+
+penFisher <- function(theta, sd.corr, model, attributes=FALSE)
+{
+  if(any(is.na(theta))) stop("NAs in regression parameters.", ADVICEONERROR)
+  
   # unpack 
   subset <- model$subset
   Y <- model$response[subset,,drop=FALSE]
@@ -1428,15 +1431,16 @@ marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL){
     return(-Inf)
   }
   
+  if(any(is.na(sd.corr))){
+    # in order to avoid nlminb from running into an infinite loop (cf. bug
+    # report #15052), we have to emergency stop() in this case.
+    # As of R 2.16.0, nlminb() will throw an error if it receives NA from
+    # any of the supplied functions.
+    stop("NAs in variance parameters.", ADVICEONERROR)
+  }
+
   sd <- head(sd.corr,dimVar)
   corr <- tail(sd.corr,dimCorr)
-  
-  if(any(is.na(sd.corr))){
-    cat("WARNING (in marLogLik): NAs in variance parameters\n")
-    # FIXME: in order to avoid nlminb from hanging (cf. bug report #15052), we
-    # should just do an emergency stop() in this case
-    return(NA_real_)
-  }
   
   dimFE <- model$nFE
   dimOver <- model$nOverdisp
@@ -1477,7 +1481,7 @@ marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL){
 
 
 marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
-  
+
   dimVar <- model$nVar
   dimCorr <- model$nCorr
   dimSigma <- model$nSigma
@@ -1485,15 +1489,11 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   if(dimSigma == 0){
     return(numeric(0L))
   }
+
+  if(any(is.na(sd.corr))) stop("NAs in variance parameters.", ADVICEONERROR)
   
   sd <- head(sd.corr,dimVar)
   corr <- tail(sd.corr,dimCorr)
-  
-  if(any(is.na(sd.corr))){
-    cat("WARNING (in marScore): NAs in variance parameters\n") 
-    return(rep.int(NA_real_,dimSigma))
-  }
-  
   
   dimFE <- model$nFE
   dimOver <- model$nOverdisp
@@ -1517,7 +1517,8 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING (in marScore): penalized Fisher is singular!\n")
-    return(rep.int(NA_real_,dimSigma))
+    F.inv <- MASS::ginv(fisher)
+    #return(rep.int(0,dimSigma))
   }
    
   F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]
@@ -1557,6 +1558,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   return(marg.score)
 }
 
+
 marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   dimVar <- model$nVar
@@ -1566,15 +1568,11 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   if(dimSigma == 0){
     return(matrix(NA_real_,dimSigma,dimSigma))   
   }
+
+  if(any(is.na(sd.corr))) stop("NAs in variance parameters.", ADVICEONERROR)
   
-    sd <- head(sd.corr,dimVar)
-    corr <- tail(sd.corr,dimCorr)
-  
-  if(any(is.na(sd.corr))){
-    cat("WARNING (in marFisher): NAs in variance parameters\n") 
-    return(matrix(NA_real_,dimSigma,dimSigma))   
-  }
-  
+  sd <- head(sd.corr,dimVar)
+  corr <- tail(sd.corr,dimCorr)
   
   dimFE <- model$nFE
   dimOver <- model$nOverdisp
@@ -1598,7 +1596,8 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING (in marFisher): penalized Fisher is singular!\n")
-    return(matrix(NA_real_,dimSigma,dimSigma))   
+    F.inv <- MASS::ginv(fisher)
+    #return(matrix(Inf,dimSigma,dimSigma))
   }
    
   F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]
@@ -1905,9 +1904,10 @@ updateVariance <- function(sd.corr, theta, model, fisher.unpen,
     sd.corr.new <- res$par
     ll <- -res$objective
     if(any(is.na(sd.corr.new))) {
-        ## in some cases nlminb continues being stucked at the NA parameters
-        ## until the iteration limit is reached (returning NA $par/$objective).
-        ## in others, nlminb hangs with 100% CPU load even ignoring the BREAK signal
+        ## Before R 2.16.0, in some cases nlminb continues being stucked at the
+        ## NA parameters until the iteration limit is reached (then returning).
+        ## In others, nlminb is in an infinite loop in the FORTRAN code even
+        ## ignoring the BREAK signal.
         if (res$convergence == 0) res$convergence <- 99
     }
   } else if(method == "nr"){
@@ -2059,7 +2059,7 @@ fitHHH <- function(theta, sd.corr, model,
       cat("Update of variance parameters in iteration ", i, " unreliable\n")
     }
 
-    if(any(is.na(parVar$par))){
+    if(any(is.na(parVar$par))){         # this might occur when using nlminb
       var.method <- if (length(sd.corr) == 1L) "Brent" else "Nelder-Mead"
       cat("WARNING: at least one updated variance parameter is not a number\n",
           "\t-> NO UPDATE of variance\n",
