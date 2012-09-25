@@ -1865,9 +1865,10 @@ updateRegression <- function(theta, sd.corr, model, control, method="nlminb")
     theta.new <- res$par
     ll <- res$value
   }
-  
+
   rel.tol <- max(abs(theta.new - theta)) / max(abs(theta))
-  ##<- FIXME: shouldn't the max() be overall?
+  # The above is a weaker criterion than the maximum relative parameter change:
+  #rel.tol <- max(abs(theta.new/theta - 1))
   
   return(list(par=theta.new, ll=ll, rel.tol=rel.tol,
               convergence=res$convergence, message=res$message))
@@ -1877,13 +1878,13 @@ updateRegression <- function(theta, sd.corr, model, control, method="nlminb")
 updateVariance <- function(sd.corr, theta, model, fisher.unpen,
                            control, method="nlminb")
 {
-  lower <- control[["lower"]]; control$lower <- NULL
-  upper <- control[["upper"]]; control$upper <- NULL
-
   # only fixed effects => no variance 
   if(model$nSigma==0){
     return(list(par=sd.corr,ll=NA_real_,rel.tol=0,convergence=0))
   }
+
+  lower <- control[["lower"]]; control$lower <- NULL
+  upper <- control[["upper"]]; control$upper <- NULL
   
   # estimate variance parameters (sd.corr)
   if(method == "nlminb"){
@@ -1936,9 +1937,10 @@ updateVariance <- function(sd.corr, theta, model, fisher.unpen,
     sd.corr.new <- res$par  
     ll <- res$value
   }
-  
+
   rel.tol <- max(abs(sd.corr.new - sd.corr)) / max(abs(sd.corr)) 
-  ##<- FIXME: shouldn't the max() be overall?
+  # The above is a weaker criterion than the maximum relative parameter change:
+  #rel.tol <- max(abs(sd.corr.new/sd.corr - 1))
   
   return(list(par=sd.corr.new, ll=ll, rel.tol=rel.tol,
               convergence=res$convergence, message=res$message))
@@ -2022,7 +2024,7 @@ fitHHH <- function(theta, sd.corr, model,
                          "fisher")
 
     if(verbose>0)
-      cat("Update of regression parameters:  max|x_0 - x_1| / |x_0| =",
+      cat("Update of regression parameters:  max|x_0 - x_1| / max|x_0| =",
           parReg$rel.tol, "\n")
     
     if(parReg$convergence!=0) {
@@ -2043,7 +2045,7 @@ fitHHH <- function(theta, sd.corr, model,
                              control=cntrl.update.var, method=var.method)
 
     if(verbose>0)
-      cat("Update of variance parameters:  max|x_0 - x_1| / |x_0| =",
+      cat("Update of variance parameters:  max|x_0 - x_1| / max|x_0| =",
           parVar$rel.tol, "\n")
       
     if(parVar$convergence!=0) {

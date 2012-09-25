@@ -192,10 +192,24 @@ fixef.ah4 <- function(object,...){
   } else return(NULL)
 }
 
-ranef.ah4 <- function(object,...){
+ranef.ah4 <- function(object, tomatrix = FALSE, ...){
   if(object$dim[2]>0){
-    return(tail(coef(object,...), object$dim[2]))
+    ranefvec <- tail(coef(object,...), object$dim[2])
   } else return(NULL)
+  if (!tomatrix) return(ranefvec)
+
+  model <- surveillance:::interpretControl(object$control,object$stsObj)
+  idxRE <- model$indexRE
+  idxs <- unique(idxRE)
+  names(idxs) <- model$namesFE[idxs]
+  mat <- sapply(idxs, function (idx) {
+      RE <- ranefvec[idxRE==idx]
+      Z <- model$terms["Z.intercept",][[idx]]
+      "%m%" <- get(model$terms["mult",][[idx]])
+      Z %m% RE
+  })
+  rownames(mat) <- colnames(model$response)
+  return(mat)
 }
 
 confint.ah4 <- function (object, parm, level = 0.95, reparamPsi = TRUE, idx2Exp = NULL, amplitudeShift = FALSE, ...) 

@@ -111,16 +111,21 @@ hhh4(stsObj,
       }
       \item{\code{subset}}{Typically \code{2:nrow(obs)} if model contains
 	autoregression}
-      \item{\code{optimizer}}{Stop criteria for the outer
-	optimization of regression and variance parameters as well as
-	control arguments for the single optimizers. \code{nlminb} is
-	the default engine (taking advantage of the implemented
-	analytical score vector and Fisher information matrix), however,
+      \item{\code{optimizer}}{a list of three lists of control arguments.
+	The \code{"stop"} list specifies two criteria for the outer
+	optimization of regression and variance parameters: the relative
+	\code{tol}erance for parameter change using the criterion 
+	\code{max(abs(x[i+1]-x[i])) / max(abs(x[i]))},
+	and the maximum number \code{niter} of outer iterations.
+	Control arguments for the single optimizers are specified in the
+	lists named \code{"regression"} and \code{"variance"}.
+	\code{nlminb} is the default \code{method} for both (taking
+	advantage of the analytical Fisher information matrices), however,
 	the methods specified in the \code{method} argument of
-	\code{\link{optim}} may also be used. Especially for the
-	variance updates, Nelder-Mead is also attractive. Control
-	arguments for the optimizer may be passed as part of the
-	\code{"regression"} or \code{"variance"} lists.} 
+	\code{\link{optim}} may also be used (as well as
+	\code{\link{nlm}} but that one is not recommended here).
+	Especially for the variance updates, Nelder-Mead optimization is
+	an attractive alternative.}
       \item{\code{verbose}}{Logical if additional information is to be printed
 	during the computations}
       \item{\code{start}}{List with initials, overrides any initial
@@ -129,7 +134,7 @@ hhh4(stsObj,
       \item{\code{data}}{ data.frame or named list with covariates that
 	are specified in the formulas for the 3 components}
       \item{\code{keep.terms}}{ Logical if the terms object used in the fit
-    is to be returned }
+	is to be returned }
     }
   }
 }
