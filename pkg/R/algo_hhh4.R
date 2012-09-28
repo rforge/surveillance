@@ -3,7 +3,7 @@
 ## The function allows the incorporation of random effects and covariates.
 ##
 ## Author: Michaela Paul, with contributions from Sebastian Meyer
-## $Rev$
+## $Revision$
 ## $Date$
 ########################################################################
 
@@ -47,19 +47,12 @@ hhh4 <- function(stsObj,
                keep.terms=FALSE
                )
    ){
-        
-  #Convert sts objects
+
+  #Convert old disProg class to new sts class
   if(inherits(stsObj, "disProg")) stsObj <- disProg2sts(stsObj)
   
-  if(is.null(control$data)){
-    control$data <- list(.sts=stsObj, t=epoch(stsObj)-1)
-  } else {  # coerce to list
-    control$data <- modifyList(list(.sts=stsObj),as.list(control$data))
-  }
-
   #set default values (if not provided in control)
   control <- setControl(control, stsObj)
-  verbose <- control$verbose
   #* if univariate, no neighbouring term
   #* check nhood matrix
   
@@ -87,7 +80,7 @@ hhh4 <- function(stsObj,
                     cntrl.stop       = control$optimizer$stop,
                     cntrl.regression = control$optimizer$regression,
                     cntrl.variance   = control$optimizer$variance,
-                    verbose=verbose)
+                    verbose=control$verbose)
 
   convergence <- myoptim$convergence == 0
   thetahat <- c(myoptim$fixef, myoptim$ranef)
@@ -159,7 +152,12 @@ setControl <- function(control, stsObj){
   
   nTime <- nrow(stsObj)
   nUnits <- ncol(stsObj)
-  
+
+  control$data <- if(is.null(control[["data"]])){
+    list(.sts=stsObj, t=epoch(stsObj)-1)
+  } else {  # coerce to list
+    modifyList(list(.sts=stsObj),as.list(control$data))
+  }
   
   #set default values (if not provided in control)
   if(is.null( control[["ar", exact = TRUE]] )) {
@@ -216,12 +214,6 @@ setControl <- function(control, stsObj){
       stop("\'ne$f\' must be a formula\n")
     } 
     if(is.null(control$ne[["lag", exact = TRUE]])) control$ne$lag <- 1
-    if(!is.null(control$ne[["weights", exact = TRUE]])){
-        if(!is.matrix(control$ne$weights) ||
-           any(dim(control$ne$weights) != nUnits)){ # TODO: what about W_t?
-            stop("\'ne$weights\' must be a square matrix of size ",nUnits,"\n")
-        }
-    }
     if(is.null(control$ne[["initial", exact = TRUE]])) control$ne$initial <- NULL 
     
     # currently only lag=1 considered
@@ -233,13 +225,32 @@ setControl <- function(control, stsObj){
       stop("\'ne$f\' is not allowed when \'ar$f\' is a matrix\n")
     }
     
-    # if no weight is specified, the nhood-matrix of the stsObj is used
-    if(is.null(control$ne$weights)){
-      control$ne$weights <- neighbourhood(stsObj)
-      diag(control$ne$weights) <- 0
-    } else if(any(!diag(control$ne$weights) %in% 0)){
-        stop("'diag(ne$weights)' must only contain zeroes")
+    # check ne$weights specification
+    testweights <- if (is.null(control$ne[["weights"]])) {
+        # if no weight is specified, the nhood-matrix of the stsObj is used
+        control$ne$weights <- neighbourhood(stsObj)
+        diag(control$ne$weights) <- 0
+        control$ne$weights
+    } else if (is.array(control$ne[["weights"]])) {
+        control$ne$weights
+    } else if (is.list(control$ne[["weights"]]) &&
+               all(sapply(control$ne$weights[paste0(c("","d","d2"), "weights")],
+                          is.function))
+               ) {
+        stop("not yet implemented")
+        #control$ne$weights$weights(initpars, nbmat, data)    # TODO...
+    } else {
+        stop("'ne$weights' must be NULL, an array or a list of functions")
     }
+    # check matrix/array of weights
+    if(any(dim(testweights)[1:2] != nUnits) ||
+       isTRUE(dim(testweights)[3] != nTime))
+        stop("'ne$weights' must conform to dimensions ",nUnits, " x ", nUnits,
+             " (x ", nTime, ")")
+    if(any(!diag(testweights) %in% 0))
+        stop("'diag(ne$weights)' must only contain zeroes")
+    if (any(is.na(testweights)))
+        stop("missing values in 'ne$weights' are not allowed")
   }
   
   ##----------------------------------------------------------------------
@@ -565,18 +576,20 @@ interpretControl <- function(control, stsObj){
   ar <- control$ar
   ne <- control$ne
   end <- control$end
-  
+
+  ## FIXME: really weird... if the array below is evaluated, code will be faster
+  ## A complex example model takes 132s (without this nonsense array evaluation)
+  ## or 116s (with) for the whole fit
+  if (ne$inModel) {
+    dev.null <- array(ne$weights, c(nUnits,nUnits,nTime))
+    ## for instance, str(ne$weights), as.vector(ne$weights), or
+    ## array(ne$weights, dim(ne$weights)) do not have this effect...
+  }
+
   # create response
   Y <- observed(stsObj)
-  
-  Ym1 <- rbind(matrix(NA_integer_,control$ar$lag,nUnits),head(Y, nTime-control$ar$lag))
-  
-  if(control$ne$inModel){
-    Ym1.ne <- weightedSumNE(stsObj, control$ne$weights)$neighbours
-    Ym1.ne <- rbind(matrix(NA_real_,control$ne$lag,nUnits),head(Ym1.ne, nTime-control$ne$lag))
-  } else {
-    Ym1.ne <- 1
-  }
+  Ym1 <- rbind(matrix(NA_integer_, ar$lag, nUnits), head(Y, nTime-ar$lag))
+  Ym1.ne <- if (ne$inModel) weightedSumNE(Y, ne$weights, ne$lag) else 1
   
   # list with offsets
   offsets <- list(ar=Ym1, ne=Ym1.ne, end=end$offset)
@@ -633,9 +646,9 @@ interpretControl <- function(control, stsObj){
   # poisson or negbin model
   if(fam=="Poisson"){
     ddistr <- function(y,mu,size){
-        dpois(y, lambda=mu,log=TRUE)
+        dpois(y, lambda=mu, log=TRUE)
     }
-    dim.overdisp <- 0
+    dim.overdisp <- 0L
   } else {
     ddistr <- function(y,mu,size){
         dnbinom(y, mu=mu, size=size, log=TRUE)
@@ -649,14 +662,15 @@ interpretControl <- function(control, stsObj){
     ##                              size=size[!poisidx], log=TRUE)
     ##     res
     ## }
-    dim.overdisp <- ifelse(fam=="NegBin1",1,nUnits)
+    dim.overdisp <- if (fam=="NegBin1") 1L else nUnits
   }
+  environment(ddistr) <- .GlobalEnv     # function is self-contained
 
   initial.fe <- unlist(all.term["initial.fe",])
-  initial.fe.overdisp <- c(initial.fe, rep(2, dim.overdisp))
+  initial.fe.overdisp <- c(initial.fe, rep.int(2,dim.overdisp))
   initial.re <- unlist(all.term["initial.re",])
-  initial.sd<- unlist(all.term["initial.var",])
-  initial.sd.corr <- c(initial.sd,rep(0,dim.corr))
+  initial.sd <- unlist(all.term["initial.var",])
+  initial.sd.corr <- c(initial.sd, rep.int(0,dim.corr))
   
   # check if a vector of initials is supplied
   if(!is.null(control$start$fixed)){
@@ -676,15 +690,20 @@ interpretControl <- function(control, stsObj){
     initial.sd.corr <- control$start$sd.corr
   }
 
-  if(dim.overdisp>1){
-    names.overdisp <- paste(paste("-log(overdisp", colnames(stsObj), sep=".") ,")", sep="")
+  names.overdisp <- if(dim.overdisp > 1L){
+    paste(paste("-log(overdisp", colnames(stsObj), sep=".") ,")", sep="")
   } else {
-    names.overdisp <- rep("-log(overdisp)",dim.overdisp)  # dim.overdisp may be 0
+    rep("-log(overdisp)",dim.overdisp)  # dim.overdisp may be 0
   }
   names(initial.fe.overdisp) <- c(names.fe,names.overdisp)
   initial.theta <- c(initial.fe.overdisp,initial.re)
   names(initial.sd.corr) <- c(names.var,head(paste("corr",1:3,sep="."),dim.corr))
-  
+
+  ## FIXME: the following check might be redundant (given the above checks)
+  if(length(initial.theta) != dim.re + dim.fe + dim.overdisp){
+    stop("theta must be of length ", dim.re + dim.fe + dim.overdisp)
+  }
+
   result <- list(response = Y,
                  terms = all.term,
                  nTime = nTime,
@@ -725,78 +744,25 @@ getCov <- function(x){
   return(corr)
 }
 
- 
-################################
-# Calculates the weighted sum of counts of adjacent areas
-# weights are specified in neighbourhood-matrix of the disProgObj
-# (experimental atm)
-# 
-# \nu_i,t = \lambda_y_i,t-1 + \phi*\sum_(j~i) [w_ji*y_j,t-1]
-#
-# disProgObj$neighbourhood can either be a matrix with weights w_ji (in columns)
-# or an array (for time varying weights)
-#
-# if the neighbourhood-matrix has elements 1 if i~j and 0 otherwise
-# weightedSumNeighbours() = sumNeighbours()
-###########################################
-weightedSumNE <- function(stsObj, weights){
-
-  observed <- observed(stsObj)
-  nTime<-nrow(observed)
-  nUnits<-ncol(observed)
-  neighbours <- matrix(nrow=nTime,ncol=nUnits)
-  
-  nhood <- weights
-  
-  #check neighbourhood
-  if(any(is.na(nhood)))
-    stop("No correct neighbourhood matrix given\n")
-  
-  ## constant neighbourhood (over time)?
-  if(length(dim(nhood))==2){
-    # ensure only neighouring areas are summed up
-    diag(nhood) <- 0
-    nhood <- array(nhood,c(nUnits,nUnits,nTime))
-  
-  } else if(length(dim(nhood))==3){
-    if(any(dim(nhood)[1:2]!= nUnits) | dim(nhood)[3] != nTime) 
-      stop("neighbourhood info incorrect\n")
-  }
-    
-  # number of neighbours
-  nOfNeighbours <-colSums(nhood[,,1]>0)
-    
-  for(i in 1:ncol(observed)){
-    weights <- t(nhood[,i,])
-    weightedObs <- observed*weights
-    neighbours[,i] <- rowSums(weightedObs, na.rm=TRUE)
-  }
-  
-  return(list(neighbours=neighbours, nOfNeighbours=nOfNeighbours))
-}
-
 
 splitParams <- function(theta, model){
-  fixed <- head(theta,model$nFE)
-  random <- tail(theta, model$nRE)
-  if(model$nOverdisp >0){
-    overdisp <- theta[(model$nFE+1):(model$nFE+model$nOverdisp)]
-  } else  overdisp <- numeric(0)
-  
-  return(list(fixed=fixed,random=random,overdisp=overdisp))
+  fixed <- theta[seq_len(model$nFE)]
+  random <- theta[seq.int(to=length(theta), length.out=model$nRE)]
+  overdisp <- theta[model$nFE + seq_len(model$nOverdisp)]
+  list(fixed=fixed, random=random, overdisp=overdisp)
 }
 
-# compute predictor
-meanHHH <- function(theta, model){
-
-  # unpack 
-  Y <- model$response
-  term <- model$terms
-  offsets <- model$offset
-  
-  pars <- splitParams(theta,model)
+### compute predictor
+meanHHH <- function(theta, model)
+{
+  # unpack theta
+  pars <- splitParams(theta, model)
   fixed <- pars$fixed
   random <- pars$random
+
+  # unpack model
+  term <- model$terms
+  offsets <- model$offset  # offsets[[i]] is either 1 or a nTime x nUnits matrix
   
   nGroups <- model$nGroups
   comp <- unlist(term["offsetComp",])
@@ -804,21 +770,13 @@ meanHHH <- function(theta, model){
   idxRE <- model$indexRE
   
   subset <- model$subset
-  
-  #* check at higher level
-  if(length(theta) != model$nRE+model$nFE+model$nOverdisp){
-    stop("theta must be of length ",model$nRE+model$nFE+model$nOverdisp,"\n")
-  }
-  
+  isNA <- model$isNA                    # set missing values in observed Y to NA
+
   toMatrix <- function(par, r=model$nTime, c=model$nUnits){
     matrix(par,r,c, byrow=TRUE)
   }
   
-  # set missing values in observed Y to NA
-  # offset[[i]] is either 1 or a nTime x nUnits matrix
-  isNA <- model$isNA
-
-  # go through groups of parameters and compute the lin predictor of each component
+  # go through groups of parameters and compute the predictor of each component
   computePartMean <- function(component, isNA, subset){
   
     pred <- nullMatrix <- toMatrix(0)
@@ -846,7 +804,7 @@ meanHHH <- function(theta, model){
     mean <- exp(pred)*offsets[[component]]
     
     is.na(mean) <- isNA
-    return(mean[subset,])
+    mean[subset,]
   } 
   
   ## autoregressive component
@@ -862,7 +820,8 @@ meanHHH <- function(theta, model){
   mean <- ar.mean + ne.mean + end.mean
 
   #Done
-  return(list(mean=mean,epidemic=ar.mean+ne.mean,endemic=end.mean,epi.own=ar.mean,epi.neighbours=ne.mean))
+  list(mean=mean, epidemic=ar.mean+ne.mean, endemic=end.mean,
+       epi.own=ar.mean, epi.neighbours=ne.mean)
 }
 
 ############################################
@@ -889,7 +848,7 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
   #(which is always true), we have that sum(ll.units) = -Inf, hence: 
   if (any(overdispParam == 0)) return(-Inf)
   
-  if(model$nOverdisp > 1) {
+  if(model$nOverdisp > 1L) {
     overdispParam <- matrix(overdispParam,ncol=model$nUnits, nrow=model$nTime, byrow=TRUE)[model$subset,,drop=FALSE]
   }
   
@@ -936,7 +895,6 @@ penScore <- function(theta, sd.corr, model)
   nUnits <- model$nUnits
   
   term <- model$terms
-  offsets <- model$offset
   
   nGroups <- model$nGroups
   idxFE <- model$indexFE
@@ -947,6 +905,7 @@ penScore <- function(theta, sd.corr, model)
     
   dimFE <- model$nFE
   dimRE <- model$nRE
+  dimPsi <- model$nOverdisp
   
   # predictor
   mu <- meanHHH(theta=theta, model=model)
@@ -958,7 +917,7 @@ penScore <- function(theta, sd.corr, model)
   pars <- splitParams(theta,model)
   #ensure overdispersion param is positive
   psi <- exp(pars$overdisp)
-  if(model$nOverdisp > 1) {
+  if(dimPsi > 1L) {
     psi <- matrix(psi,ncol=model$nUnits, nrow=model$nTime, byrow=TRUE)[subset,,drop=FALSE]
   }
   #random effects
@@ -969,7 +928,7 @@ penScore <- function(theta, sd.corr, model)
   ############################################################
   ## helper function for derivatives:
   # negbin model or poisson model
-  if(model$nOverdisp > 0){
+  if(dimPsi > 0L){
     psiPlusMu <- psi + meanTotal
     psiYpsiMu <- (psi+Y) / psiPlusMu
     
@@ -1028,11 +987,11 @@ penScore <- function(theta, sd.corr, model)
   
   
   # gradient for overdispersionParameter psi
-  if(model$nOverdisp > 0){
+  if(dimPsi > 0L){
     dPsi <- psi*(digamma(Y+psi)-digamma(psi) +log(psi)+1 -log(psiPlusMu) -psiYpsiMu)
     
     # multiple psi_i's or single psi?
-    if(model$nOverdisp > 1){
+    if(dimPsi > 1L){
       grPsi <- colSums(dPsi, na.rm=TRUE)
     }else {
       grPsi <- sum(dPsi, na.rm=TRUE)
@@ -1081,7 +1040,6 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
   nUnits <- model$nUnits
   
   term <- model$terms
-  offsets <- model$offset
   
   nGroups <- model$nGroups
   idxFE <- model$indexFE
@@ -1104,7 +1062,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
   pars <- splitParams(theta,model)
   #ensure overdispersion param is positive
   psi <- exp(pars$overdisp)             # this is actually 1/overdisp
-  if (dimPsi > 1) {
+  if (dimPsi > 1L) {
     psi <- matrix(psi,ncol=model$nUnits, nrow=model$nTime, byrow=TRUE)[subset,,drop=FALSE]
   }
   #random effects
@@ -1113,7 +1071,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
   Sigma.inv <- getSigmaInv(sd, corr, model$nVar, dimBlock)
   
   ## helper functions for derivatives:
-  if (dimPsi > 0) { # negbin
+  if (dimPsi > 0L) { # negbin
     psiPlusY <- psi + Y
     psiPlusMu <- psi + meanTotal
     psiPlusMu2 <- psiPlusMu^2
@@ -1150,8 +1108,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
     hessian.FE.Psi <- matrix(0,dimFE, dimPsi)
     hessian.Psi.RE <- matrix(0,dimPsi, dimPsi+dimRE)
 
-    if (dimPsi > 0) { # d l(theta,x) /dpsi dpsi
-        hessian.Psi.RE[,seq_len(dimPsi)] <- if (dimPsi == 1) {
+    if (dimPsi > 0L) { # d l(theta,x) /dpsi dpsi
+        hessian.Psi.RE[,seq_len(dimPsi)] <- if (dimPsi == 1L) {
             sum(dPsidPsi(), na.rm=TRUE)
         } else diag(colSums(dPsidPsi(), na.rm=TRUE))
     }
@@ -1244,12 +1202,12 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         "%m%" <- get(term["mult",i][[1]])
          
         fillHess <-i.random
-        if(dimPsi==1){
+        if(dimPsi==1L){
           dPsi<- dThetadPsi(m.Xit)
           dPsi[isNA] <- 0
           hessian.FE.Psi[idxFE==i,]<- sum(dPsi)
           hessian.Psi.RE[,c(FALSE,idxRE==i)] <- colSums( dPsi%m%Z.i)
-        } else if(dimPsi>1){
+        } else if(dimPsi>1L){
           dPsi<- dThetadPsi(m.Xit)
           dPsi[isNA] <- 0
           hessian.FE.Psi[idxFE==i,]<- colSums( dPsi)
@@ -1259,9 +1217,9 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
       } else if(unitSpecific.i){
         which.i <- term["which",i][[1]]
         fillHess <- i.unit
-        if(dimPsi>0){
+        if(dimPsi>0L){
           dPsi<- colSums(dThetadPsi(m.Xit),na.rm=TRUE)
-          if(dimPsi==1){ 
+          if(dimPsi==1L){ 
             hessian.FE.Psi[idxFE==i,] <- dPsi[which.i] 
           } else {
             hessian.FE.Psi[idxFE==i,] <- diag(dPsi)[which.i,]
@@ -1270,9 +1228,9 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         
       } else {
         fillHess <- i.fixed
-        if(dimPsi>0){
+        if(dimPsi>0L){
           dPsi<- colSums(dThetadPsi(m.Xit),na.rm=TRUE)
-          if(dimPsi==1){ dPsi <- sum(dPsi) }
+          if(dimPsi==1L){ dPsi <- sum(dPsi) }
           hessian.FE.Psi[idxFE==i,] <-dPsi
         }
       }
@@ -1437,8 +1395,8 @@ marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL){
   corr <- tail(sd.corr,dimCorr)
   
   dimFE <- model$nFE
-  dimOver <- model$nOverdisp
-  dimFE.O <- dimFE+dimOver
+  dimPsi <- model$nOverdisp
+  dimFE.O <- dimFE + dimPsi
   dimRE <- model$nRE
   
   dimBlocks<- model$rankRE[model$rankRE>0]
@@ -1490,8 +1448,8 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   corr <- tail(sd.corr,dimCorr)
   
   dimFE <- model$nFE
-  dimOver <- model$nOverdisp
-  dimFE.O <- dimFE+dimOver
+  dimPsi <- model$nOverdisp
+  dimFE.O <- dimFE + dimPsi
   dimRE <- model$nRE
   
   dimBlocks<- model$rankRE[model$rankRE>0]
@@ -1511,8 +1469,10 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING (in marScore): penalized Fisher is singular!\n")
-    F.inv <- MASS::ginv(fisher)
     #return(rep.int(0,dimSigma))
+    ## continuing with the generalized inverse often works, otherwise we would
+    ## have to stop() here, because nlminb() cannot deal with NA's
+    F.inv <- MASS::ginv(fisher)
   }
    
   F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]
@@ -1560,7 +1520,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   dimSigma <- model$nSigma
   
   if(dimSigma == 0){
-    return(matrix(NA_real_,dimSigma,dimSigma))   
+    return(matrix(numeric(0L),0L,0L))
   }
 
   if(any(is.na(sd.corr))) stop("NAs in variance parameters.", ADVICEONERROR)
@@ -1569,8 +1529,8 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   corr <- tail(sd.corr,dimCorr)
   
   dimFE <- model$nFE
-  dimOver <- model$nOverdisp
-  dimFE.O <- dimFE+dimOver
+  dimPsi <- model$nOverdisp
+  dimFE.O <- dimFE + dimPsi
   dimRE <- model$nRE
   
   dimBlocks<- model$rankRE[model$rankRE>0]
@@ -1590,8 +1550,10 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING (in marFisher): penalized Fisher is singular!\n")
-    F.inv <- MASS::ginv(fisher)
     #return(matrix(Inf,dimSigma,dimSigma))
+    ## continuing with the generalized inverse often works, otherwise we would
+    ## have to stop() here, because nlminb() cannot deal with NA's
+    F.inv <- MASS::ginv(fisher)
   }
    
   F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]
@@ -1813,7 +1775,7 @@ d2Sigma3 <- function(sd,corr, d1){
 }
 
 
-updateRegression <- function(theta, sd.corr, model, control, method="nlminb")
+updateRegression <- function(theta, sd.corr, model, control, method = "nlminb")
 {  
   lower <- control[["lower"]]; control$lower <- NULL
   upper <- control[["upper"]]; control$upper <- NULL
@@ -1876,10 +1838,10 @@ updateRegression <- function(theta, sd.corr, model, control, method="nlminb")
 
 
 updateVariance <- function(sd.corr, theta, model, fisher.unpen,
-                           control, method="nlminb")
+                           control, method = "nlminb")
 {
   # only fixed effects => no variance 
-  if(model$nSigma==0){
+  if(length(sd.corr) == 0L){
     return(list(par=sd.corr,ll=NA_real_,rel.tol=0,convergence=0))
   }
 
@@ -2083,7 +2045,7 @@ fitHHH <- function(theta, sd.corr, model,
   
   ll <- penLogLik(theta=theta,sd.corr=sd.corr,model=model)
   fisher <- penFisher(theta=theta,sd.corr=sd.corr,model=model)
-  fisher.var <- marFisher(sd.corr=sd.corr,theta=theta,model=model,
+  fisher.var <- marFisher(sd.corr=sd.corr, theta=theta, model=model,
                           fisher.unpen=fisher.unpen)
   
   return(list(fixef=head(theta,dimFE),ranef=tail(theta,dimRE),sd.corr=sd.corr,

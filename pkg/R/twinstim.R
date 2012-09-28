@@ -1,10 +1,13 @@
 ################################################################################
-### Function 'twinstim' performs maximum likelihood inference
-### for the additive-multiplicative spatio-temporal intensity model
-### described in Meyer et al (2012).
+### Part of the surveillance package, http://surveillance.r-forge.r-project.org
+### Free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
 ###
-### Author: Sebastian Meyer
-### $Rev$
+### Maximum Likelihood inference for the two-component spatio-temporal intensity
+### model described in Meyer et al (2012), DOI: 10.1111/j.1541-0420.2011.01684.x
+###
+### Copyright (C) 2012 Sebastian Meyer
+### $Revision$
 ### $Date$
 ################################################################################
 
