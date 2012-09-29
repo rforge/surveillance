@@ -99,12 +99,11 @@ hhh4 <- function (stsObj, control)
   fisher <- myoptim$fisher
   cov <- try(solve(fisher), silent=TRUE) # approximation to inverted fisher info
 
-  ## check various types of non-convergence
+  ## check for degenerate fisher info
   if(inherits(cov, "try-error")){ # fisher info is singular
     cat("Fisher info singular!\n")
     convergence <- FALSE
-  }
-  if(any(!is.finite(diag(cov))) || any(diag(cov)<0)){
+  } else if(any(!is.finite(diag(cov))) || any(diag(cov)<0)){
     cat("Infinite or negative cov!\n")
     convergence <- FALSE
   }
