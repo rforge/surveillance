@@ -37,21 +37,21 @@
 \usage{
 hhh4(stsObj, 
      control = list(
-               ar = list(f = ~ -1,        
-                         lag = 1,         
-                         weights = NULL,  
-                         initial = NULL   
+               ar = list(f = ~ -1,
+                         lag = 1,
+                         weights = NULL,
+                         initial = NULL
                          ),
-               ne = list(f = ~ -1,        
-                         lag = 1,         
-                         weights = NULL,  
-                         initial = NULL   
+               ne = list(f = ~ -1,
+                         lag = 1,
+                         weights = neighbourhood(stsObj) != 0,
+                         initial = NULL
                          ),
-               end = list(f = ~ 1,         
-                          offset = NULL,   
-                          initial = NULL   
+               end = list(f = ~ 1,
+                          offset = 1,
+                          initial = NULL
                           ),
-               family = c("Poisson","NegBin1","NegBinM")[1],
+               family = c("Poisson","NegBin1","NegBinM"),
                subset = 2:nrow(stsObj),
                optimizer = list(stop = list(tol=1e-5, niter=100),
                                 regression = list(method="nlminb"),
@@ -89,8 +89,9 @@ hhh4(stsObj,
 	  \item{f = ~ -1}{a formula specifying \eqn{\log(\phi_{it})}{log(\phi_it)}}
 	  \item{lag = 1}{autoregression on \eqn{y_{j,t-lag}}{y_j,t-lag}  
 	    (currently only \code{lag = 1} is possible)}
-	  \item{weights = NULL}{weights \eqn{w_{ji}}{w_ji}, if 
-	    \code{NULL} the neighbourhood matrix of \code{stsObj} is used}
+	  \item{weights = neighbourhood(stsObj) != 0}{
+	    weights \eqn{w_{ji}}{w_ji}. By default, 
+	    the neighbourhood matrix of \code{stsObj} is used.}
 	  \item{initial = NULL}{vector with initial values for
 	    parameter if \code{f = ~1} (not really used ATM)}
 	}
@@ -99,15 +100,15 @@ hhh4(stsObj,
 	with the following components
 	\describe{
 	  \item{f = ~ 1}{a formula specifying \eqn{\log(\nu_{it})}{log(\nu_it)}}
-	  \item{offset = NULL}{optional multiplicative offset \eqn{e_{it}}{e_it}}
+	  \item{offset = 1}{optional multiplicative offset \eqn{e_{it}}{e_it}}
 	  \item{initial = NULL}{vector with initial values for
 	    parameter if \code{f = ~1} (not really used ATM)}
 	}
       }
-      \item{\code{family}}{Distributional family -- either Poisson,
-	or the negative Binomial distribution with one common
-	overdispersion parameter for all units (\code{NegBin1}) or a
-	overdispersion parameter for each unit (\code{NegBinM}).
+      \item{\code{family}}{Distributional family -- either \code{"Poisson"},
+	or the Negative Binomial distribution with one common
+	overdispersion parameter for all units (\code{"NegBin1"}) or an
+	overdispersion parameter for each unit (\code{"NegBinM"}).
       }
       \item{\code{subset}}{Typically \code{2:nrow(obs)} if model contains
 	autoregression}

@@ -11,6 +11,85 @@
 ################################################################################
 
 
+### check ne$weights specification
+
+checkWeights <- function (weights, nUnits, nTime,
+                          nbmat, data)  # only used for parametric weights
+{
+    name <- "control$ne$weights"
+
+    ## check specification
+    testweights <- if (is.array(weights)) weights else {
+        if (is.list(weights) && checkWeightsFUN(weights)) {
+            weights$w(weights$initial, nbmat, data)
+        } else {
+            stop("'", name, "' must be an array or a list of functions")
+        }
+    }
+    
+    ## check matrix/array of weights
+    if (any(dim(testweights)[1:2] != nUnits) ||
+        isTRUE(dim(testweights)[3] != nTime))
+        stop("'", name, "' must conform to dimensions ",
+             nUnits, " x ", nUnits, " (x ", nTime, ")")
+    if (any(!diag(testweights) %in% 0))
+        stop("'diag(", name, ")' must only contain zeroes")
+    if (any(is.na(testweights)))
+        stop("missing values in '", name, "' are not allowed")
+
+    ## Done
+    invisible(TRUE)
+}
+
+
+
+### calculate the weighted sum of counts of adjacent (or all other) regions
+### i.e. the nTime x nUnit matrix with elements ne_ti = sum_j w_jit * y_jt
+## W is either a nUnits x nUnits matrix of time-constant weights w_ji
+## or a nUnits x nUnits x nTime array of time-varying weights
+
+weightedSumNE <- function (observed, weights, lag)
+{
+  dimY <- dim(observed)
+  nTime <- dimY[1L]
+  nUnits <- dimY[2L]
+  tY <- t(observed)
+  
+  timeconstantweights <- length(dim(weights)) == 2L
+  selecti <- if (timeconstantweights) quote(weights[,i]) else quote(weights[,i,])
+    
+  res <- matrix(NA_real_, nrow=nTime, ncol=nUnits)
+  for(i in seq_len(nUnits)){
+    weights.i <- eval(selecti)
+    weightedObs <- tY * weights.i
+    res[,i] <- colSums(weightedObs, na.rm=TRUE)
+  }
+
+  rbind(matrix(NA_real_, lag, nUnits), head(res, nTime-lag))
+}
+
+## slower alternative, where the weights are always converted to a 3D array
+weightedSumNE.old <- function(observed, weights, lag)
+{
+  dimY <- dim(observed)
+  nTime <- dimY[1L]
+  nUnits <- dimY[2L]
+  
+  nhood <- array(weights, c(nUnits,nUnits,nTime))
+  
+  res <- matrix(NA_real_, nrow=nTime,ncol=nUnits)
+  for(i in seq_len(nUnits)){
+    weights.i <- t(nhood[,i,])
+    weightedObs <- observed * weights.i
+    res[,i] <- rowSums(weightedObs, na.rm=TRUE)
+  }
+  
+  rbind(matrix(NA_real_, lag, nUnits), head(res, nTime-lag))
+}
+
+
+
+
 ### determine matrix with higher neighbourhood order given the binary matrix of
 ### first-order neighbours based on spdep::nblag()
 
@@ -69,8 +148,36 @@ nblagmat <- function (neighbourhood, maxlag = 1)
 
 
 
-### Construct weights according to the Zeta-distribution with respect to the
-### order of neighbourhood and fulfilling rowSums(wji) = 1
+
+
+
+###############################################
+### predefined parametric weight structures ###
+###############################################
+
+
+### check parametric weights specification consisting of a list of:
+## - three functions: w, dw, and d2w
+## - a vector of initial parameter values
+
+checkWeightsFUN <- function (object)
+{
+    fnames <- paste0(c("","d","d2"), "w")
+    if (any(!sapply(object[fnames], is.function)))
+        stop("parametric weights require functions 'w', 'dw', 'd2'")
+    if (any(!sapply(object[fnames], function(FUN) length(formals(FUN)) >= 3L)))
+        stop("parametric weights functions must accept (not necessarily use)",
+             "\n  at least 3 arguments (parameter vector, ",
+             "neighbourhood order matrix, data)")
+    if (!is.vector(object$initial, mode="numeric"))
+        stop("parametric weights require initial parameter values")
+    TRUE
+}
+
+
+### Construct weight matrix wji according to the Zeta-distribution with respect
+### to the orders of neighbourhood (in nbmat, as e.g. obtained from nblagmat()),
+### optionally fulfilling rowSums(wji) = 1
 ## As a formula (for j != i, otherwise wji = 0):
 ## - for shared=TRUE: wji = pzeta(oji; rho, maxlag) / sum_k I(ojk == oji)
 ## - for shared=FALSE: wji = pzeta(oji; rho, maxlag) / sum_k pzeta(ojk; rho, maxlag)
@@ -85,25 +192,11 @@ nblagmat <- function (neighbourhood, maxlag = 1)
 ## wji = oji^-\rho / sum_k ojk^-\rho
 ## In both cases, maxlag=1 yields the classical weights wji=1/nj.
 
-## nbmat is a matrix of neighbourhood orders as, e.g., obtained from nblagmat()
 zetaweights <- function (nbmat, maxlag = Inf, rho = 1,
                          normalize = TRUE, shared = FALSE)
 {
-    ## if (all(nbmat %in% 0:1)) {
-    ##     ## determine (integer) neighbourhood matrix up to order 'maxlag'
-    ##     ## this is the time-consuming part !!!
-    ##     nbmat <- nblagmat(neighbourhood, maxlag)
-    ## }
-
     ## check maxlag
     if (!is.finite(maxlag)) maxlag <- max(nbmat)
-    ## if (maxlag > .maxlag) {
-    ##     maxlag <- .maxlag
-    ##     if (normalize) {
-    ##         message("Note: reduced 'maxlag' to the maximum observed lag (",
-    ##                 .maxlag, ")")
-    ##     }
-    ## }
 
     ## raw (non-normalized) zeta-distribution on 1:maxlag
     zetaweights <- c(0, seq_len(maxlag)^-rho)
@@ -113,6 +206,7 @@ zetaweights <- function (nbmat, maxlag = Inf, rho = 1,
     wji <- zetaweights[nbmat + 1L]
     wji[is.na(wji)] <- 0
     dim(wji) <- dim(nbmat)
+    dimnames(wji) <- dimnames(nbmat)
 
     if (shared) {
         ## multiplicity of orders by row: dim(nbmat)==dim(multbyrow)
@@ -130,16 +224,20 @@ zetaweights <- function (nbmat, maxlag = Inf, rho = 1,
 
 
 
-### predefined parametric weight structures
+### powerlaw weights
+## in the non-truncated case, i.e. maxlag = max(nbmat),
+## the raw powerlaw weights are defined as w_ji = o_ji^-rho,
+## and with (row-)normalization we have    w_ji = o_ji^-rho / sum_k o_jk^-rho
 
-powerlaw <- function (maxlag, normalize = TRUE) # only shared=FALSE
+powerlaw <- function (maxlag, normalize = TRUE) # only shared=FALSE is supported
 {
     if (missing(maxlag)) {
         stop("'maxlag' must be specified (e.g., maximum neighbourhood order)")
     }
 
     ## main function which returns the weight matrix
-    weights.call <- substitute(zetaweights(nbmat, maxlag, rho, normalize, FALSE))
+    weights.call <- call("zetaweights", quote(nbmat), maxlag, quote(rho),
+                         normalize, FALSE)
     weights <- as.function(c(alist(rho=, nbmat=, ...=), weights.call),
                            envir=.GlobalEnv)
 
@@ -147,12 +245,12 @@ powerlaw <- function (maxlag, normalize = TRUE) # only shared=FALSE
     dweights <- d2weights <- as.function(c(alist(rho=, nbmat=, ...=),
         substitute({
             W <- weights.call
-            is.na(nbmat) <- nbmat == 0L # w_jj = 0 => d/drho = 0
+            is.na(nbmat) <- nbmat == 0L # w_jj = 0 => d/drho = 0, sum over j!=i
             tmp1a <- log(nbmat)
-            norm <- rowSums(nbmat^-rho) # unused for raw weights
-            tmp1b <- rowSums(nbmat^-rho * -log(nbmat)) / norm # set to 0 for raw
+            norm <- rowSums(nbmat^-rho, na.rm=TRUE) # unused for raw weights
+            tmp1b <- rowSums(nbmat^-rho * -log(nbmat), na.rm=TRUE)/norm # set to 0 for raw
             tmp1 <- tmp1a + tmp1b
-            tmp2 <- rowSums(nbmat^-rho * log(nbmat)^2) / norm - tmp1b^2 # for 2nd derivative
+            tmp2 <- rowSums(nbmat^-rho * log(nbmat)^2, na.rm=TRUE)/norm - tmp1b^2 # for 2nd deriv
             deriv <- W * -tmp1          # for d2weights: W * (tmp1^2 - tmp2)
             deriv[is.na(deriv)] <- 0
             deriv
@@ -173,51 +271,7 @@ powerlaw <- function (maxlag, normalize = TRUE) # only shared=FALSE
     }
     
     ## return list of functions
-    list(weights=weights, dweights=dweights, d2weights=d2weights)
+    list(w=weights, dw=dweights, d2w=d2weights, initial=1)
 }
 
 
-
-### calculate the weighted sum of counts of adjacent (or all other) regions
-### i.e. the nTime x nUnit matrix with elements ne_ti = sum_j w_jit * y_jt
-## W is either a nUnits x nUnits matrix of time-constant weights w_ji
-## or a nUnits x nUnits x nTime array of time-varying weights
-
-weightedSumNE <- function (observed, weights, lag)
-{
-  dimY <- dim(observed)
-  nTime <- dimY[1L]
-  nUnits <- dimY[2L]
-  tY <- t(observed)
-  
-  timeconstantweights <- length(dim(weights)) == 2L
-  selecti <- if (timeconstantweights) quote(weights[,i]) else quote(weights[,i,])
-    
-  res <- matrix(NA_real_, nrow=nTime, ncol=nUnits)
-  for(i in seq_len(nUnits)){
-    weights.i <- eval(selecti)
-    weightedObs <- tY * weights.i
-    res[,i] <- colSums(weightedObs, na.rm=TRUE)
-  }
-
-  rbind(matrix(NA_real_, lag, nUnits), head(res, nTime-lag))
-}
-
-## slower alternative, where the weights are always converted to a 3D array
-weightedSumNE.old <- function(observed, weights, lag)
-{
-  dimY <- dim(observed)
-  nTime <- dimY[1L]
-  nUnits <- dimY[2L]
-  
-  nhood <- array(weights, c(nUnits,nUnits,nTime))
-  
-  res <- matrix(NA_real_, nrow=nTime,ncol=nUnits)
-  for(i in seq_len(nUnits)){
-    weights.i <- t(nhood[,i,])
-    weightedObs <- observed * weights.i
-    res[,i] <- rowSums(weightedObs, na.rm=TRUE)
-  }
-  
-  rbind(matrix(NA_real_, lag, nUnits), head(res, nTime-lag))
-}

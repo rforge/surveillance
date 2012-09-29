@@ -1,53 +1,64 @@
-########################################################################
-## hhh4 is an extended version of algo.hhh for the sts-class
-## The function allows the incorporation of random effects and covariates.
-##
-## Author: Michaela Paul, with contributions from Sebastian Meyer
-## $Revision$
-## $Date$
-########################################################################
+################################################################################
+### Part of the surveillance package, http://surveillance.r-forge.r-project.org
+### Free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
+###
+### hhh4 is an extended version of algo.hhh for the sts-class
+### The function allows the incorporation of random effects and covariates.
+###
+### Copyright (C) 2012 Michaela Paul and Sebastian Meyer
+### $Revision$
+### $Date$
+################################################################################
 
 # - some function arguments are currently not used (but will eventually)
-# - further argument checks necessary to avoid input errors
 # - formula formulation is experimental and not yet implemented in full generality 
 # - do some profiling...
 
 ## Error message issued in loglik, score and fisher functions upon NA parameters
 ADVICEONERROR <- "\n  Try different starting values or another optimizer.\n"
 
-## FIXME: it is not intended that hhh4 be called without specifying the control
-## list. Thus, the default formal argument list is actually not used,
-## the defaults are set internally by setControl.
-## Proposition: define hhh4 just as function(stsObj, control)
 
-hhh4 <- function(stsObj, 
-   control = list(
-               ar = list(f = ~ -1,        # a formula " exp(x'lamba)*y_t-1 " (ToDo: or a matrix " Lambda %*% y_t-1 ")
-                         lag = 1,         # autoregression on y_i,t-lag (currently not used)
-                         weights = NULL,  # optional weights, only used if model is a contact matrix (currently not used)
-                         initial = NULL   # vector with initial values for parameters if pred is a matrix or if pred = ~1 (not really used ATM)
-                         ),
-               ne = list(f = ~ -1,        # a formula " exp(x'phi) * \sum_j {w_ji * y_j,t-1} "
-                         lag = 1,         # autoregression on y_j,t-lag  (currently not used)
-                         weights = NULL,  # weights w_ji, if NULL neighbourhood matrix of stsObj is used
-                         initial = NULL   # vector with initial values for parameter if pred = ~1 (not really used ATM)
-                         ),
-               end = list(f = ~ 1,         # a formula " exp(x'nu) * n_it "
-                          offset = NULL,   # optional offset n_it
-                          initial = NULL   # vector with initial values for parameter if pred = ~1 (not really used ATM)
-                          ),
-               family = c("Poisson","NegBin1","NegBinM")[1],
-               subset = 2:nrow(stsObj),             # typically 2:nrow(obs) if model contains autoregression
-               optimizer = list(stop = list(tol=1e-5, niter=100), # control arguments for optimizers
-                                regression = list(method="nlminb"),
-                                variance = list(method="nlminb")),
-               verbose = FALSE,
-               start=list(fixed=NULL,random=NULL,sd.corr=NULL), # list with initials, overrides any initial values in formulas
-               data=data.frame(t=epoch(stsObj)-1),    # data.frame or named list with covariates that are specified in the formulas for the 3 components
-               keep.terms=FALSE
-               )
-   ){
+### Default control argument for hhh4
+### This argument list is also set as the formal 'control' argument of hhh4()
+### below the definition of hhh4
 
+CONTROL.hhh4 <- alist(
+    ar = list(f = ~ -1,        # a formula " exp(x'lamba)*y_t-1 "
+                               # (ToDo: or a matrix " Lambda %*% y_t-1 ")
+              lag = 1,         # autoregression on y_i,t-lag (currently unused)
+              weights = NULL,  # for a contact matrix model (currently unused)
+              initial = NULL   # initial parameters values if pred is a matrix
+                               # or if pred = ~1 (not really used ATM)
+    ),
+    ne = list(f = ~ -1,        # a formula "exp(x'phi) * sum_j w_ji * y_j,t-lag"
+              lag = 1,         # regression on y_j,t-lag  (currently unused)
+              weights = neighbourhood(stsObj) != 0,  # weights w_ji
+              initial = NULL   # initial parameter values if pred = ~1 (not really used ATM)
+    ),
+    end = list(f = ~ 1,        # a formula " exp(x'nu) * n_it "
+               offset = 1,     # optional offset e_it
+               initial = NULL  # initial parameter values if pred = ~1 (not really used ATM)
+    ),
+    family = c("Poisson", "NegBin1", "NegBinM"),
+    subset = 2:nrow(stsObj),   # typically 2:nTime if model contains lags
+    optimizer = list(stop = list(tol=1e-5, niter=100),   # control arguments
+                     regression = list(method="nlminb"), # for optimization 
+                     variance = list(method="nlminb")),
+    verbose = FALSE,           # level of reporting during hhh4() processing
+    start = list(fixed=NULL,random=NULL,sd.corr=NULL),  # list with initials,
+                               # overrides any initial values in formulas 
+    data = data.frame(t=epoch(stsObj)-1), # data.frame or named list with
+                               # covariates that appear in any of the formulae
+    keep.terms = FALSE
+)
+
+
+
+### Main function, which is to be called by the user
+
+hhh4 <- function (stsObj, control)
+{
   #Convert old disProg class to new sts class
   if(inherits(stsObj, "disProg")) stsObj <- disProg2sts(stsObj)
   
@@ -137,9 +148,10 @@ hhh4 <- function(stsObj,
                  dim=c(fixed=dimFixedEffects,random=dimRandomEffects),
                  loglikelihood=loglik, margll=margll, 
                  convergence=convergence,
-                 fitted.values=fitted, control=control,
+                 fitted.values=fitted,
+                 control=control,
                  terms=if(control$keep.terms) model else NULL,
-                 stsObj=stsObj, 
+                 stsObj=stsObj,         # FIXME: stsObj also in 'control$data'
                  lag=1, nObs=sum(!model$isNA[control$subset,]),
                  nTime=length(model$subset), nUnit=ncol(stsObj))
   
@@ -147,177 +159,138 @@ hhh4 <- function(stsObj,
   return(result)
 }
 
+## Store default control arguments in the formal argument list of hhh4
+formals(hhh4)[["control"]] <- as.pairlist(CONTROL.hhh4)
+
+
 ## set default values for model specifications in control
-setControl <- function(control, stsObj){
-  
+setControl <- function (control, stsObj)
+{
+  stopifnot(is.list(control))
   nTime <- nrow(stsObj)
   nUnits <- ncol(stsObj)
-
-  control$data <- if(is.null(control[["data"]])){
-    list(.sts=stsObj, t=epoch(stsObj)-1)
-  } else {  # coerce to list
-    modifyList(list(.sts=stsObj),as.list(control$data))
-  }
+  if(nTime <= 2) stop("too few observations")
   
-  #set default values (if not provided in control)
-  if(is.null( control[["ar", exact = TRUE]] )) {
-    control$ar <- list(f = ~ -1, lag = 1, weights = NULL, initial = NULL, isMatrix=FALSE, inModel=FALSE)
-  } else {
-    if(!is.list(control$ar)){
-      stop("\'ar\' must be a list\n")
-    } else if(is.null( control$ar[["f", exact = TRUE]] )){
-      stop("Predictor for the autregressive component \'ar\' not specified.\n")
-    } else if( !( inherits(control$ar$f, "formula") | is.matrix(control$ar$f) ) ){
-      stop("\'ar$f\' must be either a formula or a matrix\n")
-    } else if( is.matrix(control$ar$f) & any(dim(control$ar$f) != nUnits)){
-      stop("\'ar$f\' must be a matrix of size ",nUnits,"\n")  
-    }
-    if(is.null(control$ar[["lag", exact = TRUE]])) control$ar$lag <- 1
-    if(is.null(control$ar[["weights", exact = TRUE]])){
-      control$ar$weights <- NULL
-    } else if(!is.matrix(control$ar$weights)){
-      stop("\'ar$weights\' must be a matrix of size ",nUnits,"\n")          
-    } else if(any(dim(control$ar$weights) != nUnits)){
-      stop("\'ar$weights\' must be a matrix of size ",nUnits,"\n")    
-    }
-    if(is.null(control$ar[["initial", exact = TRUE]])) control$ar$initial <- NULL 
-    
-    # currently only lag=1 considered
-    if(control$ar$lag !=1) stop("\'ar$lag\' must be 1\n")
-    # check whether f is a matrix or a formula
-    if(is.matrix(control$ar$f)){
-      #use identity matrix if weight matrix is missing
-      if(is.null(control$ar$weights)) control$ar$weights <- diag(nrow=nUnits)
-      
-      control$ar$isMatrix <- TRUE
+  ## arguments in 'control' override any corresponding default arguments
+  defaultControl <- lapply(CONTROL.hhh4, eval, envir=environment())
+  environment(defaultControl$ar$f) <- environment(defaultControl$ne$f) <-
+      environment(defaultControl$end$f) <- .GlobalEnv
+  control <- modifyList(defaultControl, control)
+
+  ## add the stsObj to control$data
+  control$data <- modifyList(list(.sts=stsObj), as.list(control$data))
+  
+  ## add nTime and nUnits to control list
+  control$nTime <- nTime                # FIXME: are these actually
+  control$nUnits <- nUnits              #        used anywhere?
+
+  ## check that component specifications are list objects
+  for (comp in c("ar", "ne", "end")) {
+      if(!is.list(control[[comp]])) stop("'control$", comp, "' must be a list")
+  }
+
+  ## check lags in "ar" and "ne" components
+  for (comp in c("ar", "ne")) {
+      if (!isScalar(control[[comp]]$lag))
+          stop("'control$", comp, "$lag' must be scalar")
+      control[[comp]]$lag <- as.integer(control[[comp]]$lag)
+      if (control[[comp]]$lag != 1L)
+          stop("currently, only 'control$", comp, "$lag=1' is supported")
+  }
+
+  
+  ### check AutoRegressive component
+  
+  control$ar$isMatrix <- is.matrix(control$ar$f)
+
+  if (is.matrix(control$ar$f)) {
+      if (any(dim(control$ar$f) != nUnits))
+          stop("'control$ar$f' must be a square matrix of size ", nUnits)
+      # use identity matrix if weight matrix is missing
+      if (is.null(control$ar$weights)) control$ar$weights <- diag(nrow=nUnits)
       control$ar$inModel <- TRUE
-    } else {
-      control$ar$isMatrix <- FALSE
-      if(!is.null(control$ar$weights)) {
-        warning("argument \'ar$weights\' is not used\n")
-        control$ar$weights <- NULL
+  } else if (inherits(control$ar$f, "formula")) {
+      if (!is.null(control$ar$weights)) {
+          warning("argument 'control$ar$weights' is not used")
+          control$ar$weights <- NULL
       }
-      #check if formula is valid
-      control$ar$inModel <- isInModel(control$ar$f,"\'ar$f\'") 
-    }
-  }
-  
-  ##----------------------------------------------------------------------
-  if(is.null( control[["ne", exact = TRUE]] )) {
-    control$ne <- list(f = ~ -1, lag = 1, weights = NULL, initial = NULL, inModel = FALSE)
+      # check if formula is valid
+      control$ar$inModel <- isInModel(control$ar$f)
   } else {
-    if(!is.list(control$ne)){
-      stop("\'ne\' must be a list\n")
-    } else if(is.null( control$ne[["f", exact = TRUE]] )){
-      stop("Predictor for the neighbour component \'ne\' not specified.\n")
-    } else if( !inherits(control$ne$f, "formula") ){
-      stop("\'ne$f\' must be a formula\n")
-    } 
-    if(is.null(control$ne[["lag", exact = TRUE]])) control$ne$lag <- 1
-    if(is.null(control$ne[["initial", exact = TRUE]])) control$ne$initial <- NULL 
-    
-    # currently only lag=1 considered
-    if(control$ne$lag !=1) stop("\'ne$lag\' must be 1\n")
-    #check if formula is valid
-    control$ne$inModel <- isInModel(control$ne$f,"\'ne$f\'") 
-    # if ar$f is a matrix and thus includes neighbouring units, control$ne$f must be empty
-    if(control$ar$isMatrix & control$ne$inModel){
-      stop("\'ne$f\' is not allowed when \'ar$f\' is a matrix\n")
-    }
-    
-    # check ne$weights specification
-    testweights <- if (is.null(control$ne[["weights"]])) {
-        # if no weight is specified, the nhood-matrix of the stsObj is used
-        control$ne$weights <- neighbourhood(stsObj)
-        diag(control$ne$weights) <- 0
-        control$ne$weights
-    } else if (is.array(control$ne[["weights"]])) {
-        control$ne$weights
-    } else if (is.list(control$ne[["weights"]]) &&
-               all(sapply(control$ne$weights[paste0(c("","d","d2"), "weights")],
-                          is.function))
-               ) {
-        stop("not yet implemented")
-        #control$ne$weights$weights(initpars, nbmat, data)    # TODO...
-    } else {
-        stop("'ne$weights' must be NULL, an array or a list of functions")
-    }
-    # check matrix/array of weights
-    if(any(dim(testweights)[1:2] != nUnits) ||
-       isTRUE(dim(testweights)[3] != nTime))
-        stop("'ne$weights' must conform to dimensions ",nUnits, " x ", nUnits,
-             " (x ", nTime, ")")
-    if(any(!diag(testweights) %in% 0))
-        stop("'diag(ne$weights)' must only contain zeroes")
-    if (any(is.na(testweights)))
-        stop("missing values in 'ne$weights' are not allowed")
+      stop("'control$ar$f' must be either a formula or a matrix")
   }
-  
-  ##----------------------------------------------------------------------
-  if(is.null( control[["end", exact = TRUE]] )) {
-    control$end <- list(f = ~ 1, offset = 1, initial = NULL, inModel=TRUE)
-  } else {
-    if(!is.list(control$end)){
-      stop("\'end\' must be a list\n")
-    } else if(is.null( control$end[["f", exact = TRUE]] )){
-      stop("Predictor for the endemic component \'end\' not specified.\n")
-    } else if( !inherits(control$end$f, "formula") ){
-      stop("\'end$f\' must be a formula\n")
-    }   
-    if(is.null(control$end[["offset", exact = TRUE]])){
-      control$end$offset <- 1
-    } else if(!identical(control$end$offset,1) && !is.matrix(control$end$offset)){
-      stop("\'end$offset\' must be a matrix of size ",nTime,"x",nUnits,"\n")        
-    } else if(!identical(control$end$offset,1) && {(ncol(control$end$offset) != nUnits) | (nrow(control$end$offset) != nTime)}){
-      stop("\'end$offset\' must be a matrix of size ",nTime,"x",nUnits,"\n")        
-    } else if(any(is.na(control$end$offset))){
-      stop("\'end$offset\' cannot contain NA values\n")
-    }
-    if(is.null(control$end[["initial", exact = TRUE]])) control$end$initial <- NULL
-     
-    #check if formula is valid
-    control$end$inModel <- isInModel(control$end$f,"\'end$f\'") 
-     
-  }
-  
-  if(is.null(control[["family",exact=TRUE]]))
-    control$family <- "Poisson"
-  
-  if(is.null(control[["subset",exact=TRUE]])){
-    if(nTime <= 2) stop("too few observations\n")
-    control$subset <- 2:nTime
-  }
-  
-  if(is.null(control[["optimizer"]])) control$optimizer <- list()
-  control$optimizer <- modifyList(
-                       list(stop       = list(tol=1e-5, niter=100),
-                            regression = list(method="nlminb"),
-                            variance   = list(method="nlminb")),
-                       control[["optimizer"]])
 
-  if(is.null(control[["verbose",exact=TRUE]]))
-    control$verbose <- FALSE
-    
-  if(is.null(control[["start", exact=TRUE]])){
-    control$start <- list(fixed=NULL,random=NULL,sd.corr=NULL)
-  } else {
-    # set default values (if not provided in start)
-    if(is.null(control$start[["fixed",exact=TRUE]]))
-      control$start$fixed <- NULL
-    if(is.null(control$start[["random",exact=TRUE]]))
-      control$start$random <- NULL
-    if(is.null(control$start[["sd.corr",exact=TRUE]]))
-      control$start$sd.corr <- NULL 
+  if (is.matrix(control$ar$weights)) {
+      if (any(dim(control$ar$weights) != nUnits))
+          stop("'control$ar$weights' must be a square matrix of size ", nUnits)
   }
   
-  if(is.null(control[["keep.terms",exact=TRUE]]))
-    control$keep.terms <- FALSE
-        
-  control$nTime <- nTime
-  control$nUnits <- nUnits
+  
+  ### check NEighbourhood component
+  
+  if (!inherits(control$ne$f, "formula"))
+      stop("'control$ne$f' must be a formula")
+  control$ne$inModel <- isInModel(control$ne$f)
+  
+  if (control$ne$inModel) {
+      ## if ar$f is a matrix it includes neighbouring units => no "ne" component
+      if (control$ar$isMatrix)
+          stop("there must not be an extra \"ne\" component ",
+               "if 'control$ar$f' is a matrix")
+      ## check ne$weights specification
+      checkWeights(control$ne$weights, nUnits, nTime,
+                   neighbourhood(stsObj), control$data)
+  } else control$ne$weights <- NULL
 
+  
+  ### check ENDemic component
+  
+  if (!inherits(control$end$f, "formula"))
+      stop("'control$end$f' must be a formula")
+  control$end$inModel <- isInModel(control$end$f)
+
+  if (is.matrix(control$end$offset) && is.numeric(control$end$offset)){
+      if (!identical(dim(control$end$offset), dim(stsObj)))
+          stop("'control$end$offset' must be a numeric matrix of size ",
+               nTime, "x", nUnits)
+      if (any(is.na(control$end$offset)))
+          stop("'control$end$offset' must not contain NA values")
+  } else if (!identical(as.numeric(control$end$offset), 1)) {
+      stop("'control$end$offset' must either be 1 or a numeric ",
+           nTime, "x", nUnits, " matrix")
+  }
+
+
+  ### check remaining components of the control list
+  
+  control$family <- match.arg(control$family, defaultControl$family)  
+
+  if (!is.vector(control$subset, mode="numeric") ||
+      !all(control$subset %in% seq_len(nTime)))
+      stop("'control$subset' must be %in% 1:", nTime)
+
+  if (!is.list(control$optimizer) ||
+      any(! sapply(c("stop", "regression", "variance"),
+                   function(x) is.list(control$optimizer[[x]]))))
+      stop("'control$optimizer' must be a list of lists")
+
+  if (!length(control$verbose) == 1L ||
+      (!is.logical(control$verbose) && !is.numeric(control$verbose)))
+      stop("'control$verbose' must be a numeric or logical value")
+  control$verbose <- as.integer(control$verbose)
+
+  if (!is.list(control$start) ||
+      any(! sapply(c("fixed", "random", "sd.corr"),
+                   function(x) is.null(control$start[[x]]) ||
+                               is.numeric(control$start[[x]]))))
+      stop("'control$start' must be a list of numeric start values")
+  
+  stopifnot(length(control$keep.terms) == 1L, is.logical(control$keep.terms))
+
+  ## Done
   return(control)
 }
+
 
 # check whether or not one of the three components is included in the model
 isInModel <- function(formula, name=deparse(substitute(formula))){
@@ -576,6 +549,13 @@ interpretControl <- function(control, stsObj){
   ar <- control$ar
   ne <- control$ne
   end <- control$end
+
+  ## function which returns the weight matrix
+  ## if (all(nbmat %in% 0:1)) {
+  ##     ## determine (integer) neighbourhood matrix up to order 'maxlag'
+  ##     ## this is the time-consuming part !!!
+  ##     nbmat <- nblagmat(neighbourhood, maxlag)
+  ## }
 
   ## FIXME: really weird... if the array below is evaluated, code will be faster
   ## A complex example model takes 132s (without this nonsense array evaluation)
@@ -2238,7 +2218,7 @@ addSeason2formula <- function(f=~1,       # formula to start with
       f <- paste(f,"+ fe( sin(",2*i,"*pi*t/",period,"), which=c(",which,")) + fe( cos(",2*i,"*pi*t/",period,"), which=c(",which,"))",sep="")
     }
   }
-  return(as.formula(f))
+  return(as.formula(f, env=.GlobalEnv))
 }
 
 
