@@ -13,6 +13,30 @@
 
 ### check ne$weights specification
 
+checkNeighbourhood <- function (neighbourhood)
+{
+    ## setValidity() in sts.R only guarantees correct 'dim' and 'dimnames'
+    ## we also assert numeric or logical matrix with non-NA entries
+    stopifnot(is.matrix(neighbourhood),
+              nrow(neighbourhood) == ncol(neighbourhood),
+              is.numeric(neighbourhood) | is.logical(neighbourhood),
+              is.finite(neighbourhood))
+    invisible(TRUE)
+}
+
+checkWeightsArray <- function (W, nUnits, nTime, name)
+{
+    if (!is.array(W))
+        stop("'", name, "' must return a matrix/array")
+    if (any(dim(W)[1:2] != nUnits) || isTRUE(dim(W)[3] != nTime))
+        stop("'", name, "' must conform to dimensions ",
+             nUnits, " x ", nUnits, " (x ", nTime, ")")
+    if (any(!diag(W) %in% 0))
+        stop("'diag(", name, ")' must only contain zeroes")
+    if (any(is.na(W)))
+        stop("missing values in '", name, "' are not allowed")
+}
+
 checkWeights <- function (weights, nUnits, nTime,
                           nbmat, data)  # only used for parametric weights
 {
@@ -20,23 +44,37 @@ checkWeights <- function (weights, nUnits, nTime,
 
     ## check specification
     testweights <- if (is.array(weights)) weights else {
-        if (is.list(weights) && checkWeightsFUN(weights)) {
+        if (is.list(weights) && checkWeightsFUN(weights)
+            && checkNeighbourhood(nbmat)) {
             weights$w(weights$initial, nbmat, data)
         } else {
-            stop("'", name, "' must be an array or a list of functions")
+            stop("'", name, "' must be a matrix/array or a list of functions")
         }
     }
     
-    ## check matrix/array of weights
-    if (any(dim(testweights)[1:2] != nUnits) ||
-        isTRUE(dim(testweights)[3] != nTime))
-        stop("'", name, "' must conform to dimensions ",
-             nUnits, " x ", nUnits, " (x ", nTime, ")")
-    if (any(!diag(testweights) %in% 0))
-        stop("'diag(", name, ")' must only contain zeroes")
-    if (any(is.na(testweights)))
-        stop("missing values in '", name, "' are not allowed")
-
+    ## apply matrix/array checks
+    if (is.list(weights)) { # parametric weights
+        checkWeightsArray(testweights, nUnits, nTime, name=paste0(name, "$w"))
+        dim.d <- length(weights$initial)
+        dw <- weights$dw(weights$initial, nbmat, data)
+        d2w <- weights$d2w(weights$initial, nbmat, data)
+        if (dim.d == 1L) {
+            checkWeightsArray(dw, nUnits, nTime, name=paste0(name, "$dw"))
+            checkWeightsArray(d2w, nUnits, nTime, name=paste0(name, "$d2w"))
+        } else {
+            if (!is.list(dw) || length(dw) != dim.d)
+                stop("'", name, "$dw' must return a list (of matrices/arrays)",
+                     " of length ", dim.d)
+            if (!is.list(d2w) || length(d2w) != dim.d)
+                stop("'", name, "$d2w' must return a list (of matrices/arrays)",
+                     " of length ", dim.d)
+            lapply(dw, checkWeightsArray, nUnits, nTime,
+                   name=paste0(name, "$dw[[i]]"))
+            lapply(d2w, checkWeightsArray, nUnits, nTime,
+                   name=paste0(name, "$d2w[[i]]"))
+        }
+    } else checkWeightsArray(testweights, nUnits, nTime, name=name)
+    
     ## Done
     invisible(TRUE)
 }
@@ -65,7 +103,9 @@ weightedSumNE <- function (observed, weights, lag)
     res[,i] <- colSums(weightedObs, na.rm=TRUE)
   }
 
-  rbind(matrix(NA_real_, lag, nUnits), head(res, nTime-lag))
+  reslagged <- rbind(matrix(NA_real_, lag, nUnits),
+                     res[seq_len(nTime-lag),,drop=FALSE])
+  reslagged
 }
 
 ## slower alternative, where the weights are always converted to a 3D array
@@ -95,14 +135,12 @@ weightedSumNE.old <- function(observed, weights, lag)
 
 nblagmat <- function (neighbourhood, maxlag = 1)
 {
-    stopifnot(isScalar(maxlag), maxlag > 0, is.matrix(neighbourhood))
-    nd <- dim(neighbourhood)
-    nregions <- nd[1L]
-    if (nregions != nd[2L]) stop("'neighbourhood' matrix must be square")
+    stopifnot(isScalar(maxlag), maxlag > 0)
+    checkNeighbourhood(neighbourhood)
+    nregions <- nrow(neighbourhood)
     maxlag <- as.integer(min(maxlag, nregions-1)) # upper bound of nb order
     neighbourhood <- neighbourhood != 0           # convert to binary matrix
-    ndn <- dimnames(neighbourhood)
-    region.ids <- ndn[[1L]]
+    region.ids <- dimnames(neighbourhood)[[1L]]
     
     if (maxlag == 1L) {
         storage.mode(neighbourhood) <- "integer"
@@ -164,12 +202,14 @@ checkWeightsFUN <- function (object)
 {
     fnames <- paste0(c("","d","d2"), "w")
     if (any(!sapply(object[fnames], is.function)))
-        stop("parametric weights require functions 'w', 'dw', 'd2'")
+        stop("parametric weights require functions ",
+             paste0("'", fnames, "'", collapse=", "))
     if (any(!sapply(object[fnames], function(FUN) length(formals(FUN)) >= 3L)))
         stop("parametric weights functions must accept (not necessarily use)",
              "\n  at least 3 arguments (parameter vector, ",
              "neighbourhood order matrix, data)")
-    if (!is.vector(object$initial, mode="numeric"))
+    if (!is.vector(object$initial, mode="numeric") ||
+        length(object$initial) == 0L)
         stop("parametric weights require initial parameter values")
     TRUE
 }
@@ -226,31 +266,32 @@ zetaweights <- function (nbmat, maxlag = Inf, rho = 1,
 
 ### powerlaw weights
 ## in the non-truncated case, i.e. maxlag = max(nbmat),
-## the raw powerlaw weights are defined as w_ji = o_ji^-rho,
-## and with (row-)normalization we have    w_ji = o_ji^-rho / sum_k o_jk^-rho
+## the raw powerlaw weights are defined as w_ji = o_ji^-d,
+## and with (row-)normalization we have    w_ji = o_ji^-d / sum_k o_jk^-d
 
-powerlaw <- function (maxlag, normalize = TRUE) # only shared=FALSE is supported
+powerlaw <- function (maxlag, normalize = TRUE, initial = 1)
+                                        # atm, only shared=FALSE is supported
 {
     if (missing(maxlag)) {
         stop("'maxlag' must be specified (e.g., maximum neighbourhood order)")
     }
 
     ## main function which returns the weight matrix
-    weights.call <- call("zetaweights", quote(nbmat), maxlag, quote(rho),
+    weights.call <- call("zetaweights", quote(nbmat), maxlag, quote(d),
                          normalize, FALSE)
-    weights <- as.function(c(alist(rho=, nbmat=, ...=), weights.call),
+    weights <- as.function(c(alist(d=, nbmat=, ...=), weights.call),
                            envir=.GlobalEnv)
 
-    ## construct derivatives with respect to "rho"
-    dweights <- d2weights <- as.function(c(alist(rho=, nbmat=, ...=),
+    ## construct derivatives with respect to "d"
+    dweights <- d2weights <- as.function(c(alist(d=, nbmat=, ...=),
         substitute({
             W <- weights.call
-            is.na(nbmat) <- nbmat == 0L # w_jj = 0 => d/drho = 0, sum over j!=i
+            is.na(nbmat) <- nbmat == 0L # w_jj(d) = 0 => w_jj'(d) = 0, sum over j!=i
             tmp1a <- log(nbmat)
-            norm <- rowSums(nbmat^-rho, na.rm=TRUE) # unused for raw weights
-            tmp1b <- rowSums(nbmat^-rho * -log(nbmat), na.rm=TRUE)/norm # set to 0 for raw
+            norm <- rowSums(nbmat^-d, na.rm=TRUE) # unused for raw weights
+            tmp1b <- rowSums(nbmat^-d * -log(nbmat), na.rm=TRUE)/norm # set to 0 for raw
             tmp1 <- tmp1a + tmp1b
-            tmp2 <- rowSums(nbmat^-rho * log(nbmat)^2, na.rm=TRUE)/norm - tmp1b^2 # for 2nd deriv
+            tmp2 <- rowSums(nbmat^-d * log(nbmat)^2, na.rm=TRUE)/norm - tmp1b^2 # for 2nd deriv
             deriv <- W * -tmp1          # for d2weights: W * (tmp1^2 - tmp2)
             deriv[is.na(deriv)] <- 0
             deriv
@@ -271,7 +312,7 @@ powerlaw <- function (maxlag, normalize = TRUE) # only shared=FALSE is supported
     }
     
     ## return list of functions
-    list(w=weights, dw=dweights, d2w=d2weights, initial=1)
+    list(w=weights, dw=dweights, d2w=d2weights, initial=initial)
 }
 
 

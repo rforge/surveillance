@@ -44,7 +44,7 @@ hhh4(stsObj,
                          ),
                ne = list(f = ~ -1,
                          lag = 1,
-                         weights = neighbourhood(stsObj) != 0,
+                         weights = neighbourhood(stsObj),
                          initial = NULL
                          ),
                end = list(f = ~ 1,
@@ -89,7 +89,7 @@ hhh4(stsObj,
 	  \item{f = ~ -1}{a formula specifying \eqn{\log(\phi_{it})}{log(\phi_it)}}
 	  \item{lag = 1}{autoregression on \eqn{y_{j,t-lag}}{y_j,t-lag}  
 	    (currently only \code{lag = 1} is possible)}
-	  \item{weights = neighbourhood(stsObj) != 0}{
+	  \item{weights = neighbourhood(stsObj)}{
 	    weights \eqn{w_{ji}}{w_ji}. By default, 
 	    the neighbourhood matrix of \code{stsObj} is used.}
 	  \item{initial = NULL}{vector with initial values for

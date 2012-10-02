@@ -43,7 +43,7 @@
   \tabular{ll}{
     Package: \tab surveillance\cr
     Version: \tab 1.4-3\cr
-    Date: \tab 2012-08-20\cr
+    Date: \tab 2012-10-01\cr
     License: \tab GPL version 2
     (\url{http://www.gnu.org/licenses/old-licenses/gpl-2.0.html}) \cr
     URL: \tab \url{http://surveillance.r-forge.r-project.org/}\cr
@@ -99,9 +99,11 @@
   The authors would like to thank the following people for ideas,
   discussions, testing and feedback:
   Doris Altmann, Johannes Dreesman, Johannes Elias, Mayeul Kauffmann,
-  Marcos Prates, Barry Rowlingson, Christopher W. Ryan, Klaus Stark,
-  Yann Le Strat, Andr\enc{é}{e} Michael Toschke, Achim Zeileis.
+  Marc Geilhufe, Marcos Prates, Barry Rowlingson, Christopher W. Ryan,
+  Klaus Stark, Yann Le Strat, Andr\enc{é}{e} Michael Toschke,
+  Achim Zeileis.
 }
+
 \author{
   Michael H\enc{ö}{oe}hle, Sebastian Meyer, and Michaela Paul
   

@@ -278,7 +278,7 @@ plot.ah4 <- function(x,i=1,ylim=NULL, ylab="No. infected",title=NULL,m=NULL,xlab
   m$mean[is.na(m$mean)] <- 0
     
   tp <- (1:(length(obs)))/x$stsObj@freq +x$stsObj@start[1] + x$stsObj@start[2]/x$stsObj@freq
-  if(!is.null(dim(as.matrix(m$epidemic)))) {
+  if(!is.null(dim(as.matrix(m$epidemic)))) { # FIXME: will this ever be FALSE?
     polygon(c(tp[1],tp,tail(tp,1)),c(0,as.matrix(m$mean)[,i],0),col=col[1],border=col[1])
     if(!is.null(dim(m$epi.own)))
       polygon(c(tp[1],tp,tail(tp,1)),c(0,as.matrix(m$endemic)[,i]+as.matrix(m$epi.own)[,i],0),col=col[2],border=col[2])
