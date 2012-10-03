@@ -2,7 +2,7 @@ Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
 Version: 1.4-3
 Revision: $Rev$
-Date: 2012-10-02 22:30:55+02:00
+Date: 2012-10-03 23:42:30+02:00
 Author: M. Höhle, S. Meyer and M. Paul
         with contributions from
         T. Correa, L. Held, M. Hofmann, C. Lang, A. Riebler, D. Sabanés Bové,
@@ -14,7 +14,7 @@ Imports: graphics, utils, Matrix, MASS, colorspace, xtable, spc, msm, quadprog,
         gpclib, spatstat (>= 1.17-0), intervals
 LinkingTo: Rcpp
 Suggests: mvtnorm, RUnit, digest, coda, gamlss, splancs, statmod,
-        animation, RColorBrewer, vcd, maptools, VGAM, spdep
+        animation, RColorBrewer, vcd, maptools, VGAM, spdep, numDeriv, maxLik
 Description: A package implementing statistical methods for the modeling and
         change-point detection in time series of counts, proportions and
         categorical data, as well as for the modeling of continuous-time

@@ -93,3 +93,53 @@ modifyListcall <- function (x, val)
     }
     x
 }
+
+
+
+### _c_onditional lapply, which only uses lapply() if X really is a list object
+### and otherwise applies FUN to X. The result is always a list (of length 1 in
+### the latter case). Used for neOffset in hhh4 models.
+
+clapply <- function (X, FUN, ...)
+{
+    if (is.list(X)) lapply(X, FUN, ...) else list(FUN(X, ...))
+}
+
+
+
+### Simple wrapper around functionality of the numDeriv and maxLik packages
+### to check the score vector and the Fisher information matrix
+### CAVE: the return values of both wrappers are not unified
+
+checkDerivatives.numDeriv <- function(ll, score, fisher, theta, method="simple",
+                                      method.args=list(eps=1e-6), ...)
+{
+    cat("Checking analytical score vector ...\n")
+    nsc <- numDeriv::grad(ll, theta, method, method.args, ...)
+    asc <- penScore(theta, ...)
+    print(all.equal(asc, nsc, check.attributes=FALSE))
+    cat("Checking analytical Fisher information matrix ...\n")
+    nfi <- -numDeriv::hessian(ll, theta, "Richardson", ...)
+    afi <- penFisher(theta, ...)
+    print(all.equal(afi, nfi, check.attributes=FALSE))
+    invisible(list(score  = list(analytic=asc, numeric=nsc),
+                   fisher = list(analytic=afi, numeric=nfi)))
+}
+
+
+checkDerivatives.maxLik <- function(ll, score, fisher, theta, eps=1e-6,
+                                    print=FALSE, ...)
+{
+    cat("Checking analytical score vector and Fisher information matrix ...\n")
+    res <- maxLik::compareDerivatives(
+                   f=ll, grad=score,
+                   hess=function (theta, ...) -fisher(theta, ...),
+                   t0=theta, eps=eps, print=print, ...)
+    cat("Comparison of score vectors:\n")
+    print(all.equal(res$compareGrad$analytic, drop(res$compareGrad$numeric),
+                    check.attributes=FALSE))
+    cat("Comparison of Fisher information matrices:\n")
+    print(all.equal(res$compareHessian$analytic, drop(res$compareHessian$numeric),
+                    check.attributes=FALSE))
+    invisible(res)
+}

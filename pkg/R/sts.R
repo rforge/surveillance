@@ -287,7 +287,10 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
 
   #Save time by not allocating a new object
   #res <- new("sts",epoch=week, freq=x@freq, start=start,observed=observed,state=state,alarm=alarm,upperbound=upperbound,neighbourhood=neighbourhood,populationFrac=populationFrac,map=x@map,control=x@control)
-    
+
+  ## FIXME: also subset map according to region index j? Here's the code:
+  ##x@map <- x@map[colnames(x@observed),]
+  
   return(x)
 })
 
@@ -915,6 +918,9 @@ setValidity("sts", function ( object ) {
   if (!all( colnames(object@observed) == colnames(object@neighbourhood)))
     retval <- c( retval , " colnames of observed and neighbourhood have to match")
 
+  ## FIXME: if map slot is not NULL, check that all colnames(object@observed)
+  ## are in row.names(object@map) (ideally, these are identical sets)
+  
   if(is.null( retval)) return ( TRUE )
   else return ( retval )
 })

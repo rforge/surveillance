@@ -60,7 +60,8 @@ hhh4(stsObj,
                start = list(fixed=NULL, random=NULL, sd.corr=NULL),
                data = data.frame(t = epoch(stsObj)-1),
                keep.terms = FALSE
-               )
+               ),
+     check.analyticals = FALSE
    )
 }
 
@@ -138,6 +139,14 @@ hhh4(stsObj,
 	is to be returned }
     }
   }
+  \item{check.analyticals}{logical (or a subset of
+    \code{c("numDeriv", "maxLik")}), indicating if (how) the implemented
+    analytical score vector and Fisher information matrix should be
+    checked against numerical derivatives at the parameter starting values,
+    using the packages \pkg{numDeriv} and/or \pkg{maxLik}. If activated,
+    \code{hhh4} will return a list containing the analytical and numerical
+    derivatives for comparison (no ML estimation will be performed). 
+    This is mainly intended for internal use by the package developers.}
 }
 
 \value{Returns an object of class \code{ah4} with elements

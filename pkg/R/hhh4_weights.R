@@ -46,6 +46,7 @@ checkWeights <- function (weights, nUnits, nTime,
     testweights <- if (is.array(weights)) weights else {
         if (is.list(weights) && checkWeightsFUN(weights)
             && checkNeighbourhood(nbmat)) {
+            ## FIXME: stop() if nbmat only contains 0/1 entries
             weights$w(weights$initial, nbmat, data)
         } else {
             stop("'", name, "' must be a matrix/array or a list of functions")
@@ -139,7 +140,7 @@ nblagmat <- function (neighbourhood, maxlag = 1)
     checkNeighbourhood(neighbourhood)
     nregions <- nrow(neighbourhood)
     maxlag <- as.integer(min(maxlag, nregions-1)) # upper bound of nb order
-    neighbourhood <- neighbourhood != 0           # convert to binary matrix
+    neighbourhood <- neighbourhood == 1           # convert to binary matrix
     region.ids <- dimnames(neighbourhood)[[1L]]
     
     if (maxlag == 1L) {

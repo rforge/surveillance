@@ -57,7 +57,7 @@ CONTROL.hhh4 <- alist(
 
 ### Main function, which is to be called by the user
 
-hhh4 <- function (stsObj, control)
+hhh4 <- function (stsObj, control, check.analyticals = FALSE)
 {
   ## Convert old disProg class to new sts class
   if(inherits(stsObj, "disProg")) stsObj <- disProg2sts(stsObj)
@@ -77,11 +77,27 @@ hhh4 <- function (stsObj, control)
   theta.start <- model$initialTheta
   Sigma.start <- model$initialSigma
   
-  # check if initial values are valid
-  # there might be NA's in mu if there are missing values in Y
+  ## check if initial values are valid
+  ## CAVE: there might be NA's in mu if there are missing values in Y
   mu <- meanHHH(theta.start,model)$mean
   if(any(mu==0, na.rm=TRUE) || any(is.infinite(mu)))
     stop("some mean is degenerate (0 or Inf) at initial values")
+
+  ## check score vector and fisher information at starting values
+  check.analyticals <- if (isTRUE(check.analyticals)) {
+      "numDeriv"
+  } else if (is.character(check.analyticals)) {
+      match.arg(check.analyticals, c("numDeriv", "maxLik"), several.ok=TRUE)
+  } else NULL
+  resCheck <- sapply(check.analyticals, function(derivMethod) {
+      if (require(derivMethod, character.only=TRUE)) {
+          do.call(paste("checkDerivatives", derivMethod, sep="."),
+                  args=alist(penLogLik, penScore, penFisher, theta.start,
+                             sd.corr=Sigma.start, model=model))
+      }
+  }, simplify=FALSE, USE.NAMES=TRUE)
+  if (length(resCheck) == 1L) resCheck <- resCheck[[1L]]
+  if (length(resCheck) > 0L) return(resCheck)
 
   ## maximize loglikelihood (penalized and marginal)
   myoptim <- fitHHH(theta=theta.start,sd.corr=Sigma.start, model=model,
@@ -539,10 +555,9 @@ neOffsetFUN <- function (Y, neweights, nbmat, data, lag)
         function (pars, type = "response") {
             name <- switch(type, response="w", gradient="dw", hessian="d2w")
             weights <- neweights[[name]](pars, nbmat, data)
-            if (is.list(weights)) { # if length(pars) > 1 and
-                                    # type %in% c("gradient", "hessian")
-                lapply(weights, function(W) weightedSumNE(Y, W, lag))
-            } else weightedSumNE(Y, weights, lag)
+            ## gradient and hessian are lists if length(pars$d) > 1L
+            ## and single matrices/arrays if == 1 => _c_onditional lapply
+            clapply(weights, function(W) weightedSumNE(Y, W, lag))
         }
     } else { # fixed (known) array (0-length pars)
         initoffset <- weightedSumNE(Y, neweights, lag)
@@ -812,15 +827,15 @@ meanHHH <- function(theta, model)
   }
   
   ## autoregressive component
-  ar.mean <- (computePartMean(1) * offsets[[1L]])[subset,]
+  ar.mean <- (computePartMean(1) * offsets[[1L]])[subset,,drop=FALSE]
   
   ## neighbourhood component
   ne.exppred <- computePartMean(2)
   ne.offset <- offsets[[2L]](d)         # this is just 0 if no "ne" in model
-  ne.mean <- (ne.exppred * ne.offset)[subset,]
+  ne.mean <- (ne.exppred * ne.offset)[subset,,drop=FALSE]
   
   ## endemic component
-  end.mean <- (computePartMean(3) * offsets[[3L]])[subset,]
+  end.mean <- (computePartMean(3) * offsets[[3L]])[subset,,drop=FALSE]
    
   ## total mean
   mean <- ar.mean + ne.mean + end.mean
@@ -828,7 +843,7 @@ meanHHH <- function(theta, model)
   ## Done (FIXME: "epidemic" seems to be unused)
   list(mean=mean, epidemic=ar.mean+ne.mean, endemic=end.mean,
        epi.own=ar.mean, epi.neighbours=ne.mean,
-       ne.exppred=ne.exppred[subset,])
+       ne.exppred=ne.exppred[subset,,drop=FALSE])
 }
 
 
@@ -952,7 +967,7 @@ penScore <- function(theta, sd.corr, model)
   derivHHH <- function (dmu) derivHHH.factor * dmu
 
   ## go through groups of parameters and compute the gradient of each component
-  computeGrad <- function(mean.comp, subset){
+  computeGrad <- function(mean.comp){
   
     grad.fe <- numeric(0L)
     grad.re <- numeric(0L)
@@ -986,21 +1001,18 @@ penScore <- function(theta, sd.corr, model)
     list(fe=grad.fe, re=grad.re)
   }
   
-  gradients <- computeGrad(mean.comp=mu[c("epi.own","epi.neighbours","endemic")],
-                           subset=subset)
+  gradients <- computeGrad(mu[c("epi.own","epi.neighbours","endemic")])
 
   ## gradient for parameter vector of the neighbourhood weights
   grd <- if (dimd > 0L) {
-      neOffsets <- model$offsets[[2L]](pars$d, type="gradient")
+      dneOffset <- model$offset[[2L]](pars$d, type="gradient")
       ##<- this is a matrix/array (dimd=1) or a list of such objects (dimd>1)
-      onescore.d <- function (dW) {
-          dmudd <- mu$ne.exppred * dW
+      onescore.d <- function (dneoff) {
+          dmudd <- mu$ne.exppred * dneoff[subset,,drop=FALSE]
           grd.terms <- derivHHH(dmudd)
           sum(grd.terms, na.rm=TRUE)
       }
-      if (dimd == 1L) onescore.d(neOffsets) else {
-          lapply(neOffsets, onescore.d)
-      }
+      unlist(clapply(dneOffset, onescore.d))
   } else numeric(0L)
   
   ## gradient for overdispersion parameter psi
@@ -1096,19 +1108,53 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
   }
 
   ## go through groups of parameters and compute the hessian of each component
-  computeFisher <- function(mean.comp, subset){
+  computeFisher <- function(mean.comp){
     # initialize hessian
     hessian.FE.FE <- matrix(0,dimFE,dimFE)
     hessian.FE.RE <- matrix(0,dimFE,dimRE)
     hessian.RE.RE <- matrix(0,dimRE,dimRE)
     
-    hessian.FE.Psi <- matrix(0,dimFE, dimPsi)
-    hessian.Psi.RE <- matrix(0,dimPsi, dimPsi+dimRE)
+    hessian.FE.Psi <- matrix(0,dimFE,dimPsi)
+    hessian.Psi.RE <- matrix(0,dimPsi,dimPsi+dimRE) # CAVE: contains PsiPsi and PsiRE
 
-    if (dimPsi > 0L) { # d l(theta,x) /dpsi dpsi
+    hessian.FE.d <- matrix(0,dimFE,dimd)
+    hessian.d.d <- matrix(0,dimd,dimd)
+    hessian.d.Psi <- matrix(0,dimd,dimPsi)
+    hessian.d.RE <- matrix(0,dimd,dimRE)
+    
+    ## derivatives wrt neighbourhood weight parameters d
+    if (dimd > 0L) {
+        phi.doff <- function (dneoff) {
+            mu$ne.exppred * dneoff[subset,,drop=FALSE]
+        }
+        ## for type %in% c("gradient", "hessian"), model$offset[[2L]] is a
+        ## matrix/array (dimd=1) or a list of such objects (dimd>1)
+        dneOffset <- model$offset[[2L]](pars$d, type="gradient")
+        dmudd <- clapply(dneOffset, phi.doff)
+        d2neOffset <- model$offset[[2L]](pars$d, type="hessian")
+        d2mudddd <- clapply(d2neOffset, phi.doff)
+        ij <- 0L
+        for (i in seq_len(dimd)) {
+            for (j in i:dimd) {
+                ij <- ij + 1L  #= dimd*(i-1) + j - (i-1)*i/2  # for j >= i
+                ## d2mudddd contains upper triangle, by row
+                d2ij <- deriv2HHH(dmudd[[i]], dmudd[[j]], d2mudddd[[ij]])
+                hessian.d.d[i,j] <- sum(d2ij, na.rm=TRUE)
+            }
+        }
+    }
+
+    if (dimPsi > 0L) {
+        ## d l(theta,x) /dpsi dpsi
         hessian.Psi.RE[,seq_len(dimPsi)] <- if (dimPsi == 1L) {
             sum(dPsidPsi(), na.rm=TRUE)
         } else diag(colSums(dPsidPsi(), na.rm=TRUE))
+        ## d l(theta) / dd dpsi
+        for (i in seq_len(dimd)) {      # will not be run if dimd==0
+            dPsi.i <- colSums(dThetadPsi(dmudd[[i]]),na.rm=TRUE)
+            if(dimPsi==1L) dPsi.i <- sum(dPsi.i)
+            hessian.d.Psi[i,] <- dPsi.i
+        }
     }
     
     ##
@@ -1173,9 +1219,9 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         }        
               
       } else if(unitSpecific.j){
-        dIJ <-  colSums(didj)[ which.j ]
+        dIJ <-  colSums(didj)[ which.j ] # FIXME: missing assignment for hessian.FE.RE?
       } else {
-        dIJ <- sum(didj,na.rm=TRUE)
+        dIJ <- sum(didj,na.rm=TRUE)      # FIXME: missing assignment for hessian.FE.RE?
       }
       hessian.FE.FE[idxFE==i,idxFE==j] <<- dIJ    
     }
@@ -1185,7 +1231,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
       # parameter group belongs to which components
       comp.i <- term["offsetComp",i][[1]]      
       # get covariate value
-      Xit<- term["terms",i][[1]] # eiter 1 or a matrix with values
+      Xit <- term["terms",i][[1]] # eiter 1 or a matrix with values
       if(is.matrix(Xit)){
         Xit <- Xit[subset,,drop=FALSE]
       }
@@ -1193,12 +1239,12 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
       
       random.i <- term["random",i][[1]]
       unitSpecific.i <- term["unitSpecific",i][[1]]
-      
+
+      ## fill psi-related entries and select fillHess function
       if(random.i){
         Z.i <- term["Z.intercept",i][[1]]   
         "%m%" <- get(term["mult",i][[1]])
-         
-        fillHess <-i.random
+        fillHess <- i.random
         if(dimPsi==1L){
           dPsi<- dThetadPsi(m.Xit)
           dPsi[isNA] <- 0
@@ -1215,11 +1261,11 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         which.i <- term["which",i][[1]]
         fillHess <- i.unit
         if(dimPsi>0L){
-          dPsi<- colSums(dThetadPsi(m.Xit),na.rm=TRUE)
-          if(dimPsi==1L){ 
-            hessian.FE.Psi[idxFE==i,] <- dPsi[which.i] 
+          dPsi <- colSums(dThetadPsi(m.Xit),na.rm=TRUE)
+          hessian.FE.Psi[idxFE==i,] <- if(dimPsi==1L) {
+              dPsi[which.i]
           } else {
-            hessian.FE.Psi[idxFE==i,] <- diag(dPsi)[which.i,]
+              diag(dPsi)[which.i,]
           }
         }
         
@@ -1231,23 +1277,31 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
           hessian.FE.Psi[idxFE==i,] <-dPsi
         }
       }
-            
 
+      ## fill pars$d-related entries
+      for (j in seq_len(dimd)) {      # will not be run if dimd==0
+          didd <- deriv2HHH(dTheta_l = m.Xit, dTheta_k = dmudd[[j]],
+                            dTheta_lk = if (comp.i == 2) dmudd[[j]] * Xit else 0)
+          didd[isNA] <- 0
+          hessian.FE.d[idxFE==i,j] <- if (unitSpecific.i) {
+              colSums(didd,na.rm=TRUE)[which.i]
+          } else sum(didd)
+          if (random.i) hessian.d.RE[j,idxRE==i] <- colSums(didd %m% Z.i)
+      }
+      
+      ## fill other (non-psi, non-d) entries
       for(j in 1:nGroups){
         comp.j <- term["offsetComp",j][[1]]
         
-        Xjt<- term["terms",j][[1]] # eiter 1 or a matrix with values
+        Xjt <- term["terms",j][[1]] # eiter 1 or a matrix with values
         if(is.matrix(Xjt)){
           Xjt <- Xjt[subset,,drop=FALSE]
         }
         # if param i and j do not belong to the same component, d(i)d(j)=0
-        if(comp.i!=comp.j){
-          m.Xit.Xjt <- 0
-        } else {
-          m.Xit.Xjt <- m.Xit*Xjt        
-        }
+        m.Xit.Xjt <- if (comp.i != comp.j) 0 else m.Xit * Xjt
         
-        didj <- deriv2HHH(dTheta_l=m.Xit,dTheta_k=mean.comp[[comp.j]]*Xjt, dTheta_lk=m.Xit.Xjt)
+        didj <- deriv2HHH(dTheta_l = m.Xit, dTheta_k = mean.comp[[comp.j]]*Xjt,
+                          dTheta_lk = m.Xit.Xjt)
         didj[isNA]<-0
 
         random.j <- term["random",j][[1]]      
@@ -1263,9 +1317,10 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
     ######################################################### 
     ## fill lower triangle of hessians and combine them
     ########################################################
-    hessian <- rbind(cbind(hessian.FE.FE,hessian.FE.Psi,hessian.FE.RE),
-                     cbind(matrix(0,dimPsi,dimFE),hessian.Psi.RE),
-                     cbind(matrix(0,dimRE,dimFE+dimPsi),hessian.RE.RE))
+    hessian <- rbind(cbind(hessian.FE.FE,hessian.FE.d,hessian.FE.Psi,hessian.FE.RE),
+                     cbind(matrix(0,dimd,dimFE),hessian.d.d,hessian.d.Psi,hessian.d.RE),
+                     cbind(matrix(0,dimPsi,dimFE+dimd),hessian.Psi.RE),
+                     cbind(matrix(0,dimRE,dimFE+dimd+dimPsi),hessian.RE.RE))
           
     diagHessian <- diag(hessian)
     hessian[lower.tri(hessian)] <- 0    #* only use upper.tri?
@@ -1273,10 +1328,9 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
     diag(fisher) <- -diagHessian   
   
     return(fisher)
-  } 
+  }
 
-  fisher <- computeFisher(mean.comp=mu[c("epi.own","epi.neighbours","endemic")],
-                          subset=subset)
+  fisher <- computeFisher(mu[c("epi.own","epi.neighbours","endemic")])
 
   ## add penalty for random effects
   pen <- matrix(0, dimFE+dimPsi+dimRE, dimFE+dimPsi+dimRE)
