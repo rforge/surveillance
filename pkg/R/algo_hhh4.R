@@ -1152,11 +1152,12 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         dmudd <- lapply(dneOffset, phi.doff)
         d2neOffset <- model$offset[[2L]](pars$d, type="hessian")
         d2mudddd <- lapply(d2neOffset, phi.doff)
+        ## d l(theta,x) /dd dd (fill only upper triangle)
         ij <- 0L
         for (i in seq_len(dimd)) {
             for (j in i:dimd) {
                 ij <- ij + 1L  #= dimd*(i-1) + j - (i-1)*i/2  # for j >= i
-                ## d2mudddd contains upper triangle, by row
+                ## d2mudddd contains upper triangle by row (=lowertri by column)
                 d2ij <- deriv2HHH(dmudd[[i]], dmudd[[j]], d2mudddd[[ij]])
                 hessian.d.d[i,j] <- sum(d2ij, na.rm=TRUE)
             }
@@ -1180,8 +1181,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
     i.fixed <- function(){
       if(random.j){
         Z.j <- term["Z.intercept",j][[1]]  
-        "%m%" <- get(term["mult",j][[1]])
-        hessian.FE.RE[idxFE==i,idxRE==j] <<- colSums(didj %m% Z.j)
+        "%mj%" <- get(term["mult",j][[1]])
+        hessian.FE.RE[idxFE==i,idxRE==j] <<- colSums(didj %mj% Z.j)
         ##<- didj must not contain NA's (all NA's set to 0)
         dIJ <- sum(didj,na.rm=TRUE)     # fixed on 24/09/2012
       } else if(unitSpecific.j){
@@ -1195,25 +1196,26 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
     i.unit <- function(){
       if(random.j){
         Z.j <- term["Z.intercept",j][[1]] 
-        "%m%" <- get(term["mult",j][[1]]) 
-        dIJ <- colSums(didj %m% Z.j)     # didj must not contain NA's (all NA's set to 0)
+        "%mj%" <- get(term["mult",j][[1]]) 
+        dIJ <- colSums(didj %mj% Z.j)   # didj must not contain NA's (all NA's set to 0)
         hessian.FE.RE[idxFE==i,idxRE==j] <<- diag(dIJ)[ which.i, ]
-        
+        dIJ <- dIJ[ which.i ]           # added which.i subsetting in r432
+                                        # FIXME @Michaela: please confirm this correction
       } else if(unitSpecific.j){
         which.ij <- (which.i & which.j) # FIXME: this is actually unused...?
-        dIJ <- diag(colSums(didj,na.rm=TRUE))[ which.i, which.j ] 
+        dIJ <- diag(colSums(didj))[ which.i, which.j ] 
       } else {
-        dIJ <- colSums(didj,na.rm=TRUE)[ which.i ]
+        dIJ <- colSums(didj)[ which.i ]
       }
       hessian.FE.FE[idxFE==i,idxFE==j] <<- dIJ  
     }
     ##
     i.random <- function(){
       if(random.j){
-        dIJ <- sum(didj)
         Z.j <- term["Z.intercept",j][[1]]  
         "%mj%" <- get(term["mult",j][[1]])
-        hessian.FE.RE[idxFE==i,idxRE==j] <<- colSums( didj %mj% Z.j)
+        hessian.FE.RE[idxFE==i,idxRE==j] <<- colSums(didj %mj% Z.j)
+        hessian.FE.RE[idxFE==j,idxRE==i] <<- colSums(didj %m% Z.i)
 
         if(length(Z.j)==1 & length(Z.i)==1){
           Z <- Z.i*Z.j
@@ -1236,11 +1238,14 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
             hessian.RE.RE[which(idxRE==i)[k],idxRE==j] <<- colSums( didj %m% Z)
           }  
         }        
-              
+        dIJ <- sum(didj)
       } else if(unitSpecific.j){
-        dIJ <-  colSums(didj)[ which.j ] # FIXME: missing assignment for hessian.FE.RE?
+        dIJ <- colSums(didj %m% Z.i)
+        hessian.FE.RE[idxFE==j,idxRE==i] <<- diag(dIJ)[ which.j, ]
+        dIJ <- dIJ[ which.j ]
       } else {
-        dIJ <- sum(didj,na.rm=TRUE)      # FIXME: missing assignment for hessian.FE.RE?
+        hessian.FE.RE[idxFE==j,idxRE==i] <<- colSums(didj %m% Z.i)
+        dIJ <- sum(didj)
       }
       hessian.FE.FE[idxFE==i,idxFE==j] <<- dIJ    
     }
@@ -1261,8 +1266,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
 
       ## fill psi-related entries and select fillHess function
       if(random.i){
-        Z.i <- term["Z.intercept",i][[1]]   
-        "%m%" <- get(term["mult",i][[1]])
+        Z.i <- term["Z.intercept",i][[1]]   # Z.i and %m% (of i) determined here
+        "%m%" <- get(term["mult",i][[1]])   # will also be used in j's for loop
         fillHess <- i.random
         if(dimPsi==1L){
           dPsi<- dThetadPsi(m.Xit)
@@ -1308,8 +1313,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
           if (random.i) hessian.d.RE[j,idxRE==i] <- colSums(didd %m% Z.i)
       }
       
-      ## fill other (non-psi, non-d) entries
-      for(j in 1:nGroups){
+      ## fill other (non-psi, non-d) entries (only upper triangle, j >= i!)
+      for(j in i:nGroups){
         comp.j <- term["offsetComp",j][[1]]
         
         Xjt <- term["terms",j][[1]] # eiter 1 or a matrix with values
@@ -1328,8 +1333,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         which.j <- term["which",j][[1]]
         
         fillHess()
-      }        
-  
+      }
+      
     }
     
     
@@ -1340,9 +1345,9 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
                      cbind(matrix(0,dimd,dimFE),hessian.d.d,hessian.d.Psi,hessian.d.RE),
                      cbind(matrix(0,dimPsi,dimFE+dimd),hessian.Psi.RE),
                      cbind(matrix(0,dimRE,dimFE+dimd+dimPsi),hessian.RE.RE))
-          
+
+    hessian[lower.tri(hessian)] <- 0    # FIXME: should already be the case!
     diagHessian <- diag(hessian)
-    hessian[lower.tri(hessian)] <- 0    #* only use upper.tri?
     fisher <- -(hessian + t(hessian))
     diag(fisher) <- -diagHessian   
   
@@ -2045,7 +2050,7 @@ fitHHH <- function(theta, sd.corr, model,
   i <- 0
   while(convergence != 0 && (i < cntrl.stop$niter)){
     i <- i+1
-    cat("\n")
+    if (verbose>0) cat("\n")
     
     ## update regression coefficients
     parReg <- updateRegression(theta=theta, sd.corr=sd.corr, model=model,
