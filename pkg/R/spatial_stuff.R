@@ -1,7 +1,12 @@
 ################################################################################
+### Part of the surveillance package, http://surveillance.r-forge.r-project.org
+### Free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
+###
 ### Spatial helper functions
 ###
-### Author: Sebastian Meyer
+### Copyright (C) 2012 Sebastian Meyer
+### $Revision$
 ### $Date$
 ################################################################################
 
@@ -110,3 +115,57 @@ intersectCircle <- function (Wgpc, center, r, npoly)
     scale.poly(intersection, center = center) # use scale method as defined above
 }
 
+
+### determine matrix with higher neighbourhood order based on spdep::nblag()
+### given the binary matrix of first-order neighbours
+
+nbOrder <- function (neighbourhood, maxlag = 1)
+{
+    stopifnot(isScalar(maxlag), maxlag > 0)
+    checkNeighbourhood(neighbourhood)
+    nregions <- nrow(neighbourhood)
+    maxlag <- as.integer(min(maxlag, nregions-1)) # upper bound of nb order
+    neighbourhood <- neighbourhood == 1           # convert to binary matrix
+    region.ids <- dimnames(neighbourhood)[[1L]]
+    
+    if (maxlag == 1L) {
+        storage.mode(neighbourhood) <- "integer"
+        return(neighbourhood)
+    }
+
+    ## manually convert to spdep's "nb" class
+    #nb <- apply(neighbourhood, 1, which)   # could result in a matrix
+    region.idxs <- seq_len(nregions)
+    nb <- lapply(region.idxs, function(i) region.idxs[neighbourhood[i,]])
+    attr(nb, "region.id") <- region.ids
+    class(nb) <- "nb"
+
+    ## compute higher order neighbours using spdep::nblag()
+    nb.lags <- spdep::nblag(nb, maxlag=maxlag)
+
+    ## Side note: fast method to determine neighbours _up to_ specific order:
+    ## crossprod(neighbourhoud) > 0  # second order neighbours (+set diag to 0)
+    ## (neighbourhood %*% neighbourhood %*% neighbourhood) > 0  # order 3
+    ## and so on...
+
+    ## convert to a single matrix
+    nbmat <- neighbourhood   # logical first-order matrix
+    storage.mode(nbmat) <- "numeric"
+    for (lag in 2:maxlag) {
+        if (any(spdep::card(nb.lags[[lag]]) > 0L)) { # any neighbours of this order
+            nbmat.lag <- spdep::nb2mat(nb.lags[[lag]], style="B",
+                                       zero.policy=TRUE)
+            nbmat <- nbmat + lag * nbmat.lag
+        }
+    }
+    attr(nbmat, "call") <- NULL
+    storage.mode(nbmat) <- "integer"
+
+    ## message about maximum neighbour order by region
+    maxlagbyrow <- apply(nbmat, 1, max)
+    message("Note: range of maximum neighbour order by region is ",
+            paste(range(maxlagbyrow), collapse="-"))
+
+    ## Done
+    nbmat
+}

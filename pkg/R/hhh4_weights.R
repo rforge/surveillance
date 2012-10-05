@@ -46,7 +46,10 @@ checkWeights <- function (weights, nUnits, nTime,
     testweights <- if (is.array(weights)) weights else {
         if (is.list(weights) && checkWeightsFUN(weights)
             && checkNeighbourhood(nbmat)) {
-            ## FIXME: stop() if nbmat only contains 0/1 entries
+            if (all(nbmat %in% 0:1))
+                warning("'", deparse(substitute(nbmat)),
+                        "' is binary (should contain",
+                        " general neighbourhood orders)")
             weights$w(weights$initial, nbmat, data)
         } else {
             stop("'", name, "' must be a matrix/array or a list of functions")
@@ -66,9 +69,9 @@ checkWeights <- function (weights, nUnits, nTime,
             if (!is.list(dw) || length(dw) != dim.d)
                 stop("'", name, "$dw' must return a list (of matrices/arrays)",
                      " of length ", dim.d)
-            if (!is.list(d2w) || length(d2w) != dim.d)
+            if (!is.list(d2w) || length(d2w) != dim.d*(dim.d+1)/2)
                 stop("'", name, "$d2w' must return a list (of matrices/arrays)",
-                     " of length ", dim.d)
+                     " of length ", dim.d*(dim.d+1)/2)
             lapply(dw, checkWeightsArray, nUnits, nTime,
                    name=paste0(name, "$dw[[i]]"))
             lapply(d2w, checkWeightsArray, nUnits, nTime,
@@ -97,7 +100,8 @@ weightedSumNE <- function (observed, weights, lag)
   timeconstantweights <- length(dim(weights)) == 2L
   selecti <- if (timeconstantweights) quote(weights[,i]) else quote(weights[,i,])
     
-  res <- matrix(NA_real_, nrow=nTime, ncol=nUnits)
+  res <- matrix(NA_real_, nrow = nTime, ncol = nUnits,
+                dimnames = list(NULL, colnames(observed)))
   for(i in seq_len(nUnits)){
     weights.i <- eval(selecti)
     weightedObs <- tY * weights.i
@@ -118,7 +122,8 @@ weightedSumNE.old <- function(observed, weights, lag)
   
   nhood <- array(weights, c(nUnits,nUnits,nTime))
   
-  res <- matrix(NA_real_, nrow=nTime,ncol=nUnits)
+  res <- matrix(NA_real_, nrow = nTime, ncol = nUnits,
+                dimnames = list(NULL, colnames(observed)))
   for(i in seq_len(nUnits)){
     weights.i <- t(nhood[,i,])
     weightedObs <- observed * weights.i
@@ -126,63 +131,6 @@ weightedSumNE.old <- function(observed, weights, lag)
   }
   
   rbind(matrix(NA_real_, lag, nUnits), head(res, nTime-lag))
-}
-
-
-
-
-### determine matrix with higher neighbourhood order given the binary matrix of
-### first-order neighbours based on spdep::nblag()
-
-nblagmat <- function (neighbourhood, maxlag = 1)
-{
-    stopifnot(isScalar(maxlag), maxlag > 0)
-    checkNeighbourhood(neighbourhood)
-    nregions <- nrow(neighbourhood)
-    maxlag <- as.integer(min(maxlag, nregions-1)) # upper bound of nb order
-    neighbourhood <- neighbourhood == 1           # convert to binary matrix
-    region.ids <- dimnames(neighbourhood)[[1L]]
-    
-    if (maxlag == 1L) {
-        storage.mode(neighbourhood) <- "integer"
-        return(neighbourhood)
-    }
-
-    ## manually convert to spdep's "nb" class
-    #nb <- apply(neighbourhood, 1, which)   # could result in a matrix
-    region.idxs <- seq_len(nregions)
-    nb <- lapply(region.idxs, function(i) region.idxs[neighbourhood[i,]])
-    attr(nb, "region.id") <- region.ids
-    class(nb) <- "nb"
-
-    ## compute higher order neighbours using spdep::nblag()
-    nb.lags <- spdep::nblag(nb, maxlag=maxlag)
-
-    ## Side note: fast method to determine neighbours _up to_ specific order:
-    ## crossprod(neighbourhoud) > 0  # second order neighbours (+set diag to 0)
-    ## (neighbourhood %*% neighbourhood %*% neighbourhood) > 0  # order 3
-    ## and so on...
-
-    ## convert to a single matrix
-    nbmat <- neighbourhood   # logical first-order matrix
-    storage.mode(nbmat) <- "numeric"
-    for (lag in 2:maxlag) {
-        if (any(spdep::card(nb.lags[[lag]]) > 0L)) { # any neighbours of this order
-            nbmat.lag <- spdep::nb2mat(nb.lags[[lag]], style="B",
-                                       zero.policy=TRUE)
-            nbmat <- nbmat + lag * nbmat.lag
-        }
-    }
-    attr(nbmat, "call") <- NULL
-    storage.mode(nbmat) <- "integer"
-
-    ## message about maximum neighbour order by region
-    maxlagbyrow <- apply(nbmat, 1, max)
-    message("Note: range of maximum neighbour order by region is ",
-            paste(range(maxlagbyrow), collapse="-"))
-
-    ## Done
-    nbmat
 }
 
 
@@ -217,7 +165,7 @@ checkWeightsFUN <- function (object)
 
 
 ### Construct weight matrix wji according to the Zeta-distribution with respect
-### to the orders of neighbourhood (in nbmat, as e.g. obtained from nblagmat()),
+### to the orders of neighbourhood (in nbmat, as e.g. obtained from nbOrder()),
 ### optionally fulfilling rowSums(wji) = 1
 ## As a formula (for j != i, otherwise wji = 0):
 ## - for shared=TRUE: wji = pzeta(oji; rho, maxlag) / sum_k I(ojk == oji)

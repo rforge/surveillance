@@ -85,19 +85,37 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
 
   ## check score vector and fisher information at starting values
   check.analyticals <- if (isTRUE(check.analyticals)) {
-      "numDeriv"
+      if (length(theta.start) > 50) "maxLik" else "numDeriv"
   } else if (is.character(check.analyticals)) {
       match.arg(check.analyticals, c("numDeriv", "maxLik"), several.ok=TRUE)
   } else NULL
-  resCheck <- sapply(check.analyticals, function(derivMethod) {
-      if (require(derivMethod, character.only=TRUE)) {
-          do.call(paste("checkDerivatives", derivMethod, sep="."),
-                  args=alist(penLogLik, penScore, penFisher, theta.start,
-                             sd.corr=Sigma.start, model=model))
+  if (length(check.analyticals) > 0L) {
+      cat("\nPenalized log-likelihood:\n")
+      resCheckPen <- sapply(check.analyticals, function(derivMethod) {
+          if (require(derivMethod, character.only=TRUE)) {
+              do.call(paste("checkDerivatives", derivMethod, sep="."),
+                      args=alist(penLogLik, penScore, penFisher, theta.start,
+                      sd.corr=Sigma.start, model=model))
+          }
+      }, simplify=FALSE, USE.NAMES=TRUE)
+      if (length(resCheckPen) == 1L) resCheckPen <- resCheckPen[[1L]]
+      resCheckMar <- if (length(Sigma.start) == 0L) list() else {
+          cat("\nMarginal log-likelihood:\n")
+          fisher.unpen <- attr(penFisher(theta.start, Sigma.start, model,
+                                         attributes=TRUE), "fisher")
+          resCheckMar <- sapply(check.analyticals, function(derivMethod) {
+              if (require(derivMethod, character.only=TRUE)) {
+                  do.call(paste("checkDerivatives", derivMethod, sep="."),
+                          args=alist(marLogLik, marScore, marFisher, Sigma.start,
+                          theta=theta.start, model=model,
+                          fisher.unpen=fisher.unpen))
+              }
+          }, simplify=FALSE, USE.NAMES=TRUE)
+          if (length(resCheckMar) == 1L) resCheckMar[[1L]] else resCheckMar
       }
-  }, simplify=FALSE, USE.NAMES=TRUE)
-  if (length(resCheck) == 1L) resCheck <- resCheck[[1L]]
-  if (length(resCheck) > 0L) return(resCheck)
+      resCheck <- list(pen = resCheckPen, mar = resCheckMar)
+      return(resCheck)
+  }
 
   ## maximize loglikelihood (penalized and marginal)
   myoptim <- fitHHH(theta=theta.start,sd.corr=Sigma.start, model=model,
@@ -520,7 +538,7 @@ checkFormula <- function(f, env, component){
     }  
   }
   
-  res <- cbind(res) # ensure res has matrix dimensions
+  res <- cbind(res, deparse.level=0) # ensure res has matrix dimensions
   if(sum(unlist(res["intercept",])) > 1) {
     stop("There can only be one intercept in the formula ", deparse(substitute(f)))
   }
@@ -541,9 +559,12 @@ checkFormula <- function(f, env, component){
 }
 
 
-## create function (pars, type = "response") which
+## Create function (pars, type = "response") which
 ## returns the weighted sum of time-lagged counts of neighbours
-## (or its derivates, if type = "gradient" or type = "hessian")
+## (or its derivates, if type = "gradient" or type = "hessian").
+## For type="reponse", the result is a matrix/array, otherwise a list of such
+## objects, which for the gradient has length length(pars) and
+## length(pars)*(length(pars)+1)/2 for the hessian.
 neOffsetFUN <- function (Y, neweights, nbmat, data, lag)
 {
     if (is.null(neweights)) { # no neighbourhood component
@@ -557,11 +578,14 @@ neOffsetFUN <- function (Y, neweights, nbmat, data, lag)
             weights <- neweights[[name]](pars, nbmat, data)
             ## gradient and hessian are lists if length(pars$d) > 1L
             ## and single matrices/arrays if == 1 => _c_onditional lapply
-            clapply(weights, function(W) weightedSumNE(Y, W, lag))
+            res <- clapply(weights, function(W) weightedSumNE(Y, W, lag))
+            ##<- clapply always returns a list (possibly of length 1)
+            if (type=="response") res[[1L]] else res
         }
     } else { # fixed (known) array (0-length pars)
         initoffset <- weightedSumNE(Y, neweights, lag)
         function (pars, type = "response") initoffset
+        ## this will not be called for other types
     }
 }
 
@@ -611,31 +635,27 @@ interpretControl <- function(control, stsObj){
       } else names(initial.d))
   }
 
-  # determine all NA's
-  # offset[[i]] is either 1 or a nTime x nUnits matrix
+  ## determine all NA's (offset[[i]] is either 0 or a nTime x nUnits matrix)
   isNA <- (is.na(Ym1) | is.na(Ym1.ne(initial.d)) | is.na(Y))
 
 
-  ## get terms for all components 
-  if(ar$isMatrix){        # ar$f is a matrix:
-    stop("not yet implemented\n")
-  } else if(ar$inModel){  # ar$f is formula
-    all.term <- checkFormula(ar$f,env=env, component=1)    
-  } else {
-    all.term <-NULL
+  ## get terms for all components
+  all.term <- NULL
+  if(ar$isMatrix){                      # ar$f is a matrix
+      stop("not yet implemented")
+  } else if(ar$inModel){                # ar$f is a formula
+      all.term <- cbind(all.term, checkFormula(ar$f, env=env, component=1))
   }
-  
   if(ne$inModel){
-    all.term <- cbind(all.term, checkFormula(ne$f,env=env, component=2))
+      all.term <- cbind(all.term, checkFormula(ne$f, env=env, component=2))
   }
-  
   if(end$inModel){
-    all.term<- cbind(all.term, checkFormula(end$f,env=env, component=3) )
+      all.term <- cbind(all.term, checkFormula(end$f,env=env, component=3))
   }
   
   dim.fe <- sum(unlist(all.term["dim.fe",]))
-  dim.re <- sum(unlist(all.term["dim.re",]))
-  dim.re.group <- unlist(all.term["dim.re",])
+  dim.re.group <- unlist(all.term["dim.re",], use.names=FALSE)
+  dim.re <- sum(dim.re.group)
   dim.var <- sum(unlist(all.term["dim.var",]))
   dim.corr <- sum(unlist(all.term["corr",]))
   
@@ -818,12 +838,10 @@ meanHHH <- function(theta, model)
         Z.re <- 0
       }
       X <- term["terms",i][[1]]
-      pred <- pred +X*fe + Z.re
+      pred <- pred + X*fe + Z.re
     }
     
-    mean <- exp(pred)             # CAVE: multiplicative offset added later
-    is.na(mean) <- isNA           # FIXME: redundant? (NA setting of pred above)
-    mean
+    exp(pred)                  # CAVE: this is without the multiplicative offset
   }
   
   ## autoregressive component
@@ -998,7 +1016,7 @@ penScore <- function(theta, sd.corr, model)
       }
     }
     
-    list(fe=grad.fe, re=grad.re)
+    list(fe=grad.fe, re=unname(grad.re))
   }
   
   gradients <- computeGrad(mu[c("epi.own","epi.neighbours","endemic")])
@@ -1006,13 +1024,13 @@ penScore <- function(theta, sd.corr, model)
   ## gradient for parameter vector of the neighbourhood weights
   grd <- if (dimd > 0L) {
       dneOffset <- model$offset[[2L]](pars$d, type="gradient")
-      ##<- this is a matrix/array (dimd=1) or a list of such objects (dimd>1)
+      ##<- this is always a list (of length dimd) of matrices/arrays
       onescore.d <- function (dneoff) {
           dmudd <- mu$ne.exppred * dneoff[subset,,drop=FALSE]
           grd.terms <- derivHHH(dmudd)
           sum(grd.terms, na.rm=TRUE)
       }
-      unlist(clapply(dneOffset, onescore.d))
+      unlist(clapply(dneOffset, onescore.d), recursive=FALSE, use.names=FALSE)
   } else numeric(0L)
   
   ## gradient for overdispersion parameter psi
@@ -1127,12 +1145,13 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         phi.doff <- function (dneoff) {
             mu$ne.exppred * dneoff[subset,,drop=FALSE]
         }
-        ## for type %in% c("gradient", "hessian"), model$offset[[2L]] is a
-        ## matrix/array (dimd=1) or a list of such objects (dimd>1)
+        ## for type %in% c("gradient", "hessian"), model$offset[[2L]] is always
+        ## a list of matrices/arrays. It has length(pars$d) elements for the
+        ## gradient and length(pars$d)*(length(pars$d)+1)/2 for the hessian.
         dneOffset <- model$offset[[2L]](pars$d, type="gradient")
-        dmudd <- clapply(dneOffset, phi.doff)
+        dmudd <- lapply(dneOffset, phi.doff)
         d2neOffset <- model$offset[[2L]](pars$d, type="hessian")
-        d2mudddd <- clapply(d2neOffset, phi.doff)
+        d2mudddd <- lapply(d2neOffset, phi.doff)
         ij <- 0L
         for (i in seq_len(dimd)) {
             for (j in i:dimd) {
@@ -1333,9 +1352,10 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
   fisher <- computeFisher(mu[c("epi.own","epi.neighbours","endemic")])
 
   ## add penalty for random effects
-  pen <- matrix(0, dimFE+dimPsi+dimRE, dimFE+dimPsi+dimRE)
+  pen <- matrix(0, length(theta), length(theta))
   Fpen <- if(dimRE > 0){
-    pen[-(1:(dimFE+dimPsi)),-(1:(dimFE+dimPsi))] <- Sigma.inv
+    thetaIdxRE <- seq.int(to=length(theta), length.out=dimRE)
+    pen[thetaIdxRE,thetaIdxRE] <- Sigma.inv
     fisher + pen
   } else fisher
 
@@ -1445,7 +1465,6 @@ marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL){
   
   dimFE <- model$nFE
   dimPsi <- model$nOverdisp
-  dimFE.O <- dimFE + dimPsi
   dimRE <- model$nRE
   
   dimBlocks<- model$rankRE[model$rankRE>0]
@@ -1456,8 +1475,9 @@ marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL){
     fisher.unpen <- attr(penFisher(theta, sd.corr, model,attributes=TRUE), "fisher")
   }
   # add penalty to fisher
-  fisher <- fisher.unpen 
-  fisher[-(1:dimFE.O),-(1:dimFE.O)] <- fisher[-(1:dimFE.O),-(1:dimFE.O)] + Sigma.inv
+  fisher <- fisher.unpen
+  thetaIdxRE <- seq.int(to=length(theta), length.out=dimRE)
+  fisher[thetaIdxRE,thetaIdxRE] <- fisher[thetaIdxRE,thetaIdxRE] + Sigma.inv
   
   pars <- splitParams(theta,model)  
   randomEffects <- pars$random
@@ -1498,7 +1518,6 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   dimFE <- model$nFE
   dimPsi <- model$nOverdisp
-  dimFE.O <- dimFE + dimPsi
   dimRE <- model$nRE
   
   dimBlocks<- model$rankRE[model$rankRE>0]
@@ -1511,8 +1530,9 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   }
   
   # add penalty to fisher
-  fisher <- fisher.unpen 
-  fisher[-(1:dimFE.O),-(1:dimFE.O)] <- fisher[-(1:dimFE.O),-(1:dimFE.O)] + Sigma.inv
+  fisher <- fisher.unpen
+  thetaIdxRE <- seq.int(to=length(theta), length.out=dimRE)
+  fisher[thetaIdxRE,thetaIdxRE] <- fisher[thetaIdxRE,thetaIdxRE] + Sigma.inv
   
   F.inv <- try(solve(fisher),silent=TRUE)
   
@@ -1524,7 +1544,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
     F.inv <- MASS::ginv(fisher)
   }
    
-  F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]
+  F.inv.RE <- F.inv[thetaIdxRE,thetaIdxRE]
   
   pars <- splitParams(theta,model)  
   randomEffects <- pars$random
@@ -1579,7 +1599,6 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   
   dimFE <- model$nFE
   dimPsi <- model$nOverdisp
-  dimFE.O <- dimFE + dimPsi
   dimRE <- model$nRE
   
   dimBlocks<- model$rankRE[model$rankRE>0]
@@ -1592,8 +1611,9 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   }
   
   # add penalty to fisher
-  fisher <- fisher.unpen 
-  fisher[-(1:dimFE.O),-(1:dimFE.O)] <- fisher[-(1:dimFE.O),-(1:dimFE.O)] + Sigma.inv
+  fisher <- fisher.unpen
+  thetaIdxRE <- seq.int(to=length(theta), length.out=dimRE)
+  fisher[thetaIdxRE,thetaIdxRE] <- fisher[thetaIdxRE,thetaIdxRE] + Sigma.inv
   
   F.inv <- try(solve(fisher),silent=TRUE)
   
@@ -1605,7 +1625,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
     F.inv <- MASS::ginv(fisher)
   }
    
-  F.inv.RE <- F.inv[-(1:dimFE.O),-(1:dimFE.O)]
+  F.inv.RE <- F.inv[thetaIdxRE,thetaIdxRE]
   ## declare F.inv.RE as a symmetric matrix?
   ##F.inv.RE <- new("dsyMatrix", Dim = dim(F.inv.RE), x = c(F.inv.RE))
   ## -> no, F.inv.RE %*% dS.i becomes actually slower (dS.i is a "sparseMatrix")
@@ -1986,7 +2006,7 @@ fitHHH <- function(theta, sd.corr, model,
                    cntrl.variance=list(method="nlminb"),
                    verbose=0, shrinkage=FALSE)
 {  
-  dimFE <- model$nFE + model$nOverdisp
+  dimFE.d.O <- model$nFE + model$nd + model$nOverdisp
   dimRE <- model$nRE
 
   ## artificial lower bound on regression parameters
@@ -2097,9 +2117,9 @@ fitHHH <- function(theta, sd.corr, model,
   fisher.var <- marFisher(sd.corr=sd.corr, theta=theta, model=model,
                           fisher.unpen=fisher.unpen)
   
-  return(list(fixef=head(theta,dimFE),ranef=tail(theta,dimRE),sd.corr=sd.corr,
-              loglik=ll, fisher=fisher, fisherVar=fisher.var,
-              convergence=convergence, dim=c(fixed=dimFE,random=dimRE)))
+  list(fixef=head(theta,dimFE.d.O), ranef=tail(theta,dimRE), sd.corr=sd.corr,
+       loglik=ll, fisher=fisher, fisherVar=fisher.var,
+       convergence=convergence, dim=c(fixed=dimFE.d.O,random=dimRE))
 }
 
 
@@ -2298,11 +2318,10 @@ oneStepAhead <- function(result, # result of call to hhh4
   
   stsObj <- result$stsObj
   control <- result$control
-  if(is.null(result$terms)){
-	# get model terms
-	model <- interpretControl(control,stsObj)
-  } else {
-	model <- result$terms
+  # get model terms
+  model <- result[["terms"]]
+  if(is.null(model)){
+      model <- interpretControl(control,stsObj)
   }
   
   # which model: negbin or poisson?

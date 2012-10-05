@@ -225,7 +225,7 @@ confint.ah4 <- function (object, parm, level = 0.95, reparamPsi = TRUE, idx2Exp 
     pct <- paste(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3),"%")
     fac <- qnorm(a)
     ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(parm, pct))
-    ses <- cf[parm,2][parm]
+    ses <- cf[parm,2]
     ci[] <- cf[parm,1] + ses %o% fac
     ci
 }

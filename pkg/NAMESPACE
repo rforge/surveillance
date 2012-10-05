@@ -110,6 +110,7 @@ export(discpoly)
 export(inside.gpc.poly)
 exportMethods(scale.poly)   # redefined method for gpc.poly in spatial_stuff.R
 #S3method(scale, gpc.poly)  # alternatively, if defined as S3 method for scale
+export(nbOrder)
 
 # little helper: multiplicity of points
 export(multiplicity)                    # new S3-generic
@@ -143,7 +144,7 @@ export(nowcast, backprojNP)
 
 ### disProg-specific
 
-export(create.disProg, create.grid, readData, toFileDisProg)
+export(create.disProg, readData, toFileDisProg)
 S3method(print, disProg)
 S3method(plot, disProg)
 S3method(plot, disProg.one)
@@ -151,7 +152,7 @@ S3method(aggregate, disProg)
 
 export(sim.pointSource, sim.seasonalNoise)
 export(LRCUSUM.runlength, arlCusum, find.kh, findH, hValues, findK)
-exportPattern("^algo\\.")
+exportPattern("^algo\\.")               # export all algo.* functions
 export(compMatrix.writeTable, correct53to52, enlargeData)
 export(makePlot)
 export(estimateGLRNbHook)
@@ -283,6 +284,7 @@ S3method(logLik, ahg)
 
 export(hhh4) 
 export(addSeason2formula)
+export(zetaweights, powerlaw)
 export(ranef)  # S3-generic
 export(fixef)  # S3-generic
 

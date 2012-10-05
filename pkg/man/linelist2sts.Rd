@@ -51,8 +51,8 @@ linelist2sts(linelist,dateCol,aggregate.by="1 week",dRange=NULL,
 }
 
 \value{
-  The function returns an object of \code{"\linkS4class{sts}"}. The \code{freq}
-  slot might not be appropriate.
+  The function returns an object of class \code{"\linkS4class{sts}"}.
+  The \code{freq} slot might not be appropriate.
 }
 
 \author{
@@ -67,6 +67,8 @@ Michael \enc{Höhle}{Hoehle}
   See also \code{\link{seq.Date}}.
 }
 
+%FIXME: the example requires internet access... 
+%       ok to put outbreak.txt into inst/extdata?
 \examples{
 #Load simulated outbreak data.
 url <- paste("http://www.stat.uni-muenchen.de/~hoehle/",
@@ -78,7 +80,6 @@ sts <- linelist2sts(D, dateCol="dOnset", aggregate.by="1 day")
 
 #Plot the result
 plot(sts,xaxis.years=FALSE,legend.opts=NULL,xlab="time (days)")
-
 }
 
 \keyword{models}

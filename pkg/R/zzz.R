@@ -111,30 +111,34 @@ clapply <- function (X, FUN, ...)
 ### to check the score vector and the Fisher information matrix
 ### CAVE: the return values of both wrappers are not unified
 
-checkDerivatives.numDeriv <- function(ll, score, fisher, theta, method="simple",
-                                      method.args=list(eps=1e-6), ...)
+checkDerivatives.numDeriv <- function(ll, score, fisher, par,
+                                      method="Richardson",
+                                      method.args=list(), ...)
 {
-    cat("Checking analytical score vector ...\n")
-    nsc <- numDeriv::grad(ll, theta, method, method.args, ...)
-    asc <- penScore(theta, ...)
+    cat("Checking analytical score vector using numDeriv::grad() ...\n")
+    nsc <- numDeriv::grad(ll, par, method, method.args, ...)
+    asc <- score(par, ...)
     print(all.equal(asc, nsc, check.attributes=FALSE))
-    cat("Checking analytical Fisher information matrix ...\n")
-    nfi <- -numDeriv::hessian(ll, theta, "Richardson", ...)
-    afi <- penFisher(theta, ...)
+    cat("Checking analytical Fisher information matrix using numDeriv::hessian() ...\n")
+    if (length(par) > 50)
+        cat("NOTE: this might take several minutes considering length(par) =",
+            length(par), "\n")
+    nfi <- -numDeriv::hessian(ll, par, "Richardson", method.args, ...)
+    afi <- fisher(par, ...)
     print(all.equal(afi, nfi, check.attributes=FALSE))
     invisible(list(score  = list(analytic=asc, numeric=nsc),
                    fisher = list(analytic=afi, numeric=nfi)))
 }
 
 
-checkDerivatives.maxLik <- function(ll, score, fisher, theta, eps=1e-6,
+checkDerivatives.maxLik <- function(ll, score, fisher, par, eps=1e-6,
                                     print=FALSE, ...)
 {
-    cat("Checking analytical score vector and Fisher information matrix ...\n")
+    cat("Checking analytical score and Fisher using maxLik::compareDerivatives() ...\n")
     res <- maxLik::compareDerivatives(
                    f=ll, grad=score,
-                   hess=function (theta, ...) -fisher(theta, ...),
-                   t0=theta, eps=eps, print=print, ...)
+                   hess=function (par, ...) -fisher(par, ...),
+                   t0=par, eps=eps, print=print, ...)
     cat("Comparison of score vectors:\n")
     print(all.equal(res$compareGrad$analytic, drop(res$compareGrad$numeric),
                     check.attributes=FALSE))
