@@ -342,6 +342,7 @@ intensityplot.twinstim <- function (x,
     }
 }
 
+
 intensity.twinstim <- function (x, aggregate = c("time", "space"),
     types = 1:nrow(x$qmatrix), tiles, tiles.idcol = NULL)
 {
@@ -355,27 +356,50 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
 
     ## model environment
     modelenv <- environment(x)          # for the functions to be returned
-    thisenv <- environment()
-    parent.env(thisenv) <- modelenv     # objects of modelenv become visible
-    ## CAVE: The R manual says:
-    ## "The replacement function 'parent.env<-' is extremely dangerous [...].
-    ##  It may be removed in the near future."
     qmatrix <- x$qmatrix                # not part of modelenv
     force(types)                        # evaluate types before rm(x)
     rm(x)                               # don't need this anymore
+
+    ## thisenv <- environment()
+    ## parent.env(thisenv) <- modelenv     # objects of modelenv become visible
+    ## CAVE: The R manual says:
+    ## "The replacement function 'parent.env<-' is extremely dangerous [...].
+    ##  It may be removed in the near future."
+
+    ## we do cheap and nasty model unpacking!
+    ## this is apparently safer than using the parent.env<- hack, and cleaner
+    ## than running the whole code inside with(modelenv,...) since assignments
+    ## then would take place inside modelenv, which would produce garbage
+    t0 <- modelenv$t0
+    T <- modelenv$T
+    histIntervals <- modelenv$histIntervals
+    eventTimes <- modelenv$eventTimes
+    eventCoords <- modelenv$eventCoords
+    eventTypes <- modelenv$eventTypes
+    removalTimes <- modelenv$removalTimes
+    gridTiles <- modelenv$gridTiles
+    gridBlocks <- modelenv$gridBlocks
+    tiaf <- modelenv$tiaf
+    tiafpars <- modelenv$tiafpars
+    eps.s <- modelenv$eps.s
+    siaf <- modelenv$siaf
+    siafpars <- modelenv$siafpars
     
     ## endemic component on the spatial or temporal grid
-    hInt <-
-        if (hash) {
-            eta <- drop(mmhGrid %*% beta)
-            if (!is.null(offsetGrid)) eta <- offsetGrid + eta
+    hInt <- 
+        if (modelenv$hash) {
+            eta <- drop(modelenv$mmhGrid %*% modelenv$beta)
+            if (!is.null(modelenv$offsetGrid)) eta <- modelenv$offsetGrid + eta
             expeta <- exp(unname(eta))
-            .beta0 <- rep(if (nbeta0==0L) 0 else beta0, length = nTypes)
+            .beta0 <- rep(if (modelenv$nbeta0==0L) 0 else modelenv$beta0,
+                          length = modelenv$nTypes)
             fact <- sum(exp(.beta0[types]))
             if (aggregate == "time") {      # int over W and types by BLOCK
-                fact * c(tapply(expeta * ds, gridBlocks, sum, simplify = TRUE))
+                fact * c(tapply(expeta * modelenv$ds, gridBlocks, sum,
+                                simplify = TRUE))
             } else {                        # int over T and types by tile
-                fact * c(tapply(expeta * dt, gridTiles, sum, simplify = TRUE))
+                fact * c(tapply(expeta * modelenv$dt, gridTiles, sum,
+                                simplify = TRUE))
             }
         } else {
             ngrid <- if (aggregate == "time") {
@@ -385,7 +409,7 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
         }
 
     ## endemic component as a function of time or location
-    hIntFUN <- if (hash) {
+    hIntFUN <- if (modelenv$hash) {
         if (aggregate == "time") {
             function (tp) {
                 stopifnot(isScalar(tp))
@@ -420,11 +444,11 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
     } else function (...) 0
 
     ## epidemic component
-    eInt <- if (hase) {
+    eInt <- if (modelenv$hase) {
         qSum_types <- rowSums(qmatrix[,types,drop=FALSE])[eventTypes]
-        fact <- qSum_types * gammapred
-        if (aggregate == "time") {      # as a function of time (int over W & types)
-            factS <- fact * siafInt
+        fact <- qSum_types * modelenv$gammapred
+        if (aggregate == "time") {  # as a function of time (int over W & types)
+            factS <- fact * modelenv$siafInt
             function (tp) {
                 stopifnot(isScalar(tp))
                 tdiff <- tp - eventTimes
@@ -437,8 +461,8 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
                     sum(intWj)
                 } else 0
             }
-        } else {                        # as a function of location (int over time and types)
-            factT <- fact * tiafInt
+        } else {  # as a function of location (int over time and types)
+            factT <- fact * modelenv$tiafInt
             function (xy) {
                 stopifnot(is.vector(xy, mode="numeric"), length(xy) == 2L)
                 point <- matrix(xy, nrow=nrow(eventCoords), ncol=2L, byrow=TRUE)

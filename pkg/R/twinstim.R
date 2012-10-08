@@ -140,6 +140,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         xx
     }
 
+    ID <- tile <- type <- BLOCK <- .obsInfLength <- .bdist <-
+        "just cheating on codetools::checkUsage"
     mfe <- model.frame(epidemic, data = eventsData,
                        subset = time + eps.t > t0 & time <= T,
 # here we can have some additional rows (individuals) compared to mfhEvents, which is established below!
@@ -150,7 +152,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                        ID = ID, time = time, tile = tile, type = type,
                        eps.t = eps.t, eps.s = eps.s, BLOCK = BLOCK,
                        obsInfLength = .obsInfLength, bdist = .bdist)
-
+    rm(ID, tile, type, BLOCK, .obsInfLength, .bdist)
 
     ### Extract essential information from model frame
 
@@ -245,12 +247,14 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
     ### Generate endemic model frame and model matrix on event data
 
+    ID <- "just cheating on codetools::checkUsage"
     mfhEvents <- model.frame(endemic, data = eventsData,
                              subset = time>t0 & time<=T & ID %in% mfe[["(ID)"]],
                              na.action = na.fail,
                              # since R 2.10.0 patched also works with
                              # endemic = ~1 (see PR#14066)
                              drop.unused.levels = FALSE)
+    rm(ID)
     mmhEvents <- model.matrix(endemic, mfhEvents)
     # exclude intercept from endemic model matrix below, will be treated separately
     if (nbeta0 > 0) mmhEvents <- mmhEvents[,-1,drop=FALSE]
@@ -263,15 +267,17 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
     if (hash) {
         offsetEvents <- model.offset(mfhEvents)
+        BLOCK <- tile <- area <- "just cheating on codetools::checkUsage"
         mfhGrid <- model.frame(endemic, data = data$stgrid,
                                subset = start >= t0 & stop <= T,
                                na.action = na.fail,
                                # since R 2.10.0 patched also works with
                                # endemic = ~1 (see PR#14066)
                                drop.unused.levels = FALSE,
-                               BLOCK = BLOCK, tile = tile, dt = stop-start, ds = area)
-                               # 'tile' is redundant here for fitting, but is
-                               # useful for debugging and necessary for post. intensityplots
+                               BLOCK=BLOCK, tile=tile, dt=stop-start, ds=area)
+                               # 'tile' is redundant here for fitting but useful
+                               # for debugging & necessary for intensityplots
+        rm(BLOCK, tile, area)
         gridBlocks <- mfhGrid[["(BLOCK)"]]
         histIntervals <- unique(data$stgrid[c("BLOCK", "start", "stop")]) # sorted
         rownames(histIntervals) <- NULL

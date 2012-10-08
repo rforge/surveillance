@@ -1,9 +1,15 @@
 ################################################################################
-### Function 'simEpidataCS' simulates a point pattern according to an
-### additive-multiplicative spatio-temporal intensity model of class 'twinstim'.
-### It basically uses Ogata's modified thinning algorithm
-### (cf. Daley & Vere-Jones, 2003, Algorithm 7.5.V.).
-### Author: Sebastian Meyer
+### Part of the surveillance package, http://surveillance.r-forge.r-project.org
+### Free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
+###
+### Simulate a point pattern according to a spatio-temporal intensity model of
+### class "twinstim". The function basically uses Ogata's modified thinning
+### algorithm (cf. Daley & Vere-Jones, 2003, Algorithm 7.5.V.).
+###
+### Copyright (C) 2012 Sebastian Meyer
+### $Revision$
+### $Date$
 ################################################################################
 
 ### CAVE:
@@ -108,7 +114,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     block_t0 <- stgrid$BLOCK[match(TRUE, stgrid$start > t0) - 1L]
     # BLOCK in stgrid such that stop time is equal to or just after T
     block_T <- stgrid$BLOCK[match(TRUE, stgrid$stop >= T)]
-    stgrid <- subset(stgrid, BLOCK >= block_t0 & BLOCK <= block_T)
+    stgrid <- stgrid[stgrid$BLOCK >= block_t0 & stgrid$BLOCK <= block_T,]
     stgrid$start[stgrid$BLOCK == block_t0] <- t0
     stgrid$stop[stgrid$BLOCK == block_T] <- T
     # matrix of BLOCKS and start times (used later)
@@ -307,8 +313,12 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
     ### Build endemic model matrix on stgrid
 
-    mfhGrid <- model.frame(endemic, data = stgrid, na.action = na.fail, drop.unused.levels = FALSE,
+    BLOCK <- tile <- area <- "just cheating on codetools::checkUsage"
+    ## model.frame() will evaluate these variables in the context of 'stgrid'
+    mfhGrid <- model.frame(endemic, data = stgrid, na.action = na.fail,
+                           drop.unused.levels = FALSE,
                            BLOCK = BLOCK, tile = tile, ds = area)
+    rm(BLOCK, tile, area)
     # we don't actually need 'tile' in mfhGrid; this is only for easier identification when debugging
     mmhGrid <- model.matrix(endemic, mfhGrid)
     # exclude intercept from endemic model matrix below, will be treated separately

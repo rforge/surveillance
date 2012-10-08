@@ -10,6 +10,7 @@
 ## if (getRversion() >= "2.15.1") utils::globalVariables("r")
 
 siaf.constant <- function () {
+    r <- s <- "just cheating on codetools::checkUsage"
     res <- list(
         f = as.function(alist(s=, pars=, types=, rep.int(1, nrow(s))), envir = .GlobalEnv),
         deriv = NULL,
