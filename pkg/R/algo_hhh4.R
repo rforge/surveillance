@@ -207,8 +207,9 @@ setControl <- function (control, stsObj)
       environment(defaultControl$end$f) <- .GlobalEnv
   control <- modifyList(defaultControl, control)
 
-  ## add the stsObj to control$data
-  control$data <- modifyList(list(.sts=stsObj), as.list(control$data))
+  ## convert data to a list and add stsObj
+  control$data <- as.list(control$data)
+  control$data$.sts <- stsObj
   
   ## add nTime and nUnits to control list
   control$nTime <- nTime                # FIXME: are these actually
@@ -613,7 +614,7 @@ interpretControl <- function(control, stsObj){
   ## FIXME: really weird... if the array below is evaluated, code will be faster
   ## A complex example model takes 132s (without this nonsense array evaluation)
   ## or 116s (with) for the whole fit
-  if (ne$inModel) {
+  if (ne$inModel && is.array(ne$weights)) {
     dev.null <- array(ne$weights, c(nUnits,nUnits,nTime))
     ## for instance, str(ne$weights), as.vector(ne$weights), or
     ## array(ne$weights, dim(ne$weights)) do not have this effect...
@@ -1446,7 +1447,10 @@ getSigma <- function(sd, correlation, dimSigma, dimBlocks, Sigmai=NULL){
   return(Sigma)
 }
 
-# approximate marginal likelihood for variance components
+
+## Approximate marginal likelihood for variance components
+## Parameter and model unpacking at the beginning (up to the ###...-line) is
+## identical in marScore() and marFisher()
 marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL){
 
   dimVar <- model$nVar
@@ -1465,27 +1469,30 @@ marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL){
     stop("NAs in variance parameters.", ADVICEONERROR)
   }
 
-  sd <- head(sd.corr,dimVar)
+  sd   <- head(sd.corr,dimVar)
   corr <- tail(sd.corr,dimCorr)
-  
+
+  pars <- splitParams(theta,model)  
+  randomEffects <- pars$random
+
   dimFE <- model$nFE
   dimPsi <- model$nOverdisp
   dimRE <- model$nRE
   
-  dimBlocks<- model$rankRE[model$rankRE>0]
+  dimBlocks <- model$rankRE[model$rankRE>0]
   Sigma.inv <- getSigmaInv(sd, corr, dimVar, dimBlocks)
 
   # if not given, calculate unpenalized part of fisher info 
   if(is.null(fisher.unpen)){
     fisher.unpen <- attr(penFisher(theta, sd.corr, model,attributes=TRUE), "fisher")
   }
+  
   # add penalty to fisher
   fisher <- fisher.unpen
   thetaIdxRE <- seq.int(to=length(theta), length.out=dimRE)
   fisher[thetaIdxRE,thetaIdxRE] <- fisher[thetaIdxRE,thetaIdxRE] + Sigma.inv
-  
-  pars <- splitParams(theta,model)  
-  randomEffects <- pars$random
+
+  ############################################################
   
   # penalized part of likelihood
   # compute -0.5*log(|Sigma|) - 0.5*RE' %*% Sigma.inv %*% RE
@@ -1518,17 +1525,19 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
 
   if(any(is.na(sd.corr))) stop("NAs in variance parameters.", ADVICEONERROR)
   
-  sd <- head(sd.corr,dimVar)
+  sd   <- head(sd.corr,dimVar)
   corr <- tail(sd.corr,dimCorr)
-  
+
+  pars <- splitParams(theta,model)  
+  randomEffects <- pars$random
+
   dimFE <- model$nFE
   dimPsi <- model$nOverdisp
   dimRE <- model$nRE
   
-  dimBlocks<- model$rankRE[model$rankRE>0]
+  dimBlocks <- model$rankRE[model$rankRE>0]
   Sigma.inv <- getSigmaInv(sd, corr, dimVar, dimBlocks)
-  
-  
+
   # if not given, calculate unpenalized part of fisher info 
   if(is.null(fisher.unpen)){
     fisher.unpen <- attr(penFisher(theta, sd.corr, model,attributes=TRUE), "fisher")
@@ -1538,9 +1547,9 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   fisher <- fisher.unpen
   thetaIdxRE <- seq.int(to=length(theta), length.out=dimRE)
   fisher[thetaIdxRE,thetaIdxRE] <- fisher[thetaIdxRE,thetaIdxRE] + Sigma.inv
-  
+
+  # inverse of penalized fisher info
   F.inv <- try(solve(fisher),silent=TRUE)
-  
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING (in marScore): penalized Fisher is singular!\n")
     #return(rep.int(0,dimSigma))
@@ -1548,12 +1557,10 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
     ## have to stop() here, because nlminb() cannot deal with NA's
     F.inv <- MASS::ginv(fisher)
   }
-   
   F.inv.RE <- F.inv[thetaIdxRE,thetaIdxRE]
+
+  ############################################################
   
-  pars <- splitParams(theta,model)  
-  randomEffects <- pars$random
-   
   ## compute marginal score and fisher for each variance component
   # initialize score and fisher info
   marg.score <- rep.int(NA_real_,dimSigma)
@@ -1599,17 +1606,19 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
 
   if(any(is.na(sd.corr))) stop("NAs in variance parameters.", ADVICEONERROR)
   
-  sd <- head(sd.corr,dimVar)
+  sd   <- head(sd.corr,dimVar)
   corr <- tail(sd.corr,dimCorr)
-  
+
+  pars <- splitParams(theta,model)  
+  randomEffects <- pars$random
+
   dimFE <- model$nFE
   dimPsi <- model$nOverdisp
   dimRE <- model$nRE
   
-  dimBlocks<- model$rankRE[model$rankRE>0]
+  dimBlocks <- model$rankRE[model$rankRE>0]
   Sigma.inv <- getSigmaInv(sd, corr, dimVar, dimBlocks)
-  
-  
+
   # if not given, calculate unpenalized part of fisher info 
   if(is.null(fisher.unpen)){
     fisher.unpen <- attr(penFisher(theta, sd.corr, model,attributes=TRUE), "fisher")
@@ -1619,9 +1628,9 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   fisher <- fisher.unpen
   thetaIdxRE <- seq.int(to=length(theta), length.out=dimRE)
   fisher[thetaIdxRE,thetaIdxRE] <- fisher[thetaIdxRE,thetaIdxRE] + Sigma.inv
-  
+
+  # inverse of penalized fisher info
   F.inv <- try(solve(fisher),silent=TRUE)
-  
   if(inherits(F.inv,"try-error")){
     cat("\n WARNING (in marFisher): penalized Fisher is singular!\n")
     #return(matrix(Inf,dimSigma,dimSigma))
@@ -1629,15 +1638,13 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
     ## have to stop() here, because nlminb() cannot deal with NA's
     F.inv <- MASS::ginv(fisher)
   }
-   
   F.inv.RE <- F.inv[thetaIdxRE,thetaIdxRE]
   ## declare F.inv.RE as a symmetric matrix?
   ##F.inv.RE <- new("dsyMatrix", Dim = dim(F.inv.RE), x = c(F.inv.RE))
   ## -> no, F.inv.RE %*% dS.i becomes actually slower (dS.i is a "sparseMatrix")
   
-  pars <- splitParams(theta,model)  
-  randomEffects <- pars$random
-
+  ############################################################
+  
   marg.hesse <- matrix(NA_real_,dimSigma,dimSigma)
   
   ## specify functions for derivatives
