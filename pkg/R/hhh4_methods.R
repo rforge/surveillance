@@ -132,12 +132,18 @@ coef.ah4 <- function(object,se=FALSE, reparamPsi=TRUE, idx2Exp=NULL, amplitudeSh
   coefs <- object$coefficients
   stdErr <- object$se
 
-  if(reparamPsi & object$control$family!="Poisson"){
+  if(reparamPsi && object$control$family!="Poisson"){
     #extract psi coefficients
     index <- grep("-log(overdisp",names(coefs), fixed=TRUE)
-    psi.names <- names(coefs)[index]
-    # change labels from "-log(overdisp.xxx)" to "overdisp.xxx"
-    names(coefs)[index] <- substr(psi.names, start=6, stop=nchar(psi.names)-1)
+
+    if (length(index) == 0L) { # backward compatibility (internal psi coef
+                               # was named "overdisp" prior to r406)
+      index <- grep("^overdisp", names(coefs))
+    } else {
+      psi.names <- names(coefs)[index]
+      # change labels from "-log(overdisp.xxx)" to "overdisp.xxx"
+      names(coefs)[index] <- substr(psi.names, start=6, stop=nchar(psi.names)-1)
+    }
     
     #transform psi coefficients
     coefs[index] <- exp(-coefs[index])
