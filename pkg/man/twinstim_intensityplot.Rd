@@ -186,9 +186,13 @@ legend("topright", legend=levels(imdepi$events$type), lty=1, col=1:2,
 # algorithm (level=60\%) using www.MapShaper.org:
 load(system.file("shapes", "districtsD.RData", package="surveillance"))
 if (require("maptools")) {
-    # total intensity
+    # total intensity (using a rather sparse 'sgrid' for speed)
     intensityplot(imdepifit, which="total intensity",
-                  aggregate="space", tiles=districtsD, sgrid=2000)
+                  aggregate="space", tiles=districtsD, sgrid=500)
+}
+
+\dontrun{
+if (require("maptools")) {
     # epidemic proportion by type
     maps_epiprop <- lapply(1:2, function (type) {
         intensityplot(imdepifit, which="epidemic", aggregate="space",
@@ -197,6 +201,7 @@ if (require("maptools")) {
     })
     plot(maps_epiprop[[1]], split=c(1,1,2,1), more=TRUE)
     plot(maps_epiprop[[2]], split=c(2,1,2,1))
+}
 }
 }
 

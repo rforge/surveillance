@@ -295,17 +295,21 @@ data(imdepifit)
 ## www.geodatenzentrum.de), simplified by the "special" Visvalingam
 ## algorithm (level=60\%) using www.MapShaper.org:
 load(system.file("shapes", "districtsD.RData", package="surveillance"))
+
+\dontrun{
+## map of Germany's districts
 plot(districtsD)
 plot(stateD, add=TRUE, border=2, lwd=2)
 # 'stateD' is the union of the polygons in 'districtsD'
 # (created by maptools::unionSpatialPolygons)
+}
 
 ## simulate two "epidemics" from an endemic-only model (during a short period)
 m_noepi <- update(imdepifit, epidemic=~0, siaf=NULL,
     optim.args=list(par=coef(imdepifit)[1:4]), model=FALSE, cumCIF=FALSE)
 mysim <- simulate(m_noepi, nsim=2, seed=399, data=imdepi,
-    tiles=districtsD, W=stateD, t0=31, T=91, trace=20, nCircle2Poly=16,
-    .allocate=100, simplify=TRUE)
+    tiles=districtsD, W=stateD, t0=31, T=91, trace=FALSE,
+    nCircle2Poly=16, .allocate=100, simplify=TRUE)
 
 # extract the first realization -> object of class simEpidataCS
 mysim1 <- mysim[[1]]
@@ -316,7 +320,7 @@ plot(mysim, aggregate="time", subset=type=="B")
 
 ## simulate one realization from the imdepifit-model (during a short period)
 simimdepifit <- simulate(imdepifit, seed=1, data=imdepi,
-    tiles=districtsD, W=stateD, t0=31, T=91, trace=50)
+    tiles=districtsD, W=stateD, t0=31, T=91, trace=10)
 summary(simimdepifit)
 }
 

@@ -358,10 +358,11 @@ pchisq(2*(logLik(m_noepi_type)-logLik(m_noepi)), df=1, lower.tail=FALSE)
 ### eps.s = 200 km and eps.t = 30 days (see summary(imdepi))
 
 m0 <- update(m_noepi, epidemic = ~1,
-             optim.args = list(par=c(coef(m_noepi),-10)), model = TRUE)
+             optim.args = list(par=c(coef(m_noepi),-15)), model = TRUE)
 
 \dontrun{
-## NOTE: optim's BFGS would not identify the epidemic intercept
+## NOTE: in contrast to using nlminb() optim's BFGS would miss the
+##       likelihood maximum wrt the epidemic intercept if starting at -10
 m0_BFGS <- update(m_noepi, epidemic = ~1,
                   optim.args = list(par=c(coef(m_noepi),-10),
                                     method="BFGS"))
@@ -370,8 +371,8 @@ m0_BFGS$fisherinfo   # singular Fisher information matrix here
 m0$fisherinfo
 logLik(m0_BFGS)
 logLik(m0)
-## nlminb is more powerful since it makes use of the fisherinfo as
-## estimated by the model during optimization, which optim cannot
+## nlminb is more powerful since it makes use of the (expected) fisherinfo
+## as estimated by the model during optimization, which optim cannot
 }
 
 ## summarize the model fit
@@ -387,8 +388,8 @@ confint(m0, level=0.95)
 summary(R0(m0, trimmed=FALSE))
 
 ## plot the path of the total intensity or of the epidemic proportion
-plot(m0, "total intensity", tgrid=1000)
-plot(m0, "epidemic proportion", tgrid=1000)
+plot(m0, "total intensity", tgrid=500)
+plot(m0, "epidemic proportion", tgrid=500)
 
 \dontrun{
 ## extract "residual process" integrating over space (takes some seconds)
@@ -399,12 +400,14 @@ res <- residuals(m0)
 plot(res, type="l"); abline(h=c(0, length(res)), lty=2)
 # -> use the function checkResidualProcess
 checkResidualProcess(m0)
-}
 
 ## NB: the model fit environment is kept in the workspace with model=TRUE
 sort(sapply(environment(m0), object.size))
 # saving m0 to RData will include this model environment, thus might
-# consume quiet a lot of disk space (as it does use memory)
+# consume quiet a lot of disk space (as it does use memory), mainly
+# depending on the size of "stgrid", the number of "events" and the
+# polygonal resolution of "W"
+}
 
 
 ### try with spatially decreasing interaction kernel
@@ -426,6 +429,7 @@ summary(m1, test.iaf=FALSE)   # nonsense to test H0: log(sigma) = 0
 plot(m1, "siaf", xlim=c(0,200), types=1)   # the same for types=2
 
 
+\dontrun{
 ### add epidemic covariates
 
 m2 <- update(m1,
@@ -438,6 +442,7 @@ summary(m2)
 
 # look at estimated R0 values by event type
 tapply(R0(m2), imdepi$events@data[names(R0(m2)), "type"], summary)
+}
 }
 
 \keyword{models}

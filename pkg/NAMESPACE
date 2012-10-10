@@ -13,7 +13,6 @@ import(methods)
 ### general imports
 
 ## import generics to define own methods
-importFrom(graphics, plot)
 importFrom(stats, coef, vcov, logLik, residuals, confint, AIC, extractAIC,
            profile, simulate, update) # we actually _depend_ on stats (for ks.plot.unif)
 importFrom(utils, head, tail, toLatex)
@@ -36,14 +35,9 @@ import(sp)
 ### disProg-specific
 
 importFrom(MASS, glm.nb)   # for algo.glrnb
-#importFrom(msm, msm, hmmPois, viterbi.msm)   # for algo.hmm (msm is now "suggested", not imported)
-importFrom(spc, xcusum.arl, xcusum.crit)   # for CUSUM control charts in junchoi.R and algo_cusum.R
-
-
-### sts-specific
-
-# for colors in sts plots
-importFrom(colorspace, heat_hcl)
+##importFrom(msm, msm, hmmPois, viterbi.msm)   # for algo.hmm()
+##importFrom(spc, xcusum.arl, xcusum.crit)     # for find.kh()
+## (packages msm and spc are now "suggested", not imported)
 
 
 ### hhh4-specific
@@ -72,7 +66,8 @@ importFrom(spatstat, as.owin, as.owin.gpc.poly, coords, coords.ppp, area.owin, d
                                         # simulate.twinstim because spatstat
                                         # does not register its S3 methods 
                      bounding.box, runifpoint, inside.owin)
-importFrom(intervals, Intervals, reduce)
+##importFrom(intervals, Intervals, reduce)   # for as.epidata.epidataCS
+## package intervals is now "suggested", not imported
 
 
 

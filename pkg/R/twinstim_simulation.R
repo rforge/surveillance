@@ -708,20 +708,26 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
             # We now sample type and location
             if (.eventSource == 0L) {   # i.e. endemic source of infection
-                .eventType <- sample(typeNames, 1L, prob=if (nbeta0 > 1L) exp(beta0))
+                .eventType <- sample(typeNames, 1L,
+                                     prob=if (nbeta0 > 1L) exp(beta0))
                 stgrididx <- which(gridBlocks == tBLOCK)
-                .eventTile <- sample(stgrid$tile[stgrididx], 1L, prob=dsexpeta[stgrididx])  # this is a factor
-                # spsample doesn't guarantee that the sample will consist of exactly n points
-                # if no point is sampled (very unlikely though), there would be an error
+                .eventTile <- sample(stgrid$tile[stgrididx], 1L,
+                                     prob=dsexpeta[stgrididx])  # this is a factor
+                ## spsample doesn't guarantee that the sample will consist of
+                ## exactly n points. if no point is sampled (very unlikely
+                ## though), there would be an error
                 ntries <- 1L
+                .nsample <- 1L
                 while(
                 inherits(eventLocationSP <- try(
                     spsample(tiles[as.character(.eventTile),],
-                             n=1L, type="random"),
+                             n=.nsample, type="random"),
                     silent = TRUE), "try-error")) {
+                    .nsample <- 10L   # this also circumvents a bug in sp 1.0-0
+                                      # (missing drop=FALSE in sample.Spatial())
                     if (ntries >= 1000) {
-                        stop("'spsample()' did not succeed in sampling a random point ",
-                             "in tile '", as.character(.eventTile), "'")
+                        stop("'sp::spsample()' didn't succeed in sampling a ",
+                             "point from tile \"", as.character(.eventTile), "\"")
                     }
                     ntries <- ntries + 1L
                 }

@@ -918,6 +918,10 @@ plot.epidataCS_space <- function (x, subset,
 # tileCentroids is a coordinate matrix whose row names are the tile levels
 as.epidata.epidataCS <- function (data, tileCentroids, eps = 0.001, ...)
 {
+    if (!require("intervals"))
+        stop("conversion from ", dQuote("epidataCS"), " to ", dQuote("epidata"),
+             " requires the ", dQuote("intervals"), " package")
+    
     ### generate twinSIR's epidata object from stgrid (no events)
     centroidIdx <- match(levels(data$stgrid$tile), rownames(tileCentroids), nomatch = NA_integer_)
     if (any(is.na(centroidIdx))) {

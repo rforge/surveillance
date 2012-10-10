@@ -1,7 +1,12 @@
 ################################################################################
-### coerce-methods for the different spatial classes
+### Part of the surveillance package, http://surveillance.r-forge.r-project.org
+### Free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
 ###
-### Author: Sebastian Meyer
+### Additional coerce-methods between different spatial classes
+###
+### Copyright (C) 2012 Sebastian Meyer
+### $Revision$
 ### $Date$
 ################################################################################
 
