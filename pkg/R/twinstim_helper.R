@@ -196,10 +196,10 @@ gridcellOfEvent <- function (t, tilename, stgrid)
                 eps <- eps.s[i]
                 bdisti <- bdist[i]
                 effRange <- effRanges[i]
-                siafInts[i] <- if (effRange <= bdisti) { # effective region completely inside W
-                    siaf$Fcircle(min(eps,effRange), siafpars, eventTypes[i])
-                } else if (eps <= bdisti) { # influence region is completely inside W
+                siafInts[i] <- if (eps <= bdisti) { # influence region is completely inside W
                     siaf$Fcircle(eps, siafpars, eventTypes[i])
+                } else if (effRange <= bdisti) { # effective region completely inside W
+                    siaf$Fcircle(bdisti, siafpars, eventTypes[i])
                 } else { # integrate over polygonal influence region
                     polyCub.midpoint(influenceRegion[[i]], siaf$f,
                                      siafpars, eventTypes[i], eps = hs[i])
