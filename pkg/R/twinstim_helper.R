@@ -1,8 +1,13 @@
 ################################################################################
-### Some internal helper functions for 'twinstim'.
+### Part of the surveillance package, http://surveillance.r-forge.r-project.org
+### Free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
 ###
-### Author: Sebastian Meyer
-### $Date: 2010-11-16 04:08:22 +0100 (Tue, 16 Nov 2010) $
+### Some internal helper functions for "twinstim".
+###
+### Copyright (C) 2009-2012 Sebastian Meyer
+### $Revision$
+### $Date$
 ################################################################################
 
 
@@ -22,7 +27,7 @@ bdist <- function (xy, poly)
         for (j in 1L:nsegs) {
             j1 <- if (j < nsegs) j + 1L else 1L
             seg <- c(polly$x[j], polly$y[j], polly$x[j1], polly$y[j1])
-            result <- pmin(result, spatstat::distppl(xy, seg))
+            result <- pmin(result, distppl(xy, seg))
         }
     }
     return(result)
