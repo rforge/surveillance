@@ -1,8 +1,16 @@
 ################################################################################
+### Part of the surveillance package, http://surveillance.r-forge.r-project.org
+### Free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
+###
 ### Methods for objects of class "twinstim", specifically:
-### coef (coefficients), vcov, logLik, print, summary, print.summary, plot
-### Author: Sebastian Meyer
+### vcov, logLik, print, summary, plot (intensity, iaf), R0, residuals, update
+###
+### Copyright (C) 2009-2012 Sebastian Meyer
+### $Revision$
+### $Date$
 ################################################################################
+
 
 ### don't need a specific coef-method (identical to stats:::coef.default)
 ## coef.twinstim <- function (object, ...)
@@ -185,7 +193,7 @@ ret <- capture.output({
             tab2[] <- lapply(tab2, function(x) {
                 ifelse(is.na(x), "", paste0("$",x,"$")) # (test.iaf=FALSE)
             })
-            print(xtable::xtable(tab2), only.contents=TRUE, hline.after=NULL,
+            print(xtable(tab2), only.contents=TRUE, hline.after=NULL,
                   include.colnames=FALSE, sanitize.text.function=identity)
             cat("\\hline\n")
         }
@@ -285,6 +293,9 @@ intensityplot.twinstim <- function (x,
             if (!require("maptools")) {
                 stop("auto-generation of 'sgrid' requires package \"maptools\"")
             }
+            ## maptools gets attached by the above check, which is actually not
+            ## necessary. However, there seems to be no better way to check for
+            ## the availability of a package (cf. "Details" in ?find.package)
             sgrid <- maptools::Sobj_SpatialGrid(.tiles, n = sgrid)$SG
         }
         sgrid <- as(sgrid, "SpatialPixels")
@@ -431,7 +442,7 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
             .tiles <- as(tiles, "SpatialPolygons") # for over-method (drop data)
             function (xy) {             # works with a whole coordinate matrix
                 points <- SpatialPoints(xy, proj4string=tiles@proj4string)
-                polygonidxOfPoints <- sp::over(points, .tiles)
+                polygonidxOfPoints <- over(points, .tiles)
                 points.outside <- is.na(polygonidxOfPoints)
                 polygonidxOfPoints[points.outside] <- 1L   # tiny hack
                 tilesOfPoints <- if (is.null(tiles.idcol)) {
@@ -748,7 +759,7 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, ...)
         }
         noCircularIR <- if (is.null(bdist)) FALSE else all(eps.s > bdist)
         if (attr(form$siaf, "constant")) {
-            iRareas <- sapply(influenceRegion, spatstat::area.owin)
+            iRareas <- sapply(influenceRegion, area.owin)
             ## will be used by .siafInt()
         } else if (! (is.null(siaf$Fcircle) ||
                (is.null(siaf$effRange) && noCircularIR))) {
@@ -1020,9 +1031,9 @@ update.twinstim <- function (object, endemic, epidemic, optim.args, model,
         }
     }
     if (!missing(endemic))
-        call$endemic <- stats::update.formula(formula(object)$endemic, endemic)
+        call$endemic <- update(formula(object)$endemic, endemic)
     if (!missing(epidemic))
-        call$epidemic <- stats::update.formula(formula(object)$epidemic, epidemic)
+        call$epidemic <- update(formula(object)$epidemic, epidemic)
     if (!missing(optim.args)) {
         oldargs <- call$optim.args
         call$optim.args <- if (is.list(optim.args)) {

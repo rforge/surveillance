@@ -120,7 +120,9 @@ polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
 }
 
 \author{
-   Sebastian Meyer
+  Sebastian Meyer;
+  the original MATLAB implementation on which the product Gauss cubature in
+  polyCub.SV() is based, is due to Sommariva & Vianello (2007)
 }
 
 \note{

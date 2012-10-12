@@ -1,6 +1,13 @@
 ################################################################################
-### Spatial/Temporal interaction functions for the epidemic component
-### Author: Sebastian Meyer
+### Part of the surveillance package, http://surveillance.r-forge.r-project.org
+### Free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
+###
+### Spatial and temporal interaction functions for twinstim's epidemic component
+###
+### Copyright (C) 2009-2012 Sebastian Meyer
+### $Revision$
+### $Date$
 ################################################################################
 
 
@@ -117,7 +124,7 @@ siaf.gaussian <- function (nTypes, logsd = TRUE, density = FALSE,
         tmp1,
         expression(
             sd <- rep(sds, length.out=type)[type],
-            matrix(rnorm(2*n, mean=0, sd=sd), nrow = n, ncol = 2L)
+            matrix(stats::rnorm(2*n, mean=0, sd=sd), nrow = n, ncol = 2L)
         )
     ))
 
@@ -152,8 +159,8 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
 
     ## helper expression, note: logpars=c(logscale=logsigma, logshape=logalpha)
     tmp <- expression(
-        logsigma <- logpars[[1]],  # used "[[" to drop names
-        logalpha <- logpars[[2]],
+        logsigma <- logpars[[1L]],  # used "[[" to drop names
+        logalpha <- logpars[[2L]],
         sigma <- exp(logsigma),
         alpha <- exp(logalpha)
         )
@@ -223,14 +230,51 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
         effRange
     } else NULL
     
-    simulate <- function (n, logpars)
+    simulate <- function (n, logpars, type, ub)
     {
-        ## stopifnot(require("VGAM"))
-        samp1d <- VGAM::rlomax(n, scale=exp(logpars[[1]]),
-                               shape3.q=exp(logpars[[2]]))
+        ## Sampling from f(s) = dlomax(||s||), truncated to ||s|| <= ub is via
+        ## polar coordinates and applies the inverse transformation method
+        sigma <- exp(logpars[[1L]])
+        alpha <- exp(logpars[[2L]])
+        exp <- sigma / (alpha-1)        # only valid if alpha > 1
+        ##r <- VGAM::rlomax(n, scale=sigma, shape3.q=alpha)
+        ## NO, r must be sampled from a density proportional to r*dlomax(r)!!!
+        ##curve(x * alpha/sigma * (1+x/sigma)^-(alpha+1), 0, 200)
+
+        ## We need the primitive of the density, i.e. int_0^r x*dlomax(x) dx
+        cumd <- if (alpha == 1) {
+            function (r) sigma * (log(1+r/sigma) - r/(r+sigma))
+        } else {
+            function (r)
+                ifelse(is.infinite(r) & alpha > 1, exp,
+                       exp * (1 - (1+r/sigma)^-alpha * (r*alpha/sigma+1)))
+        }
+
+        ## cumulative distribution function: int_0^q x*dlomax(x) / c dx
+        ## the normalization constant c is only finite if alpha > 1 _or_ if 
+        ## the density is truncated (in simEpidataCS, simulation is always
+        ## bounded to eps.s and to the largest extend of W), otherwise the
+        ## distribution is improper
+        CDF <- if (is.finite(ub)) { # in this case any alpha > 0 is fine
+            normconst <- cumd(ub)
+            function (q) cumd(q) / normconst
+        } else { # for r in [0;Inf] the density is only proper if alpha > 1
+            stopifnot(alpha > 1)
+            function (q) cumd(q) / exp
+        }
+        
+        ## However, there is no closed form expression for the quantile function
+        ## of that distribution (inverse CDF), so we have to use uniroot
+        ## However, uniroot needs a finite upper bound
+        stopifnot(is.finite(ub))
+        QF <- function(p) uniroot(function(q) CDF(q)-p, lower=0, upper=ub)$root
+
+        ## now sample r as QF(U), where U ~ U(0,1)
+        r <- sapply(runif(n), QF)
+        
         ## now rotate each point by a random angle to cover all directions
-        theta <- runif(n, 0, 2*pi)
-        samp1d * cbind(cos(theta), sin(theta))
+        theta <- stats::runif(n, 0, 2*pi)
+        r * cbind(cos(theta), sin(theta)) 
     }
 
     ## set function environments to the global environment
@@ -394,7 +438,7 @@ tiaf.constant <- function () {
 # deriv: optional derivative of f with respect to the parameters. Takes the same arguments as f but returns a matrix with as many rows as there were coordinates in the input and npars columns. The derivative is necessary for the score function.
 # Fcircle: optional function for fast calculation of the integral of f over a circle with radius r (first argument). Further arguments like f. It must not be vectorized for model fitting (will be passed single radius and single type).
 # effRange: optional function returning the effective range (domain) of f for the given set of parameters such that the circle with radius effRange contains the numerical essential proportion the integral mass, e.g. function (sigma) 6*sigma. The return value must be a vector of length nTypes (effRange for each type). Must be supplied together with Fcircle.
-# simulate: optional function returning a sample drawn from the spatial kernel (i.e. a two-column matrix of 'n' points). The arguments are 'n' (size of the sample), 'pars' (parameter vector of the spatial kernel), and, for marked twinstim, 'type' (a single type of event being generated).
+# simulate: optional function returning a sample drawn from the spatial kernel (i.e. a two-column matrix of 'n' points). The arguments are 'n' (size of the sample), 'pars' (parameter vector of the spatial kernel), for marked twinstim also 'type' (a single type of event being generated), and optionally 'ub' (upper bound, truncation of the kernel)
 # npars: number of parameters
 # validpars: a function indicating if a specific parameter vector is valid. Not necessary if npars == 0. If missing or NULL, it will be set to function (pars) TRUE. This function is rarely needed in practice, because usual box constrained parameters can be taken into account by using L-BFGS-B as the optimization method (with arguments 'lower' and 'upper').
 # knots: not implemented. Knots (> 0) of a spatial interaction STEP function of the distance
@@ -432,7 +476,10 @@ checksiaf <- function (f, deriv, Fcircle, effRange, simulate, npars, validpars, 
     }
     ## Check if simulation function has proper format
     if (missing(simulate)) simulate <- NULL
-    if (!is.null(simulate)) simulate <- .checknargs3(simulate, "siaf$simulate")
+    if (!is.null(simulate)) {
+        simulate <- .checknargs3(simulate, "siaf$simulate")
+        formals(simulate) <- c(formals(simulate), alist(ub=))
+    }
     ## Check if the validpars are of correct form
     validpars <- if (!haspars || missing(validpars) || is.null(validpars))
         NULL else match.fun(validpars)

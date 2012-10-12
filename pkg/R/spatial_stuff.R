@@ -5,7 +5,7 @@
 ###
 ### Spatial helper functions
 ###
-### Copyright (C) 2012 Sebastian Meyer
+### Copyright (C) 2009-2012 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -24,8 +24,8 @@ discpoly <- function (center, r, npoly = 64,
     class = c("gpc.poly", "owin", "Polygon"), hole = FALSE)
 {
     class <- match.arg(class)
-    if (class == "owin") {
-        res <- spatstat::disc(radius = r, centre = center, mask = FALSE, npoly = npoly)
+    if (class == "owin") { # use spatstat::disc
+        res <- disc(radius = r, centre = center, mask = FALSE, npoly = npoly)
         if (hole) {
             res$bdry[[1]]$x <- rev(res$bdry[[1]]$x)
             res$bdry[[1]]$y <- rev(res$bdry[[1]]$y)
@@ -43,6 +43,16 @@ discpoly <- function (center, r, npoly = 64,
         "Polygon" = Polygon(cbind(c(x,x[1]),c(y,y[1])), hole=hole),
         "gpc.poly" = new("gpc.poly", pts = list(list(x=x, y=y, hole=hole)))
     )
+}
+
+
+### sample n points uniformly on a disc with radius r
+
+runifdisc <- function (n, r = 1)
+{
+    rangle <- runif(n, 0, 2*pi)
+    rdist <- r * sqrt(runif(n, 0, 1))
+    rdist * cbind(cos(rangle), sin(rangle))
 }
 
 
@@ -69,8 +79,8 @@ inside.gpc.poly <- function(x, y = NULL, polyregion, mode.checked = FALSE)
 	xy <- xy.coords(x, y, recycle=FALSE)
 	N <- length(xy$x)
     # check for each polygon of polyregion if points are in the polygon
-    locations <- sapply(gpclib::get.pts(polyregion), function (poly) {
-        pip <- sp::point.in.polygon(xy$x, xy$y, poly$x, poly$y, mode.checked = mode.checked)
+    locations <- sapply(get.pts(polyregion), function (poly) {
+        pip <- point.in.polygon(xy$x, xy$y, poly$x, poly$y, mode.checked = mode.checked)
         if (poly$hole) { # if point is inside a hole then attribute -Inf
             ifelse(pip == 1, -Inf, 0)
         } else pip
@@ -106,12 +116,13 @@ isClosed <- function (coords)
 
 
 ## Compute the intersection of a "gpc.poly" with a "discpoly" (and centering)
+## using gpclib::intersect
 
 intersectCircle <- function (Wgpc, center, r, npoly)
 {
     circle <- discpoly(center = center, r = r, npoly = npoly,
                        class = "gpc.poly", hole = FALSE)
-    intersection <- gpclib::intersect(circle, Wgpc)  # this order seems to be faster
+    intersection <- intersect(circle, Wgpc)  # this order seems to be faster
     scale.poly(intersection, center = center) # use scale method as defined above
 }
 
@@ -132,6 +143,10 @@ nbOrder <- function (neighbourhood, maxlag = 1)
         storage.mode(neighbourhood) <- "integer"
         return(neighbourhood)
     }
+
+    ## if (!require("spdep"))         # actually we don't need to attach "spdep"
+    ##     stop("package ", dQuote("spdep"),
+    ##          " is required to determine neighbourhood orders")
 
     ## manually convert to spdep's "nb" class
     #nb <- apply(neighbourhood, 1, which)   # could result in a matrix

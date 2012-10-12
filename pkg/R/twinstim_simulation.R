@@ -7,7 +7,7 @@
 ### class "twinstim". The function basically uses Ogata's modified thinning
 ### algorithm (cf. Daley & Vere-Jones, 2003, Algorithm 7.5.V.).
 ###
-### Copyright (C) 2012 Sebastian Meyer
+### Copyright (C) 2010-2012 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -140,6 +140,9 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         stopifnot(inherits(W, "SpatialPolygons"),
                   identical(proj4string(tiles), proj4string(W)))
     }
+
+    # get (upper bound for) maximum extent of W (i.e. the diagonal of the bbox)
+    maxExtentOfW <- sqrt(sum(apply(bbox(W), 1, diff)^2))
 
     # Transform W into a gpc.poly
     Wgpc <- as(W, "gpc.poly")
@@ -736,25 +739,33 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                 sourceType <- eventMatrix[.eventSource,"type"]
                 sourceCoords <- eventCoords[.eventSource,,drop=FALSE]
                 sourceIR <- influenceRegions[[.eventSource]]
+                sourceEpss <- eventMatrix[.eventSource,"eps.s"]
+                .upperRange <- min(sourceEpss, maxExtentOfW)
                 .eventType <- sample(typeNames[qmatrix[sourceType,]], 1L)
                 .eventTypeCode <- match(.eventType, typeNames)
                 eventLocationIR <- if (constantsiaf) {
-                        as.matrix(spatstat::coords(spatstat::runifpoint(1L, win=sourceIR, giveup=1000)))
-                    } else {
-                        eventInsideIR <- FALSE
-                        ntries <- 0L
-                        while(!eventInsideIR) {
-                            if (ntries >= 1000) {
-                                stop("event location sampled by siaf$simulate() was ",
-                                     "rejected 1000 times (outside influence region)")
-                            }
-                            ntries <- ntries + 1L
-                            eventLocationIR <- siaf$simulate(1L, siafpars, .eventTypeCode)
-                            eventInsideIR <- spatstat::inside.owin(eventLocationIR[,1],
-                                  eventLocationIR[,2], sourceIR)
+                    as.matrix(spatstat::coords(
+                        spatstat::runifpoint(1L, win=sourceIR, giveup=1000)
+                    ))
+                } else {
+                    eventInsideIR <- FALSE
+                    ntries <- 0L
+                    while(!eventInsideIR) {
+                        if (ntries >= 1000) {
+                            stop("event location sampled by siaf$simulate() was",
+                                 " rejected 1000 times (not in influence region)")
                         }
-                        eventLocationIR
+                        ntries <- ntries + 1L
+                        eventLocationIR <- siaf$simulate(1L, siafpars,
+                                                         .eventTypeCode,
+                                                         .upperRange)
+                        eventInsideIR <- spatstat::inside.owin(
+                                                   eventLocationIR[,1],
+                                                   eventLocationIR[,2],
+                                                   sourceIR)
                     }
+                    eventLocationIR
+                }
                 .eventLocation <- sourceCoords + eventLocationIR
                 whichTile <- overlay(SpatialPoints(.eventLocation, proj4string=CRS(proj4string(W))), tiles)
                 .eventTile <- row.names(tiles)[whichTile]

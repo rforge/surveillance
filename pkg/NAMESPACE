@@ -7,28 +7,33 @@ useDynLib(surveillance)
 ### IMPORTS ###
 ###############
 
-import(methods)
+### Fully import all packages listed as Depends in the given order
+### (except for Rcpp, which is only used on the C-level, and
+### stats, utils, and xtable, from which only selected methods are imported)
 
+import(grDevices, graphics)
 
-### general imports
-
-## import generics to define own methods
+## required generics (that's why we "Depend" on these packages)
 importFrom(stats, coef, vcov, logLik, residuals, confint, AIC, extractAIC,
-           profile, simulate, update) # we actually _depend_ on stats (for ks.plot.unif)
+           profile, simulate, update)
 importFrom(utils, head, tail, toLatex)
-importFrom(xtable, xtable)
+importFrom(xtable, xtable) # if we wouldn't "Depend" on xtable, our
+                           # xtable-methods would not be useable except if the
+                           # user attaches the xtable package himself
+## required functions from stats and utils
+importFrom(stats, pnorm, cov2cor, ks.test, formula, rnorm, runif)
+importFrom(utils, packageDescription, modifyList)
+
+import(methods)
+##import(Rcpp)   # not used on the R-level
 
 #importMethodsFrom(stats4, plot)   # import S4-generic
 #<- would be nice, but then gives strange warnings for S3 methods from stats
 #   "Warning: found methods to import for function 'AIC' but not the generic itself"
 #   However, we don't need to import it here, because we depend on package sp, which makes plot generic
 
-## basic methods used in different parts of the package
-importFrom(stats, pnorm, cov2cor, ks.test, formula)
-importFrom(utils, packageDescription, modifyList)
-
-## sp classes, utility functions (bbox, coordinates, dimensions, overlay, ...), plot methods
-## (moved package sp to "Depends:" since it defines essential data classes and methods for surveillance)
+## sp classes & utilities (bbox, coordinates, dimensions, overlay, plot, ...)
+## (we "Depend" on package sp since it defines essential data classes & methods)
 import(sp)
 
 
@@ -52,7 +57,7 @@ importMethodsFrom(Matrix, coerce, diag, forceSymmetric, solve)
 
 # for use in computing OSAIC weights by simulation
 importFrom(MASS, mvrnorm)
-importFrom(quadprog, solve.QP)
+#importFrom(quadprog, solve.QP)   # moved to "Suggests"
 
 
 ### twinstim-specific
@@ -61,7 +66,7 @@ importClassesFrom(gpclib, gpc.poly)
 #importMethodsFrom(gpclib, coerce)   # we don't need to import coerce from gpclib because we import methods
 importMethodsFrom(gpclib, "[", get.bbox, intersect, append.poly, get.pts, scale.poly, tristrip)
 importFrom(spatstat, as.owin, as.owin.gpc.poly, coords, coords.ppp, area.owin, distppl,
-                     as.im.function, disc, shift, shift.owin, plot.owin, marks,
+                     as.im.function, disc, shift, shift.owin, plot.owin, plot.im, marks,
                      marks.ppp, markformat.default, # required for runifpoint() in
                                         # simulate.twinstim because spatstat
                                         # does not register its S3 methods 
@@ -75,8 +80,7 @@ importFrom(spatstat, as.owin, as.owin.gpc.poly, coords, coords.ppp, area.owin, d
 ### EXPORTS ###
 ###############
 
-# This might take a while before working correctly so we start by
-# exporting all variables that do not start with a period
+# just export all variables that do not start with a period:
 #exportPattern("^[^\\.]")
 
 
@@ -102,6 +106,7 @@ export(polyCub, polyCub.midpoint, polyCub.SV, polyCub.exact.Gauss)
 
 # spatial utilities
 export(discpoly)
+export(runifdisc)
 export(inside.gpc.poly)
 exportMethods(scale.poly)   # redefined method for gpc.poly in spatial_stuff.R
 #S3method(scale, gpc.poly)  # alternatively, if defined as S3 method for scale

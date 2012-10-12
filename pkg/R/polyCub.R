@@ -1,9 +1,19 @@
 ################################################################################
+### Part of the surveillance package, http://surveillance.r-forge.r-project.org
+### Free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
+###
 ### Methods for two-dimensional numerical integration over a polygonal domain
-### (see Section 3.2 of my Master's Thesis)
-### 
-### Author: Sebastian Meyer
-### $Date: 2010-04-23 10:49:46 +0200 (Fri, 23 Apr 2010) $
+### cf. Section 3.2 of my Master's Thesis: http://epub.ub.uni-muenchen.de/11703/
+###
+### Copyright (C) 2009-2012 Sebastian Meyer
+### $Revision$
+### $Date$
+###
+### The product Gauss cubature in 'gaussCub()' is based on the corresponding
+### MATLAB code ('polygauss') by Sommariva & Vianello (2007):
+### "Product Gauss cubature over polygons based on Green's integration formula"
+### Bit Numerical Mathematics, 47 (2), 441-453.
 ###
 ### PARAMS:
 ### polyregion: a polygon of class "gpc.poly" (gpclib::) or "owin" (spatstat::)
@@ -49,8 +59,7 @@ polyCub.midpoint <- function (polyregion, f, ..., eps = NULL, dimyx = NULL, plot
 # and i cannot observe any problem with spatstat here.
 # so we just let the function do its work... (fingers crossed)
     IM <- tryCatch(
-          spatstat::as.im.function(X = fxy, W = polyregion, ...,
-                                   eps = eps, dimyx = dimyx),
+          as.im.function(X=fxy, W=polyregion, ..., eps=eps, dimyx=dimyx),
           error = function (e) {
               ## if eps was to small such that the dimensions of the image would
               ## be too big then the operation matrix(TRUE, nr, nc) throws an
@@ -64,7 +73,7 @@ polyCub.midpoint <- function (polyregion, f, ..., eps = NULL, dimyx = NULL, plot
     
 ### ILLUSTRATION ###
 if (plot) {
-    spatstat::plot.im(IM, axes = TRUE, col=grey(31:4/35), main="")
+    plot.im(IM, axes = TRUE, col=grey(31:4/35), main="")
     # add evaluation points (unsure about spatstat implementation of class "im")
     # both of the following commands worked with different versions of spatstat
     #with(IM, points(expand.grid(xcol, yrow), col=!is.na(v), cex=0.5))
@@ -272,7 +281,7 @@ gaussCub <- function (x_bd, y_bd, N = 10, a = NULL)
     Lh0rho <- mvtnorm::pmvnorm(
         lower = c(h,0), upper = c(Inf,Inf), mean = c(0,0), corr = matrix(c(1,rho,rho,1),2,2)
     )
-    Qh <- stats::pnorm(h, mean = 0, sd = 1, lower.tail = FALSE)
+    Qh <- pnorm(h, mean = 0, sd = 1, lower.tail = FALSE)
     return(Lh0rho - asin(rho)/2/pi - Qh/2)
 }
 
@@ -332,7 +341,7 @@ polyCub.exact.Gauss <- function (polyregion, mean = c(0,0), Sigma = diag(2), plo
     
     # coordinate transformation so that the standard bivariat normal density
     # can be used in integrations (cf. formula 26.3.22)
-    rho <- stats::cov2cor(Sigma)[1,2]
+    rho <- cov2cor(Sigma)[1,2]
     sdx <- sqrt(Sigma[1,1])
     sdy <- sqrt(Sigma[2,2])
     polyregion@pts <- lapply(polyregion@pts, function (poly) {
@@ -342,7 +351,7 @@ polyCub.exact.Gauss <- function (polyregion, mean = c(0,0), Sigma = diag(2), plo
     })
     
     # triangulation: tristrip returns a list where each element is a coordinate matrix of vertices of triangles
-    triangleSets <- gpclib::tristrip(polyregion)
+    triangleSets <- tristrip(polyregion)
     
 ### ILLUSTRATION ###
 if (plot) {
