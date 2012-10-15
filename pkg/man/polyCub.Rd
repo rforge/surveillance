@@ -41,8 +41,8 @@ polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
     In contrast, the \code{polyCub.SV} and \code{polyCub.exact.Gauss} methods
     assume \code{polyregion} to be anything
     coercible to a \code{"\link[gpclib:gpc.poly-class]{gpc.poly}"} polygon.
-    Unfortunately, there is no documented convention for the implementation of polygons
-    of class \code{"gpc.poly"}. The cubature methods here assume vertices
+    Unfortunately, it seems that there is no convention for the implementation of
+    polygons of class \code{"gpc.poly"}. The cubature methods here assume vertices
     ordered according to the \pkg{sp} convention, i.e. \emph{clockwise} for normal
     boundaries and \emph{anticlockwise} for holes. However, in contrast to \pkg{sp},
     the first vertex should \emph{not} be repeated!

@@ -7,9 +7,8 @@
 \alias{tail.epidataCS}
 \alias{[.epidataCS}
 \alias{subset.epidataCS}
-\alias{marks}	       % to make R CMD check happy (the generic
-                       % marks is imported from spatstat and then
-                       % exported (unchanged) -> documentation required)
+\alias{marks}	       % the generic 'marks()' is imported from spatstat and
+                       % then exported (unchanged) -> documentation required
 \alias{marks.ppp}               % dito
 \alias{markformat.default}      % dito
 \alias{marks.epidataCS}
@@ -42,7 +41,7 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 \method{[}{epidataCS}(x, i, j, drop = FALSE)
 \method{subset}{epidataCS}(x, subset, select, drop = FALSE, ...)
 
-\method{marks}{epidataCS}(x, ...)
+\method{marks}{epidataCS}(x, coords = TRUE, ...)
 
 \method{summary}{epidataCS}(object, ...)
 \method{print}{summary.epidataCS}(x, ...)
@@ -165,6 +164,10 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 
   \item{subset, select}{arguments used to subset the \code{events} from
     an \code{"epidataCS"} object like in \code{\link{subset.data.frame}}.}
+
+  \item{coords}{logical indicating if the data frame of event marks
+    returned by \code{marks.epidataCS} should also include the event
+    coordinates. This defaults to \code{TRUE}.}
 
   \item{object}{an object of class \code{"epidataCS"}.}
 }

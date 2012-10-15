@@ -106,11 +106,18 @@ export(polyCub, polyCub.midpoint, polyCub.SV, polyCub.exact.Gauss)
 
 # spatial utilities
 export(discpoly)
-export(runifdisc)
+#export(runifdisc)          # don't export since package spatstat has a similar
+                            # but more general function also named runifdisc
 export(inside.gpc.poly)
 exportMethods(scale.poly)   # redefined method for gpc.poly in spatial_stuff.R
 #S3method(scale, gpc.poly)  # alternatively, if defined as S3 method for scale
 export(nbOrder)
+
+# randomly break tied event times or coordinates
+export(untie)                           # new S3-generic
+S3method(untie, default)
+S3method(untie, matrix)
+S3method(untie, epidataCS)
 
 # little helper: multiplicity of points
 export(multiplicity)                    # new S3-generic

@@ -22,7 +22,7 @@ runifdisc(n, r = 1)
     integer size of the sample.
   }
   \item{r}{
-    numeric radius of the disc.
+    numeric radius of the disc (centered at (0,0)).
   }
 }
 
@@ -34,8 +34,13 @@ A two-column coordinate matrix of the sampled points.
 Sebastian Meyer
 }
 
+\seealso{
+\code{\link[spatstat]{runifdisc}} in package \pkg{spatstat}, which is
+slightly more flexible and integrated within the \code{"ppp"} class.
+}
+
 \examples{
-plot(runifdisc(1000, 3))
+plot(surveillance:::runifdisc(1000, 3))
 }
 
 \keyword{datagen}

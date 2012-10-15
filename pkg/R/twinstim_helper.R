@@ -12,7 +12,8 @@
 
 
 ## Compute distance from points to boundary
-## (adapted from spatstat::bdist.points, DEPENDS ON spatstat::distppl)
+## copied in part from function bdist.points() of the "spatstat" package authored
+## by A. Baddeley and R. Turner (DEPENDS ON spatstat::distppl)
 
 # xy is the coordinate matrix of the points
 # poly is a polygonal domain of class "gpc.poly"
@@ -23,10 +24,12 @@ bdist <- function (xy, poly)
     bdry <- poly@pts
     for (i in seq_along(bdry)) {
         polly <- bdry[[i]]
-        nsegs <- length(polly$x)
-        for (j in 1L:nsegs) {
+        px <- polly$x
+        py <- polly$y
+        nsegs <- length(px)
+        for (j in seq_len(nsegs)) {
             j1 <- if (j < nsegs) j + 1L else 1L
-            seg <- c(polly$x[j], polly$y[j], polly$x[j1], polly$y[j1])
+            seg <- c(px[j], py[j], px[j1], py[j1])
             result <- pmin(result, distppl(xy, seg))
         }
     }
