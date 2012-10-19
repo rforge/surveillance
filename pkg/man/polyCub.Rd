@@ -3,6 +3,7 @@
 \alias{polyCub}
 \alias{polyCub.midpoint}
 \alias{polyCub.SV}
+\alias{.polyCub.SV}
 \alias{polyCub.exact.Gauss}
 
 \title{
@@ -30,6 +31,7 @@ polyCub(polyregion, f, method = c("SV", "midpoint", "exact.Gauss"), ..., plot = 
 
 polyCub.midpoint(polyregion, f, ..., eps = NULL, dimyx = NULL, plot = FALSE)
 polyCub.SV(polyregion, f, ..., N, a = 0, plot = FALSE)
+.polyCub.SV(xylist, f, ..., N, a = 0)
 polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
 }
 
@@ -79,7 +81,17 @@ polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
     Defaults to the origin, because this seems to be reasonable if \code{f} has its
     maximum value at (0,0), which is the case for the typical usage in this package
     (bivariate normal density with zero mean).
-}
+  }
+  \item{xylist}{
+    \code{.polyCub.SV} is a compact version of \code{polyCub.SV} for
+    internal use. Here, the domain of integration is specified by \code{xylist},
+    a list of polygons exactly like the polygonal boundaries stored in
+    objects of class \code{"\link{owin}"}: Each component (polygon) is a
+    list with components \code{x} and \code{y}, which give the
+    coordinates of the vertices of the polygon in \emph{anticlockwise} order
+    without repeating any vertex. For holes, clockwise ordered vertices
+    must be used instead.
+  }
   \item{mean, Sigma}{
     mean and covariance matrix of the bivariate normal density to be integrated.
   }
@@ -122,7 +134,7 @@ polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
 \author{
   Sebastian Meyer;
   the original MATLAB implementation on which the product Gauss cubature in
-  polyCub.SV() is based, is due to Sommariva & Vianello (2007)
+  \code{polyCub.SV} is based, is due to Sommariva & Vianello (2007)
 }
 
 \note{

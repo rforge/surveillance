@@ -121,7 +121,7 @@ polyCub.SV <- function (polyregion, f, ..., N, a = 0, plot = FALSE)
         # (clockwise order leads to inverse integral value needed for holes)
         x <- rev(poly$x)
         y <- rev(poly$y)
-        nw <- gaussCub(c(x,x[1]), c(y,y[1]), N = N, a = a)
+        nw <- gaussCub(c(x,x[1L]), c(y,y[1L]), N = N, a = a)
         if (plot) points(nw$nodes, cex=0.6, pch = poly$ID) #, col=1+(nw$weights<=0)
         fvals <- f(nw$nodes, ...)
         cubature_val <- sum(nw$weights * fvals)
@@ -135,13 +135,26 @@ polyCub.SV <- function (polyregion, f, ..., N, a = 0, plot = FALSE)
     int
 }
 
+## "sparse" internal version for a polyregion like polygonal "owin.object$bdry"
+.polyCub.SV <- function (xylist, f, ..., N, a = 0)
+{
+    respolys <- sapply(xylist, function(poly) {
+        x <- poly$x                 # anticlockwise order (clockwise for holes),
+        y <- poly$y                 # first vertex not repeated
+        nw <- gaussCub(c(x,x[1L]), c(y,y[1L]), N = N, a = a)
+        fvals <- f(nw$nodes, ...)
+        sum(nw$weights * fvals)
+    }, simplify = TRUE, USE.NAMES = FALSE)
+    int <- sum(respolys)
+    int
+}
 
 
 ### Function to calculate nodes and weights of the product Gauss cubature
 ### Code is based on the MATLAB implementation of Sommariva & Vianello (2007)
 # Note: The efficiency rotation also proposed by Sommariva & Vianello (2007)
 # is not implemented since it does in general only apply to convex polygons.
-# Potential improvement: The efficient implementation of this function in C
+# TODO: The efficient implementation of this function in C
 # seems possible and would increase the speed of the cubature
 # Parameters:
 # x_bd, y_bd: coordinates of the polygon's vertices in _anticlockwise_ order
@@ -160,7 +173,7 @@ gaussCub <- function (x_bd, y_bd, N = 10, a = NULL)
     # base-line at x=a
     if (is.null(a)) {
         xrange <- range(x_bd)
-        a <- (xrange[1] + xrange[2]) / 2
+        a <- (xrange[1L] + xrange[2L]) / 2
     }
     
     
