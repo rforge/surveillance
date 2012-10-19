@@ -17,6 +17,8 @@ checkNeighbourhood <- function (neighbourhood)
 {
     ## setValidity() in sts.R only guarantees correct 'dim' and 'dimnames'
     ## we also assert numeric or logical matrix with non-NA entries
+    ## FIXME: However, we currently don't check for symmetry and for zeros on
+    ## the diagonal...
     stopifnot(is.matrix(neighbourhood),
               nrow(neighbourhood) == ncol(neighbourhood),
               is.numeric(neighbourhood) | is.logical(neighbourhood),
