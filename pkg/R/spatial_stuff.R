@@ -132,28 +132,32 @@ intersectCircle <- function (Wgpc, center, r, npoly)
 
 nbOrder <- function (neighbourhood, maxlag = 1)
 {
+    ## if (!require("spdep"))         # actually we don't need to attach "spdep"
+    ##     stop("package ", dQuote("spdep"),
+    ##          " is required to determine neighbourhood orders")
+
     stopifnot(isScalar(maxlag), maxlag > 0)
     checkNeighbourhood(neighbourhood)
+    neighbourhood <- neighbourhood == 1           # convert to binary matrix
     nregions <- nrow(neighbourhood)
     maxlag <- as.integer(min(maxlag, nregions-1)) # upper bound of nb order
-    neighbourhood <- neighbourhood == 1           # convert to binary matrix
-    region.ids <- dimnames(neighbourhood)[[1L]]
     
     if (maxlag == 1L) {
         storage.mode(neighbourhood) <- "integer"
         return(neighbourhood)
     }
 
-    ## if (!require("spdep"))         # actually we don't need to attach "spdep"
-    ##     stop("package ", dQuote("spdep"),
-    ##          " is required to determine neighbourhood orders")
-
     ## manually convert to spdep's "nb" class
-    #nb <- apply(neighbourhood, 1, which)   # could result in a matrix
-    region.idxs <- seq_len(nregions)
-    nb <- lapply(region.idxs, function(i) region.idxs[neighbourhood[i,]])
-    attr(nb, "region.id") <- region.ids
-    class(nb) <- "nb"
+    ## region.idxs <- seq_len(nregions)
+    ## nb <- lapply(region.idxs, function(i) {
+    ##     nbs <- which(neighbourhood[i,])
+    ##     if (length(nbs) > 0L) nbs else 0L
+    ## })
+    ## class(nb) <- "nb"
+
+    ## convert first-order neighbourhood to spdep's "nb" class
+    nb <- spdep::mat2listw(neighbourhood)$neighbours
+    attr(nb, "region.id") <- NULL
 
     ## compute higher order neighbours using spdep::nblag()
     nb.lags <- spdep::nblag(nb, maxlag=maxlag)
