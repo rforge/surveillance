@@ -102,7 +102,7 @@ export(checkResidualProcess)            # for twinstim and twinSIR
 exportMethods(coerce)     # from spatial_coerce-methods.R
 
 # numerical integration of two-dimensional function over polygonal domains
-export(polyCub, polyCub.midpoint, polyCub.SV, .polyCub.SV, polyCub.exact.Gauss)
+export(polyCub, polyCub.midpoint, polyCub.SV, polyCub.exact.Gauss)
 
 # spatial utilities
 export(discpoly)

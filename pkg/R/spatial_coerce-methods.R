@@ -19,6 +19,22 @@
 #     first vertex and to have clockwise vertex order for the normal boundary. 
 
 
+### xylist methods get the simple list of polygons from the various classes
+### where each component (polygon) is a simple list of "x" and "y" coordinates,
+### which give the coordinates of the vertices of the polygon
+### following the "owin" convention (anticlockwise order without repeating any
+### vertex). There may be additional elements "area" and "hole" in each
+### component, but these are not necessary.
+
+xylist.owin <- function (object, ...) object$bdry
+xylist.gpc.poly <- function (object, ...) xylist.owin(as.owin(object))
+xylist.SpatialPolygons <- function (object, ...)
+    xylist.owin(maptools::as.owin.SpatialPolygons(object))
+## for the default method, no transformation is performed
+xylist.default <- function (object, ...)
+    lapply(object, function(xy) xy.coords(xy)[c("x","y")])
+
+
 ### Method for coercion from "Polygons" (sp) to "gpc.poly" (gpclib) and vice versa
 
 setAs(from = "Polygons", to = "gpc.poly", def = function (from)
@@ -37,7 +53,7 @@ setAs(from = "Polygons", to = "gpc.poly", def = function (from)
 
 setAs(from = "gpc.poly", to = "Polygons", def = function (from)
     {
-        srl <- lapply(gpclib::get.pts(from), function (poly) {
+        srl <- lapply(get.pts(from), function (poly) {
             if (isClosed(poly)) {
                 Polygon(cbind(poly$x,poly$y), hole = poly$hole)
             } else {
@@ -60,7 +76,7 @@ setAs(from = "SpatialPolygons", to = "gpc.poly", def = function (from)
         gpc <- new("gpc.poly")
         for (i in seq_along(polygonsList))
         {
-            gpc <- gpclib::append.poly(gpc, as(polygonsList[[i]], "gpc.poly"))
+            gpc <- append.poly(gpc, as(polygonsList[[i]], "gpc.poly"))
         }
         gpc
     }

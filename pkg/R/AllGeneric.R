@@ -10,6 +10,9 @@ untie <- function (x, amount, ...) UseMethod("untie")
 ## internal function with methods for "twinSIR" and "simEpidata"
 getModel <- function (object, ...) UseMethod("getModel")
 
+## internal function with methods for gpc.poly and owin
+xylist <- function (object, ...) UseMethod("xylist")
+
 ## (rather internal) generic with a default and a "Spatial" method
 multiplicity <- function (x, ...) UseMethod("multiplicity")
 

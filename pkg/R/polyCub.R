@@ -106,47 +106,41 @@ if (plot) {
 
 polyCub.SV <- function (polyregion, f, ..., N, a = 0, plot = FALSE)
 {
-    if (!require("statmod")) {
-        stop("package ", sQuote("statmod"), " is needed for Gaussian cubature")
-    }
-    polyregion <- as(polyregion, "gpc.poly")
-    polys <- polyregion@pts
-    if (plot) {
-    	plot(polyregion, poly.args=alist(lwd=2), ann=FALSE)
-        for (i in seq_along(polys)) polys[[i]]$ID <- i
-    }
-    
-    respolys <- sapply(polys, function(poly) {
-        # gaussCub function assumes anticlockwise order
-        # (clockwise order leads to inverse integral value needed for holes)
-        x <- rev(poly$x)
-        y <- rev(poly$y)
-        nw <- gaussCub(c(x,x[1L]), c(y,y[1L]), N = N, a = a)
-        if (plot) points(nw$nodes, cex=0.6, pch = poly$ID) #, col=1+(nw$weights<=0)
+    polys <- xylist(polyregion) # transform to something like "owin$bdry"
+
+    int1 <- function (poly) {
+        nw <- gaussCub.xy(poly, N, a)
         fvals <- f(nw$nodes, ...)
         cubature_val <- sum(nw$weights * fvals)
-# if (!isTRUE(all.equal(0, cubature_val))) {
-# if ((1 - 2 * as.numeric(poly$hole)) * sign(cubature_val) == -1)
-# warning("wrong sign if positive integral")
-# }
+        ## if (!isTRUE(all.equal(0, cubature_val))) {
+        ## if ((1 - 2 * as.numeric(poly$hole)) * sign(cubature_val) == -1)
+        ## warning("wrong sign if positive integral")
+        ## }
         cubature_val
-    })
+    }
+    respolys <- sapply(polys, int1, simplify = TRUE, USE.NAMES = FALSE)
     int <- sum(respolys)
+
+    if (plot) {
+        if (inherits(polyregion, "gpc.poly")) {
+            plot(polyregion, poly.args=list(lwd=2), ann=FALSE)
+        } else plot(polyregion, lwd=2, axes=TRUE, main="")
+        for (i in seq_along(polys)) {
+            nw <- gaussCub.xy(polys[[i]], N, a)
+            points(nw$nodes, cex=0.6, pch = i) #, col=1+(nw$weights<=0)
+        }
+    }
+
     int
 }
 
-## "sparse" internal version for a polyregion like polygonal "owin.object$bdry"
-.polyCub.SV <- function (xylist, f, ..., N, a = 0)
-{
-    respolys <- sapply(xylist, function(poly) {
-        x <- poly$x                 # anticlockwise order (clockwise for holes),
-        y <- poly$y                 # first vertex not repeated
-        nw <- gaussCub(c(x,x[1L]), c(y,y[1L]), N = N, a = a)
-        fvals <- f(nw$nodes, ...)
-        sum(nw$weights * fvals)
-    }, simplify = TRUE, USE.NAMES = FALSE)
-    int <- sum(respolys)
-    int
+gaussCub.xy <- function (xy, N, a) {
+    ## gaussCub() assumes anticlockwise order (like for "owin")
+    ## (clockwise order leads to inverse integral value needed for holes)
+    ## but with repeated first vertex
+    x <- xy$x
+    y <- xy$y
+    gaussCub(c(x,x[1L]), c(y,y[1L]), N = N, a = a)
 }
 
 
@@ -347,9 +341,6 @@ gaussCub <- function (x_bd, y_bd, N = 10, a = NULL)
 
 polyCub.exact.Gauss <- function (polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
 {
-	if (!require("mvtnorm")) {
-        stop("package ", sQuote("mvtnorm"), " is needed for the exact Gaussian method")
-    }
     polyregion <- as(polyregion, "gpc.poly")
     
     # coordinate transformation so that the standard bivariat normal density
