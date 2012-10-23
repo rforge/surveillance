@@ -144,9 +144,10 @@ iafplot(imdepifit, "siaf", types=1, scaled=TRUE, xlim=c(0,200), xgrid=500,
 data(imdepi)
 imdepifit_lomax <- update(imdepifit,
     siaf = siaf.lomax(1),
+    control.siaf = list(F=list(nGQ=20), Deriv=list(nGQ=20)),
     optim.args = list(par=c(coef(imdepifit), 0), fixed=1:4,
                       control=list(REPORT=1)),
-    nCub = 3, nCub.adaptive = FALSE, model = FALSE, cumCIF = FALSE)
+    model = FALSE, cumCIF = FALSE)
 # false convergence
 imdepifit_lomax2 <- update(imdepifit_lomax, optim.args=list(hessian=FALSE))
 # false convergence

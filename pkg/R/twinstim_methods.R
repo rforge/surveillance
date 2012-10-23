@@ -758,7 +758,7 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, ...)
             stop("missing \".influenceRegion\" component in 'newevents'")
         }
         noCircularIR <- if (is.null(bdist)) FALSE else all(eps.s > bdist)
-        if (attr(form$siaf, "constant")) {
+        if (attr(siaf, "constant")) {
             iRareas <- sapply(influenceRegion, area.owin)
             ## will be used by .siafInt()
         } else if (! (is.null(siaf$Fcircle) ||
@@ -767,9 +767,9 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, ...)
                 stop("missing \".bdist\" component in 'newevents'")
             }
         }
-        nCub <- object$nCub
-        .siafInt <- .siafIntFUN(siaf, nCub.adaptive=object$nCub.adaptive, noCircularIR=noCircularIR)
-        siafInt <- .siafInt(siafpars)
+        .siafInt <- .siafIntFUN(siaf, noCircularIR=noCircularIR)
+        .siafInt.args <- c(alist(siafpars), object$control.siaf$F)
+        siafInt <- do.call(".siafInt", .siafInt.args)
         
     } else {                     # untrimmed R0 for original events or newevents
 
@@ -791,9 +791,10 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, ...)
         typeScombis$fInt <- apply(typeScombis, MARGIN=1, FUN=function (type_eps.s) {
             type <- type_eps.s[1]
             eps.s <- type_eps.s[2]
-            if (is.null(siaf$Fcircle)) { # implies that nCub was non-adaptive
-                polyCub.midpoint(discpoly(c(0,0), eps.s, class="owin"),
-                                 form$siaf$f, siafpars, type, eps=object$nCub)
+            if (is.null(siaf$Fcircle)) {
+                do.call(siaf$F, c(list(discpoly(c(0,0), eps.s, class="owin"),
+                                       siaf$f, siafpars, type),
+                                  object$control.siaf$F))
             } else {
                 siaf$Fcircle(eps.s, siafpars, type)
             }

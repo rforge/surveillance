@@ -20,7 +20,7 @@
 simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     events, stgrid, tiles, beta0, beta, gamma, siafpars, tiafpars,
     t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5,
-    nCub, nCub.adaptive = FALSE,
+    control.siaf = list(F=list(), Deriv=list()),
     W = NULL, trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
     .skipChecks = FALSE, .onlyEvents = FALSE)
 {
@@ -353,6 +353,11 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                  ") does not match the 'tiaf' specification (", tiaf$npars, ")")
         }
 
+        ## Check control.siaf
+        if (constantsiaf) control.siaf <- NULL else {
+            stopifnot(is.null(control.siaf) || is.list(control.siaf))
+        }
+
         ## Define function that integrates the two-dimensional 'siaf' function
         ## over the influence regions of the events
         if (!constantsiaf && !is.null(siaf$Fcircle) && !is.null(siaf$effRange))
@@ -360,21 +365,9 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
             ## pre-compute effective range of the 'siaf' (used by .siafInt)
             effRangeTypes <- rep(siaf$effRange(siafpars), length.out = nTypes)
         }
-        .siafInt <- .siafIntFUN(siaf = siaf, nCub.adaptive = nCub.adaptive,
-                                noCircularIR = FALSE) # not certain beforehand
-        ## CAVE: nCub or nCub.adaptive might have been fixed by the above call
-
-        ## Check nCub
-        if (!constantsiaf) {
-            stopifnot(is.vector(nCub, mode="numeric"))
-            if (any(is.na(nCub) | nCub <= 0L)) {
-                stop("'nCub' must be positive")
-            }
-            if (isTRUE(cl[["nCub.adaptive"]]) && !nCub.adaptive) {
-                message("'nCub.adaptive' only works in conjunction with ",
-                        "specified 'siaf$effRange()'")
-            }
-        }
+        .siafInt <- .siafIntFUN(siaf = siaf, noCircularIR = FALSE)
+                                             # not certain beforehand
+        .siafInt.args <- c(list(siafpars), control.siaf$F)
 
         ## Check gmax
         if (is.null(gmax)) {
@@ -390,7 +383,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         if (!missing(tiaf) && !is.null(tiaf))
             warning("'tiaf' can only be modelled in conjunction with an 'epidemic' process")
         siaf <- tiaf <- NULL
-        nCub <- nCub.adaptive <- NULL
+        control.siaf <- NULL
     }
 
 
@@ -467,7 +460,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         # integrate the two-dimensional 'siaf' function over the influence region
         siafInts <- if (length(influenceRegion) == 0L) numeric(0L) else {
             environment(.siafInt) <- environment()
-            .siafInt(siafpars)
+            do.call(".siafInt", .siafInt.args)
         }
         # Matrix of terms in the epidemic component
         eTerms <- cbind(
@@ -943,8 +936,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     epi$coefficients <- coefs  #list(beta0=beta0, beta=beta, gamma=gamma,
                                #     siafpars=siafpars, tiafpars=tiafpars)
     epi$npars <- c(nbeta0=nbeta0, p=p, q=q, nsiafpars=nsiafpars, ntiafpars=ntiafpars)
-    epi$nCub <- nCub                    # for R0.simEpidataCS
-    epi$nCub.adaptive <- nCub.adaptive  # for R0.simEpidataCS
+    epi$control.siaf <- control.siaf    # for R0.simEpidataCS
     epi$call <- cl
     epi$runtime <- proc.time()[[3]] - ptm
     class(epi) <- c("simEpidataCS", "epidataCS", "list")
@@ -974,7 +966,7 @@ R0.simEpidataCS <- function (object, trimmed = TRUE, ...)
 
 simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5,
-    nCub = object$nCub, nCub.adaptive = object$nCub.adaptive,
+    control.siaf = object$control.siaf,
     W = NULL, trace = FALSE, nCircle2Poly = 32, gmax = NULL, .allocate = 500, simplify = TRUE, ...)
 {
     ptm <- proc.time()[[3]]
@@ -1040,7 +1032,7 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
                     stgrid=quote(data$stgrid), tiles=quote(tiles), beta0=beta0,
                     beta=beta, gamma=gamma, siafpars=siafpars,
                     tiafpars=tiafpars, t0=t0, T=T, nEvents=nEvents,
-                    nCub=nCub, nCub.adaptive=nCub.adaptive,
+                    control.siaf=control.siaf,
                     W=quote(W), trace=trace, nCircle2Poly=nCircle2Poly,
                     gmax=gmax, .allocate=.allocate,
                     .skipChecks=TRUE, .onlyEvents=FALSE)

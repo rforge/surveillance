@@ -22,13 +22,13 @@
 simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     events, stgrid, tiles, beta0, beta, gamma, siafpars, tiafpars,
     t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5,
-    nCub, nCub.adaptive = FALSE,
+    control.siaf = list(F=list(), Deriv=list()),
     W = NULL, trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
     .skipChecks = FALSE, .onlyEvents = FALSE)
 
 \method{simulate}{twinstim}(object, nsim = 1, seed = NULL, data, tiles,
     rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5,
-    nCub = object$nCub, nCub.adaptive = object$nCub.adaptive,
+    control.siaf = object$control.siaf,
     W = NULL, trace = FALSE, nCircle2Poly = 32, gmax = NULL,
     .allocate = 500, simplify = TRUE, ...)
 }
@@ -197,7 +197,7 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     simulation is stored as an attribute \code{"runtime"} to each simulated
     \code{events}. See also the \dQuote{Value} section below.
   }
-  \item{nCub, nCub.adaptive}{see \code{\link{twinstim}}.}
+  \item{control.siaf}{see \code{\link{twinstim}}.}
   \item{nCircle2Poly}{see \code{\link{as.epidataCS}}.}
   \item{gmax}{
     maximum value the temporal interaction function

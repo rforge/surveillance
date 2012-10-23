@@ -99,17 +99,17 @@ if (plot) {
 #       However, in contrast to "sp", the first vertex should NOT be repeated!
 #       The coerce-methods from "Polygon" or "owin" to "gpc.poly" defined in
 #       package surveillance follow this convention for "gpc.poly".
-# N: number of nodes of 1-dimensional Gauss-Legendre rule (see gaussCub)
+# nGQ: number of nodes of 1-dimensional Gauss-Legendre rule (see gaussCub)
 # a: base-line at x = a (see gaussCub)
 #    a = 0 seems to be reasonable if f has its maximum value at (0,0), e.g. for
 #    the bivariate normal density with zero mean
 
-polyCub.SV <- function (polyregion, f, ..., N, a = 0, plot = FALSE)
+polyCub.SV <- function (polyregion, f, ..., nGQ, a = 0, plot = FALSE)
 {
     polys <- xylist(polyregion) # transform to something like "owin$bdry"
 
     int1 <- function (poly) {
-        nw <- gaussCub.xy(poly, N, a)
+        nw <- gaussCub.xy(poly, nGQ, a)
         fvals <- f(nw$nodes, ...)
         cubature_val <- sum(nw$weights * fvals)
         ## if (!isTRUE(all.equal(0, cubature_val))) {
@@ -126,7 +126,7 @@ polyCub.SV <- function (polyregion, f, ..., N, a = 0, plot = FALSE)
             plot(polyregion, poly.args=list(lwd=2), ann=FALSE)
         } else plot(polyregion, lwd=2, axes=TRUE, main="")
         for (i in seq_along(polys)) {
-            nw <- gaussCub.xy(polys[[i]], N, a)
+            nw <- gaussCub.xy(polys[[i]], nGQ, a)
             points(nw$nodes, cex=0.6, pch = i) #, col=1+(nw$weights<=0)
         }
     }

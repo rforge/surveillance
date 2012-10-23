@@ -29,7 +29,7 @@ experiment of those three (among others).
 polyCub(polyregion, f, method = c("SV", "midpoint", "exact.Gauss"), ..., plot = FALSE)
 
 polyCub.midpoint(polyregion, f, ..., eps = NULL, dimyx = NULL, plot = FALSE)
-polyCub.SV(polyregion, f, ..., N, a = 0, plot = FALSE)
+polyCub.SV(polyregion, f, ..., nGQ, a = 0, plot = FALSE)
 polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
 }
 
@@ -74,7 +74,7 @@ polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
     vector of length two specifying the number of subdivisions in each dimension for the
     generation of the image. See \code{\link{as.im.function}} and \code{\link{as.mask}}.
 }
-  \item{N}{
+  \item{nGQ}{
     degree of the one-dimensional Gauss-Legendre quadrature rule (see
     \code{\link[statmod]{gauss.quad}} in package \pkg{statmod}, on which this function depends).
 }
@@ -170,9 +170,9 @@ testmidpoint(0.2)
 
 # Product Gauss cubature by Sommariva & Vianello (2007)
 if (require("statmod")) {
-    for (N in c(1:5,10,20,60)) {
-        cat("N =", sprintf("\%2i",N), ": ",
-            format(polyCub.SV(disc.owin, f, N=N), digits=16),
+    for (nGQ in c(1:5,10,20,60)) {
+        cat("nGQ =", sprintf("\%2i",nGQ), ": ",
+            format(polyCub.SV(disc.owin, f, nGQ=nGQ), digits=16),
             "\n")
     }
 }

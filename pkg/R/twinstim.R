@@ -14,8 +14,9 @@
 
 twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     data, subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
-    na.action = na.fail, nCub, nCub.adaptive = FALSE, partial = FALSE,
-    optim.args, finetune = FALSE, model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE)
+    na.action = na.fail, partial = FALSE,
+    control.siaf = list(F=list(), Deriv=list()), optim.args, finetune = FALSE,
+    model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE)
 {
 
     ####################
@@ -44,7 +45,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         functions, globalEndemicIntercept, inmfe, initpars, ll, negll, loglik,
         mfe, mfhEvents, mfhGrid, model, my.na.action, na.action, namesOptimUser,
         namesOptimArgs, nlminbControl, nlminbRes, nlmObjective, nlmControl,
-        nlmRes, nmRes, optim.args, optimArgs, 
+        nlmRes, nmRes, optim.args, optimArgs, control.siaf,
         optimControl, optimMethod, optimRes, optimRes1, optimValid, partial,
         partialloglik, ptm, qmatrix, res, negsc, score, subset, tmpexpr,
         typeSpecificEndemicIntercept, useScore, whichfixed, 
@@ -321,26 +322,19 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         constanttiaf <- attr(tiaf, "constant")
         ntiafpars <- tiaf$npars
 
+        ## Check control.siaf
+        if (constantsiaf) control.siaf <- NULL else {
+            stopifnot(is.null(control.siaf) || is.list(control.siaf))
+            if (is.list(control.siaf)) stopifnot(sapply(control.siaf, is.list))
+        }
+        
         ## Define function that integrates the 'tiaf' function
         .tiafInt <- .tiafIntFUN()
 
         ## Define function that integrates the two-dimensional 'siaf' function
         ## over the influence regions of the events
-        .siafInt <- .siafIntFUN(siaf = siaf, nCub.adaptive = nCub.adaptive,
-                                noCircularIR = all(eps.s > bdist))
-        ## CAVE: nCub or nCub.adaptive might have been fixed by the above call
-
-        ## Check nCub
-        if (!constantsiaf) {
-            stopifnot(is.vector(nCub, mode="numeric"))
-            if (any(is.na(nCub) | nCub <= 0L)) {
-                stop("'nCub' must be positive")
-            }
-            if (isTRUE(cl[["nCub.adaptive"]]) && !nCub.adaptive) {
-                message("'nCub.adaptive' only works in conjunction with ",
-                        "specified 'siaf$effRange()'")
-            }
-        }
+        .siafInt <- .siafIntFUN(siaf = siaf, noCircularIR = all(eps.s > bdist))
+        .siafInt.args <- c(alist(siafpars), control.siaf$F)
 
     } else {
         
@@ -350,7 +344,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             warning("'tiaf' can only be modelled in conjunction with an 'epidemic' process")
         siaf <- tiaf <- NULL
         nsiafpars <- ntiafpars <- 0L
-        nCub <- nCub.adaptive <- NULL
+        control.siaf <- NULL
 
     }
 
@@ -363,7 +357,19 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         (!hastiafpars | (!is.null(tiaf$deriv)) & !is.null(tiaf$Deriv))
     } else TRUE
 
-
+    ## Define function that applies siaf$Deriv on all events (integrate the
+    ## two-dimensional siaf$deriv function)
+    if (useScore && hassiafpars) {
+        .siafDeriv <- function (siafpars, ...) {
+            derivInti <- function (i)
+                siaf$Deriv(influenceRegion[[i]], siaf$deriv, siafpars,
+                           eventTypes[i], ...)
+            derivInt <- sapply(1:N, derivInti)
+            #<- N-vector or nsiafpars x N matrix => transform to N x nsiafpars
+            if (is.matrix(derivInt)) t(derivInt) else as.matrix(derivInt)
+        }
+        .siafDeriv.args <- c(alist(siafpars), control.siaf$Deriv)
+    }
 
 
 
@@ -478,16 +484,16 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                           uppert = NULL) {}
     body(heIntTWK) <- as.call(c(as.name("{"),
         if (hash) { # endemic component
-            expression({
-                hIntTW <- .hIntTW(beta, uppert = uppert)
-                .beta0 <- rep(if (nbeta0==0L) 0 else beta0, length.out = nTypes)
-                fact <- sum(exp(.beta0))
+            expression(
+                hIntTW <- .hIntTW(beta, uppert = uppert),
+                .beta0 <- rep(if (nbeta0==0L) 0 else beta0, length.out = nTypes),
+                fact <- sum(exp(.beta0)),
                 hInt <- fact * hIntTW
-            })
+            )
         } else { expression(hInt <- 0) },
         if (hase) { # epidemic component
-            expression({
-                siafInt <- .siafInt(siafpars) # N-vector
+            expression(
+                siafInt <- do.call(".siafInt", .siafInt.args), # N-vector
                 if (!is.null(uppert)) { # && isScalar(uppert) && t0 <= uppert && uppert < T
                     gIntUpper <- pmin(uppert-eventTimes, eps.t)
                     subtimeidx <- eventTimes < uppert
@@ -501,7 +507,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                     tiafInt <- .tiafInt(tiafpars)
                     eInt <- sum(qSum * gammapred * siafInt * tiafInt)
                 }
-            })
+            )
         } else expression(eInt <- 0),
         expression(c(hInt, eInt))
     ))
@@ -554,7 +560,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             hEvents <- if (hash) .hEvents(beta0, beta) else 0
             eEvents <- .eEvents(gammapred, siafpars, tiafpars) # Nin-vector! (only 'includes' here)
             lambdaEvents <- hEvents + eEvents  # Nin-vector
-            siafInt <- .siafInt(siafpars) # N-vector
+            siafInt <- do.call(".siafInt", .siafInt.args) # N-vector
             tiafInt <- .tiafInt(tiafpars) # N-vector
         }
 
@@ -606,18 +612,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 nom <- .eEvents(gammapred, siafpars, tiafpars,
                                 ncolsRes=nsiafpars, f=siaf$deriv) # Nin x nsiafpars matrix
                 sEventsSum <- colSums(nom / lambdaEvents)
-                epsTypes <- if (nCub.adaptive) {
-                        siaf$effRange(siafpars) / nCub
-                        ## FIXME: this bandwidth is actually not adapted for siaf$deriv
-                    } else nCub
-                epsTypes <- rep(epsTypes, length.out = nTypes)
-                derivInt <- sapply(1:nsiafpars, function (paridx) {
-                    sapply(1:N, function (i) {
-                        polyCub.midpoint(influenceRegion[[i]], function (s) {
-                            siaf$deriv(s, siafpars, eventTypes[i])[,paridx,drop=TRUE]
-                        }, eps = epsTypes[eventTypes[i]])
-                    })
-                })  # Nxnsiafpars matrix
+                derivInt <- do.call(".siafDeriv", .siafDeriv.args) # N x nsiafpars matrix
                 sInt <- colSums(derivInt * (qSum * gammapred * tiafInt))
                 sEventsSum - sInt
             }) else numeric(nsiafpars) # if 'fixedsiafpars', this part is unused
@@ -752,7 +747,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 unname(hInt_blocks[.idx])   # Nin-vector
             } else 0
         eInts <- if (hase) { # epidemic component
-                siafInt <- .siafInt(siafpars) # N-vector
+                siafInt <- do.call(".siafInt", .siafInt.args) # N-vector
                 gs <- gammapred * siafInt # N-vector
                 sapply(includes, function (i) {
                     timeSources <- determineSources(i, eventTimes, removalTimes,
@@ -863,40 +858,6 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         if (hastiafpars) paste("e.tiaf",1:ntiafpars,sep=".")
     )
 
-    
-    ### Message about potentially cumbersome numerical cubature
-    
-    if (hassiafpars && !is.null(siaf$Fcircle)) {
-        .maxnpixels <- local({
-            if (nCub.adaptive) {
-                initsiaf <- optim.args$par[grep("^e\\.siaf", names(optim.args$par))]
-                initeffRangeTypes <- rep(siaf$effRange(initsiaf),length.out=nTypes)
-                initeffRanges <- initeffRangeTypes[eventTypes]
-                border <- which(eps.s > bdist & initeffRanges > bdist) # here we integrate
-                if (length(border) > 0L) {
-                    maxarea <- spatstat::bounding.box(influenceRegion[border][[which.max(iRareas[border])]])
-                    inithmin <- min(initeffRangeTypes) / nCub
-                    ceiling(c(diff(maxarea$xrange), diff(maxarea$yrange)) / inithmin)
-                } else NULL
-            } else {
-                border <- which(eps.s > bdist) # for these events we must integrate
-                if (length(border) > 0L) {
-                    maxarea <- spatstat::bounding.box(influenceRegion[border][[which.max(iRareas[border])]])
-                    ceiling(c(diff(maxarea$xrange), diff(maxarea$yrange)) / nCub)
-                } else NULL
-            }
-        })
-        if (!is.null(.maxnpixels) && prod(.maxnpixels) > 10000) {
-            cat("\nNOTE: the initial values of the 'e.siaf' parameters potentially require up to",
-                "\n     ", .maxnpixels[1], "x", .maxnpixels[2], "pixels for the midpoint cubature.",
-                "If iterations are slow,",
-                "\n      consider increasing",
-                if (nCub.adaptive) {
-                    "'eps = siaf$effRange(siafpars) / nCub'."
-                } else "'nCub'.", "\n\n")
-        }
-    }
-
 
     ### Fixed parameters during optimization
 
@@ -966,7 +927,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         ## if siafpars or tiafpars are fixed, pre-evaluate integrals    
         if (fixedsiafpars) {
             cat("pre-evaluating 'siaf' integrals with fixed parameters ...\n")
-            siafInt <- .siafInt(initpars[paste("e.siaf", 1:nsiafpars, sep=".")])
+            .siafInt.args[[1]] <- initpars[paste("e.siaf", 1:nsiafpars, sep=".")]
+            siafInt <- do.call(".siafInt", .siafInt.args)
             ## re-define .siafInt such that it just returns the pre-evaluated integrals
             .siafInt.orig <- .siafInt
             body(.siafInt) <- expression(siafInt)
@@ -1152,9 +1114,6 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
            counts = if (all(fixed)) c("function"=1L, "gradient"=0L) else {
                optimRes1$counts + if (finetune) optimRes$counts else c(0L, 0L)
            },
-           method = if (all(fixed)) NA_character_ else optimMethod,
-           nCub = nCub, nCub.adaptive = nCub.adaptive,
-           ## nCub and nCub.adaptive are queried for default eps in R0.twinstim
            converged = all(fixed) || (optimRes$convergence == 0)
            )
 
@@ -1185,7 +1144,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     # and final gammapred (also used by intensity.twinstim)
     if (hase) {
         gammapred <- drop(exp(mme %*% gamma)) # N-vector
-        if (!fixedsiafpars) siafInt <- .siafInt(siafpars)
+        if (!fixedsiafpars) siafInt <- do.call(".siafInt", .siafInt.args)
         if (!fixedtiafpars) tiafInt <- .tiafInt(tiafpars)
     }
     
@@ -1205,7 +1164,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         if (hase) {
             ## tiny hack such that siaf integrals are not evaluated N-fold
             .siafInt.orig <- .siafInt
-            .siafInt <<- function (siafpars) siafInt
+            body(.siafInt) <<- expression(siafInt)
             on.exit(.siafInt <<- .siafInt.orig)
         }
         heIntEvents <- matrix(NA_real_, Nin, 2L)
@@ -1238,7 +1197,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     fit$npars <- c(nbeta0 = nbeta0, p = p,
                    q = q, nsiafpars = nsiafpars, ntiafpars = ntiafpars)
     fit$qmatrix <- qmatrix   # -> information about nTypes and typeNames
-    fit$bbox <- sp::bbox(data$W)        # for completeness and for iafplot
+    fit$bbox <- bbox(data$W)            # for completeness and for iafplot
     fit$timeRange <- c(t0, T)           # for simulate.twinstim's defaults
     if (!model) {
         # Link formulae to the global environment such that the evaluation
@@ -1253,6 +1212,12 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                    epidemic = formula(epidemic),
                    siaf = siaf, tiaf = tiaf
                    )
+    fit$control.siaf <- control.siaf
+
+    
+    ### Append optimizer configuration
+    
+    fit$optim.args <- optim.args
     if (model) {
         fit$functions <- functions
         environment(fit) <- environment()

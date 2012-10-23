@@ -15,7 +15,8 @@
 \usage{
 twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
          subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
-         na.action = na.fail, nCub, nCub.adaptive = FALSE, partial = FALSE,
+         na.action = na.fail, partial = FALSE,
+         control.siaf = list(F = list(), Deriv = list()),
          optim.args, finetune = FALSE,
          model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE)
 }
@@ -80,34 +81,23 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     \code{\link{na.pass}}. Missing values in the spatio-temporal grid
     \code{data$stgrid} are not accepted.
   }
-  \item{nCub, nCub.adaptive}{
-    determine the accuracy of the numerical cubature for non-constant
-    \code{siaf} specifications. These arguments are ignored in the case
-    \code{siaf=siaf.constant()} (which is the default if \code{siaf} is
-    unspecified).\cr
-    If \code{siaf$Fcircle} and \code{siaf$effRange} are
-    both specified and \code{nCub.adaptive = TRUE}, then \code{nCub} is
-    interpreted as \code{siaf$effRange()}/\code{eps}, where \code{eps}
-    is used as pixel width and height in the two-dimensional midpoint
-    rule (see \code{\link{polyCub.midpoint}}). Thus \code{nCub} is the
-    desired number of subdivions of the effective integration range in
-    both dimensions (for the current \code{siaf} parameters during
-    optimisation), and \code{eps} thus equals
-    \code{siaf$effRange()}/\code{nCub}. This is intended and especially
-    useful for the Gaussian \code{\link[=siaf.gaussian]{siaf}} kernel:
-    if, e.g., 6\eqn{\sigma} is used as the effective integration range
-    and \code{nCub = 24}, then a bandwidth of \eqn{\sigma / 4} is used
-    in the midpoint rule.\cr 
-    If \code{siaf$Fcircle} or \code{siaf$effRange} is unspecified or
-    \code{nCub.adaptive = FALSE}, then \code{nCub} equals the above
-    mentioned \code{eps} in \code{polyCub.midpoint} (in this case may
-    also be a vector of length 2 to specify different bandwidths in
-    the x and y directions, see \code{\link[spatstat]{as.mask}}.
-  }
   \item{partial}{
     logical indicating if a partial likelihood similar to the approach
     by Diggle et al. (2010) should be used (default is \code{FALSE}).
     Note that the partial likelihood implementation is not well tested.
+  }
+  \item{control.siaf}{
+    a list with elements \code{"F"} and \code{"Deriv"}, which are lists
+    of extra arguments passed to the functions \code{siaf$F} and
+    \code{siaf$Deriv}, respectively.\cr
+    These arguments mainly determine the accuracy of the numerical
+    cubature rules involved in non-constant \code{siaf} specifications,
+    e.g., the bandwidth (\code{eps}) of the midpoint rule or the number
+    of (univariate) Gaussian quadrature points (\code{nGQ}), see
+    the help on \code{\link{siaf.gaussian}}.
+    This argument list is ignored in the case
+    \code{siaf=siaf.constant()} (which is the default if \code{siaf} is
+    unspecified).
   }
   \item{optim.args}{
     \code{NULL} or an argument list passed to \code{\link{optim}} containing
@@ -219,8 +209,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     likelihood was used.}
   \item{counts}{number of log-likelihood and score evaluations during
     optimization.}
-  \item{method}{name of the optimizer used to determine the MLE.}
-  \item{nCub, nCub.adaptive}{see the \dQuote{Arguments} section above.}
+  \item{control.siaf}{see the \dQuote{Arguments} section above.}
+  \item{optim.args}{input optimizer arguments used to determine the MLE.}
   \item{converged}{logical indicating if the optimizer converged.}
   \item{fisherinfo}{\emph{expected} Fisher information evaluated at the
     MLE. Only part of the output for full likelihood inference
@@ -416,12 +406,12 @@ sort(sapply(environment(m0), object.size))
 ## standard deviation for both finetypes
 
 m1 <- update(m0,
-    siaf = siaf.gaussian(1, logsd = TRUE),
+    siaf = siaf.gaussian(1, F.adaptive = TRUE),
     optim.args = list(par=c(coef(m0), 2.8),  # exp(2.8) = sigma = 16 km
                       fixed="e.siaf.1"),
                       # for reasons of speed of the example, the siaf
                       # parameter log(sigma) is fixed to 2.8 here
-    nCub = 24, nCub.adaptive = TRUE  # use adaptive eps=6*sigma/24=sigma/4
+    control.siaf = list(F=list(adapt=0.25)) # use adaptive eps=sigma/4
 )
 
 AIC(m_noepi, m0, m1)   # further improvement
