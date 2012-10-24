@@ -115,6 +115,7 @@ export(nbOrder)
 
 # randomly break tied event times or coordinates
 export(untie)                           # new S3-generic
+#export(untie.default, untie.matrix, untie.epidataCS)
 S3method(untie, default)
 S3method(untie, matrix)
 S3method(untie, epidataCS)

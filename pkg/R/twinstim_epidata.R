@@ -1049,7 +1049,11 @@ untie.epidataCS <- function (x, amount = list(t=NULL, s=NULL),
         untie.matrix(coordinates(x$events), amount$s, constraint=x$W)
     } else coordinates(x$events)
     if (do.temporal) {                  # untie event times
-        events$time <- untie.default(events$time, amount$t, sort=TRUE)
+        ## we shift event times (non-symmetrically) to the left such that the
+        ## shifted versions potentially stay in the same BLOCK of endemic
+        ## covariates (the CIF is left-continuous).
+        events$time <- untie.default(events$time, amount$t,
+                                     direction="left", sort=TRUE)
     }
 
     ## Generate epidataCS object with new events
@@ -1066,8 +1070,10 @@ untie.epidataCS <- function (x, amount = list(t=NULL, s=NULL),
     res
 }
 
-## untie event times by subtracting U(0, amount) from each
-untie.default <- function (x, amount = NULL, sort = NULL, ...)
+## untie event times by uniform jittering
+untie.default <- function (x, amount = NULL,
+                           direction = c("symmetric", "left", "right"),
+                           sort = NULL, ...)
 {
     stopifnot(is.numeric(x), is.vector(x))
     distx <- dist(x)
@@ -1075,11 +1081,15 @@ untie.default <- function (x, amount = NULL, sort = NULL, ...)
         return(x)
     if (is.null(amount))                # take smallest positive distance
         amount <- min(distx[distx > 0])
+    direction <- match.arg(direction)
     if (is.null(sort))                  # sort if x was sorted
         sort <- identical(order(x, decreasing=FALSE), seq_along(x))
 
-    u <- runif(length(x), 0, amount)
-    res <- x - u
+    u <- switch(direction,
+                "symmetric" = runif(length(x), -amount, amount),
+                "left" = runif(length(x), -amount, 0),
+                "right" = runif(length(x), 0, amount))
+    res <- x + u
     
     if (sort) base::sort(res) else res
 }

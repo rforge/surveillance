@@ -157,7 +157,7 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 - profiling of hhh4 ...
 - remove redundant elements in control/stsObj/terms to reduce the
   size of ah4-objects
-
+- add documentation for parametric neighbourhood weights
 
 
 #======================================================================
