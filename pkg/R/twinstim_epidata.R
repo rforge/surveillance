@@ -1085,10 +1085,12 @@ untie.default <- function (x, amount = NULL,
     if (is.null(sort))                  # sort if x was sorted
         sort <- identical(order(x, decreasing=FALSE), seq_along(x))
 
-    u <- switch(direction,
-                "symmetric" = runif(length(x), -amount, amount),
-                "left" = runif(length(x), -amount, 0),
-                "right" = runif(length(x), 0, amount))
+    u <- if (direction == "symmetric") {
+        runif(length(x), -amount, amount)
+    } else {
+        u <- runif(length(x), 0, amount)
+        if (direction == "left") -u else u
+    }
     res <- x + u
     
     if (sort) base::sort(res) else res

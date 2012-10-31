@@ -30,9 +30,20 @@ xylist.owin <- function (object, ...) object$bdry
 xylist.gpc.poly <- function (object, ...) xylist.owin(as.owin(object))
 xylist.SpatialPolygons <- function (object, ...)
     xylist.owin(maptools::as.owin.SpatialPolygons(object))
-## for the default method, no transformation is performed
-xylist.default <- function (object, ...)
-    lapply(object, function(xy) xy.coords(xy)[c("x","y")])
+## for the default method, no transformation is performed, we only check that
+## polys are not closed (first vertex not repeated)
+xylist.default <- function (object, ...) {
+    lapply(object, function(xy) {
+        poly <- xy.coords(xy)[c("x","y")]
+        if (isClosed(poly)) {
+            n <- length(poly$x)
+            sel <- seq_len(n-1L)
+            poly$x <- poly$x[sel]
+            poly$y <- poly$y[sel]
+        }
+        poly
+    })
+}
 
 
 ### Method for coercion from "Polygons" (sp) to "gpc.poly" (gpclib) and vice versa

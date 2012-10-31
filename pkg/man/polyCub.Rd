@@ -10,7 +10,7 @@
 }
 
 \description{
-The functions documented here will numerically integrate a two-dimensional
+The functions documented here numerically integrate a two-dimensional
 function over a polygonal domain. The first method uses the classical midpoint rule
 converting the polygons to binary pixel images using the
 \code{\link[spatstat]{as.im.function}} method from package \pkg{spatstat}.
@@ -26,11 +26,15 @@ experiment of those three (among others).
 }
 
 \usage{
-polyCub(polyregion, f, method = c("SV", "midpoint", "exact.Gauss"), ..., plot = FALSE)
+polyCub(polyregion, f, method = c("SV", "midpoint", "exact.Gauss"), ...,
+        plot = FALSE)
 
-polyCub.midpoint(polyregion, f, ..., eps = NULL, dimyx = NULL, plot = FALSE)
-polyCub.SV(polyregion, f, ..., nGQ, a = 0, plot = FALSE)
-polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
+polyCub.midpoint(polyregion, f, ...,
+                 eps = NULL, dimyx = NULL, plot = FALSE)
+polyCub.SV(polyregion, f, ...,
+           nGQ = 13, alpha = NULL, rotation = FALSE, plot = FALSE)
+polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2),
+                    plot = FALSE)
 }
 
 \arguments{
@@ -68,22 +72,36 @@ polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
     further arguments passed to \code{f}.
 }
   \item{eps}{
-    numeric scalar specifying the (approximate) width/height of the pixels for the generation of the image.
+    numeric scalar specifying the (approximate) width/height of the
+    pixels for the generation of the image.
 }
   \item{dimyx}{
     vector of length two specifying the number of subdivisions in each dimension for the
     generation of the image. See \code{\link{as.im.function}} and \code{\link{as.mask}}.
 }
   \item{nGQ}{
-    degree of the one-dimensional Gauss-Legendre quadrature rule (see
-    \code{\link[statmod]{gauss.quad}} in package \pkg{statmod}, on which this function depends).
+    degree of the one-dimensional Gauss-Legendre quadrature rule
+    (default: 13). See \code{\link[statmod]{gauss.quad}} in package
+    \pkg{statmod}, on which this function depends.
 }
-  \item{a}{
-    base-line at \eqn{x = a} (see Sommariva & Vianello (2007) for an explication).
-    If \code{NULL}, the midpoint of the x-range of the polygon is chosen.
-    Defaults to the origin, because this seems to be reasonable if \code{f} has its
-    maximum value at (0,0), which is the case for the typical usage in this package
-    (bivariate normal density with zero mean).
+  \item{alpha}{
+    base-line of the (rotated) polygon at \eqn{x = alpha} (see Sommariva
+    & Vianello (2007) for an explication).
+    If \code{NULL} (default), the midpoint of the x-range of the polygon is chosen
+    if no \code{rotation} is performed, and otherwise the \eqn{x}-coordinate
+    of the rotated point \code{"P"}.
+    If \code{f} has its maximum value at the origin (0,0), which is the
+    case for the typical usage in this package (spatial interaction
+    functions like \code{\link{siaf.gaussian}}), \code{alpha = 0} is a
+    reasonable choice.
+  }
+  \item{rotation}{
+    logical (default: \code{FALSE}) or a list of points \code{"P"} and
+    \code{"Q"} describing the preferred direction. If \code{TRUE}, the
+    polygon is rotated according to the vertices \code{"P"} and
+    \code{"Q"}, which are farthest apart (see Sommariva & Vianello,
+    2007). For convex polygons, this rotation guarantees that all nodes
+    fall inside the polygon.
   }
   \item{mean, Sigma}{
     mean and covariance matrix of the bivariate normal density to be integrated.

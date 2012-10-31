@@ -173,7 +173,7 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
         } else { # d f(s|type_i) / d sigma_{type_j} is 0 for i != j
             expression(deriv.type <- function (s) deriv(s, pars, type)[,type,drop=TRUE])
         },
-        expression(int <- polyCub.SV(polydomain$bdry, deriv.type, nGQ=nGQ, a=a)),
+        expression(int <- polyCub.SV(polydomain$bdry, deriv.type, nGQ=nGQ, alpha=a)),
         if (nTypes == 1L) expression(int) else expression(
             res <- numeric(length(pars)), # zeros
             res[type] <- int,
@@ -305,7 +305,7 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
                 deriv(s, logpars, type)[,paridx,drop=TRUE],
             intderiv1 <- function (paridx)
                 polyCub.SV(polydomain$bdry, deriv1, paridx=paridx,
-                           nGQ = nGQ, a = a[paridx]),
+                           nGQ = nGQ, alpha = a[paridx]),
             res.logsigma <- intderiv1(1L),
             res.logalpha <- intderiv1(2L),
             res <- c(res.logsigma, res.logalpha),
@@ -426,16 +426,23 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
 
 ## numerical integration of f over a polygonal domain (single "owin" and type)
 siaf.fallback.F <- function(polydomain, f, pars, type, method = "SV", ...)
-    polyCub(polydomain, f, method, pars, type, ...)
+{
+    dotargs <- list(...)
+    if (identical(method,"SV") && !"alpha" %in% names(dotargs))
+        dotargs$alpha <- 0
+    do.call("polyCub", c(alist(polydomain, f, method, pars, type), dotargs))
+}
 
 ## numerical integration of deriv over a polygonal domain
-siaf.fallback.Deriv <- function (polydomain, deriv, pars, type,
-                                 method = "SV", ...)
+siaf.fallback.Deriv <- function (polydomain, deriv, pars, type, method = "SV", ...)
 {
+    dotargs <- list(...)
+    if (identical(method,"SV") && !"alpha" %in% names(dotargs))
+        dotargs$alpha <- 0
     deriv1 <- function (s, paridx)
         deriv(s, pars, type)[,paridx,drop=TRUE]
     intderiv1 <- function (paridx)
-        polyCub(polydomain, deriv1, method, paridx=paridx, ...)
+        do.call("polyCub", c(alist(polydomain, deriv1, method, paridx=paridx), dotargs))
     derivInt <- sapply(seq_along(pars), intderiv1)
     derivInt
 }
