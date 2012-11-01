@@ -427,22 +427,19 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
 ## numerical integration of f over a polygonal domain (single "owin" and type)
 siaf.fallback.F <- function(polydomain, f, pars, type, method = "SV", ...)
 {
-    dotargs <- list(...)
-    if (identical(method,"SV") && !"alpha" %in% names(dotargs))
-        dotargs$alpha <- 0
-    do.call("polyCub", c(alist(polydomain, f, method, pars, type), dotargs))
+    if (identical(method,"SV"))
+        polyCub.SV(polydomain, f, pars, type, alpha=0, ...) # since max at origin
+    else 
+        polyCub(polydomain, f, method, pars, type, ...)
 }
 
 ## numerical integration of deriv over a polygonal domain
 siaf.fallback.Deriv <- function (polydomain, deriv, pars, type, method = "SV", ...)
 {
-    dotargs <- list(...)
-    if (identical(method,"SV") && !"alpha" %in% names(dotargs))
-        dotargs$alpha <- 0
     deriv1 <- function (s, paridx)
         deriv(s, pars, type)[,paridx,drop=TRUE]
     intderiv1 <- function (paridx)
-        do.call("polyCub", c(alist(polydomain, deriv1, method, paridx=paridx), dotargs))
+        polyCub(polydomain, deriv1, method, paridx=paridx, ...)
     derivInt <- sapply(seq_along(pars), intderiv1)
     derivInt
 }

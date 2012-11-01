@@ -326,7 +326,7 @@ m_noepi <- twinstim(
                 sin(start * 2 * pi/365) + cos(start * 2 * pi/365),
     data = imdepi, subset = !is.na(agegrp),
     optim.args = list(par=c(h.intercept,rep(0,3)),
-                      method="nlminb", control = list(REPORT=1)),
+                      method="nlminb", control = list(trace=1)),
     model = FALSE, cumCIF = FALSE   # for reasons of speed
 )
 

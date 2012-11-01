@@ -46,7 +46,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         mfe, mfhEvents, mfhGrid, model, my.na.action, na.action, namesOptimUser,
         namesOptimArgs, nlminbControl, nlminbRes, nlmObjective, nlmControl,
         nlmRes, nmRes, optim.args, optimArgs, control.siaf,
-        optimControl, optimMethod, optimRes, optimRes1, optimValid, partial,
+        optimMethod, optimRes, optimRes1, optimValid, partial,
         partialloglik, ptm, qmatrix, res, negsc, score, subset, tmpexpr,
         typeSpecificEndemicIntercept, useScore, whichfixed, 
         inherits = FALSE)))
@@ -791,7 +791,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         body(ll) <- as.call(append(as.list(body(ll)),
             as.list(expression(
                 if (hassiafpars && !siaf$validpars(siafpars)) {
-                    if (optimArgs$control$trace > 0L) cat("(invalid 'siafpars' in loglik)\n")
+                    if (optimArgs$control$trace > 0L)
+                        cat("(invalid 'siafpars' in loglik)\n")
                     return(-Inf)
                 }
                 )),
@@ -1011,7 +1012,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             }
             nlminbRes <- nlminb(start = optimArgs$par, objective = negll,
                                 gradient = negsc,
-                                hessian = if (optimArgs$hessian) neghess else NULL,
+                                hessian = if (doHessian) neghess else NULL,
                                 control = nlminbControl,
                                 lower = optimArgs$lower, upper = optimArgs$upper)
             nlminbRes$value <- -nlminbRes$objective
@@ -1037,17 +1038,16 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             ##<- we use the negative _expected_ Fisher information as the Hessian,
             ##   which is of course different from the true Hessian (=neg. obs. Fisher info)
             nlmRes <- do.call("nlm", c(alist(f = nlmObjective, p = optimArgs$par,
-                                             hessian = optimArgs$hessian),
+                                             hessian = doHessian),
                                              nlmControl))
             names(nlmRes)[names(nlmRes) == "estimate"] <- "par"
             nlmRes$value <- -nlmRes$minimum
             nlmRes$counts <- rep.int(nlmRes$iterations, 2L)
             nlmRes$convergence <- if (nlmRes$code %in% 1:2) 0L else nlmRes$code
             nlmRes
-        } else {
-            optimControl <- list(trace=1L, REPORT=5L) # default control arguments
-            optimControl[names(optimArgs$control)] <- optimArgs$control
-            optimArgs$control <- optimControl
+        } else { # use optim()
+            optimArgs$control <- modifyList(list(trace=1L, REPORT=5L),
+                                            optimArgs$control)
             if (finetune) optimArgs$hessian <- FALSE
             res <- do.call("optim", optimArgs)
             res$value <- -res$value
@@ -1065,6 +1065,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             optimArgs$par <- optimRes1$par
             optimArgs$method <- "Nelder-Mead"
             optimArgs$hessian <- doHessian
+            optimArgs$control <- modifyList(list(trace=1L), optimArgs$control)
             nmRes <- do.call("optim", optimArgs)
             nmRes$value <- -nmRes$value
             nmRes$counts[2L] <- 0L   # 0 gradient evaluations (replace NA for addition below)
