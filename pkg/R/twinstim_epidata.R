@@ -1058,7 +1058,9 @@ untie.epidataCS <- function (x, amount = list(t=NULL, s=NULL),
 
     ## Generate epidataCS object with new events
     coordinates(events) <- newcoords    # -> SpatialPointsDataFrame
-    proj4string(events) <- proj4string(x$W)
+    #proj4string(events) <- proj4string(x$W)  # "proj4string<-" might change the
+                                        # string e.g. add +towgs84=0,0,0,0,0,0,0
+    events@proj4string <- x$W@proj4string
     npoly <- attr(x$events$.influenceRegion, "nCircle2Poly")
     res <- as.epidataCS(events, x$stgrid[,-1], x$W, x$qmatrix,
                         nCircle2Poly=npoly)
