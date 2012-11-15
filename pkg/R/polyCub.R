@@ -98,7 +98,7 @@ if (plot) {
 ## See function polygauss() below for further argument details
 
 polyCub.SV <- function (polyregion, f, ...,
-                        nGQ = 13, alpha = NULL, rotation = FALSE,
+                        nGQ = 20, alpha = NULL, rotation = FALSE,
                         plot = FALSE)
 {
     polys <- xylist(polyregion) # transform to something like "owin$bdry"

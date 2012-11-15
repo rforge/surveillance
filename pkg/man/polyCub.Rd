@@ -32,7 +32,7 @@ polyCub(polyregion, f, method = c("SV", "midpoint", "exact.Gauss"), ...,
 polyCub.midpoint(polyregion, f, ...,
                  eps = NULL, dimyx = NULL, plot = FALSE)
 polyCub.SV(polyregion, f, ...,
-           nGQ = 13, alpha = NULL, rotation = FALSE, plot = FALSE)
+           nGQ = 20, alpha = NULL, rotation = FALSE, plot = FALSE)
 polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2),
                     plot = FALSE)
 }
@@ -81,7 +81,7 @@ polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2),
 }
   \item{nGQ}{
     degree of the one-dimensional Gauss-Legendre quadrature rule
-    (default: 13). See \code{\link[statmod]{gauss.quad}} in package
+    (default: 20). See \code{\link[statmod]{gauss.quad}} in package
     \pkg{statmod}, on which this function depends.
 }
   \item{alpha}{
