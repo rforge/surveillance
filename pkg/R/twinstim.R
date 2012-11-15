@@ -336,6 +336,18 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         .siafInt <- .siafIntFUN(siaf = siaf, noCircularIR = all(eps.s > bdist))
         .siafInt.args <- c(alist(siafpars), control.siaf$F)
 
+        ## Memoisation of .siafInt
+        ..siafInt <- if (requireNamespace("memoise")) {
+            memoise::memoise(.siafInt)
+            ## => speed-up optimization since 'nlminb' evaluates the loglik and
+            ## score for the same set of parameters at the end of each iteration
+        } else {
+            cat("Continuing without memoisation of 'siaf$f' cubature ...\n")
+            ## However, trivial caching is used manually in case of fixed
+            ## "siafpars" and in LambdagEvents()
+            .siafInt
+        }
+
     } else {
         
         if (!missing(siaf) && !is.null(siaf))
@@ -493,7 +505,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         } else { expression(hInt <- 0) },
         if (hase) { # epidemic component
             expression(
-                siafInt <- do.call(".siafInt", .siafInt.args), # N-vector
+                siafInt <- do.call("..siafInt", .siafInt.args), # N-vector
                 if (!is.null(uppert)) { # && isScalar(uppert) && t0 <= uppert && uppert < T
                     gIntUpper <- pmin(uppert-eventTimes, eps.t)
                     subtimeidx <- eventTimes < uppert
@@ -560,7 +572,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             hEvents <- if (hash) .hEvents(beta0, beta) else 0
             eEvents <- .eEvents(gammapred, siafpars, tiafpars) # Nin-vector! (only 'includes' here)
             lambdaEvents <- hEvents + eEvents  # Nin-vector
-            siafInt <- do.call(".siafInt", .siafInt.args) # N-vector
+            siafInt <- do.call("..siafInt", .siafInt.args) # N-vector
             tiafInt <- .tiafInt(tiafpars) # N-vector
         }
 
@@ -1145,7 +1157,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     # and final gammapred (also used by intensity.twinstim)
     if (hase) {
         gammapred <- drop(exp(mme %*% gamma)) # N-vector
-        if (!fixedsiafpars) siafInt <- do.call(".siafInt", .siafInt.args)
+        if (!fixedsiafpars) siafInt <- do.call("..siafInt", .siafInt.args)
         if (!fixedtiafpars) tiafInt <- .tiafInt(tiafpars)
     }
     
