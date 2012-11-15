@@ -294,7 +294,7 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
     body(Deriv) <- as.call(c(as.name("{"),
         ## Determine a = argmax(abs(deriv(c(x,0))))
         if (density) {
-            expression(a.logsigma <- a.logalpha <- 0) # max abs values are at 0
+            expression(a <- c(0,0)) # max abs values are at 0
         } else c(tmp, expression(
             xrange <- polydomain$xrange,           # polydomain is a "owin"
             maxxdist <- max(abs(xrange)),
