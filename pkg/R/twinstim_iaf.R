@@ -67,7 +67,7 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
     Fcircle <- function (r, pars, type) {}  # single radius and type
     effRange <- function (pars) {}
     deriv <- function (s, pars, types) {}   # coordinate matrix s, length(types) = 1 or nrow(s)
-    Deriv <- function (polydomain, deriv, pars, type, nGQ = 13L) {} # single "owin" and type
+    Deriv <- function (polydomain, deriv, pars, type, nGQ = 20L) {} # single "owin" and type
     simulate <- function (n, pars, type, ub) {} # n=size of the sample,
                                                 # type=single type,
                                                 # ub=upperbound (unused here)
