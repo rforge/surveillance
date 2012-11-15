@@ -58,7 +58,7 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
                            F.adaptive = TRUE, effRangeMult = 6, validpars = NULL)
 {
     nTypes <- as.integer(nTypes)
-    stopifnot(length(nTypes) == 1L, nTypes > 0L, isScalar(effRangeMult))
+    stopifnot(length(nTypes) == 1L, nTypes > 0L)
 
     f <- function (s, pars, types) {}       # coordinate matrix s, length(types) = 1 or nrow(s)
     F <- if (F.adaptive) {
@@ -214,6 +214,9 @@ qlomax <- function (p, scale, shape) {
 siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
                         effRangeProb = 0.99, validpars = NULL)
 {
+    nTypes <- as.integer(nTypes)
+    stopifnot(length(nTypes) == 1L, nTypes > 0L)
+
     ## for the moment we don't make this type-specific
     if (nTypes != 1) stop("type-specific shapes are not yet implemented")
     if (!logpars) stop("only the 'logpars' parametrization is implemented")
