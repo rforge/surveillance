@@ -1,8 +1,7 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
-Version: 1.4-3
-Revision: $Rev$
-Date: 2012-11-15 17:24:12+01:00
+Version: 1.5-0
+Date: 2012-11-16
 Author: M. Höhle, S. Meyer and M. Paul
         with contributions from
         T. Correa, L. Held, M. Hofmann, C. Lang, A. Riebler, D. Sabanés Bové,

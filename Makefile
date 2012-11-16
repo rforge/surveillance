@@ -15,6 +15,8 @@
 ##    9 Aug 2012 (SM): added --timings for R CMD check
 ##   27 Aug 2012 (SM): install from built .tar.gz (which includes vignettes)
 ##   14 Sep 2012 (SM): automatic date in DESCRIPTION file
+##   15 Nov 2012 (SM): removed automatic date in DESCRIPTION file since R-Forge
+##                     now includes date and revision in its built packages
 ################################################################################
 
 ## Define variable for R and sed script which enables the use of alternatives,
@@ -48,18 +50,18 @@ DATE := $(shell date --rfc-3339=seconds)
 #$(shell find . -printf "%TY-%Tm-%Td\n" | sort -nr | head -n 1)
 
 ## phony targets
-.PHONY: clean build check install manual ${DESCRIPTION}
+.PHONY: clean build check install manual #${DESCRIPTION}
 
 clean:
 	cd pkg/src; rm -f *.o *.so *.dll symbols.rds
 	rm -f pkg/*/.Rhistory
 
-build: clean ${SYSDATA} ${DESCRIPTION}
+build: clean ${SYSDATA} #${DESCRIPTION}
 	$R CMD build --no-resave-data --compact-vignettes pkg
 
 ## update date in DESCRIPTION file
-${DESCRIPTION}:
-	$(sed) -i "s/^\(Date:\)[^\r]*/\1 ${DATE}/" $@
+# ${DESCRIPTION}:
+# 	$(sed) -i "s/^\(Date:\)[^\r]*/\1 ${DATE}/" $@
 
 ## Save internal datasets from pkg/sysdata/ into pkg/R/sysdata.rda
 ${SYSDATA}: pkg/sysdata/sysdata.R
