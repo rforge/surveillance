@@ -91,11 +91,13 @@ tiaf.exponential(nTypes = 1)
     Gaussian kernel, i.e. with \code{effRangeMult=6} numerical
     integration only considers the \eqn{6 \sigma} area around the event instead
     of the whole observation region \code{W}.
+    Setting \code{effRangeMult=NULL} will disable
+    the integral approximation with an effective integration range.
   }
   \item{effRangeProb}{
     numeric scalar in \eqn{(0,1)}, which determines the effective range for
     numerical integration in terms of the corresponding quantile of the
-    univariate Lomax distribution. May also be \code{NULL} which disables
+    univariate Lomax distribution. May also be \code{NULL}, which disables
     the integral approximation with an effective integration range.
   }
   \item{validpars}{

@@ -27,6 +27,7 @@
 	   library("gpclib"); library("maptools"); library("rgeos")
 	   works...
 12/09/2012 more package tests
+15/11/2012 change from GPL-2 to GPL-3 + gpclib-restriction
 
 #Done
 
@@ -154,7 +155,6 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 #Open
 - add documentation for oneStepAhead predictions/scores
 - improve and document plot/predict methods
-- profiling of hhh4 ...
 - remove redundant elements in control/stsObj/terms to reduce the
   size of ah4-objects
 - add documentation for parametric neighbourhood weights

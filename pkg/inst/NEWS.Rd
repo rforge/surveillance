@@ -6,6 +6,116 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.5-0 (2012-11-16)}{
+
+  \subsection{SYNOPSIS}{\itemize{
+    \item This new version mainly improves upon the \code{twinstim()} and
+    \code{hhh4()} implementations (see below).
+    \item Changed license from GPL-2 to GPL-3 + a \CRANpkg{gpclib}
+    restriction on commercial use. 
+    \item As requested by the CRAN team, examples now run faster.
+    \item Moved some rarely used package dependencies to
+    \dQuote{Suggests:}, and also removed some unused packages from there.
+  }}
+
+  \subsection{NEW FEATURES (\code{twinstim()}-related)}{\itemize{
+    \item Speed-up by memoisation of the \code{siaf} cubature (using
+    the \CRANpkg{memoise} package).
+    \item Allow for \code{nlm}-optimizer (really not recommended).
+    \item Allow for \code{nlminb}-specific control arguments.
+    \item Use of the expected Fisher information matrix can be disabled
+    for \code{nlminb} optimization.
+    \item Use of the \code{effRange}-trick can be disabled in
+    \code{siaf.gaussian()} and \code{siaf.lomax()}.
+    \item The \code{twinstim()} argument \code{nCub} has been replaced
+    by the new \code{control.siaf} argument list. The old
+    \code{nCub.adaptive} indicator became a feature of the
+    \code{siaf.gaussian()} generator (named \code{F.adaptive} there) and
+    does no longer depend on the \code{effRange} specification, but uses
+    the bandwidth \code{adapt*sd}, where the \code{adapt} parameter may be
+    specified in the \code{control.siaf} list in the \code{twinstim()}
+    call. Accordingly, the components \code{"nCub"} and
+    \code{"nCub.adaptive"} have been removed from the result
+    of \code{twinstim()}, and are replaced by \code{"control.siaf"}.
+    \item The \code{"method"} component of the \code{twinstim()} result
+    has been replaced by the whole \code{"optim.args"}.
+    \item The new \code{"Deriv"} component of \code{siaf} specifications
+    integrates the \dQuote{siaf$deriv} function over a polygonal domain.
+    \code{siaf.gaussian()} and \code{siaf.lomax()} use \code{polyCub.SV()}
+    (with intelligent \code{alpha} parameters) for this task
+    (previously: midpoint-rule with naive bandwidth)
+    \item \code{scaled} \code{iafplot()} (default \code{FALSE}). The
+    \code{ngrid} parameter has been renamed to \code{xgrid} and is more
+    general.
+    \item The \code{"simulate"} component of \code{siaf}'s takes an
+    argument \code{ub} (upperbound for distance from the source).
+    \item Numerical integration of spatial interaction functions with an
+    \code{Fcircle} trick is more precise now; this slightly changes
+    previous results.
+    \item New \acronym{S3}-generic \code{untie()} with a method for the
+    \code{"epidataCS"} class (to randomly break tied event times and/or
+    locations).
+    \item Renamed \code{N} argument of \code{polyCub.SV()} to
+    \code{nGQ}, and \code{a} to \code{alpha}, which both have new
+    default values.
+    The optional polygon rotation proposed by Sommariva &
+    Vianello is now also implemented (based on the corresponding MATLAB
+    code) and available as the new \code{rotation} argument.
+  }}
+
+  \subsection{NEW FEATURES (\code{hhh4()}-related)}{\itemize{
+    \item Significant speed-up (runs about 6 times faster now, amongst
+    others by many code optimizations and by using sparse \CRANpkg{Matrix}
+    operations).
+    \item \code{hhh4()} optimization routines can now be customized for
+    the updates of regression and variance parameters seperately, which
+    for instance enables the use of Nelder-Mead for the variance
+    updates, which seems to be more stable/robust as it does 
+    not depend on the inverse Fisher info and is usually faster.
+    \item The \code{ranef()} extraction function for \code{"ah4"} objects
+    gained a useful \code{tomatrix} argument, which re-arranges random
+    effects in a unit x effect matrix (also transforming CAR effects
+    appropriately).
+    \item Generalized \code{hhh4()} to also capture parametric
+    neighbourhood weights (like a power-law decay). The new function
+    \code{nbOrder()} determines the neighbourhood order matrix
+    from a binary adjacency matrix (depends on package \CRANpkg{spdep}).
+    \item New argument \code{check.analyticals} (default \code{FALSE})
+    mainly for development purposes.
+  }}
+
+  \subsection{BUG FIXES}{\itemize{
+    \item Fixed sign of observed Fisher information matrix in
+    \code{twinstim}.
+    \item Simulation from the Lomax kernel is now correct (via polar
+    coordinates).
+    \item Fixed \code{modifyListcall()} to also work with updated \code{NULL} arguments.
+    \item Fixed wrong Fisher information entry for the overdispersion
+    parameter in \code{hhh4}-models.
+    \item Fixed wrong entries in penalized Fisher information wrt the
+    combination fixed effects x CAR intercept.
+    \item Fixed indexing bug in penalized Fisher calculation in the case
+    of multiple overdispersion parameters and random intercepts.
+    \item Fixed bug in Fisher matrix calculation concerning the relation
+    of unit-specific and random effects (did not work previously).
+    \item Improved handling of non-convergent / degenerate solutions during
+    \code{hhh4} optimization. This involves using \code{ginv()} from
+    package \CRANpkg{MASS}, if the penalized Fisher info is singular.
+    \item Correct labeling of overdispersion parameter in
+    \code{"ah4"}-objects.
+    \item Some control arguments of \code{hhh4()} have more clear
+    defaults.
+    \item The result of \code{algo.farrington.fitGLM.fast()} now
+    additionally inherits from the \code{"lm"} class to avoid warnings
+    from \code{predict.lm()} about fake object. 
+    \item Improved \file{NAMESPACE} imports.
+    \item Some additional tiny bug fixes, see the subversion log on
+    R-Forge for details.
+  }}
+
+}
+
+
 \section{Changes in surveillance version 1.4-2 (2012-08-17)}{
   
   \subsection{SYNOPSIS}{
