@@ -29,7 +29,7 @@ siaf.constant()
 siaf.gaussian(nTypes = 1, logsd = TRUE, density = FALSE, F.adaptive = TRUE,
               effRangeMult = 6, validpars = NULL)
 siaf.lomax(nTypes = 1, logpars = TRUE, density = FALSE,
-           effRangeProb = 0.99, validpars = NULL)
+           effRangeProb = 0.999, validpars = NULL)
 
 # temporal interaction functions
 tiaf.constant()
