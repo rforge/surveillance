@@ -1,6 +1,6 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
-Version: 1.5-0
+Version: 1.5-1
 Date: 2012-11-21
 Author: M. Höhle, S. Meyer and M. Paul
         with contributions from
@@ -42,7 +42,7 @@ Description: A package implementing statistical methods for the modeling and
         simulate outbreak data, visualize the results of the monitoring in
         temporal, spatial or spatio-temporal fashion.
 Maintainer: Michael Höhle <Michael.Hoehle@stat.uni-muenchen.de>
-License: GPL-2
+License: GPL (>= 3) | file LICENSE
 URL: http://surveillance.r-forge.r-project.org/
 ZipData: no
 Encoding: latin1

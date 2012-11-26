@@ -1,0 +1,33 @@
+All code of the surveillance package is available under GPL-3
+(http://www.r-project.org/Licenses/GPL-3).
+
+However, the functionality of the 'twinstim' function depends
+on the R package 'gpclib', which has a license restriction. 
+Quoting from the 'gpclib' R package license file:
+
+  Free for non-commercial use; commercial use prohibited (see the files
+   `gpc.c' and `gpc.h' for details)
+
+As a consequence the fitting of 'twinstim' models is restricted by the same
+license, i.e.
+
+	 Free for non-commercial use; commercial use prohibited.
+
+Should you intend to use twinstim for commercial purposes the details
+in the 'gpclib' mention the following:
+
+  You may not use this software, in whole or in part, in support of any
+  commercial product without the express consent of the author.
+
+According to the text in 'gpc.c' the author is: Alan Murta (email:
+gpc@cs.man.ac.uk). On his webpage the following additional details are
+given (copied from http://www.cs.man.ac.uk/~toby/alan/software/#Licensing):
+
+ If you wish to use GPC in support of a commercial product, you must
+ obtain an official GPC Commercial Use Licence from The University of
+ Manchester. Please email for details.
+
+The developers of 'surveillance' hope to be able to use the 'rgeos'
+library at some point to lift the above license restriction, but
+currently the above restriction to 'twinstim' model fitting applies.
+
