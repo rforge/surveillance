@@ -65,7 +65,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     cat("Checking 'W' and 'nCircle2Poly'...\n")
     # Check class and proj4string of W
     W <- as(W, "SpatialPolygons")
-    stopifnot(proj4string(W) == proj4string(events))
+    stopifnot(identical(proj4string(W), proj4string(events)))
     # Check nCircle2Poly
     stopifnot(isScalar(nCircle2Poly))
     nCircle2Poly <- as.integer(nCircle2Poly)

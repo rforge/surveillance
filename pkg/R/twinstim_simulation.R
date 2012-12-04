@@ -196,7 +196,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         .stillInfective <- with(events@data, time <= t0 & time + eps.t > t0)
         Nout <- sum(.stillInfective)    # = number of events in the prehistory
         if (Nout > 0L) {
-            stopifnot(proj4string(events) == proj4string(W))
+            stopifnot(identical(proj4string(events), proj4string(W)))
             events <- events[.stillInfective,]
             # check event types
             events@data$type <- factor(events@data$type, levels=typeNames)
@@ -760,7 +760,9 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                     eventLocationIR
                 }
                 .eventLocation <- sourceCoords + eventLocationIR
-                whichTile <- overlay(SpatialPoints(.eventLocation, proj4string=CRS(proj4string(W))), tiles)
+                whichTile <- over(SpatialPoints(.eventLocation,
+                                                proj4string=tiles@proj4string),
+                                  tiles)
                 .eventTile <- row.names(tiles)[whichTile]
                 .eventTile <- factor(.eventTile, levels=tileLevels)
             }
@@ -903,7 +905,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
     events <- SpatialPointsDataFrame(
         coords = eventCoords[seqAlongEvents,,drop=FALSE], data = eventData,
-        proj4string = CRS(proj4string(W)), match.ID = FALSE
+        proj4string = W@proj4string, match.ID = FALSE
         #, bbox = bbox(W)   # the bbox of SpatialPoints is defined as the actual
                             # bbox of the points and is also updated every time 
                             # when subsetting the SpatialPoints object

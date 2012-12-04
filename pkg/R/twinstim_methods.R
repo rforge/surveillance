@@ -297,6 +297,9 @@ intensityplot.twinstim <- function (x,
             ## necessary. However, there seems to be no better way to check for
             ## the availability of a package (cf. "Details" in ?find.package)
             sgrid <- maptools::Sobj_SpatialGrid(.tiles, n = sgrid)$SG
+            ## ensure that sgrid has exactly the same proj4string as .tiles
+            ## since CRS(proj4string(.tiles)) might have modified the original string
+            sgrid@proj4string <- .tiles@proj4string
         }
         sgrid <- as(sgrid, "SpatialPixels")
         

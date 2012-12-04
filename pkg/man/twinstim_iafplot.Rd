@@ -136,36 +136,6 @@ iafplot(imdepifit, "siaf", types=1,   # same for types=2
 # bootstrap-CI (used if more than one parameter is affected)
 iafplot(imdepifit, "siaf", types=1, scaled=TRUE, xlim=c(0,200), xgrid=500,
         conf.type="bootstrap", col.estimate=2)
-
-\dontshow{
-\dontrun{
-## FIXME: fit model with 2-parameter Lomax kernel as siaf (this takes a
-##        while and does not converge properly...)
-data(imdepi)
-imdepifit_lomax <- update(imdepifit,
-    siaf = siaf.lomax(1),
-    control.siaf = list(F=list(nGQ=20), Deriv=list(nGQ=20)),
-    optim.args = list(par=c(coef(imdepifit), 0), fixed=1:4,
-                      control=list(REPORT=1)),
-    model = FALSE, cumCIF = FALSE)
-# false convergence
-imdepifit_lomax2 <- update(imdepifit_lomax, optim.args=list(hessian=FALSE))
-# false convergence
-imdepifit_lomax_noepicovars <- update(imdepifit_lomax, epidemic = ~1,
-optim.args=list(par=c(coef(imdepifit)[grep("(type|agegrp)",
-names(coef(imdepifit)), invert=TRUE)], 0)))
-# false convergence: loglik much greater (-6214), f approaches point mass in 0
-# fit with step fun while decreasing delta, look at loglik
-loglikdelta <- sapply(10^seq(0,-12, by=-2),
-  #smaller eps cannot be modelled this way (radius for iR too small)
-  function(delta) {
-    logLik(update(imdepifit_lomax, data=update(imdepi, eps.s=delta),
-    epidemic = ~1, siaf=siaf.constant(),
-    optim.args=list(par=coef(imdepifit)[1:5], control=list(trace=0))))
-  })
-# full convergence: loglik increases with decreasing delta... WHY?
-}
-}
 }
 
 \keyword{hplot}
