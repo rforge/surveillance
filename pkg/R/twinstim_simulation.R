@@ -127,12 +127,17 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
     stopifnot(inherits(tiles, "SpatialPolygons"),
               (tileLevels <- levels(stgrid$tile)) %in% row.names(tiles))
+    tiles <- as(tiles, "SpatialPolygons") # drop possible data attribute
+                                          # (-> correct over-method)
     if (is.null(W)) {
     	if (require("maptools")) {
             cat("Building W as the union of 'tiles' ...\n")
             W <- maptools::unionSpatialPolygons(tiles,
                      IDs = rep.int(1,length(tiles@polygons)),
                      avoidGEOS = TRUE)
+            ## ensure that W has exactly the same proj4string as tiles
+            ## since the internal CRS()-call might have modified the original string
+            W@proj4string <- tiles@proj4string
         } else {
             stop("automatic generation of 'W' from 'tiles' requires package \"maptools\"")
         }
