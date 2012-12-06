@@ -11,12 +11,15 @@
 ################################################################################
 
 ### Note the varying polygon specifications in the packages:
-# sp: REPEAT first vertex at the end (closed)
-#     anticlockwise = hole, clockwise = normal boundary
-# spatstat: do NOT REPEAT first vertex
-#     anticlockwise = normal boundary, clockwise = hole
-# gpc.poly: NOT DOCUMENTED, but it seems that it is prefered to not repeat the
-#     first vertex and to have clockwise vertex order for the normal boundary. 
+## sp: REPEAT first vertex at the end (closed)
+##     anticlockwise = hole, clockwise = normal boundary
+## spatstat: do NOT REPEAT first vertex
+##     anticlockwise = normal boundary, clockwise = hole
+## gpc.poly: NOT DOCUMENTED, but it seems that it is prefered to not repeat the
+##     first vertex and to have clockwise vertex order for the normal boundary.
+##     The coerce-methods from "[Spatial]Polygons" or "owin" to "gpc.poly"
+##     defined below follow this convention for "gpc.poly". 
+
 
 
 ### xylist methods get the simple list of polygons from the various classes
@@ -50,6 +53,7 @@ xylist.default <- function (object, ...) {
 
 setAs(from = "Polygons", to = "gpc.poly", def = function (from)
     {
+        gpclibCheck()
         pls <- slot(from, "Polygons")
         pts <- lapply(pls, function (sr) {
             coords <- coordinates(sr)
@@ -64,7 +68,7 @@ setAs(from = "Polygons", to = "gpc.poly", def = function (from)
 
 setAs(from = "gpc.poly", to = "Polygons", def = function (from)
     {
-        srl <- lapply(get.pts(from), function (poly) {
+        srl <- lapply(from@pts, function (poly) {
             if (isClosed(poly)) {
                 Polygon(cbind(poly$x,poly$y), hole = poly$hole)
             } else {
@@ -83,11 +87,12 @@ setAs(from = "gpc.poly", to = "Polygons", def = function (from)
 
 setAs(from = "SpatialPolygons", to = "gpc.poly", def = function (from)
     {
+        gpclibCheck()
         polygonsList <- polygons(from)@polygons
         gpc <- new("gpc.poly")
         for (i in seq_along(polygonsList))
         {
-            gpc <- append.poly(gpc, as(polygonsList[[i]], "gpc.poly"))
+            gpc <- gpclib::append.poly(gpc, as(polygonsList[[i]], "gpc.poly"))
         }
         gpc
     }
@@ -100,6 +105,7 @@ setAs(from = "SpatialPolygons", to = "gpc.poly", def = function (from)
 
 setAs(from = "owin", to = "gpc.poly", def = function (from)
     {
+        gpclibCheck()
         pts <- lapply(from$bdry, function (poly) {
             list(x = rev(poly$x), y = rev(poly$y), hole = poly$hole)
         })

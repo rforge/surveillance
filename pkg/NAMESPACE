@@ -62,15 +62,15 @@ importFrom(MASS, mvrnorm)
 
 ### twinstim-specific
 
-importClassesFrom(gpclib, gpc.poly)
-#importMethodsFrom(gpclib, coerce)   # we don't need to import coerce from gpclib because we import methods
-importMethodsFrom(gpclib, "[", get.bbox, intersect, append.poly, get.pts, scale.poly, tristrip)
+## importClassesFrom(gpclib, gpc.poly)
+## importMethodsFrom(gpclib, "[", get.bbox, intersect, append.poly, tristrip)
+## -> we no longer strictly depend on gpclib for clarity of the package license
 importFrom(spatstat, as.owin, as.owin.gpc.poly, coords, coords.ppp, area.owin, distppl,
                      as.im.function, disc, shift, shift.owin, plot.owin, plot.im, marks,
                      marks.ppp, markformat.default, # required for runifpoint() in
                                         # simulate.twinstim because spatstat
                                         # does not register its S3 methods 
-                     bounding.box, runifpoint, inside.owin)
+                     bounding.box, runifpoint, inside.owin, spatstat.options)
 ##importFrom(intervals, Intervals, reduce)   # for as.epidata.epidataCS
 ## package intervals is now "suggested", not imported
 
@@ -109,8 +109,7 @@ export(discpoly)
 #export(runifdisc)          # don't export since package spatstat has a similar
                             # but more general function also named runifdisc
 export(inside.gpc.poly)
-exportMethods(scale.poly)   # redefined method for gpc.poly in spatial_stuff.R
-#S3method(scale, gpc.poly)  # alternatively, if defined as S3 method for scale
+S3method(scale, gpc.poly)   # redefined method for gpc.poly in spatial_stuff.R
 export(nbOrder)
 
 # randomly break tied event times or coordinates

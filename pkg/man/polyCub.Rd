@@ -57,7 +57,10 @@ polyCub.exact.Gauss(polyregion, mean = c(0,0), Sigma = diag(2),
     the first vertex should \emph{not} be repeated!
     The package \pkg{surveillance} offers methods to convert
     \code{"SpatialPolygons"} and \code{"owin"} objects to class
-    \code{"gpc.poly"}, which follow this convention.
+    \code{"gpc.poly"}, which follow this convention. However,
+    \pkg{gpclib} has a restricted license, which must be accepted
+    explicitly (e.g. via setting \code{options(gpclib=TRUE)}) prior to
+    using \code{polyCub.exact.Gauss}.
 }
   \item{f}{
     two-dimensional function to be integrated. As its first argument the function must take
@@ -195,9 +198,12 @@ if (require("statmod")) {
     }
 }
 
-# quasi-exact cubature by triangulation and using 'pmvnorm' from package 'mvtnorm' appropriately
-if (require("mvtnorm")) {
-    print(polyCub.exact.Gauss(disc.owin, mean=c(0,0), Sigma=5^2*diag(2), plot=TRUE), digits=16)
+# quasi-exact cubature by triangulation (gpclib) and using mvtnorm::pmvnorm()
+if (require("mvtnorm") && require("gpclib")) {
+    oopt <- options(gpclib=TRUE) # license applicable for the example
+    print(polyCub.exact.Gauss(disc.owin, mean=c(0,0), Sigma=5^2*diag(2),
+                              plot=TRUE), digits=16)
+    options(oopt)
 }
 }
 

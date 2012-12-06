@@ -11,17 +11,17 @@
 ################################################################################
 
 
-## Returns a Polygon representing a disc (in planar coordinates)
-## as an object of one of three possible classes: gpc.poly, owin, or Polygon.
-## This function is inspired by the disc() function from package 'spatstat'
-## authored by Adrian Baddeley and Rolf Turner
+### Returns a Polygon representing a disc (in planar coordinates)
+### as an object of one of three possible classes: gpc.poly, owin, or Polygon.
+### This function is inspired by the disc() function from package 'spatstat'
+### authored by Adrian Baddeley and Rolf Turner
 
 # center: center of the disc
 # r: radius
 # npoly: Number of edges of the polygonal approximation
 # hole: hole flag of the polygon
 discpoly <- function (center, r, npoly = 64,
-    class = c("gpc.poly", "owin", "Polygon"), hole = FALSE)
+    class = c("Polygon", "owin", "gpc.poly"), hole = FALSE)
 {
     class <- match.arg(class)
     if (class == "owin") { # use spatstat::disc
@@ -41,7 +41,10 @@ discpoly <- function (center, r, npoly = 64,
     y <- center[2] + r * sin(theta)
     switch(class,
         "Polygon" = Polygon(cbind(c(x,x[1]),c(y,y[1])), hole=hole),
-        "gpc.poly" = new("gpc.poly", pts = list(list(x=x, y=y, hole=hole)))
+        "gpc.poly" = {
+            gpclibCheck()
+            new("gpc.poly", pts = list(list(x=x, y=y, hole=hole)))
+        }
     )
 }
 
@@ -58,9 +61,7 @@ runifdisc <- function (n, r = 1)
 
 ### Redefinition of the gpclib::scale.poly method for gpc.poly's to also do centering
 
-setMethod("scale.poly", signature(x = "gpc.poly"),
-# alternatively: define S3 method for scale
-#scale.gpc.poly <-
+scale.gpc.poly <-
     function (x, center = c(0,0), scale = c(1,1)) {
         x@pts <- lapply(x@pts, function (p) {
             p$x <- (p$x-center[1]) / scale[1]
@@ -69,17 +70,16 @@ setMethod("scale.poly", signature(x = "gpc.poly"),
         })
         x
     }
-)
 
 
 ### Same as inside.owin for gpc.poly (using point.in.polygon from package sp)
 
 inside.gpc.poly <- function(x, y = NULL, polyregion, mode.checked = FALSE)
 {
-	xy <- xy.coords(x, y, recycle=FALSE)
-	N <- length(xy$x)
+    xy <- xy.coords(x, y, recycle=FALSE)
+    N <- length(xy$x)
     # check for each polygon of polyregion if points are in the polygon
-    locations <- sapply(get.pts(polyregion), function (poly) {
+    locations <- sapply(polyregion@pts, function (poly) {
         pip <- point.in.polygon(xy$x, xy$y, poly$x, poly$y, mode.checked = mode.checked)
         if (poly$hole) { # if point is inside a hole then attribute -Inf
             ifelse(pip == 1, -Inf, 0)
@@ -90,7 +90,7 @@ inside.gpc.poly <- function(x, y = NULL, polyregion, mode.checked = FALSE)
 }
 
 
-## Count number of instances at the same location of a SpatialPoint object
+### Count number of instances at the same location of a SpatialPoint object
 
 multiplicity.default <- function (x, ...)
 {
@@ -115,15 +115,15 @@ isClosed <- function (coords)
 }
 
 
-## Compute the intersection of a "gpc.poly" with a "discpoly" (and centering)
-## using gpclib::intersect
+### Compute the intersection of a "gpc.poly" with a "discpoly" using gpclib
 
 intersectCircle <- function (Wgpc, center, r, npoly)
 {
+    ## gpclibCheck() # unexported function, check already in caller
     circle <- discpoly(center = center, r = r, npoly = npoly,
                        class = "gpc.poly", hole = FALSE)
-    intersection <- intersect(circle, Wgpc)  # this order seems to be faster
-    scale.poly(intersection, center = center) # use scale method as defined above
+    intersection <- gpclib::intersect(circle, Wgpc)  # this order seems to be faster
+    scale(intersection, center = center) # use scale method as defined above
 }
 
 
@@ -132,9 +132,9 @@ intersectCircle <- function (Wgpc, center, r, npoly)
 
 nbOrder <- function (neighbourhood, maxlag = 1)
 {
-    ## if (!require("spdep"))         # actually we don't need to attach "spdep"
-    ##     stop("package ", dQuote("spdep"),
-    ##          " is required to determine neighbourhood orders")
+    if (!requireNamespace("spdep"))
+        stop("package ", dQuote("spdep"),
+             " is required to determine neighbourhood orders")
 
     stopifnot(isScalar(maxlag), maxlag > 0)
     checkNeighbourhood(neighbourhood)

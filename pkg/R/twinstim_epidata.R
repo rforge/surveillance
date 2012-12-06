@@ -377,8 +377,10 @@ checkstgrid <- function (stgrid, T)
 # An attribute "area" gives the area of the influenceRegion.
 # If it is actually a circular influence region, then there is an attribute
 # "radius" denoting the radius of the influence region.
-.influenceRegions <- function (events, Wgpc, npoly) {
-    ext <- sqrt(sum(sapply(get.bbox(Wgpc), diff)^2))
+.influenceRegions <- function (events, Wgpc, npoly)
+{
+    gpclibCheck()
+    ext <- sqrt(sum(sapply(gpclib::get.bbox(Wgpc), diff)^2))
     ##<- length of the diagonal of the bounding box of W
     eventCoords <- coordinates(events)
     nEvents <- nrow(eventCoords)
@@ -387,7 +389,7 @@ checkstgrid <- function (stgrid, T)
         eps <- events$eps.s[i]
         center <- eventCoords[i,]
         res[[i]] <- if (eps > ext) {   # influence region is whole region of W
-                as.owin(scale.poly(Wgpc, center = center))
+                as.owin(scale(Wgpc, center = center))
             } else {   # influence region is a subset of W
                 as.owin(intersectCircle(Wgpc, center, eps, npoly))
             }

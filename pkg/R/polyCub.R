@@ -88,13 +88,7 @@ if (plot) {
 ### Alternative 2: Product Gauss cubature of two-dimensional functions
 ### over simple polygons proposed by Sommariva & Vianello (2007)
 ########################################################################
-## polyregion can be anything coercible to "gpc.poly", BUT:
-##       If supplied as a "gpc.poly" be aware of the following restriction:
-##       Vertices are assumed to be ordered according to the "sp" convention,
-##       i.e. _clockwise_ for normal boundaries and _anticlockwise_ for holes.
-##       However, in contrast to "sp", the first vertex should NOT be repeated!
-##       The coerce-methods from "Polygon" or "owin" to "gpc.poly" defined in
-##       package surveillance follow this convention for "gpc.poly".
+## polyregion may be of classes "owin", "SpatialPolygons", or "gpc.poly"
 ## See function polygauss() below for further argument details
 
 polyCub.SV <- function (polyregion, f, ...,
@@ -122,6 +116,7 @@ polyCub.SV <- function (polyregion, f, ...,
 
     if (plot) {
         if (inherits(polyregion, "gpc.poly")) {
+            gpclibCheck()
             plot(polyregion, poly.args=list(lwd=2), ann=FALSE)
         } else plot(polyregion, lwd=2, axes=TRUE, main="")
         for (i in seq_along(polys)) {
@@ -350,17 +345,21 @@ rotmatPQ <- function (P, Q)
 }
 
 
-### Alternative 3: Quasi-exact cubature specific for the bivariate normal density
-### based on triangulation and formulae from Chapter 26 of the famous
-### Abramowitz & Stegun handbook (cf. Section 26.9, Example 9, pp. 956f. therein)
-# quite complicated because A&S formula is only for triangles where one vertex is the origin (0,0)
-# For each triangle of the tristrip we have to check in which of the 6 outer regions
-# of the triangle the origin (0,0) lies and adapt the signs in the formula adequately
-# (AOB+BOC-AOC) or (AOB-AOC-BOC) or (AOB+AOC-BOC) or (AOC+BOC-AOB) or ...
-# In contrast, the most time consuming step is the evaluation of pmvnorm in .V
 
-# helper function, which calculates the integral of the standard bivariat normal
-# over a triangle bounded by y=0, y=ax, x=h (cf. formula 26.3.23)
+#######################################################################
+### Alternative 3: Quasi-exact cubature of the bivariate normal density
+### based on triangulation and formulae from Chapter 26 of the famous
+### Abramowitz & Stegun handbook (Section 26.9, Example 9, pp. 956f.)
+#######################################################################
+## this is quite complicated because A&S formula is only for triangles where one
+## vertex is the origin (0,0)
+## For each triangle of the tristrip we have to check in which of the 6 outer regions
+## of the triangle the origin (0,0) lies and adapt the signs in the formula adequately
+## (AOB+BOC-AOC) or (AOB-AOC-BOC) or (AOB+AOC-BOC) or (AOC+BOC-AOB) or ...
+## In contrast, the most time consuming step is the evaluation of pmvnorm in .V
+
+## helper function, which calculates the integral of the standard bivariat normal
+## over a triangle bounded by y=0, y=ax, x=h (cf. formula 26.3.23)
 .V <- function(h,k) {
     a <- k/h
     rho <- -a/sqrt(1+a^2)
@@ -374,7 +373,7 @@ rotmatPQ <- function (P, Q)
     return(Lh0rho - asin(rho)/2/pi - Qh/2)
 }
 
-# helper function, which calculates the integral of the standard bivariat normal over a triangle A0B
+## helper function, which calculates the integral of the standard bivariat normal over a triangle A0B
 .intTriangleAS0 <- function (A, B)
 {
     d <- sqrt(sum((B-A)^2))
@@ -392,8 +391,8 @@ rotmatPQ <- function (P, Q)
     return(res)
 }
 
-# checks if point1 and point2 lie on the same side of a line through linepoint1 and linepoint2
-# see http://www.gamedev.net/community/forums/topic.asp?topic_id=457450
+## checks if point1 and point2 lie on the same side of a line through linepoint1 and linepoint2
+## see, e.g., http://www.gamedev.net/community/forums/topic.asp?topic_id=457450
 .pointsOnSameSide <- function (linepoint1, linepoint2, point1, point2 = c(0,0))
 {
     n <- c(-1,1) * rev(linepoint2-linepoint1)   # normal vector
@@ -401,7 +400,7 @@ rotmatPQ <- function (P, Q)
     return(S > 0)
 }
 
-# helper function, which calculates the integral of the standard bivariat normal over a triangle ABC
+## helper function, which calculates the integral of the standard bivariat normal over a triangle ABC
 .intTriangleAS <- function (xy)
 {
     A <- xy[1,]
@@ -421,8 +420,10 @@ rotmatPQ <- function (P, Q)
     return(int)
 }
 
+## main function to be called by the user
 polyCub.exact.Gauss <- function (polyregion, mean = c(0,0), Sigma = diag(2), plot = FALSE)
 {
+    gpclibCheck()
     polyregion <- as(polyregion, "gpc.poly")
     
     # coordinate transformation so that the standard bivariat normal density
@@ -437,7 +438,7 @@ polyCub.exact.Gauss <- function (polyregion, mean = c(0,0), Sigma = diag(2), plo
     })
     
     # triangulation: tristrip returns a list where each element is a coordinate matrix of vertices of triangles
-    triangleSets <- tristrip(polyregion)
+    triangleSets <- gpclib::tristrip(polyregion)
     
 ### ILLUSTRATION ###
 if (plot) {

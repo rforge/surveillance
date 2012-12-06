@@ -252,6 +252,12 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   \url{MapShaper.org} or as function \code{dp()}
   in the (slightly outdated) package \pkg{shapefiles}, or by passing by
   \pkg{spatstat}'s \code{\link[spatstat]{simplify.owin}} procedure.
+
+  Note also that generation of \code{"epidataCS"} depends on the
+  computation of polygon intersections via the \pkg{gpclib} package,
+  which has a restricted license. In order to use \code{as.epidataCS},
+  this license must be explicitly accepted, e.g., by setting
+  \code{options(gpclib=TRUE)}.
 }
 
 \references{
@@ -346,12 +352,16 @@ qmatrix <- imdepi$qmatrix
 qmatrix
 
 ## now construct an object of class "epidataCS" from these components
-myimdepi <- as.epidataCS(events, stgrid, W, qmatrix, nCircle2Poly=16)
+if (require("gpclib")) {
+    oopt <- options(gpclib=TRUE) # license applicable for the example
+    myimdepi <- as.epidataCS(events, stgrid, W, qmatrix, nCircle2Poly=16)
+    options(oopt)
+}
 
 \dontshow{
 #isTRUE(all.equal(imdepi, myimdepi))
-## should be equal as long as the internal structures of the embedded
-## classes (SpatialPolygons, etc.) don't change
+## should be equal as long as the internal structure of the embedded
+## class "owin" doesn't change
 }
 
 ## take a look into the internal structure of an epidataCS-object

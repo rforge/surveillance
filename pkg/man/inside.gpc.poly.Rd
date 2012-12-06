@@ -47,10 +47,14 @@ Sebastian Meyer
 }
 
 \examples{
-poly <- discpoly(c(0.5,0.5), 0.5, npoly=4, class="gpc.poly")
-pts <- cbind(x=runif(50), y=runif(50))
-plot(poly)
-points(pts, col=1+inside.gpc.poly(pts, polyregion=poly))
+if (require("gpclib")) {
+    oopt <- options(gpclib=TRUE) # license applicable for the example
+    poly <- discpoly(c(0.5,0.5), 0.5, npoly=4, class="gpc.poly")
+    options(oopt)
+    pts <- cbind(x=runif(50), y=runif(50))
+    plot(poly)
+    points(pts, col=1+inside.gpc.poly(pts, polyregion=poly))
+}
 }
 
 \keyword{utilities}

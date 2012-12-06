@@ -6,16 +6,23 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.5-0 (2012-11-16)}{
+\section{Changes in surveillance version 1.5-0 (2012-12-06)}{
 
   \subsection{SYNOPSIS}{\itemize{
     \item This new version mainly improves upon the \code{twinstim()} and
     \code{hhh4()} implementations (see below).
-    \item Changed license from GPL-2 to GPL-3 + a \CRANpkg{gpclib}
-    restriction on commercial use. 
     \item As requested by the CRAN team, examples now run faster.
     \item Moved some rarely used package dependencies to
     \dQuote{Suggests:}, and also removed some unused packages from there.
+    \item Dropped strict dependence on \CRANpkg{gpclib}, which has a
+    restricted license, for the \pkg{surveillance} package to be clearly
+    GPL-2. Generation of \code{"epidataCS"} objects, which makes use of
+    \pkg{gpclib}'s polygon intersection capabilities, now requires prior
+    explicit acceptance of the \pkg{gpclib} license, e.g. via setting
+    \code{options(gpclib = TRUE)} (or, similarly, by activating
+    \pkg{gpclib} in packages \pkg{spatstat} or \pkg{maptools} if one of
+    them is concurrently attached). Otherwise, \code{as.epidataCS()} and
+    \code{simEpidataCS()} may not be used.
   }}
 
   \subsection{NEW FEATURES (\code{twinstim()}-related)}{\itemize{
@@ -26,7 +33,9 @@
     \item Use of the expected Fisher information matrix can be disabled
     for \code{nlminb} optimization.
     \item Use of the \code{effRange}-trick can be disabled in
-    \code{siaf.gaussian()} and \code{siaf.lomax()}.
+    \code{siaf.gaussian()} and \code{siaf.lomax()}. The default
+    \code{effRangeProb} argument for the latter has been changed from
+    0.99 to 0.999.
     \item The \code{twinstim()} argument \code{nCub} has been replaced
     by the new \code{control.siaf} argument list. The old
     \code{nCub.adaptive} indicator became a feature of the
@@ -61,6 +70,9 @@
     The optional polygon rotation proposed by Sommariva &
     Vianello is now also implemented (based on the corresponding MATLAB
     code) and available as the new \code{rotation} argument.
+    \item The \code{scale.poly()} method for \code{"gpc.poly"} is now
+    available as \code{scale.gpc.poly()}. The default return class of
+    \code{discpoly()} was changed from \code{"gpc.poly"} to \code{"Polygon"}.
   }}
 
   \subsection{NEW FEATURES (\code{hhh4()}-related)}{\itemize{

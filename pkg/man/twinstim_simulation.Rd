@@ -252,6 +252,12 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   \url{MapShaper.org} or as function \code{dp()}
   in the (slightly outdated) package \pkg{shapefiles}, or by passing by
   \pkg{spatstat}'s \code{\link[spatstat]{simplify.owin}} procedure.
+  
+  Note also that generation of \code{"epidataCS"} depends on the
+  computation of polygon intersections via the \pkg{gpclib} package,
+  which has a restricted license. In order to use \code{as.epidataCS},
+  this license must be explicitly accepted, e.g., by setting
+  \code{options(gpclib=TRUE)}.
 }
 
 \references{
@@ -304,24 +310,24 @@ plot(stateD, add=TRUE, border=2, lwd=2)
 # (created by maptools::unionSpatialPolygons)
 }
 
-## simulate two "epidemics" from an endemic-only model (during a short period)
-m_noepi <- update(imdepifit, epidemic=~0, siaf=NULL,
-    optim.args=list(par=coef(imdepifit)[1:4]), model=FALSE, cumCIF=FALSE)
-mysim <- simulate(m_noepi, nsim=2, seed=399, data=imdepi,
-    tiles=districtsD, W=stateD, t0=31, T=91, trace=FALSE,
-    nCircle2Poly=16, .allocate=100, simplify=TRUE)
+if (require("gpclib")) {
+    oopt <- options(gpclib=TRUE) # license applicable for the example
 
-# extract the first realization -> object of class simEpidataCS
-mysim1 <- mysim[[1]]
-plot(mysim1, aggregate="space")
+    ## simulate two realizations from the imdepifit-model (during a short period)
+    mysim <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
+	              tiles=districtsD, W=stateD, t0=31, T=91, trace=FALSE,
+                      nCircle2Poly=16, .allocate=100, simplify=TRUE)
 
-# use the plot-method for simEpidataCSlist's
-plot(mysim, aggregate="time", subset=type=="B")
+    ## extract the first realization -> object of class simEpidataCS
+    mysim1 <- mysim[[1]]
+    summary(mysim1)
+    plot(mysim1, aggregate="space")
 
-## simulate one realization from the imdepifit-model (during a short period)
-simimdepifit <- simulate(imdepifit, seed=1, data=imdepi,
-    tiles=districtsD, W=stateD, t0=31, T=91, trace=10)
-summary(simimdepifit)
+    ## plot both epidemics using the plot-method for simEpidataCSlist's
+    plot(mysim, aggregate="time", subset=type=="B")
+
+    options(oopt) # reset gpclib option
+}
 }
 
 \keyword{datagen}
