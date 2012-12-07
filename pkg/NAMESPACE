@@ -86,6 +86,7 @@ importFrom(spatstat, as.owin, as.owin.gpc.poly, coords, coords.ppp, area.owin, d
 
 ### general exports
 
+export(surveillance.options, reset.surveillance.options)
 export(animate)          # new S3-generic
 export(R0)               # new S3-generic
 export(intensityplot)    # new S3-generic

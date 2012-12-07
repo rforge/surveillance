@@ -256,8 +256,8 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   Note also that generation of \code{"epidataCS"} depends on the
   computation of polygon intersections via the \pkg{gpclib} package,
   which has a restricted license. In order to use \code{as.epidataCS},
-  this license must be explicitly accepted, e.g., by setting
-  \code{options(gpclib=TRUE)}.
+  this license must be explicitly accepted by setting
+  \code{\link{surveillance.options}(gpclib=TRUE)}.
 }
 
 \references{
@@ -311,7 +311,7 @@ plot(stateD, add=TRUE, border=2, lwd=2)
 }
 
 if (require("gpclib")) {
-    oopt <- options(gpclib=TRUE) # license applicable for the example
+    oopt <- surveillance.options(gpclib=TRUE)
 
     ## simulate two realizations from the imdepifit-model (during a short period)
     mysim <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
@@ -326,7 +326,7 @@ if (require("gpclib")) {
     ## plot both epidemics using the plot-method for simEpidataCSlist's
     plot(mysim, aggregate="time", subset=type=="B")
 
-    options(oopt) # reset gpclib option
+    surveillance.options(oopt)
 }
 }
 

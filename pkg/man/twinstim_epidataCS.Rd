@@ -256,8 +256,8 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   Note also that generation of \code{"epidataCS"} depends on the
   computation of polygon intersections via the \pkg{gpclib} package,
   which has a restricted license. In order to use \code{as.epidataCS},
-  this license must be explicitly accepted, e.g., by setting
-  \code{options(gpclib=TRUE)}.
+  this license must be explicitly accepted by setting
+  \code{\link{surveillance.options}(gpclib=TRUE)}.
 }
 
 \references{
@@ -353,9 +353,9 @@ qmatrix
 
 ## now construct an object of class "epidataCS" from these components
 if (require("gpclib")) {
-    oopt <- options(gpclib=TRUE) # license applicable for the example
+    oopt <- surveillance.options(gpclib=TRUE)
     myimdepi <- as.epidataCS(events, stgrid, W, qmatrix, nCircle2Poly=16)
-    options(oopt)
+    surveillance.options(oopt)
 }
 
 \dontshow{

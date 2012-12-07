@@ -2,50 +2,76 @@
 ### Hook functions for package start-up
 #######################################
 
-gpclibPermitStatus <- function ()
-{
-    ## check global gpclib permission status
-    globally <- isTRUE(getOption("gpclib"))
-
-    ## check for permission via spatstat package
-    via.spatstat <- spatstat.options("gpclib")
-
-    ## check for permission via maptools
-    via.maptools <- if ("maptools" %in% loadedNamespaces())
-        maptools::gpclibPermitStatus() else FALSE
-
-    ## return gpclib permission status
-    globally | via.spatstat | via.maptools
-}
+### not sure if we should query gpclib permission via spatstat or maptools:
+### within a single R session, spatstat might be used for commercial purposes
+### _without_ gpclib, whereas some functionality of the surveillance package might
+### be used non-commercially _with_ gpclib
+## gpclibPermitStatus <- function ()
+## {
+##     ## check global gpclib permission status
+##     ##globally <- isTRUE(getOption("gpclib"))
+##     ## -> CRAN team does not like packages which use own global options
+##
+##     ## check for permission via surveillance.options
+##     via.surveillance <- surveillance.options("gpclib")
+##
+##     ## check for permission via spatstat package
+##     via.spatstat <- spatstat.options("gpclib")
+##
+##     ## check for permission via maptools
+##     via.maptools <- if ("maptools" %in% loadedNamespaces())
+##         maptools::gpclibPermitStatus() else FALSE
+##
+##     ## return gpclib permission status
+##     via.surveillance | via.spatstat | via.maptools
+## }
 
 gpclibCheck <- function (fatal = TRUE)
 {
-    gpclibOK <- isTRUE(gpclibPermitStatus()) && requireNamespace("gpclib")
+    gpclibOK <- surveillance.options("gpclib")
     if (!gpclibOK && fatal) {
         message("The gpclib license is considered accepted by setting ",
-                sQuote("options(gpclib=TRUE)"), ".")
-        stop("the gpclib package and acceptance of its license is required")
+                sQuote("surveillance.options(gpclib=TRUE)"), ".")
+        stop("acceptance of the gpclib license is required")
     }
     gpclibOK
 }
 
+.onLoad <- function (libname, pkgname)
+{
+    ## Determine package version and store it as surveillance:::VERSION
+    v <- packageDescription(pkgname, lib.loc=libname, fields="Version", drop=TRUE)
+    ##<- a convenience function packageVersion() was only introduced in R 2.12.0
+    assign("VERSION", package_version(v), getNamespace(pkgname))
+
+    ## initialize options
+    reset.surveillance.options()
+}
+
 .onAttach <- function (libname, pkgname)
-{      
+{
     ## Startup message
-    vrs <- packageDescription(pkgname, lib.loc = libname, fields = "Version", drop = TRUE)
-    packageStartupMessage("This is ", pkgname, " ", vrs, ". ",
+    packageStartupMessage("This is ", pkgname, " ", VERSION, ". ",
                           "For overview type ",
                           sQuote(paste0("help(", pkgname, ")")), ".")
 
     ## License limitation for package gpclib
-    if (!gpclibCheck(fatal=FALSE)) packageStartupMessage(
+    packageStartupMessage(
         "Note: Polygon geometry computations required for the generation of",
         "\n      \"epidataCS\" objects currently depend on the gpclib package,",
-        "\n      which has a restricted license.",
-        "\n      This functionality is disabled by default, but may be enabled",
-        "\n      by setting ", sQuote("options(gpclib=TRUE)"),
-                 " if this license is applicable."
+        "\n      which has a restricted license.  This functionality is disabled",
+        "\n      by default, but may be enabled by setting",
+        "\n      ", sQuote("surveillance.options(gpclib=TRUE)"),
+                 ", if this license is applicable."
     )
+
+    ## decide if we should run all examples (some take a few seconds)
+    allExamples <- if (interactive()) TRUE else {
+        .withTimings <- Sys.getenv("_R_CHECK_TIMINGS_")
+        withTimings <- !is.na(.withTimings) && nzchar(.withTimings)
+        !withTimings
+    }
+    surveillance.options(allExamples = allExamples)
 }
 
 

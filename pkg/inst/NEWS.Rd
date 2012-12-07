@@ -6,23 +6,24 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.5-0 (2012-12-06)}{
+\section{Changes in surveillance version 1.5-0 (2012-12-07)}{
 
   \subsection{SYNOPSIS}{\itemize{
     \item This new version mainly improves upon the \code{twinstim()} and
     \code{hhh4()} implementations (see below).
-    \item As requested by the CRAN team, examples now run faster.
+    \item As requested by the CRAN team, examples now run faster. Some
+    are conditioned on the value of the new package option
+    \code{"allExamples"}, which usually defaults to \code{TRUE} (but is
+    set to \code{FALSE} for CRAN convenience).
     \item Moved some rarely used package dependencies to
     \dQuote{Suggests:}, and also removed some unused packages from there.
     \item Dropped strict dependence on \CRANpkg{gpclib}, which has a
     restricted license, for the \pkg{surveillance} package to be clearly
     GPL-2. Generation of \code{"epidataCS"} objects, which makes use of
     \pkg{gpclib}'s polygon intersection capabilities, now requires prior
-    explicit acceptance of the \pkg{gpclib} license, e.g. via setting
-    \code{options(gpclib = TRUE)} (or, similarly, by activating
-    \pkg{gpclib} in packages \pkg{spatstat} or \pkg{maptools} if one of
-    them is concurrently attached). Otherwise, \code{as.epidataCS()} and
-    \code{simEpidataCS()} may not be used.
+    explicit acceptance of the \pkg{gpclib} license via setting
+    \code{surveillance.options(gpclib = TRUE)}. Otherwise,
+    \code{as.epidataCS()} and \code{simEpidataCS()} may not be used.
   }}
 
   \subsection{NEW FEATURES (\code{twinstim()}-related)}{\itemize{

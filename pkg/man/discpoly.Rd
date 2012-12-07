@@ -60,11 +60,11 @@ print(disc2)
 lines(disc2, col=3)
 
 if (require("gpclib")) {
-    oopt <- options(gpclib=TRUE) # license applicable for the example
+    oopt <- surveillance.options(gpclib=TRUE)
     disc3 <- discpoly(c(0,0), 5, npoly=64, class = "gpc.poly")
     print(disc3)
     plot(disc3, add=TRUE, poly.args=list(border=4))
-    options(oopt)
+    surveillance.options(oopt)
 }
 
 # if one only wants to draw a circle without an object behind

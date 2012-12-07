@@ -65,9 +65,9 @@ data("imdepi")
 
 if (require("gpclib")) {
     ## assume different interaction ranges and simplify polygons
-    oopt <- options(gpclib=TRUE) # license applicable for the example
+    oopt <- surveillance.options(gpclib=TRUE)
     imdepi2 <- update(imdepi, eps.t = 20, eps.s = Inf, nCircle2Poly = 16)
-    options(oopt)
+    surveillance.options(oopt)
     
     (s <- summary(imdepi))
     (s2 <- summary(imdepi2))

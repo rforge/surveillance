@@ -48,9 +48,9 @@ Sebastian Meyer
 
 \examples{
 if (require("gpclib")) {
-    oopt <- options(gpclib=TRUE) # license applicable for the example
+    oopt <- surveillance.options(gpclib=TRUE)
     poly <- discpoly(c(0.5,0.5), 0.5, npoly=4, class="gpc.poly")
-    options(oopt)
+    surveillance.options(oopt)
     pts <- cbind(x=runif(50), y=runif(50))
     plot(poly)
     points(pts, col=1+inside.gpc.poly(pts, polyregion=poly))
