@@ -71,8 +71,9 @@ data("hepatitisA")
 # Fix seed - this is used for the MCMC samplers in twins
 set.seed(123)
 
-# Call algorithm and save result (use filter=2 only for reasons of speed)
-otwins <- algo.twins(hepatitisA, control=list(filter=2))
+# Call algorithm and save result (use short chain without filtering for speed)
+otwins <- algo.twins(hepatitisA,
+                     control=list(burnin=500, filter=1, sampleSize=1000))
 
 # This shows the entire output (use ask=TRUE for pause between plots)
 plot(otwins, ask=FALSE)

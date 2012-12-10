@@ -302,7 +302,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
 # Load invasive meningococcal disease data
 data("imdepi")
 
-### first, fit an endemic-only model
+### first, fit a simple endemic-only model
 
 ## As a start value for the endemic intercept use the crude estimate
 ## assuming the model only had a single-cell endemic component
@@ -333,14 +333,18 @@ m_noepi <- twinstim(
 ## look at the model summary
 summary(m_noepi)
 
-## type-dependent endemic intercept?
-m_noepi_type <- update(m_noepi,
-                       endemic = ~(1|type) + .,
-                       optim.args=list(par=coef(m_noepi)[c(1,1:4)]))
-summary(m_noepi_type)
 
-# LR-test for a type-dependent intercept in the endemic-only model
-pchisq(2*(logLik(m_noepi_type)-logLik(m_noepi)), df=1, lower.tail=FALSE)
+if (surveillance.options("allExamples"))
+{
+  ## type-dependent endemic intercept?
+  m_noepi_type <- update(m_noepi,
+                         endemic = ~(1|type) + .,
+                         optim.args=list(par=coef(m_noepi)[c(1,1:4)]))
+  summary(m_noepi_type)
+  
+  # LR-test for a type-dependent intercept in the endemic-only model
+  pchisq(2*(logLik(m_noepi_type)-logLik(m_noepi)), df=1, lower.tail=FALSE)
+}
 
 
 ### add an epidemic component with just the intercept, i.e.
@@ -348,7 +352,7 @@ pchisq(2*(logLik(m_noepi_type)-logLik(m_noepi)), df=1, lower.tail=FALSE)
 ### eps.s = 200 km and eps.t = 30 days (see summary(imdepi))
 
 m0 <- update(m_noepi, epidemic = ~1,
-             optim.args = list(par=c(coef(m_noepi),-15)), model = TRUE)
+             optim.args = list(par=c(coef(m_noepi),-18)), model = TRUE)
 
 \dontrun{
 ## NOTE: in contrast to using nlminb() optim's BFGS would miss the
@@ -361,7 +365,7 @@ m0_BFGS$fisherinfo   # singular Fisher information matrix here
 m0$fisherinfo
 logLik(m0_BFGS)
 logLik(m0)
-## nlminb is more powerful since it makes use of the (expected) fisherinfo
+## nlminb is more powerful since we make use of the analytical fisherinfo
 ## as estimated by the model during optimization, which optim cannot
 }
 
@@ -374,64 +378,65 @@ toLatex(s, digits=2, withAIC=FALSE)
 ## the default confint-method can be used for Wald-CI's
 confint(m0, level=0.95)
 
-## same (untrimmed) R0 estimate for every event (epidemic intercept only)
+## same R0 estimate for every event (epidemic intercept only)
 summary(R0(m0, trimmed=FALSE))
 
-## plot the path of the total intensity or of the epidemic proportion
+## plot the path of the fitted total intensity
 plot(m0, "total intensity", tgrid=500)
-plot(m0, "epidemic proportion", tgrid=500)
 
-\dontrun{
-## extract "residual process" integrating over space (takes some seconds)
-res <- residuals(m0)
-# if the model describes the true CIF well _in the temporal dimension_,
-# then this residual process should behave like a stationary Poisson
-# process with intensity 1
-plot(res, type="l"); abline(h=c(0, length(res)), lty=2)
-# -> use the function checkResidualProcess
-checkResidualProcess(m0)
+if (surveillance.options("allExamples"))
+{
+  ## extract "residual process" integrating over space (takes some seconds)
+  res <- residuals(m0)
+  # if the model describes the true CIF well _in the temporal dimension_,
+  # then this residual process should behave like a stationary Poisson
+  # process with intensity 1
+  plot(res, type="l"); abline(h=c(0, length(res)), lty=2)
+  # -> use the function checkResidualProcess
+  checkResidualProcess(m0)
 
-## NB: the model fit environment is kept in the workspace with model=TRUE
-sort(sapply(environment(m0), object.size))
-# saving m0 to RData will include this model environment, thus might
-# consume quiet a lot of disk space (as it does use memory), mainly
-# depending on the size of "stgrid", the number of "events" and the
-# polygonal resolution of "W"
+  ## NB: the model fit environment is kept in the workspace with model=TRUE
+  sort(sapply(environment(m0), object.size))
+  # saving m0 to RData will include this model environment, thus might
+  # consume quiet a lot of disk space (as it does use memory), mainly
+  # depending on the size of "stgrid", the number of "events" and the
+  # polygonal resolution of "W"
 }
 
 
-### try with spatially decreasing interaction kernel
-## Likelihood evaluation takes much longer than for constant spatial spread
-## Here we use the kernel of an isotropic bivariate Gaussian with same
-## standard deviation for both finetypes
+if (surveillance.options("allExamples"))
+{
+  ### try with spatially decreasing interaction kernel
+  ## Likelihood evaluation takes much longer than for constant spatial spread
+  ## Here we use the kernel of an isotropic bivariate Gaussian with same
+  ## standard deviation for both finetypes
 
-m1 <- update(m0,
-    siaf = siaf.gaussian(1, F.adaptive = TRUE),
-    optim.args = list(par=c(coef(m0), 2.8),  # exp(2.8) = sigma = 16 km
-                      fixed="e.siaf.1"),
-                      # for reasons of speed of the example, the siaf
-                      # parameter log(sigma) is fixed to 2.8 here
-    control.siaf = list(F=list(adapt=0.25)) # use adaptive eps=sigma/4
-)
+  m1 <- update(m0,
+      siaf = siaf.gaussian(1, F.adaptive = TRUE),
+      optim.args = list(par=c(coef(m0), 2.8),  # exp(2.8) = sigma = 16 km
+                        fixed="e.siaf.1"),
+                        # for reasons of speed of the example, the siaf
+                        # parameter log(sigma) is fixed to 2.8 here
+      control.siaf = list(F=list(adapt=0.25)) # use adaptive eps=sigma/4
+  )
 
-AIC(m_noepi, m0, m1)   # further improvement
-summary(m1, test.iaf=FALSE)   # nonsense to test H0: log(sigma) = 0
-plot(m1, "siaf", xlim=c(0,200), types=1)   # the same for types=2
+  AIC(m_noepi, m0, m1)   # further improvement
+  summary(m1, test.iaf=FALSE)   # nonsense to test H0: log(sigma) = 0
+  plot(m1, "siaf", xlim=c(0,200), types=1)   # the same for types=2
 
 
-\dontrun{
-### add epidemic covariates
+  ### add epidemic covariates
 
-m2 <- update(m1,
-    epidemic = ~ 1 + type + agegrp,
-    optim.args = list(par=c(coef(m0), 0, 0, 0, coef(m1)["e.siaf.1"]))
-)
-
-AIC(m1, m2)   # further improvement
-summary(m2)
-
-# look at estimated R0 values by event type
-tapply(R0(m2), imdepi$events@data[names(R0(m2)), "type"], summary)
+  m2 <- update(m1,
+      epidemic = ~ 1 + type + agegrp,
+      optim.args = list(par=c(coef(m0), 0, 0, 0, coef(m1)["e.siaf.1"]))
+  )
+  
+  AIC(m1, m2)   # further improvement
+  summary(m2)
+  
+  # look at estimated R0 values by event type
+  tapply(R0(m2), imdepi$events@data[names(R0(m2)), "type"], summary)
 }
 }
 

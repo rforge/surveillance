@@ -179,29 +179,27 @@ intensityplot(imdepifit, which="epidemic proportion",
 legend("topright", legend=levels(imdepi$events$type), lty=1, col=1:2,
        title = "event type")
 
-## spatial shape of the intensity (aggregated over time)
-# load borders of Germany's districts (obtained from the
-# Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, Germany,
-# www.geodatenzentrum.de), simplified by the "special" Visvalingam
-# algorithm (level=60\%) using www.MapShaper.org:
-load(system.file("shapes", "districtsD.RData", package="surveillance"))
-if (require("maptools")) {
-    # total intensity (using a rather sparse 'sgrid' for speed)
-    intensityplot(imdepifit, which="total intensity",
-                  aggregate="space", tiles=districtsD, sgrid=500)
-}
+if (surveillance.options("allExamples") && require("maptools"))
+{
+  ## spatial shape of the intensity (aggregated over time)
+  # load borders of Germany's districts (obtained from the
+  # Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, Germany,
+  # www.geodatenzentrum.de), simplified by the "special" Visvalingam
+  # algorithm (level=60\%) using www.MapShaper.org:
+  load(system.file("shapes", "districtsD.RData", package="surveillance"))
 
-\dontrun{
-if (require("maptools")) {
-    # epidemic proportion by type
-    maps_epiprop <- lapply(1:2, function (type) {
-        intensityplot(imdepifit, which="epidemic", aggregate="space",
-                      types=type, tiles=districtsD, sgrid=1000,
-                      at=seq(0,1,by=0.1), col.regions=rev(heat.colors(20)))
-    })
-    plot(maps_epiprop[[1]], split=c(1,1,2,1), more=TRUE)
-    plot(maps_epiprop[[2]], split=c(2,1,2,1))
-}
+  # total intensity (using a rather sparse 'sgrid' for speed)
+  intensityplot(imdepifit, which="total intensity",
+                aggregate="space", tiles=districtsD, sgrid=500)
+
+  # epidemic proportion by type
+  maps_epiprop <- lapply(1:2, function (type) {
+      intensityplot(imdepifit, which="epidemic", aggregate="space",
+                    types=type, tiles=districtsD, sgrid=1000,
+                    at=seq(0,1,by=0.1), col.regions=rev(heat.colors(20)))
+  })
+  plot(maps_epiprop[[1]], split=c(1,1,2,1), more=TRUE)
+  plot(maps_epiprop[[2]], split=c(2,1,2,1))
 }
 }
 

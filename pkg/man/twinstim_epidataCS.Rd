@@ -343,6 +343,10 @@ title(xlab="x [km]", ylab="y [km]")
 points(events, pch=unclass(events$type), cex=0.5, col=unclass(events$type))
 legend("topright", legend=levels(events$type), title="Type",
        pch=1:2, col=1:2)
+\dontrun{
+    # similar to using the convenient plot-method for "epidataCS"
+    plot(imdepi, "space")
+}
 
 ## endemic covariates
 stgrid <- imdepi$stgrid[,-1]
@@ -359,9 +363,10 @@ if (require("gpclib")) {
 }
 
 \dontshow{
-#isTRUE(all.equal(imdepi, myimdepi))
-## should be equal as long as the internal structure of the embedded
-## class "owin" doesn't change
+## should be equal as long as the internal structures of "epidataCS" and
+## of the embedded class "owin" do not change
+if (!identical(imdepi, myimdepi))
+    warning("@Sebastian: update data(imdepi)")
 }
 
 ## take a look into the internal structure of an epidataCS-object

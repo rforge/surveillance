@@ -302,24 +302,23 @@ data(imdepifit)
 ## algorithm (level=60\%) using www.MapShaper.org:
 load(system.file("shapes", "districtsD.RData", package="surveillance"))
 
-\dontrun{
 ## map of Germany's districts
 plot(districtsD)
 plot(stateD, add=TRUE, border=2, lwd=2)
 # 'stateD' is the union of the polygons in 'districtsD'
 # (created by maptools::unionSpatialPolygons)
-}
 
 if (require("gpclib")) {
     oopt <- surveillance.options(gpclib=TRUE)
 
-    ## simulate two realizations from the imdepifit-model (during a short period)
+    ## simulate 2 realizations (during a VERY short period -- for speed)
+    ## considering events from data(imdepi) before t=31 as pre-history
     mysim <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
-	              tiles=districtsD, W=stateD, t0=31, T=91, trace=FALSE,
+	              tiles=districtsD, W=stateD, t0=31, T=61, trace=FALSE,
                       nCircle2Poly=16, .allocate=100, simplify=TRUE)
 
     ## extract the first realization -> object of class simEpidataCS
-    mysim1 <- mysim[[1]]
+    mysim1 <- mysim[[2]]
     summary(mysim1)
     plot(mysim1, aggregate="space")
 

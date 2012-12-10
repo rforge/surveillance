@@ -208,22 +208,6 @@ title(xlab = "x [km]", ylab = "y [km]")
   # spread during the first year of type B with a step size of 7 days
   animate(imdepiB, interval=c(0,365), time.spacing=7, sleep=0.1)
 }
-
-
-\dontrun{
-### data(imdepifit) is obtained as
-data(imdepi)
-imdepifit <- twinstim(
-    endemic = ~1 + offset(log(popdensity)) + I(start/365) + 
-        sin(start * 2 * pi/365) + cos(start * 2 * pi/365),
-    epidemic = ~1 + type + agegrp, siaf = siaf.gaussian(1, F.adaptive=TRUE),
-    data = imdepi, subset = !is.na(agegrp),
-    control.siaf = list(F=list(adapt=0.25), Deriv=list(nGQ=13)), 
-    optim.args = list(par = c(-20, -0.041, 0.24, 0.35, -17, 0, 0, 0, 4)),
-    # initial values obtained from model with epidemic=~1 and constant siaf
-    model = FALSE, cumCIF = TRUE
-)
-}
 }
 
 \keyword{datasets}
