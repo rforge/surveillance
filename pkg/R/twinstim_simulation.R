@@ -130,16 +130,17 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     tiles <- as(tiles, "SpatialPolygons") # drop possible data attribute
                                           # (-> correct over-method)
     if (is.null(W)) {
-    	if (require("maptools")) {
+    	if (require("maptools") && maptools::gpclibPermitStatus()) {
             cat("Building W as the union of 'tiles' ...\n")
             W <- maptools::unionSpatialPolygons(tiles,
                      IDs = rep.int(1,length(tiles@polygons)),
                      avoidGEOS = TRUE)
             ## ensure that W has exactly the same proj4string as tiles
-            ## since the internal CRS()-call might have modified the original string
+            ## since the internal CRS()-call might have modified it
             W@proj4string <- tiles@proj4string
         } else {
-            stop("automatic generation of 'W' from 'tiles' requires package \"maptools\"")
+            stop("generation of 'W' from 'tiles' requires package\n",
+                 "  \"maptools\" and \"gpclibPermit()\" therein")
         }
     } else {
         stopifnot(inherits(W, "SpatialPolygons"),
@@ -147,7 +148,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     }
 
     # get (upper bound for) maximum extent of W (i.e. the diagonal of the bbox)
-    maxExtentOfW <- sqrt(sum(apply(bbox(W), 1, diff)^2))
+    bboxW <- bbox(W)
+    maxExtentOfW <- sqrt(sum(apply(bboxW, 1, diff)^2))
 
     # Transform W into a gpc.poly
     Wgpc <- as(W, "gpc.poly")
@@ -911,10 +913,10 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     events <- SpatialPointsDataFrame(
         coords = eventCoords[seqAlongEvents,,drop=FALSE], data = eventData,
         proj4string = W@proj4string, match.ID = FALSE
-        #, bbox = bbox(W)   # the bbox of SpatialPoints is defined as the actual
-                            # bbox of the points and is also updated every time 
-                            # when subsetting the SpatialPoints object
-                            # -> useless to specify it as the bbox of W
+        #, bbox = bboxW)   # the bbox of SpatialPoints is defined as the actual
+                           # bbox of the points and is also updated every time 
+                           # when subsetting the SpatialPoints object
+                           # -> useless to specify it as the bbox of W
     )
 
     if (.onlyEvents) {
@@ -931,6 +933,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
     cat("Done.\n")
     # append configuration of the model
+    epi$bbox <- bboxW
     epi$timeRange <- c(t0, T)
     epi$formula <- list(
                    endemic = if (typeSpecificEndemicIntercept) {
@@ -952,7 +955,11 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
 
 
-### R0-method for "simEpidataCS"-objects (wrapper for R0.twinstim)
+####################################################
+### some twinstim-methods for "simEpidataCS" objects
+####################################################
+
+### wrapper for R0.twinstim
 
 R0.simEpidataCS <- function (object, trimmed = TRUE, ...)
 {
@@ -960,6 +967,40 @@ R0.simEpidataCS <- function (object, trimmed = TRUE, ...)
 }
 
 
+### wrapper for intensityplot.twinstim
+
+as.twinstim.simEpidataCS <- function (x)
+{
+    capture.output(
+    m <- do.call("twinstim",
+                 c(formula(x),
+                   alist(data=x),
+                   list(control.siaf = x$control.siaf,
+                        optim.args=list(par=coef(x), fixed=seq_along(coef(x))),
+                        model=TRUE, cumCIF=FALSE)
+                   ))
+    )
+    components2copy <- setdiff(names(m), names(x))
+    for (comp in components2copy) x[[comp]] <- m[[comp]]
+    environment(x) <- environment(m)
+    class(x) <- c("simEpidataCS", "epidataCS", "twinstim")
+    x
+}
+
+intensityplot.simEpidataCS <- function (x, ...)
+{
+    if (is.null(environment(x))) {
+        objname <- deparse(substitute(x))
+        cat("Setting up model environment ...\n")
+        x <- as.twinstim.simEpidataCS(x)
+        try({
+            assign(objname, x, envir=parent.frame())
+            cat("Note: added model environment to '", objname,
+                "' for future use.\n", sep="")
+        }, silent=TRUE)
+    }
+    intensityplot.twinstim(x, ...)
+}
 
 
 

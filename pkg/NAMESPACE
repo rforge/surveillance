@@ -250,6 +250,7 @@ export(as.epidata.epidataCS)            # for convenience
 
 S3method(print, twinstim)
 S3method(summary, twinstim)
+export(summary.twinstim)                # for convenience
 S3method(print, summary.twinstim)
 S3method(toLatex, summary.twinstim)
 S3method(plot, twinstim)
@@ -265,8 +266,11 @@ export(simulate.twinstim)               # for convenience
 S3method(R0, twinstim)
 S3method(residuals, twinstim)
 S3method(update, twinstim)
+export(update.twinstim)                 # for convenience
 
 S3method(R0, simEpidataCS)
+S3method(intensityplot, simEpidataCS)
+export(intensityplot.simEpidataCS)      # for convenience
 S3method(print, simEpidataCSlist)
 S3method("[[", simEpidataCSlist)
 S3method(plot, simEpidataCSlist)

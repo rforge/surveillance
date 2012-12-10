@@ -1,6 +1,7 @@
 \name{twinstim_intensityplot}
 \alias{intensityplot.twinstim}
 \alias{intensity.twinstim}
+\alias{intensityplot.simEpidataCS}
 \title{
   Plotting Intensities of Infection over Time or Space
 }
@@ -9,7 +10,11 @@
 \code{\link{intensityplot}} method to plot the evolution of the total infection
 intensity, its epidemic proportion or its endemic proportion over time
 or space (integrated over the other dimension) of fitted
-\code{\link{twinstim}} models.
+\code{\link{twinstim}} models (or \code{\link{simEpidataCS}}).
+The \code{"simEpidataCS"}-method is just a wrapper around
+\code{intensityplot.twinstim} by making the \code{"simEpidataCS"} object
+\code{"twinstim"}-compatible, i.e. enriching it by the
+required model components and environment.
 
 The \code{intensity.twinstim} auxiliary function returns functions which
 calculate the endemic or epidemic intensity at a specific time point or
@@ -25,6 +30,8 @@ location (integrated over the other dimension).
     sgrid = 128, polygons.args = list(), points.args = list(),
     cex.fun = sqrt, ...)
 
+\method{intensityplot}{simEpidataCS}(x, ...)
+
 intensity.twinstim(x,
     aggregate = c("time", "space"), types = 1:nrow(x$qmatrix), 
     tiles, tiles.idcol = NULL)
@@ -32,7 +39,7 @@ intensity.twinstim(x,
 
 \arguments{
   \item{x}{
-    an object of class \code{"twinstim"}.
+    an object of class \code{"twinstim"} or \code{"simEpidataCS"}, respectively.
 }
   \item{which}{
     \code{"epidemic proportion"}, \code{"endemic proportion"},
@@ -134,7 +141,9 @@ intensity.twinstim(x,
   \item{\dots}{
     further arguments passed to \code{plot} or \code{lines} (if
     \code{aggregate = "time"}), or to \code{\link{spplot}} (if
-    \code{aggregate = "space"}).
+    \code{aggregate = "space"}).\cr
+    For \code{intensityplot.simEpidataCS}, arguments passed to
+    \code{intensityplot.twinstim}.
 }
 }
 
