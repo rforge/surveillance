@@ -17,6 +17,7 @@
 ##   14 Sep 2012 (SM): automatic date in DESCRIPTION file
 ##   15 Nov 2012 (SM): removed automatic date in DESCRIPTION file since R-Forge
 ##                     now includes date and revision in its built packages
+##   10 Dec 2012 (SM): add message about warnings in examples in "check"
 ################################################################################
 
 ## Define variable for R and sed script which enables the use of alternatives,
@@ -71,9 +72,13 @@ ${SYSDATA}: pkg/sysdata/sysdata.R
 check: build
 	$R CMD check --as-cran --timings surveillance_${VERSION}.tar.gz
 ## further option: --use-gct (for better detection of memory bugs/segfaults)
-	echo "timings <- read.table(\"surveillance.Rcheck/surveillance-Ex.timings\", header=TRUE, row.names=\"name\"); \
+	@echo "timings <- read.table(\"surveillance.Rcheck/surveillance-Ex.timings\", header=TRUE, row.names=\"name\"); \
 	timings <- timings[order(timings$$elapsed, decreasing=TRUE),\"elapsed\",drop=FALSE]; \
 	cat(capture.output(subset(timings, elapsed > 1)), sep=\"\n\")" | $R --slave --vanilla
+	@nwarn=`grep -c "Warning" surveillance.Rcheck/surveillance-Ex.Rout`; \
+	if [ $$nwarn -gt 0 ]; then echo "\n\tWARNING: $$nwarn" \
+        "warning(s) thrown when running examples,\n" \
+	"\t         see file surveillance.Rcheck/surveillance-Ex.Rout\n"; fi
 
 install: build
 	$R CMD INSTALL surveillance_${VERSION}.tar.gz
