@@ -313,17 +313,17 @@ if (require("gpclib")) {
 
     ## simulate 2 realizations (during a VERY short period -- for speed)
     ## considering events from data(imdepi) before t=31 as pre-history
-    mysim <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
-	              tiles=districtsD, W=stateD, t0=31, T=61, trace=FALSE,
-                      nCircle2Poly=16, .allocate=100, simplify=TRUE)
+    mysims <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
+	               tiles=districtsD, W=stateD, t0=31, T=61, trace=FALSE,
+                       nCircle2Poly=16, .allocate=100, simplify=TRUE)
 
     ## extract the first realization -> object of class simEpidataCS
-    mysim1 <- mysim[[2]]
+    mysim1 <- mysims[[2]]
     summary(mysim1)
     plot(mysim1, aggregate="space")
 
     ## plot both epidemics using the plot-method for simEpidataCSlist's
-    plot(mysim, aggregate="time", subset=type=="B")
+    plot(mysims, aggregate="time", subset=type=="B")
 
     surveillance.options(oopt)
 }

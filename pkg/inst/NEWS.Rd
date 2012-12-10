@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.5-0 (2012-12-07)}{
+\section{Changes in surveillance version 1.5-0 (2012-12-12)}{
 
   \subsection{SYNOPSIS}{\itemize{
     \item This new version mainly improves upon the \code{twinstim()} and
@@ -14,7 +14,7 @@
     \item As requested by the CRAN team, examples now run faster. Some
     are conditioned on the value of the new package option
     \code{"allExamples"}, which usually defaults to \code{TRUE} (but is
-    set to \code{FALSE} for CRAN convenience).
+    set to \code{FALSE} for CRAN checking, if timings are active).
     \item Moved some rarely used package dependencies to
     \dQuote{Suggests:}, and also removed some unused packages from there.
     \item Dropped strict dependence on \CRANpkg{gpclib}, which has a
@@ -73,7 +73,10 @@
     code) and available as the new \code{rotation} argument.
     \item The \code{scale.poly()} method for \code{"gpc.poly"} is now
     available as \code{scale.gpc.poly()}. The default return class of
-    \code{discpoly()} was changed from \code{"gpc.poly"} to \code{"Polygon"}.
+    \code{discpoly()} was changed from \code{"gpc.poly"} to
+    \code{"Polygon"}.
+    \item An \code{intensityplot()}-method is now also implemented for
+    \code{"simEpidataCS"}.
   }}
 
   \subsection{NEW FEATURES (\code{hhh4()}-related)}{\itemize{

@@ -30,7 +30,7 @@ gpclibCheck <- function (fatal = TRUE)
 {
     gpclibOK <- surveillance.options("gpclib")
     if (!gpclibOK && fatal) {
-        message("The gpclib license is considered accepted by setting ",
+        message("Note: The gpclib license is accepted by ",
                 sQuote("surveillance.options(gpclib=TRUE)"), ".")
         stop("acceptance of the gpclib license is required")
     }

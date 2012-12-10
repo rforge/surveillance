@@ -49,7 +49,7 @@ print.twinstim <- function (x, digits = max(3, getOption("digits") - 3), ...)
 summary.twinstim <- function (object, test.iaf = FALSE,
     correlation = FALSE, symbolic.cor = FALSE, ...)
 {
-    ans <- object[c("call", "converged", "counts")]
+    ans <- unclass(object)[c("call", "converged", "counts")]
     ans$cov <- vcov(object)
     npars <- object$npars
     coefs <- coef(object)
@@ -213,177 +213,31 @@ ret
 
 ### Plot temporal or spatial evolution of the intensity
 
-intensityplot.twinstim <- function (x,
-    which = c("epidemic proportion", "endemic proportion", "total intensity"),
-    aggregate = c("time", "space"),
-    types = 1:nrow(x$qmatrix), tiles, tiles.idcol = NULL,
-    plot = TRUE, add = FALSE, tgrid = 101, rug.opts = list(),
-    sgrid = 128, polygons.args = list(), points.args = list(),
-    cex.fun = sqrt, ...)
-{
-    ## check arguments
-    if (is.null(environment(x))) {
-        stop("'", substitute(x), "' is missing the model environment -- re-fit with 'model=TRUE'")
-    }
-    which <- match.arg(which)
-    aggregate <- match.arg(aggregate)
-    stopifnot(is.vector(types, mode="numeric"), types %in% 1:nrow(x$qmatrix),
-              !anyDuplicated(types))
-
-    ## set up desired intensities
-    cl <- match.call()
-    cl <- cl[c(1L, match(names(formals(intensity.twinstim)), names(cl), 0L))]
-    cl[[1]] <- as.name("intensity.twinstim")
-    components <- eval(cl, envir = parent.frame())
-
-    ## define function to plot
-    FUN <- function (tmp) {}
-    names(formals(FUN)) <- if (aggregate == "time") "times" else "coords"
-    body1 <- if (aggregate == "time") expression(
-        hGrid <- sapply(times, components$hFUN, USE.NAMES=FALSE),
-        eGrid <- sapply(times, components$eFUN, USE.NAMES=FALSE)
-        ) else expression(
-            hGrid <- unname(components$hFUN(coords)), # works with whole coord matrix
-            eGrid <- apply(coords, 1, components$eFUN)
-            )
-    body2 <- switch(which,
-                    "epidemic proportion" = expression(eGrid / (hGrid + eGrid)),
-                    "endemic proportion" = expression(hGrid / (hGrid + eGrid)),
-                    "total intensity" = expression(hGrid + eGrid))
-    body(FUN) <- as.call(c(as.name("{"), c(body1, body2)))
-    
-    if (!plot) return(FUN)
-
-    ## plot the FUN
-    modelenv <- environment(x)
-    dotargs <- list(...)
-    nms <- names(dotargs)
-    if (aggregate == "time") {
-        ## set up grid of x-values (time points where 'which' will be evaluated)
-        tgrid <- if (isScalar(tgrid)) {
-            seq(modelenv$t0, modelenv$T, length.out=tgrid)
-        } else {
-            stopifnot(is.vector(tgrid, mode="numeric"))
-            sort(tgrid)
-        }
-        
-        ## calculate 'which' on tgrid
-        yvals <- FUN(tgrid)
-        
-        ## plot it
-        if(! "xlab" %in% nms) dotargs$xlab <- "time"
-        if(! "ylab" %in% nms) dotargs$ylab <- which
-        if(! "type" %in% nms) dotargs$type <- "l"
-        if(! "ylim" %in% nms) dotargs$ylim <- {
-            if (which == "total intensity") c(0,max(yvals)) else c(0,1)
-        }
-        do.call(if (add) "lines" else "plot", args=c(alist(x=tgrid, y=yvals), dotargs))
-        if (is.list(rug.opts)) {
-            if (is.null(rug.opts$ticksize)) rug.opts$ticksize <- 0.02
-            if (is.null(rug.opts$quiet)) rug.opts$quiet <- TRUE
-            eventTimes.types <- modelenv$eventTimes[modelenv$eventTypes %in% types]
-            do.call("rug", args = c(alist(x=eventTimes.types), rug.opts))
-        }
-        invisible(FUN)
-    } else {
-        .tiles <- as(tiles, "SpatialPolygons") # we don't need the data here
-        
-        ## set up grid of coordinates where 'which' will be evaluated
-        if (isScalar(sgrid)) {
-            if (!require("maptools")) {
-                stop("auto-generation of 'sgrid' requires package \"maptools\"")
-            }
-            ## maptools gets attached by the above check, which is actually not
-            ## necessary. However, there seems to be no better way to check for
-            ## the availability of a package (cf. "Details" in ?find.package)
-            sgrid <- maptools::Sobj_SpatialGrid(.tiles, n = sgrid)$SG
-            ## ensure that sgrid has exactly the same proj4string as .tiles
-            ## since CRS(proj4string(.tiles)) might have modified the original string
-            sgrid@proj4string <- .tiles@proj4string
-        }
-        sgrid <- as(sgrid, "SpatialPixels")
-        
-        ## only select grid points inside W (tiles)
-        in.tiles <- !is.na(over(sgrid, .tiles))
-        sgrid <- sgrid[in.tiles,]
-        
-        ## calculate 'which' on sgrid
-        yvals <- FUN(coordinates(sgrid))
-        sgridy <- SpatialPixelsDataFrame(sgrid, data=data.frame(yvals=yvals),
-                                         proj4string=.tiles@proj4string)
-
-        ## define sp.layout
-        lobjs <- list()
-        if (is.list(polygons.args)) {
-            nms.polygons <- names(polygons.args)
-            if(! "col" %in% nms.polygons) polygons.args$col <- "darkgrey"
-            lobjs <- c(lobjs,
-                       list(c(list("sp.polygons", .tiles, first=FALSE),
-                              polygons.args)))
-        }
-        if (is.list(points.args)) {
-            eventCoords.types <- modelenv$eventCoords[modelenv$eventTypes %in% types,,drop=FALSE]
-            ## eventCoords as Spatial object with duplicates counted and removed
-            eventCoords.types <- SpatialPoints(eventCoords.types,
-                                               proj4string=.tiles@proj4string,
-                                               bbox = .tiles@bbox)
-            eventCoords.types <- SpatialPointsDataFrame(eventCoords.types,
-                data.frame(mult = multiplicity(eventCoords.types)))
-            eventCoords.types <- eventCoords.types[!duplicated(coordinates(eventCoords.types)),]
-            points.args <- modifyList(list(pch=1, cex=0.5), points.args)
-            pointcex <- cex.fun(eventCoords.types$mult)
-            pointcex <- pointcex * points.args$cex
-            points.args$cex <- NULL
-            lobjs <- c(lobjs,
-                       list(c(list("sp.points", eventCoords.types, first=FALSE,
-                                   cex=pointcex), points.args)))
-        }
-        if ("sp.layout" %in% nms) {
-            if (!is.list(dotargs$sp.layout[[1]])) { # let sp.layout be a list of lists
-                dotargs$sp.layout <- list(dotargs$sp.layout)
-            }
-            lobjs <- c(lobjs, dotargs$sp.layout)
-            dotargs$sp.layout <- NULL
-        }
-
-        ## plotit
-        if (add) message("'add'ing is not possible with 'aggregate=\"space\"'")
-        if (! "xlim" %in% nms) dotargs$xlim <- bbox(.tiles)[1,]
-        if (! "ylim" %in% nms) dotargs$ylim <- bbox(.tiles)[2,]
-        if (! "scales" %in% nms) dotargs$scales <- list(draw = TRUE)
-        do.call("spplot", args=c(alist(sgridy, zcol="yvals", sp.layout=lobjs,
-                          checkEmptyRC=FALSE), dotargs))
-    }
-}
-
-
 intensity.twinstim <- function (x, aggregate = c("time", "space"),
     types = 1:nrow(x$qmatrix), tiles, tiles.idcol = NULL)
 {
+    modelenv <- environment(x)
+    
     ## check arguments
-    if (is.null(environment(x))) {
-        stop("'x' is missing the model environment -- re-fit with 'model=TRUE'")
-    }
+    if (is.null(modelenv))
+        stop("'x' is missing the model environment\n",
+             "  -- re-fit or update() with 'model=TRUE'")
     aggregate <- match.arg(aggregate)
-    stopifnot(is.vector(types, mode="numeric"), types %in% 1:nrow(x$qmatrix),
+    stopifnot(is.vector(types, mode="numeric"),
+              types %in% seq_len(modelenv$nTypes),
               !anyDuplicated(types))
 
-    ## model environment
-    modelenv <- environment(x)          # for the functions to be returned
+    ## remove (big) x object from current evaluation environment
     qmatrix <- x$qmatrix                # not part of modelenv
     force(types)                        # evaluate types before rm(x)
     rm(x)                               # don't need this anymore
 
-    ## thisenv <- environment()
-    ## parent.env(thisenv) <- modelenv     # objects of modelenv become visible
-    ## CAVE: The R manual says:
-    ## "The replacement function 'parent.env<-' is extremely dangerous [...].
-    ##  It may be removed in the near future."
-
-    ## we do cheap and nasty model unpacking!
-    ## this is apparently safer than using the parent.env<- hack, and cleaner
-    ## than running the whole code inside with(modelenv,...) since assignments
-    ## then would take place inside modelenv, which would produce garbage
+    ##thisenv <- environment()
+    ##parent.env(thisenv) <- modelenv     # objects of modelenv become visible
+    ## Instead of the above, we do cheap and nasty model unpacking!
+    ## safer than the parent.env<- hack (R manual: "extremely dangerous"), and
+    ## cleaner than running code inside with(modelenv,...) since assignments
+    ## then would take place in modelenv, which would produce garbage
     t0 <- modelenv$t0
     T <- modelenv$T
     histIntervals <- modelenv$histIntervals
@@ -494,8 +348,149 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
     } else function (...) 0
 
     ## return component functions
-    list(hGrid = hInt, hFUN = hIntFUN, eFUN = eInt)
+    list(hGrid = hInt, hFUN = hIntFUN, eFUN = eInt,
+         aggregate = aggregate, types = types)
 }
+
+intensityplot.twinstim <- function (x,
+    which = c("epidemic proportion", "endemic proportion", "total intensity"),
+    aggregate, types, tiles, tiles.idcol, # arguments of intensity.twinstim;
+                                          # defaults are set below
+    plot = TRUE, add = FALSE, tgrid = 101, rug.opts = list(),
+    sgrid = 128, polygons.args = list(), points.args = list(),
+    cex.fun = sqrt, ...)
+{
+    which <- match.arg(which)
+    
+    ## set up desired intensities
+    cl <- match.call()
+    cl <- cl[c(1L, match(names(formals(intensity.twinstim)), names(cl), 0L))]
+    cl[[1]] <- as.name("intensity.twinstim")
+    components <- eval(cl, envir = parent.frame())
+    aggregate <- components$aggregate
+    types <- components$types
+    
+    ## define function to plot
+    FUN <- function (tmp) {}
+    names(formals(FUN)) <- if (aggregate == "time") "times" else "coords"
+    body1 <- if (aggregate == "time") expression(
+        hGrid <- sapply(times, components$hFUN, USE.NAMES=FALSE),
+        eGrid <- sapply(times, components$eFUN, USE.NAMES=FALSE)
+        ) else expression(
+            hGrid <- unname(components$hFUN(coords)), # takes whole coord matrix
+            eGrid <- apply(coords, 1, components$eFUN)
+            )
+    body2 <- switch(which,
+                    "epidemic proportion" = expression(eGrid / (hGrid + eGrid)),
+                    "endemic proportion" = expression(hGrid / (hGrid + eGrid)),
+                    "total intensity" = expression(hGrid + eGrid))
+    body(FUN) <- as.call(c(as.name("{"), c(body1, body2)))
+    
+    if (!plot) return(FUN)
+
+    ## plot the FUN
+    modelenv <- environment(components$eFUN)$modelenv
+    dotargs <- list(...)
+    nms <- names(dotargs)
+    if (aggregate == "time") {
+        ## set up grid of x-values (time points where 'which' will be evaluated)
+        tgrid <- if (isScalar(tgrid)) {
+            seq(modelenv$t0, modelenv$T, length.out=tgrid)
+        } else {
+            stopifnot(is.vector(tgrid, mode="numeric"))
+            sort(tgrid)
+        }
+        
+        ## calculate 'which' on tgrid
+        yvals <- FUN(tgrid)
+        
+        ## plot it
+        if(! "xlab" %in% nms) dotargs$xlab <- "time"
+        if(! "ylab" %in% nms) dotargs$ylab <- which
+        if(! "type" %in% nms) dotargs$type <- "l"
+        if(! "ylim" %in% nms) dotargs$ylim <- {
+            if (which == "total intensity") c(0,max(yvals)) else c(0,1)
+        }
+        do.call(if (add) "lines" else "plot", args=c(alist(x=tgrid, y=yvals), dotargs))
+        if (is.list(rug.opts)) {
+            if (is.null(rug.opts$ticksize)) rug.opts$ticksize <- 0.02
+            if (is.null(rug.opts$quiet)) rug.opts$quiet <- TRUE
+            eventTimes.types <- modelenv$eventTimes[modelenv$eventTypes %in% types]
+            do.call("rug", args = c(alist(x=eventTimes.types), rug.opts))
+        }
+        invisible(FUN)
+    } else {
+        .tiles <- as(tiles, "SpatialPolygons") # we don't need the data here
+        
+        ## set up grid of coordinates where 'which' will be evaluated
+        if (isScalar(sgrid)) {
+            if (!requireNamespace("maptools")) {
+                stop("auto-generation of 'sgrid' requires package \"maptools\"")
+            }
+            sgrid <- maptools::Sobj_SpatialGrid(.tiles, n = sgrid)$SG
+            ## ensure that sgrid has exactly the same proj4string as .tiles
+            ## since CRS(proj4string(.tiles)) might have modified the string
+            sgrid@proj4string <- .tiles@proj4string
+        }
+        sgrid <- as(sgrid, "SpatialPixels")
+        
+        ## only select grid points inside W (tiles)
+        in.tiles <- !is.na(over(sgrid, .tiles))
+        sgrid <- sgrid[in.tiles,]
+        
+        ## calculate 'which' on sgrid
+        yvals <- FUN(coordinates(sgrid))
+        sgridy <- SpatialPixelsDataFrame(sgrid, data=data.frame(yvals=yvals),
+                                         proj4string=.tiles@proj4string)
+
+        ## define sp.layout
+        lobjs <- list()
+        if (is.list(polygons.args)) {
+            nms.polygons <- names(polygons.args)
+            if(! "col" %in% nms.polygons) polygons.args$col <- "darkgrey"
+            lobjs <- c(lobjs,
+                       list(c(list("sp.polygons", .tiles, first=FALSE),
+                              polygons.args)))
+        }
+        if (is.list(points.args)) {
+            eventCoords.types <- modelenv$eventCoords[modelenv$eventTypes %in% types,,drop=FALSE]
+            ## eventCoords as Spatial object with duplicates counted and removed
+            eventCoords.types <- SpatialPoints(eventCoords.types,
+                                               proj4string=.tiles@proj4string,
+                                               bbox = .tiles@bbox)
+            eventCoords.types <- SpatialPointsDataFrame(eventCoords.types,
+                data.frame(mult = multiplicity(eventCoords.types)))
+            eventCoords.types <- eventCoords.types[!duplicated(coordinates(eventCoords.types)),]
+            points.args <- modifyList(list(pch=1, cex=0.5), points.args)
+            pointcex <- cex.fun(eventCoords.types$mult)
+            pointcex <- pointcex * points.args$cex
+            points.args$cex <- NULL
+            lobjs <- c(lobjs,
+                       list(c(list("sp.points", eventCoords.types, first=FALSE,
+                                   cex=pointcex), points.args)))
+        }
+        if ("sp.layout" %in% nms) {
+            if (!is.list(dotargs$sp.layout[[1]])) { # let sp.layout be a list of lists
+                dotargs$sp.layout <- list(dotargs$sp.layout)
+            }
+            lobjs <- c(lobjs, dotargs$sp.layout)
+            dotargs$sp.layout <- NULL
+        }
+
+        ## plotit
+        if (add) message("'add'ing is not possible with 'aggregate=\"space\"'")
+        if (! "xlim" %in% nms) dotargs$xlim <- bbox(.tiles)[1,]
+        if (! "ylim" %in% nms) dotargs$ylim <- bbox(.tiles)[2,]
+        if (! "scales" %in% nms) dotargs$scales <- list(draw = TRUE)
+        do.call("spplot", args=c(alist(sgridy, zcol="yvals", sp.layout=lobjs,
+                          checkEmptyRC=FALSE), dotargs))
+    }
+}
+
+## set default arguments for intensityplot.twinstim from intensity.twinstim
+formals(intensityplot.twinstim)[names(formals(intensity.twinstim))] <-
+    formals(intensity.twinstim)
+
 
 
 ### Plot fitted tiaf or siaf(cbind(0, r)), r=distance
@@ -993,7 +988,7 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
 ### update-method for the twinstim-class
 ## stats::update.default would also work but is not adapted to the specific
 ## structure of twinstim: optim.args (use modifyList), two formulae, model, ...
-## However, this specific method is inspired by and copies parts of the
+## However, this specific method is inspired by and copies small parts of the
 ## update.default method from the stats package developed by The R Core Team
 
 update.twinstim <- function (object, endemic, epidemic, optim.args, model,

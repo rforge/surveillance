@@ -23,11 +23,11 @@
 	   cannot use with duplicate class names (the package may need to be re-installed)
 	   Error: package/namespace load failed for ‘rgeos’
 	   This seems to be related to the fact that rgeos also
-	   contains an implementation of the gpc.poly class. However,
+	   contains an implementation of the gpc.poly class and surveillance
+	   also defines coerce-methods for gpc.poly. For instance,
 	   library("gpclib"); library("maptools"); library("rgeos")
 	   works...
 12/09/2012 more package tests
-15/11/2012 change from GPL-2 to GPL-3 + gpclib-restriction
 
 #Done
 
@@ -130,7 +130,7 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 - implement step function support for interaction kernels
 - allow for spatial "prehistory", i.e. events outside of W as possible sources
   in the epidemic component only, but otherwise not part of the likelihood
-- intensityplot-method for simEpidataCS (through twinstim(*, optim.args=NULL)??)
+
 
 #Done
 06/08/2010 (sebastian): Lambda(t) function, i.e. cumulative intensity function
@@ -143,6 +143,8 @@ xx/07/2012 (sebastian): robustification of optim procedure by making it less
 adaptive (nCub.adaptive can be set to FALSE)
 xx/07/2012 (sebastian): Documentation of functions in Rd files; also update references (Biometrics)
 15/08/2012 (sebastian): added support for fixed parameters
+10/12/2012 (sebastian): intensityplot-method for simEpidataCS passing by
+                        twinstim() with all parameters fixed
 
 
 
