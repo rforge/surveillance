@@ -389,9 +389,9 @@ checkstgrid <- function (stgrid, T)
         eps <- events$eps.s[i]
         center <- eventCoords[i,]
         res[[i]] <- if (eps > ext) {   # influence region is whole region of W
-                as.owin(scale(Wgpc, center = center))
+                gpc2owin(scale(Wgpc, center = center))
             } else {   # influence region is a subset of W
-                as.owin(intersectCircle(Wgpc, center, eps, npoly))
+                gpc2owin(intersectCircle(Wgpc, center, eps, npoly))
             }
         # if influence region actually is a circle of radius eps, attach eps as attribute
         r <- if (eps <= events$.bdist[i]) eps else NULL
@@ -785,7 +785,8 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
             tps <- seq(from = start, to = end, by = time.spacing)
             if (length(tps) > nmax) {
                 message("Generating only the first ",
-                    sQuote("ani.options(\"nmax\")"), " (=", nmax, ") snapshots")
+                        sQuote(if (with.animation) "ani.options(\"nmax\")" else "nmax"),
+                        " (=", nmax, ") snapshots")
                 head(tps, nmax)
             } else tps
         }
@@ -798,7 +799,8 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
         idxs <- which(s$eventTimes >= interval[1] & s$eventTimes <= interval[2])
         if (length(idxs) > nmax) {
             message("Generating only the first ",
-                sQuote("ani.options(\"nmax\")"), " (=", nmax, ") events")
+                    sQuote(if (with.animation) "ani.options(\"nmax\")" else "nmax"),
+                    " (=", nmax, ") events")
             head(idxs, nmax)
         } else idxs
     }

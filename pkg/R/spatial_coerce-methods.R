@@ -30,7 +30,7 @@
 ### component, but these are not necessary.
 
 xylist.owin <- function (object, ...) object$bdry
-xylist.gpc.poly <- function (object, ...) xylist.owin(as.owin(object))
+xylist.gpc.poly <- function (object, ...) xylist.owin(gpc2owin(object))
 xylist.SpatialPolygons <- function (object, ...)
     xylist.owin(maptools::as.owin.SpatialPolygons(object))
 ## for the default method, no transformation is performed, we only check that
@@ -101,7 +101,7 @@ setAs(from = "SpatialPolygons", to = "gpc.poly", def = function (from)
 
 
 ### Method for coercion from "owin" (spatstat) to "gpc.poly" (gpclib)
-### Coercion the other way round is defined in spatstat::as.owin.gpc.poly
+### Coercion the other way round is defined in spatstat::gpc2owin
 
 setAs(from = "owin", to = "gpc.poly", def = function (from)
     {

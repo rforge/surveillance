@@ -65,7 +65,7 @@ importFrom(MASS, mvrnorm)
 ## importClassesFrom(gpclib, gpc.poly)
 ## importMethodsFrom(gpclib, "[", get.bbox, intersect, append.poly, tristrip)
 ## -> we no longer strictly depend on gpclib for clarity of the package license
-importFrom(spatstat, as.owin, as.owin.gpc.poly, coords, coords.ppp, area.owin, distppl,
+importFrom(spatstat, gpc2owin, coords, coords.ppp, area.owin, distppl,
                      as.im.function, disc, shift, shift.owin, plot.owin, plot.im, marks,
                      marks.ppp, markformat.default, # required for runifpoint() in
                                         # simulate.twinstim because spatstat
