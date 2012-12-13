@@ -6,6 +6,20 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.5-1 (2012-12-13)}{
+
+\subsection{SYNOPSIS}{
+  \itemize{
+    \item The \pkg{surveillance} package is again backward-compatible
+    with \R version 2.14.0, which is now declared as the minimum
+    required version.
+  }
+}
+
+}
+
+
+
 \section{Changes in surveillance version 1.5-0 (2012-12-12)}{
 
 \subsection{SYNOPSIS}{
@@ -138,6 +152,7 @@
 }
 
 }
+
 
 
 \section{Changes in surveillance version 1.4-2 (2012-08-17)}{
