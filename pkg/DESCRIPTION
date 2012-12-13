@@ -8,7 +8,7 @@ Author: M. Höhle, S. Meyer and M. Paul
         S. Steiner, M. Virtanen, and V. Wimmer.
         A few code segments are modified versions of code by
         The R Core Team (available under GPL-2).
-Depends: R (>= 2.10.1), grDevices, graphics, stats, utils, xtable, methods, Rcpp, sp
+Depends: R (>= 2.14.0), grDevices, graphics, stats, utils, xtable, methods, Rcpp, sp
 Imports: MASS, Matrix, spatstat (>= 1.17-0)
 LinkingTo: Rcpp
 Suggests: msm, spc, colorspace, animation,
