@@ -205,10 +205,12 @@ setControl <- function (control, stsObj)
   defaultControl <- lapply(CONTROL.hhh4, eval, envir=environment())
   environment(defaultControl$ar$f) <- environment(defaultControl$ne$f) <-
       environment(defaultControl$end$f) <- .GlobalEnv
+  defaultControl$data <- as.list(defaultControl$data) # since we will add stsObj
+  ##<- NROW(stsObj) only works as intended since R 2.15.0, but this is required
+  ##   for adding stsObj to a data.frame; thus we switch to a list
   control <- modifyList(defaultControl, control)
 
-  ## convert data to a list and add stsObj
-  control$data <- as.list(control$data)
+  ## add stsObj (maybe overwrite an old one from the control object)
   control$data$.sts <- stsObj
   
   ## add nTime and nUnits to control list
