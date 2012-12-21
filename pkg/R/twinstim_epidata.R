@@ -852,8 +852,9 @@ plot.epidataCS <- function (x, aggregate = c("time", "space"), subset, ...)
 ## in case t0.Date is specified, hist.Date() is used and breaks must set in ... (e.g. "months")
 
 plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
+    col = "white", add = FALSE,
     xlim = NULL, ylim = NULL, xlab = "Time", ylab = NULL, main = NULL,
-    col = "white", panel.first = abline(h=axTicks(2), lty=2, col="grey"), ...)
+    panel.first = abline(h=axTicks(2), lty=2, col="grey"), ...)
 {
     timeRange <- with(x$stgrid, c(start[1L], stop[length(stop)]))
     eventTimes <- if (missing(subset)) x$events$time else {
@@ -866,6 +867,7 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
         stopifnot(inherits(t0.Date, "Date"))
         t0 <- timeRange[1L]
         if (is.null(xlim)) xlim <- t0.Date + (timeRange - t0)
+        if (missing(xlab)) xlab <- paste0("Time (", list(...)[["breaks"]], ")")
         eventTimes <- t0.Date + as.integer(eventTimes - t0)
         ## we need integer dates here because otherwise, if the last event
         ## occurs on the last day of a month, year, etc. (depending on
@@ -879,15 +881,17 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
     } else {
         hist(eventTimes, plot=FALSE, ...) # warn.unused=FALSE is hard-coded in hist.Date
     }
-    if (is.null(xlim)) xlim <- timeRange
-    if (is.null(ylim)) {
-        ylim <- range(0, histdata[[if (freq) "counts" else "density"]])
+    if (!add) {
+        if (is.null(xlim)) xlim <- timeRange
+        if (is.null(ylim)) {
+            ylim <- range(0, histdata[[if (freq) "counts" else "density"]])
+        }
+        if (is.null(ylab)) {
+            ylab <- if (freq) "Number of cases" else "Density of cases"
+        }
+        plot(x=xlim, y=ylim, xlab=xlab, ylab=ylab, main=main, type="n", bty="n")
+        force(panel.first)
     }
-    if (is.null(ylab)) {
-        ylab <- if (freq) "Number of cases" else "Density of cases"
-    }
-    plot(x=xlim, y=ylim, xlab=xlab, ylab=ylab, main=main, type="n", bty="n")
-    force(panel.first)
     plot(histdata, freq = freq, add = TRUE, col = col, ...)
     box()          # because white filling of bars might overdraw the inital box
     invisible(histdata)

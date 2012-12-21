@@ -6,7 +6,26 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.5-1 (2012-12-13)}{
+\section{Changes in surveillance version 1.5-2 (2012-12-21)}{
+
+\subsection{SYNOPSIS}{
+  \itemize{
+    \item Tiny new features and bug fixes.
+  }
+}
+
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item The temporal \code{plot}-method for class \code{"epidataCS"}
+    now understands the \code{add} parameter to add the histogram to an
+    existing plot window.
+  }
+}
+}
+
+
+
+\section{Changes in surveillance version 1.5-1 (2012-12-14)}{
 
 \subsection{SYNOPSIS}{
   \itemize{

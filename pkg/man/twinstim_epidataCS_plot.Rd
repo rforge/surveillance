@@ -50,10 +50,13 @@ number of events along the time axis (aggregated over space) using
 	using \code{breaks = "months"} or other automatic types always
 	works).}
       \item{freq}{see \code{\link{hist}}, defaults to \code{TRUE}.}
+      \item{col}{fill colour for the bars of the histogram, defaults to
+	\code{"white"}.}
+      \item{add}{logical (\code{FALSE}) indicating if the histogram
+	should be added to an existing plot window.}
       \item{xlim,ylim}{\code{NULL} provides automatic axis limits.}
       \item{xlab,ylab}{axis labels (with sensible defaults).}
       \item{main}{main title of the plot, defaults to \code{NULL}.}
-      \item{col}{fill colour for the bars of the histogram, default to \code{"white"}}
       \item{panel.first}{expression that should be evaluated after the
 	plotting window has been set up but before the histogram is plotted.
 	Defaults to adding horizontal grid lines.}

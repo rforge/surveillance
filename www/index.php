@@ -151,7 +151,7 @@ under the GPL conditions.</li>
 <b>Download:</b>
 <blockquote>
   <blockquote>
-    <blockquote> The <tt>surveillance</tt> package (version 1.5-0) is
+    <blockquote> The <tt>surveillance</tt> package is
 available for download from <a
  href="http://cran.r-project.org/web/packages/surveillance/">CRAN</a>.<br>
 Current package development, help-forum and bugtracking is hosted
