@@ -163,8 +163,8 @@ nbOrder <- function (neighbourhood, maxlag = 1)
     nb.lags <- spdep::nblag(nb, maxlag=maxlag)
 
     ## Side note: fast method to determine neighbours _up to_ specific order:
-    ## crossprod(neighbourhoud) > 0  # second order neighbours (+set diag to 0)
-    ## (neighbourhood %*% neighbourhood %*% neighbourhood) > 0  # order 3
+    ## crossprod(neighbourhoud) > 0  # up to second order neighbours (+set diag to 0)
+    ## (neighbourhood %*% neighbourhood %*% neighbourhood) > 0  # up to order 3
     ## and so on...
 
     ## convert to a single matrix

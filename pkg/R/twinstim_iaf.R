@@ -211,6 +211,7 @@ qlomax <- function (p, scale, shape) {
 
 ## density=FALSE returns standardized Lomax kernel, i.e. f(x) = f_Lomax(x)/f(0),
 ## such that the kernel function starts at 1. f_Lomax(0) = alpha / sigma
+## FIXME: re-parametrise with decay parameter d = alpha + 1
 siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
                         effRangeProb = 0.999, validpars = NULL)
 {

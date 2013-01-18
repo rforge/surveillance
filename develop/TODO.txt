@@ -28,6 +28,7 @@
 	   library("gpclib"); library("maptools"); library("rgeos")
 	   works...
 12/09/2012 more package tests
+           (see http://www.bioconductor.org/developers/unitTesting-guidelines/)
 
 #Done
 
