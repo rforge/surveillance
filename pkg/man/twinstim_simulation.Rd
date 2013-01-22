@@ -249,9 +249,9 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   algorithm is. Often it can be advantageous to sacrifice some detail
   for speed by reducing polygon complexity using, e.g., the
   Douglas and Peucker (1973) reduction method available at
-  \url{MapShaper.org} or as function \code{dp()}
-  in the (slightly outdated) package \pkg{shapefiles}, or by passing by
-  \pkg{spatstat}'s \code{\link[spatstat]{simplify.owin}} procedure.
+  \url{http://MapShaper.org} (Harrower and Bloch, 2006) or as function
+  \code{dp()} in the (slightly outdated) package \pkg{shapefiles}, or by
+  passing by \pkg{spatstat}'s \code{\link[spatstat]{simplify.owin}} procedure.
   
   Note also that generation of \code{"epidataCS"} depends on the
   computation of polygon intersections via the \pkg{gpclib} package,
@@ -266,7 +266,12 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   represent a digitized line or its caricature.
   \emph{Cartographica: The International Journal for Geographic
   Information and Geovisualization}, \bold{10}, 112-122
-  
+
+  Harrower, M. and Bloch, M. (2006):
+  MapShaper.org: A Map Generalization Web Service.
+  \emph{IEEE Computer Graphics and Applications}, \bold{26}(4), 22-27.\cr
+  DOI-Link: \url{http://dx.doi.org/10.1109/MCG.2006.85}
+
   Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2012):
   A space-time conditional intensity model for invasive meningococcal
   disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.\cr
