@@ -2310,7 +2310,7 @@ addSeason2formula <- function(f=~1,       # formula to start with
   # return formula as is if S = 0
   if(max(S) == 0) return(f)
   
-  f <- deparse(f)
+  f <- paste(deparse(f), collapse="")
   # create formula
   if(length(S)==1 && S>0){
     for(i in 1:S){

@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.5-2 (2012-12-21)}{
+\section{Changes in surveillance version 1.5-2 (2013-01-24)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -19,6 +19,10 @@
     \item The temporal \code{plot}-method for class \code{"epidataCS"}
     now understands the \code{add} parameter to add the histogram to an
     existing plot window.
+    \item New argument \code{hide0s} in the \code{plot}-method for class
+    \code{"ah4"}.
+    \item New argument \code{timevar} for \code{addSeason2formula()},
+    which now also works for long formulae.
   }
 }
 }
