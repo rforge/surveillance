@@ -5,7 +5,7 @@
 ###
 ### Spatial helper functions
 ###
-### Copyright (C) 2009-2012 Sebastian Meyer
+### Copyright (C) 2009-2013 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################

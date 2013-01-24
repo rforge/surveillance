@@ -6,7 +6,7 @@
 ### hhh4 is an extended version of algo.hhh for the sts-class
 ### The function allows the incorporation of random effects and covariates.
 ###
-### Copyright (C) 2012 Michaela Paul and Sebastian Meyer
+### Copyright (C) 2010-2013 Michaela Paul and Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################

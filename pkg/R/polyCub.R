@@ -6,7 +6,7 @@
 ### Methods for two-dimensional numerical integration over a polygonal domain
 ### cf. Section 3.2 of my Master's Thesis: http://epub.ub.uni-muenchen.de/11703/
 ###
-### Copyright (C) 2009-2012 Sebastian Meyer
+### Copyright (C) 2009-2013 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ###

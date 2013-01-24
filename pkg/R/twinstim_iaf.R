@@ -5,7 +5,7 @@
 ###
 ### Spatial and temporal interaction functions for twinstim's epidemic component
 ###
-### Copyright (C) 2009-2012 Sebastian Meyer
+### Copyright (C) 2009-2013 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
