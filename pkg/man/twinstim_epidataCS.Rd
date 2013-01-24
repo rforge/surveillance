@@ -1,8 +1,9 @@
 \encoding{latin1}
 \name{twinstim_epidataCS}
 \alias{epidataCS}
-\alias{as.epidataCS} 
+\alias{as.epidataCS}
 \alias{print.epidataCS}
+\alias{nobs.epidataCS}
 \alias{head.epidataCS}
 \alias{tail.epidataCS}
 \alias{[.epidataCS}
@@ -36,6 +37,7 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 
 \method{print}{epidataCS}(x, n = 6L, digits = getOption("digits"), ...)
 
+\method{nobs}{epidataCS}(object, ...)
 \method{head}{epidataCS}(x, n = 6L, ...)
 \method{tail}{epidataCS}(x, n = 6L, ...)
 \method{[}{epidataCS}(x, i, j, drop = FALSE)
@@ -176,36 +178,19 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   The function \code{as.epidataCS} is used to generate objects of class
   \code{"epidataCS"}, which is the data structure that
   \code{\link{twinstim}} models work on.
-  
-  The \code{head} and \code{tail} methods subset the epidemic data using
-  the extraction method (\code{[}), i.e. they return an object of class
-  \code{"epidataCS"}, which only contains (all but) the first/last
-  \code{n} events. The extraction method for class \code{"epidataCS"}
+
+  The extraction method for class \code{"epidataCS"}
   ensures that the subsetted object will be valid, for instance, it
   updates the auxiliary list of potential transmission paths stored
   in the object. This \code{[}-method is also the basis for the
   \code{subset.epidataCS}-method, which is implemented similar to the
   \code{\link{subset.data.frame}}-method.
   
-  The \code{marks.epidataCS} method (of the generic function
-  \code{\link[spatstat]{marks}} defined by the package \pkg{spatstat})
-  returns a \code{data.frame} of the event marks (actually also
-  including time and location of the events), disregarding endemic
-  covariates and the auxiliary columns from the \code{events} component
-  of the \code{"epidataCS"} object.
-
   The \code{print} method for \code{"epidataCS"} prints some metadata
   of the epidemic, e.g., the observation period, the dimensions of the
   spatio-temporal grid, the types of events, and the total number of
   events. By default, it also prints the first \code{n = 6} rows of the
   \code{events}.
-  The \code{summary} method (or its \code{print} method) instead returns
-  the metadata along with a \code{summary} of the \code{events} (by
-  column as for \code{data.frame}s), a summary of the number of
-  potential sources of transmission for each event, and the
-  \code{str}ucture of the \code{counter} element of the \code{summary}
-  output, which is a step function of the number of infectious
-  individuals over time.
 }
 
 \value{
@@ -242,6 +227,28 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   \item{qmatrix}{see the description of the argument. The
     \code{\link{storage.mode}} of the indicator matrix is set to logical
     and the \code{dimnames} are set to the levels of the event types.}
+
+  The \code{nobs}-method returns the number of events.
+
+  The \code{head} and \code{tail} methods subset the epidemic data using
+  the extraction method (\code{[}), i.e. they return an object of class
+  \code{"epidataCS"}, which only contains (all but) the first/last
+  \code{n} events.
+
+  For the \code{"epidataCS"} class, the method of the generic function
+  \code{\link[spatstat]{marks}} defined by the \pkg{spatstat} package
+  returns a \code{data.frame} of the event marks (actually also
+  including time and location of the events), disregarding endemic
+  covariates and the auxiliary columns from the \code{events} component
+  of the \code{"epidataCS"} object.
+
+  The \code{summary} method (which has again a \code{print} method)
+  returns a list of metadata, event data, the tables of tiles and types,
+  a step function of the number of infectious individuals over time
+  (\code{counter}), and the number of
+  potential sources of transmission for each event (\code{nSources})
+  which is based on the given maximum interaction ranges \code{eps.t}
+  and \code{eps.s}.
 }
 
 \note{

@@ -412,12 +412,17 @@ checkstgrid <- function (stgrid, T)
 ######################################################################
 
 
+### Number of events
+
+nobs.epidataCS <- function (object, ...) length(object$events)
+
+
 ### UPDATE eps.s, eps.t, qmatrix OR nCircle2Poly IN AN EXISTING epidataCS OBJECT
 
 # all arguments but 'object' are optional, the ... argument is unused
 update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
 {
-    nEvents <- nrow(object$events@data)
+    nEvents <- nobs(object)
 
     # Check and update eps.t
     if (!missing(eps.t)) {
@@ -599,7 +604,7 @@ print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
     nBlocks <- length(unique(x$stgrid$BLOCK))
     nTiles <- nlevels(x$stgrid$tile)
     typeNames <- levels(x$events$type)
-    nEvents <- nrow(x$events@coords)
+    nEvents <- nobs(x)
     cat("\nHistory of an epidemic\n")
     cat("Observation period:", paste(format(timeRange, trim=TRUE, digits=digits), collapse = " -- "), "\n")
     cat("Observation window (bounding box):", bboxtxt, "\n")

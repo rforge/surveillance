@@ -32,6 +32,8 @@ logLik.twinstim <- function (object, ...)
     r
 }
 
+nobs.twinstim <- function (object, ...) length(object$fitted)
+
 print.twinstim <- function (x, digits = max(3, getOption("digits") - 3), ...)
 {
     cat("\nCall:\n")
@@ -108,27 +110,6 @@ print.summary.twinstim <- function (x,
 #             printCoefmat(x$coefficients.iaf, digits = digits, signif.stars = signif.stars, ...)
 #         }
     } else cat("\nNo epidemic component.\n")
-#     nEvents <- x$nEvents
-#     nh0 <- length(nEvents)
-#     if (nh0 < 2L) {
-#         cat("\nTotal number of infections: ", nEvents, "\n")
-#     } else {
-#         cat("\nBaseline intervals:\n")
-#         intervals <- character(nh0)
-#         for(i in seq_len(nh0)) {
-#             intervals[i] <-
-#             paste("(",
-#                   paste(format(x$intervals[c(i,i+1L)],trim=TRUE), collapse=";"),
-#                   "]", sep = "")
-#         }
-#         names(intervals) <- paste("logbaseline", seq_len(nh0), sep=".")
-#         print.default(rbind("Time interval" = intervals,
-#                             "Number of events" = nEvents),
-#                       quote = FALSE, print.gap = 2)
-#     }
-#     cat("\n", attr(x$aic, "type"), ": ", format(x$aic, digits=max(4, digits+1)),
-#         if (!attr(x$aic, "exact")) "\t(simulated penalty weights)" else "",
-#         sep = "")
     cat("\nAIC: ", format(x$aic, digits=max(4, digits+1)))
     cat("\nLog-likelihood:", format(x$loglik, digits = digits))
     cat("\nNumber of log-likelihood evaluations:", x$counts[1])
@@ -1030,7 +1011,17 @@ update.twinstim <- function (object, endemic, epidemic, optim.args, model,
         }
     }
     if (!missing(endemic))
-        call$endemic <- update(formula(object)$endemic, endemic)
+        if (is.list(formula(object))) # proper case
+            call$endemic <- update(formula(object)$endemic, endemic)
+        else { # update was invoked by step(object)
+            ## dirty hacking such that step() works for endemic-only
+            ## twinstim's, since step() overwrote object$formula with
+            ## terms(endemic) and also added it as call$formula
+            call$formula <- NULL
+            call$endemic <- update(formula(object), endemic)
+            ## Automatically update optim.args$par
+            #optim.args <- list(par=)
+        }
     if (!missing(epidemic))
         call$epidemic <- update(formula(object)$epidemic, epidemic)
     if (!missing(optim.args)) {

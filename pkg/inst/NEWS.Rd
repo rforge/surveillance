@@ -19,6 +19,8 @@
     \item The temporal \code{plot}-method for class \code{"epidataCS"}
     now understands the \code{add} parameter to add the histogram to an
     existing plot window.
+    \item \code{nobs()} methods for classes \code{"epidataCS"} and
+    \code{"twinstim"}.
     \item New argument \code{hide0s} in the \code{plot}-method for class
     \code{"ah4"}.
     \item New argument \code{timevar} for \code{addSeason2formula()},

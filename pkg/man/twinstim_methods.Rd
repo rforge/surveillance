@@ -4,6 +4,7 @@
 \alias{summary.twinstim}
 \alias{vcov.twinstim}
 \alias{logLik.twinstim}
+\alias{nobs.twinstim}
 \alias{print.summary.twinstim}
 \alias{toLatex.summary.twinstim}
 
@@ -14,7 +15,8 @@ Print, Summary and Extraction Methods for \code{"twinstim"} Objects
 \description{
   Besides \code{\link{print}} and \code{\link{summary}} methods there
   are also some standard extraction methods defined for objects of class
-  \code{"twinstim"}: \code{\link{vcov}} and \code{\link{logLik}}. This
+  \code{"twinstim"}: \code{\link{vcov}}, \code{\link{logLik}}, and
+  \code{\link{nobs}}. This
   also enables the use of, e.g., \code{\link{confint}} and
   \code{\link{AIC}}. The model \code{summary} can be exported to LaTeX
   by the corresponding \code{\link{toLatex}} method.
@@ -27,6 +29,7 @@ Print, Summary and Extraction Methods for \code{"twinstim"} Objects
 
 \method{vcov}{twinstim}(object, ...)
 \method{logLik}{twinstim}(object, ...)
+\method{nobs}{twinstim}(object, ...)
 
 \method{print}{summary.twinstim}(x,
       digits = max(3, getOption("digits") - 3), symbolic.cor = x$symbolic.cor,
@@ -89,11 +92,12 @@ Print, Summary and Extraction Methods for \code{"twinstim"} Objects
 
 \value{
   The \code{print} methods return their first argument, invisibly, as
-  they always should. The \code{vcov} and \code{logLik}
+  they always should. The \code{vcov}, \code{logLik}, and \code{nobs}
   methods return the estimated variance-covariance
   matrix of the parameters (here, the inverse of the estimate of the
-  expected Fisher information matrix), and the maximum log-likelihood
-  value of the model, respectively.
+  expected Fisher information matrix), the maximum log-likelihood
+  value of the model, and the number of events (excluding events of the
+  pre-history), respectively.
   The \code{summary} method returns a list containing some summary
   statistics of the model, which is nicely printed by the corresponding
   \code{print} method.
@@ -126,6 +130,7 @@ confint(imdepifit, parm="e.typeC", level=0.95)
 # log-likelihood and AIC of the fitted model
 logLik(imdepifit)
 AIC(imdepifit)
+nobs(imdepifit)
 
 # summary method
 summary(imdepifit, test.iaf=FALSE, correlation=TRUE, symbolic.cor=TRUE)
