@@ -2304,21 +2304,26 @@ newtonRaphson <- function(x,fn,..., control=list(), verbose=FALSE){
 ##############
 addSeason2formula <- function(f=~1,       # formula to start with
                               S=1,         # number of sine/cosine pairs
-                              period=52
+                              period=52,
+                              timevar="t"
                               ){
   # return formula as is if S = 0
   if(max(S) == 0) return(f)
   
   f <- deparse(f)
   # create formula
-  if(max(S)>0 && length(S)==1){
+  if(length(S)==1 && S>0){
     for(i in 1:S){
-      f <- paste(f,"+sin(",2*i,"*pi*t/",period,")+cos(",2*i,"*pi*t/",period,")",sep="")
+      f <- paste0(f,
+                  " + sin(",2*i,"*pi*",timevar,"/",period,")",
+                  " + cos(",2*i,"*pi*",timevar,"/",period,")")
     }
   } else {
     for(i in 1:max(S)){
       which <- paste(i <= S,collapse=",")
-      f <- paste(f,"+ fe( sin(",2*i,"*pi*t/",period,"), which=c(",which,")) + fe( cos(",2*i,"*pi*t/",period,"), which=c(",which,"))",sep="")
+      f <- paste0(f,
+                  " + fe( sin(",2*i,"*pi*",timevar,"/",period,"), which=c(",which,"))",
+                  " + fe( cos(",2*i,"*pi*",timevar,"/",period,"), which=c(",which,"))")
     }
   }
   return(as.formula(f, env=.GlobalEnv))
