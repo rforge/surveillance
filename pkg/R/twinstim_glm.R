@@ -41,6 +41,7 @@ glm.epidataCS <- function (data, formula = NULL)
     weights <- with(data$stgrid, nTypes * (stop-start) * area)
 
     ## Poisson-GLM
+    environment(formula) <- environment() # -> nEvents and weights are visible
     glm(update(formula, nEvents/weights ~ .), data=data$stgrid,
         family=poisson, weights=weights)
 }
