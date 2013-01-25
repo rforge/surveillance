@@ -21,6 +21,9 @@
     existing plot window.
     \item \code{nobs()} methods for classes \code{"epidataCS"} and
     \code{"twinstim"}.
+    \item New argument \code{verbose} for \code{twinstim()} which, if
+    set to \code{FALSE}, disables the printing of information messages
+    during execution.
     \item New argument \code{hide0s} in the \code{plot}-method for class
     \code{"ah4"}.
     \item New argument \code{timevar} for \code{addSeason2formula()},

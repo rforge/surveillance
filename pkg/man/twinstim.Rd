@@ -18,7 +18,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
          na.action = na.fail, partial = FALSE,
          control.siaf = list(F = list(), Deriv = list()),
          optim.args, finetune = FALSE,
-         model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE)
+         model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE, verbose = TRUE)
 }
 
 \arguments{
@@ -107,7 +107,9 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     (thus, if used, \code{optim.args$control$fnscale} should be
     positive). The \code{hessian} argument defaults to \code{TRUE} and
     in the \code{control} list, \code{trace}ing is enabled with
-    \code{REPORT=5} by default. 
+    \code{REPORT=5} by default. By setting
+    \code{optim.args$control$trace = 0}, all output from the
+    optimization routine is suppressed.
 
     For the \code{partial} likelihood, the analytic score function and
     the Fisher information are not implemented and the default is to use
@@ -179,6 +181,10 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   \item{cumCIF.pb}{
     logical indicating if a progress bar should be shown
     during the calculation of \code{cumCIF}. Defaults to \code{TRUE}.
+  }
+  \item{verbose}{
+    logical indicating if information should be printed during
+    execution. Defaults to \code{TRUE}.
   }
 }
 
