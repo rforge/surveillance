@@ -5,7 +5,7 @@
 ###
 ### Some internal helper functions for "twinstim".
 ###
-### Copyright (C) 2009-2012 Sebastian Meyer
+### Copyright (C) 2009-2013 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -126,6 +126,15 @@ gridcellOfEvent <- function (t, tilename, stgrid)
     }
 }
 
+
+## Crude estimate for a start value of the endemic intercept
+## assuming the model only had a single-cell endemic component
+## (rate of homogeneous Poisson process scaled for the offset)
+crudebeta0 <- function (nEvents, offset.mean, W.area, period, nTypes)
+{
+    ## nEvents = exp(offset + beta0) * W.area * period * nTypes
+    log(nEvents/W.area/period/nTypes) - offset.mean
+}
 
 
 ### Really internal helper function, which constructs the function that
