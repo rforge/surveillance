@@ -189,7 +189,7 @@ toLatex.summary.twinstim <- function (object, digits = max(3, getOption("digits"
 {
 ret <- capture.output({
     cat("\\begin{tabular}{", align, "}\n\\hline\n", sep="")
-    cat(" & Estimate & Std. Error & $z$ value & $\\P(|Z|>|z|)$ \\\\\n\\hline\n\\hline\n")
+    cat(" & Estimate & Std. Error & $z$ value & $P(|Z|>|z|)$ \\\\\n\\hline\n\\hline\n")
 
     tabh <- object$coefficients.beta
     tabe <- rbind(object$coefficients.gamma, object$coefficients.iaf)
@@ -206,7 +206,7 @@ ret <- capture.output({
             con <- textConnection(tab_char)
             tab2 <- read.table(con, colClasses="character")
             close(con)
-            rownames(tab2) <- paste0("\\texttt{",tab2[,1],"}")
+            rownames(tab2) <- paste0("\\texttt{",gsub("_","\\\\_",tab2[,1]),"}")
             tab2 <- tab2[,-1]
             tab2[] <- lapply(tab2, function(x) {
                 ifelse(is.na(x), "", paste0("$",x,"$")) # (test.iaf=FALSE)
@@ -1014,7 +1014,8 @@ update.twinstim <- function (object, endemic, epidemic, optim.args, model,
 {
     call <- object$call
     thiscall <- match.call(expand.dots=FALSE)
-
+    extras <- thiscall$...
+    
     ## If invoked through step(), call$formula has been set to terms(object)
     call$formula <- NULL
     ## Furthermore, object$formula has been overwritten with terms(object),
@@ -1079,8 +1080,14 @@ update.twinstim <- function (object, endemic, epidemic, optim.args, model,
     ## Set initial values (will be appropriately subsetted and/or extended with
     ## zeroes inside twinstim())
     call$start <- if (use.estimates) coef(object) else call$optim.args$par
-    call$optim.args$par <- NULL
-    extras <- thiscall$...
+    if ("start" %in% names(extras)) {
+        call$start <- call("c", call$start, extras$start)
+        ##<- if names appear both in the first and second set, the last
+        ##   occurrence will be chosen in twinstim()
+        extras$start <- NULL
+    }
+    if (missing(optim.args) || !"par" %in% names(optim.args))
+        call$optim.args$par <- NULL
     ## CAVE: the remainder is copied from stats::update.default (as at R-2.15.0)
     if(length(extras)) {
 	existing <- !is.na(match(names(extras), names(call)))

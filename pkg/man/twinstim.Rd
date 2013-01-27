@@ -17,7 +17,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
          subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
          na.action = na.fail, start = NULL, partial = FALSE,
          control.siaf = list(F = list(), Deriv = list()),
-         optim.args, finetune = FALSE,
+         optim.args = list(), finetune = FALSE,
          model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE, verbose = TRUE)
 }
 
@@ -130,7 +130,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     Initial values for the parameters may be given as list element
     \code{par} in the order \code{(endemic, epidemic, siaf, tiaf)}.
     If no initial values are provided, a crude estimate for the endemic
-    intercept will be used, but only zeroes for the remaining parameters.
+    intercept will be used (see the Examples),
+    but just zeroes for the remaining parameters.
     However, any initial values given in the \code{start} argument
     take precedence over those in \code{par}.
     
@@ -335,9 +336,10 @@ data("imdepi")
 
 ### first, fit a simple endemic-only model
 
-## As a start value for the endemic intercept use the crude estimate
-## assuming the model only had a single-cell endemic component
-## (rate of homogeneous Poisson process scaled for population density)
+## Calculate initial value for the endemic intercept (the crude estimate
+## which is used by default if no initial value is supplied).
+## Assume the model only had a single-cell endemic component
+## (rate of homogeneous Poisson process scaled for population density):
 popdensity.overall <- with(subset(imdepi$stgrid, BLOCK == 1),
     weighted.mean(popdensity, area))
 popdensity.overall   # pop. density in Germany is ~230 inhabitants/km^2
@@ -347,7 +349,7 @@ W.area               # area of Germany is about 357100 km^2
 sum(sapply(imdepi$W@polygons, slot, "area"))
 # which here is not exactly the case because of polygon simplification
 
-## start value for the endemic intercept
+## initial value for the endemic intercept
 h.intercept <- with(summary(imdepi),
     log(nEvents/popdensity.overall/diff(timeRange)/W.area))
 
@@ -356,7 +358,7 @@ m_noepi <- twinstim(
     endemic = ~ 1 + offset(log(popdensity)) + I(start/365) +
                 sin(start * 2 * pi/365) + cos(start * 2 * pi/365),
     data = imdepi, subset = !is.na(agegrp),
-    optim.args = list(par=c(h.intercept,rep(0,3)),
+    optim.args = list(par=c(h.intercept,rep(0,3)), # this is the default
                       method="nlminb", control = list(trace=1)),
     model = FALSE, cumCIF = FALSE   # for reasons of speed
 )
@@ -368,9 +370,7 @@ summary(m_noepi)
 if (surveillance.options("allExamples"))
 {
   ## type-dependent endemic intercept?
-  m_noepi_type <- update(m_noepi,
-                         endemic = ~(1|type) + .,
-                         optim.args=list(par=coef(m_noepi)[c(1,1:4)]))
+  m_noepi_type <- update(m_noepi, endemic = ~(1|type) + .)
   summary(m_noepi_type)
   
   # LR-test for a type-dependent intercept in the endemic-only model
@@ -382,15 +382,13 @@ if (surveillance.options("allExamples"))
 ### assuming uniform dispersal in time and space up to a distance of
 ### eps.s = 200 km and eps.t = 30 days (see summary(imdepi))
 
-m0 <- update(m_noepi, epidemic = ~1,
-             optim.args = list(par=c(coef(m_noepi),-18)), model = TRUE)
+m0 <- update(m_noepi, epidemic=~1, start=c("e.(Intercept)"=-18), model=TRUE)
 
 \dontrun{
 ## NOTE: in contrast to using nlminb() optim's BFGS would miss the
 ##       likelihood maximum wrt the epidemic intercept if starting at -10
-m0_BFGS <- update(m_noepi, epidemic = ~1,
-                  optim.args = list(par=c(coef(m_noepi),-10),
-                                    method="BFGS"))
+m0_BFGS <- update(m_noepi, epidemic=~1, start=c("e.(Intercept)"=-10),
+                  optim.args = list(method="BFGS"))
 format(cbind(coef(m0), coef(m0_BFGS)), digits=3, scientific=FALSE)
 m0_BFGS$fisherinfo   # singular Fisher information matrix here
 m0$fisherinfo
@@ -444,8 +442,8 @@ if (surveillance.options("allExamples"))
 
   m1 <- update(m0,
       siaf = siaf.gaussian(1, F.adaptive = TRUE),
-      optim.args = list(par=c(coef(m0), 2.8),  # exp(2.8) = sigma = 16 km
-                        fixed="e.siaf.1"),
+      start = c("e.siaf.1" = 2.8),  # exp(2.8) = sigma = 16 km
+      optim.args = list(fixed="e.siaf.1"),
                         # for reasons of speed of the example, the siaf
                         # parameter log(sigma) is fixed to 2.8 here
       control.siaf = list(F=list(adapt=0.25)) # use adaptive eps=sigma/4
@@ -458,10 +456,7 @@ if (surveillance.options("allExamples"))
 
   ### add epidemic covariates
 
-  m2 <- update(m1,
-      epidemic = ~ 1 + type + agegrp,
-      optim.args = list(par=c(coef(m0), 0, 0, 0, coef(m1)["e.siaf.1"]))
-  )
+  m2 <- update(m1, epidemic = ~ 1 + type + agegrp)
   
   AIC(m1, m2)   # further improvement
   summary(m2)

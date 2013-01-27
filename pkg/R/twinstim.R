@@ -15,7 +15,8 @@
 twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     data, subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
     na.action = na.fail, start = NULL, partial = FALSE,
-    control.siaf = list(F=list(), Deriv=list()), optim.args, finetune = FALSE,
+    control.siaf = list(F=list(), Deriv=list()),
+    optim.args = list(), finetune = FALSE,
     model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE, verbose = TRUE)
 {
 
@@ -828,11 +829,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
     ### Check that optim.args is a list or NULL
 
-    if (missing(optim.args) || (!is.list(optim.args) && !is.null(optim.args))) {
-        stop("'optim.args' must be a list or NULL")
-    }
-
-    if (is.null(optim.args)) {          # no optimisation requested
+    if (is.null(optim.args)) {  # no optimisation requested
         setting <- functions
         on.exit(rm(setting), add = TRUE)
         # Append model information
@@ -845,7 +842,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         # Return settings
         if (verbose) message("optimization skipped (returning functions in data environment)")
         return(setting)
-    }
+    } else if (!is.list(optim.args)) stop("'optim.args' must be a list or NULL")
 
 
     ### Check initial value for theta
