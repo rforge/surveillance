@@ -14,7 +14,7 @@
 
 twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     data, subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
-    na.action = na.fail, partial = FALSE,
+    na.action = na.fail, start = NULL, partial = FALSE,
     control.siaf = list(F=list(), Deriv=list()), optim.args, finetune = FALSE,
     model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE, verbose = TRUE)
 {
@@ -42,12 +42,13 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     # Clean the model environment when exiting the function
     on.exit(suppressWarnings(rm(cl, cumCIF, cumCIF.pb, data, doHessian,
         eventDists, eventsData, finetune, neghess, fisherinfo, fit, fixed,
-        functions, globalEndemicIntercept, inmfe, initpars, ll, negll, loglik,
+        functions, globalEndemicIntercept, h.Intercept, inmfe, initpars,
+        ll, negll, loglik, 
         mfe, mfhEvents, mfhGrid, model, my.na.action, na.action, namesOptimUser,
         namesOptimArgs, nlminbControl, nlminbRes, nlmObjective, nlmControl,
         nlmRes, nmRes, optim.args, optimArgs, control.siaf,
         optimMethod, optimRes, optimRes1, optimValid, partial,
-        partialloglik, ptm, qmatrix, res, negsc, score, subset, tmpexpr,
+        partialloglik, ptm, qmatrix, res, negsc, score, start, subset, tmpexpr,
         typeSpecificEndemicIntercept, useScore, verbose, whichfixed, 
         inherits = FALSE)))
 
@@ -846,22 +847,29 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         return(setting)
     }
 
-    
-    ### Check start value for theta
 
-    if (is.null(optim.args[["par"]])) {
-        stop("start values of parameters must be specified as 'optim.args$par'")
-    }
-    if (!is.vector(optim.args$par, mode="numeric")) {
-        stop("'optim.args$par' must be a numeric vector")
-    }
-    if (length(optim.args$par) != npars) {
-        stop(gettextf(paste("'optim.args$par' (%d) does not have the same",
-             "length as the number of unknown parameters (%d)"),
-             length(optim.args$par), npars))
+    ### Check initial value for theta
+
+    if (is.null(optim.args[["par"]])) { # set naive defaults
+        h.Intercept <- crudebeta0(
+            nEvents = Nin, offset.mean = weighted.mean(offsetGrid, ds),
+            W.area = sum(ds[gridBlocks==histIntervals[1,"BLOCK"]]),
+            period = T-t0, nTypes = nTypes
+                       )
+        optim.args$par <- c(rep.int(h.Intercept, nbeta0),
+                            rep.int(0, npars - nbeta0))
+    } else { # check validity of par-specification
+        if (!is.vector(optim.args$par, mode="numeric")) {
+            stop("'optim.args$par' must be a numeric vector")
+        }
+        if (length(optim.args$par) != npars) {
+            stop(gettextf(paste("'optim.args$par' (%d) does not have the same",
+                                "length as the number of unknown parameters (%d)"),
+                          length(optim.args$par), npars))
+        }
     }
     
-    # Set names for theta
+    ## Set names for theta
     names(optim.args$par) <- c(
         if (nbeta0 > 1L) {
             paste0("h.type",typeNames)
@@ -871,6 +879,21 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         if (hassiafpars) paste("e.siaf",1:nsiafpars,sep="."),
         if (hastiafpars) paste("e.tiaf",1:ntiafpars,sep=".")
     )
+
+    ## values in "start" overwrite initial values given by optim.args$par
+    if (is.list(start)) { # convert allowed list specification to vector
+        stopifnot(names(start) %in% c("endemic", "epidemic", "h", "e",
+                                      "siaf", "tiaf", "e.siaf", "e.tiaf"))
+        names(start)[names(start) == "endemic"] <- "h"
+        names(start)[names(start) == "epidemic"] <- "e"
+        names(start)[names(start) == "siaf"] <- "e.siaf"
+        names(start)[names(start) == "tiaf"] <- "e.tiaf"
+        start <- unlist(start, use.names=TRUE)
+    }
+    if (is.vector(start, mode="numeric")) {
+        start <- start[names(start) %in% names(optim.args$par)]
+        optim.args$par[names(start)] <- start
+    }
 
 
     ### Fixed parameters during optimization

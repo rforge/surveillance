@@ -15,7 +15,7 @@
 \usage{
 twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
          subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
-         na.action = na.fail, partial = FALSE,
+         na.action = na.fail, start = NULL, partial = FALSE,
          control.siaf = list(F = list(), Deriv = list()),
          optim.args, finetune = FALSE,
          model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE, verbose = TRUE)
@@ -81,6 +81,28 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     \code{\link{na.pass}}. Missing values in the spatio-temporal grid
     \code{data$stgrid} are not accepted.
   }
+  \item{start}{
+    a named vector of initial values for (a subset of) the parameters.
+    The names must conform to the conventions of \code{twinstim} to be
+    assigned to the correct model terms. For instance,
+    \code{"h.(Intercept)"} = endemic intercept,
+    \code{"h.I(start/365)"} = coefficient of a linear time
+    trend in the endemic component, \code{"h.factorB"} =
+    coefficient of the level B of the factor variable \code{factor} in
+    the endemic predictor, \code{"e.(Intercept)"} = epidemic intercept,
+    \code{"e.VAR"} = coefficient of the epidemic term \code{VAR},
+    \code{"e.siaf.2"} = second \code{siaf} parameter,
+    \code{"e.tiaf.1"} = first \code{tiaf} parameter.
+    Elements which don't match any of the model parameters are ignored.
+
+    Alternatively, \code{start} may also be a named list with elements
+    \code{"endemic"} or \code{"h"}, \code{"epidemic"} or \code{"e"},
+    \code{"siaf"} or \code{"e.siaf"}, and \code{"tiaf"} or \code{"e.tiaf"},
+    each of which containing a named numeric vector with the term labels
+    as names (i.e. without the prefix \code{"h."}, \code{"e."}, etc).
+    Thus, \code{start=list(endemic=c("(Intercept)"=-10))} is equivalent
+    to \code{start=c("h.(Intercept)"=-10)}.
+  }
   \item{partial}{
     logical indicating if a partial likelihood similar to the approach
     by Diggle et al. (2010) should be used (default is \code{FALSE}).
@@ -100,11 +122,20 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     unspecified).
   }
   \item{optim.args}{
-    \code{NULL} or an argument list passed to \code{\link{optim}} containing
-    at least the element \code{par}, the start values of the parameters in
-    the order \code{par = c(endemic, epidemic, siaf, tiaf)}.
-    Note that \code{optim} receives the negative log-likelihood for minimization
-    (thus, if used, \code{optim.args$control$fnscale} should be
+    an argument list passed to \code{\link{optim}}, or \code{NULL}, in
+    which case no optimization will be performed
+    but the necessary functions will be returned in a list (similar to
+    what is returned if \code{model = TRUE}).
+
+    Initial values for the parameters may be given as list element
+    \code{par} in the order \code{(endemic, epidemic, siaf, tiaf)}.
+    If no initial values are provided, a crude estimate for the endemic
+    intercept will be used, but only zeroes for the remaining parameters.
+    However, any initial values given in the \code{start} argument
+    take precedence over those in \code{par}.
+    
+    Note that \code{optim} receives the negative log-likelihood for 
+    minimization (thus, if used, \code{optim.args$control$fnscale} should be
     positive). The \code{hessian} argument defaults to \code{TRUE} and
     in the \code{control} list, \code{trace}ing is enabled with
     \code{REPORT=5} by default. By setting
@@ -117,12 +148,10 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     
     There may be an extra component \code{fixed} in the
     \code{optim.args} list, which determines which parameters should stick
-    to their initial (\code{par}) values. This can be specified by a
+    to their initial values. This can be specified by a
     logical vector of the same length as the \code{par} component, by an
     integer vector indexing \code{par} or by a character vector following
-    the \code{twinstim} naming conventions (e.g. \code{"h.(Intercept)"} for
-    the endemic intercept, \code{"e.siaf.1"} for the first \code{siaf}
-    parameter).
+    the \code{twinstim} naming conventions.
     
     Importantly, the \code{method} argument in the \code{optim.args}
     list may also be \code{"nlminb"}, in 
@@ -146,11 +175,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     approximation is used).
 
     Similary, \code{method="nlm"} should also work but is not
-    recommended here.
-    
-    If \code{optim.args} is \code{NULL}, then no optimization will be performed
-    but the necessary functions will be returned in a list (similar to what is
-    returned if \code{model = TRUE}).
+    recommended here.    
   }
   \item{finetune}{
     logical indicating if a second maximisation should be performed with
