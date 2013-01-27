@@ -61,7 +61,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     W <- as(W, "SpatialPolygons")
     stopifnot(identical(proj4string(W), proj4string(events)))
     W.area <- sum(sapply(W@polygons, slot, "area"))
-    tiles.totalarea <- sum(base::subset(stgrid, BLOCK == 1, "area", drop=TRUE))
+    tiles.totalarea <- sum(stgrid$area[stgrid$BLOCK == 1])
     if (abs(W.area - tiles.totalarea) / max(W.area, tiles.totalarea) > 0.005) {
         cat("\tArea of 'W' =", W.area, "\n")
         cat("\tTotal area of the tiles in 'stgrid' =", tiles.totalarea, "\n")

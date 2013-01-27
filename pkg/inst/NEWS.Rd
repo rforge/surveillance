@@ -6,11 +6,11 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.5-2 (2013-01-24)}{
+\section{Changes in surveillance version 1.5-2 (2013-01-27)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
-    \item Tiny new features and bug fixes.
+    \item Some new features and bug fixes.
   }
 }
 
@@ -24,6 +24,19 @@
     \item New argument \code{verbose} for \code{twinstim()} which, if
     set to \code{FALSE}, disables the printing of information messages
     during execution.
+    \item New argument \code{start} for \code{twinstim()}, where (some)
+    initial parameter values may be provided, which overwrite those in
+    \code{optim.args$par}, which is no longer required (as a naive
+    default, a crude estimate for the endemic intercept and zeroes for
+    the other parameters are used).
+    \item Implemented \code{terms()} and \code{extractAIC()} methods for 
+    class \code{"twinstim"}, which enable the use of \code{step()} for the
+    endemic component.
+    \item The \code{update.twinstim()} method now by default uses the
+    parameter estimates from the previous model as initial values for
+    the new fit (new argument \code{use.estimates = TRUE}).
+    \item \code{as.epidataCS()} checks for consistency of the area of
+    \code{W} and the (now really obligatory) area column in \code{stgrid}.
     \item New argument \code{hide0s} in the \code{plot}-method for class
     \code{"ah4"}.
     \item New argument \code{timevar} for \code{addSeason2formula()},

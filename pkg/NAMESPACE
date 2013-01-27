@@ -15,7 +15,7 @@ import(grDevices, graphics)
 
 ## required generics (that's why we "Depend" on these packages)
 importFrom(stats, coef, vcov, logLik, nobs, residuals, confint, AIC, extractAIC,
-           profile, simulate, update)
+           profile, simulate, update, update.formula, terms.formula)
 importFrom(utils, head, tail, toLatex)
 importFrom(xtable, xtable) # if we wouldn't "Depend" on xtable, our
                            # xtable-methods would not be useable except if the
@@ -262,6 +262,7 @@ export(intensityplot.twinstim)          # for convenience
 S3method(profile, twinstim)
 S3method(vcov, twinstim)
 S3method(logLik, twinstim)
+S3method(extractAIC, twinstim)
 S3method(nobs, twinstim)
 S3method(simulate, twinstim)
 export(simulate.twinstim)               # for convenience
@@ -269,6 +270,7 @@ S3method(R0, twinstim)
 S3method(residuals, twinstim)
 S3method(update, twinstim)
 export(update.twinstim)                 # for convenience
+S3method(terms, twinstim)
 
 S3method(R0, simEpidataCS)
 S3method(intensityplot, simEpidataCS)

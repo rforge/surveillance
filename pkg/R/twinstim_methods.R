@@ -6,7 +6,7 @@
 ### Methods for objects of class "twinstim", specifically:
 ### vcov, logLik, print, summary, plot (intensity, iaf), R0, residuals, update
 ###
-### Copyright (C) 2009-2012 Sebastian Meyer
+### Copyright (C) 2009-2013 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -18,12 +18,38 @@
 ##     object$coefficients
 ## }
 
-# asymptotic variance-covariance matrix (inverse of fisher information matrix)
+### but a method to extract the coefficients in a list might be useful
+## "npars" is a named vector or list, where each element states the number of
+## coefficients in a group of coefficients.
+coeflist <- function (coefs, npars)
+{
+    coeflist <- vector("list", length(npars))
+    names(coeflist) <- names(npars)
+    csum <- c(0L,cumsum(npars))
+    for (i in seq_along(coeflist)) {
+        coeflist[[i]] <- coefs[seq.int(from=csum[i]+1L, length.out=npars[[i]])]
+    }
+    coeflist
+}
+
+## extended and twinstim-specific version,
+## which renames elements and unions nbeta0 and p as "endemic"
+mycoeflist <- function (coefs, npars)
+{
+    coeflist <- coeflist(coefs, npars)
+    coeflist <- c(list(c(coeflist[[1]], coeflist[[2]])), coeflist[-(1:2)])
+    names(coeflist) <- c("endemic", "epidemic", "siaf", "tiaf")
+    coeflist
+}
+
+
+## asymptotic variance-covariance matrix (inverse of fisher information matrix)
 vcov.twinstim <- function (object, ...)
 {
     solve(object$fisherinfo)  # inverse of estimated expected fisher information
 }
 
+## Extract log-likelihood of the model (which also enables the use of AIC())
 logLik.twinstim <- function (object, ...)
 {
     r <- object$loglik
@@ -32,8 +58,19 @@ logLik.twinstim <- function (object, ...)
     r
 }
 
+## Also define an extractAIC-method to make step() work
+extractAIC.twinstim <- function (fit, scale, k = 2, ...)
+{
+    loglik <- logLik(fit)
+    edf <- attr(loglik, "df")
+    penalty <- k * edf
+    c(edf = edf, AIC = -2 * c(loglik) + penalty)            
+}
+
+## Number of events (excluding the pre-history)
 nobs.twinstim <- function (object, ...) length(object$fitted)
 
+## print-method
 print.twinstim <- function (x, digits = max(3, getOption("digits") - 3), ...)
 {
     cat("\nCall:\n")
@@ -973,17 +1010,27 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
 ## update.default method from the stats package developed by The R Core Team
 
 update.twinstim <- function (object, endemic, epidemic, optim.args, model,
-                             ..., evaluate = TRUE)
+                             ..., use.estimates = TRUE, evaluate = TRUE)
 {
     call <- object$call
     thiscall <- match.call(expand.dots=FALSE)
+
+    ## If invoked through step(), call$formula has been set to terms(object)
+    call$formula <- NULL
+    ## Furthermore, object$formula has been overwritten with terms(object),
+    ## but there is currently no need to correct this (via:)
+    ## if (!is.list(formula(object))) {
+    ##     formulaParts <- c("endemic", "epidemic", "siaf", "tiaf")
+    ##     object$formula <- as.list(call)[formulaParts]
+    ##     names(object$formula) <- formulaParts
+    ## }
 
     if (!missing(model)) {
         call$model <- model
         ## Special case: update model component only
         if (evaluate &&
             all(names(thiscall)[-1] %in% c("object", "model", "evaluate"))) {
-            if (model) {                # add model environment
+            if (model) { # add model environment
                 call$optim.args$par <- coef(object)
                 call$optim.args$fixed <- seq_along(coef(object))
                 call$cumCIF <- FALSE
@@ -1000,7 +1047,7 @@ update.twinstim <- function (object, endemic, epidemic, optim.args, model,
                 environment(object) <- environment(objectWithModel)
                 ## re-add class attribute (dropped on re-ordering)
                 class(object) <- "twinstim"
-            } else {                    # remove model environment
+            } else { # remove model environment
                 environment(object$formula$epidemic) <-
                     environment(object$formula$endemic) <- .GlobalEnv
                 object$functions <- NULL
@@ -1011,19 +1058,14 @@ update.twinstim <- function (object, endemic, epidemic, optim.args, model,
         }
     }
     if (!missing(endemic))
-        if (is.list(formula(object))) # proper case
-            call$endemic <- update(formula(object)$endemic, endemic)
-        else { # update was invoked by step(object)
-            ## dirty hacking such that step() works for endemic-only
-            ## twinstim's, since step() overwrote object$formula with
-            ## terms(endemic) and also added it as call$formula
-            call$formula <- NULL
-            call$endemic <- update(formula(object), endemic)
-            ## Automatically update optim.args$par
-            #optim.args <- list(par=)
+        call$endemic <- if (is.null(call$endemic)) endemic else {
+            update.formula(call$endemic, endemic)
+            ##<- update.formula did simplify but order of terms is retained
         }
     if (!missing(epidemic))
-        call$epidemic <- update(formula(object)$epidemic, epidemic)
+        call$epidemic <- if (is.null(call$epidemic)) epidemic else {
+            update.formula(call$epidemic, epidemic)
+        }
     if (!missing(optim.args)) {
         oldargs <- call$optim.args
         call$optim.args <- if (is.list(optim.args)) {
@@ -1034,6 +1076,10 @@ update.twinstim <- function (object, endemic, epidemic, optim.args, model,
             }
         } else thiscall$optim.args
     }
+    ## Set initial values (will be appropriately subsetted and/or extended with
+    ## zeroes inside twinstim())
+    call$start <- if (use.estimates) coef(object) else call$optim.args$par
+    call$optim.args$par <- NULL
     extras <- thiscall$...
     ## CAVE: the remainder is copied from stats::update.default (as at R-2.15.0)
     if(length(extras)) {
@@ -1047,4 +1093,15 @@ update.twinstim <- function (object, endemic, epidemic, optim.args, model,
     }
     if(evaluate) eval(call, parent.frame())
     else call
+}
+
+## needed for step(), add1(), drop1()
+terms.twinstim <- function (x, component=c("endemic", "epidemic"), ...)
+{
+    if (is.list(x$formula)) { # proper case
+        component <- match.arg(component)
+        terms.formula(x$formula[[component]], keep.order=TRUE)
+    } else { # called through step(), which replaced x$formula by terms(x)
+        terms.formula(x$formula, keep.order=TRUE)
+    }
 }
