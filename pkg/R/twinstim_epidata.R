@@ -56,20 +56,29 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     cat("Checking 'stgrid':\n")
     stgrid <- checkstgrid(stgrid, T)
 
+    # Check class and proj4string of W and consistency of area
+    cat("Checking 'W'...\n")
+    W <- as(W, "SpatialPolygons")
+    stopifnot(identical(proj4string(W), proj4string(events)))
+    W.area <- sum(sapply(W@polygons, slot, "area"))
+    tiles.totalarea <- sum(base::subset(stgrid, BLOCK == 1, "area", drop=TRUE))
+    if (abs(W.area - tiles.totalarea) / max(W.area, tiles.totalarea) > 0.005) {
+        cat("\tArea of 'W' =", W.area, "\n")
+        cat("\tTotal area of the tiles in 'stgrid' =", tiles.totalarea, "\n")
+        warning("area of 'W' should be consistent with the ",
+                "total area of the tiles in 'stgrid'")
+    }
+    
     # Check qmatrix
     cat("Checking 'qmatrix'...\n")
     typeNames <- levels(events$type)
     nTypes <- length(typeNames)
     qmatrix <- checkQ(qmatrix, typeNames)
 
-    cat("Checking 'W' and 'nCircle2Poly'...\n")
-    # Check class and proj4string of W
-    W <- as(W, "SpatialPolygons")
-    stopifnot(identical(proj4string(W), proj4string(events)))
     # Check nCircle2Poly
     stopifnot(isScalar(nCircle2Poly))
     nCircle2Poly <- as.integer(nCircle2Poly)
-
+    
     # Small helper function converting event index to (time, tile) string
     eventidx2string <- function (eventIdx) {
         paste(c("time", "tile", "type"), "=",
@@ -266,16 +275,6 @@ checkstgrid <- function (stgrid, T)
     # Check class
     stopifnot(inherits(stgrid, "data.frame"))
 
-    # Check existence of area column
-    cat("\tChecking 'area' column... ")
-    stgrid$area <- if ("area" %in% names(stgrid)) {
-                     as.numeric(stgrid$area)
-                   } else {
-                     cat("Setting 'area' to 1 for all grid cells.")
-                     1
-                   }
-    cat("\n")
-
     # Check obligatory columns
     autostop <- FALSE
     if (is.null(stgrid[["stop"]])) {
@@ -301,13 +300,16 @@ checkstgrid <- function (stgrid, T)
         stgrid <- stgrid[-reservedColsIdx]
     }
 
-    # Transform tile into a factor variable (also removing unused levels if it was a factor)
+    # Transform tile into a factor variable
+    # (also removing unused levels if it was a factor)
     cat("\tConverting 'tile' into a factor variable...\n")
     stgrid$tile <- factor(stgrid$tile)
 
-    # Transform start times into numeric variable
+    # Transform start times and area into numeric variables
     stgrid$start <- as.numeric(stgrid$start)
-    
+    stgrid$area <- as.numeric(stgrid$area)        
+
+    # Check stop times
     stgrid$stop <- if (autostop) {
         # auto-generate stop times from start times and T
         cat("\tAuto-generating 'stop' column...\n")
