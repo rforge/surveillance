@@ -29,7 +29,7 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 \method{simulate}{twinstim}(object, nsim = 1, seed = NULL, data, tiles,
     rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5,
     control.siaf = object$control.siaf,
-    W = NULL, trace = FALSE, nCircle2Poly = 32, gmax = NULL,
+    W = NULL, trace = FALSE, nCircle2Poly = NULL, gmax = NULL,
     .allocate = 500, simplify = TRUE, ...)
 }
 
@@ -76,9 +76,7 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     i.e. the values of the spatial and temporal interaction ranges at this
     point. Only \code{"numeric"} and \code{"factor"} columns are
     allowed. Assure that factor variables are coded equally 
-    (same levels and level order) for each new sample. If there is no
-    epidemic component in the process, \code{rmarks} can be missing or
-    \code{NULL}.
+    (same levels and level order) for each new sample.
 
     For the \code{simulate.twinstim} method, the default (\code{NULL})
     means sampling from the empirical distribution function of the
@@ -198,7 +196,9 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     \code{events}. See also the \dQuote{Value} section below.
   }
   \item{control.siaf}{see \code{\link{twinstim}}.}
-  \item{nCircle2Poly}{see \code{\link{as.epidataCS}}.}
+  \item{nCircle2Poly}{see \code{\link{as.epidataCS}}. For
+    \code{simulate.twinstim}, \code{NULL} means to use the same value as
+    for \code{data}.}
   \item{gmax}{
     maximum value the temporal interaction function
     \code{tiaf$g} can attain. If \code{NULL}, then it is assumed as the

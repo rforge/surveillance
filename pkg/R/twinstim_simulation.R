@@ -168,13 +168,14 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     if (!is.data.frame(sampleMarks) || nrow(sampleMarks) != 1L) {
         stop("'rmarks' must return a one-row data.frame of marks")
     }
-    if (!all(sapply(sampleMarks, function(x) inherits(x, c("integer","numeric","factor"), which=FALSE)))) {
-        stop("'rmarks' must return \"numeric\", \"integer\" or \"factor\" variables only")
-    }
     markNames <- names(sampleMarks)
     if (.idx <- match(FALSE, unpredMarks %in% markNames, nomatch=0L)) {
         stop("the unpredictable mark '", unpredMarks[.idx], "' is not returned by 'rmarks'")
     }
+    if (!all(sapply(sampleMarks[unpredMarks], function(x)
+                    inherits(x, c("integer","numeric","factor"), which=FALSE))))
+        warning("'rmarks' should return \"numeric\" or",
+                " \"factor\" ('epidemic') variables only")
 
 
     ### Check events (prehistory of the process)
@@ -906,6 +907,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     eventData$.sources <- sources[seqAlongEvents]
     eventData$.bdist <- bdists[seqAlongEvents]
     eventData$.influenceRegion <- influenceRegions[seqAlongEvents]
+    attr(eventData$.influenceRegion, "nCircle2Poly") <- nCircle2Poly
 
 
     ### Construct "epidataCS" object
@@ -1015,7 +1017,8 @@ intensityplot.simEpidataCS <- function (x, ...)
 simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5,
     control.siaf = object$control.siaf,
-    W = NULL, trace = FALSE, nCircle2Poly = 32, gmax = NULL, .allocate = 500, simplify = TRUE, ...)
+    W = NULL, trace = FALSE, nCircle2Poly = NULL, gmax = NULL,
+    .allocate = 500, simplify = TRUE, ...)
 {
     ptm <- proc.time()[[3]]
     cl <- match.call()
@@ -1043,6 +1046,8 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     nsim <- as.integer(nsim)
     if (is.null(t0)) t0 <- object$timeRange[1]
     if (is.null(T))  T  <- object$timeRange[2]
+    if (is.null(nCircle2Poly))
+        nCircle2Poly <- attr(data$events$.influenceRegion, "nCircle2Poly")
 
 
     ### Retrieve arguments for simulation
