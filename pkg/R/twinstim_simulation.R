@@ -350,14 +350,14 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     if (hase) {
 
         ## Check interaction functions
-        siaf <- do.call(".parseiaf", args = alist(siaf))
+        siaf <- do.call(".parseiaf", args = alist(siaf, trace > 0))
         constantsiaf <- attr(siaf, "constant")
         if (siaf$npars != nsiafpars) {
             stop("length of 'siafpars' (", nsiafpars,
                  ") does not match the 'siaf' specification (", siaf$npars, ")")
         }
         
-        tiaf <- do.call(".parseiaf", args = alist(tiaf))
+        tiaf <- do.call(".parseiaf", args = alist(tiaf, trace > 0))
         constanttiaf <- attr(tiaf, "constant")
         if (constanttiaf) gmax <- 1L
         if (tiaf$npars != ntiafpars) {

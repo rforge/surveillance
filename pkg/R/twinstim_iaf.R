@@ -676,13 +676,15 @@ checktiaf <- function (g, G, deriv, Deriv, npars, validpars, knots)
 ### Wrapper used in main function to evaluate the siaf and tiaf arguments.
 ### If succesful, returns checked interaction function
 
-.parseiaf <- function (iaf)
+.parseiaf <- function (iaf, verbose = TRUE)
 {
     name <- as.character(substitute(iaf))
     if (missing(iaf) || is.null(iaf)) {
-        message("assuming constant ",
-                switch(name, siaf="spatial", tiaf="temporal"),
-                " interaction '", name, ".constant()'")
+        if (verbose) {
+            message("assuming constant ",
+                    switch(name, siaf="spatial", tiaf="temporal"),
+                    " interaction '", name, ".constant()'")
+        }
         do.call(paste(name, "constant", sep="."), args=alist())
     } else if (is.list(iaf)) {
         ret <- do.call(paste0("check",name), args = iaf)
