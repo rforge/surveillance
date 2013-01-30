@@ -1108,7 +1108,55 @@ terms.twinstim <- function (x, component=c("endemic", "epidemic"), ...)
     if (is.list(x$formula)) { # proper case
         component <- match.arg(component)
         terms.formula(x$formula[[component]], keep.order=TRUE)
-    } else { # called through step(), which replaced x$formula by terms(x)
+    } else { # called through internal method,
+             # which replaced x$formula by terms(x)
         terms.formula(x$formula, keep.order=TRUE)
     }
 }
+
+
+## define a step function for twinstim
+## (since step() is not generic this is no method in the S3 sense)
+step.twinstim <- function (object, component = c("endemic", "epidemic"),
+                           trace = 2, verbose = FALSE, ...)
+{
+    component <- match.arg(component)
+    
+    ## silent optimizations
+    if (trace <= 2) {
+        oldtrace <- object$call$optim.args$control$trace
+        object$call$optim.args$control$trace <- 0
+    }
+    oldverbose <- object$call$verbose
+    object$call$verbose <- verbose
+
+    ## stats::step() & Co. just call update(fit, ~. +- change) ...
+    ## using assignInMyNamespace to locally redefine terms.twinstim and
+    ## update.twinstim such that the epidemic component is the default
+    ## (second) argument does not work:
+    if (component == "epidemic") {
+        stop("not yet implemented for the epidemic component")
+    ##     oldterms <- terms.twinstim
+    ##     formals(terms.twinstim)$component <- "epidemic"
+    ##     assignInMyNamespace("terms.twinstim", terms.twinstim)
+    ##     oldupdate <- update.twinstim
+    ##     names(formals(update.twinstim))[2:3] <- c("epidemic", "endemic")
+    ##     assignInMyNamespace("update.twinstim", update.twinstim)
+    }
+    ## => only way: adapt step(), add1.default(), drop1.default()
+
+    ## Run the selection procedure
+    res <- step(object, trace = trace, ...)  # requires terms(object)
+
+    ## if (component == "epidemic") {
+    ##     ## restore original terms and update methods
+    ##     assignInMyNamespace("terms.twinstim", oldterms)
+    ##     assignInMyNamespace("update.twinstim", oldupdate)
+    ## }
+    
+    ## Done
+    if (trace <= 2) res$call$optim.args$control$trace <- oldtrace
+    res$call$verbose <- oldverbose
+    res
+}
+
