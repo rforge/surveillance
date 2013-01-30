@@ -647,7 +647,7 @@ as.epidata.epidataCS <- function (data, tileCentroids, eps = 0.001, ...)
 
 
 untie.epidataCS <- function (x, amount = list(t=NULL, s=NULL),
-                             keep.sources = FALSE, ...)
+                             direction = "left", keep.sources = FALSE, ...)
 {
     stopifnot(is.list(amount), !is.null(names(amount)))
     do.spatial <- pmatch("s", names(amount), nomatch=0L) > 0L
@@ -662,11 +662,13 @@ untie.epidataCS <- function (x, amount = list(t=NULL, s=NULL),
         untie.matrix(coordinates(x$events), amount$s, constraint=x$W)
     } else coordinates(x$events)
     if (do.temporal) {                  # untie event times
-        ## we shift event times (non-symmetrically) to the left such that the
-        ## shifted versions potentially stay in the same BLOCK of endemic
-        ## covariates (the CIF is left-continuous).
+        ## by default, we shift event times (non-symmetrically) to the left such
+        ## that the shifted versions potentially stay in the same BLOCK of
+        ## endemic covariates (the CIF is left-continuous).
         events$time <- untie.default(events$time, amount$t,
-                                     direction="left", sort=TRUE)
+                                     direction=direction, sort=TRUE)
+        ## FIXME: Does sort=TRUE always make sense?
+        ##        maybe only sort in untie.default if amount < minsep?
     }
 
     ## Generate epidataCS object with new events
