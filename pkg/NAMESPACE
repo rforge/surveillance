@@ -15,13 +15,14 @@ import(grDevices, graphics)
 
 ## required generics (that's why we "Depend" on these packages)
 importFrom(stats, coef, vcov, logLik, nobs, residuals, confint, AIC, extractAIC,
-           profile, simulate, update, update.formula, terms.formula)
+           profile, simulate, update, terms)
 importFrom(utils, head, tail, toLatex)
 importFrom(xtable, xtable) # if we wouldn't "Depend" on xtable, our
                            # xtable-methods would not be useable except if the
                            # user attaches the xtable package himself
 ## required functions from stats and utils
-importFrom(stats, pnorm, cov2cor, ks.test, formula, rnorm, runif)
+importFrom(stats, pnorm, cov2cor, ks.test, formula, rnorm, runif, step,
+           update.formula, terms.formula)
 importFrom(utils, packageDescription, modifyList)
 
 import(methods)
@@ -271,6 +272,12 @@ S3method(residuals, twinstim)
 S3method(update, twinstim)
 export(update.twinstim)                 # for convenience
 S3method(terms, twinstim)
+
+export(stepComponent)
+S3method(terms, twinstim_stependemic)
+S3method(terms, twinstim_stepepidemic)
+S3method(update, twinstim_stependemic)
+S3method(update, twinstim_stepepidemic)
 
 S3method(R0, simEpidataCS)
 S3method(intensityplot, simEpidataCS)
