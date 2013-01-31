@@ -1018,34 +1018,10 @@ update.twinstim <- function (object, endemic, epidemic, optim.args, model,
     
     if (!missing(model)) {
         call$model <- model
-        ## Special case: update model component only
+        ## Special case: update model component ONLY
         if (evaluate &&
             all(names(thiscall)[-1] %in% c("object", "model", "evaluate"))) {
-            if (model) { # add model environment
-                call$optim.args$par <- coef(object)
-                call$optim.args$fixed <- seq_along(coef(object))
-                call$cumCIF <- FALSE
-                cat("Setting up the model environment ...\n")
-                capture.output(suppressMessages(
-                    objectWithModel <- eval(call, parent.frame())
-                ))
-                cat("Done.\n")
-                object$formula <- objectWithModel$formula
-                object$functions <- objectWithModel$functions
-                ## CAVE: order of components of the twinstim-object
-                object <- object[c(1:match("formula", names(object)),
-                                 match(c("functions", "call", "runtime"), names(object)))]
-                environment(object) <- environment(objectWithModel)
-                ## re-add class attribute (dropped on re-ordering)
-                class(object) <- "twinstim"
-            } else { # remove model environment
-                environment(object$formula$epidemic) <-
-                    environment(object$formula$endemic) <- .GlobalEnv
-                object$functions <- NULL
-                environment(object) <- NULL
-            }
-            object$call$model <- model
-            return(object)
+            return(.update.twinstim.model(object, model))
         }
     }
     if (!missing(endemic))
@@ -1092,7 +1068,35 @@ update.twinstim <- function (object, endemic, epidemic, optim.args, model,
     else call
 }
 
-## required for stepComponent()
+.update.twinstim.model <- function (object, model)
+{
+    call <- object$call
+    call$model <- model
+    if (model) { # add model environment
+        call$optim.args$par <- coef(object)
+        call$optim.args$fixed <- seq_along(coef(object))
+        call$cumCIF <- FALSE
+        cat("Setting up the model environment ...\n")
+        capture.output(suppressMessages(
+                       objectWithModel <- eval(call, parent.frame())
+                       ))
+        cat("Done.\n")
+        object$functions <- objectWithModel$functions
+        ## CAVE: order of components of the twinstim-object
+        object <- object[c(1:match("formula", names(object)),
+                           match(c("functions", "call", "runtime"), names(object)))]
+        environment(object) <- environment(objectWithModel)
+        ## re-add class attribute (dropped on re-ordering)
+        class(object) <- class(objectWithModel)
+    } else { # remove model environment
+        object$functions <- NULL
+        environment(object) <- NULL
+    }
+    object$call$model <- model
+    object
+}
+
+## a terms-method is required for stepComponent()
 terms.twinstim <- function (x, component=c("endemic", "epidemic"), ...)
 {
     component <- match.arg(component)
