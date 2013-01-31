@@ -21,17 +21,15 @@
 ### methods which don't use the $formula part work, but this constraint holds
 ### for what is needed to run step().
 
-twinstim_stependemic <- function (.fit)
+twinstim_stependemic <- twinstim_stepepidemic <- function (object)
 {
-    class(.fit) <- c("twinstim_stependemic", "twinstim")
-    .fit$formula <- .fit$formula$endemic
-    .fit
-}
-twinstim_stepepidemic <- function (.fit)
-{
-    class(.fit) <- c("twinstim_stepepidemic", "twinstim")
-    .fit$formula <- .fit$formula$epidemic
-    .fit
+    stepclass <- grep("twinstim_step", sys.call()[[1L]], value=TRUE)
+    ##<- since sys.call()[[1L]] may also be surveillance:::...
+    if (identical(class(object), "twinstim")) {
+        class(object) <- c(stepclass, "twinstim")
+        object$formula <- object$formula[[sub("twinstim_step", "", stepclass)]]
+    } else if (!inherits(object, stepclass)) stop("unintended use")
+    object
 }
 
 
@@ -98,8 +96,7 @@ stepComponent <- function (object, component = c("endemic", "epidemic"),
                 trace = trace, ...)
     
     ## Restore original trace and verbose arguments
-    if (trace <= 2) res$call$optim.args$control$trace <-
-        object$call$optim.args$control$trace
+    if (trace <= 2) res$call$optim.args <- object$call$optim.args
     res$call$verbose <- object$call$verbose
 
     ## Convert back to original class
@@ -108,23 +105,36 @@ stepComponent <- function (object, component = c("endemic", "epidemic"),
     res$formula[[component]] <- newformula
     class(res) <- class(object)
 
-    ## Done
-    res
+    ## Done (assure to have no call$formula element)
+    .drop.formula.from.call(res)
 }
 
 
-## add1.default and drop1.default would work through step() -- since
-## object$formula is internally replaced by the requested component's formula --
-## but not in general
-## For completeness, we thus also define twinstim methods for add1 and drop1
-## add1.twinstim <- function(object, scope,
-##                           component = c("endemic", "epidemic"),
-##                           k = 2, trace = 2, ...)
-## {
-##     component <- match.arg(component)
-##     class(object) <- c(paste0("twinstim_step", component), "twinstim")
-##     object$formula <- object$formula[[component]]
-##     NextMethod(component = NULL)  # -> .default-method (the "component" argument will be part
-##                   # of "..." and passed to extractAIC where it is unused)
-## }
-## drop1.twinstim <- add1.twinstim
+### add1.default and drop1.default work without problems through the above
+### implementation of stepComponent() using the tricky twinstim classes,
+### where object$formula is replaced by the requested component's formula.
+### However, for stand-alone use of add1 and drop1, we need specialised methods.
+
+add1.twinstim <- drop1.twinstim <-
+    function (object, scope,
+              component = c("endemic", "epidemic"),
+              trace = 2, ...)
+{
+    component <- match.arg(component)
+    
+    ## Convert to special twinstim class where $formula is the component formula
+    object <- do.call(paste0("twinstim_step", component), alist(object))
+
+    ## Call the default method (unfortunately not exported from stats)
+    ## Note that the next method chosen is "unchanged if the class of the
+    ## dispatching argument is changed" (see ?NextMethod)
+    ## (the "component" argument will be part of "..." and passed further on to
+    ## extractAIC.twinstim() where it is unused)
+    NextMethod(trace=trace)
+}
+
+add1.twinstim_stependemic <- drop1.twinstim_stependemic <-
+    function (object, scope, ...) NextMethod(component="endemic")
+
+add1.twinstim_stepepidemic <- drop1.twinstim_stepepidemic <-
+    function (object, scope, ...) NextMethod(component="epidemic")
