@@ -48,7 +48,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         mfe, mfhEvents, mfhGrid, model, my.na.action, na.action, namesOptimUser,
         namesOptimArgs, nlminbControl, nlminbRes, nlmObjective, nlmControl,
         nlmRes, nmRes, optim.args, optimArgs, control.siaf,
-        optimMethod, optimRes, optimRes1, optimValid, partial,
+        optimMethod, optimRes, optimRes1, optimValid,
+        origenv.endemic, origenv.epidemic, partial,
         partialloglik, ptm, qmatrix, res, negsc, score, start, subset, tmpexpr,
         typeSpecificEndemicIntercept, useScore, verbose, whichfixed, 
         inherits = FALSE)))
@@ -115,10 +116,12 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     ### Parse epidemic formula
 
     if (missing(epidemic)) {
+        origenv.epidemic <- .GlobalEnv
         epidemic <- ~ 0
     } else {
+        origenv.epidemic <- environment(epidemic)
         environment(epidemic) <- environment()
-        # so that t0 and T are found in the subset expressions below
+        ## such that t0 and T are found in the subset expression below
     }
     epidemic <- terms(epidemic, data = eventsData, keep.order = TRUE)
     if (!is.null(attr(epidemic, "offset"))) {
@@ -157,6 +160,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                        obsInfLength = .obsInfLength, bdist = .bdist)
     rm(ID, tile, type, BLOCK, .obsInfLength, .bdist)
 
+    
     ### Extract essential information from model frame
 
     # inmfe=rowindex(data$events@data) is necessary for subsetting
@@ -216,6 +220,13 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     } else if (verbose) message("no epidemic component in model")
 
 
+    ### Drop "terms" and restore original formula environment
+    
+    epidemic <- formula(epidemic)
+    environment(epidemic) <- origenv.epidemic
+
+
+
 
     #########################
     ### endemic component ###
@@ -225,10 +236,12 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     ### Parse endemic formula
 
     if (missing(endemic)) {
+        origenv.endemic <- .GlobalEnv
         endemic <- ~ 0
     } else {
+        origenv.endemic <- environment(endemic)
         environment(endemic) <- environment()
-        # so that t0 and T are found in the subset expressions below
+        ## such that t0 and T are found in the subset expressions below
     }
     endemic <- terms(endemic, data = data$stgrid, keep.order = TRUE)
 
@@ -296,6 +309,15 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         dt <- mfhGrid[["(dt)"]]
         ds <- mfhGrid[["(ds)"]]
     } else if (verbose) message("no endemic component in model")
+
+    
+    ### Drop "terms" and restore original formula environment
+    
+    endemic <- if (typeSpecificEndemicIntercept) {
+        ## re-add it to the endemic formula
+        update.formula(formula(endemic), ~ (1|type) + .)
+    } else formula(endemic)
+    environment(endemic) <- origenv.endemic
 
 
     ### Check that there is at least one parameter
@@ -836,11 +858,13 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         setting$npars <- c(nbeta0 = nbeta0, p = p,
                            q = q, nsiafpars = nsiafpars, ntiafpars = ntiafpars)
         setting$qmatrix <- qmatrix   # -> information about nTypes and typeNames
-        setting$formula <- list(endemic = formula(endemic), epidemic = formula(epidemic),
-                            siaf = siaf, tiaf = tiaf)
+        setting$formula <- list(endemic = endemic, epidemic = epidemic,
+                                siaf = siaf, tiaf = tiaf)
         setting$call <- cl
         # Return settings
-        if (verbose) message("optimization skipped (returning functions in data environment)")
+        if (verbose)
+            message("optimization skipped",
+                    " (returning functions in data environment)")
         return(setting)
     } else if (!is.list(optim.args)) stop("'optim.args' must be a list or NULL")
 
@@ -1245,19 +1269,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     fit$qmatrix <- qmatrix   # -> information about nTypes and typeNames
     fit$bbox <- bbox(data$W)            # for completeness and for iafplot
     fit$timeRange <- c(t0, T)           # for simulate.twinstim's defaults
-    if (!model) {
-        # Link formulae to the global environment such that the evaluation
-        # environment will be dropped at the end
-        environment(epidemic) <- environment(endemic) <- .GlobalEnv
-    }
-    # if typeSpecificEndemicIntercept, re-add this to the endemic formula
-    fit$formula <- list(
-                   endemic = if (typeSpecificEndemicIntercept) {
-                       update.formula(formula(endemic), ~ (1|type) + .)
-                   } else formula(endemic),
-                   epidemic = formula(epidemic),
-                   siaf = siaf, tiaf = tiaf
-                   )
+    fit$formula <- list(endemic = endemic, epidemic = epidemic,
+                        siaf = siaf, tiaf = tiaf)
     fit$control.siaf <- control.siaf
 
     
