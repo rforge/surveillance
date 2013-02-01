@@ -6,15 +6,15 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.5-2 (2013-01-27)}{
+\section{Changes in surveillance version 1.5-2 (2013-02-01)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
-    \item Some new features and bug fixes.
+    \item Some new features and minor bug fixes.
   }
 }
 
-\subsection{NEW FEATURES}{
+\subsection{NEW FEATURES (\code{twinstim()}-related)}{
   \itemize{
     \item The temporal \code{plot}-method for class \code{"epidataCS"}
     now understands the \code{add} parameter to add the histogram to an
@@ -29,20 +29,32 @@
     \code{optim.args$par}, which is no longer required (as a naive
     default, a crude estimate for the endemic intercept and zeroes for
     the other parameters are used).
-    \item Implemented \code{terms()} and \code{extractAIC()} methods for 
-    class \code{"twinstim"}, which enable the use of \code{step()} for the
-    endemic component.
+    \item Implemented a wrapper \code{stepComponent()} for \code{step()}
+    to perform algorithmic component-specific model selection in
+    \code{"twinstim"} models. This also required the implementation of
+    suitable \code{terms()} and \code{extractAIC()} methods. The single-step
+    methods \code{add1()} and \code{drop1()} are also available.
     \item The \code{update.twinstim()} method now by default uses the
     parameter estimates from the previous model as initial values for
     the new fit (new argument \code{use.estimates = TRUE}).
     \item \code{as.epidataCS()} checks for consistency of the area of
-    \code{W} and the (now really obligatory) area column in \code{stgrid}.
+    \code{W} and the (now really obligatory) area column in
+    \code{stgrid}.
+    \item \code{simulate.twinstim()} now by default uses the previous
+    \code{nCircle2Poly} from the \code{data} argument.
+    \item \code{direction} argument for \code{untie.epidataCS()}.
+  }
+}
+
+\subsection{NEW FEATURES (\code{hhh4()}-related)}{
+  \itemize{
     \item New argument \code{hide0s} in the \code{plot}-method for class
     \code{"ah4"}.
     \item New argument \code{timevar} for \code{addSeason2formula()},
     which now also works for long formulae.
   }
 }
+
 }
 
 

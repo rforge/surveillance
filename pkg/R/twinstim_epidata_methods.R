@@ -696,11 +696,16 @@ untie.default <- function (x, amount = NULL,
     distx <- dist(x)
     if (all(distx > 0))                 # no ties
         return(x)
-    if (is.null(amount))                # take smallest positive distance
-        amount <- min(distx[distx > 0])
+    minsep <- min(distx[distx > 0])     # smallest positive distance
+    if (is.null(amount)) amount <- minsep
     direction <- match.arg(direction)
     if (is.null(sort))                  # sort if x was sorted
         sort <- identical(order(x, decreasing=FALSE), seq_along(x))
+    amount.bound <- if (direction=="symmetric") minsep/2 else minsep
+    if (sort && abs(amount) > amount.bound)
+        warning("'amount' should not be greater than ",
+                if (direction=="symmetric") "half of ",
+                "the minimum separation (", format(amount.bound), ")")
 
     u <- if (direction == "symmetric") {
         runif(length(x), -amount, amount)
