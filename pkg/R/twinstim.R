@@ -361,12 +361,13 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         .siafInt.args <- c(alist(siafpars), control.siaf$F)
 
         ## Memoisation of .siafInt
-        ..siafInt <- if (requireNamespace("memoise")) {
+        ..siafInt <- if (!constantsiaf && requireNamespace("memoise")) {
             memoise::memoise(.siafInt)
             ## => speed-up optimization since 'nlminb' evaluates the loglik and
             ## score for the same set of parameters at the end of each iteration
         } else {
-            if (verbose) cat("Continuing without memoisation of 'siaf$f' cubature ...\n")
+            if (!constantsiaf && verbose)
+                cat("Continuing without memoisation of 'siaf$f' cubature ...\n")
             ## However, trivial caching is used manually in case of fixed
             ## "siafpars" and in LambdagEvents()
             .siafInt

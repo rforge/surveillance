@@ -293,6 +293,15 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   the result.
 }
 
+\note{
+  \code{twinstim} makes use of the \pkg{memoise} package if it is
+  available -- and that is highly recommended for non-constant
+  \code{siaf} specifications to speed up calculations. Specifically, the
+  necessary numerical integrations of the spatial interaction function
+  will be cached such that they are only calculated once for every
+  state of the \code{siaf} parameters during optimization.
+}
+
 \references{
   Diggle, P. J., Kaimi, I. & Abellana, R. (2010):
   Partial-likelihood analysis of spatio-temporal point-process data.
