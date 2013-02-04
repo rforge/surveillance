@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.5-2 (2013-02-01)}{
+\section{Changes in surveillance version 1.5-2 (2013-02-04)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -43,6 +43,8 @@
     \item \code{simulate.twinstim()} now by default uses the previous
     \code{nCircle2Poly} from the \code{data} argument.
     \item \code{direction} argument for \code{untie.epidataCS()}.
+    \item The \code{toLatex}-method for \code{"summary.twinstim"} got
+    different defaults and a new argument \code{eps.Pvalue}.
   }
 }
 

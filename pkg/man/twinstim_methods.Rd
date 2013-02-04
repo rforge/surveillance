@@ -36,8 +36,8 @@ Print, Summary and Extraction Methods for \code{"twinstim"} Objects
       signif.stars = getOption("show.signif.stars"), ...)
 
 \method{toLatex}{summary.twinstim}(object,
-        digits = max(3, getOption("digits") - 3), align = "rrrrr",
-        withAIC = TRUE, ...)
+        digits = max(3, getOption("digits") - 3), eps.Pvalue = 1e-4,
+        align = "lrrrr", withAIC = FALSE, ...)
 }
 
 \arguments{
@@ -63,6 +63,7 @@ Print, Summary and Extraction Methods for \code{"twinstim"} Objects
   }
   \item{signif.stars}{logical. If \code{TRUE}, \dQuote{significance
       stars} are printed for each coefficient.}
+  \item{eps.Pvalue}{see \code{\link{printCoefmat}}.}
   \item{align}{column alignment used for the LaTeX tabular.
     \code{nchar(align)} must equal 5.}
   \item{withAIC}{logical indicating if the AIC and the log-likelihood of

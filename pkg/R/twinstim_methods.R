@@ -184,8 +184,10 @@ print.summary.twinstim <- function (x,
 
 ### 'cat's the summary in LaTeX code
 
-toLatex.summary.twinstim <- function (object, digits = max(3, getOption("digits") - 3),
-                                      align = "rrrrr", withAIC = TRUE, ...)
+toLatex.summary.twinstim <- function (object,
+                                      digits = max(3, getOption("digits") - 3),
+                                      eps.Pvalue = 1e-4,
+                                      align = "lrrrr", withAIC = FALSE, ...)
 {
 ret <- capture.output({
     cat("\\begin{tabular}{", align, "}\n\\hline\n", sep="")
@@ -198,7 +200,8 @@ ret <- capture.output({
         if (nrow(tab) > 0L) {
             rownames(tab) <- gsub(" ", "", rownames(tab))
             tab_char <- capture.output(
-                        printCoefmat(tab,digits=digits,signif.stars=FALSE,na.print="NA")
+                        printCoefmat(tab, digits=digits, signif.stars=FALSE,
+                                     eps.Pvalue = eps.Pvalue, na.print="NA")
                         )[-1]
             tab_char <- sub("([<]?)[ ]?([0-9]+)e([+-][0-9]+)$",
                             "\\1\\2\\\\cdot{}10^{\\3}",
