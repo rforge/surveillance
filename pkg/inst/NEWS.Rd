@@ -6,11 +6,12 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.5-2 (2013-02-04)}{
+\section{Changes in surveillance version 1.5-2 (2013-02-05)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
     \item Some new features and minor bug fixes.
+    \item Yet another p-value formatting function \code{formatPval()}.
   }
 }
 
@@ -45,6 +46,8 @@
     \item \code{direction} argument for \code{untie.epidataCS()}.
     \item The \code{toLatex}-method for \code{"summary.twinstim"} got
     different defaults and a new argument \code{eps.Pvalue}.
+    \item New \code{xtable}-method for \code{"summary.twinstim"} for
+    printing the covariate effects as risk ratios (with CI's and p-values).
   }
 }
 

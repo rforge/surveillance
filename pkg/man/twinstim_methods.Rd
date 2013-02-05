@@ -7,6 +7,7 @@
 \alias{nobs.twinstim}
 \alias{print.summary.twinstim}
 \alias{toLatex.summary.twinstim}
+\alias{xtable.summary.twinstim}
 
 \title{
 Print, Summary and Extraction Methods for \code{"twinstim"} Objects
@@ -38,6 +39,11 @@ Print, Summary and Extraction Methods for \code{"twinstim"} Objects
 \method{toLatex}{summary.twinstim}(object,
         digits = max(3, getOption("digits") - 3), eps.Pvalue = 1e-4,
         align = "lrrrr", withAIC = FALSE, ...)
+\method{xtable}{summary.twinstim}(x, caption = NULL, label = NULL,
+      align = c("l", "r", "r", "r"), digits = 3,
+      display = c("s", "f", "s", "s"),
+      ci.level = 0.95, ci.fmt = "\%4.2f", ci.to = "--",
+      eps.pvalue = 1e-4, ...)
 }
 
 \arguments{
@@ -64,11 +70,14 @@ Print, Summary and Extraction Methods for \code{"twinstim"} Objects
   \item{signif.stars}{logical. If \code{TRUE}, \dQuote{significance
       stars} are printed for each coefficient.}
   \item{eps.Pvalue}{see \code{\link{printCoefmat}}.}
-  \item{align}{column alignment used for the LaTeX tabular.
-    \code{nchar(align)} must equal 5.}
   \item{withAIC}{logical indicating if the AIC and the log-likelihood of
     the model should be included below the table of coefficients in the
     LaTeX tabular.}
+  \item{caption,label,align,display}{see \code{\link{xtable}}.}
+  \item{ci.level,ci.fmt,ci.to}{the confidence intervals are calculated
+    at level \code{ci.level} and printed using \code{\link{sprintf}}
+    with format \code{ci.fmt} and seperator \code{ci.to}.}
+  \item{eps.pvalue}{argument passed to \code{\link{formatPval}}.}
   \item{\dots}{
     For \code{print.summary.twinstim}, arguments passed to
     \code{\link{printCoefmat}}.\cr

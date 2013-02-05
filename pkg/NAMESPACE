@@ -91,7 +91,8 @@ export(surveillance.options, reset.surveillance.options)
 export(animate)          # new S3-generic
 export(R0)               # new S3-generic
 export(intensityplot)    # new S3-generic
-export(isScalar)  # very basic little helper function
+export(isScalar)         # very basic little helper function
+export(formatPval)       # yapf -- yet another p-value formatter
 export(anscombe.residuals)
 export(magic.dim, primeFactors, bestCombination)   # similar to n2mfrow
 export(isoWeekYear)
@@ -174,8 +175,8 @@ S3method(print, algoQV)
 S3method(xtable, algoQV)
 
 export(test, testSim)   # FIXME: do we really want that?
-# if not, then we have to prefix all test() and testSim() calls in the corresponding
-# examples in the Rd files by "surveillance:::"
+# if not, then we have to prefix all test() and testSim() calls in the
+# corresponding examples in the Rd files by "surveillance:::"
 
 
 ### conversion between old disProg and new sts classes
@@ -255,13 +256,18 @@ S3method(summary, twinstim)
 export(summary.twinstim)                # for convenience
 S3method(print, summary.twinstim)
 S3method(toLatex, summary.twinstim)
+S3method(xtable, summary.twinstim)
+export(xtable.summary.twinstim)         # for xtable.twinstim
+S3method(xtable, twinstim)
 S3method(plot, twinstim)
 export(iafplot)
 export(intensity.twinstim)
 S3method(intensityplot, twinstim)
 export(intensityplot.twinstim)          # for convenience
 S3method(profile, twinstim)
+S3method(coef, summary.twinstim)
 S3method(vcov, twinstim)
+S3method(vcov, summary.twinstim)
 S3method(logLik, twinstim)
 S3method(extractAIC, twinstim)
 S3method(nobs, twinstim)

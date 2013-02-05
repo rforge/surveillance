@@ -124,6 +124,14 @@ summary.twinstim <- function (object, test.iaf = FALSE,
     ans
 }
 
+## additional methods to make confint.default work for summary.twinstim
+vcov.summary.twinstim <- function (object, ...) object$cov
+coef.summary.twinstim <- function (object, ...) with(object, {
+    coeftab <- rbind(coefficients.beta, coefficients.gamma, coefficients.iaf)
+    structure(coeftab[,1], names=rownames(coeftab))
+})
+
+## print-method for summary.twinstim
 print.summary.twinstim <- function (x,
     digits = max(3, getOption("digits") - 3), symbolic.cor = x$symbolic.cor,
     signif.stars = getOption("show.signif.stars"), ...)
@@ -192,7 +200,6 @@ toLatex.summary.twinstim <- function (object,
 ret <- capture.output({
     cat("\\begin{tabular}{", align, "}\n\\hline\n", sep="")
     cat(" & Estimate & Std. Error & $z$ value & $P(|Z|>|z|)$ \\\\\n\\hline\n\\hline\n")
-
     tabh <- object$coefficients.beta
     tabe <- rbind(object$coefficients.gamma, object$coefficients.iaf)
     for (tabname in c("tabh", "tabe")) {
@@ -203,6 +210,7 @@ ret <- capture.output({
                         printCoefmat(tab, digits=digits, signif.stars=FALSE,
                                      eps.Pvalue = eps.Pvalue, na.print="NA")
                         )[-1]
+            #tab_char <- sub("< (0\\..+)$", "<\\1", tab_char)
             tab_char <- sub("([<]?)[ ]?([0-9]+)e([+-][0-9]+)$",
                             "\\1\\2\\\\cdot{}10^{\\3}",
                             tab_char)
@@ -230,6 +238,50 @@ ret <- capture.output({
 class(ret) <- "Latex"
 ret
 }
+
+
+## Alternative implementation including exp-transformation of parameters
+## CAVE: no iaf parameters here
+
+xtable.summary.twinstim <- function (x, caption = NULL, label = NULL,
+                             align = c("l", "r", "r", "r"), digits = 3,
+                             display = c("s", "f", "s", "s"),
+                             ci.level = 0.95, ci.fmt = "%4.2f", ci.to = "--",
+                             eps.pvalue = 1e-4, ...)
+{
+    cis <- confint(x, level=ci.level)
+    tabh <- x$coefficients.beta
+    tabe <- x$coefficients.gamma
+    tab <- rbind(tabh, tabe)
+    tab <- tab[grep("^([he]\\.\\(Intercept\\)|h.type)", rownames(tab),
+                    invert=TRUE),,drop=FALSE]
+    expcis <- exp(cis[rownames(tab),,drop=FALSE])
+    cifmt <- paste0(ci.fmt, ci.to, ci.fmt)
+    rrtab <- data.frame(RR = exp(tab[,1]),
+                        CI = sprintf(cifmt, expcis[,1], expcis[,2]),
+                        "p-value" = formatPval(tab[,4], eps=eps.pvalue),
+                        check.names = FALSE, stringsAsFactors=FALSE)
+    names(rrtab)[2] <- paste0(100*ci.level, "%-CI")
+
+    ## append caption etc.
+    class(rrtab) <- c("xtable", "data.frame")
+    caption(rrtab) <- caption
+    label(rrtab) <- label
+    align(rrtab) <- align
+    digits(rrtab) <- digits
+    display(rrtab) <- display
+
+    ## Done
+    rrtab
+}
+
+xtable.twinstim <- function () {
+    cl <- match.call()
+    cl[[1]] <- as.name("xtable.summary.twinstim")
+    cl$x <- substitute(summary(x))
+    eval.parent(cl)                # => xtable.summary.twinstim must be exported
+}
+formals(xtable.twinstim) <- formals(xtable.summary.twinstim)
 
 
 ### Plot temporal or spatial evolution of the intensity
