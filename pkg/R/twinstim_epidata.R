@@ -229,7 +229,7 @@ checkEvents <- function (events, dropTypes = TRUE)
         events@data <- events@data[-reservedColsIdx]
     }    
 
-    # Check that influence radii are numeric and positive
+    # Check that influence radii are numeric and positive (also not NA)
     cat("\tChecking 'eps.t' and 'eps.s' columns...\n")
     with(events@data, stopifnot(is.numeric(eps.t), eps.t > 0,
                                 is.numeric(eps.s), eps.s > 0))
@@ -237,6 +237,7 @@ checkEvents <- function (events, dropTypes = TRUE)
     # Transform time into a numeric variable
     cat("\tConverting event time into a numeric variable...\n")
     events$time <- as.numeric(events$time)
+    stopifnot(!is.na(events$time))
 
     # Check event times for ties
     cat("\tChecking event times for ties...\n")
@@ -249,18 +250,18 @@ checkEvents <- function (events, dropTypes = TRUE)
                 paste(duplicatedTimes, collapse = ", "))
     }
 
+    # Sort events chronologically
     cat("\tSorting events...\n")
+    events <- events[order(events$time),]
+    
     # Attribute unique IDs to events (running chronologically from 1 to nEvents)
-    events$ID <- order(events$time)
+    events$ID <- seq_along(events)
 
     # Make ID column the first column, then obligatory columns then remainders (epidemic covariates)
     IDcolIdx <- match("ID", names(events))
     obligColsIdx <- match(obligColsNames_events, names(events))
     covarColsIdx <- setdiff(seq_along(events@data), c(IDcolIdx, obligColsIdx))
     events <- events[c(IDcolIdx, obligColsIdx, covarColsIdx)]
-
-    # Sort events chronologically
-    events <- events[events$ID,]
 
     # Done.
     return(events)
