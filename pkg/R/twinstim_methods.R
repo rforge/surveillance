@@ -1090,7 +1090,7 @@ update.twinstim <- function (object, endemic, epidemic, optim.args, model,
         }
     if (!missing(optim.args)) {
         oldargs <- call$optim.args
-        call$optim.args <- if (is.list(optim.args)) {
+        call$optim.args <- if (!is.null(oldargs) && is.list(optim.args)) {
             if (is.listcall(oldargs)) {
                 modifyListcall(oldargs, thiscall$optim.args)
             } else {                    # i.e. is.list(oldargs)
