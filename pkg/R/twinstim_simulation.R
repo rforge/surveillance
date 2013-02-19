@@ -193,8 +193,10 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     Nout <- 0L
     # do we have a prehistory in 'events'
     if (!missing(events) && !is.null(events)) {
-        .reservedColsIdx <- match(c("ID",".obsInfLength",".bdist",".influenceRegion",".sources"), names(events))
-        events <- events[setdiff(seq_along(names(events)),.reservedColsIdx)]
+        .reservedColsNames <- c("ID", ".obsInfLength", ".bdist",
+                                ".influenceRegion", ".sources",
+                                "BLOCK", "start") # from stgrid
+        events <- events[!names(events) %in% .reservedColsNames]
         if (!.skipChecks) {
             cat("Checking 'events':\n")
             events <- checkEvents(events, dropTypes = FALSE)
