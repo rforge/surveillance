@@ -6,12 +6,14 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.5-2 (2013-02-05)}{
+\section{Changes in surveillance version 1.5-2 (2013-02-19)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
-    \item Some new features and minor bug fixes.
-    \item Yet another p-value formatting function \code{formatPval()}.
+    \item This version essentially adds new features and fixes
+    some minor bugs for the "\code{twinstim}" part of the package.
+    \item Yet another p-value formatting function \code{formatPval()}
+    is now also part of the \pkg{surveillance} package.
   }
 }
 

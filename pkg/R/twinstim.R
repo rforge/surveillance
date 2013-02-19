@@ -873,13 +873,12 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     ### Check initial value for theta
 
     if (is.null(optim.args[["par"]])) { # set naive defaults
-        h.Intercept <- crudebeta0(
-            nEvents = Nin, offset.mean = weighted.mean(offsetGrid, ds),
-            W.area = sum(ds[gridBlocks==histIntervals[1,"BLOCK"]]),
-            period = T-t0, nTypes = nTypes
-                       )
-        optim.args$par <- c(rep.int(h.Intercept, nbeta0),
-                            rep.int(0, npars - nbeta0))
+        h.Intercept <- if (nbeta0 > 0) rep.int(crudebeta0(
+                nEvents = Nin, offset.mean = weighted.mean(offsetGrid, ds),
+                W.area = sum(ds[gridBlocks==histIntervals[1,"BLOCK"]]),
+                period = T-t0, nTypes = nTypes
+            ), nbeta0) else numeric(0L)
+        optim.args$par <- c(h.Intercept, rep.int(0, npars - nbeta0))
     } else { # check validity of par-specification
         if (!is.vector(optim.args$par, mode="numeric")) {
             stop("'optim.args$par' must be a numeric vector")
