@@ -88,7 +88,7 @@ if (plot) {
 ### Alternative 2: Product Gauss cubature of two-dimensional functions
 ### over simple polygons proposed by Sommariva & Vianello (2007)
 ########################################################################
-## polyregion may be of classes "owin", "SpatialPolygons", or "gpc.poly"
+## polyregion: "owin", "SpatialPolygons", "Polygons", "Polygon", "gpc.poly"
 ## See function polygauss() below for further argument details
 
 polyCub.SV <- function (polyregion, f, ...,
@@ -123,6 +123,10 @@ polyCub.SV <- function (polyregion, f, ...,
     int <- sum(respolys)
 
     if (plot) {
+        if (inherits(polyregion, "Polygon"))
+            polyregion <- Polygons(list(polyregion), "ID")
+        if (inherits(polyregion, "Polygons"))
+            polyregion <- SpatialPolygons(list(polyregion))
         if (inherits(polyregion, "gpc.poly")) {
             gpclibCheck()
             plot(polyregion, poly.args=list(lwd=2), ann=FALSE)
