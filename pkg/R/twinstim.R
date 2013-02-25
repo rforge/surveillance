@@ -338,11 +338,11 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     if (hase) {
 
         ## Check interaction functions
-        siaf <- do.call(".parseiaf", args = alist(siaf, verbose))
+        siaf <- do.call(".parseiaf", args = alist(siaf, "siaf", verbose))
         constantsiaf <- attr(siaf, "constant")
         nsiafpars <- siaf$npars
 
-        tiaf <- do.call(".parseiaf", args = alist(tiaf, verbose))
+        tiaf <- do.call(".parseiaf", args = alist(tiaf, "tiaf", verbose))
         constanttiaf <- attr(tiaf, "constant")
         ntiafpars <- tiaf$npars
 

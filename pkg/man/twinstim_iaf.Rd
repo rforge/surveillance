@@ -29,7 +29,7 @@ siaf.constant()
 siaf.gaussian(nTypes = 1, logsd = TRUE, density = FALSE, F.adaptive = TRUE,
               effRangeMult = 6, validpars = NULL)
 siaf.lomax(nTypes = 1, logpars = TRUE, density = FALSE,
-           effRangeProb = 0.999, validpars = NULL)
+           effRangeProb = NULL, validpars = NULL)
 
 # temporal interaction functions
 tiaf.constant()
@@ -97,8 +97,9 @@ tiaf.exponential(nTypes = 1)
   \item{effRangeProb}{
     numeric scalar in \eqn{(0,1)}, which determines the effective range for
     numerical integration in terms of the corresponding quantile of the
-    univariate Lomax distribution. May also be \code{NULL}, which disables
-    the integral approximation with an effective integration range.
+    univariate Lomax distribution. May also be \code{NULL} (default),
+    which disables the integral approximation with an effective
+    integration range.
   }
   \item{validpars}{
     function taking one argument, the parameter vector, indicating if it

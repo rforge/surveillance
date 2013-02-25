@@ -11,13 +11,20 @@
 ################################################################################
 
 
-### Function returning specification of constant spatial interaction/dispersal
 
-## ## to avoid notes in R CMD check ("no visible binding for global variable ...")
-## if (getRversion() >= "2.15.1") utils::globalVariables("r")
+##########################################
+### siaf: SPATIAL INTERACTION FUNCTION ###
+##########################################
 
-siaf.constant <- function () {
+
+### Constant spatial interaction/dispersal
+
+siaf.constant <- function ()
+{
     r <- s <- n <- ub <- "just cheating on codetools::checkUsage"
+    ## to avoid notes in R CMD check ("no visible binding for global variable")
+    ## one could also use utils::globalVariables() in R >= 2.15.1 as follows:
+    ## if (getRversion() >= "2.15.1") utils::globalVariables("r")
     res <- list(
            f = as.function(alist(s=, pars=NULL, types=NULL, rep.int(1,nrow(s))),
                            envir = .GlobalEnv),
@@ -35,7 +42,7 @@ siaf.constant <- function () {
 }
 
 
-### Generates a list specifying a Gaussian spatial interaction function
+### Gaussian spatial interaction function
 ## nTypes: determines the number of parameters=(log-)standard deviations of the
 ##   Gaussian kernel. In a multitype epidemic, the different types may share the
 ##   same spatial interaction function (type-invariant), in which case nTypes=1.
@@ -202,6 +209,9 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
 
 ### Implementation of an isotropic power law kernel, specifically the
 ### Lomax distribution, i.e. a shifted Pareto distribution with domain [0;Inf)
+### THIS IS OBSOLETE (except for the included density-variant which is, however,
+### not recommended) since siaf.powerlaw provides the same kernel but with a
+### better parametrization (use d := alpha+1 and omit prop. constants in f)
 
 ## quantile function of the Lomax distribution
 ## we could also use VGAM::qlomax (but this would be slightly slower)
@@ -211,9 +221,8 @@ qlomax <- function (p, scale, shape) {
 
 ## density=FALSE returns standardized Lomax kernel, i.e. f(x) = f_Lomax(x)/f(0),
 ## such that the kernel function starts at 1. f_Lomax(0) = alpha / sigma
-## FIXME: re-parametrise with decay parameter d = alpha + 1
 siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
-                        effRangeProb = 0.999, validpars = NULL)
+                        effRangeProb = NULL, validpars = NULL)
 {
     nTypes <- as.integer(nTypes)
     stopifnot(length(nTypes) == 1L, nTypes > 0L)
@@ -334,7 +343,7 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
         ## polar coordinates and applies the inverse transformation method
         sigma <- exp(logpars[[1L]])
         alpha <- exp(logpars[[2L]])
-        exp <- sigma / (alpha-1)        # only valid if alpha > 1
+        E <- sigma / (alpha-1)        # only valid if alpha > 1
         ##r <- VGAM::rlomax(n, scale=sigma, shape3.q=alpha)
         ## NO, r must be sampled from a density proportional to r*dlomax(r)!!!
         ##curve(x * alpha/sigma * (1+x/sigma)^-(alpha+1), 0, 200)
@@ -344,8 +353,8 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
             function (r) sigma * (log(1+r/sigma) - r/(r+sigma))
         } else {
             function (r)
-                ifelse(is.infinite(r) & alpha > 1, exp,
-                       exp * (1 - (1+r/sigma)^-alpha * (r*alpha/sigma+1)))
+                ifelse(is.infinite(r) & alpha > 1, E,
+                       E * (1 - (1+r/sigma)^-alpha * (r*alpha/sigma+1)))
         }
 
         ## cumulative distribution function: int_0^q x*dlomax(x) / c dx
@@ -358,7 +367,7 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
             function (q) cumd(q) / normconst
         } else { # for r in [0;Inf] the density is only proper if alpha > 1
             stopifnot(alpha > 1)
-            function (q) cumd(q) / exp
+            function (q) cumd(q) / E
         }
         
         ## However, there is no closed form expression for the quantile function
@@ -369,6 +378,9 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
 
         ## now sample r as QF(U), where U ~ U(0,1)
         r <- sapply(runif(n), QF)
+        ## Check simulation via kernel estimate:
+        ## plot(density(r, from=0, to=ub))
+        ## curve(x*VGAM::dlomax(x,sigma,alpha) / normconst, add=TRUE, col=2)
         
         ## now rotate each point by a random angle to cover all directions
         theta <- stats::runif(n, 0, 2*pi)
@@ -386,44 +398,183 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
          simulate=simulate, npars=2L, validpars=validpars)
 }
 
-## Fcircle_Lomax <- function(r, logpars) {
-##     logsigma <- logpars[[1]]  # used "[[" to drop names
-##     logalpha <- logpars[[2]]
-##     sigma <- exp(logsigma)
-##     alpha <- exp(logalpha)
-##     logfofr <- logalpha + alpha*logsigma - (alpha+1) * log(r+sigma)
-##     fofr <- exp(logfofr)
-##     ## method 1:
-##     Intfinvsq <- function (z, sigma, alpha) {
-##         ## antiderivative of ((f^-1)(z))^2
-##         if (alpha == 1) {
-##             sigma * (log(z) - 4*sqrt(sigma*z) + sigma*z)
-##         } else {
-##             (alpha*sigma^alpha)^(2/(alpha+1)) *
-##                 z^((alpha-1)/(alpha+1))*(alpha+1)/(alpha-1) -
-##                     2*alpha^(1/(alpha+1))*sigma^(1+alpha/(alpha+1)) *
-##                         z^(alpha/(alpha+1))*(alpha+1)/alpha + sigma^2*z
-##         }}
-##     intfinvsq2 <- Intfinvsq(alpha/sigma, sigma, alpha) -
-##         Intfinvsq(fofr, sigma, alpha)
-##     ## method 2 (faster):
-##     intfinvsq <- if (alpha == 1) {
-##         sigma.rsigma <- sigma / (r+sigma)
-##         sigma*(-2*log(sigma.rsigma) -3 +sigma.rsigma*(4-sigma.rsigma))
-##     } else {
-##         intfinvsq.fof0 <- 2*sigma / (alpha-1)
-##         intfinvsq.fofr <- (sigma/(sigma+r))^alpha *
-##             (r*(alpha+1)*(alpha*r+2*sigma)+2*sigma^2) /
-##                 ((alpha-1)*(r+sigma))
-##         intfinvsq.fof0 - intfinvsq.fofr
-##     }
-##     ## check if identical
-##     if (!isTRUE(all.equal(intfinvsq2, intfinvsq))) {
-##         browser("the two integrations of lomax^-1 differ")
-##     }
-##     base <- pi * r^2 * fofr   # volume of cylinder up to height f(r)
-##     base + pi*intfinvsq
-## }
+
+### Power-law kernel f(s) = (||s||+sigma)^-d
+### This is the pure kernel of the Lomax density (the density requires d>1, but
+### for the siaf specification we only want d to be positive)
+
+siaf.powerlaw <- function (nTypes = 1, logpars = TRUE,
+                           effRangeProb = NULL, validpars = NULL)
+{
+    nTypes <- as.integer(nTypes)
+    stopifnot(length(nTypes) == 1L, nTypes > 0L)
+
+    ## for the moment we don't make this type-specific
+    if (nTypes != 1) stop("type-specific shapes are not yet implemented")
+    if (!logpars) stop("only the 'logpars' parametrization is implemented")
+
+    ## helper expression, note: logpars=c(logscale=logsigma, logd=logd)
+    tmp <- expression(
+        logsigma <- logpars[[1L]],  # used "[[" to drop names
+        logd <- logpars[[2L]],
+        sigma <- exp(logsigma),
+        d <- exp(logd)
+        )
+
+    ## spatial kernel
+    f <- function (s, logpars, types = NULL) {}
+    body(f) <- as.call(c(as.name("{"),
+        tmp,
+        expression(sLength <- sqrt(rowSums(s^2))),
+        expression((sLength+sigma)^-d)
+    ))
+
+    ## numerically integrate f over a polygonal domain
+    F <- siaf.fallback.F
+    
+    ## fast integration of f over a circular domain
+    Fcircle <- function (r, logpars, type = NULL) {}
+    body(Fcircle) <- as.call(c(as.name("{"),
+        tmp,
+        expression(
+            fofr <- (r+sigma)^-d,
+            fof0 <- sigma^-d,
+            basevolume <- pi * r^2 * fofr, # cylinder volume up to height f(r)
+            Ifinvsq <- function (z) {
+                if (d == 1) {
+                    -1/z - 2*sigma*log(z) + sigma^2*z
+                } else if (d == 2) {
+                    log(z) - 4*sigma*sqrt(z) + sigma^2*z
+                } else {
+                    z^(1-2/d) * d / (d-2) - z^(1-1/d) * 2*sigma*d/(d-1) + sigma^2*z
+                }
+            },
+            intfinvsq <- Ifinvsq(fof0) - Ifinvsq(fofr),
+            basevolume + pi * intfinvsq
+            )
+    ))
+
+    ## derivative of f wrt logpars
+    deriv <- function (s, logpars, types = NULL) {}
+    body(deriv) <- as.call(c(as.name("{"),
+        tmp,
+        expression(
+            sLength <- sqrt(rowSums(s^2)),
+            rsigmad <- (sLength+sigma)^d,
+            derivlogsigma <- -d*sigma / rsigmad / (sLength+sigma),
+            derivlogd <- -log(rsigmad) / rsigmad,
+            cbind(derivlogsigma, derivlogd)
+            )
+    ))
+
+    ## Numerical integration of 'deriv' over a polygonal domain
+    Deriv <- function (polydomain, deriv, logpars, type = NULL, nGQ = 20L) {}
+    body(Deriv) <- as.call(c(as.name("{"),
+        ## Determine a = argmax(abs(deriv(c(x,0))))
+        c(tmp, expression(
+            xrange <- polydomain$xrange,           # polydomain is a "owin"
+            maxxdist <- max(abs(xrange)),
+            a.logsigma <- 0,
+            xmin.derivlogd <- exp(1/d) - sigma,
+            a.logd <- if (xmin.derivlogd <= 0) 0 else {
+                derivlogd.0 <- -d*log(sigma) / sigma^d
+                derivlogd.xmin <- -exp(-1)
+                if (abs(derivlogd.0) >= abs(derivlogd.xmin))
+                    0 else min(maxxdist, xmin.derivlogd)
+            },
+            a <- c(a.logsigma, a.logd),
+            if (sum(xrange) < 0) a <- -a # is more of the domain left of 0?
+            )),
+        expression(
+            deriv1 <- function (s, paridx)
+                deriv(s, logpars, type)[,paridx,drop=TRUE],
+            intderiv1 <- function (paridx)
+                polyCub.SV(polydomain$bdry, deriv1, paridx=paridx,
+                           nGQ = nGQ, alpha = a[paridx]),
+            res.logsigma <- intderiv1(1L),
+            res.logd <- intderiv1(2L),
+            res <- c(res.logsigma, res.logd),
+            res
+            )
+    ))
+
+    ## "effective" integration range (based on some high quantile)
+    effRange <- if (isScalar(effRangeProb)) {
+        effRange <- function (logpars) {}
+        body(effRange) <- as.call(c(as.name("{"),
+            substitute(qlomax(effRangeProb, exp(logpars[[1]]), exp(logpars[[2]])),
+                       list(effRangeProb=effRangeProb))
+        ))
+        effRange
+    } else NULL
+
+    ## simulate from the Lomax kernel (within a maximum distance 'ub')
+    simulate <- function (n, logpars, type, ub)
+    {
+        sigma <- exp(logpars[[1L]])
+        d <- exp(logpars[[2L]])
+
+        ## Sampling from f_{2D}(s) \propto f(||s||), truncated to ||s|| <= ub,
+        ## works via polar coordinates and the inverse transformation method:
+        ## p_{2D}(r,theta) = r * f_{2D}(x,y) \propto r*f(r) = r*(r+\sigma)^{-d}
+        ## => sample angle theta from U(0,2*pi) and r according to:
+        ## p <- function (r) r * (r+sigma)^-d
+        
+        ## Primitive of p: P(r) = int_0^r p(z) dz
+        P <- function (r) {
+            if (d == 1) {
+                r - sigma * log(r/sigma + 1)
+            } else if (d == 2) {
+                log(r/sigma + 1) - r/(r+sigma)
+            } else {
+                (r*(r+sigma)^(1-d) - (r+sigma)^(2-d) / (2-d) +
+                 sigma^(2-d)/(2-d)) / (1-d)
+            }
+        }
+        ## for validation of analytic P: numerical integration
+        ## Pnum <- function (r, sigma, d) sapply(r, function (.r) {
+        ##     integrate(p, 0, .r, sigma=sigma, d=d)$value
+        ## })        
+
+        ## Normalizing constant of the density on [0;ub]
+        normconst <- if (is.finite(ub)) P(ub) else {
+            ## for sampling on [0;Inf] the density is only proper if d > 2
+            if (d <= 2) stop("improper density for d<=2, 'ub' must be finite")
+            (sigma^(d-2) * (d-2) * (d-1))^-1 # = P(Inf)
+        }
+
+        ## => cumulative distribution function
+        CDF <- function (q) P(q) / normconst
+
+        ## For inversion sampling, we need the quantile function CDF^-1
+        ## However, this is not available in closed form, so we use uniroot,
+        ## which requires a finite upper bound!
+        ## Note: in simEpidataCS, simulation is always bounded to eps.s and to
+        ## the largest extend of W, thus, 'ub' is finite
+        stopifnot(is.finite(ub))
+        QF <- function (p) uniroot(function(q) CDF(q)-p, lower=0, upper=ub)$root
+
+        ## Now sample r as QF(U), where U ~ U(0,1)
+        r <- sapply(runif(n), QF)
+        ## Check simulation via kernel estimate:
+        ## plot(density(r, from=0, to=ub)); curve(p(x) / normconst, add=TRUE, col=2)
+        
+        ## now rotate each point by a random angle to cover all directions
+        theta <- stats::runif(n, 0, 2*pi)
+        r * cbind(cos(theta), sin(theta))
+    }
+
+    ## set function environments to the global environment
+    environment(f) <- environment(F) <- environment(Fcircle) <-
+        environment(deriv) <- environment(Deriv) <-
+            environment(simulate) <- .GlobalEnv
+    if (is.function(effRange)) environment(effRange) <- .GlobalEnv
+
+    ## return the kernel specification
+    list(f=f, F=F, Fcircle=Fcircle, effRange=effRange, deriv=deriv, Deriv=Deriv,
+         simulate=simulate, npars=2L, validpars=validpars)
+}
+
 
 
 ### naive defaults for the siaf specification
@@ -450,113 +601,82 @@ siaf.fallback.Deriv <- function (polydomain, deriv, pars, type, method = "SV", .
 
 
 
-### Returns a list specifying an exponential temporal interaction function
-# nTypes: cf. parameter description for siaf.gaussian
+### Check Fcircle, deriv, and simulate components of a siaf specification
 
-tiaf.exponential <- function (nTypes = 1)
+checksiaf <- function (siaf, pargrid, type=1)
 {
-    # time points vector t, length(types) = 1 or length(t)
-    g <- function (t, alpha, types) {
-        types <- rep(types, length.out = length(t))
-        alphat <- alpha[types]
-        exp(-alphat*t)
+    stopifnot(is.list(siaf), is.numeric(pargrid))
+    if (is.vector(pargrid)) pargrid <- t(pargrid) # 1-row matrix
+    
+    ## Check Fcircle
+    if (!is.null(siaf$Fcircle)) {
+        comp <- checksiaf.Fcircle(siaf$Fcircle, siaf$f, pargrid, type=type)
+        cat("'Fcircle' vs. numerical cubature ...", comp, "\n")
     }
-    G <- function (t, alpha, types) {
-        types <- rep(types, length.out = length(t))
-        alphat <- alpha[types]
-        ifelse(alphat==0, t, -exp(-alphat*t)/alphat)
-    }
-    deriv <- function (t, alpha, types) {
-        L <- length(t)
-        types <- rep(types, length.out = L)
-        alphat <- alpha[types]
-        deriv <- matrix(0, L, length(alpha))
-        deriv[cbind(1:L,types)] <- -t*exp(-alphat*t)
-        deriv
-    }
-    Deriv <- function (t, alpha, types) {
-        L <- length(t)
-        types <- rep(types, length.out = L)
-        alphat <- alpha[types]
-        Deriv <- matrix(0, L, length(alpha))
-        Deriv[cbind(1:L,types)] <- ifelse(alphat==0, -t^2/2, (t+1/alphat)*exp(-alphat*t)/alphat)
-        Deriv
+    
+    ## Check deriv
+    if (!is.null(siaf$deriv)) {
+        comp <- checksiaf.deriv(siaf$deriv, siaf$f, pargrid, type=type)
+        cat("'deriv' vs. numerical derivative ... maxRelDiff =", comp, "\n")
     }
 
-    list(g=g, G=G, deriv=deriv, Deriv=Deriv, npars=nTypes, validpars=NULL)
+    ## Check simulate
+    if (!is.null(siaf$simulate)) {
+        checksiaf.simulate(siaf$simulate, siaf$f, pargrid[1,], type=type)
+    }
 }
 
-
-### Returns specification of constant temporal interaction
-
-tiaf.constant <- function () {
-    res <- list(
-        g = as.function(alist(t=, pars=, types=, rep.int(1, length(t))), envir = .GlobalEnv),
-        G = as.function(alist(t=, pars=, types=, t), envir = .GlobalEnv),
-        deriv = NULL, Deriv = NULL, npars = 0L, validpars = NULL
-    )
-    attr(res, "constant") <- TRUE
-    res
-}
-
-
-
-### Helper function which checks if the (spatial or temporal)
-### interaction function 'iaf' returns 1 at the origin 0 or (0,0)
-
-.checkiaf0 <- function(iaf, npars, validpars, type = c("siaf", "tiaf"))
+checksiaf.Fcircle <- function (Fcircle, f, pargrid, type=1, B=20, rmax=100)
 {
-    type <- match.arg(type)
-    testpars <- rep.int(0.5, npars)
-    if (!is.null(validpars)) {
-        valid <- validpars(testpars)
-        if (length(valid) != 1 || !is.logical(valid)) {
-            stop("the '", type, "'/'validpars' function must return a single ",
-                 "logical value")
-        }
-        if (!valid) {
-            testpars <- rep.int(pi, npars)
-            valid <- validpars(testpars)
-        }
-    } else valid <- TRUE
-    if (valid) {
-        ctext <- switch(type, siaf = "coordinate (0,0)", tiaf = "time point 0")
-        iaf0 <- switch(type,
-            siaf = iaf(t(c(0,0)), testpars, 1),
-            tiaf = iaf(0, testpars, 1))
-        if (!isTRUE(all.equal(iaf0, 1))) {
-            message("CAVE: the '", type, "' function does not evaluate to 1 ",
-                    "at ", ctext)
-        }
-    } else {
-        message("the maximum value returned by the '", type,
-                "' function should be 1")
-    }
-    NULL
+    pargrid <- pargrid[sample(nrow(pargrid), B, replace=TRUE),]
+    res <- t(apply(cbind(runif(B, 0, rmax), pargrid), 1, function (x) {
+        c(ana = Fcircle(x[1], x[-1], type),
+          num = polyCub.SV(discpoly(c(0,0), x[1], class="owin"),
+                           function (s) f(s, x[-1], type),
+                           alpha=0, nGQ=30))
+    }))
+    all.equal(res[,1], res[,2])
 }
 
-
-
-### Checks if FUN has three arguments (s/t, pars, type) and
-### eventually adds the last two
-
-.checknargs3 <- function (FUN, name)
+checksiaf.deriv <- function (deriv, f, pargrid, type=1)
 {
-    FUN <- match.fun(FUN)
-    NARGS <- length(formals(FUN))
-    if (NARGS == 0L) {
-        stop("the function '", name, "' must accept at least one argument")
-    } else if (NARGS == 1L) {
-        formals(FUN) <- c(formals(FUN), alist(pars=, types=))
-    } else if (NARGS == 2L) {
-        formals(FUN) <- c(formals(FUN), alist(types=))
+    sgrid <- cbind(seq(-2,2,len=21), seq(-1,1,len=21))
+    sgrid <- sgrid[-11,] # some siafs are always 1 at (0,0) (deriv=0)
+    maxreldiffs <- if (requireNamespace("maxLik")) {
+        apply(pargrid, 1, function (pars) {
+            maxLik::compareDerivatives(f, deriv, t0=pars, s=sgrid,
+                                       print=FALSE)$maxRelDiffGrad
+        })
+    } else { # use stats::numericDeriv
+        apply(pargrid, 1, function (pars) {
+            ana <- deriv(sgrid, pars, types=type)
+            logsigma <- pars[1L]; logd <- pars[2L]
+            num <- attr(stats::numericDeriv(quote(f(sgrid, c(logsigma,logd),
+                                                    types=type)),
+                                            theta=c("logsigma", "logd")),
+                        "gradient")
+            max((ana-num)/(0.5*(abs(ana)+abs(num))))
+        })
     }
-    FUN
+    max(maxreldiffs)
+}
+
+checksiaf.simulate <- function (simulate, f, pars, type=1, B=1000, ub=10)
+{
+    ## Naive graphical check
+    plot(as.im.function(function(x,y,...) f(cbind(x,y), pars, type),
+                        W=discpoly(c(0,0), ub, class="owin")), axes=TRUE)
+    simpoints <- simulate(B, pars, type=type, ub=ub)
+    points(simpoints, cex=0.2)
+
+    ## kdens <- MASS::kde2d(simpoints[,1], simpoints[,2], n=100)
+    ## x11(); image(kdens)
+    ## x11(); contour(kdens)
 }
 
 
 
-### Checks the siaf specification
+### Construct (check) a siaf specification
 # f: spatial interaction function (siaf). must accept two arguments, a coordinate matrix and a parameter vector. for marked twinstim, it must accept a third argument which is the type of the event (either a single type for all locations or separate types for each location)
 # F: function that integrates 'f' (2nd argument) over a polygonal domain (of class "owin", 1st argument). The third and fourth arguments are the parameters and the type, respectively. There may be additional arguments which are passed by the control.siaf list in twinstim().
 # Fcircle: optional function for fast calculation of the integral of f over a circle with radius r (first argument). Further arguments like f. It must not be vectorized for model fitting (will be passed single radius and single type).
@@ -568,7 +688,7 @@ tiaf.constant <- function () {
 # validpars: a function indicating if a specific parameter vector is valid. Not necessary if npars == 0. If missing or NULL, it will be set to function (pars) TRUE. This function is rarely needed in practice, because usual box constrained parameters can be taken into account by using L-BFGS-B as the optimization method (with arguments 'lower' and 'upper').
 # knots: not implemented. Knots (> 0) of a spatial interaction STEP function of the distance
 
-checksiaf <- function (f, F, Fcircle, effRange, deriv, Deriv, simulate, npars, validpars, knots)
+siaf <- function (f, F, Fcircle, effRange, deriv, Deriv, simulate, npars, validpars, knots)
 {
     # if siaf is a step function specified by knots
     if (!missing(knots)) {
@@ -624,8 +744,8 @@ checksiaf <- function (f, F, Fcircle, effRange, deriv, Deriv, simulate, npars, v
     ## Check if the validpars are of correct form
     validpars <- if (!haspars || missing(validpars) || is.null(validpars))
         NULL else match.fun(validpars)
-    ## Check if the siaf has value 1 at (0,0)
-    .checkiaf0(f, npars, validpars, "siaf")
+    ## Check if the siaf has value 1 at (0,0) (THIS IS NO REQUIREMENT)
+    ##.checkiaf0(f, npars, validpars, "siaf")
     ## Done, return result.
     list(f = f, F = F, Fcircle = Fcircle, effRange = effRange,
          deriv = deriv, Deriv = Deriv,
@@ -635,7 +755,66 @@ checksiaf <- function (f, F, Fcircle, effRange, deriv, Deriv, simulate, npars, v
 
 
 
-### Checks the tiaf specification
+
+
+
+###########################################
+### tiaf: TEMPORAL INTERACTION FUNCTION ###
+###########################################
+
+
+### Constant temporal interaction
+
+tiaf.constant <- function ()
+{
+    res <- list(
+        g = as.function(alist(t=, pars=, types=, rep.int(1, length(t))), envir = .GlobalEnv),
+        G = as.function(alist(t=, pars=, types=, t), envir = .GlobalEnv),
+        deriv = NULL, Deriv = NULL, npars = 0L, validpars = NULL
+    )
+    attr(res, "constant") <- TRUE
+    res
+}
+
+
+### Exponential temporal interaction function
+## nTypes: cf. parameter description for siaf.gaussian
+
+tiaf.exponential <- function (nTypes = 1)
+{
+    # time points vector t, length(types) = 1 or length(t)
+    g <- function (t, alpha, types) {
+        types <- rep(types, length.out = length(t))
+        alphat <- alpha[types]
+        exp(-alphat*t)
+    }
+    G <- function (t, alpha, types) {
+        types <- rep(types, length.out = length(t))
+        alphat <- alpha[types]
+        ifelse(alphat==0, t, -exp(-alphat*t)/alphat)
+    }
+    deriv <- function (t, alpha, types) {
+        L <- length(t)
+        types <- rep(types, length.out = L)
+        alphat <- alpha[types]
+        deriv <- matrix(0, L, length(alpha))
+        deriv[cbind(1:L,types)] <- -t*exp(-alphat*t)
+        deriv
+    }
+    Deriv <- function (t, alpha, types) {
+        L <- length(t)
+        types <- rep(types, length.out = L)
+        alphat <- alpha[types]
+        Deriv <- matrix(0, L, length(alpha))
+        Deriv[cbind(1:L,types)] <- ifelse(alphat==0, -t^2/2, (t+1/alphat)*exp(-alphat*t)/alphat)
+        Deriv
+    }
+
+    list(g=g, G=G, deriv=deriv, Deriv=Deriv, npars=nTypes, validpars=NULL)
+}
+
+
+### Construct (check) a tiaf specification
 # g: temporal interaction function (tiaf). must accept two arguments, a vector of time points and a parameter vector. for marked twinstim, it must accept a third argument which is the type of the event (either a single type for all locations or separate types for each location)
 # G: a primitive of g. Must accept same arguments as g. (_vector_ of time points, not just a single one!)
 # deriv: optional derivative of g with respect to the parameters. Takes the same arguments as g but returns a matrix with as many rows as there were time points in the input and npars columns. The derivative is necessary for the score function.
@@ -644,7 +823,7 @@ checksiaf <- function (f, F, Fcircle, effRange, deriv, Deriv, simulate, npars, v
 # validpars: a function indicating if a specific parameter vector is valid. Not necessary if npars == 0. If missing or NULL, will be set to function (pars) TRUE. This function is rarely needed in practice, because usual box constrained parameters can be taken into account by using L-BFGS-B as the optimization method (with arguments 'lower' and 'upper').
 # knots: not implemented. Knots (> 0) of a temporal interaction STEP function
 
-checktiaf <- function (g, G, deriv, Deriv, npars, validpars, knots)
+tiaf <- function (g, G, deriv, Deriv, npars, validpars, knots)
 {
     # if tiaf is a step function specified by knots
     if (!missing(knots)) {
@@ -666,35 +845,101 @@ checktiaf <- function (g, G, deriv, Deriv, npars, validpars, knots)
     if (!is.null(Deriv)) Deriv <- .checknargs3(Deriv, "tiaf$Deriv")
     validpars <- if (!haspars || missing(validpars) || is.null(validpars))
         NULL else match.fun(validpars)
-    ## Check if the tiaf has value 1 at the origin
-    .checkiaf0(g, npars, validpars, "tiaf")
+    ## Check if the tiaf has value 1 at the origin (THIS IS NO REQUIREMENT)
+    ##.checkiaf0(g, npars, validpars, "tiaf")
     list(g = g, G = G, deriv = deriv, Deriv = Deriv, npars = npars, validpars = validpars)
 }
 
 
 
-### Wrapper used in main function to evaluate the siaf and tiaf arguments.
-### If succesful, returns checked interaction function
 
-.parseiaf <- function (iaf, verbose = TRUE)
+
+
+##############################################
+### INTERNAL HELPER FOR iaf SPECIFICATIONS ###
+##############################################
+
+
+### check if the (spatial or temporal) interaction function 'iaf' returns 1 at
+### the origin 0 or (0,0).
+### CAVE: THIS IS NO LONGER THOUGHT OF AS A REQUIRED CONSTRAINT
+###       The crucial point is that interaction functions should not include
+###       proportionality constants (just the kernel) since scaling is subsumed
+###       by the epidemic intercept gamma_0 !
+
+.checkiaf0 <- function(iaf, npars, validpars, type = c("siaf", "tiaf"))
 {
-    name <- as.character(substitute(iaf))
+    type <- match.arg(type)
+    testpars <- rep.int(0.5, npars)
+    if (!is.null(validpars)) {
+        valid <- validpars(testpars)
+        if (length(valid) != 1 || !is.logical(valid)) {
+            stop("the '", type, "'/'validpars' function must return a single ",
+                 "logical value")
+        }
+        if (!valid) {
+            testpars <- rep.int(pi, npars)
+            valid <- validpars(testpars)
+        }
+    } else valid <- TRUE
+    if (valid) {
+        ctext <- switch(type, siaf = "coordinate (0,0)", tiaf = "time point 0")
+        iaf0 <- switch(type,
+            siaf = iaf(t(c(0,0)), testpars, 1),
+            tiaf = iaf(0, testpars, 1))
+        if (!isTRUE(all.equal(iaf0, 1))) {
+            message("CAVE: the '", type, "' function does not evaluate to 1 ",
+                    "at ", ctext)
+        }
+    } else {
+        message("the maximum value returned by the '", type,
+                "' function should be 1")
+    }
+    NULL
+}
+
+
+### Checks if FUN has three arguments (s/t, pars, type) and
+### eventually adds the last two
+
+.checknargs3 <- function (FUN, name)
+{
+    FUN <- match.fun(FUN)
+    NARGS <- length(formals(FUN))
+    if (NARGS == 0L) {
+        stop("the function '", name, "' must accept at least one argument")
+    } else if (NARGS == 1L) {
+        formals(FUN) <- c(formals(FUN), alist(pars=, types=))
+    } else if (NARGS == 2L) {
+        formals(FUN) <- c(formals(FUN), alist(types=))
+    }
+    FUN
+}
+
+
+### Internal wrapper used in twinstim() and simEpidataCS() to evaluate the siaf
+### and tiaf arguments. If succesful, returns checked interaction function.
+
+.parseiaf <- function (iaf, type = c("siaf", "tiaf"), verbose = TRUE)
+{
+    type <- match.arg(type)
     if (missing(iaf) || is.null(iaf)) {
         if (verbose) {
             message("assuming constant ",
-                    switch(name, siaf="spatial", tiaf="temporal"),
-                    " interaction '", name, ".constant()'")
+                    switch(type, siaf="spatial", tiaf="temporal"),
+                    " interaction '", type, ".constant()'")
         }
-        do.call(paste(name, "constant", sep="."), args=alist())
+        do.call(paste(type, "constant", sep="."), args=alist())
     } else if (is.list(iaf)) {
-        ret <- do.call(paste0("check",name), args = iaf)
+        ret <- do.call(type, args = iaf)
         attr(ret, "constant") <- isTRUE(attr(iaf, "constant"))
         ret
     } else if (is.vector(iaf, mode = "numeric")) {
-        stop("'knots' are not implemented for '",name,"'")
-        do.call(paste0("check",name), args = list(knots = iaf))
+        stop("'knots' are not implemented for '",type,"'")
+        do.call(type, args = list(knots = iaf))
     } else {
-        stop("'",name,"' must be NULL (or missing), a list (-> continuous ",
-            "function), or numeric (-> knots of step function)")
+        stop("'", as.character(substitute(iaf)),
+             "' must be NULL (or missing), a list (-> continuous ",
+             "function), or numeric (-> knots of step function)")
     }
 }
