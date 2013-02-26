@@ -41,7 +41,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     (corresponding to \code{siaf.constant()}, i.e. constant infectivity 
     independent of the spatial distance from the host), a list
     (specifying a continuous kernel, as e.g., returned by the functions
-    \code{\link{siaf.gaussian}} or \code{\link{siaf.lomax}}), or numeric
+    \code{\link{siaf.gaussian}} or \code{\link{siaf.powerlaw}}), or numeric
     (knots of a step function).
   }
   \item{tiaf}{

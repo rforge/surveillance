@@ -188,7 +188,7 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
             )
     ))
 
-    # sampler
+    ## sampler (does not obey the 'ub' argument!!)
     body(simulate) <- as.call(c(as.name("{"),
         tmp1, tmp1.1,
         expression(matrix(stats::rnorm(2*n, mean=0, sd=sd), nrow=n, ncol=2L))
@@ -224,6 +224,7 @@ qlomax <- function (p, scale, shape) {
 siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
                         effRangeProb = NULL, validpars = NULL)
 {
+    .Deprecated("siaf.powerlaw")
     nTypes <- as.integer(nTypes)
     stopifnot(length(nTypes) == 1L, nTypes > 0L)
 
@@ -605,8 +606,10 @@ siaf.fallback.Deriv <- function (polydomain, deriv, pars, type, method = "SV", .
 
 checksiaf <- function (siaf, pargrid, type=1)
 {
-    stopifnot(is.list(siaf), is.numeric(pargrid))
-    if (is.vector(pargrid)) pargrid <- t(pargrid) # 1-row matrix
+    stopifnot(is.list(siaf), is.numeric(pargrid), !is.na(pargrid),
+              length(pargrid) > 0)
+    pargrid <- as.matrix(pargrid)
+    stopifnot(siaf$npars == ncol(pargrid))
     
     ## Check Fcircle
     if (!is.null(siaf$Fcircle)) {
@@ -628,7 +631,7 @@ checksiaf <- function (siaf, pargrid, type=1)
 
 checksiaf.Fcircle <- function (Fcircle, f, pargrid, type=1, B=20, rmax=100)
 {
-    pargrid <- pargrid[sample(nrow(pargrid), B, replace=TRUE),]
+    pargrid <- pargrid[rep(1:nrow(pargrid), B, replace=TRUE),]
     res <- t(apply(cbind(runif(B, 0, rmax), pargrid), 1, function (x) {
         c(ana = Fcircle(x[1], x[-1], type),
           num = polyCub.SV(discpoly(c(0,0), x[1], class="owin"),
@@ -661,17 +664,23 @@ checksiaf.deriv <- function (deriv, f, pargrid, type=1)
     max(maxreldiffs)
 }
 
-checksiaf.simulate <- function (simulate, f, pars, type=1, B=1000, ub=10)
+checksiaf.simulate <- function (simulate, f, pars, type=1, B=3000, ub=10)
 {
-    ## Naive graphical check
-    plot(as.im.function(function(x,y,...) f(cbind(x,y), pars, type),
-                        W=discpoly(c(0,0), ub, class="owin")), axes=TRUE)
+    ## Simulate B points on the disc with radius 'ub'
     simpoints <- simulate(B, pars, type=type, ub=ub)
-    points(simpoints, cex=0.2)
 
-    ## kdens <- MASS::kde2d(simpoints[,1], simpoints[,2], n=100)
-    ## x11(); image(kdens)
-    ## x11(); contour(kdens)
+    ## Graphical check
+    par(mar=c(1,2,2,1))
+    plot(as.im.function(function(x,y,...) f(cbind(x,y), pars, type),
+                        W=discpoly(c(0,0), ub, class="owin")),
+         axes=TRUE, main="Simulation from the spatial kernel")
+    points(simpoints, cex=0.2)
+    if (requireNamespace("MASS")) {
+        kdens <- MASS::kde2d(simpoints[,1], simpoints[,2], n=100)
+        contour(kdens, add=TRUE, col=2, lwd=2,
+                labcex=1.5, vfont=c("sans serif", "bold"))
+        ##x11(); image(kdens, add=TRUE)
+    }
 }
 
 

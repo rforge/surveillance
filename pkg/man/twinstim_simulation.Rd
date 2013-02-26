@@ -49,13 +49,13 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     the \code{siaf} specification must also contain the element
     \code{simulate}, a function which draws random locations following the
     spatial kernel \code{siaf$f}. The first argument of the function is the
-    number of points to sample, the second one is the vector of parameters
+    number of points to sample (say \code{n}),
+    the second one is the vector of parameters
     \code{siafpars}, the third one is the type indicator (a character string
     matching a type name as specified by \code{dimnames(qmatrix)}). With the
     current implementation there will always be simulated only one
-    location at a time. Predefined specifications are
-    \code{\link{siaf.gaussian}}, \code{\link{siaf.lomax}}, and
-    \code{\link{siaf.constant}}.
+    location at a time, i.e. \code{n=1}.
+    The \link[=siaf.constant]{predefined siaf's} all provide simulation.
   } 
   \item{tiaf}{
     e.g. what is returned by the generating function
