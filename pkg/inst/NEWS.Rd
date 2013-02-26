@@ -6,14 +6,19 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.5-2 (2013-02-19)}{
+\section{Changes in surveillance version 1.5-2 (2013-02-26)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
     \item This version essentially adds new features and fixes
-    some minor bugs for the "\code{twinstim}" part of the package.
+    some minor bugs for the "\code{twinstim}" part of the package (see
+    below). 
     \item Yet another p-value formatting function \code{formatPval()}
     is now also part of the \pkg{surveillance} package.
+    \item \code{polyCub.SV()} now also accepts objects of classes
+    \code{"Polygon"} and \code{"Polygons"} for convenience.
+    \item \code{siaf.lomax} is deprecated and replaced by
+    \code{siaf.powerlaw} (re-parametrization).
   }
 }
 
