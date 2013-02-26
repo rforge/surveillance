@@ -613,7 +613,9 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
     
     ## grid of x-values (t or ||s||) on which FUN will be evaluated
     if (is.null(xlim)) {
-        xmax <- if (which == "siaf") {
+        xmax <- if (add) {
+            par("usr")[2] / (if (par("xaxs")=="r") 1.04 else 1)
+        } else if (which == "siaf") {
             sqrt(sum((object$bbox[,"max"] - object$bbox[,"min"])^2))
         } else {
             diff(object$timeRange)

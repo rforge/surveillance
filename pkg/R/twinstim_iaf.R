@@ -180,7 +180,7 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
         } else { # d f(s|type_i) / d sigma_{type_j} is 0 for i != j
             expression(deriv.type <- function (s) deriv(s, pars, type)[,type,drop=TRUE])
         },
-        expression(int <- polyCub.SV(polydomain$bdry, deriv.type, nGQ=nGQ, alpha=a)),
+        expression(int <- polyCub.SV(polydomain, deriv.type, nGQ=nGQ, alpha=a)),
         if (nTypes == 1L) expression(int) else expression(
             res <- numeric(length(pars)), # zeros
             res[type] <- int,
@@ -318,7 +318,7 @@ siaf.lomax <- function (nTypes = 1, logpars = TRUE, density = FALSE,
             deriv1 <- function (s, paridx)
                 deriv(s, logpars, type)[,paridx,drop=TRUE],
             intderiv1 <- function (paridx)
-                polyCub.SV(polydomain$bdry, deriv1, paridx=paridx,
+                polyCub.SV(polydomain, deriv1, paridx=paridx,
                            nGQ = nGQ, alpha = a[paridx]),
             res.logsigma <- intderiv1(1L),
             res.logalpha <- intderiv1(2L),
@@ -490,7 +490,7 @@ siaf.powerlaw <- function (nTypes = 1, logpars = TRUE,
             deriv1 <- function (s, paridx)
                 deriv(s, logpars, type)[,paridx,drop=TRUE],
             intderiv1 <- function (paridx)
-                polyCub.SV(polydomain$bdry, deriv1, paridx=paridx,
+                polyCub.SV(polydomain, deriv1, paridx=paridx,
                            nGQ = nGQ, alpha = a[paridx]),
             res.logsigma <- intderiv1(1L),
             res.logd <- intderiv1(2L),
