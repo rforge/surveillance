@@ -43,6 +43,10 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     (specifying a continuous kernel, as e.g., returned by the functions
     \code{\link{siaf.gaussian}} or \code{\link{siaf.powerlaw}}), or numeric
     (knots of a step function).
+    If you run into \dQuote{false convergence} with a non-constant
+    \code{siaf} specification, the numerical accuracy of the cubature
+    methods is most likely too low (see the \code{control.siaf}
+    argument).
   }
   \item{tiaf}{
     temporal interaction function. May be \code{NULL} (or missing,
@@ -114,9 +118,18 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     \code{siaf$Deriv}, respectively.\cr
     These arguments mainly determine the accuracy of the numerical
     cubature rules involved in non-constant \code{siaf} specifications,
-    e.g., the bandwidth (\code{eps}) of the midpoint rule or the number
-    of (univariate) Gaussian quadrature points (\code{nGQ}), see
-    the help on \code{\link{siaf.gaussian}}.
+    e.g., the bandwidth of the midpoint rule or the number
+    of Gaussian quadrature points.
+    For instance, \code{\link{siaf.gaussian}} by default uses the
+    midpoint-cubature (see \code{\link{polyCub.midpoint}}) with an
+    adaptive bandwidth of \code{adapt*sd} to numerically integrate the
+    kernel \eqn{f(\bold{s})} over polygonal domains. The \code{adapt}
+    parameter defaults to 0.1, but may be modified via setting
+    \code{control.siaf$F$adapt}. In contrast, \code{polyCub.SV} with
+    \code{nGQ=20} is by default used to numerically integrate the
+    derivative of \eqn{f(\bold{s})} wrt the kernel parameters over
+    polygonal domains. The number of cubature points may be modified via
+    setting \code{control.siaf$Deriv$nGQ}.\cr
     This argument list is ignored in the case
     \code{siaf=siaf.constant()} (which is the default if \code{siaf} is
     unspecified).
