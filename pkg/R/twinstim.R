@@ -1146,6 +1146,14 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 if (!is.null(optimRes$message) && nzchar(optimRes$message)) {
                     cat("MESSAGE: \"", optimRes$message, "\"\n", sep="")
                 }
+                if (useScore && !constantsiaf &&
+                    grepl("false", msgNotConverged)) {
+                    cat("SOLUTION: increase the precision of 'siaf$Deriv'\n")
+                    if (optimMethod == "nlminb") {
+                        cat("          otherwise increase nlminb's false",
+                            "convergence tolerance 'xf.tol'\n")
+                    }
+                }
             }
         }
 
