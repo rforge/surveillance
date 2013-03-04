@@ -41,8 +41,9 @@ number of events along the time axis (aggregated over space) using
     For plotting the number of events over time (\code{aggregate = "time"}):
     \describe{
       \item{t0.Date}{the beginning of the observation period
-	\code{t0 = x$stgrid$start[1]} as \code{\link{Date}}, enabling
-	a nice x-axis using \code{\link{hist.Date}} and sensible
+	\code{t0 = x$stgrid$start[1]} as a \code{"\link{Date}"} (or
+	anything coercible by \code{as.Date} without further arguments),
+	enabling a nice x-axis using \code{\link{hist.Date}} and sensible
 	\code{breaks} of the histogram (which must also be specified in
 	this case, e.g., \code{"months"}). The event times then equal
 	\code{t0.Date + as.integer(x$events$time - t0)}, i.e. possible
