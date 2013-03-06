@@ -469,7 +469,7 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
     }
     if (length(eventTimes) == 0) stop("no events left after 'subset'")
     if (!is.null(t0.Date)) {
-        stopifnot(is.vector(t0.Date), length(t0.Date) == 1L)
+        stopifnot(inherits(t0.Date, "Date") || is.vector(t0.Date), length(t0.Date) == 1L)
         t0.Date <- as.Date(t0.Date)
         t0 <- timeRange[1L]
         if (is.null(xlim)) xlim <- t0.Date + (timeRange - t0)
