@@ -276,3 +276,50 @@ control2nlminb <- function (control, defaults)
     defaults[names(control)] <- control
     defaults
 }
+
+
+### Helper for iaf-checks:
+### Checks if FUN has three arguments (s/t, pars, type) and
+### eventually adds the last two
+
+.checknargs3 <- function (FUN, name)
+{
+    FUN <- match.fun(FUN)
+    NARGS <- length(formals(FUN))
+    if (NARGS == 0L) {
+        stop("the function '", name, "' must accept at least one argument")
+    } else if (NARGS == 1L) {
+        formals(FUN) <- c(formals(FUN), alist(pars=, types=))
+    } else if (NARGS == 2L) {
+        formals(FUN) <- c(formals(FUN), alist(types=))
+    }
+    FUN
+}
+
+
+### Internal wrapper used in twinstim() and simEpidataCS() to evaluate the siaf
+### and tiaf arguments. If succesful, returns checked interaction function.
+
+.parseiaf <- function (iaf, type = c("siaf", "tiaf"), verbose = TRUE)
+{
+    type <- match.arg(type)
+    if (missing(iaf) || is.null(iaf)) {
+        if (verbose) {
+            message("assuming constant ",
+                    switch(type, siaf="spatial", tiaf="temporal"),
+                    " interaction '", type, ".constant()'")
+        }
+        do.call(paste(type, "constant", sep="."), args=alist())
+    } else if (is.list(iaf)) {
+        ret <- do.call(type, args = iaf)
+        attr(ret, "constant") <- isTRUE(attr(iaf, "constant"))
+        ret
+    } else if (is.vector(iaf, mode = "numeric")) {
+        stop("'knots' are not implemented for '",type,"'")
+        do.call(type, args = list(knots = iaf))
+    } else {
+        stop("'", as.character(substitute(iaf)),
+             "' must be NULL (or missing), a list (-> continuous ",
+             "function), or numeric (-> knots of step function)")
+    }
+}
