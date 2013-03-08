@@ -118,7 +118,7 @@ siaf.powerlaw <- function (nTypes = 1, logpars = TRUE,
         effRange
     } else NULL
 
-    ## simulate from the Lomax kernel (within a maximum distance 'ub')
+    ## simulate from the power-law kernel (within a maximum distance 'ub')
     simulate <- function (n, logpars, type, ub)
     {
         sigma <- exp(logpars[[1L]])

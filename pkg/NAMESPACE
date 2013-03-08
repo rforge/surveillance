@@ -148,6 +148,7 @@ exportMethods("epoch<-","observed<-","alarms<-","upperbound<-","population<-","c
 export(linelist2sts)
 
 export(wrap.algo, farrington, bayes, rki, cusum, glrpois, glrnb, outbreakP) # rogerson, hmm
+export(earsC)
 export(categoricalCUSUM, pairedbinCUSUM, pairedbinCUSUM.runlength)
 export(nowcast, backprojNP)
 
