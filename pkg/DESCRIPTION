@@ -5,7 +5,7 @@ Date: 2013-02-26
 Author: M. Höhle, S. Meyer and M. Paul
         with contributions from
         T. Correa, L. Held, M. Hofmann, C. Lang, A. Riebler, D. Sabanés Bové,
-        S. Steiner, M. Virtanen, and V. Wimmer.
+        M. Salmon, S. Steiner, M. Virtanen, and V. Wimmer.
         A few code segments are modified versions of code by
         The R Core Team (available under GPL-2).
 Depends: R (>= 2.14.0), grDevices, graphics, stats, utils, xtable, methods, Rcpp, sp
