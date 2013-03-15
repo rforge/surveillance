@@ -6,13 +6,15 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.5-2 (2013-02-26)}{
+\section{Changes in surveillance version 1.5-2 (2013-03-15)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
-    \item This version essentially adds new features and fixes
-    some minor bugs for the "\code{twinstim}" part of the package (see
-    below). 
+    \item New method for outbreak detection: \code{earsC}
+    (CUSUM-method described in the CDC Early Aberration Reporting
+    System, see Hutwagner et al, 2003).
+    \item New features and minor bug fixes for the "\code{twinstim}"
+    part of the package (see below).
     \item Yet another p-value formatting function \code{formatPval()}
     is now also part of the \pkg{surveillance} package.
     \item \code{polyCub.SV()} now also accepts objects of classes
@@ -26,7 +28,8 @@
   \itemize{
     \item The temporal \code{plot}-method for class \code{"epidataCS"}
     now understands the \code{add} parameter to add the histogram to an
-    existing plot window.
+    existing plot window, and auto-transforms the \code{t0.Date}
+    argument using \code{as.Date()} if necessary.
     \item \code{nobs()} methods for classes \code{"epidataCS"} and
     \code{"twinstim"}.
     \item New argument \code{verbose} for \code{twinstim()} which, if
