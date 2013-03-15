@@ -215,10 +215,11 @@ checksiaf.Fcircle <- function (Fcircle, f, pargrid, type=1, B=20, rmax=100)
     all.equal(res[,1], res[,2])
 }
 
-checksiaf.deriv <- function (deriv, f, pargrid, type=1)
+checksiaf.deriv <- function (deriv, f, pargrid, type=1, rmax=100)
 {
-    sgrid <- cbind(seq(-2,2,len=21), seq(-1,1,len=21))
-    sgrid <- sgrid[-11,] # some siafs are always 1 at (0,0) (deriv=0)
+    rgrid <- seq(-rmax,rmax,len=21) / sqrt(2)
+    rgrid <- rgrid[rgrid != 0] # some siafs are always 1 at (0,0) (deriv=0)
+    sgrid <- cbind(rgrid, rgrid)
     maxreldiffs <- if (requireNamespace("maxLik")) {
         apply(pargrid, 1, function (pars) {
             maxLik::compareDerivatives(f, deriv, t0=pars, s=sgrid,
