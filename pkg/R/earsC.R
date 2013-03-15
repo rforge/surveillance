@@ -49,8 +49,8 @@
 # by the function
 ######################################################################
 
-earsC <- function(sts, control = list(range = range, method = c("C1","C2","C3")),
-thresholdParameter = alpha) { 
+earsC <- function(sts, control = list(range = NULL, method = "C1",
+                                      alpha = 0.001)) { 
 
 ######################################################################
   #Handle I/O
@@ -59,47 +59,44 @@ thresholdParameter = alpha) {
   #If list elements are empty fill them!
 
   # Method
-
   if (is.null(control[["method",exact=TRUE]])) {
     control$method <- "C1"
-    
   }
-    # Extracting the method
+  
+  # Extracting the method
   method <- match.arg( control$method, c("C1","C2","C3"),several.ok=FALSE)
   
-    # Range
-    # By default it will take all possible weeks
-    # which is not the same depending on the method
+  # Range
+  # By default it will take all possible weeks
+  # which is not the same depending on the method
   if (is.null(control[["range",exact=TRUE]])) {
-
-  if (method == "C1"){
-  control$range <- c(8:length(sts@observed))
+    if (method == "C1"){
+      control$range <- c(8:length(sts@observed))
+    }
+    if (method == "C2"){
+      control$range <- c(10:length(sts@observed))
+    }
+    if (method == "C3"){
+      control$range <- c(12:length(sts@observed))
+    }    
   }
-  if (method == "C2"){
-  control$range <- c(10:length(sts@observed))
-  }
-  if (method == "C3"){
-  control$range <- c(12:length(sts@observed))
-  }    
-  }
-  
   
   # zAlpha
-  if (is.null(control[["thresholdParameter",exact=TRUE]])) {
-  # C1 and C2: Risk of 1st type error of 10-3
-  # This corresponds to an Z(1-zAlpha) of about 3
-  if (method %in% c("C1","C2")) {
-  control$thresholdParameter = 0.001
+  if (is.null(control[["alpha",exact=TRUE]])) {
+    # C1 and C2: Risk of 1st type error of 10-3
+    # This corresponds to an Z(1-zAlpha) of about 3
+    if (method %in% c("C1","C2")) {
+      control$alpha = 0.001
   }
-  # C3: Risk of 1st type error of 0.025
-  # This corresponds to an Z(1-zAlpha) of about 2
-  if (method=="C3") {
-  control$thresholdParameter = 0.025
-  }
+    # C3: Risk of 1st type error of 0.025
+    # This corresponds to an Z(1-zAlpha) of about 2
+    if (method=="C3") {
+      control$alpha = 0.025
+    }
   }
 
   # Calculating the threshold zAlpha
-  zAlpha <- qnorm((1-control$thresholdParameter))
+  zAlpha <- qnorm((1-control$alpha))
  
   
   #Deduce necessary amount of data from method
@@ -125,7 +122,6 @@ thresholdParameter = alpha) {
      if (method %in% c("C1","C2")) {
 
        # Create a matrix with time-lagged vectors
-
        refVals <- NULL
        for (lag in maxLag:(maxLag-6)) {
          refVals <- cbind(refVals, observed(sts)[(control$range-lag),j])
@@ -137,38 +133,28 @@ thresholdParameter = alpha) {
      }
           
      if (method=="C3") {
-
-
        # Create a matrix with time-lagged vectors
-     refVals <- NULL
-     rangeC2 = ((min(control$range) - 2) : max(control$range))
-     for (lag in 9:3) {
-       refVals <- cbind(refVals, observed(sts)[(rangeC2-lag),j])
-     }
+       refVals <- NULL
+       rangeC2 = ((min(control$range) - 2) : max(control$range))
+       for (lag in 9:3) {
+         refVals <- cbind(refVals, observed(sts)[(rangeC2-lag),j])
+       }
 
-     # Calculate C2
-     C2 <- (observed(sts)[rangeC2,j] - apply(refVals,1,mean)) / apply(refVals,1,sd)
-
-
+       # Calculate C2
+       C2 <- (observed(sts)[rangeC2,j] - apply(refVals,1,mean)) / apply(refVals,1,sd)
+       # Calculate the upperbound
+       # first calculate the parts of the formula with the maximum of C2 and 0 for     # two time lags.
+       partUpperboundLag2 =  pmax(rep(0,length=length(C2)-2),C2[1:(length(C2)-2)]-1)
+       partUpperboundLag1 =  pmax(rep(0,length=length(C2)-2),C2[2:(length(C2)-1)]-1)
      
-     # Calculate the upperbound
-     # first calculate the parts of the formula with the maximum of C2 and 0 for 
-     # two time lags.
+       sts@upperbound[control$range,j] <- observed(sts)[control$range,j] +
+         apply(as.matrix(refVals[3:length(C2),]),1,sd)*(zAlpha - (partUpperboundLag2 + partUpperboundLag1))
 
-     partUpperboundLag2 =  pmax(rep(0,length=length(C2)-2),C2[1:(length(C2)-2)]-1)
-     partUpperboundLag1 =  pmax(rep(0,length=length(C2)-2),C2[2:(length(C2)-1)]-1)
-
-sts@upperbound[control$range,j] <- observed(sts)[control$range,j] +
-apply(as.matrix(refVals[3:length(C2),]),1,sd)*(zAlpha - (partUpperboundLag2 + partUpperboundLag1))
-
-
-     # Upperbound must be superior to 0 which is not always the case with this formula
-
-sts@upperbound[control$range,j] = pmax(rep(0,length(control$range)),sts@upperbound[control$range,j])     
-
-   }  # end of loop over j
-  } #end of loop over cols in sts
-   
+       # Upperbound must be superior to 0 which is not always the case
+       #with this formula
+       sts@upperbound[control$range,j] = pmax(rep(0,length(control$range)),sts@upperbound[control$range,j])     
+     }  # end of loop over j
+   } #end of loop over cols in sts
 
   #Make sts return object
   control$name <- paste("EARS_",method,sep="")
@@ -176,7 +162,7 @@ sts@upperbound[control$range,j] = pmax(rep(0,length(control$range)),sts@upperbou
   sts@control <- control
   #Where are the alarms?
   sts@alarm[control$range,] <- matrix(observed(sts)[control$range,]>upperbound(sts)[control$range,] )
-
+  
   #Done
   return(sts[control$range,])
 }

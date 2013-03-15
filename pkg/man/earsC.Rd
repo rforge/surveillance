@@ -14,9 +14,8 @@
   for data without many reference values, since it only needs counts from the recent past.
 %
 }
-\usage{
-  earsC(sts, control = list(range = NULL, method = "C1"),
-                            thresholdParameter = 0.001)
+\usage{ earsC(sts, control = list(range = NULL, method = "C1",
+                            alpha = 0.001))
 }
 \arguments{
 \item{sts}{object of class sts (including the \code{observed} and the \code{state} time series) , which is to be monitored.}
@@ -134,7 +133,7 @@ plot(res1,legend.opts=list(horiz=TRUE,x="topright"),dx.upperbound=0)
 
 
 # compare upperbounds depending on alpha
-res3 <- earsC(stsObj, control = list(range = 20:208,method="C3",thresholdParameter = 0.001))
+res3 <- earsC(stsObj, control = list(range = 20:208,method="C3",alpha = 0.001))
 plot(res3@upperbound,t='l')
 res3 <- earsC(stsObj, control = list(range = 20:208,method="C3"))
 lines(res3@upperbound,col='red')
