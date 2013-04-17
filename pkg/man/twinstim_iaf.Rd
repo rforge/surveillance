@@ -230,9 +230,7 @@ tiaf.exponential(nTypes = 1)
     return a two-column \emph{matrix} of the sampled locations.
     Note that the simulation method actually samples only one location
     at a time, thus it is sufficient to have a working
-    \code{function(n=1, pars, type)}. For \code{siaf.constant()}, the
-    \code{simulate} component is \code{NULL}, but this will be handled
-    specially by \code{simEpidataCS}.
+    \code{function(n=1, pars, type)}.
   }
   \item{npars}{the number of parameters of the spatial interaction
     function \code{f} (i.e. the length of its second argument).}
