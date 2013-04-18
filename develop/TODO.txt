@@ -38,8 +38,6 @@
 ###########
 
 #Open
-11/11/2011 Author@R field in the ‘DESCRIPTION’ file.
-           CAVE: not supported with R < 2.14.0 => wait some time
 02/11/2011 plot for sts objects which contains daily data as Date obj
 
 #Done
@@ -47,6 +45,7 @@
 19/06/2012 move vignettes into a vignettes directory or create .Rinstignore
            (as of R 2.14.0 the preferred location for vignette sources is
             directory ‘vignettes’ and not ‘inst/doc’)
+18/04/2013 Author@R field in the ‘DESCRIPTION’ file.
 
 
 
@@ -128,6 +127,7 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 ##########
 
 #Open issues / feature requests
+- allow for use of rgeos instead of gpclib for polygon operations
 - implement step function support for interaction kernels
 - allow for spatial "prehistory", i.e. events outside of W as possible sources
   in the epidemic component only, but otherwise not part of the likelihood

@@ -52,22 +52,22 @@ siaf.powerlawL <- function (nTypes = 1, logpars = TRUE,
     ## }
     
     ## fast integration of f over a circular domain
-    Fcircle <- function (r, logpars, type = NULL)
-    {
-        ## the 'tmp' expression will be inserted here
-
-        ## trivial case: radius of integration domain < sigma (=> constant f)
-        if (r <= sigma) return(pi * r^2)
-
-        ## otherwise, if r > sigma, integration via f^-1
-        fofr <- (r/sigma)^-d
-        basevolume <- pi * r^2 * fofr   # cylinder volume up to height f(r)
-        intfinvsq <- sigma^2 * if (d == 2) -d*log(sigma/r) else {
-            d/(d-2) * (1 - (sigma/r)^(d-2))
-        }
-        basevolume + pi * intfinvsq
-    }
-    body(Fcircle) <- as.call(c(as.name("{"), as.list(tmp), as.list(body(Fcircle))[-1]))
+    Fcircle <- function (r, logpars, type = NULL) {}
+    body(Fcircle) <- as.call(c(as.name("{"),
+        tmp,
+        expression(
+            ## trivial case: radius of integration domain < sigma (=> constant f)
+            if (r <= sigma) return(pi * r^2),
+            
+            ## otherwise, if r > sigma, integration via f^-1
+            fofr <- (r/sigma)^-d,
+            basevolume <- pi * r^2 * fofr,   # cylinder volume up to height f(r)
+            intfinvsq <- sigma^2 * if (d == 2) -d*log(sigma/r) else {
+                d/(d-2) * (1 - (sigma/r)^(d-2))
+            },
+            basevolume + pi * intfinvsq
+        )
+    ))
 
     ## derivative of f wrt logpars
     deriv <- function (s, logpars, types = NULL) {}
