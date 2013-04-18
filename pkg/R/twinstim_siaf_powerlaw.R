@@ -110,10 +110,11 @@ siaf.powerlaw <- function (nTypes = 1, logpars = TRUE,
 
     ## "effective" integration range (based on some high quantile)
     effRange <- if (isScalar(effRangeProb)) {
+        stop("'effRange' is currently not supported for power law's")
         effRange <- function (logpars) {}
         body(effRange) <- as.call(c(as.name("{"),
-            substitute(qlomax(effRangeProb, exp(logpars[[1]]), exp(logpars[[2]])),
-                       list(effRangeProb=effRangeProb))
+            substitute(qlomax(effRangeProb, exp(logpars[[1]]), exp(logpars[[2]])-1),
+                       list(effRangeProb=effRangeProb)) # only works for d > 1!
         ))
         effRange
     } else NULL

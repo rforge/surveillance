@@ -111,11 +111,12 @@ siaf.powerlawL <- function (nTypes = 1, logpars = TRUE,
 
     ## "effective" integration range (based on quantile of the Pareto distri)
     effRange <- if (isScalar(effRangeProb)) {
+        stop("'effRange' is currently not supported for power law's")
         effRange <- function (logpars) {}
         body(effRange) <- as.call(c(as.name("{"),
             tmp,
             expression(
-                alpha <- d-1,  # actually only works for alpha > 0, i.e. d > 1
+                alpha <- d-1,  # only works for alpha > 0, i.e. d > 1 !
                 sigma/(1-effRangeProb)^(1/alpha)
                 )
         ))
