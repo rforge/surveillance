@@ -6,16 +6,15 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.5-3 (2013-04-17)}{
+
+\section{Changes in surveillance version 1.5-3 (2013-04-19)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
-    \item ...
-  }
-}
-
-\subsection{NEW FEATURES (\code{twinstim()}-related)}{
-  \itemize{
+    \item Fixed obsolete \code{.path.package()} calls.
+    \item Small corrections in the documentation.
+    \item \code{update.twinstim()} performs better in preserving
+    the original initial values of the parameters.
     \item New pre-defined spatial interaction function
     \code{siaf.powerlawL()}, which implements a _L_agged power-law
     kernel, i.e. accounts for uniform short-range dispersal.
