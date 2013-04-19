@@ -19,7 +19,7 @@ popM <- matrix(pop[,2],dimnames=list(NULL,pop[,1]),nrow=nrow(flu.counts),ncol=nr
 nhood <- as.matrix(read.table("neighourhood_ByBw.txt"))
 #map <- readShapePoly("../inst/shapes/districts_BYBW.shp", IDvar = "id")
 #Read the shapefile
-file <- file.path(.path.package("surveillance"),"shapes","districts_BYBW.shp")
+file <- file.path(path.package("surveillance"),"shapes","districts_BYBW.shp")
 map <- readShapePoly(file, IDvar = "id")
 
 
