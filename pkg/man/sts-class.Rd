@@ -39,7 +39,7 @@
 
 \description{
 
-  This is a leightweight S4 class to implement multivariate time
+  This is a lightweight S4 class to implement multivariate time
   series of counts used for public health surveillance data. The class
   captures the time series data as well as the spatial layout of the
   regions, where the data originate from.
