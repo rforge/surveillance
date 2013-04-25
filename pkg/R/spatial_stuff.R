@@ -188,3 +188,36 @@ nbOrder <- function (neighbourhood, maxlag = 1)
     ## Done
     nbmat
 }
+
+
+### Internal wrapper for maptools::unionSpatialPolygons
+
+unionSpatialPolygons <- function (SpP)
+{
+    if (require("maptools") && maptools::gpclibPermitStatus()) {
+        W <- maptools::unionSpatialPolygons(
+            SpP, IDs = rep.int(1,length(SpP@polygons)), avoidGEOS = TRUE)
+        ## ensure that W has exactly the same proj4string as SpP
+        ## since the internal CRS()-call might have modified it
+        W@proj4string <- SpP@proj4string
+        W
+    } else {
+        stop("package \"maptools\" required, and \"gpclibPermit()\" therein")
+    }
+}
+
+    
+### determines which polygons of a SpatialPolygons object are at the border,
+### i.e. have coordinates in common with the spatial union of all polygons
+
+polyAtBorder <- function (SpP)
+{
+    W <- unionSpatialPolygons(SpP)
+    Wcoords <- unique(coordinates(W@polygons[[1]]@Polygons[[1]]))
+    atBorder <- sapply(SpP@polygons, function (x) {
+        coords <- coordinates(x@Polygons[[1]])
+        anyDuplicated(rbind(unique(coords), Wcoords)) > 0
+    })
+    names(atBorder) <- row.names(SpP)
+    atBorder
+}

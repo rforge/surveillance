@@ -130,18 +130,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     tiles <- as(tiles, "SpatialPolygons") # drop possible data attribute
                                           # (-> correct over-method)
     if (is.null(W)) {
-    	if (require("maptools") && maptools::gpclibPermitStatus()) {
-            cat("Building W as the union of 'tiles' ...\n")
-            W <- maptools::unionSpatialPolygons(tiles,
-                     IDs = rep.int(1,length(tiles@polygons)),
-                     avoidGEOS = TRUE)
-            ## ensure that W has exactly the same proj4string as tiles
-            ## since the internal CRS()-call might have modified it
-            W@proj4string <- tiles@proj4string
-        } else {
-            stop("generation of 'W' from 'tiles' requires package\n",
-                 "  \"maptools\" and \"gpclibPermit()\" therein")
-        }
+        cat("Building 'W' as the union of 'tiles' ...\n")
+    	W <- unionSpatialPolygons(tiles)
     } else {
         stopifnot(inherits(W, "SpatialPolygons"),
                   identical(proj4string(tiles), proj4string(W)))
