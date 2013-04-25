@@ -1,0 +1,10 @@
+%% need no \usepackage{Sweave.sty}
+<<setup,cache=FALSE,include=FALSE>>=
+source("setup.R")
+@
+
+
+\section{Introduction} \label{sec:intro}
+
+%- why Modellierung von Epidemic Phenomena
+%      - The R package surveillance

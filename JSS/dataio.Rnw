@@ -1,0 +1,14 @@
+%% need no \usepackage{Sweave.sty}
+<<setup,cache=FALSE,include=FALSE>>=
+source("setup.R")
+@
+
+
+\section{Notation and classes for epidemic data} \label{sec:dataio}
+
+% 2. Notation für die vorhandenen Daten in deren verschiedenen Auflösungen.
+%      - surveillance Klassen für solche Daten (twinstim, twinSIR, sts)
+%      - I/O von solch Daten, Erstellung der Klassen.
+%      - Beispiele: meningokokken, Hagelloch measles, Influenza in
+% Süddeutschland
+%      - Visualisierung

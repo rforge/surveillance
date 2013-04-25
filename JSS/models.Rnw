@@ -1,0 +1,12 @@
+%% need no \usepackage{Sweave.sty}
+<<setup,cache=FALSE,include=FALSE>>=
+source("setup.R")
+@
+
+
+\section{Epidemic modelling} \label{sec:models}
+
+% 3. Modellierung & Modellselektion & Residuen für die Beispiele
+%      - twinstim
+%      - twinSIR
+%      - hhh4

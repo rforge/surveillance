@@ -1,0 +1,112 @@
+\documentclass[article]{jss}
+\usepackage[utf8]{inputenc}   % character encoding of LaTeX source files
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% almost as usual
+\author{Sebastian Meyer\\University of Zurich \And
+        Michaela Paul\\Novartis? \And
+        Leonhard Held\\University of Zurich \And
+        Michael Höhle\\Stockholm University}
+\title{Spatio-Temporal Modelling in Infectious Disease Epidemiology Using the
+\proglang{R} package \pkg{surveillance}}
+
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Sebastian Meyer, Michaela Paul, Leonhard Held, Michael Höhle} %% comma-separated
+\Plaintitle{Spatio-Temporal Modelling in Infectious Disease Epidemiology Using the R package surveillance} %% without formatting
+\Shorttitle{\pkg{surveillance}: Spatio-Temporal Modelling in Infectious Disease Epidemiology} %% a short title (if necessary)
+
+%% an abstract and keywords
+\input{abstract}
+
+%% publication information
+%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
+%% \Volume{50}
+%% \Issue{9}
+%% \Month{June}
+%% \Year{2012}
+%% \Submitdate{2012-06-04}
+%% \Acceptdate{2012-06-04}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+\Address{
+  Sebastian Meyer\\
+  Division of Biostatistics\\
+  Institute of Social and Preventive Medicine\\
+  University of Zurich\\
+  Hirschengraben 84\\
+  8001 Zurich, Switzerland\\
+  E-mail: \email{Sebastian.Meyer@ifspm.uzh.ch}\\
+  URL: \url{http://www.biostat.uzh.ch/}
+
+  \bigskip
+  Michaela Paul\\
+  E-mail: \email{Michaela.Paul}
+
+  \bigskip
+  Leonhard Held\\
+  Division of Biostatistics\\
+  Institute of Social and Preventive Medicine\\
+  University of Zurich\\
+  E-mail: \email{Leonhard.Held@ifspm.uzh.ch}
+
+  \bigskip
+  Michael Höhle\\
+  Department of Mathematics\\
+  Stockholm University\\
+  E-mail: \email{hoehle@math.su.se}
+}
+%% It is also possible to add a telephone and fax number
+%% before the e-mail in the following format:
+%% Telephone: +43/512/507-7103
+%% Fax: +43/512/507-2851
+
+%% for those who use Sweave please include the following line (with % symbols):
+%% need no \usepackage{Sweave.sty}
+
+%% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Our own header stuff
+\input{header}
+
+
+
+\begin{document}
+
+%% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
+%% There are also the commands \E, \VAR, \COV, \Prob (using \mathsf).
+
+
+\include{intro}
+\include{dataio}
+\include{models}
+\include{outlook}
+
+
+
+\section*{Acknowledgements}
+
+We thank ...
+%We also appreciate helpful comments on earlier versions of this manuscript by
+%two anonymous referees.
+Financial support by the Swiss National Science Foundation
+(project 137919: \emph{Statistical methods for spatio-temporal modelling and
+  prediction of infectious diseases}) is gratefully acknowledged.
+
+
+%--------------
+% BIBLIOGRAPHY (all titles must be in uppercase title style)
+%--------------
+
+\nocite{R:2.15.3}
+\iffalse
+\bibliography{literatur}  % full database (inserted here for RefTeX)
+\fi
+\bibliography{references} % bibfile for this document
+
+
+
+\end{document}

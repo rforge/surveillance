@@ -1,0 +1,34 @@
+\Abstract{
+The availability of geocoded health data and the inherent temporal structure of
+communicable diseases have led to the development of a whole range of statistical
+models for the spatio-temporal analysis of infectious diseases. Aim is to describe and
+analyse such data, typically collected as part of routine public health surveillance systems,
+in order to better understand disease dynamics and the relationship with risk factors and
+interventions. The present work focuses on functionality of the open source \proglang{R} package
+\pkg{surveillance} available from CRAN to accomplish this task.
+
+We distinguish data by its available resolution in space and time. In its most natural form,
+event data are available continuous in space within the selected observation region and
+continuous in time. However, in some applications, the set of locations where events can
+occur is discrete, e.g., for epidemics among households or farm animals. The \code{S3} classes
+\code{"epidataCS"} (continuous space) and \code{"epidata"} (discrete space) represent such point
+process event data, possibly with the specification of additional external covariates which
+may vary in space and/or time. Variations of Hawkes self-exciting point-process consisting
+of endemic and epidemic components parametrized by covariates are used for spatio-temporal epidemic modelling.
+Maximum likelihood estimation for these models is
+implemented in functions \code{twinstim} and \code{twinSIR}. Finally, if data are available in
+temporal and geographical aggregated form, i.e., as a multivariate time series of counts,
+the \code{S4} class \code{"sts"} can be used to represent data and the function \code{hhh4} allows for similar
+endemic-epidemic time-series modelling as above. In the latter case, spatial correlation in
+the time series can also be covered by additional random effects in a conditional
+autoregressive formulation.
+
+The implemented methods are illustrated using surveillance data on invasive
+meningococcal disease in Germany 2002--2008, the Hagelloch 1861 measles outbreak,
+and influenza in southern Germany 2001--2008. Altogether, the \pkg{surveillance} package
+contains a comprehensive set of tools for spatio-temporal analyses of epidemic phenomena.
+}
+
+\Keywords{space-time modelling, infectious diseases, epidemics, point process, multivariate time series of counts}
+%\Plainkeywords{keywords, comma-separated, not capitalized, Java} %% without formatting
+%% at least one keyword must be supplied
