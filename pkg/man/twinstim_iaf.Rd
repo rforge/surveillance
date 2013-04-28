@@ -308,6 +308,8 @@ tiaf.exponential(nTypes = 1)
 \examples{
 # constant temporal dispersal
 tiaf.constant()
+# or exponential decay specification
+tiaf.exponential()
 
 # Type-dependent Gaussian spatial interaction function using an adaptive
 # two-dimensional midpoint-rule to integrate it over polygonal domains

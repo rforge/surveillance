@@ -13,12 +13,13 @@
 
 \usage{
 iafplot(object, which = c("siaf", "tiaf"),
-    types = 1:nrow(object$qmatrix), scaled = FALSE,
-    conf.type = if (length(pars) > 1) "bootstrap" else "parbounds",
-    conf.level = 0.95, conf.B = 999,
-    xgrid = 101, col.estimate = rainbow(length(types)), col.conf = col.estimate,
-    alpha.B = 0.15, lwd = c(3,1), lty = c(1,2), xlim = NULL, ylim = NULL,
-    add = FALSE, xlab = NULL, ylab = NULL, ...)
+        types = 1:nrow(object$qmatrix), scaled = FALSE,
+        conf.type = if (length(pars) > 1) "bootstrap" else "parbounds",
+        conf.level = 0.95, conf.B = 999, xgrid = 101,
+        col.estimate = rainbow(length(types)), col.conf = col.estimate,
+        alpha.B = 0.15, lwd = c(3,1), lty = c(1,2), xlim = NULL, ylim = NULL,
+        add = FALSE, xlab = NULL, ylab = NULL,
+        legend = !add && (length(types) > 1), ...)
 }
 
 \arguments{
@@ -102,6 +103,11 @@ iafplot(object, which = c("siaf", "tiaf"),
   }
   \item{xlab, ylab}{
     labels for the axes with \code{NULL} providing sensible defaults.
+  }
+  \item{legend}{
+    logical indicating if a legend for the \code{types} should be added.
+    It can also be a list of arguments passed to \code{\link{legend}}
+    to tweak the default settings.
   }
   \item{\dots}{
     additional arguments passed to the default \code{plot} method.

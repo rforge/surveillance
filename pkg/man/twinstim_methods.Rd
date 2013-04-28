@@ -7,6 +7,7 @@
 \alias{nobs.twinstim}
 \alias{print.summary.twinstim}
 \alias{toLatex.summary.twinstim}
+\alias{xtable.twinstim}
 \alias{xtable.summary.twinstim}
 
 \title{
@@ -147,6 +148,9 @@ summary(imdepifit, test.iaf=FALSE, correlation=TRUE, symbolic.cor=TRUE)
 
 # create LaTeX code of coefficient table
 toLatex(summary(imdepifit), withAIC=FALSE)
+
+# or using the xtable-method (which produces RR's)
+xtable(summary(imdepifit))
 }
 
 \keyword{methods}

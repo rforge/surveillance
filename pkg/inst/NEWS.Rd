@@ -6,6 +6,20 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.5-5 (2013-04-25)}{
+
+\subsection{SYNOPSIS}{
+  \itemize{
+    \item Using \code{tiaf.exponential()} in a \code{twinstim()} now works
+    with \code{nTypes=1} for multi-type data.
+    \item A legend can be added automatically in \code{iafplot()}.
+  }
+}
+
+}
+
+
+
 \section{Changes in surveillance version 1.5-4 (2013-04-21)}{
 
 \subsection{SYNOPSIS}{

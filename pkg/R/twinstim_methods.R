@@ -574,7 +574,8 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
     conf.level = 0.95, conf.B = 999,
     xgrid = 101, col.estimate = rainbow(length(types)), col.conf = col.estimate,
     alpha.B = 0.15, lwd = c(3,1), lty = c(1,2), xlim = NULL, ylim = NULL,
-    add = FALSE, xlab = NULL, ylab = NULL, ...)
+    add = FALSE, xlab = NULL, ylab = NULL, legend = !add && (length(types) > 1),
+    ...)
 {
     which <- match.arg(which)
     IAF <- object$formula[[which]][[if (which=="siaf") "f" else "g"]]
@@ -703,6 +704,18 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
         lines(x=xgrid,
               y=FUN(if(which=="siaf") cbind(xgrid,0) else xgrid, pars, types[i]),
               lty=lty[1], col=col.estimate[i], lwd=lwd[1])
+    }
+    
+    ## add legend
+    if (isTRUE(legend) || is.list(legend)) {
+        default.legend <- list(x = "topright",
+                               legend = rownames(object$qmatrix)[types],
+                               col = col.estimate, lty = lty[1], lwd = lwd[1],
+                               bty = "n", cex = 0.9, title="type")
+        legend.args <- if (is.list(legend)) {
+            modifyList(default.legend, legend)
+        } else default.legend
+        do.call("legend", legend.args)
     }
     invisible()
 }

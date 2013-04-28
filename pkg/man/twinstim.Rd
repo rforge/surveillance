@@ -425,6 +425,8 @@ s <- summary(m0, correlation = TRUE, symbolic.cor = TRUE)
 s
 # output the table of coefficients as LaTeX code
 toLatex(s, digits=2, withAIC=FALSE)
+# or
+xtable(s)
 
 ## the default confint-method can be used for Wald-CI's
 confint(m0, level=0.95)
@@ -454,10 +456,13 @@ if (surveillance.options("allExamples"))
   # polygonal resolution of "W"
 }
 
-
 if (surveillance.options("allExamples"))
 {
-  ### try with spatially decreasing interaction kernel
+  ## estimate an exponential temporal decay of infectivity
+  m1_tiaf <- update(m0, tiaf=tiaf.exponential())
+  plot(m1_tiaf, "tiaf", xlim=c(0,30), legend=FALSE)
+
+  ### try with a spatially decreasing interaction kernel
   ## Likelihood evaluation takes much longer than for constant spatial spread
   ## Here we use the kernel of an isotropic bivariate Gaussian with same
   ## standard deviation for both finetypes
