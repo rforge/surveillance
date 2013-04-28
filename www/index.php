@@ -139,14 +139,15 @@ The <code>epidataCS</code> data provides a novel data class for point-referenced
 approach by Assuncao &amp; Correa (2009)<br>
         </li>
       </ul>
-      <li>The package comes with ABSOLUTELY NO WARRANTY; for details
-see <a href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>
-(GPL). This is free software, and and you are welcome to redistribute
-it
-under the GPL conditions.</li>
     </ul>
   </ul>
 </ul>
+
+The package comes with ABSOLUTELY NO WARRANTY; for details see <a
+href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a>
+(GPL). This is free software, and and you are welcome to redistribute
+it under the GPL conditions.
+
 <hr>
 <b>Download:</b>
 <blockquote>
@@ -183,6 +184,16 @@ file in the current distribution</li>
     </blockquote>
   </blockquote>
 </blockquote>
+
+<hr><b>News:</b>
+<ul>
+ <ul>
+  <ul>
+   <li>2013/04/23 <a href="StockholmR-Hoehle_4.pdf">Talk</a> at the  Stockholm R useR group (StockholmR) on <a href="http://www.meetup.com/StockholmR/events/105738342/">Making R packages (and) Shiny</a>.</li>
+  </ul>
+ </ul>
+</ul>
+  
 <hr><b>Documentation:</b>
 <blockquote>
   <blockquote>
