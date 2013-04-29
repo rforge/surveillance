@@ -1,0 +1,9 @@
+%% need no \usepackage{Sweave.sty}
+<<setup,cache=FALSE,include=FALSE>>=
+source("setup.R")
+@
+
+
+\subsection[hhh4]{\code{hhh4}} \label{sec:models:hhh4}
+
+

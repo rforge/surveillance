@@ -1,0 +1,16 @@
+%% need no \usepackage{Sweave.sty}
+<<setup,cache=FALSE,include=FALSE>>=
+source("setup.R")
+@
+
+
+\subsection[twinstim]{\code{twinstim}} \label{sec:models:twinstim}
+
+
+  \begin{itemize}
+  \item Permutation test to evaluate importance of epidemic component
+    
+  \item variables are allowed to appear in both components.
+    no issues with coefficient correlation
+    
+  \end{itemize}

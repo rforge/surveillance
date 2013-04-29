@@ -6,7 +6,12 @@ source("setup.R")
 
 \section{Epidemic modelling} \label{sec:models}
 
-% 3. Modellierung & Modellselektion & Residuen für die Beispiele
-%      - twinstim
-%      - twinSIR
-%      - hhh4
+
+Model frameworks, model selection, residuals, ...
+
+
+\input{models_twinstim}
+
+\input{models_twinSIR}
+
+\input{models_hhh4}
