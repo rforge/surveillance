@@ -848,7 +848,7 @@ wait <- function(wait.ms) {
 #Helper function -- use colors from the vcd package
 hcl.colors <- function(x, ncolors=100, use.color=TRUE)
 {
-    GYR <- if (require("colorspace")) { # the Zeil-ice colors 
+    GYR <- if (requireNamespace("colorspace")) { # the Zeil-ice colors 
         colorspace::heat_hcl(ncolors, h=c(0,120),
                              c=if (use.color) c(90,30) else c(0,0),
                              l=c(50,90), power=c(0.75, 1.2))

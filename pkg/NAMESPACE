@@ -77,7 +77,8 @@ importFrom(spatstat, coords, coords.ppp, area.owin, distppl,
 ##importFrom(intervals, Intervals, reduce)   # for as.epidata.epidataCS
 ## package intervals is now "suggested", not imported
 
-importMethodsFrom(polyCub, coerce) # "gpc.poly" -> "owin"
+importMethodsFrom(polyCub, coerce) # gpc.poly -> owin,
+                                   # SpatialPolygons -> gpc.poly (from rgeos)
 importFrom(polyCub, discpoly, polyCub, polyCub.SV, polyCub.midpoint)
 
 

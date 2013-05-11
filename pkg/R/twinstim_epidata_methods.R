@@ -54,7 +54,8 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
     if (any(ir2update)) {
         Wgpc <- as(object$W, "gpc.poly")
         object$events$.influenceRegion[ir2update] <-
-            .influenceRegions(object$events[ir2update,], Wgpc, nCircle2Poly)
+            .influenceRegions(object$events[ir2update,], Wgpc, object$W,
+                              nCircle2Poly)
         attr(object$events$.influenceRegion, "nCircle2Poly") <- nCircle2Poly
     }
 
@@ -545,7 +546,7 @@ plot.epidataCS_space <- function (x, subset,
 # tileCentroids is a coordinate matrix whose row names are the tile levels
 as.epidata.epidataCS <- function (data, tileCentroids, eps = 0.001, ...)
 {
-    if (!require("intervals"))
+    if (!requireNamespace("intervals"))
         stop("conversion from ", dQuote("epidataCS"), " to ", dQuote("epidata"),
              " requires the ", dQuote("intervals"), " package")
     
@@ -741,7 +742,7 @@ untie.matrix <- function (x, amount = NULL, constraint = NULL, ...)
         amount <- min(distx[distx > 0]) / 2
     if (!is.null(constraint)) {
         stopifnot(inherits(constraint, "SpatialPolygons"))
-        if (any(is.na(overlay(SpatialPoints(x), constraint))))
+        if (any(is.na(over(SpatialPoints(x), constraint))))
             stop("some points of the matrix 'x' don't respect the 'constraint'")
     }
 
@@ -752,7 +753,7 @@ untie.matrix <- function (x, amount = NULL, constraint = NULL, ...)
         rvec <- runifdisc(nleft, amount)
         res[move,] <- res[move,] + rvec
         move[move] <- if (is.null(constraint)) FALSE else {
-            is.na(overlay(SpatialPoints(res[move,,drop=FALSE]), constraint))
+            is.na(over(SpatialPoints(res[move,,drop=FALSE]), constraint))
         }
         ntry <- ntry + 1L
     }

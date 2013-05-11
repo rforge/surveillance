@@ -11,6 +11,34 @@
 ################################################################################
 
 
+### Compute distance from points to boundary
+### copied in part from function bdist.points() of the "spatstat" package authored
+### by A. Baddeley and R. Turner (DEPENDS ON spatstat::distppl)
+
+## xy is the coordinate matrix of the points
+## poly is a polygonal domain of class "gpc.poly"
+## the function does not check if points are actually inside the polygonal domain
+bdist <- function (xy, poly)
+{
+    result <- rep(Inf, nrow(xy))
+    bdry <- poly@pts
+    for (i in seq_along(bdry)) {
+        polly <- bdry[[i]]
+        px <- polly$x
+        py <- polly$y
+        nsegs <- length(px)
+        for (j in seq_len(nsegs)) {
+            j1 <- if (j < nsegs) j + 1L else 1L
+            seg <- c(px[j], py[j], px[j1], py[j1])
+            ## calculate distances of points to segment j of polygon i
+            dists <- distppl(xy, seg)
+            result <- pmin(result, dists)
+        }
+    }
+    return(result)
+}
+
+
 ### sample n points uniformly on a disc with radius r
 
 runifdisc <- function (n, r = 1)
@@ -21,7 +49,7 @@ runifdisc <- function (n, r = 1)
 }
 
 
-### Redefinition of the gpclib::scale.poly method for gpc.poly's to also do centering
+### Redefinition of gpclib's scale.poly method to also do centering
 
 scale.gpc.poly <-
     function (x, center = c(0,0), scale = c(1,1)) {
@@ -52,6 +80,23 @@ inside.gpc.poly <- function(x, y = NULL, polyregion, mode.checked = FALSE)
 }
 
 
+### Maximum extent of a gpc.poly (i.e. maximum distance of two vertices)
+
+maxExtent.gpc.poly <- function (object, ...)
+{
+    pts <- object@pts
+    x <- unlist(lapply(pts, "[[", "x"), use.names=FALSE)
+    y <- unlist(lapply(pts, "[[", "y"), use.names=FALSE)
+    
+    ## The diagonal of the bounding box provides a fast upper bound
+    ##ext <- sqrt(diff(range(x))^2 + diff(range(y))^2)
+
+    xy <- cbind(x,y)
+    dists <- dist(xy)
+    max(dists)
+}
+
+
 ### Count number of instances at the same location of a SpatialPoint object
 
 multiplicity.default <- function (x, ...)
@@ -63,18 +108,6 @@ multiplicity.default <- function (x, ...)
 multiplicity.Spatial <- function (x, ...)
 {
     multiplicity(coordinates(x))
-}
-
-
-### Compute the intersection of a "gpc.poly" with a "discpoly" using gpclib
-
-intersectCircle <- function (Wgpc, center, r, npoly)
-{
-    ## gpclibCheck() # unexported function, check already in caller
-    circle <- discpoly(center = center, r = r, npoly = npoly,
-                       class = "gpc.poly", hole = FALSE)
-    intersection <- gpclib::intersect(circle, Wgpc)  # this order seems to be faster
-    scale(intersection, center = center) # use scale method as defined above
 }
 
 
@@ -138,23 +171,6 @@ nbOrder <- function (neighbourhood, maxlag = 1)
 
     ## Done
     nbmat
-}
-
-
-### Internal wrapper for maptools::unionSpatialPolygons
-
-unionSpatialPolygons <- function (SpP)
-{
-    if (require("maptools") && maptools::gpclibPermitStatus()) {
-        W <- maptools::unionSpatialPolygons(
-            SpP, IDs = rep.int(1,length(SpP@polygons)), avoidGEOS = TRUE)
-        ## ensure that W has exactly the same proj4string as SpP
-        ## since the internal CRS()-call might have modified it
-        W@proj4string <- SpP@proj4string
-        W
-    } else {
-        stop("package \"maptools\" required, and \"gpclibPermit()\" therein")
-    }
 }
 
     

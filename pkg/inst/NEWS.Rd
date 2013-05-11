@@ -15,6 +15,11 @@
     have been moved to the new dedicated package \CRANpkg{polyCub},
     since they are of a rather general use. The \code{discpoly} function
     has also been moved to that package.
+
+    \item As a replacement of the license-restricted \pkg{gpclib} package,
+    the \pkg{rgeos} package may now be used in generating
+    \code{"epidataCS"} (polygon intersections, slightly slower).
+    This is also the default (\code{surveillance.options(gpclib=FALSE)}).
   }
 }
 

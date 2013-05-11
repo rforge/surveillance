@@ -263,11 +263,12 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   \code{dp()} in the (slightly outdated) package \pkg{shapefiles}, or by
   passing by \pkg{spatstat}'s \code{\link[spatstat]{simplify.owin}} procedure.
 
-  Note also that generation of \code{"epidataCS"} depends on the
-  computation of polygon intersections via the \pkg{gpclib} package,
-  which has a restricted license. In order to use \code{as.epidataCS},
-  this license must be explicitly accepted by setting
+  Note also that generation of \code{"epidataCS"} requires
+  computation of polygon intersections. If you want these to be computed
+  by the \pkg{gpclib} package, its restricted license must first be
+  accepted explicitly by setting
   \code{\link{surveillance.options}(gpclib=TRUE)}.
+  Otherwise (default), the \pkg{rgeos} library is used.
 }
 
 \references{
@@ -375,7 +376,14 @@ if (requireNamespace("gpclib")) {
     oopt <- surveillance.options(gpclib=TRUE)
     myimdepi <- as.epidataCS(events, stgrid, W, qmatrix, nCircle2Poly=16)
     surveillance.options(oopt)
+} else if (requireNamespace("rgeos")) {
+    oopt <- surveillance.options(gpclib=FALSE)
+    myimdepi2 <- as.epidataCS(events, stgrid, W, qmatrix, nCircle2Poly=16)
+    surveillance.options(oopt)
 }
+## myimdepi2 differs from myimdepi only in the events$.influenceRegion
+## component due to different polygon intersection algorithms in gpclib
+## and rgeos (usually the vertex order/choice of first vertex is different)
 
 \dontshow{
 ## should be equal as long as the internal structures of "epidataCS" and

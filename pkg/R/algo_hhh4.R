@@ -92,7 +92,7 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
   if (length(check.analyticals) > 0L) {
       cat("\nPenalized log-likelihood:\n")
       resCheckPen <- sapply(check.analyticals, function(derivMethod) {
-          if (require(derivMethod, character.only=TRUE)) {
+          if (requireNamespace(derivMethod, character.only=TRUE)) {
               do.call(paste("checkDerivatives", derivMethod, sep="."),
                       args=alist(penLogLik, penScore, penFisher, theta.start,
                       sd.corr=Sigma.start, model=model))
@@ -104,7 +104,7 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
           fisher.unpen <- attr(penFisher(theta.start, Sigma.start, model,
                                          attributes=TRUE), "fisher")
           resCheckMar <- sapply(check.analyticals, function(derivMethod) {
-              if (require(derivMethod, character.only=TRUE)) {
+              if (requireNamespace(derivMethod, character.only=TRUE)) {
                   do.call(paste("checkDerivatives", derivMethod, sep="."),
                           args=alist(marLogLik, marScore, marFisher, Sigma.start,
                           theta=theta.start, model=model,

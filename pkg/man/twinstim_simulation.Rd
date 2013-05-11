@@ -253,11 +253,12 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   \code{dp()} in the (slightly outdated) package \pkg{shapefiles}, or by
   passing by \pkg{spatstat}'s \code{\link[spatstat]{simplify.owin}} procedure.
   
-  Note also that generation of \code{"epidataCS"} depends on the
-  computation of polygon intersections via the \pkg{gpclib} package,
-  which has a restricted license. In order to use \code{as.epidataCS},
-  this license must be explicitly accepted by setting
+  Note also that generation of \code{"epidataCS"} requires
+  computation of polygon intersections. If you want these to be computed
+  by the \pkg{gpclib} package, its restricted license must first be
+  accepted explicitly by setting
   \code{\link{surveillance.options}(gpclib=TRUE)}.
+  Otherwise (default), the \pkg{rgeos} library is used.
 }
 
 \references{
@@ -313,7 +314,7 @@ plot(stateD, add=TRUE, border=2, lwd=2)
 # 'stateD' is the union of the polygons in 'districtsD'
 # (created by maptools::unionSpatialPolygons)
 
-if (require("gpclib")) {
+if (requireNamespace("gpclib")) {
     oopt <- surveillance.options(gpclib=TRUE)
 
     ## simulate 2 realizations (during a VERY short period -- for speed)

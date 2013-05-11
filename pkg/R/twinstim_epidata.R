@@ -59,7 +59,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     # Check class and proj4string of W and consistency of area
     cat("Checking 'W'...\n")
     W <- as(W, "SpatialPolygons")
-    stopifnot(identical(proj4string(W), proj4string(events)))
+    stopifnot(identicalCRS(W, events))
     W.area <- sum(sapply(W@polygons, slot, "area"))
     tiles.totalarea <- sum(stgrid$area[stgrid$BLOCK == 1])
     if (abs(W.area - tiles.totalarea) / max(W.area, tiles.totalarea) > 0.005) {
@@ -88,7 +88,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
 
     # Check that all events are part of W
     cat("Checking if all events are part of 'W'...\n")
-    WIdxOfEvents <- overlay(events, W)
+    WIdxOfEvents <- over(events, W)
     if (eventNotInWidx <- match(NA, WIdxOfEvents, nomatch = 0L)) {
         stop("the event at (", eventidx2string(eventNotInWidx), ") is not ",
              "inside 'W'")
@@ -167,12 +167,13 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
 
     # Calculate minimal distance of event locations from the polygonal boundary
     cat("Calculating (minimal) distances of the events to the boundary...\n")
-    Wgpc <- as(W, "gpc.poly")
+    Wgpc <- as(W, "gpc.poly")   # coerce-method from rgeos imported via polyCub
     events$.bdist <- bdist(eventCoords, Wgpc)   # this may take a while
 
     # Construct spatial influence regions around events
     cat("Constructing spatial influence regions around events...\n")
-    events$.influenceRegion <- .influenceRegions(events, Wgpc, npoly = nCircle2Poly)
+    events$.influenceRegion <- .influenceRegions(events, Wgpc, W,
+                                                 npoly=nCircle2Poly)
 
     # Attach some useful attributes
     res <- list(events = events, stgrid = stgrid, W = W, qmatrix = qmatrix)
@@ -380,23 +381,22 @@ checkstgrid <- function (stgrid, T)
 # An attribute "area" gives the area of the influenceRegion.
 # If it is actually a circular influence region, then there is an attribute
 # "radius" denoting the radius of the influence region.
-.influenceRegions <- function (events, Wgpc, npoly)
+.influenceRegions <- function (events, Wgpc, W, npoly, maxExtent = NULL)
 {
-    gpclibCheck()
-    ext <- sqrt(sum(sapply(gpclib::get.bbox(Wgpc), diff)^2))
-    ##<- length of the diagonal of the bounding box of W
+    if (is.null(maxExtent)) maxExtent <- maxExtent.gpc.poly(Wgpc)
     eventCoords <- coordinates(events)
     nEvents <- nrow(eventCoords)
     res <- vector(nEvents, mode = "list")
     for (i in seq_len(nEvents)) {
         eps <- events$eps.s[i]
         center <- eventCoords[i,]
-        res[[i]] <- if (eps > ext) {   # influence region is whole region of W
-                as(scale(Wgpc, center = center), "owin")
-            } else {   # influence region is a subset of W
-                as(intersectCircle(Wgpc, center, eps, npoly), "owin")
+        iRgpc <- if (eps > maxExtent) { # influence region is whole region of W
+                Wgpc
+            } else { # influence region is a subset of W
+                intersectCircle(Wgpc, W, center, eps, npoly)
             }
-        # if influence region actually is a circle of radius eps, attach eps as attribute
+        res[[i]] <- as(scale(iRgpc, center=center), "owin") # coerce via polyCub
+        ## if iR is actually a circle of radius eps, attach eps as attribute
         r <- if (eps <= events$.bdist[i]) eps else NULL
         attr(res[[i]], "radius") <- r
         attr(res[[i]], "area") <- if(is.null(r)) area.owin(res[[i]]) else pi*r^2
