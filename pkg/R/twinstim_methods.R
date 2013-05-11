@@ -664,13 +664,8 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
             do.call("expand.grid", as.data.frame(t(cis)))
         }, bootstrap = {
             ## bootstrapping parameter values
-            if (length(pars) == 1) {
-                as.matrix(c(pars, rnorm(conf.B, mean=pars,
-                                sd=sqrt(vcov(object)[idxpars,idxpars]))))
-            } else {
-                rbind(pars, mvtnorm::rmvnorm(conf.B, mean=pars,
-                      sigma=vcov(object)[idxpars,idxpars,drop=FALSE]))
-            }
+            rbind(pars, mvrnorm(conf.B, mu=pars,
+                                Sigma=vcov(object)[idxpars,idxpars,drop=FALSE]))
         })
         
         ## add confidence limits
