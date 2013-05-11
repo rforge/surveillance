@@ -177,17 +177,15 @@ pit <- function(J=10,x,pdistr=pnbinom,...){
 permutationTest <- function(score1,score2, nPermutation=9999,plot=FALSE){
   meanScore1 <- mean(score1)
   meanScore2 <- mean(score2)
-  diffObserved <- meanScore1 -meanScore2
+  diffObserved <- meanScore1 - meanScore2
   
   nTime <- length(score1)
-  diffMean <- rep(NA,nPermutation)
-  
-  for(i in 1:nPermutation){
-    sel <- rbinom(nTime, size=1, prob=0.5)
-    g1 <- (sum(score1[sel==0]) + sum(score2[sel==1]))/nTime
-    g2 <- (sum(score1[sel==1]) + sum(score2[sel==0]))/nTime
-    diffMean[i] <- g1-g2
-  }
+  diffMean <- replicate(nPermutation, {
+      sel <- rbinom(nTime, size=1, prob=0.5)
+      g1 <- (sum(score1[sel==0]) + sum(score2[sel==1]))/nTime
+      g2 <- (sum(score1[sel==1]) + sum(score2[sel==0]))/nTime
+      g1 - g2
+  })
 
   if(plot){
     hist(diffMean, nclass=50, prob=TRUE,xlab="Difference between means",main="")
