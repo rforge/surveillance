@@ -215,6 +215,9 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
         objects of the \pkg{spatstat} class \code{"owin"}. For each
         event, this is the intersection of \code{W} with a (polygonal)
         circle of radius \code{eps.s} centered at the event location.
+        The \code{"owin"} class was chosen since it is best compatible
+        with both the \code{polyCub.midpoint} and the \code{polyCub.SV}
+        cubature methods from package \pkg{polyCub}.
         The list has \code{nCircle2Poly} set as an attribute.}
       }
   }
@@ -368,7 +371,7 @@ qmatrix <- imdepi$qmatrix
 qmatrix
 
 ## now construct an object of class "epidataCS" from these components
-if (require("gpclib")) {
+if (requireNamespace("gpclib")) {
     oopt <- surveillance.options(gpclib=TRUE)
     myimdepi <- as.epidataCS(events, stgrid, W, qmatrix, nCircle2Poly=16)
     surveillance.options(oopt)

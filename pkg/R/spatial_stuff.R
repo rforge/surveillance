@@ -11,44 +11,6 @@
 ################################################################################
 
 
-### Returns a Polygon representing a disc (in planar coordinates)
-### as an object of one of three possible classes: gpc.poly, owin, or Polygon.
-### This function is inspired by the disc() function from package 'spatstat'
-### authored by Adrian Baddeley and Rolf Turner
-
-# center: center of the disc
-# r: radius
-# npoly: Number of edges of the polygonal approximation
-# hole: hole flag of the polygon
-discpoly <- function (center, r, npoly = 64,
-    class = c("Polygon", "owin", "gpc.poly"), hole = FALSE)
-{
-    class <- match.arg(class)
-    if (class == "owin") { # use spatstat::disc
-        res <- disc(radius = r, centre = center, mask = FALSE, npoly = npoly)
-        if (hole) {
-            res$bdry[[1]]$x <- rev(res$bdry[[1]]$x)
-            res$bdry[[1]]$y <- rev(res$bdry[[1]]$y)
-            res$bdry[[1]]$hole <- TRUE
-        }
-        return(res)
-    }
-
-    stopifnot(r > 0, isScalar(npoly), npoly > 2)
-    theta <- seq(2*pi, 0, length = npoly+1)[-(npoly+1)]   # for clockwise order
-    if (hole) theta <- rev(theta)   # for anticlockwise order
-    x <- center[1] + r * cos(theta)
-    y <- center[2] + r * sin(theta)
-    switch(class,
-        "Polygon" = Polygon(cbind(c(x,x[1]),c(y,y[1])), hole=hole),
-        "gpc.poly" = {
-            gpclibCheck()
-            new("gpc.poly", pts = list(list(x=x, y=y, hole=hole)))
-        }
-    )
-}
-
-
 ### sample n points uniformly on a disc with radius r
 
 runifdisc <- function (n, r = 1)
@@ -101,17 +63,6 @@ multiplicity.default <- function (x, ...)
 multiplicity.Spatial <- function (x, ...)
 {
     multiplicity(coordinates(x))
-}
-
-
-### Checks if the first and last coordinates of a coordinate matrix are equal
-
-isClosed <- function (coords)
-{
-    xycoords <- xy.coords(coords)[c("x","y")]
-    n <- length(xycoords$x)
-    return(identical(xycoords$x[1], xycoords$x[n]) &&
-           identical(xycoords$y[1], xycoords$y[n]))
 }
 
 

@@ -60,7 +60,7 @@ adjmat[lower.tri(adjmat)] <- sample(0:1, n*(n-1)/2, replace=TRUE)
 adjmat <- adjmat + t(adjmat)
 
 ## determine neighbourhood order matrix
-if (require("spdep")) {
+if (requireNamespace("spdep")) {
     nbmat <- nbOrder(adjmat, maxlag=Inf)
     nbmat
 }

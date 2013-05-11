@@ -188,7 +188,7 @@ intensityplot(imdepifit, which="epidemic proportion",
 legend("topright", legend=levels(imdepi$events$type), lty=1, col=1:2,
        title = "event type")
 
-if (surveillance.options("allExamples") && require("maptools"))
+if (surveillance.options("allExamples") && requireNamespace("maptools"))
 {
   ## spatial shape of the intensity (aggregated over time)
   # load borders of Germany's districts (obtained from the

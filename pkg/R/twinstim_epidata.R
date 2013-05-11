@@ -392,9 +392,9 @@ checkstgrid <- function (stgrid, T)
         eps <- events$eps.s[i]
         center <- eventCoords[i,]
         res[[i]] <- if (eps > ext) {   # influence region is whole region of W
-                gpc2owin(scale(Wgpc, center = center))
+                as(scale(Wgpc, center = center), "owin")
             } else {   # influence region is a subset of W
-                gpc2owin(intersectCircle(Wgpc, center, eps, npoly))
+                as(intersectCircle(Wgpc, center, eps, npoly), "owin")
             }
         # if influence region actually is a circle of radius eps, attach eps as attribute
         r <- if (eps <= events$.bdist[i]) eps else NULL

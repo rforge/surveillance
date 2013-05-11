@@ -1,7 +1,7 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
-Version: 1.5-5
-Date: 2013-04-25
+Version: 1.6-0
+Date: 2013-05-09
 Authors@R: c(person("Michael", "Höhle",
                     email = "Michael.Hoehle@stat.uni-muenchen.de",
                     role = c("aut", "cre", "ths")),
@@ -32,11 +32,11 @@ Author: M. Höhle, S. Meyer and M. Paul
         M. Salmon, S. Steiner, M. Virtanen, V. Wimmer, and The R Core Team
         (A few code segments are modified versions of code from base R)
 Depends: R (>= 2.14.0), grDevices, graphics, stats, utils, xtable, methods, Rcpp, sp
-Imports: MASS, Matrix, spatstat (>= 1.17-0)
+Imports: MASS, Matrix, spatstat (>= 1.17-0), polyCub
 LinkingTo: Rcpp
 Suggests: msm, spc, colorspace, animation,
 	quadprog,
-        mvtnorm, statmod, memoise, gpclib, maptools, intervals,
+        memoise, gpclib, maptools, intervals,
         spdep, numDeriv, maxLik,
         RUnit, digest, coda, splancs, gamlss
 Description: A package implementing statistical methods for the modeling and

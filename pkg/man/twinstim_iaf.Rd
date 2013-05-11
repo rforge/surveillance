@@ -84,13 +84,14 @@ tiaf.exponential(nTypes = 1)
   \item{F.adaptive}{
     If \code{F.adaptive = TRUE}, then an adaptive bandwidth of
     \code{adapt*sd} will be used in the midpoint-cubature
-    (see \code{\link{polyCub.midpoint}}) of the Gaussian interaction
+    (\code{\link[polyCub]{polyCub.midpoint}} in package \pkg{polyCub})
+    of the Gaussian interaction
     kernel, where \code{adapt} is an extra parameter of the returned
     \code{siaf$F} function and defaults to 0.1, but it may also be
     specified in the \code{control.siaf$F} argument list of
     \code{twinstim}.\cr  
     Otherwise, if \code{F.adaptive = FALSE}, a general cubature
-    method (\code{\link{polyCub}}) is returned as \code{siaf$F}
+    method (\code{\link[polyCub]{polyCub}}) is returned as \code{siaf$F}
     component, where the \code{method} and accuracy (\code{eps},
     \code{dimyx}, or \code{nGQ}, depending on the method) should then be
     specified in \code{twinstim}'s \code{control.siaf$F} argument.
@@ -197,9 +198,9 @@ tiaf.exponential(nTypes = 1)
     the parameter vector and the (\emph{single}) type, respectively.
     There may be additional arguments, which can then be specified in
     the \code{control.siaf$F} argument list of \code{twinstim}. If this
-    function is missing, a general default (\code{polyCub}) will be
-    used, with extra arguments \code{method} (default: \code{"SV"}) and
-    corresponding accuracy parameters.}
+    function is missing, a general default (\code{\link[polyCub]{polyCub}}) 
+    will be used, with extra arguments \code{method} (default: \code{"SV"}) 
+    and corresponding accuracy parameters.}
   \item{Fcircle}{optional function for fast calculation of the
     (two-dimensional) integral of \eqn{f(s)} over a circle with radius
     \code{r} (first argument). Further arguments are as for \code{f}. It
@@ -231,9 +232,9 @@ tiaf.exponential(nTypes = 1)
     the parameter vector and the (\emph{single}) type, respectively.
     There may be additional arguments, which can then be specified in
     the \code{control.siaf$Deriv} argument list of \code{twinstim}. If this
-    function is missing, a general default (\code{polyCub}) will be
-    used, with extra arguments \code{method} (default: \code{"SV"}) and
-    corresponding accuracy parameters.}
+    function is missing, a general default (\code{\link[polyCub]{polyCub}}) 
+    will be used, with extra arguments \code{method} (default: \code{"SV"}) 
+    and corresponding accuracy parameters.}
   \item{simulate}{optional function returning a sample drawn from the
     spatial kernel (only required for the simulation of \code{twinstim}
     models).  Its first argument is the size of the sample to

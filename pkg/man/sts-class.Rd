@@ -146,7 +146,7 @@
 
 \author{M. \enc{Höhle}{Hoehle}}
 \examples{
-  if (require("maptools")) {
+  if (requireNamespace("maptools")) {
     # load disProg-object "ha" and convert to S4-class "sts"
     data("ha")
     shp <- system.file("shapes/berlin.shp",package="surveillance")

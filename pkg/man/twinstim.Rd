@@ -117,16 +117,18 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     of extra arguments passed to the functions \code{siaf$F} and
     \code{siaf$Deriv}, respectively.\cr
     These arguments mainly determine the accuracy of the numerical
-    cubature rules involved in non-constant \code{siaf} specifications,
+    cubature rules from package \pkg{polyCub}
+    involved in non-constant \code{siaf} specifications,
     e.g., the bandwidth of the midpoint rule or the number
     of Gaussian quadrature points.
     For instance, \code{\link{siaf.gaussian}} by default uses the
-    midpoint-cubature (see \code{\link{polyCub.midpoint}}) with an
-    adaptive bandwidth of \code{adapt*sd} to numerically integrate the
+    midpoint-cubature (\code{\link[polyCub]{polyCub.midpoint}}) with an
+    adaptive bandwidth of \code{eps=adapt*sd} to numerically integrate the
     kernel \eqn{f(\bold{s})} over polygonal domains. The \code{adapt}
     parameter defaults to 0.1, but may be modified via setting
-    \code{control.siaf$F$adapt}. In contrast, \code{polyCub.SV} with
-    \code{nGQ=20} is by default used to numerically integrate the
+    \code{control.siaf$F$adapt}. 
+    In contrast, the cubature rule \code{\link[polyCub]{polyCub.SV}}
+    with \code{nGQ=20} is by default used to numerically integrate the 
     derivative of \eqn{f(\bold{s})} wrt the kernel parameters over
     polygonal domains. The number of cubature points may be modified via
     setting \code{control.siaf$Deriv$nGQ}.\cr

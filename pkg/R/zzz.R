@@ -40,9 +40,8 @@ gpclibCheck <- function (fatal = TRUE)
 .onLoad <- function (libname, pkgname)
 {
     ## Determine package version and store it as surveillance:::VERSION
-    v <- packageDescription(pkgname, lib.loc=libname, fields="Version", drop=TRUE)
-    ##<- a convenience function packageVersion() was only introduced in R 2.12.0
-    assign("VERSION", package_version(v), getNamespace(pkgname))
+    v <- packageVersion(pkgname, lib.loc=libname)
+    assign("VERSION", v, getNamespace(pkgname))
 
     ## initialize options
     reset.surveillance.options()
@@ -102,14 +101,6 @@ if (getRversion() < "2.15.0" || R.version$"svn rev" < 57795 ||
 
 isScalar <- function (x) {
     length(x) == 1L && is.vector(x, mode = "numeric")
-}
-
-
-### returns the dot/scalar product of two vectors
-
-dotprod <- function (x,y)
-{
-    sum(x*y)
 }
 
 

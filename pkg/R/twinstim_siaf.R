@@ -156,9 +156,9 @@ siaf.constant <- function ()
 siaf.fallback.F <- function(polydomain, f, pars, type, method = "SV", ...)
 {
     if (identical(method,"SV"))
-        polyCub.SV(polydomain, f, pars, type, alpha=0, ...) # since max at origin
+        polyCub::polyCub.SV(polydomain, f, pars, type, alpha=0, ...) # since max at origin
     else 
-        polyCub(polydomain, f, method, pars, type, ...)
+        polyCub::polyCub(polydomain, f, method, pars, type, ...)
 }
 
 ## numerical integration of deriv over a polygonal domain
@@ -167,7 +167,7 @@ siaf.fallback.Deriv <- function (polydomain, deriv, pars, type, method = "SV", .
     deriv1 <- function (s, paridx)
         deriv(s, pars, type)[,paridx,drop=TRUE]
     intderiv1 <- function (paridx)
-        polyCub(polydomain, deriv1, method, paridx=paridx, ...)
+        polyCub::polyCub(polydomain, deriv1, method, paridx=paridx, ...)
     derivInt <- sapply(seq_along(pars), intderiv1)
     derivInt
 }
@@ -250,14 +250,12 @@ checksiaf.simulate <- function (simulate, f, pars, type=1, B=3000, ub=10)
 
     ## Graphical check
     par(mar=c(1,2,2,1))
-    plot(as.im.function(function(x,y,...) f(cbind(x,y), pars, type),
-                        W=discpoly(c(0,0), ub, class="owin")),
+    plot(spatstat::as.im.function(function(x,y,...) f(cbind(x,y), pars, type),
+                                  W=discpoly(c(0,0), ub, class="owin")),
          axes=TRUE, main="Simulation from the spatial kernel")
     points(simpoints, cex=0.2)
-    if (requireNamespace("MASS")) {
-        kdens <- MASS::kde2d(simpoints[,1], simpoints[,2], n=100)
-        contour(kdens, add=TRUE, col=2, lwd=2,
-                labcex=1.5, vfont=c("sans serif", "bold"))
-        ##x11(); image(kdens, add=TRUE)
-    }
+    kdens <- MASS::kde2d(simpoints[,1], simpoints[,2], n=100)
+    contour(kdens, add=TRUE, col=2, lwd=2,
+            labcex=1.5, vfont=c("sans serif", "bold"))
+    ##x11(); image(kdens, add=TRUE)
 }

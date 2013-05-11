@@ -6,6 +6,22 @@
 \encoding{latin1}
 
 
+
+\section{Changes in surveillance version 1.6-0 (2013-05-09)}{
+
+\subsection{SYNOPSIS}{
+  \itemize{
+    \item The \code{polyCub}-methods for cubature over polygonal domains
+    have been moved to the new dedicated package \CRANpkg{polyCub},
+    since they are of a rather general use. The \code{discpoly} function
+    has also been moved to that package.
+  }
+}
+
+}
+
+
+
 \section{Changes in surveillance version 1.5-5 (2013-04-25)}{
 
 \subsection{SYNOPSIS}{
