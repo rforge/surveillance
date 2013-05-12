@@ -1,12 +1,12 @@
 \name{powerlaw}
 \alias{powerlaw}
 \title{
-  Power-Law Neighbourhood Weight Structure for \code{hhh4} Models
+  Power-Law Neighbourhood Weights for \code{hhh4} Models
 }
 
 \description{
   Set up a power-law weight structure for the neighbourhood
-  component of \code{\link{hhh4}} models -- STILL EXPERIMENTAL.
+  component of \code{\link{hhh4}} models.
 }
 
 % \usage{

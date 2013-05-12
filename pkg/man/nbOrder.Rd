@@ -53,11 +53,13 @@ Sebastian Meyer
 }
 
 \examples{
-## generate random adjancency matrix
+## generate adjacency matrix
+set.seed(1)
 n <- 6
 adjmat <- matrix(0, n, n)
 adjmat[lower.tri(adjmat)] <- sample(0:1, n*(n-1)/2, replace=TRUE)
 adjmat <- adjmat + t(adjmat)
+adjmat
 
 ## determine neighbourhood order matrix
 if (requireNamespace("spdep")) {

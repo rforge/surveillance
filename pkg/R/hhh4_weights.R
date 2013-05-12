@@ -5,7 +5,7 @@
 ###
 ### Helper functions for neighbourhood weight matrices in hhh4()
 ###
-### Copyright (C) 2012 Sebastian Meyer
+### Copyright (C) 2012-2013 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -170,31 +170,28 @@ checkWeightsFUN <- function (object)
 ### to the orders of neighbourhood (in nbmat, as e.g. obtained from nbOrder()),
 ### optionally fulfilling rowSums(wji) = 1
 ## As a formula (for j != i, otherwise wji = 0):
-## - for shared=TRUE: wji = pzeta(oji; rho, maxlag) / sum_k I(ojk == oji)
-## - for shared=FALSE: wji = pzeta(oji; rho, maxlag) / sum_k pzeta(ojk; rho, maxlag)
+## - for shared=TRUE: wji = pzeta(oji; d, maxlag) / sum_k I(ojk == oji)
+## - for shared=FALSE: wji = pzeta(oji; d, maxlag) / sum_k pzeta(ojk; d, maxlag)
 ## Here, oji = oij is the order of nb of i and j,
-## and pzeta(o; rho, m) = o^-rho / sum_{r=1}^m r^-rho is the Zeta-distribution
+## and pzeta(o; d, m) = o^-d / sum_{r=1}^m r^-d is the Zeta-distribution
 ## on 1:m (also called Zipf's law).
-## For shared=TRUE and normalize=FALSE, maxlag should not be greater than
-## min_j(max_i(oji)), such that every region has neighbours up to order 'maxlag'
-## and higher orders can not be infected. Otherwise, regions with not as
-## high-order neighbours would not sum their weights to 1 (but lower).
-## For shared=FALSE, maxlag=Inf yields the weights
-## wji = oji^-\rho / sum_k ojk^-\rho
+## For shared=TRUE (not recommended) and normalize=FALSE, maxlag should be
+## <= min_j(max_i(oji)), such that every region has neighbours up to order 
+## 'maxlag' and higher orders can not be infected. Otherwise, regions with not
+## as high-order neighbours would not sum their weights to 1 (but lower).
+## For shared=FALSE, maxlag=max(nbmat) yields the weights
+## wji = oji^-d / sum_k ojk^-d
 ## In both cases, maxlag=1 yields the classical weights wji=1/nj.
 
-zetaweights <- function (nbmat, maxlag = Inf, rho = 1,
+zetaweights <- function (nbmat, d = 1, maxlag = max(nbmat),
                          normalize = TRUE, shared = FALSE)
 {
-    ## check maxlag
-    if (!is.finite(maxlag)) maxlag <- max(nbmat)
-
     ## raw (non-normalized) zeta-distribution on 1:maxlag
-    zetaweights <- c(0, seq_len(maxlag)^-rho)
+    zeta <- c(0, seq_len(maxlag)^-d)
     ##<- first 0 is for lag 0 (for instance, diag(nbmat))
 
     ## replace order by zetaweight of that order
-    wji <- zetaweights[nbmat + 1L]
+    wji <- zeta[nbmat + 1L]
     wji[is.na(wji)] <- 0
     dim(wji) <- dim(nbmat)
     dimnames(wji) <- dimnames(nbmat)
@@ -203,7 +200,7 @@ zetaweights <- function (nbmat, maxlag = Inf, rho = 1,
         ## multiplicity of orders by row: dim(nbmat)==dim(multbyrow)
         multbyrow <- t(apply(nbmat, 1, function(x) table(x)[as.character(x)]))
         ## neighbours of same order share the zetaweight for that order
-        wji <- wji / sum(zetaweights) / multbyrow
+        wji <- wji / sum(zeta) / multbyrow
     }
     if (normalize) { # normalize such that each row sums to 1
         wji <- wji / rowSums(wji)
@@ -220,15 +217,17 @@ zetaweights <- function (nbmat, maxlag = Inf, rho = 1,
 ## the raw powerlaw weights are defined as w_ji = o_ji^-d,
 ## and with (row-)normalization we have    w_ji = o_ji^-d / sum_k o_jk^-d
 
-powerlaw <- function (maxlag, normalize = TRUE, initial = 1)
-                                        # atm, only shared=FALSE is supported
+powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
+                      initial = if (log) 0 else 1)
+                                        # only shared=FALSE is supported
 {
+    if (log) stop("log-parametrization not yet implemented")
     if (missing(maxlag)) {
         stop("'maxlag' must be specified (e.g., maximum neighbourhood order)")
     }
 
     ## main function which returns the weight matrix
-    weights.call <- call("zetaweights", quote(nbmat), maxlag, quote(d),
+    weights.call <- call("zetaweights", quote(nbmat), quote(d), maxlag,
                          normalize, FALSE)
     weights <- as.function(c(alist(d=, nbmat=, ...=), weights.call),
                            envir=.GlobalEnv)
@@ -237,12 +236,12 @@ powerlaw <- function (maxlag, normalize = TRUE, initial = 1)
     dweights <- d2weights <- as.function(c(alist(d=, nbmat=, ...=),
         substitute({
             W <- weights.call
-            is.na(nbmat) <- nbmat == 0L # w_jj(d) = 0 => w_jj'(d) = 0, sum over j!=i
+            is.na(nbmat) <- nbmat == 0L # w_jj(d)=0 => w_jj'(d)=0, sum over j!=i
             tmp1a <- log(nbmat)
             norm <- rowSums(nbmat^-d, na.rm=TRUE) # unused for raw weights
-            tmp1b <- rowSums(nbmat^-d * -log(nbmat), na.rm=TRUE)/norm # set to 0 for raw
+            tmp1b <- rowSums(nbmat^-d * -log(nbmat), na.rm=TRUE)/norm # 0 for raw
             tmp1 <- tmp1a + tmp1b
-            tmp2 <- rowSums(nbmat^-d * log(nbmat)^2, na.rm=TRUE)/norm - tmp1b^2 # for 2nd deriv
+            tmp2 <- rowSums(nbmat^-d * log(nbmat)^2, na.rm=TRUE)/norm - tmp1b^2
             deriv <- W * -tmp1          # for d2weights: W * (tmp1^2 - tmp2)
             deriv[is.na(deriv)] <- 0
             deriv
