@@ -90,30 +90,8 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
       match.arg(check.analyticals, c("numDeriv", "maxLik"), several.ok=TRUE)
   } else NULL
   if (length(check.analyticals) > 0L) {
-      cat("\nPenalized log-likelihood:\n")
-      resCheckPen <- sapply(check.analyticals, function(derivMethod) {
-          if (requireNamespace(derivMethod, character.only=TRUE)) {
-              do.call(paste("checkDerivatives", derivMethod, sep="."),
-                      args=alist(penLogLik, penScore, penFisher, theta.start,
-                      sd.corr=Sigma.start, model=model))
-          }
-      }, simplify=FALSE, USE.NAMES=TRUE)
-      if (length(resCheckPen) == 1L) resCheckPen <- resCheckPen[[1L]]
-      resCheckMar <- if (length(Sigma.start) == 0L) list() else {
-          cat("\nMarginal log-likelihood:\n")
-          fisher.unpen <- attr(penFisher(theta.start, Sigma.start, model,
-                                         attributes=TRUE), "fisher")
-          resCheckMar <- sapply(check.analyticals, function(derivMethod) {
-              if (requireNamespace(derivMethod, character.only=TRUE)) {
-                  do.call(paste("checkDerivatives", derivMethod, sep="."),
-                          args=alist(marLogLik, marScore, marFisher, Sigma.start,
-                          theta=theta.start, model=model,
-                          fisher.unpen=fisher.unpen))
-              }
-          }, simplify=FALSE, USE.NAMES=TRUE)
-          if (length(resCheckMar) == 1L) resCheckMar[[1L]] else resCheckMar
-      }
-      resCheck <- list(pen = resCheckPen, mar = resCheckMar)
+      resCheck <- checkAnalyticals(model, theta.start, Sigma.start,
+                                   methods=check.analyticals)
       return(resCheck)
   }
 
@@ -1380,8 +1358,9 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
 
 sqrtOf1pr2 <- function(r){ sqrt(1+r^2) }
 
-getSigmai <- function(sd,    # vector of length dim with stdev's
-                      correlation, # vector of length dim with correlation parameters, =0 if un-correlated
+getSigmai <- function(sd,    # vector of length dim with log-stdev's
+                      correlation, # vector of length dim with correlation
+                                   # parameters, 0-length if uncorrelated
                       dim
                       ){
   if(dim==0) return(NULL)
@@ -1399,8 +1378,9 @@ getSigmai <- function(sd,    # vector of length dim with stdev's
   return(Sigma.i)
 }
 
-getSigmaiInv <- function(sd,    # vector of length dim with stdev's
-                         correlation, # vector of length dim with correlation parameters, =0 if un-correlated
+getSigmaiInv <- function(sd,    # vector of length dim with log-stdev's
+                         correlation, # vector of length dim with correlation
+                                      # parameters, 0-length if uncorrelated
                          dim
                          ){
     
@@ -1466,7 +1446,7 @@ marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL){
   if(any(is.na(sd.corr))){
     # in order to avoid nlminb from running into an infinite loop (cf. bug
     # report #15052), we have to emergency stop() in this case.
-    # As of R 2.16.0, nlminb() will throw an error if it receives NA from
+    # As of R 2.15.2, nlminb() will throw an error if it receives NA from
     # any of the supplied functions.
     stop("NAs in variance parameters.", ADVICEONERROR)
   }
@@ -1700,6 +1680,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
       # ~85% faster implementation using crossprod() avoiding "slow" t():
       d2lpen.i <- -0.5 * crossprod(randomEffects, dSij) %*% randomEffects
 
+      # compute second derivative of log-determinant of penFisher
       mpart1 <- dS.j %*% F.inv.RE  # 3 times as fast as the other way round
       mpart2 <- dS.i %*% F.inv.RE
       mpart <- mpart1 %*% mpart2
@@ -1942,7 +1923,7 @@ updateVariance <- function(sd.corr, theta, model, fisher.unpen,
     sd.corr.new <- res$par
     ll <- -res$objective
     if(any(is.na(sd.corr.new))) {
-        ## Before R 2.16.0, in some cases nlminb continues being stucked at the
+        ## Before R 2.15.2, in some cases nlminb continues being stucked at the
         ## NA parameters until the iteration limit is reached (then returning).
         ## In others, nlminb is in an infinite loop in the FORTRAN code even
         ## ignoring the BREAK signal.
@@ -2412,3 +2393,37 @@ oneStepAhead <- function(result, # result of call to hhh4
 
 }
 
+
+## check analytical score functions and Fisher informations for
+## a given model (the result of interpretControl(control, stsObj))
+## and given parameters theta (regression par.) and sd.corr (variance par.).
+## This is a wrapper around functionality of the numDeriv and maxLik packages.
+checkAnalyticals <- function (model, theta, sd.corr,
+                              methods=c("numDeriv","maxLik"))
+{
+    cat("\nPenalized log-likelihood:\n")
+    resCheckPen <- sapply(methods, function(derivMethod) {
+        if (requireNamespace(derivMethod)) {
+            do.call(paste("checkDerivatives", derivMethod, sep="."),
+                    args=alist(penLogLik, penScore, penFisher, theta,
+                    sd.corr=sd.corr, model=model))
+        }
+    }, simplify=FALSE, USE.NAMES=TRUE)
+    if (length(resCheckPen) == 1L) resCheckPen <- resCheckPen[[1L]]
+    
+    resCheckMar <- if (length(sd.corr) == 0L) list() else {
+        cat("\nMarginal log-likelihood:\n")
+        fisher.unpen <- attr(penFisher(theta, sd.corr, model, attributes=TRUE),
+                             "fisher")
+        resCheckMar <- sapply(methods, function(derivMethod) {
+            if (requireNamespace(derivMethod)) {
+                do.call(paste("checkDerivatives", derivMethod, sep="."),
+                        args=alist(marLogLik, marScore, marFisher, sd.corr,
+                        theta=theta, model=model, fisher.unpen=fisher.unpen))
+            }
+        }, simplify=FALSE, USE.NAMES=TRUE)
+        if (length(resCheckMar) == 1L) resCheckMar[[1L]] else resCheckMar
+    }
+    
+    list(pen = resCheckPen, mar = resCheckMar)
+}
