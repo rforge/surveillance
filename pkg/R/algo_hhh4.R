@@ -1787,8 +1787,8 @@ dSigma3 <- function(sd,corr){
 
 }
 
-d2Sigma3 <- function(sd,corr, d1){
-  
+d2Sigma3 <- function(sd,corr, d1)
+{  
   derivs <- array(0,c(3,3,6))
   result <- list(dsd1=d1, dsd2=derivs, dsd3=derivs, dcorr1=derivs, dcorr2=derivs, dcorr3=derivs)
   
@@ -1803,7 +1803,8 @@ d2Sigma3 <- function(sd,corr, d1){
   result$dsd3[,,3]<- d1[,,3]
   result$dsd3[3,3,3] <- 2*d1[3,3,3]#
   
-  if(length(corr)>0){
+  if (length(corr)>0)
+  {
     result$dsd1[2:3,2:3,4] <-  0
     result$dsd1[2:3,2:3,5] <-  0
     result$dsd1[,,6] <-  0
@@ -1813,7 +1814,7 @@ d2Sigma3 <- function(sd,corr, d1){
     
     result$dsd3[3,2,4] <- result$dsd3[2,3,4] <- d1[3,2,4]
     result$dsd3[,,c(5,6)] <- d1[,,c(5,6)]
-  
+
     # derivative of corr_1
     result$dcorr1[2,1,4] <- result$dcorr1[1,2,4] <- -(exp(sum(sd[1:2]))*3*corr[1])/(sqrtOf1pr2(corr[1])^5) #
     result$dcorr1[3,2,4] <- result$dcorr1[2,3,4] <- -(exp(sum(sd[2:3]))*(corr[1]*(3*corr[2]*sqrtOf1pr2(corr[3])-2*prod(corr[c(1,3)])) + corr[3]) )/ (prod(sqrtOf1pr2(corr[2:3]))*(sqrtOf1pr2(corr[1])^5)) #
@@ -1825,15 +1826,15 @@ d2Sigma3 <- function(sd,corr, d1){
     # derivative of corr_2
     result$dcorr2[3,1,5] <- result$dcorr2[1,3,5] <- -(exp(sum(sd[c(3,1)]))*3*corr[2])/(sqrtOf1pr2(corr[2])^5)
     result$dcorr2[3,2,5] <- result$dcorr2[2,3,5] <- -(exp(sum(sd[2:3]))*(corr[2]*(3*corr[1]*sqrtOf1pr2(corr[3])-2*prod(corr[c(2,3)])) + corr[3]) )/ (prod(sqrtOf1pr2(corr[c(1,3)]))*(sqrtOf1pr2(corr[2])^5))
-      
-    result$dcorr2[3,2,6] <- result$dcorr2[2,3,6] <- -(exp(sum(sd[2:3]))*sqrtOf1pr2(corr[2]))/ (prod(sqrtOf1pr2(corr[c(2,3)])^3)*sqrtOf1pr2(corr[1]))
+    
+    result$dcorr2[3,2,6] <- result$dcorr2[2,3,6] <-
+        -exp(sum(sd[2:3]))*corr[2] / # SM @ 14/05/13: formula fixed, marFisher()
+                                     # and hhh4()$Sigma.cov[5,6] are now correct
+            (prod(sqrtOf1pr2(corr[c(2,3)])^3)*sqrtOf1pr2(corr[1]))
     
     # derivative of corr_3
     result$dcorr3[3,2,6] <- result$dcorr3[2,3,6] <- -(exp(sum(sd[2:3]))*3*corr[3])/ (prod(sqrtOf1pr2(corr[c(1,2)]))*sqrtOf1pr2(corr[3])^5)
-    
-    
   }
-  
 
   return(result)
 }
