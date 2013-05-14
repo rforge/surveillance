@@ -221,46 +221,67 @@ powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
                       initial = if (log) 0 else 1)
                                         # only shared=FALSE is supported
 {
-    if (log) stop("log-parametrization not yet implemented")
     if (missing(maxlag)) {
         stop("'maxlag' must be specified (e.g., maximum neighbourhood order)")
     }
 
     ## main function which returns the weight matrix
-    weights.call <- call("zetaweights", quote(nbmat), quote(d), maxlag,
-                         normalize, FALSE)
-    weights <- as.function(c(alist(d=, nbmat=, ...=), weights.call),
+    weights.call <- call("zetaweights",
+                         quote(nbmat), quote(d), maxlag, normalize)
+    weights <- as.function(c(alist(d=, nbmat=, ...=), call("{", weights.call)),
                            envir=.GlobalEnv)
-
-    ## construct derivatives with respect to "d"
-    dweights <- d2weights <- as.function(c(alist(d=, nbmat=, ...=),
-        substitute({
-            W <- weights.call
-            is.na(nbmat) <- nbmat == 0L # w_jj(d)=0 => w_jj'(d)=0, sum over j!=i
-            tmp1a <- log(nbmat)
-            norm <- rowSums(nbmat^-d, na.rm=TRUE) # unused for raw weights
-            tmp1b <- rowSums(nbmat^-d * -log(nbmat), na.rm=TRUE)/norm # 0 for raw
-            tmp1 <- tmp1a + tmp1b
-            tmp2 <- rowSums(nbmat^-d * log(nbmat)^2, na.rm=TRUE)/norm - tmp1b^2
-            deriv <- W * -tmp1          # for d2weights: W * (tmp1^2 - tmp2)
-            deriv[is.na(deriv)] <- 0
-            deriv
-        }, list(weights.call=weights.call))), envir=.GlobalEnv)
-
-    ## adaptions for dweights and d2weights
-    body(dweights)[[grep("^tmp2 <-", body(dweights))]] <- NULL
-    body(d2weights)[[grep("^deriv <-", body(d2weights))]] <-
-        quote(deriv <- W * (tmp1^2 - tmp2))
-    
-    ## simplifications for raw weights
-    if (!normalize) {
-        body(dweights)[[grep("^norm", body(dweights))]] <-
-            body(d2weights)[[grep("^norm", body(d2weights))]] <- NULL
-        body(dweights)[[grep("^tmp1b <-", body(dweights))]] <-
-            body(d2weights)[[grep("^tmp1b <-", body(d2weights))]] <- quote(tmp1b <- 0)
-        body(d2weights)[[grep("^tmp2 <-", body(d2weights))]] <- quote(tmp2 <- 0)
+    if (log) { # the parameter d is interpreted on log-scale
+        ## we prepend the necessary conversion d <- exp(d)
+        body(weights) <- as.call(append(as.list(body(weights)),
+                                        quote(d <- exp(d)), after=1))
     }
     
+    ## construct derivatives with respect to "d" (or log(d), respectively)
+    dweights <- d2weights <- as.function(c(alist(d=, nbmat=, ...=), quote({})),
+                                         envir=.GlobalEnv)
+    header <- c(
+        if (log) quote(d <- exp(d)),    # such that d is again on original scale
+        substitute(W <- weights.call, list(weights.call=weights.call)),
+        expression(
+            is.na(nbmat) <- nbmat == 0L, # w_jj(d)=0 => w_jj'(d)=0, sum over j!=i,
+            logo <- log(nbmat)           # have to set NA because we do log(o)
+            )
+        )
+    footer <- expression(deriv[is.na(deriv)] <- 0, deriv)
+
+    ## first derivative
+    tmp1 <- expression(
+        norm <- rowSums(nbmat^-d, na.rm=TRUE),
+        tmpnorm <- rowSums(nbmat^-d * -log(nbmat), na.rm=TRUE) / norm,
+        tmp1 <- logo + tmpnorm
+        )
+    deriv1 <- if (normalize) {
+        expression(deriv <- W * -tmp1)
+    } else expression(deriv <- W * -logo)
+    body(dweights) <- as.call(c(as.name("{"),
+            header,
+            if (normalize) tmp1,
+            deriv1,
+            if (log) expression(deriv <- deriv * d), # this is the non-log d
+            footer
+        ))
+
+    ## second derivative
+    body(d2weights) <- as.call(c(as.name("{"),
+            header,
+            if (normalize) {
+                c(tmp1, expression(
+                    tmp2 <- rowSums(nbmat^-d * log(nbmat)^2, na.rm=TRUE) / norm - tmpnorm^2,
+                    deriv <- W * (tmp1^2 - tmp2)
+                    ))
+            } else expression(deriv <- W * logo^2),
+            if (log) c(
+                do.call("substitute", list(deriv1[[1]], list(deriv=as.name("deriv1")))),
+                expression(deriv <- deriv * d^2 + deriv1 * d) # this is the non-log d
+                ),
+            footer
+        ))
+
     ## return list of functions
     list(w=weights, dw=dweights, d2w=d2weights, initial=initial)
 }

@@ -19,7 +19,26 @@
     \item As a replacement of the license-restricted \pkg{gpclib} package,
     the \pkg{rgeos} package may now be used in generating
     \code{"epidataCS"} (polygon intersections, slightly slower).
-    This is also the default (\code{surveillance.options(gpclib=FALSE)}).
+    This is also the default
+    (\code{surveillance.options(gpclib=FALSE)}).
+
+    \item Changed parametrization of \code{zetaweights()} and completed
+    its documentation (now no longer marked as experimental).
+  }
+}
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item \code{hhh4}: The entry \eqn{(5,6)} of the marginal Fisher
+    information matrix in models with random intercepts in all three
+    components was incorrect. 
+    If \code{nlminb} was used as optimizer for the variance parameters
+    (using the negative marginal Fisher information as Hessian), this
+    could have caused false convergence (with warning) or minimally
+    biased convergence (without warning).
+    As a consequence, the \code{"Sigma.cov"} component of the
+    \code{hhh4()} result, which is the inverse of the marginal Fisher
+    information matrix at the MLE, was also wrong.
   }
 }
 
