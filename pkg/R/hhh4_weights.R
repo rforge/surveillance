@@ -183,25 +183,25 @@ checkWeightsFUN <- function (object)
 ## wji = oji^-d / sum_k ojk^-d
 ## In both cases, maxlag=1 yields the classical weights wji=1/nj.
 
-zetaweights <- function (nbmat, d = 1, maxlag = max(nbmat),
-                         normalize = TRUE, shared = FALSE)
+zetaweights <- function (nbmat, d = 1, maxlag = max(nbmat), normalize = FALSE)
 {
     ## raw (non-normalized) zeta-distribution on 1:maxlag
-    zeta <- c(0, seq_len(maxlag)^-d)
-    ##<- first 0 is for lag 0 (for instance, diag(nbmat))
+    zeta <- c(0, seq_len(maxlag)^-d)  # first 0 is for lag 0 (i.e., diag(nbmat))
 
     ## replace order by zetaweight of that order
-    wji <- zeta[nbmat + 1L]
-    wji[is.na(wji)] <- 0
+    wji <- zeta[nbmat + 1L]           # results in vector
+    wji[is.na(wji)] <- 0              # for lags > maxlag
+
+    ## set dim and names
     dim(wji) <- dim(nbmat)
     dimnames(wji) <- dimnames(nbmat)
 
-    if (shared) {
-        ## multiplicity of orders by row: dim(nbmat)==dim(multbyrow)
-        multbyrow <- t(apply(nbmat, 1, function(x) table(x)[as.character(x)]))
-        ## neighbours of same order share the zetaweight for that order
-        wji <- wji / sum(zeta) / multbyrow
-    }
+    ## if (shared) {
+    ##     ## multiplicity of orders by row: dim(nbmat)==dim(multbyrow)
+    ##     multbyrow <- t(apply(nbmat, 1, function(x) table(x)[as.character(x)]))
+    ##     ## neighbours of same order share the zetaweight for that order
+    ##     wji <- wji / sum(zeta) / multbyrow
+    ## }
     if (normalize) { # normalize such that each row sums to 1
         wji <- wji / rowSums(wji)
     }
@@ -219,10 +219,12 @@ zetaweights <- function (nbmat, d = 1, maxlag = max(nbmat),
 
 powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
                       initial = if (log) 0 else 1)
-                                        # only shared=FALSE is supported
 {
     if (missing(maxlag)) {
-        stop("'maxlag' must be specified (e.g., maximum neighbourhood order)")
+        stop("'maxlag' must be specified (e.g. maximum neighbourhood order)")
+        ## specifying 'maxlag' in zetaweights is actually optional since it has
+        ## the default value max(nbmat). however, repeatedly asking for this
+        ## maximum would be really inefficient.
     }
 
     ## main function which returns the weight matrix

@@ -15,8 +15,7 @@
 }
 
 \usage{
-zetaweights(nbmat, d = 1, maxlag = max(nbmat),
-            normalize = TRUE, shared = FALSE)
+zetaweights(nbmat, d = 1, maxlag = max(nbmat), normalize = FALSE)
 }
 
 \arguments{
@@ -28,7 +27,6 @@ zetaweights(nbmat, d = 1, maxlag = max(nbmat),
     is 0. Defaults to no truncation.}
   \item{normalize}{Should the resulting weight matrix be normalized such
     that rows sum to 1?}
-  \item{shared}{rather nonsense. Deprecated.}
 }
 
 \value{
