@@ -634,7 +634,8 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
     
     ## initialize plotting frame
     if (!add) {
-        if (is.null(ylim)) ylim <- c(0, if (scaled) exp(gamma0) else 1)
+        if (is.null(ylim))
+            ylim <- c(0, FUN(if (which=="siaf") cbind(0,0) else 0, pars, 1L))
         if (is.null(xlab)) xlab <- if (which == "siaf") {
             expression("Distance " * group("||",bold(s)-bold(s)[j],"||") *
                 " from host")
