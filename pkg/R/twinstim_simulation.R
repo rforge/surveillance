@@ -1189,8 +1189,8 @@ plot.simEpidataCSlist <- function (x,
     }
     opar <- par(mfrow = mfrow); on.exit(par(opar))
     main <- rep(main, length.out=length(which))
-    for (i in which) {
-        do.call("plot", args=list(x=quote(x[[i]]), aggregate=aggregate,
+    for (i in seq_along(which)) {
+        do.call("plot", args=list(x=quote(x[[which[i]]]), aggregate=aggregate,
                         subset=substitute(subset), main = main[i], ...))
     }
 }
