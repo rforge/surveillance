@@ -42,8 +42,8 @@
 \details{
   \tabular{ll}{
     Package: \tab surveillance\cr
-    Version: \tab 1.5-3\cr
-    Date: \tab 2013-04-19\cr
+    Version: \tab 1.6-0\cr
+    Date: \tab 2013-05-22\cr
     License: \tab GPL version 2
     (\url{http://www.gnu.org/licenses/old-licenses/gpl-2.0.html}) \cr
     URL: \tab \url{http://surveillance.r-forge.r-project.org/}\cr

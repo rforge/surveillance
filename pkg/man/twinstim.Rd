@@ -258,7 +258,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     optimization.}
   \item{control.siaf}{see the \dQuote{Arguments} section above.}
   \item{optim.args}{input optimizer arguments used to determine the MLE.}
-  \item{converged}{logical indicating if the optimizer converged.}
+  \item{converged}{either \code{TRUE} (if the optimizer converged) or a
+    character string containing a failure message).}
   \item{fisherinfo}{\emph{expected} Fisher information evaluated at the
     MLE. Only part of the output for full likelihood inference
     (\code{partial = FALSE}) and if spatial and temporal interaction

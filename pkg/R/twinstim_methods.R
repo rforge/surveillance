@@ -78,8 +78,9 @@ print.twinstim <- function (x, digits = max(3, getOption("digits") - 3), ...)
     cat("\nCoefficients:\n")
     print.default(format(coef(x), digits=digits), print.gap = 2, quote = FALSE)
     cat("\nLog-likelihood: ", format(logLik(x), digits=digits), "\n", sep = "")
-    if (!x$converged) {
-        cat("\nWARNING: OPTIMIZATION ROUTINE DID NOT CONVERGE!\n")
+    if (!isTRUE(x$converged)) {
+        cat("\nWARNING: OPTIMIZATION ROUTINE DID NOT CONVERGE!",
+            paste0("(",x$converged,")"), "\n")
     }
     cat("\n")
     invisible(x)
@@ -181,8 +182,9 @@ print.summary.twinstim <- function (x,
         }
         }
     }
-    if (!x$converged) {
-        cat("\nWARNING: OPTIMIZATION ROUTINE DID NOT CONVERGE!\n")
+    if (!isTRUE(x$converged)) {
+        cat("\nWARNING: OPTIMIZATION ROUTINE DID NOT CONVERGE!",
+            paste0("(",x$converged,")"), "\n")
     }
     cat("\n")
     invisible(x)
@@ -1075,7 +1077,8 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
 ## However, this specific method is inspired by and copies small parts of the
 ## update.default method from the stats package developed by The R Core Team
 
-update.twinstim <- function (object, endemic, epidemic, optim.args, model,
+update.twinstim <- function (object, endemic, epidemic,
+                             control.siaf, optim.args, model,
                              ..., use.estimates = TRUE, evaluate = TRUE)
 {
     call <- object$call
@@ -1098,6 +1101,10 @@ update.twinstim <- function (object, endemic, epidemic, optim.args, model,
     if (!missing(epidemic))
         call$epidemic <- if (is.null(call$epidemic)) epidemic else {
             update.formula(call$epidemic, epidemic)
+        }
+    if (!missing(control.siaf))
+        call$control.siaf <- if (is.null(call$control.siaf)) control.siaf else {
+            modifyList(eval.parent(call$control.siaf), control.siaf)
         }
     if (!missing(optim.args)) {
         oldargs <- call$optim.args

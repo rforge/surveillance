@@ -1135,23 +1135,28 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             nmRes
         } else optimRes1
 
+
+        ## Convergence message
+        
+        msgConvergence <- if (finetune || optimMethod != "nlminb") {
+            paste("code", optimRes$convergence)
+        } else optimRes$message
+        
         if (optimRes$convergence != 0) {
-            msgNotConverged <- paste("optimization routine did not converge",
-                if (finetune || optimMethod != "nlminb") {
-                    paste0("(code ", optimRes$convergence, ")")
-                } else paste0("(", optimRes$message, ")"))
+            msgNotConverged <- paste0("optimization routine did not converge (",
+                                      msgConvergence, ")")
             warning(msgNotConverged)
             if (verbose) {
                 cat("\nWARNING: ", msgNotConverged, "!\n", sep="")
-                if (!is.null(optimRes$message) && nzchar(optimRes$message)) {
+                if ((finetune || optimMethod != "nlminb") &&
+                    !is.null(optimRes$message) && nzchar(optimRes$message)) {
                     cat("MESSAGE: \"", optimRes$message, "\"\n", sep="")
                 }
                 if (useScore && !constantsiaf &&
                     grepl("false", msgNotConverged)) {
-                    cat("SOLUTION: increase the precision of 'siaf$Deriv'\n")
+                    cat("SOLUTION: increase the precision of 'siaf$Deriv' (and 'siaf$F')\n")
                     if (optimMethod == "nlminb") {
-                        cat("          otherwise increase nlminb's false",
-                            "convergence tolerance 'xf.tol'\n")
+                        cat("          or nlminb's false convergence tolerance 'xf.tol'\n")
                     }
                 }
             }
@@ -1192,7 +1197,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
            counts = if (all(fixed)) c("function"=1L, "gradient"=0L) else {
                optimRes1$counts + if (finetune) optimRes$counts else c(0L, 0L)
            },
-           converged = all(fixed) || (optimRes$convergence == 0)
+           converged = if (all(fixed) || (optimRes$convergence == 0))
+                       TRUE else msgConvergence
            )
 
 

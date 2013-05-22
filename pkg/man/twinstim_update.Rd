@@ -11,7 +11,8 @@ especially useful if one wants to add the \code{model} environment
 }
 
 \usage{
-\method{update}{twinstim}(object, endemic, epidemic, optim.args, model,
+\method{update}{twinstim}(object, endemic, epidemic,
+       control.siaf, optim.args, model,
        ..., use.estimates = TRUE, evaluate = TRUE)
 }
 
@@ -19,6 +20,8 @@ especially useful if one wants to add the \code{model} environment
   \item{object}{a previous \code{"twinstim"} fit.}
   \item{endemic, epidemic}{changes to the formulae -- see
     \code{\link{update.formula}} and \code{\link{twinstim}}.}
+  \item{control.siaf}{a list, see \code{\link{twinstim}}. It will modify
+    the original \code{control.siaf} using \code{\link{modifyList}}.}
   \item{optim.args}{see \code{\link{twinstim}}. If a list, it will
     modify the original \code{optim.args} using \code{\link{modifyList}}.}
   \item{model}{see \code{\link{twinstim}}. If this is the only argument

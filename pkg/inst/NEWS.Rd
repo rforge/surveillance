@@ -7,7 +7,7 @@
 
 
 
-\section{Changes in surveillance version 1.6-0 (2013-05-09)}{
+\section{Changes in surveillance version 1.6-0 (2013-05-22)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -24,6 +24,10 @@
 
     \item Changed parametrization of \code{zetaweights()} and completed
     its documentation (now no longer marked as experimental).
+
+    \item \code{twinstim(...)$converged} is \code{TRUE} if
+    the optimization routine converged (as before) but contains
+    the failure message otherwise.
   }
 }
 

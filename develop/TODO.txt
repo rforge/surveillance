@@ -112,7 +112,8 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 ##########
 
 #Open issues / feature requests
-- allow for use of rgeos instead of gpclib for polygon operations
+- why don't we set environment(endemic)<-environment(epidemic)<-.GlobalEnv ???
+  was that necessary for stepComponent to work?
 - implement step function support for interaction kernels
 - allow for spatial "prehistory", i.e. events outside of W as possible sources
   in the epidemic component only, but otherwise not part of the likelihood
@@ -131,6 +132,7 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 15/08/2012 (sebastian): added support for fixed parameters
 10/12/2012 (sebastian): intensityplot-method for simEpidataCS passing by
                         twinstim() with all parameters fixed
+11/05/2013 (sebastian): allow for use of rgeos instead of gpclib for polygon operations
 
 
 
