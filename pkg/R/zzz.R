@@ -15,10 +15,6 @@ gpclibCheck <- function (fatal = TRUE)
 
 .onLoad <- function (libname, pkgname)
 {
-    ## Determine package version and store it as surveillance:::VERSION
-    v <- packageVersion(pkgname, lib.loc=libname)
-    assign("VERSION", v, getNamespace(pkgname))
-
     ## initialize options
     reset.surveillance.options()
 }
@@ -26,6 +22,7 @@ gpclibCheck <- function (fatal = TRUE)
 .onAttach <- function (libname, pkgname)
 {
     ## Startup message
+    VERSION <- packageVersion(pkgname, lib.loc=libname)
     packageStartupMessage("This is ", pkgname, " ", VERSION, ". ",
                           "For overview type ",
                           sQuote(paste0("help(", pkgname, ")")), ".")
