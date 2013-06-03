@@ -7,7 +7,7 @@
 
 
 
-\section{Changes in surveillance version 1.6-0 (2013-05-22)}{
+\section{Changes in surveillance version 1.6-0 (2013-06-03)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -28,6 +28,9 @@
     \item \code{twinstim(...)$converged} is \code{TRUE} if
     the optimization routine converged (as before) but contains
     the failure message otherwise.
+
+    \item The \code{untie} methods are now able to produce jittered points
+    with a required minimum separation (\code{minsep}).
   }
 }
 
@@ -43,6 +46,9 @@
     As a consequence, the \code{"Sigma.cov"} component of the
     \code{hhh4()} result, which is the inverse of the marginal Fisher
     information matrix at the MLE, was also wrong.
+
+    \item \code{untie.matrix()} could have produced jittering greater than
+    the specified \code{amount}.
   }
 }
 
