@@ -167,7 +167,9 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     to their initial values. This can be specified by a
     logical vector of the same length as the \code{par} component, by an
     integer vector indexing \code{par} or by a character vector following
-    the \code{twinstim} naming conventions.
+    the \code{twinstim} naming conventions. Furthermore, if
+    \code{isTRUE(fixed)}, then all parameters are fixed at their initial
+    values and no optimization is performed.
     
     Importantly, the \code{method} argument in the \code{optim.args}
     list may also be \code{"nlminb"}, in 

@@ -921,19 +921,27 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
     fixed <- optim.args[["fixed"]]
     optim.args[["fixed"]] <- NULL
-    if (is.null(fixed)) fixed <- integer(0L) else stopifnot(is.vector(fixed))
-    whichfixed <- if (is.numeric(fixed)) {
-        stopifnot(fixed %in% 1:npars)
-        fixed
-    } else if (is.character(fixed)) {
-        if (any(!fixed %in% names(optim.args$par)))
-            stop("'optim.args$fixed' must be a subset of: ",
-                 paste0("\"",names(optim.args$par), "\"", collapse=", "))
-        fixed
-    } else if (is.logical(fixed)) {
-        stopifnot(length(fixed) == npars)
-        which(fixed)
-    } else stop("'optim.args$fixed' must be a numeric, character or logical vector")
+    whichfixed <- if (is.null(fixed)) {
+        integer(0L)
+    } else if (isTRUE(fixed)) {
+        seq_len(npars)
+    } else {
+        stopifnot(is.vector(fixed))
+        if (is.numeric(fixed)) {
+            stopifnot(fixed %in% seq_len(npars))
+            fixed
+        } else if (is.character(fixed)) {
+            if (any(!fixed %in% names(optim.args$par)))
+                stop("'optim.args$fixed' must be a subset of: ",
+                     paste0("\"",names(optim.args$par), "\"", collapse=", "))
+            fixed
+        } else if (is.logical(fixed)) {
+            stopifnot(length(fixed) == npars)
+            which(fixed)
+        } else {
+            stop("'optim.args$fixed' must be a numeric, character or logical vector")
+        }
+    }
     fixed <- logical(npars)   # FALSE
     names(fixed) <- names(optim.args$par)
     fixed[whichfixed] <- TRUE
