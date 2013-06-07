@@ -110,6 +110,7 @@ export(checkResidualProcess)            # for twinstim and twinSIR
 export(inside.gpc.poly)
 S3method(scale, gpc.poly)   # redefined method for gpc.poly in spatial_stuff.R
 export(nbOrder)
+export(poly2adjmat)
 
 # randomly break tied event times or coordinates
 export(untie)                           # new S3-generic
@@ -228,6 +229,7 @@ export(twinstim)
 export(simEpidataCS)
 export(siaf.constant, siaf.gaussian, siaf.lomax, qlomax, siaf.powerlaw, siaf.powerlawL)
 export(tiaf.constant, tiaf.exponential)
+export(epidataCS2sts)
 
 S3method(nobs, epidataCS)
 S3method("[", epidataCS)

@@ -638,3 +638,78 @@ as.epidata.epidataCS <- function (data, tileCentroids, eps = 0.001, ...)
     cat("Done.\n")
     epi
 }
+
+
+####################################################################
+### Transform "epidataCS" to "sts" by aggregation of cases on stgrid
+####################################################################
+
+epidataCS2sts <- function (object, freq, start,
+                           neighbourhood, tiles = NULL,
+                           popcol.stgrid = NULL, popdensity = TRUE)
+{
+    stopifnot(inherits(object, "epidataCS"))
+    tileLevels <- levels(object$stgrid$tile)
+    if (!is.null(tiles)) {
+        stopifnot(inherits(tiles, "SpatialPolygons"),
+                  tileLevels %in% row.names(tiles))
+        tiles <- tiles[tileLevels,]
+    }
+
+    ## prepare sts components
+    epoch <- unique(object$stgrid$BLOCK) # epidataCS is sorted
+    eventsByCell <- with(object$events@data,
+                         table(BLOCK=factor(BLOCK, levels=epoch), tile))
+    if (missing(neighbourhood)) { # auto-detect neighbourhood from tiles
+        if (is.null(tiles))
+            stop("'tiles' is required for auto-generation of 'neighbourhood'")
+        neighbourhood <- poly2adjmat(tiles, zero.policy=TRUE)
+        if (any(rowSums(neighbourhood) == 0))
+            warning("generated neighbourhood matrix contains islands")
+    }
+    populationFrac <- if (is.null(popcol.stgrid)) NULL else {
+        stopifnot(is.vector(popcol.stgrid), length(popcol.stgrid) == 1)
+        popByCell <- object$stgrid[[popcol.stgrid]]
+        if (popdensity) popByCell <- popByCell * object$stgrid[["area"]]
+        totalpop <- sum(popByCell[seq_along(tileLevels)])
+        matrix(popByCell/totalpop,
+               nrow=length(epoch), ncol=length(tileLevels),
+               byrow=TRUE, dimnames=dimnames(eventsByCell))
+    }
+
+    ## initialize sts object
+    new("sts", epoch = epoch, freq=freq, start=start,
+        observed=unclass(eventsByCell), neighbourhood=neighbourhood,
+        populationFrac=populationFrac, map=tiles, epochAsDate=FALSE)
+}
+
+
+###################################################
+### Distances from potential (eps.s, eps.t) sources
+###################################################
+
+getSourceDists <- function (object)
+{
+    ## extract required info from "epidataCS"-object
+    eventCoords <- coordinates(object$events)
+    .sources <- object$events$.sources
+
+    ## distance matrix and number of sources
+    distmat <- as.matrix(dist(eventCoords))
+    nsources <- sapply(.sources, length)
+    hasSources <- nsources > 0
+    cnsources <- c(0, cumsum(nsources))
+
+    ## generate vector of distances of events to their potential sources
+    sourcedists <- numeric(sum(nsources))
+    for (i in which(hasSources)) {
+        .sourcesi <- .sources[[i]]
+        .sourcedists <- distmat[i, .sourcesi]
+        .idx <- cnsources[i] + seq_len(nsources[i])
+        sourcedists[.idx] <- .sourcedists
+        names(sourcedists)[.idx] <- paste(i, .sourcesi, sep="<-")
+    }
+
+    ## Done
+    sourcedists
+}

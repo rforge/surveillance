@@ -7,7 +7,7 @@
 
 
 
-\section{Changes in surveillance version 1.6-0 (2013-06-03)}{
+\section{Changes in surveillance version 1.6-0 (2013-06-07)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -31,6 +31,11 @@
 
     \item The \code{untie} methods are now able to produce jittered points
     with a required minimum separation (\code{minsep}).
+
+    \item It is now possible to convert (aggregate) \code{"epidataCS"}
+    (continuous-time continuous-space data) into an \code{"sts"} object
+    (multivariate time series of counts) by the new function
+    \code{epidataCS2sts}.
   }
 }
 

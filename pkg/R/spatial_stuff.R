@@ -188,3 +188,19 @@ polyAtBorder <- function (SpP)
     names(atBorder) <- row.names(SpP)
     atBorder
 }
+
+
+### derive adjacency structure from SpatialPolygons
+### (wrapping around functionality from the "spdep"-package)
+
+poly2adjmat <- function (SpP, ..., zero.policy = TRUE)
+{
+    if (!requireNamespace("spdep"))
+        stop("package ", dQuote("spdep"),
+             " is required to derive adjacencies from SpatialPolygons")
+    nb <- spdep::poly2nb(SpP, ...)
+    adjmat <- spdep::nb2mat(nb, style="B", zero.policy=zero.policy)
+    attr(adjmat, "call") <- NULL
+    colnames(adjmat) <- rownames(adjmat)
+    adjmat
+}
