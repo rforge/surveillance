@@ -74,8 +74,9 @@
       declared a specific time point in the region as having an alarm. If
       the object containins just observations then this slot is null. }
     \item{\code{upperbound}:}{Matrix with upper bound values }
-    \item{\code{neighbourhood}:}{Symmetric matrix of booleans size
-      \eqn{(number of regions)^2} stating the neighbourhood matrix. } 
+    \item{\code{neighbourhood}:}{Symmetric matrix of size
+      \eqn{(number of regions)^2} describing the neighbourhood structure. It
+      may either be a binary adjacency matrix or contain neighbourhood orders.}
     \item{\code{populationFrac}:}{Object of class \code{matrix}.}
     \item{\code{map}:}{Object of class \code{SpatialPolygonsDataFrame}
       providing a shape of the areas which are monitored. }

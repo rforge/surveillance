@@ -103,9 +103,6 @@ data(imdepifit)
   
   The entry \code{qmatrix} is a \eqn{2\times 2}{2 x 2} identity matrix
   indicating that no transmission between the two finetypes can occur.
-
-  The code used to produce the \code{imdepifit} can be found at the end
-  of the examples section below.
 }
 
 \source{
