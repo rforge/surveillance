@@ -1976,22 +1976,33 @@ updateVariance <- function(sd.corr, theta, model, fisher.unpen,
 
 ## default control arguments for updates
 defaultOptimControl <- function (method = "nlminb", lower = -Inf, upper = Inf,
-                                 verbose = 0)
+                                 iter.max = NULL, verbose = 0)
 {
+    if (is.null(iter.max)) iter.max <- 20 + 30*(method=="Nelder-Mead")
     lowVerbose <- verbose %in% 0:2
     luOptimMethod <- method %in% c("Brent", "L-BFGS-B")
     defaults.nr <- list(scoreTol=1e-5, paramTol=1e-7, F.inc=0.01, stepFrac=0.5,
-                        niter=20, verbose=verbose)
-    defaults.nlminb <- list(iter.max=20, scale=1, lower=lower, upper=upper,
+                        niter=iter.max, verbose=verbose)
+    defaults.nlminb <- list(iter.max=iter.max, scale=1, lower=lower, upper=upper,
                             trace=if(lowVerbose) c(0,0,5)[verbose+1] else 1)
-    defaults.nlm <- list(iterlim=100, check.analyticals=FALSE,
+    defaults.nlm <- list(iterlim=iter.max, check.analyticals=FALSE,
                          print.level=if(lowVerbose) c(0,0,1)[verbose+1] else 2)
-    defaults.optim <- list(fnscale=-1, trace=max(0,verbose-1),
+    defaults.optim <- list(maxit=iter.max, fnscale=-1, trace=max(0,verbose-1),
                            lower=if (luOptimMethod) lower else -Inf,
                            upper=if (luOptimMethod) upper else Inf)
     defaults <- switch(method, "nr" = defaults.nr, "nlm" = defaults.nlm,
                        "nlminb" = defaults.nlminb, defaults.optim)
     return(defaults)
+}
+
+setOptimControl <- function (method, control, ...)
+{
+    defaults <- defaultOptimControl(method, ...)
+    cntrl <- modifyList(defaults, control)
+    ## ensure fnscale < 0 (optim performs minimization)
+    if (!is.null(cntrl$fnscale) && cntrl$fnscale > 0)
+      cntrl$fnscale <- -cntrl$fnscale
+    cntrl
 }
 
 
@@ -2011,101 +2022,105 @@ fitHHH <- function(theta, sd.corr, model,
                grep("ne.ri",model$namesFE), grep("ne.1",model$namesFE))
   reg.lower[indexAR] <- -20
 
-  ## control arguments
+  ## control arguments for optimization of regression parameters
   reg.method <- cntrl.regression$method; cntrl.regression$method <- NULL
+  cntrl.update.reg <- setOptimControl(reg.method, cntrl.regression,
+                                      lower=reg.lower, upper=Inf,
+                                      iter.max=if(dimRE==0) 100,
+                                      verbose=verbose+(dimRE==0))
+
+  ## control arguments for optimization of variance parameters
   var.method <- cntrl.variance$method; cntrl.variance$method <- NULL
   if (length(sd.corr) == 1L && var.method == "Nelder-Mead") {
       var.method <- "Brent"
       cat("NOTE: switched variance optimizer from", dQuote("Nelder-Mead"),
-           "to", dQuote("Brent"), "(dim(Sigma)=1)\n")
+          "to", dQuote("Brent"), "(dim(Sigma)=1)\n")
   }
-  defaults.reg <- defaultOptimControl(method=reg.method, lower=reg.lower,
-                                      upper=Inf, verbose=verbose)
-  defaults.var <- defaultOptimControl(method=var.method, lower=-5, upper=5,
-                                      verbose=verbose)
-  cntrl.update.reg <- modifyList(defaults.reg, cntrl.regression)
-  cntrl.update.var <- modifyList(defaults.var, cntrl.variance)
-  if (!is.null(cntrl.update.reg$fnscale) && cntrl.update.reg$fnscale > 0) {
-      cntrl.update.reg$fnscale <- -cntrl.update.reg$fnscale
-  }
-  if (!is.null(cntrl.update.var$fnscale) && cntrl.update.var$fnscale > 0) {
-      cntrl.update.var$fnscale <- -cntrl.update.var$fnscale
-  }
+  cntrl.update.var <- setOptimControl(var.method, cntrl.variance,
+                                      lower=-5, upper=5, verbose=verbose)
 
-  ## Let's go
   if (verbose>0) {
       cat(as.character(Sys.time()), ":",
-          "Iterative optimization of regression & variance parameters\n")
+          if (dimRE == 0) "Optimization of regression parameters" else
+          "Iterative optimization of regression & variance parameters", "\n")
   }
-  convergence <- 99
-  i <- 0
-  while(convergence != 0 && (i < cntrl.stop$niter)){
-    i <- i+1
-    if (verbose>0) cat("\n")
-    
-    ## update regression coefficients
-    parReg <- updateRegression(theta=theta, sd.corr=sd.corr, model=model,
-                               control=cntrl.update.reg, method=reg.method)
-    theta <- parReg$par
-    fisher.unpen <- attr(penFisher(theta, sd.corr, model, attributes=TRUE),
-                         "fisher")
+  
+  if (dimRE == 0) { # optimization of regression coefficients only
+      parReg <- updateRegression(theta=theta, sd.corr=sd.corr, model=model,
+                                 control=cntrl.update.reg, method=reg.method)
+      theta <- parReg$par
+      convergence <- parReg$convergence
+  } else { # swing between updateRegression & updateVariance
+      convergence <- 99
+      i <- 0
+      while(convergence != 0 && (i < cntrl.stop$niter)){
+          i <- i+1
+          if (verbose>0) cat("\n")
+          
+          ## update regression coefficients
+          parReg <- updateRegression(theta=theta, sd.corr=sd.corr, model=model,
+                                     control=cntrl.update.reg, method=reg.method)
+          theta <- parReg$par
+          fisher.unpen <- attr(penFisher(theta, sd.corr, model, attributes=TRUE),
+                               "fisher")
 
-    if(verbose>0)
-      cat("Update of regression parameters:  max|x_0 - x_1| / max|x_0| =",
-          parReg$rel.tol, "\n")
-    
-    if(parReg$convergence!=0) {
-      if (!is.null(parReg$message)) print(parReg$message)
-      cat("Update of regression coefficients in iteration ", i, " unreliable\n")
-    }
+          if(verbose>0)
+              cat("Update of regression parameters:  max|x_0 - x_1| / max|x_0| =",
+                  parReg$rel.tol, "\n")
+          
+          if(parReg$convergence!=0) {
+              if (!is.null(parReg$message)) print(parReg$message)
+              cat("Update of regression coefficients in iteration ", i, " unreliable\n")
+          }
 
-    if(parReg$convergence >20 && shrinkage){
-      cat("\n\n***************************************\nshrinkage",
-          0.1*theta[abs(theta)>10],"\n")
-      theta[abs(theta)>10] <- 0.1*theta[abs(theta)>10]
-      diag(fisher.unpen) <- diag(fisher.unpen)+1e-2
-    }
-    
-    ## update variance parameters
-    parVar <- updateVariance(sd.corr=sd.corr, theta=theta, model=model,
-                             fisher.unpen=fisher.unpen,
-                             control=cntrl.update.var, method=var.method)
+          if(parReg$convergence >20 && shrinkage){
+              cat("\n\n***************************************\nshrinkage",
+                  0.1*theta[abs(theta)>10],"\n")
+              theta[abs(theta)>10] <- 0.1*theta[abs(theta)>10]
+              diag(fisher.unpen) <- diag(fisher.unpen)+1e-2
+          }
+          
+          ## update variance parameters
+          parVar <- updateVariance(sd.corr=sd.corr, theta=theta, model=model,
+                                   fisher.unpen=fisher.unpen,
+                                   control=cntrl.update.var, method=var.method)
 
-    if(verbose>0)
-      cat("Update of variance parameters:  max|x_0 - x_1| / max|x_0| =",
-          parVar$rel.tol, "\n")
-      
-    if(parVar$convergence!=0) {
-      if (!is.null(parVar$message)) print(parVar$message)
-      cat("Update of variance parameters in iteration ", i, " unreliable\n")
-    }
+          if(verbose>0)
+              cat("Update of variance parameters:  max|x_0 - x_1| / max|x_0| =",
+                  parVar$rel.tol, "\n")
+          
+          if(parVar$convergence!=0) {
+              if (!is.null(parVar$message)) print(parVar$message)
+              cat("Update of variance parameters in iteration ", i, " unreliable\n")
+          }
 
-    if(any(is.na(parVar$par))){         # this might occur when using nlminb
-      var.method <- if (length(sd.corr) == 1L) "Brent" else "Nelder-Mead"
-      cat("WARNING: at least one updated variance parameter is not a number\n",
-          "\t-> NO UPDATE of variance\n",
-          "\t-> SWITCHING to robust", dQuote(var.method),
-          "for variance updates\n")
-      cntrl.update.var <- defaultOptimControl(var.method, lower=-5, upper=5,
-                                              verbose=verbose)
-    } else {
-      sd.corr <- parVar$par
-    }
+          if(any(is.na(parVar$par))){   # this might occur when using nlminb
+              var.method <- if (length(sd.corr) == 1L) "Brent" else "Nelder-Mead"
+              cat("WARNING: at least one updated variance parameter is not a number\n",
+                  "\t-> NO UPDATE of variance\n",
+                  "\t-> SWITCHING to robust", dQuote(var.method),
+                  "for variance updates\n")
+              cntrl.update.var <- defaultOptimControl(var.method, lower=-5, upper=5,
+                                                      verbose=verbose)
+          } else {
+              sd.corr <- parVar$par
+          }
 
-    # overall convergence ?
-    if( (parReg$rel.tol < cntrl.stop$tol) && (parVar$rel.tol < cntrl.stop$tol)
-       && (parReg$convergence==0) && (parVar$convergence==0) ) 
-      convergence <- 0
+          ## overall convergence ?
+          if( (parReg$rel.tol < cntrl.stop$tol) && (parVar$rel.tol < cntrl.stop$tol)
+             && (parReg$convergence==0) && (parVar$convergence==0) ) 
+              convergence <- 0
 
-    # exit loop if no more change in parameters (maybe false convergence)
-    if (parReg$rel.tol == 0 && parVar$rel.tol == 0)
-        break
+          ## exit loop if no more change in parameters (maybe false convergence)
+          if (parReg$rel.tol == 0 && parVar$rel.tol == 0)
+              break
+      }
   }
-
+  
   if(verbose > 0) {
     cat("\n")
     cat(as.character(Sys.time()), ":", if (convergence==0)
-        "Algorithm converged" else "Algorithm DID NOT CONVERGE", "\n\n")
+        "Optimization converged" else "Optimization DID NOT CONVERGE", "\n\n")
   }
   
   ll <- penLogLik(theta=theta,sd.corr=sd.corr,model=model)

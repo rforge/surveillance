@@ -54,6 +54,9 @@
 
     \item \code{untie.matrix()} could have produced jittering greater than
     the specified \code{amount}.
+
+    \item \code{hhh4}: if there are no random intercepts, the
+    redundant \code{updateVariance} steps are no longer evaluated.
   }
 }
 
