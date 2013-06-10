@@ -57,6 +57,11 @@
 
     \item \code{hhh4}: if there are no random intercepts, the
     redundant \code{updateVariance} steps are no longer evaluated.
+
+    \item \code{update.twinstim()} did not work with
+    \code{optim.args=..1} (e.g., if updating a list of models with lapply).
+    Furthermore, if adding the \code{model} component only, the
+    \code{control.siaf} and \code{optim.args} components were lost.
   }
 }
 

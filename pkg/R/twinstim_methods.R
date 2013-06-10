@@ -1107,14 +1107,11 @@ update.twinstim <- function (object, endemic, epidemic,
             modifyList(eval.parent(call$control.siaf), control.siaf)
         }
     if (!missing(optim.args)) {
-        oldargs <- call$optim.args
-        call$optim.args <- if (!is.null(oldargs) && is.list(optim.args)) {
-            if (is.listcall(oldargs)) {
-                modifyListcall(oldargs, thiscall$optim.args)
-            } else {                    # i.e. is.list(oldargs)
-                modifyList(oldargs, optim.args)
-            }
-        } else thiscall$optim.args
+        call["optim.args"] <- list(     # use list() to enable optim.args=NULL
+            if (is.list(optim.args)) {
+                modifyList(object$optim.args, optim.args)
+            } else optim.args           # = NULL
+            )
     }
     ## Set initial values (will be appropriately subsetted and/or extended with
     ## zeroes inside twinstim())
@@ -1152,21 +1149,18 @@ update.twinstim <- function (object, endemic, epidemic,
     call <- object$call
     call$model <- model
     if (model) { # add model environment
-        call$optim.args$par <- coef(object)
-        call$optim.args$fixed <- seq_along(coef(object))
+        call$start <- coef(object)
+        call$optim.args$fixed <- TRUE
         call$cumCIF <- FALSE
         cat("Setting up the model environment ...\n")
         capture.output(suppressMessages(
                        objectWithModel <- eval(call, parent.frame())
                        ))
         cat("Done.\n")
-        object$functions <- objectWithModel$functions
-        ## CAVE: order of components of the twinstim-object
-        object <- object[c(1:match("formula", names(object)),
-                           match(c("functions", "call", "runtime"), names(object)))]
+        object <- append(object, objectWithModel["functions"],
+                         after=match("optim.args", names(object)))
+        class(object) <- class(objectWithModel) # dropped by append()
         environment(object) <- environment(objectWithModel)
-        ## re-add class attribute (dropped on re-ordering)
-        class(object) <- class(objectWithModel)
     } else { # remove model environment
         object$functions <- NULL
         environment(object) <- NULL
