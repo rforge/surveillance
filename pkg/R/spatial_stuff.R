@@ -177,13 +177,21 @@ nbOrder <- function (neighbourhood, maxlag = 1)
 ### determines which polygons of a SpatialPolygons object are at the border,
 ### i.e. have coordinates in common with the spatial union of all polygons
 
-polyAtBorder <- function (SpP)
+polyAtBorder <- function (SpP, snap=sqrt(.Machine$double.eps))
 {
-    W <- unionSpatialPolygons(SpP)
-    Wcoords <- unique(coordinates(W@polygons[[1]]@Polygons[[1]]))
+    W <- unionSpatialPolygons(SpP)      # length(W@polygons) == 1
+    Wcoords <- unique(do.call("rbind",
+                              lapply(W@polygons[[1]]@Polygons, coordinates)))
     atBorder <- sapply(SpP@polygons, function (x) {
-        coords <- coordinates(x@Polygons[[1]])
-        anyDuplicated(rbind(unique(coords), Wcoords)) > 0
+        coords <- unique(do.call("rbind", lapply(x@Polygons, coordinates)))
+        res <- FALSE
+        for (i in seq_len(nrow(coords))) {
+            if (any(spDistsN1(Wcoords, coords[i,]) < snap)) {
+                res <- TRUE
+                break
+            }
+        }
+        res
     })
     names(atBorder) <- row.names(SpP)
     atBorder
