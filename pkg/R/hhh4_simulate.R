@@ -5,7 +5,7 @@ simHHH4 <- function(stsObj, # sts object
                     end, # nu component
                     psi, # overdisp param(s) if specified or numeric(0) (psi->0 corresponds to Poisson)
                     nhood, # weights matrix for phi-component from model
-                    start # vector with starting counts
+                    start = NULL # vector with starting counts
                     ){
 
   # get required info from sts object
@@ -52,7 +52,7 @@ simHHH4 <- function(stsObj, # sts object
   x <- matrix(0, ncol=nUnits, nrow=nTime+1)
 
   # set starting value to mean observed
-  x[1,] <- ifelse(is.null(start),ceiling(colMeans(observed(stsObj))), start)
+  x[1,] <- if (is.null(start)) ceiling(colMeans(observed(stsObj))) else start
 
   # if no ar/ne component then simulate from Poisson/NegBin
   if(all(ar + ne == 0)){

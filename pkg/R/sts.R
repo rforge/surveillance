@@ -276,6 +276,7 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   #Fix the corresponding start entry. i can either be a vector of
   #logicals or specific index. Needs to work in both cases.
   #Note: This code does not work if we have week 53s!
+  ## FIXME: If changing "start" and !epochAsDate, we have to update epoch, too!
   if (is.logical(i)) {
     i.min <- which.max(i) #first TRUE entry
   } else {
