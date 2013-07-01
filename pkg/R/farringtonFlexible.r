@@ -58,7 +58,7 @@ farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
 													weightsThreshold = 2.58,
 													verbose = FALSE,glmWarnings = TRUE,
 													alpha = 0.01, trend = TRUE,
-													pThresholdTrend, limit54=c(5,4), 
+													pThresholdTrend = 0.05, limit54=c(5,4), 
 													powertrans="2/3",
 													fitFun="algo.farrington.fitGLM.flexible",
 													populationOffset = FALSE, 
@@ -459,21 +459,22 @@ anscombe.residuals <- function(m,phi) {
 
 
 
-################################################################################
-# WEIGHTS FUNCTION
-################################################################################
-
-algo.farrington.assign.weights <- function(s,weightsThreshold) {
-    #s_i^(-2) for s_i<weightsThreshold and 1 otherwise
-    gamma <- length(s)/(sum(    (s^(-2))^(s>weightsThreshold) ))
-    omega <- numeric(length(s))
-    omega[s>weightsThreshold] <- gamma*(s[s>weightsThreshold]^(-2))
-    omega[s<=weightsThreshold] <- gamma
-    return(omega)
-}
-################################################################################
-# END OF WEIGHTS FUNCTION
-################################################################################
+## ################################################################################
+## # WEIGHTS FUNCTION -- this function has been changed in the original algo_farrington
+## # implementation.
+## ################################################################################
+##
+## algo.farrington.assign.weights <- function(s,weightsThreshold) {
+##     #s_i^(-2) for s_i<weightsThreshold and 1 otherwise
+##     gamma <- length(s)/(sum(    (s^(-2))^(s>weightsThreshold) ))
+##     omega <- numeric(length(s))
+##     omega[s>weightsThreshold] <- gamma*(s[s>weightsThreshold]^(-2))
+##     omega[s<=weightsThreshold] <- gamma
+##     return(omega)
+## }
+## ################################################################################
+## # END OF WEIGHTS FUNCTION
+## ################################################################################
 
 
 ################################################################################
@@ -633,7 +634,7 @@ algo.farrington.threshold.farrington <- function(predFit,predSeFit,phi,
 	lu[1] <- max(0,lu[1],na.rm=TRUE)
 
 	# probability associated to the observed value as quantile
-	q <- pnorm( y^(1/exponent) , mean=mu0^exponent, sd=se,lower=FALSE)
+	q <- pnorm( y^(1/exponent) , mean=mu0^exponent, sd=se,lower.tail=FALSE)
 											    
 
 	# calculate score
@@ -685,9 +686,9 @@ algo.farrington.threshold.noufaily <- function(predFit,predSeFit,phi,
 
 		# probability associated to the observed value as quantile
 		if (phi!=1){
-			q <- pnbinom(q= y-1 ,size=mu0Quantile/(phi-1),prob=1/phi,lower=FALSE)
+			q <- pnbinom(q= y-1 ,size=mu0Quantile/(phi-1),prob=1/phi,lower.tail=FALSE)
 		} else{
-			q <- ppois(y-1,mu0Quantile,lower=FALSE)
+			q <- ppois(y-1,mu0Quantile,lower.tail=FALSE)
 		}
 
 
@@ -884,7 +885,7 @@ algo.farrington.data.glm <- function(dayToConsider, b, freq,
 algo.farrington.glm <- function(dataGLM,timeTrend,populationOffset,factorsBool,
                                 reweight,weightsThreshold,pThresholdTrend,b,
 								noPeriods,typePred,fitFun,glmWarnings,epochAsDate,
-								dayToConsider,diffDates,populationNow,k){
+								dayToConsider,diffDates,populationNow,k) {
 
 	arguments <- list(dataGLM=dataGLM,
 					  timeTrend=timeTrend,

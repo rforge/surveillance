@@ -16,18 +16,18 @@ anscombe.residuals <- function(m,phi) {
 }
 
 
-###################################################
-### code chunk number 2: algo_farrington.Rnw:60-68
-###################################################
-algo.farrington.assign.weights <- function(s) {
-  #s_i^(-2) for s_i<1 and 1 otherwise
-  gamma <- length(s)/(sum(  (s^(-2))^(s>1) ))
-  omega <- numeric(length(s)) 
-  omega[s>1] <- gamma*(s[s>1]^(-2))
-  omega[s<=1] <- gamma
-  return(omega)
-}
+################################################################################
+# WEIGHTS FUNCTION
+################################################################################
 
+algo.farrington.assign.weights <- function(s,weightsThreshold=1) {
+    #s_i^(-2) for s_i<weightsThreshold and 1 otherwise
+    gamma <- length(s)/(sum(    (s^(-2))^(s>weightsThreshold) ))
+    omega <- numeric(length(s))
+    omega[s>weightsThreshold] <- gamma*(s[s>weightsThreshold]^(-2))
+    omega[s<=weightsThreshold] <- gamma
+    return(omega)
+}
 
 ###################################################
 ### code chunk number 3: algo_farrington.Rnw:136-305

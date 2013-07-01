@@ -13,12 +13,12 @@
 %
 }
 \usage{
-farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
+farringtonFlexible(sts, control = list(range = NULL, b = 3, w = 3,
                                       reweight = TRUE, 
                                       weightsThreshold = 2.58,
                                       verbose = FALSE,glmWarnings = TRUE,
                                       alpha = 0.01, trend = TRUE,
-                                      pThresholdTrend, limit54=c(5,4), 
+                                      pThresholdTrend = 0.05, limit54=c(5,4), 
                                       powertrans="2/3",
                                       fitFun="algo.farrington.fitGLM.flexible",
                                       populationOffset = FALSE, 
@@ -53,7 +53,7 @@ farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
         criterion (see Section 3.8 of the Farrington paper) to protect
         against low counts: no alarm is sounded if fewer than
         \eqn{\code{cases}=5} reports were received in the past \eqn{\code{period}=4}
-        weeks. \code{limit54=c(\code{cases},\code{period})} is a vector allowing the
+        weeks. \code{limit54=c(cases,period)} is a vector allowing the
         user to change these numbers. Note: As of version 0.9-7 of the package the
         term "last" period of weeks includes the current week -
         otherwise no alarm is sounded for horrible large numbers if
@@ -121,7 +121,7 @@ The slot \code{control} is the usual list but with more items all of length \cod
 \item{trend}{ is a vector of Booleans indicating whether a time trend was fitted for this time point.}
 \item{trendVector}{ is a vector giving the coefficient of the time trend in the GLM for this time point. If no trend was fitted it is equal to NA.}
 \item{pvalue}{ is a vector giving the probability of observing a value at least equal to the observation under the null hypothesis .}
-\item{expected} {is a vector giving the expectation of the predictive distribution for each timepoint. 
+\item{expected}{is a vector giving the expectation of the predictive distribution for each timepoint. 
 It is only reported if the conditions for raising an alarm are met, e.g enoughCases.}
 \item{mu0Vector}{ is a vector giving what is inputed in the negative binomial distribution to get the upperbound as a quantile 
 (either a plug-in from the glm or a quantile from the asymptotic normal distribution of the estimator)}
