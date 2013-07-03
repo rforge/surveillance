@@ -505,7 +505,7 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
 }
 
 
-### plot.epidataCS(x, aggregate = "space") -> total number of cases by spatial tile
+### plot.epidataCS(x, aggregate = "space") -> spatial point pattern
 
 plot.epidataCS_space <- function (x, subset,
     cex.fun = sqrt, points.args = list(cex=0.5),
@@ -513,13 +513,10 @@ plot.epidataCS_space <- function (x, subset,
 {
     stopifnot(is.list(points.args))
     events <- if (missing(subset)) x$events else {
-        ## FIXME: subset.Spatial has a bug in sp version 0.9-99
-        ## => reported 26.06.2012 => do it myself until it gets fixed
-        e <- substitute(subset)
-        r <- eval(e, x$events@data, parent.frame())
-        if (!is.logical(r)) stop("'subset' must evaluate to logical")
-        r <- r & !is.na(r)
-        x$events[r, ]
+        eval(substitute(base::subset(x$events, subset=.subset),
+                        list(.subset=substitute(subset))))
+        ## do.call(base::subset,
+        ##         args = list(x=quote(x$events), subset=substitute(subset)))
     }
     events@data[["_MULTIPLICITY_"]] <- multiplicity(events)
     events <- events[!duplicated(coordinates(events)),]
