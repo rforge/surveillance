@@ -22,7 +22,7 @@ importFrom(xtable, xtable) # if we wouldn't "Depend" on xtable, our
                            # user attaches the xtable package himself
 ## required functions from stats and utils
 importFrom(stats, pnorm, cov2cor, ks.test, formula, rnorm, runif, step,
-           update.formula, terms.formula)
+           update.formula, terms.formula, rpois, rnbinom)
 importFrom(utils, packageVersion, modifyList)
 
 import(methods)
@@ -87,9 +87,6 @@ importFrom(polyCub, discpoly, polyCub, polyCub.SV, polyCub.midpoint)
 ### EXPORTS ###
 ###############
 
-# just export all variables that do not start with a period:
-#exportPattern("^[^\\.]")
-
 
 ### general exports
 
@@ -149,6 +146,10 @@ export(earsC)
 export(farringtonFlexible)
 export(categoricalCUSUM, pairedbinCUSUM, pairedbinCUSUM.runlength)
 export(nowcast, backprojNP)
+## auxiliary functions for farringtonFlexible:
+## export(algo.farrington.data.glm, algo.farrington.fitGLM.flexible,
+##        algo.farrington.glm, algo.farrington.referencetimepoints,
+##        algo.farrington.threshold.farrington, algo.farrington.threshold.noufaily)
 
 
 ### disProg-specific
@@ -161,10 +162,29 @@ S3method(aggregate, disProg)
 
 export(sim.pointSource, sim.seasonalNoise)
 export(LRCUSUM.runlength, arlCusum, find.kh, findH, hValues, findK)
-exportPattern("^algo\\.")               # export all algo.* functions
 export(compMatrix.writeTable, correct53to52, enlargeData)
 export(makePlot)
 export(estimateGLRNbHook)
+export(algo.compare, algo.quality, algo.summary)
+
+## outbreak detection algorithms (old disProg implementations)
+export(algo.bayes, algo.bayes1, algo.bayes2, algo.bayes3, algo.bayesLatestTimepoint,
+       algo.call,
+       algo.cdc, algo.cdcLatestTimepoint,
+       algo.cusum,
+       algo.farrington,
+       algo.glrnb, algo.glrpois,
+       algo.hhh, algo.hhh.grid,
+       algo.hmm,
+       algo.outbreakP,
+       algo.rki, algo.rki1, algo.rki2, algo.rki3, algo.rkiLatestTimepoint,
+       algo.rogerson,
+       algo.twins)
+
+## auxiliary functions for algo.farrington (FIXME: why do we export these internals?)
+export(algo.farrington.assign.weights,
+       algo.farrington.fitGLM, algo.farrington.fitGLM.fast,
+       algo.farrington.fitGLM.populationOffset, algo.farrington.threshold)
 
 
 S3method(plot, atwins)

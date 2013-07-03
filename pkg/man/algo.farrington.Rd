@@ -1,13 +1,5 @@
 \name{algo.farrington}
 \alias{algo.farrington}
-%Internal functions of the improved Farrington procedure
-\alias{algo.farrington.data.glm}
-\alias{algo.farrington.fitGLM.flexible}
-\alias{algo.farrington.glm}
-\alias{algo.farrington.referencetimepoints}
-\alias{algo.farrington.threshold.farrington}
-\alias{algo.farrington.threshold.noufaily}
-%ToDo: Write separate documention files for these function.
 \encoding{latin1}
 
 \title{Surveillance for a count data time series using the Farrington method.}
