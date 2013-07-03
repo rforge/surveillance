@@ -19,6 +19,7 @@ simulate.ah4 <- function (object, # result from a call to hhh4
                           y.start=NULL, # initial counts for epidemic components
                           subset=1:nrow(object$stsObj),
                           coefs=coef(object), # coefficients used for simulation
+                          #simplify=TRUE,
                           ...)
 {
     ## Determine seed (this part is copied from stats:::simulate.lm with
@@ -36,7 +37,7 @@ simulate.ah4 <- function (object, # result from a call to hhh4
     ## END seed
     
     cl <- match.call()
-    stsObj <- object$stsObj[subset,]
+    stsObj <- object$stsObj
     control <- object$control
     theta <- if (missing(coefs)) coefs else checkCoefs(object, coefs)
     
@@ -51,8 +52,8 @@ simulate.ah4 <- function (object, # result from a call to hhh4
     ## initial counts
     nUnits <- ncol(stsObj)
     if (is.null(y.start)) { # set starting value to mean observed (in subset!)
-        y.start <- matrix(ceiling(colMeans(observed(stsObj))),
-                          maxlag, nUnits, byrow=TRUE)
+        y.means <- ceiling(colMeans(observed(stsObj)[subset,,drop=FALSE]))
+        y.start <- matrix(y.means, maxlag, nUnits, byrow=TRUE)
     } else {
         if (is.vector(y.start)) y.start <- t(y.start)
         if (ncol(y.start) != nUnits)
@@ -66,18 +67,18 @@ simulate.ah4 <- function (object, # result from a call to hhh4
     means <- meanHHH(theta, model, subset=subset)
     psi <- splitParams(theta,model)$overdisp
 
-    ## now simulate
+    ## result template
+    res0 <- stsObj[subset,]
+    setObserved <- function (observed) {
+        res0@observed[] <- observed
+        res0
+    }
+
+    ## simulate
     simcall <- quote(simHHH4(means$ar.exppred, means$ne.exppred, means$endemic,
                              psi, neweights, y.start, lag.ar, lag.ne))
-    res <- if (nsim==1) {
-        stsObj@observed[] <- eval(simcall)
-        stsObj
-    } else {
-        replicate(nsim, {
-            stsObj@observed[] <- eval(simcall)
-            stsObj
-        }, simplify=FALSE)
-    }
+    res <- if (nsim==1) setObserved(eval(simcall)) else
+           replicate(nsim, setObserved(eval(simcall)), simplify=FALSE)
 
     ## Done
     attr(res, "call") <- cl
@@ -174,7 +175,7 @@ getNEweights <- function (object, pars = coefW(object))
     ## parametric weights
     nd <- length(neweights$initial)
     if (length(pars) != nd) stop("'pars' must be of length ", nd)
-    neweights$w(pars, neighbourhood(object), object$control$data)
+    neweights$w(pars, neighbourhood(object$stsObj), object$control$data)
 }
 
 
