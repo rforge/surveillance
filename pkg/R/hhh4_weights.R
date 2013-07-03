@@ -97,22 +97,15 @@ weightedSumNE <- function (observed, weights, lag)
   dimY <- dim(observed)
   nTime <- dimY[1L]
   nUnits <- dimY[2L]
-  tY <- t(observed)
+  tY <- t(observed)                     # -> nUnits x nTime
   
-  timeconstantweights <- length(dim(weights)) == 2L
-  selecti <- if (timeconstantweights) quote(weights[,i]) else quote(weights[,i,])
-    
-  res <- matrix(NA_real_, nrow = nTime, ncol = nUnits,
-                dimnames = list(NULL, colnames(observed)))
-  for(i in seq_len(nUnits)){
-    weights.i <- eval(selecti)
-    weightedObs <- tY * weights.i
-    res[,i] <- colSums(weightedObs, na.rm=TRUE)
-  }
-
-  reslagged <- rbind(matrix(NA_real_, lag, nUnits),
-                     res[seq_len(nTime-lag),,drop=FALSE])
-  reslagged
+  res <- apply(weights, 2L, function (wi)
+               ## if dim(weights)==2 (time-constant weights), length(wi)=nUnits,
+               ## if dim(weights)==3, wi is a matrix of size nUnits x nTime
+               .colSums(tY * wi, nUnits, nTime, na.rm=TRUE))
+  
+  rbind(matrix(NA_real_, lag, nUnits),
+        res[seq_len(nTime-lag),,drop=FALSE])
 }
 
 ## slower alternative, where the weights are always converted to a 3D array
@@ -134,9 +127,6 @@ weightedSumNE.old <- function(observed, weights, lag)
   
   rbind(matrix(NA_real_, lag, nUnits), head(res, nTime-lag))
 }
-
-
-
 
 
 
