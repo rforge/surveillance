@@ -7,7 +7,7 @@
 
 
 
-\section{Changes in surveillance version 1.6-0 (2013-06-07)}{
+\section{Changes in surveillance version 1.6-0 (2013-07-03)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -19,23 +19,42 @@
     \item As a replacement of the license-restricted \pkg{gpclib} package,
     the \pkg{rgeos} package may now be used in generating
     \code{"epidataCS"} (polygon intersections, slightly slower).
-    This is also the default
-    (\code{surveillance.options(gpclib=FALSE)}).
+    This is also the default (\code{surveillance.options(gpclib=FALSE)}).
 
+    \item The improved Farrington method described in Noufaily et al.
+    (2012) is now available as \code{farringtonFlexible()}.
+    
+    \item To make the different retrospective modelling frameworks of
+    the \pkg{surveillance} package jointly applicable, it is now possible
+    to convert (aggregate) \code{"epidataCS"} 
+    (continuous-time continuous-space data) into an \code{"sts"} object
+    (multivariate time series of counts) by the new function
+    \code{epidataCS2sts}.
+
+    \item Simulation from \code{hhh4} models (class \code{"ah4"}) has
+    been re-implemented, which fixes a bug and makes it more flexible
+    and compatible with a wider class of models.
+
+    \item Some further new features, minor changes, and bug fixes are
+    described in the following subsections.
+  }
+}
+
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item The \code{untie} methods are now able to produce jittered points
+    with a required minimum separation (\code{minsep}).
+  }
+}
+
+\subsection{MINOR CHANGES}{
+  \itemize{
     \item Changed parametrization of \code{zetaweights()} and completed
     its documentation (now no longer marked as experimental).
 
     \item \code{twinstim(...)$converged} is \code{TRUE} if
     the optimization routine converged (as before) but contains
     the failure message otherwise.
-
-    \item The \code{untie} methods are now able to produce jittered points
-    with a required minimum separation (\code{minsep}).
-
-    \item It is now possible to convert (aggregate) \code{"epidataCS"}
-    (continuous-time continuous-space data) into an \code{"sts"} object
-    (multivariate time series of counts) by the new function
-    \code{epidataCS2sts}.
   }
 }
 
@@ -62,6 +81,9 @@
     \code{optim.args=..1} (e.g., if updating a list of models with lapply).
     Furthermore, if adding the \code{model} component only, the
     \code{control.siaf} and \code{optim.args} components were lost.
+
+    \item \code{earsC} should now also work with multivariate
+    time-series.
   }
 }
 
