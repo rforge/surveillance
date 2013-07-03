@@ -128,11 +128,13 @@ AIC.ah4 <- function (object, ..., k = 2){
   }
 }
 
-coef.ah4 <- function(object,se=FALSE, reparamPsi=TRUE, idx2Exp=NULL, amplitudeShift=FALSE,...){
+coef.ah4 <- function(object, se=FALSE, reparamPsi=TRUE, idx2Exp=NULL,
+                     amplitudeShift=FALSE, ...)
+{
   coefs <- object$coefficients
   stdErr <- object$se
 
-  if(reparamPsi && object$control$family!="Poisson"){
+  if(object$control$family!="Poisson" && reparamPsi){
     #extract psi coefficients
     index <- grep("-log(overdisp",names(coefs), fixed=TRUE)
 
@@ -152,6 +154,7 @@ coef.ah4 <- function(object,se=FALSE, reparamPsi=TRUE, idx2Exp=NULL, amplitudeSh
     D <- diag(coefs[index],length(index))
     stdErr[index] <- sqrt(diag(D %*% object$cov[index,index] %*% t(D)))
   }
+  
   if(!is.null(idx2Exp)){
     # extract coefficients on log-scale
     exp.names <- names(coefs)[idx2Exp]
@@ -162,7 +165,6 @@ coef.ah4 <- function(object,se=FALSE, reparamPsi=TRUE, idx2Exp=NULL, amplitudeSh
     coefs[idx2Exp] <- exp(coefs[idx2Exp])
     D <- diag(coefs[idx2Exp],length(idx2Exp))
     stdErr[idx2Exp] <- sqrt(diag(D %*% object$cov[idx2Exp,idx2Exp] %*% t(D)))
-  
   }
   
   
@@ -182,14 +184,6 @@ coef.ah4 <- function(object,se=FALSE, reparamPsi=TRUE, idx2Exp=NULL, amplitudeSh
     return(cbind("Estimates"=coefs,"Std. Error"=stdErr))
   else
     return(coefs)
-}
-
-#Generate a new generic function for extraction of parameter estimates from hhh4
-fixef <- function (object, ...) {
-    UseMethod("fixef")
-}
-ranef <- function (object, ...) {
-    UseMethod("ranef")
 }
 
 fixef.ah4 <- function(object,...){

@@ -6,6 +6,8 @@ R0 <- function (object, ...) UseMethod("R0")
 as.epidata <- function (data, ...) UseMethod("as.epidata")
 intensityplot <- function (x, ...) UseMethod("intensityplot")
 untie <- function (x, amount, ...) UseMethod("untie")
+fixef <- function (object, ...) UseMethod("fixef")
+ranef <- function (object, ...) UseMethod("ranef")
 
 ## internal function with methods for "twinSIR" and "simEpidata"
 getModel <- function (object, ...) UseMethod("getModel")

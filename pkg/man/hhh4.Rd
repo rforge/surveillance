@@ -188,7 +188,7 @@ hhh4(stsObj,
 \seealso{\code{\link{algo.hhh}}, 
 \code{\link{fe}}, \code{\link{ri}}
 }
-\author{M. Paul and L. Held with contributions by S. Meyer}
+\author{M. Paul, S. Meyer, and L. Held}
 \examples{
 #####################################################################
 # Fit some models from ?algo.hhh

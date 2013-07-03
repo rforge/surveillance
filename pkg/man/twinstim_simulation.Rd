@@ -177,10 +177,14 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     \code{simplify}. 
   }
   \item{seed}{
-    an object specifying if and how the random number generator should be
-    initialized (seeded). By default (\code{NULL}), the state of the random
-    generator is not changed and the value of \code{.Random.seed} prior to
-    simulation is stored as attribute \code{"seed"} of the result.
+    an object specifying how the random number generator should be
+    initialized for simulation (via \code{\link{set.seed}}). The
+    initial state will also be stored as an attribute \code{"seed"} of
+    the result. The original state of the \code{\link{.Random.seed}}
+    will be restored at the end of the simulation.
+    By default (\code{NULL}), neither initialization nor recovery will
+    be done.
+    This behaviour is copied from the \code{\link{simulate}.lm} method.
   }
   \item{data}{
     an object of class \code{"epidataCS"}, usually the one to which the
