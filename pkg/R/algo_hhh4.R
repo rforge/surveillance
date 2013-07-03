@@ -79,7 +79,7 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
   
   ## check if initial values are valid
   ## CAVE: there might be NA's in mu if there are missing values in Y
-  mu <- meanHHH(theta.start,model)$mean
+  mu <- meanHHH(theta.start, model, total.only=TRUE)
   if(any(mu==0, na.rm=TRUE) || any(is.infinite(mu)))
     stop("some mean is degenerate (0 or Inf) at initial values")
 
@@ -131,7 +131,7 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
   }
 
   ## optimization successful, return a full "ah4" object
-  fitted <- meanHHH(thetahat,model)$mean
+  fitted <- meanHHH(thetahat, model, total.only=TRUE)
 
   if(dimRandomEffects>0){
     Sigma.orig <- myoptim$sd.corr
@@ -543,17 +543,20 @@ checkFormula <- function(f, env, component){
 ## Create function (pars, type = "response") which
 ## returns the weighted sum of time-lagged counts of neighbours
 ## (or its derivates, if type = "gradient" or type = "hessian").
-## For type="reponse", the result is a matrix/array, otherwise a list of such
-## objects, which for the gradient has length length(pars) and
+## For type="reponse", this is a nTime x nUnits matrix (like Y),
+## otherwise a list of such matrices,
+## which for the gradient has length length(pars) and
 ## length(pars)*(length(pars)+1)/2 for the hessian.
+## If neweights=NULL (i.e. no ne component in model), the result is always 0.
 neOffsetFUN <- function (Y, neweights, nbmat, data, lag)
 {
     if (is.null(neweights)) { # no neighbourhood component
-        return(as.function(alist(...=, 0), envir=.GlobalEnv))
-    }
-
-    ## return function (living in THIS environment)
-    if (is.list(neweights)) { # parametric weights
+        as.function(alist(...=, 0), envir=.GlobalEnv)
+        ## dimY <- dim(Y)
+        ## as.function(c(alist(...=),
+        ##               substitute(matrix(0, r, c), list(r=dimY[1], c=dimY[2]))),
+        ##             envir=.GlobalEnv)
+    } else if (is.list(neweights)) { # parametric weights
         function (pars, type = "response") {
             name <- switch(type, response="w", gradient="dw", hessian="d2w")
             weights <- neweights[[name]](pars, nbmat, data)
@@ -563,11 +566,11 @@ neOffsetFUN <- function (Y, neweights, nbmat, data, lag)
             ##<- clapply always returns a list (possibly of length 1)
             if (type=="response") res[[1L]] else res
         }
-    } else { # fixed (known) array (0-length pars)
+    } else { # fixed (known) weight structure (0-length pars)
         initoffset <- weightedSumNE(Y, neweights, lag)
         function (pars, type = "response") initoffset
         ## this will not be called for other types
-    }
+    } ## returns function (living in THIS environment)
 }
 
 
@@ -605,8 +608,10 @@ interpretControl <- function(control, stsObj){
   Ym1.ne <- neOffsetFUN(Y, ne$weights, neighbourhood(stsObj), control$data,
                         ne$lag)
   offsets <- list(ar=Ym1, ne=Ym1.ne, end=end$offset)
-
-  ## Ym1.ne is a function (pars, type="response)!
+  ## -> offset$ne is a function of the parameter vector 'd', which returns a
+  ##    nTime x nUnits matrix -- or 0 (scalar) if there is no NE component
+  ## -> offset$end might just be 1 (scalar)
+  
   ## Initial parameter vector 'd' of the neighbourhood weight function
   initial.d <- if (is.list(ne$weights)) ne$weights$initial else numeric(0L)
   dim.d <- length(initial.d)
@@ -616,8 +621,8 @@ interpretControl <- function(control, stsObj){
       } else names(initial.d))
   }
 
-  ## determine all NA's (offset[[i]] is either 0 or a nTime x nUnits matrix)
-  isNA <- (is.na(Ym1) | is.na(Ym1.ne(initial.d)) | is.na(Y))
+  ## determine all NA's (FIXME: why do we need this? Why include is.na(Y)?)
+  isNA <- is.na(offsets[[1L]]) | is.na(offsets[[2L]](initial.d)) | is.na(Y)
 
 
   ## get terms for all components
@@ -772,37 +777,41 @@ splitParams <- function(theta, model){
 
 ### compute predictor
 
-meanHHH <- function(theta, model)
+meanHHH <- function(theta, model, subset=model$subset, total.only=FALSE)
 {
-  # unpack theta
+  ## unpack theta
   pars <- splitParams(theta, model)
   fixed <- pars$fixed
   random <- pars$random
-  d <- pars$d
 
-  # unpack model
+  ## unpack model
   term <- model$terms
-  offsets <- model$offset  # offsets[[i]] is either 0 or a nTime x nUnits matrix
-                           # however, offsets[[2]] is a function of 'd'
+  offsets <- model$offset
+  offsets[[2L]] <- offsets[[2L]](pars$d) # evaluate at current parameter value
   nGroups <- model$nGroups
   comp <- unlist(term["offsetComp",])
   idxFE <- model$indexFE
   idxRE <- model$indexRE
   
-  subset <- model$subset
-  isNA <- model$isNA                    # set missing values in observed Y to NA
+  #isNA <- model$isNA
 
-  toMatrix <- function(par, r=model$nTime, c=model$nUnits){
-    matrix(par,r,c, byrow=TRUE)
-  }
+  toMatrix <- function (x, r=model$nTime, c=model$nUnits)
+      matrix(x, r, c, byrow=TRUE)
   
-  # go through groups of parameters and compute the predictor of each component
+  ## go through groups of parameters and compute predictor of each component,
+  ## i.e. lambda_it, phi_it, nu_it, EXCLUDING the multiplicative offset terms,
+  ## as well as the resulting component mean (=exppred * offset)
   computePartMean <- function (component)
   {
     pred <- nullMatrix <- toMatrix(0)
-    is.na(pred) <- isNA
+    #is.na(pred) <- isNA # set missing values in observed Y to NA
+                         # -> FIXME: why? seems to be awkward... and
+                         # incompatible with simulation for t=1 (given y.start)
     
-    if(!any(comp==component)) return(pred)
+    if(!any(comp==component)) { # component not in model -> return 0-matrix
+        zeroes <- pred[subset,,drop=FALSE]
+        return(list(exppred = zeroes, mean = zeroes))
+    }
     
     for(i in (1:nGroups)[comp==component]){
       fe <- fixed[idxFE==i]
@@ -821,28 +830,26 @@ meanHHH <- function(theta, model)
       X <- term["terms",i][[1]]
       pred <- pred + X*fe + Z.re
     }
-    
-    exp(pred)                  # CAVE: this is without the multiplicative offset
+
+    exppred <- exp(pred[subset,,drop=FALSE])
+    offset <- offsets[[component]]
+    if (length(offset) > 1) offset <- offset[subset,,drop=FALSE]
+    ##<- no subsetting if offset is scalar (time- and unit-independent)
+    list(exppred = exppred, mean = exppred * offset)
   }
   
-  ## autoregressive component
-  ar.mean <- (computePartMean(1) * offsets[[1L]])[subset,,drop=FALSE]
+  ## compute component means
+  ar <- computePartMean(1)
+  ne <- computePartMean(2)
+  end <- computePartMean(3)
   
-  ## neighbourhood component
-  ne.exppred <- computePartMean(2)
-  ne.offset <- offsets[[2L]](d)         # this is just 0 if no "ne" in model
-  ne.mean <- (ne.exppred * ne.offset)[subset,,drop=FALSE]
-  
-  ## endemic component
-  end.mean <- (computePartMean(3) * offsets[[3L]])[subset,,drop=FALSE]
-   
-  ## total mean
-  mean <- ar.mean + ne.mean + end.mean
-
-  ## Done (FIXME: "epidemic" seems to be unused)
-  list(mean=mean, epidemic=ar.mean+ne.mean, endemic=end.mean,
-       epi.own=ar.mean, epi.neighbours=ne.mean,
-       ne.exppred=ne.exppred[subset,,drop=FALSE])
+  ## Done
+  epidemic <- ar$mean + ne$mean
+  endemic <- end$mean
+  if (total.only) epidemic + endemic else
+  list(mean=epidemic+endemic, epidemic=epidemic, endemic=endemic,
+       epi.own=ar$mean, epi.neighbours=ne$mean,
+       ar.exppred=ar$exppred, ne.exppred=ne$exppred, end.exppred=end$exppred)
 }
 
 
@@ -856,7 +863,7 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
   ## unpack model
   subset <- model$subset
   Y <- model$response[subset,,drop=FALSE]
-  isNA <- model$isNA[subset,,drop=FALSE]
+  #isNA <- model$isNA[subset,,drop=FALSE]
   dimPsi <- model$nOverdisp
   dimRE <- model$nRE
 
@@ -887,11 +894,10 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
   if (any(psi == 0)) return(-Inf)
 
   ## evaluate mean
-  mu <- meanHHH(theta, model)
-  meanTotal <- mu$mean
-  # if, numerically, meanTotal=Inf, log(dnbinom) or log(dpois) both equal -Inf, hence:
-  #if (any(is.infinite(meanTotal))) return(-Inf)
-  # however, since meanTotal=Inf does not produce warnings below and this is a rare
+  mu <- meanHHH(theta, model, total.only=TRUE)
+  # if, numerically, mu=Inf, log(dnbinom) or log(dpois) both equal -Inf, hence:
+  #if (any(is.infinite(mu))) return(-Inf)
+  # however, since mu=Inf does not produce warnings below and this is a rare
   # case, it is faster to not include this conditional expression
 
   ## penalization term for random effects
@@ -904,7 +910,7 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
   
   ## log-likelihood
   ddistr <- model$family
-  ll.units <- colSums(ddistr(Y,meanTotal,psi), na.rm=TRUE)
+  ll.units <- colSums(ddistr(Y,mu,psi), na.rm=TRUE)
 
   ## penalized log-likelihood
   ll <- sum(ll.units) + lpen
@@ -979,7 +985,7 @@ penScore <- function(theta, sd.corr, model)
       }
       summ <- get(term["summ",i][[1]])
       dTheta <- derivHHH(mean.comp[[comp]]*Xit)
-      dTheta[isNA] <- 0
+      dTheta[isNA] <- 0   # dTheta must not contain NA's (set NA's to 0)
       
       if(term["unitSpecific",i][[1]]){
         which <- term["which",i][[1]]
@@ -989,7 +995,7 @@ penScore <- function(theta, sd.corr, model)
       } else if(term["random",i][[1]]){
         Z <- term["Z.intercept",i][[1]]  
         "%m%" <- get(term["mult",i][[1]])
-        dRTheta <- colSums(dTheta %m% Z)  #dTheta must not contain NA's (set NA's to 0)      
+        dRTheta <- colSums(dTheta %m% Z)
         grad.re <- c(grad.re, dRTheta)
         grad.fe <- c(grad.fe, sum(dTheta))
       } else{
@@ -1005,7 +1011,7 @@ penScore <- function(theta, sd.corr, model)
   ## gradient for parameter vector of the neighbourhood weights
   grd <- if (dimd > 0L) {
       dneOffset <- model$offset[[2L]](pars$d, type="gradient")
-      ##<- this is always a list (of length dimd) of matrices/arrays
+      ##<- this is always a list (of length dimd) of matrices
       onescore.d <- function (dneoff) {
           dmudd <- mu$ne.exppred * dneoff[subset,,drop=FALSE]
           grd.terms <- derivHHH(dmudd)
@@ -1126,8 +1132,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         phi.doff <- function (dneoff) {
             mu$ne.exppred * dneoff[subset,,drop=FALSE]
         }
-        ## for type %in% c("gradient", "hessian"), model$offset[[2L]] is always
-        ## a list of matrices/arrays. It has length(pars$d) elements for the
+        ## for type %in% c("gradient", "hessian"), model$offset[[2L]] always
+        ## returns a list of matrices. It has length(pars$d) elements for the
         ## gradient and length(pars$d)*(length(pars$d)+1)/2 for the hessian.
         dneOffset <- model$offset[[2L]](pars$d, type="gradient")
         dmudd <- lapply(dneOffset, phi.doff)
