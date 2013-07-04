@@ -12,7 +12,8 @@
 
 \usage{
 \method{simulate}{ah4}(object, nsim = 1, seed = NULL, y.start = NULL,
-         subset = 1:nrow(object$stsObj), coefs = coef(object), ...)
+         subset = 1:nrow(object$stsObj), coefs = coef(object),
+         components=c("ar","ne","end"), simplify=nsim>1, ...)
 }
 
 \arguments{
@@ -46,6 +47,18 @@
     Default is to use the fitted parameters.
     Note that the \code{coefs}-vector must be in the same order and
     scaling as \code{coef(object)}.
+  }
+  \item{components}{
+    character vector indicating which components of the fitted model
+    \code{object} should be active during simulation. For instance,
+    a simulation with \code{components="end"} is solely based on the
+    fitted endemic mean.
+  }
+  \item{simplify}{
+    logical indicating if only the simulated counts (\code{TRUE}) or the
+    full sts object (\code{FALSE}) should be returned for every
+    replicate. Defaults to counts only if \code{nsim>1}, such that the
+    result will be an array of dimension \code{c(nTime, nUnits, nsim)}.
   }
   \item{\dots}{unused (argument of the generic).}
 }

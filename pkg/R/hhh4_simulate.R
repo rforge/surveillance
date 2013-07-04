@@ -19,7 +19,8 @@ simulate.ah4 <- function (object, # result from a call to hhh4
                           y.start=NULL, # initial counts for epidemic components
                           subset=1:nrow(object$stsObj),
                           coefs=coef(object), # coefficients used for simulation
-                          #simplify=TRUE,
+                          components=c("ar","ne","end"), # which comp to include
+                          simplify=nsim>1, # counts array only (no full sts)
                           ...)
 {
     ## Determine seed (this part is copied from stats:::simulate.lm with
@@ -67,18 +68,34 @@ simulate.ah4 <- function (object, # result from a call to hhh4
     means <- meanHHH(theta, model, subset=subset)
     psi <- splitParams(theta,model)$overdisp
 
-    ## result template
-    res0 <- stsObj[subset,]
-    setObserved <- function (observed) {
-        res0@observed[] <- observed
-        res0
+    ## set predictor to zero if not included ('components' argument)
+    stopifnot(length(components) > 0, components %in% c("ar", "ne", "end"))
+    getComp <- function (comp) {
+        sel <- if (comp == "end") "endemic" else paste(comp, "exppred", sep=".")
+        res <- means[[sel]]
+        if (!comp %in% components) res[] <- 0
+        res
     }
+    ar <- getComp("ar")
+    ne <- getComp("ne")
+    end <- getComp("end")
 
     ## simulate
-    simcall <- quote(simHHH4(means$ar.exppred, means$ne.exppred, means$endemic,
-                             psi, neweights, y.start, lag.ar, lag.ne))
-    res <- if (nsim==1) setObserved(eval(simcall)) else
-           replicate(nsim, setObserved(eval(simcall)), simplify=FALSE)
+    simcall <- quote(
+        simHHH4(ar, ne, end, psi, neweights, y.start, lag.ar, lag.ne)
+        )
+    if (!simplify) {
+        ## result template
+        res0 <- stsObj[subset,]
+        setObserved <- function (observed) {
+            res0@observed[] <- observed
+            res0
+        }
+        simcall <- call("setObserved", simcall)
+    }
+    res <- if (nsim==1) eval(simcall) else
+           replicate(nsim, eval(simcall),
+                     simplify=if (simplify) "array" else FALSE)
 
     ## Done
     attr(res, "call") <- cl
@@ -117,7 +134,7 @@ simHHH4 <- function(ar,     # lambda_it (nTime x nUnits matrix)
 
     ## if only endemic component -> simulate independently
     if (all(ar + ne == 0)) {
-        return(matrix(rdistr(nUnits*nTime, end), ncol=nUnits, byrow = FALSE))
+        return(matrix(rdistr(length(end), end), nTime, nUnits))
     }
 
     ## weighted sum of counts of other (neighbouring) regions

@@ -7,7 +7,7 @@
 
 
 
-\section{Changes in surveillance version 1.6-0 (2013-07-03)}{
+\section{Changes in surveillance version 1.6-0 (2013-07-04)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -35,6 +35,10 @@
     been re-implemented, which fixes a bug and makes it more flexible
     and compatible with a wider class of models.
 
+    \item The \code{map}-slot of the \code{"sts"} class now requires
+    \code{"SpatialPolygons"} (only) instead of
+    \code{"SpatialPolygonsDataFrame"}.
+    
     \item Some further new features, minor changes, and bug fixes are
     described in the following subsections.
   }
@@ -44,6 +48,8 @@
   \itemize{
     \item The \code{untie} methods are now able to produce jittered points
     with a required minimum separation (\code{minsep}).
+
+    \item \code{simulate.ah4} gained a \code{simplify} argument.
   }
 }
 
