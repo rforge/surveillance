@@ -26,10 +26,6 @@
 ################################################################################
 # # MAIN FUNCTION
 # Function that manages input and output.
-# # RESIDUALS FUNCTION
-# Function that calculates Anscombe residuals.
-# # WEIGHTS FUNCTION
-# Function that calculates weights based on these residuals.
 # # FORMULA FUNCTION
 # Function that writes a formula for the glm using Booleans from control.
 # # FIT GLM FUNCTION
@@ -438,24 +434,6 @@ algo.farrington.referencetimepoints <- function(dayToConsider,b=control$b,freq=f
 # END OF REFERENCE TIME POINTS FUNCTION
 ################################################################################
 
-################################################################################
-# RESIDUALS FUNCTION
-################################################################################
-
-anscombe.residuals <- function(m,phi) {
-    y <- m$y
-    mu <- fitted.values(m)
-
-    #Compute raw Anscombe residuals
-    a <- 3/2*(y^(2/3) * mu^(-1/6) - mu^(1/2))
-    
-    #Compute standardized residuals
-    a <- a/sqrt(phi * (1-hatvalues(m)))
-    return(a)
-}
-################################################################################
-# END OF RESIDUALS FUNCTION
-################################################################################
 
 
 
