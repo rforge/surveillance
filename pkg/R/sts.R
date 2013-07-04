@@ -273,8 +273,8 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   #Neighbourhood matrix
   x@neighbourhood <- x@neighbourhood[j,j,drop=FALSE]
 
-  #Fix the corresponding start entry. i can either be a vector of
-  #logicals or specific index. Needs to work in both cases.
+  #Fix the corresponding start entry. it can either be a vector of
+  #logicals or a specific index. Needs to work in both cases.
   #Note: This code does not work if we have week 53s!
   ## FIXME: If changing "start" and !epochAsDate, we have to update epoch, too!
   if (is.logical(i)) {
@@ -287,13 +287,15 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   start.year <- start[1] + (new.sampleNo - 1) %/% x@freq 
   start.sampleNo <- (new.sampleNo - 1) %% x@freq + 1
   x@start <- c(start.year,start.sampleNo)
-
-  #Save time by not allocating a new object
-  #res <- new("sts",epoch=week, freq=x@freq, start=start,observed=observed,state=state,alarm=alarm,upperbound=upperbound,neighbourhood=neighbourhood,populationFrac=populationFrac,map=x@map,control=x@control)
-
-  ## FIXME: also subset map according to region index j? Here's the code:
-  ##x@map <- x@map[colnames(x@observed),]
+  #FIXEDIT: In case there is a map: Also subset map according to region index j.
+  #but take them in the order as in the map to ensure x and x[] are identical
+  if (length(x@map)>0) {
+    order <- pmatch(row.names(x@map), colnames(x)) #, row.names(x@map))
+    order2 <- pmatch(row.names(x@map)[!is.na(order)], row.names(x@map))
+    x@map <- x@map[order2,]
+  }
   
+  #Done
   return(x)
 })
 
@@ -924,6 +926,15 @@ setValidity("sts", function ( object ) {
 
   ## FIXME: if map slot is not NULL, check that all colnames(object@observed)
   ## are in row.names(object@map) (ideally, these are identical sets)
+  ## FIXEDIT. hoehle: identical might be too much to ask for, since the map
+  ## could contain extra regions. Just need to ensure that regions from
+  ## object are in the map. Non-null appears not to work, c.f. fluMen in hhh4
+  ## vignette...
+  if (length(object@map)>0) {
+    if (!(colnames(object@observed) %in% row.names(object@map))) {
+      retval <- c( retval , " colnames of observed have to be contained in the row.names of the map.")
+    }
+  }
   
   if(is.null( retval)) return ( TRUE )
   else return ( retval )
