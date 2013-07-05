@@ -26,6 +26,10 @@
 ################################################################################
 # # MAIN FUNCTION
 # Function that manages input and output.
+# # RESIDUALS FUNCTION
+# Function that calculates Anscombe residuals.
+# # WEIGHTS FUNCTION
+# Function that calculates weights based on these residuals.
 # # FORMULA FUNCTION
 # Function that writes a formula for the glm using Booleans from control.
 # # FIT GLM FUNCTION
@@ -199,7 +203,11 @@ farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
     ######################################################################
     # Initialize the necessary vectors
     ######################################################################
-    # Vector for time trend
+    # Vector for score
+    score <- matrix(data = 0, nrow = length(control$range), ncol = ncol(sts))
+    sts@control$score <- score
+	
+	# Vector for time trend
     trend <- matrix(data = 0, nrow = length(control$range), ncol = ncol(sts))
 
     
@@ -268,7 +276,8 @@ farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
 								noPeriods=control$noPeriods,typePred=control$typePred,
 								fitFun=control$fitFun,glmWarnings=control$glmWarnings,
 								epochAsDate=epochAsDate,dayToConsider=dayToConsider,
-								diffDates=diffDates,populationNow=population[k],k)
+								diffDates=diffDates,populationNow=population[k],k,
+								verbose=control$verbose)
             
 			pred <- finalModel$pred
 			doTrend <- finalModel$doTrend
@@ -339,6 +348,9 @@ farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
             # Get overdispersion
             phiVector[(k-min(control$range)+1),j] <- finalModel$phi
             
+			# Get score
+			score[(k-min(control$range)+1),j] <- lu$score
+			
             #Compute bounds of the predictive
             pvalue[(k-min(control$range)+1),j] <- lu$prob
             
@@ -352,7 +364,8 @@ farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
 			}
         }#done looping over all time points
     } #end of loop over cols in sts. 
-    
+    # Add information about score
+    sts@control$score[,j]     <- score[,j]    
     # Add information about trend
     sts@control$trend[,j]     <- trend[,j]
     
@@ -434,6 +447,24 @@ algo.farrington.referencetimepoints <- function(dayToConsider,b=control$b,freq=f
 # END OF REFERENCE TIME POINTS FUNCTION
 ################################################################################
 
+################################################################################
+# RESIDUALS FUNCTION
+################################################################################
+
+anscombe.residuals <- function(m,phi) {
+    y <- m$y
+    mu <- fitted.values(m)
+
+    #Compute raw Anscombe residuals
+    a <- 3/2*(y^(2/3) * mu^(-1/6) - mu^(1/2))
+    
+    #Compute standardized residuals
+    a <- a/sqrt(phi * (1-hatvalues(m)))
+    return(a)
+}
+################################################################################
+# END OF RESIDUALS FUNCTION
+################################################################################
 
 
 
@@ -500,7 +531,7 @@ formulaGLM <- function(populationOffset=FALSE,timeBool=TRUE,factorsBool=FALSE){
 ################################################################################
 
 algo.farrington.fitGLM.flexible <- function(dataGLM,
-timeTrend,populationOffset,factorsBool,reweight,weightsThreshold,glmWarnings,control,...) {
+timeTrend,populationOffset,factorsBool,reweight,weightsThreshold,glmWarnings,verbose,control,...) {
     
     # Model formula depends on whether to include a time trend or not.
 
@@ -527,12 +558,12 @@ timeTrend,populationOffset,factorsBool,reweight,weightsThreshold,glmWarnings,con
 				model <- suppressWarnings(glm(as.formula(theModel), data=dataGLM,
 																					family = quasipoisson(link="log")))
 			}
-			if (control$verbose) {cat("Warning: No convergence with timeTrend -- trying without.\n")}
+			if (verbose) {cat("Warning: No convergence with timeTrend -- trying without.\n")}
         }
         
         if (!model$converged) {
-        if (control$verbose) {cat("Warning: No convergence in this case.\n")}
-        if (control$verbose) {print(dataGLM[,c("response","wtime"),exact=TRUE])}
+        if (verbose) {cat("Warning: No convergence in this case.\n")}
+        if (verbose) {print(dataGLM[,c("response","wtime"),exact=TRUE])}
         return(NULL)
         }
     }
@@ -863,13 +894,14 @@ algo.farrington.data.glm <- function(dayToConsider, b, freq,
 algo.farrington.glm <- function(dataGLM,timeTrend,populationOffset,factorsBool,
                                 reweight,weightsThreshold,pThresholdTrend,b,
 								noPeriods,typePred,fitFun,glmWarnings,epochAsDate,
-								dayToConsider,diffDates,populationNow,k) {
+								dayToConsider,diffDates,populationNow,k,verbose) {
 
 	arguments <- list(dataGLM=dataGLM,
 					  timeTrend=timeTrend,
 					  populationOffset=populationOffset,
 					  factorsBool=factorsBool,reweight=reweight,
-					  weightsThreshold=weightsThreshold,glmWarnings=glmWarnings,control=control)
+					  weightsThreshold=weightsThreshold,glmWarnings=glmWarnings,
+					  verbose=verbose,control=control)
 
 	model <- do.call(fitFun, args=arguments)
 
@@ -884,7 +916,7 @@ algo.farrington.glm <- function(dataGLM,timeTrend,populationOffset,factorsBool,
 	#1) wtime is signifcant at the 95lvl
 	#2) the predicted value is not larger than any observed value
 	#3) the historical data span at least 3 years.
-	doTrend <- timeTrend
+	doTrend <- NULL
 	
 	# if model converged with time trend 
 	if ("wtime" %in% names(coef(model))){
@@ -903,12 +935,12 @@ algo.farrington.glm <- function(dataGLM,timeTrend,populationOffset,factorsBool,
 		# check if three criterion ok
 		
 		 #is the p-value for the trend significant (0.05) level
-		significant <- (summary.glm(model)$coefficients["wtime",4]< pThresholdTrend)
+		significant <- (summary.glm(model)$coefficients["wtime",4] < pThresholdTrend)
 
 		#have to use at least three years of data to allow for a trend
 		atLeastThreeYears <- (b>=3)
 		#no horrible predictions
-		noExtrapolation <- pred <= max(dataGLM$response)
+		noExtrapolation <- (pred$fit <= max(dataGLM$response))
 			
 		#All 3 criteria have to be met in order to include the trend. Otherwise
 		#it is removed. Only necessary to check this if a trend is requested.
