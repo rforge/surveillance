@@ -7,7 +7,7 @@
 
 
 
-\section{Changes in surveillance version 1.6-0 (2013-07-04)}{
+\section{Changes in surveillance version 1.6-0 (2013-07-06)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -90,6 +90,10 @@
 
     \item \code{earsC} should now also work with multivariate
     time-series.
+
+    \item The last week in \code{data(fluBYBW)} (row index 417) has been
+    removed. It corresponded to week 1 in year 2009 and was wrong
+    (an artifact, filled with zero counts only).
   }
 }
 

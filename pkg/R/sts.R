@@ -991,7 +991,7 @@ setMethod( "show", "sts", function( object ){
       print(summary(as(object@map, "SpatialPolygons"))) # without potential data
       cat("Features    :", npoly, "\n")
       if (inherits(object@map, "SpatialPolygonsDataFrame"))
-          cat("Data slot   :", ncol(object@map), "attributes\n")
+          cat("Data slot   :", ncol(object@map), "variables\n")
   }
 
   cat("\nhead of neighbourhood:\n")
