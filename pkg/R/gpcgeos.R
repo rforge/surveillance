@@ -18,7 +18,7 @@
 intersectCircle <- function (Wgpc, W, center, r, npoly)
 {
     gpclib <- gpclibCheck(fatal=FALSE)
-    circle <- discpoly(center = center, r = r, npoly = npoly,
+    circle <- discpoly(center, r, npoly = npoly,
                        class = if (gpclib) "gpc.poly" else "Polygon")
     if (gpclib) {
         gpclib::intersect(circle, Wgpc)  # this order seems to be faster
