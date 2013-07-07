@@ -16,7 +16,7 @@
 # - do some profiling...
 
 ## Error message issued in loglik, score and fisher functions upon NA parameters
-ADVICEONERROR <- "\n  Try different starting values or another optimizer.\n"
+ADVICEONERROR <- "\n  Try different starting values, more iterations, or another optimizer.\n"
 
 
 ### Default control argument for hhh4
@@ -1984,7 +1984,7 @@ updateVariance <- function(sd.corr, theta, model, fisher.unpen,
 defaultOptimControl <- function (method = "nlminb", lower = -Inf, upper = Inf,
                                  iter.max = NULL, verbose = 0)
 {
-    if (is.null(iter.max)) iter.max <- 20 + 30*(method=="Nelder-Mead")
+    if (is.null(iter.max)) iter.max <- 20 + 280*(method=="Nelder-Mead")
     lowVerbose <- verbose %in% 0:2
     luOptimMethod <- method %in% c("Brent", "L-BFGS-B")
     defaults.nr <- list(scoreTol=1e-5, paramTol=1e-7, F.inc=0.01, stepFrac=0.5,
