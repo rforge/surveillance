@@ -2,9 +2,7 @@
 \encoding{latin1}
 \name{hhh4}
 \alias{hhh4}
-% functions without documentation atm
-\alias{plot.ah4}
-\alias{predict.ah4}
+% FIXME: functions without documentation atm
 \alias{permutationTest}
 \alias{pit}
 

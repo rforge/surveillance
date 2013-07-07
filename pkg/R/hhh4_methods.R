@@ -134,7 +134,7 @@ coef.ah4 <- function(object, se=FALSE, reparamPsi=TRUE, idx2Exp=NULL,
   coefs <- object$coefficients
   stdErr <- object$se
 
-  if(object$control$family!="Poisson" && reparamPsi){
+  if(reparamPsi && object$control$family!="Poisson"){
     #extract psi coefficients
     index <- grep("-log(overdisp",names(coefs), fixed=TRUE)
 
@@ -230,27 +230,24 @@ confint.ah4 <- function (object, parm, level = 0.95, reparamPsi = TRUE, idx2Exp 
     ci
 }
 
-predict.ah4 <- function(object,newSubset=NULL,type=c("response","endemic","epi.own","epi.neighbours"),...){
-  type <- match.arg(type,c("response","endemic","epi.own","epi.neighbours"))
-  control <- object$control
-  
-  data <- object$stsObj
-  if(!is.null(newSubset)){
-    control$subset <- newSubset
-  }
-  
-  # predictions for "old" time points
-  model <- interpretControl(control, data)
-  coefs <- coef(object, reparamPsi=FALSE)
-  predicted <- meanHHH(coefs,model)
-
-  if(type=="response") result <-predicted$mean
-  else if(type=="endemic") result <- predicted$endemic
-  else if(type=="epi.own") result <- predicted$epi.own
-  else if(type=="epi.neighbours") result <- predicted$epi.neighbours
-
-   return(result)
-  
+## mean predictions for a subset of 1:nrow(object$stsObj)
+predict.ah4 <- function(object, newSubset=control$subset, type="response", ...)
+{
+    control <- object$control
+    if (type == "response" &&
+        all((m <- match(newSubset, control$subset, nomatch=0L)) > 0)) {
+        ## we can extract fitted means from object
+        object$fitted.values[m,,drop=FALSE]
+    } else { ## means for time points not fitted (not part of control$subset)
+        data <- object$stsObj
+        coefs <- coef(object, reparamPsi=FALSE)
+        model <- interpretControl(control, data)
+        predicted <- meanHHH(coefs, model, subset=newSubset)
+        if (type=="response") predicted$mean else {
+            type <- match.arg(type, names(predicted))
+            predicted[[type]]
+        }
+    }
 }
 
 # plot estimated mean 
@@ -295,4 +292,13 @@ plot.ah4 <- function(x, i=1, m=NULL, ylim=NULL,
 }
 
 
+### refit hhh4-model on a subset of the data up to time point "tp"
+### and further arguments (...) modify the original control list
 
+update.ah4 <- function (object, tp, ...)
+{
+    control <- object$control
+    control <- modifyList(control, list(...))
+    control$subset <- control$subset[control$subset <= tp]
+    hhh4(object$stsObj, control)
+}

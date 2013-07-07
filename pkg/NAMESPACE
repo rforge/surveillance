@@ -352,21 +352,18 @@ S3method(AIC, ah4)
 S3method(fixef, ah4)
 S3method(ranef, ah4)
 S3method(confint, ah4)
-# include further accessing methods...?
-# documentation for the following functions is still missing
 S3method(predict, ah4)
 S3method(plot, ah4)
+S3method(update, ah4)
 
-# TODO: add simulation function for "ah4"
-# (or use stats:::simulate instead?)
 export(simHHH, simHHH.default)
 S3method(simHHH, default)
 S3method(simHHH, ah)
 S3method(simulate, ah4)
 
-# functions not yet documented, but used in (dontrun) part of example(hhh4)
-# (maybe these would be better defined as a method for "oneStepAhead(ah4)-objects")
 export(oneStepAhead)
 export(scores)
+
+# functions not yet documented, but used in (dontrun) part of example(hhh4)
 export(permutationTest)
 export(pit)

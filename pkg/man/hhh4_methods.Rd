@@ -2,7 +2,7 @@
 \name{hhh4_methods}
 \alias{print.ah4}
 \alias{summary.ah4}
-\alias{print.summary.ah4}
+%% \alias{print.summary.ah4}
 \alias{logLik.ah4}
 \alias{AIC.ah4}
 \alias{coef.ah4}
@@ -11,6 +11,10 @@
 \alias{fixef.ah4}
 \alias{ranef.ah4}
 \alias{confint.ah4}
+% FIXME: functions without documentation atm
+%% \alias{plot.ah4}
+%% \alias{predict.ah4}
+%% \alias{update.ah4}
 
 \title{
 Print, Summary and Extraction Methods for \code{"ah4"} Objects
