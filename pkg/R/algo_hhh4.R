@@ -163,6 +163,7 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
                  stsObj=stsObj,         # FIXME: stsObj also in 'control$data'
                  lag=1, nObs=sum(!model$isNA[control$subset,]),
                  nTime=length(model$subset), nUnit=ncol(stsObj))
+       ## FIXME: nTime has a different meaning here than everywhere else!!!
   class(result) <- "ah4"
   result
 }
@@ -2333,87 +2334,114 @@ addSeason2formula <- function(f=~1,       # formula to start with
 }
 
 
-oneStepAhead <- function(result, # result of call to hhh4
-                         tp,     # one-step-ahead predictions for time points (tp+1):nrow(stsObj)
-                         verbose=TRUE,  # FIXME: this is currently unused
-                         keep.estimates = FALSE){
-  
-  stsObj <- result$stsObj
-  control <- result$control
-  # get model terms
-  model <- result[["terms"]]
-  if(is.null(model)){
-      model <- interpretControl(control,stsObj)
-  }
-  
-  # which model: negbin or poisson?
-  dimOverdisp <- model$nOverdisp
-  negbin <- dimOverdisp>0
+### compute one-step-ahead predictions (means) at a series of time points
 
-  nTime <- nrow(stsObj)
-  pred <- matrix(NA_real_,nrow=length(tp:nTime)-1,ncol=ncol(stsObj))
-  psi <- matrix(NA_real_,nrow=length(tp:nTime)-1,ncol=ifelse(dimOverdisp>1,ncol(stsObj),1))
+oneStepAhead <- function(result, # ah4-object (i.e. a hhh4 model fit)
+                         tp,     # scalar: one-step-ahead predictions for time
+                                 # points (tp+1):nrow(stsObj), or tp=c(from, to)
+                         which.start = c("current", "final", "none"),
+                         keep.estimates = FALSE,
+                         verbose = TRUE) # verbose-1 is used as verbose setting
+                                         # for sequentially refitted hhh4 models
+{
+    stopifnot(inherits(result, "ah4"))
+    which.start <- match.arg(which.start)
+    refit <- which.start != "none"
+    use.current <- which.start == "current"
+    ## i.e., use fitted parameters from previous time point as initial values
+
+    ## convert fitted parameters from "ah4" to list suitable for control$start
+    coef2start <- function (fit)
+        list(fixed = fixef(fit, reparamPsi=FALSE),
+             random = ranef(fit, reparamPsi=FALSE),
+             sd.corr = getSdCorr(fit))
+    startfinal <- coef2start(result)
     
-  res <- resN <- result
-  
-  which <- 1
-  search2 <- function(i,which){
-    control$subset <- 2:i
+    ## get model terms
+    model <- result[["terms"]]
+    if (is.null(model))
+        model <- result$terms <- with(result, interpretControl(control, stsObj))
+    nTime <- model$nTime
+    nUnits <- model$nUnits
+    psiNames <- grep("overdisp", names(model$initialTheta), value=TRUE)
     
-    if(which==1){
-      #starting values of previous time point i-1
-      control$start <- list(fixed=fixef(res.old),random=ranef(res.old),sd.corr=getSdCorr(res.old))
+    ## check that tp is within the time period of the data
+    stopifnot(tp %in% seq_len(nTime-1L), length(tp) %in% 1:2)
+    if (length(tp) == 1) tp <- c(tp, nTime-1) # historical default
+    tps <- tp[1]:tp[2]
+    ntps <- length(tps)
+    observed <- model$response[tps+1,,drop=FALSE]
+    rownames(observed) <- tps+1
+    
+    ## adjust verbosity for model refitting
+    result$control$verbose <- verbose - (ntps>1)
+
+    ## initialize result
+    pred <- matrix(NA_real_, nrow=ntps, ncol=nUnits,
+                   dimnames=list(tps, colnames(observed)))
+    psi <- matrix(NA_real_, nrow=ntps, ncol=model$nOverdisp,
+                  dimnames=list(tps, psiNames))
+    if (keep.estimates) {
+	coefficients <- matrix(NA_real_,
+                               nrow=ntps, ncol=length(model$initialTheta),
+                               dimnames=list(tps, names(model$initialTheta)))
+	Sigma.orig <- matrix(NA_real_, nrow=ntps, ncol=model$nSigma,
+                             dimnames=list(tps, names(result$Sigma.orig)))
+        logliks <- matrix(NA_real_, nrow=ntps, ncol=2L,
+                          dimnames=list(tps, c("loglikelihood", "margll")))
     } else {
-      #starting values of last time point
-      control$start <- list(fixed=fixef(resN),random=ranef(resN),sd.corr=getSdCorr(resN))
+        coefficients <- Sigma.orig <- logliks <- NULL
     }
-    res <- hhh4(stsObj,control)  
 
-    return(res)
-  }
-  
-  if(keep.estimates){
-	# save value of log-likelihood (pen+mar) and parameter estimates
-	params <- matrix(NA_real_,nrow=length(tp:nTime)-1,ncol=length(coef(res))+2)
-	# save values of estimated covariance
-	vars <- matrix(NA_real_,nrow=length(tp:nTime)-1,ncol=model$nSigma)
-  } else {
-	params <- vars <- NULL
-  }
-
-  # make one-step ahead prediction for time point tp+1
-  for(i in (tp):(nTime-1)) {
-      cat(nTime-i,"\n")
-      res.old <- res
-      
-      # fit model to data for time points 1,...,tp
-      # use initial values from previous fit or from fit to all
-      res <- search2(i, which=which)
-      
-      # check convergence        
-      # do a grid search in case of non-convergence ?
-      if(res$convergence){
-        # make one-step ahead prediction for time point tp+1
-        pred[i-tp+1,] <- tail(predict(res,newSubset=2:(i+1),type="response"),1)
-		# get overdispersion parameter
-        if(negbin)
-          psi[i-tp+1,] <- coef(res, reparamPsi=FALSE)[grep("overdisp",names(coef(res)))]
-		# save parameter estimates
-		if(keep.estimates){
-		  params[i-tp+1,] <- c(res$loglikelihood,res$margll,coef(res,reparamPsi=FALSE))
-		  vars[i-tp+1,] <- getSdCorr(res)
-		}
-      } else {
-        cat("NO convergence in iteration", i-tp,"\n")
-        res <- res.old
-      }
-  }
-   
-  return(list(mean=pred, psi=psi, x=observed(stsObj[(tp+1):nTime]),
-		      allConverged=all(!is.na(pred)),
-              params=params,variances=vars))
-
+    ## sequential one-step ahead predictions
+    fit <- result
+    for(i in seq_along(tps)) {
+        if (verbose) cat(tps[i], "\n")
+        if (refit) {
+            fit.old <- fit
+            fit <- update.ah4(result, tp=tps[i], start=if (use.current)
+                              coef2start(fit.old) else startfinal,
+                              keep.terms=TRUE) # need "model" -> $terms
+        }
+        if (fit$convergence) {
+            coefs <- coef(fit, reparamPsi=FALSE)
+            pred[i,] <- meanHHH(coefs, fit$terms,
+                                subset=tps[i]+1, total.only=TRUE)
+            if (model$nOverdisp>0)
+                psi[i,] <- coefs[psiNames]
+            if (keep.estimates) {
+                coefficients[i,] <- coefs
+                Sigma.orig[i,] <- getSdCorr(fit)
+                logliks[i,] <- c(fit$loglikelihood, fit$margll)
+            }
+        } else { # do a grid search ?
+            if (verbose) cat("-> NO convergence at time point", tps[i], "\n")
+            if (refit) fit <- fit.old
+        }
+    }
+    
+    list(pred=pred, psi=psi, observed=observed, allConverged=all(!is.na(pred)),
+         coefficients=coefficients, Sigma.orig=Sigma.orig, logliks=logliks)
 }
+
+
+### internal auxiliary function for oneStepAhead()
+### performing mean prediction at a time point "tp",
+### as long as "tp" is in the range 2:nrow(stsObj)
+
+## .osa <- function (object, tp)
+## {
+##     coefs <- coef(object, reparamPsi=FALSE)
+##     ## make one-step ahead prediction for time point tp (-> 1 x nUnits)
+##     pred <- meanHHH(coefs, object$terms, subset=tp, total.only=TRUE)
+##     ## get overdispersion parameter
+##     psi <- coefs[grep("overdisp",names(coefs))]
+##     ## Done
+##     list(mean=drop(pred), psi=psi,
+##          coefficients=coefs, Sigma.orig=getSdCorr(object),
+##          logliks=c(loglik=object$loglikelihood, margll=object$margll))
+## }
+
 
 
 ## check analytical score functions and Fisher informations for

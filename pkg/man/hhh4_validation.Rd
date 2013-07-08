@@ -8,7 +8,7 @@
 }
 \description{
  The function \code{oneStepAhead} computes successive one-step-ahead predictions for
- a (random effects) HHH model resulting from a call to \code{\link{hhh4}}. 
+ a (random effects) HHH model fitted by \code{\link{hhh4}}. 
 
  The function \code{scores} computes a number of (strictly) proper scoring rules based
  on the one-step-ahead predictions.
@@ -16,7 +16,8 @@
  See Paul and Held (2011) for further details.
 }
 \usage{
-oneStepAhead(result, tp, verbose = TRUE, keep.estimates = FALSE)
+oneStepAhead(result, tp, which.start = c("current", "final", "none"),
+             keep.estimates = FALSE, verbose = TRUE)
 
 scores(object, unit = NULL, sign = FALSE, individual = FALSE)
 }
@@ -27,13 +28,14 @@ scores(object, unit = NULL, sign = FALSE, individual = FALSE)
   One-step-ahead predictions are computed for time-points 
   \code{tp+1}, \ldots, \code{nrow(result$stsObj)}.
 }
-  \item{verbose}{
-   Logical if additional information is to be printed during the computations.
-}
+\item{which.start}{...}
   \item{keep.estimates}{
   Logical if parameter estimates from the successive fits should be returned.
 }
-  \item{object}{Result of a call to \code{oneStepAhead}.
+  \item{verbose}{
+   Logical if additional information is to be printed during the computations.
+}
+\item{object}{Result of a call to \code{oneStepAhead}.
 }
   \item{unit}{Integer specifying a specific unit for which the scores are computed. If \code{null} all units are considered.
 }
@@ -46,15 +48,16 @@ scores(object, unit = NULL, sign = FALSE, individual = FALSE)
 %}
 \value{
 \code{oneStepAhead} returns a list with
- \item{mean}{matrix with one-step-ahead predictions}
+\item{pred}{matrix with one-step-ahead predictions}
  \item{psi}{overdispersion parameter on log scale in case of a negative binomial model and \code{NULL} otherwise}
- \item{x}{matrix with observed counts at time-points 
-  \code{tp+1}, \ldots, \code{nrow(result$stsObj)} }
+ \item{observed}{matrix with observed counts at time-points \code{tp+1}, \ldots, \code{nrow(result$stsObj)} }
  \item{allConverged}{Logical indicating if all successive fits converged}
- \item{params}{matrix with estimated regression parameters from the successive fits if
+ \item{coefficients}{matrix with estimated regression parameters from the successive fits if
   \code{keep.estimates = TRUE}, and \code{NULL} otherwise.}
- \item{variances}{matrix with estimated variance components from the successive fits if
-  the model contains random effects and \code{keep.estimates = TRUE},  and \code{NULL} otherwise.}
+ \item{Sigma.orig}{matrix with estimated variance components from the successive fits if
+  the model contains random effects and \code{keep.estimates = TRUE},
+  and \code{NULL} otherwise.}
+\item{logliks}{...}
 
 \code{scores} returns a matrix with the computed logarithmic, ranked probability, squared error, Dawid-Sebastiani, and normalized squared error score as columns.
 }
@@ -67,10 +70,10 @@ scores(object, unit = NULL, sign = FALSE, individual = FALSE)
     disease counts. Statistics in Medicine, \bold{30}, 1118--1136
 }
 \author{
-M. Paul
+Michaela Paul and Sebastian Meyer
 }
 \seealso{
-See the vignette \code{vignette{"hhh4"}} and \code{\link{hhh4}}.
+\code{vignette{"hhh4"}} and \code{\link{hhh4}}.
 }
 \examples{
 

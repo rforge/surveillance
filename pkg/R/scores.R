@@ -79,60 +79,61 @@ rps <- function(x,mu,size=NULL,k=40){
 	matrix(res,ncol=ncol(as.matrix(x)),byrow=FALSE)
 }
 
-##
+
 ## returns logs, rps,ses and dss in reversed!! order
 ## i.e. the scores for time points n, n-1, n-2,...
-scores <- function(object, unit=NULL,sign=FALSE, individual=FALSE){
-	mu <- object$mean
-	size <- object$psi
-	x <- object$x
-	
-	if(!is.null(unit)){
-		x <- as.matrix(x[,unit])
-		mu <- as.matrix(mu[,unit])
-		if(ncol(size)>1){
-			size <- as.matrix(size[,unit])
-		} 
-	}
-	
-	#negbin or poisson?
-	if(any(is.na(size))){
-		size <- NULL
-	} else if(ncol(size)!=ncol(x)){
-		size <- matrix(exp(size), nrow=nrow(size), ncol=ncol(x),byrow=FALSE)
-	} else {
-      size <- exp(size)  
-   }
-	
-	if(sign)
-		signXmMu <- sign(x-mu)
-	else signXmMu <- NULL
+scores <- function(object, unit=NULL,sign=FALSE, individual=FALSE)
+{
+    mu <- object$pred
+    size <- object$psi
+    x <- object$observed
+    
+    if(!is.null(unit)){
+        x <- as.matrix(x[,unit])
+        mu <- as.matrix(mu[,unit])
+        if(ncol(size)>1){
+            size <- size[,unit,drop=FALSE]
+        } 
+    }
+    
+    #negbin or poisson?
+    if(any(is.na(size))){
+        size <- NULL
+    } else if(ncol(size)!=ncol(x)){
+        size <- matrix(exp(size), nrow=nrow(size), ncol=ncol(x),byrow=FALSE)
+    } else {
+        size <- exp(size)  
+    }
+    
+    if(sign)
+        signXmMu <- sign(x-mu)
+    else signXmMu <- NULL
 
-	#compute average scores for unit
-	log.score <- apply(as.matrix(logScore(x=x,mu=mu,size=size)),MARGIN=2,rev)
-	rp.score <- apply(as.matrix(rps(x=x,mu=mu,size=size)),MARGIN=2,rev)
-	se.score <- apply(as.matrix(ses(x=x,mu=mu)), MARGIN=2, rev)
-	nse.score <- apply(as.matrix(nses(x=x,mu=mu,size=size)),MARGIN=2,rev)
-	ds.score <- apply(as.matrix(dss(x=x, mu=mu, size=size)), MARGIN=2,rev)
-	
-	if(is.null(unit)){
-      if(individual){
-        log.score <- c(log.score)
-        rp.score <- c(rp.score)
-        se.score <- c(se.score)
-        nse.score <- c(nse.score)
-        ds.score <- c(ds.score)
-      } else {
-        log.score <- rowMeans(log.score)
-        rp.score <- rowMeans(rp.score)
-        se.score <- rowMeans(se.score)
-        nse.score <- rowMeans(nse.score)
-        ds.score <- rowMeans(ds.score)
-      }    
-	}
-	
-	result <- cbind(logs=log.score,rps=rp.score,ses=se.score,dss=ds.score,nses=nse.score,signXmMu=signXmMu)
-	return(result)
+    #compute average scores for unit
+    log.score <- apply(as.matrix(logScore(x=x,mu=mu,size=size)),MARGIN=2,rev)
+    rp.score <- apply(as.matrix(rps(x=x,mu=mu,size=size)),MARGIN=2,rev)
+    se.score <- apply(as.matrix(ses(x=x,mu=mu)), MARGIN=2, rev)
+    nse.score <- apply(as.matrix(nses(x=x,mu=mu,size=size)),MARGIN=2,rev)
+    ds.score <- apply(as.matrix(dss(x=x, mu=mu, size=size)), MARGIN=2,rev)
+    
+    if(is.null(unit)){
+        if(individual){
+            log.score <- c(log.score)
+            rp.score <- c(rp.score)
+            se.score <- c(se.score)
+            nse.score <- c(nse.score)
+            ds.score <- c(ds.score)
+        } else {
+            log.score <- rowMeans(log.score)
+            rp.score <- rowMeans(rp.score)
+            se.score <- rowMeans(se.score)
+            nse.score <- rowMeans(nse.score)
+            ds.score <- rowMeans(ds.score)
+        }    
+    }
+    
+    result <- cbind(logs=log.score,rps=rp.score,ses=se.score,dss=ds.score,nses=nse.score,signXmMu=signXmMu)
+    return(result)
 }
 
 
