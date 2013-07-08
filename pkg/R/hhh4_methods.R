@@ -292,13 +292,14 @@ plot.ah4 <- function(x, i=1, m=NULL, ylim=NULL,
 }
 
 
-### refit hhh4-model on a subset of the data up to time point "tp"
-### and further arguments (...) modify the original control list
+### refit hhh4-model
+## tp: refit on a subset of the data up to time point "tp"
+## ...: further arguments modify the original control list
 
-update.ah4 <- function (object, tp, ...)
+update.ah4 <- function (object, tp=NULL, ...)
 {
     control <- object$control
     control <- modifyList(control, list(...))
-    control$subset <- control$subset[control$subset <= tp]
+    if (isScalar(tp)) control$subset <- control$subset[control$subset <= tp]
     hhh4(object$stsObj, control)
 }
