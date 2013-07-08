@@ -1,9 +1,18 @@
-#####################################################
-## Scoring rules as discussed in:
-## Predictive model assessment for count data
-## Czado, C., Gneiting, T. & Held, L. (2009)
-## Biometrics 65:1254-1261
-######################################################
+################################################################################
+### Part of the surveillance package, http://surveillance.r-forge.r-project.org
+### Free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
+###
+### Scoring rules as discussed in:
+### Predictive model assessment for count data
+### Czado, C., Gneiting, T. & Held, L. (2009)
+### Biometrics 65:1254-1261
+###
+### Copyright (C) 2010-2012 Michaela Paul
+### $Revision$
+### $Date$
+################################################################################
+
 
 ## logarithmic score
 # logs(P,x) = - log(P(X=x))
@@ -85,29 +94,24 @@ rps <- function(x,mu,size=NULL,k=40){
 scores <- function(object, unit=NULL,sign=FALSE, individual=FALSE)
 {
     mu <- object$pred
-    size <- object$psi
     x <- object$observed
+    size <- object$psi
+
+    if (!is.null(size)) { # NegBin
+        size <- exp(size) # transform to parameterization suitable for dnbinom()
+        if (ncol(size) != ncol(x)) { # => ncol(size)=1, unit-independent psi
+            ## replicate to obtain nrow(size) x nUnits matrix
+            size <- matrix(size, nrow=nrow(size), ncol=ncol(x), byrow=FALSE)
+        }
+    }
     
     if(!is.null(unit)){
         x <- as.matrix(x[,unit])
         mu <- as.matrix(mu[,unit])
-        if(ncol(size)>1){
-            size <- size[,unit,drop=FALSE]
-        } 
+        size <- size[,unit]
     }
     
-    #negbin or poisson?
-    if(any(is.na(size))){
-        size <- NULL
-    } else if(ncol(size)!=ncol(x)){
-        size <- matrix(exp(size), nrow=nrow(size), ncol=ncol(x),byrow=FALSE)
-    } else {
-        size <- exp(size)  
-    }
-    
-    if(sign)
-        signXmMu <- sign(x-mu)
-    else signXmMu <- NULL
+    signXmMu <- if(sign) sign(x-mu) else NULL
 
     #compute average scores for unit
     log.score <- apply(as.matrix(logScore(x=x,mu=mu,size=size)),MARGIN=2,rev)
