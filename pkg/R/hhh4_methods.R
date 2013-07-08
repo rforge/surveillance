@@ -303,3 +303,10 @@ update.ah4 <- function (object, tp=NULL, ...)
     if (isScalar(tp)) control$subset <- control$subset[control$subset <= tp]
     hhh4(object$stsObj, control)
 }
+
+
+## convert fitted parameters from "ah4" to list suitable for control$start
+ah4coef2start <- function (fit)
+    list(fixed = fixef(fit, reparamPsi=FALSE),
+         random = ranef(fit, reparamPsi=FALSE),
+         sd.corr = getSdCorr(fit))

@@ -24,13 +24,7 @@ oneStepAhead <- function(result, # ah4-object (i.e. a hhh4 model fit)
     refit <- which.start != "none"
     use.current <- which.start == "current"
     ## i.e., use fitted parameters from previous time point as initial values
-
-    ## convert fitted parameters from "ah4" to list suitable for control$start
-    coef2start <- function (fit)
-        list(fixed = fixef(fit, reparamPsi=FALSE),
-             random = ranef(fit, reparamPsi=FALSE),
-             sd.corr = getSdCorr(fit))
-    startfinal <- coef2start(result)
+    startfinal <- ah4coef2start(result)
     
     ## get model terms
     model <- result[["terms"]]
@@ -77,7 +71,7 @@ oneStepAhead <- function(result, # ah4-object (i.e. a hhh4 model fit)
         if (refit) {
             fit.old <- fit
             fit <- update.ah4(result, tp=tps[i], start=if (use.current)
-                              coef2start(fit.old) else startfinal,
+                              ah4coef2start(fit.old) else startfinal,
                               keep.terms=TRUE) # need "model" -> $terms
         }
         if (fit$convergence) {
