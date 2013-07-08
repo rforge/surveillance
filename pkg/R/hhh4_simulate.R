@@ -63,7 +63,7 @@ simulate.ah4 <- function (object, # result from a call to hhh4
             stop("need 'y.start' values for lag=", maxlag, " initial time points")
     }
 
-    ## get fitted (partial) components
+    ## get fitted components nu_it (with offset), phi_it, lambda_it, t in subset
     model <- interpretControl(control, stsObj)
     means <- meanHHH(theta, model, subset=subset)
     psi <- splitParams(theta,model)$overdisp

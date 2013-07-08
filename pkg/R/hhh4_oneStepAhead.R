@@ -70,8 +70,9 @@ oneStepAhead <- function(result, # ah4-object (i.e. a hhh4 model fit)
         if (verbose) cat(tps[i], "\n")
         if (refit) {
             fit.old <- fit
-            fit <- update.ah4(result, tp=tps[i], start=if (use.current)
-                              ah4coef2start(fit.old) else startfinal,
+            fit <- update.ah4(result, subset.upper=tps[i],
+                              start=if (use.current)
+                                    ah4coef2start(fit.old) else startfinal,
                               keep.terms=TRUE) # need "model" -> $terms
         }
         if (fit$convergence) {

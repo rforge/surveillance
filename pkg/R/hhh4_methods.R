@@ -293,14 +293,19 @@ plot.ah4 <- function(x, i=1, m=NULL, ylim=NULL,
 
 
 ### refit hhh4-model
-## tp: refit on a subset of the data up to time point "tp"
-## ...: further arguments modify the original control list
+## ...: arguments modifying the original control list
+## subset.upper: refit on a subset of the data up to that time point
+## use.estimates: use fitted parameters as new start values
+##                (only applicable if same model)
 
-update.ah4 <- function (object, tp=NULL, ...)
+update.ah4 <- function (object, ..., subset.upper=NULL, use.estimates=FALSE)
 {
     control <- object$control
     control <- modifyList(control, list(...))
-    if (isScalar(tp)) control$subset <- control$subset[control$subset <= tp]
+    if (isScalar(subset.upper))
+        control$subset <- control$subset[control$subset <= subset.upper]
+    if (use.estimates)
+        control$start <- ah4coef2start(object)
     hhh4(object$stsObj, control)
 }
 
