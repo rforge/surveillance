@@ -276,8 +276,6 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   #Fix the corresponding start entry. it can either be a vector of
   #logicals or a specific index. Needs to work in both cases.
   #Note: This code does not work if we have week 53s!
-  ## FIXME: If !epochAsDate and updating "start" (which seems not really to be
-  #necessary), we have to update epoch, too! (epoch<-epoch-i.min+1 ??)
   if (is.logical(i)) {
     i.min <- which.max(i) #first TRUE entry
   } else {
@@ -288,7 +286,10 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   start.year <- start[1] + (new.sampleNo - 1) %/% x@freq 
   start.sampleNo <- (new.sampleNo - 1) %% x@freq + 1
   x@start <- c(start.year,start.sampleNo)
-  
+  ## If !epochAsDate and updating "start" (which seems not really to be
+  ## necessary), we have to update epoch, too!
+  if (!x@epochAsDate) x@epoch <- x@epoch - i.min + 1  # FIXME: correct?
+                                                     
   #FIXME: In case there is a map: Also subset map according to region index j.
   # -> This only makes sense if identical(row.names(map), colnames(observed))
   #    is a property of the sts-class already verified in init.sts
