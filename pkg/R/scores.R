@@ -147,17 +147,18 @@ scores <- function(object, unit=NULL,sign=FALSE, individual=FALSE)
 ## Params: 
 ## x - observed data
 ## pdistr - predictive CDF, i.e. a vectorized function (x, ...)
+##          or a list of such predictive CDF's, one for each data point x
+##          If evaluated at x=-1 it should return 0
 ## J - number of bins 
-## ... - arguments for pdistr
-## plot - logical indicating if a plot should be produced, or a list of
-##        arguments for plot.histogram
+## ... - arguments for pdistr. Ignored if pdistr is a list.
+## plot - NULL (no plot) or a list of arguments for plot.histogram
 ####################################################
 
-pit <- function (x, pdistr, J=10, relative=TRUE, ..., plot = FALSE)
+pit <- function (x, pdistr, J=10, relative=TRUE, ..., plot = NULL)
 {
-    stopifnot(pdistr(-1, ...) == 0)
+    PxPxm1 <- pitPxPxm1(x, pdistr, ...)
     breaks <- (0:J)/J
-    Fbar_seq <- sapply(breaks, pit.one, x=x, pdistr=pdistr, ...)
+    Fbar_seq <- sapply(breaks, pit1, Px=PxPxm1[1,], Pxm1=PxPxm1[2,])
     scale <- if (relative) J else 1
     f_j <- scale * diff(Fbar_seq)
     
@@ -166,27 +167,30 @@ pit <- function (x, pdistr, J=10, relative=TRUE, ..., plot = FALSE)
                           xname="PIT", equidist=TRUE),
                      class="histogram")
 
-    ## plot
-    if (isTRUE(plot)) plot <- list()
-    if (is.list(plot)) {
-        defaultArgs <- list(
-            x = res,
-            ylab = if (relative) "Relative frequency" else "Density",
-            main = ""
-            )
-        plot[["x"]] <- NULL             # manual x is ignored
-        plot.args <- modifyList(defaultArgs, plot)
-        do.call("plot", plot.args)
-        invisible(res)
-    } else res
+    if (is.null(plot)) res else pitplot(res, plot)
+}
+
+pitPxPxm1 <- function (x, pdistr, ...)
+{
+    if (is.list(pdistr)) {
+        stopifnot(length(pdistr) == length(x))
+        sapply(seq_along(x), function (i) {
+            stopifnot(isTRUE(all.equal(0, pdistr[[i]](-1))))
+            res <- pdistr[[i]](c(x[i], x[i]-1))
+            if (length(res) == 2 && is.vector(res, mode="numeric")) res else
+                stop("pdistr[[", i, "]](c(", x[i], ", ", x[i]-1,
+                     ")) is no numeric vector of length 2")
+        }) # 2 x length(x)
+    } else { # same pdistr for every data point
+        stopifnot(pdistr(-1, ...) == 0)
+        rbind(pdistr(x, ...), pdistr(x-1, ...))
+    }
 }
 
 ## calculate \bar{F}(u) for scalar u
-pit.one <- function (u, x, pdistr, ...)
+pit1 <- function (u, Px, Pxm1)
 {
     if (u <= 0) return(0) else if (u >= 1) return(1)
-    Px <- pdistr(x, ...)
-    Pxm1 <- pdistr(x-1, ...)             # ifelse(x==0, 0, pdistr(x-1, ...))
     F_u <- (u-Pxm1) / (Px-Pxm1)
     ## If Px=Pxm1, this means that predict. prob. of observed x is exactly zero.
     ## We get NaN for F_u. Our predictive model is bad if that happens.
@@ -198,6 +202,21 @@ pit.one <- function (u, x, pdistr, ...)
     F_u[F_u < 0] <- 0
     F_u[F_u > 1] <- 1
     mean(F_u)
+}
+
+## plot the PIT histogram
+pitplot <- function (pit, args)
+{
+    relative <- !isTRUE(all.equal(1, sum(pit$density)))
+    defaultArgs <- list(x = pit, main = "",
+                        ylab = if(relative) "Relative frequency" else "Density")
+    args <- if (is.list(args)) {
+        args[["x"]] <- NULL             # manual x is ignored
+        args <- modifyList(defaultArgs, args)
+    } else defaultArgs
+    do.call("plot", args)
+    abline(h=if (relative) 1 else 1/length(pit$mids), lty=2, col="grey")
+    invisible(pit)
 }
 
 
