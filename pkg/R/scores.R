@@ -8,7 +8,7 @@
 ### Czado, C., Gneiting, T. & Held, L. (2009)
 ### Biometrics 65:1254-1261
 ###
-### Copyright (C) 2010-2012 Michaela Paul
+### Copyright (C) 2010-2013 Michaela Paul and Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -145,36 +145,62 @@ scores <- function(object, unit=NULL,sign=FALSE, individual=FALSE)
 ## non-randomized version of the PIT histogram
 ##
 ## Params: 
-## J - number of bins 
 ## x - observed data
-## pdistr - cumulative distribution function, either pnbinom or ppois
-## ... - arguments for pdistr (i.e. lambda for ppois, mu and size for pnbinom)
+## pdistr - predictive CDF, i.e. a vectorized function (x, ...)
+## J - number of bins 
+## ... - arguments for pdistr
+## plot - logical indicating if a plot should be produced, or a list of
+##        arguments for plot.histogram
 ####################################################
-pit.one <- function(u,x,pdistr=pnbinom,...){
 
-   Px <- pdistr(x,...)
-   Pxm1 <- pdistr(x-1,...)
-   F_u <- ifelse(u< Pxm1 | u== Pxm1, 0, pmin(1,(u-Pxm1)/(Px-Pxm1) ) )
-   F_u[x==0] <- pmin(1,u/pdistr(0,...))[x==0]
-   if(u==1){
-    F_u <- 1
-   } else if(u==0){
-    F_u <- 0  
-   }
+pit <- function (x, pdistr, J=10, relative=TRUE, ..., plot = FALSE)
+{
+    stopifnot(pdistr(-1, ...) == 0)
+    breaks <- (0:J)/J
+    Fbar_seq <- sapply(breaks, pit.one, x=x, pdistr=pdistr, ...)
+    scale <- if (relative) J else 1
+    f_j <- scale * diff(Fbar_seq)
+    
+    res <- structure(list(breaks=breaks, counts=f_j, density=f_j,
+                          mids=breaks[-(J+1)] + 1/J/2,
+                          xname="PIT", equidist=TRUE),
+                     class="histogram")
 
-   return(mean(F_u))
+    ## plot
+    if (isTRUE(plot)) plot <- list()
+    if (is.list(plot)) {
+        defaultArgs <- list(
+            x = res,
+            ylab = if (relative) "Relative frequency" else "Density",
+            main = ""
+            )
+        plot[["x"]] <- NULL             # manual x is ignored
+        plot.args <- modifyList(defaultArgs, plot)
+        do.call("plot", plot.args)
+        invisible(res)
+    } else res
+}
+
+## calculate \bar{F}(u) for scalar u
+pit.one <- function (u, x, pdistr, ...)
+{
+    if (u <= 0) return(0) else if (u >= 1) return(1)
+    Px <- pdistr(x, ...)
+    Pxm1 <- pdistr(x-1, ...)             # ifelse(x==0, 0, pdistr(x-1, ...))
+    F_u <- (u-Pxm1) / (Px-Pxm1)
+    ## If Px=Pxm1, this means that predict. prob. of observed x is exactly zero.
+    ## We get NaN for F_u. Our predictive model is bad if that happens.
+    ## We could assign either 0 or 1 to express that and issue a warning.
+    if (any(is.nan(F_u))) {
+        warning("predictive distribution has 0 probability for observed 'x'")
+        F_u[is.nan(F_u)] <- 0
+    }
+    F_u[F_u < 0] <- 0
+    F_u[F_u > 1] <- 1
+    mean(F_u)
 }
 
 
-pit <- function(J=10,x,pdistr=pnbinom,...){
-  F_u.bar <- sapply((0:J)/J,pit.one,x=x,pdistr=pdistr,...)
-  f_j <- J*diff(F_u.bar)
-  
-  erg <- list(breaks=(0:J)/J,counts=f_j, density=f_j,mids=(0:(J-1))/J+diff((0:J)/J)/2,
-             xname="PIT",equidist=TRUE)
-  class(erg) <- "histogram"
-  return(erg)
-}
 
 #######################################################
 ## scores1, scores2 - vector with scores from two models
