@@ -989,7 +989,7 @@ setMethod( "show", "sts", function( object ){
 
   if (npoly <- length(object@map)) {
       cat("\nmap:\n")
-      print(summary(as(object@map, "SpatialPolygons"))) # without potential data
+      print(modifyList(summary(object@map), list(data=NULL))) # no data summary
       cat("Features    :", npoly, "\n")
       if (inherits(object@map, "SpatialPolygonsDataFrame"))
           cat("Data slot   :", ncol(object@map), "variables\n")
