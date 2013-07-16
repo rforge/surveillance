@@ -1847,13 +1847,11 @@ d2Sigma3 <- function(sd,corr, d1)
 }
 
 
-updateRegression <- function(theta, sd.corr, model, control, method = "nlminb")
-{  
+updateRegression <- function(theta, sd.corr, model,
+                             control, method = "nlminb")
+{
   lower <- control[["lower"]]; control$lower <- NULL
   upper <- control[["upper"]]; control$upper <- NULL
-  if(any(theta %in% lower[is.finite(lower)])){
-    cat("WARNING: at least one theta reached lower bound\n")
-  }
   
   # estimate regression coefficients (theta, fixed + random)
   if(method == "nlminb"){
@@ -1899,6 +1897,10 @@ updateRegression <- function(theta, sd.corr, model, control, method = "nlminb")
     theta.new <- res$par
     ll <- res$value
   }
+
+  ## if(any(theta <= lower)){       # FIXME: upper? + make message more informative
+  ##   cat("WARNING: at least one theta reached lower bound\n")
+  ## }
 
   rel.tol <- max(abs(theta.new - theta)) / max(abs(theta))
   # The above is a weaker criterion than the maximum relative parameter change:
@@ -2023,16 +2025,15 @@ fitHHH <- function(theta, sd.corr, model,
   dimFE.d.O <- model$nFE + model$nd + model$nOverdisp
   dimRE <- model$nRE
 
-  ## artificial lower bound on regression parameters
-  reg.lower <- rep.int(-Inf, length(theta))
-  indexAR <- c(grep("ar.ri",model$namesFE), grep("ar.1",model$namesFE),
-               grep("ne.ri",model$namesFE), grep("ne.1",model$namesFE))
-  reg.lower[indexAR] <- -20
+  ## ## artificial lower bound on intercepts of epidemic components
+  ## reg.lower <- rep.int(-Inf, length(theta))
+  ## indexAR <- c(grep("ar.ri",model$namesFE), grep("ar.1",model$namesFE),
+  ##              grep("ne.ri",model$namesFE), grep("ne.1",model$namesFE))
+  ## reg.lower[indexAR] <- -20
 
   ## control arguments for optimization of regression parameters
   reg.method <- cntrl.regression$method; cntrl.regression$method <- NULL
   cntrl.update.reg <- setOptimControl(reg.method, cntrl.regression,
-                                      lower=reg.lower, upper=Inf,
                                       iter.max=if(dimRE==0) 100,
                                       verbose=verbose+(dimRE==0))
 
