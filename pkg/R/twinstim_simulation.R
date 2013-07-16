@@ -376,7 +376,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         ## over the influence regions of the events
         if (!constantsiaf && !is.null(siaf$Fcircle) && !is.null(siaf$effRange))
         {
-            ## pre-compute effective range of the 'siaf' (used by .siafInt)
+            ## pre-compute effective range of the 'siaf' (USED BY .siafInt)
             effRangeTypes <- rep(siaf$effRange(siafpars), length.out = nTypes)
         }
         .siafInt <- .siafIntFUN(siaf = siaf, noCircularIR = FALSE)
@@ -449,7 +449,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     
     eTermsCalc <- function (eventData, eventCoords)
     {
-        # extract some marks from the eventData
+        # extract some marks from the eventData (USED INSIDE .siafInt() BELOW!)
         eventTypes <- as.integer(eventData$type)
         eps.s <- eventData$eps.s
         # distance to the border (required for siafInt below, and for epidataCS)
@@ -477,7 +477,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         }
         # Matrix of terms in the epidemic component
         eTerms <- cbind(
-            qSum = qSumTypes[eventData$type],
+            qSum = qSumTypes[eventTypes],
             expeta = exp(drop(mme %*% gamma)),
             siafInt = siafInts
         )

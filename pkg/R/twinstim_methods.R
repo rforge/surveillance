@@ -147,7 +147,7 @@ print.summary.twinstim <- function (x,
         printCoefmat(x$coefficients.beta, digits = digits,
             signif.stars = signif.stars, signif.legend = (q==0L) && signif.stars, ...)
     } else cat("\nNo coefficients in the endemic component.\n")
-    if (q > 0L) {
+    if (q + niafpars > 0L) {
         cat("\nCoefficients of the epidemic component:\n")
         printCoefmat(rbind(x$coefficients.gamma, x$coefficients.iaf), digits = digits,
             signif.stars = signif.stars, ...)
