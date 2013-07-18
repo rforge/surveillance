@@ -13,10 +13,10 @@
   \itemize{
     \item The \code{polyCub}-methods for cubature over polygonal domains
     have been moved to the new dedicated package \CRANpkg{polyCub},
-    since they are of a rather general use. The \code{discpoly} function
+    since they are of a rather general use. The \code{discpoly()} function
     has also been moved to that package.
 
-    \item As a replacement of the license-restricted \pkg{gpclib} package,
+    \item As a replacement for the license-restricted \pkg{gpclib} package,
     the \pkg{rgeos} package is now used by default
     (\code{surveillance.options(gpclib=FALSE)}) in generating
     \code{"epidataCS"} (polygon intersections, slightly slower).

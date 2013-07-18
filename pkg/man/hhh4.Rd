@@ -112,23 +112,26 @@ hhh4(stsObj,
       \item{\code{subset}}{Typically \code{2:nrow(obs)} if model contains
 	autoregression}
       \item{\code{optimizer}}{a list of three lists of control arguments.
+	
 	The \code{"stop"} list specifies two criteria for the outer
 	optimization of regression and variance parameters: the relative
 	\code{tol}erance for parameter change using the criterion 
 	\code{max(abs(x[i+1]-x[i])) / max(abs(x[i]))},
-	and the maximum number \code{niter} of outer iterations.\cr
+	and the maximum number \code{niter} of outer iterations.
+	
 	Control arguments for the single optimizers are specified in the
 	lists named \code{"regression"} and \code{"variance"}.
 	\code{method="nlminb"} is the default optimizer for both (taking
 	advantage of the analytical Fisher information matrices), however,
-	the optimizers from \code{\link{optim}} may also be specified
-	(as well as \code{\link{nlm}} but that one is not recommended here).
-	Especially for the variance updates,
-	Nelder-Mead optimization is an attractive alternative.\cr
+	the \code{method}s from \code{\link{optim}} may also be specified
+	(as well as \code{"\link{nlm}"} but that one is not recommended here).
+	Especially for the variance updates, Nelder-Mead optimization
+	(\code{method="Nelder-Mead"}) is an attractive alternative.
 	All other elements of these two lists are passed as
 	\code{control} arguments to the chosen \code{method}, e.g., if
 	\code{method="nlminb"} adding \code{iter.max=50} increases the 
-	maximum number of inner iterations from 20 (default) to 50.}
+	maximum number of inner iterations from 20 (default) to 50.
+      }
       \item{\code{verbose}}{Logical if additional information is to be printed
 	during the computations}
       \item{\code{start}}{List with initials, overrides any initial

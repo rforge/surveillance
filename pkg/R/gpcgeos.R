@@ -26,7 +26,7 @@ intersectCircle <- function (Wgpc, W, center, r, npoly)
         circleSpP <- SpatialPolygons(list(Polygons(list(circle), "0")))
         circleSpP@proj4string <- W@proj4string
         res <- rgeos::gIntersection(circleSpP, W)
-        as(res, "gpc.poly")
+        as(res, "gpc.poly")      # coerce-method imported from rgeos via polyCub
     }
 }
 

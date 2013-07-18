@@ -169,6 +169,9 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     cat("Calculating (minimal) distances of the events to the boundary...\n")
     Wgpc <- as(W, "gpc.poly")   # coerce-method from rgeos imported via polyCub
     events$.bdist <- bdist(eventCoords, Wgpc)   # this may take a while
+    # avoid conversion to gpc.poly by extracting xylist (first vertex repeated)?
+    #lapply(unlist(lapply(W@polygons, slot, "Polygons"), recursive=FALSE), coordinates)
+
 
     # Construct spatial influence regions around events
     cat("Constructing spatial influence regions around events...\n")
