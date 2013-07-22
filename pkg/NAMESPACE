@@ -144,6 +144,7 @@ export(linelist2sts)
 export(wrap.algo, farrington, bayes, rki, cusum, glrpois, glrnb, outbreakP) # rogerson, hmm
 export(earsC)
 export(farringtonFlexible)
+export(glrnbFarrington)
 export(categoricalCUSUM, pairedbinCUSUM, pairedbinCUSUM.runlength)
 export(nowcast, backprojNP)
 ## auxiliary functions for farringtonFlexible:

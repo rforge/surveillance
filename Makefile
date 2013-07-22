@@ -70,15 +70,7 @@ ${SYSDATA}: pkg/sysdata/sysdata.R
 	mv pkg/sysdata/sysdata.rda $@
 
 check: build
-	$R CMD check --as-cran --timings surveillance_${VERSION}.tar.gz
-## further option: --use-gct (for better detection of memory bugs/segfaults)
-	@echo "timings <- read.table(file.path('surveillance.Rcheck','surveillance-Ex.timings'), header=TRUE, row.names='name'); \
-	timings <- timings[order(timings$$elapsed, decreasing=TRUE),'elapsed',drop=FALSE]; \
-	cat(capture.output(subset(timings, elapsed > 1)), sep='\n')" | $R --slave --vanilla
-	@cd surveillance.Rcheck; nwarn=`grep -c "Warning" surveillance-Ex.Rout`; \
-	if [ $$nwarn -gt 0 ]; then echo "\n\tWARNING: $$nwarn" \
-        "warning(s) thrown when running examples,\n" \
-	"\t         see file surveillance.Rcheck/surveillance-Ex.Rout\n"; fi
+	$R CMD check --as-cran --no--timing surveillance_${VERSION}.tar.gz
 
 install: build
 	$R CMD INSTALL surveillance_${VERSION}.tar.gz
