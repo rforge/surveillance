@@ -601,7 +601,7 @@ timeTrend,populationOffset,factorsBool,reweight,weightsThreshold,glmWarnings,ver
     if (reweight) {
 	model$weights <- omega
     } else{
-    model$weights <- NA
+    model$weights <- model$weights
     }
     #Done
     return(model)
