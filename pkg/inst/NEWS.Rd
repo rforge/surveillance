@@ -28,11 +28,11 @@
     \item The improved Farrington method described in Noufaily et al.
     (2012) is now available as function \code{farringtonFlexible()}.
 
-    \item New handling of reference dates in \code{algo.farrington} for
-    \code{sts} objects with \code{epochAsDate=TRUE}. Instead of always
-    going back in time to the next Date in the \code{epoch} slot, the
+    \item New handling of reference dates in \code{algo.farrington()} for
+    \code{"sts"} objects with \code{epochAsDate=TRUE}. Instead of always
+    going back in time to the next Date in the \code{"epoch"} slot, the
     function now determines the \emph{closest} Date. Note that this
-    might light to slightly different results for the upperbound
+    might lead to slightly different results for the upperbound
     compared to previously. Furthermore, the functionality is only
     tested for weekly data (monthly data are experimental). The same
     functionality applies to \code{farringtonFlexible()}.
@@ -111,19 +111,19 @@
 
 \subsection{BUG FIXES}{
   \itemize{
-    \item \code{algo.farrington}: Fixed a bug in function
-    \code{refvalIdxByDate} which produced empty reference values
-    (i.e. NAs) in case the Date entries of \code{epoch} were not
+    \item Fixed a bug in function
+    \code{refvalIdxByDate()} which produced empty reference values
+    (i.e. \code{NA}s) in case the Date entries of \code{epoch} were not
     mondays. Note: The function works by subtracting \code{1:b} years from the
     date of the range value and then takes the span \code{-w:w} around this
     value. For each value in this set it is determined whether the
     closest date in the epoch slot is obtained by going forward or
     backward. Note that this behaviour is now slightly changed compared
-    to previously, where we _always_ went back in time.
+    to previously, where we \emph{always} went back in time.
 
-    \item \code{algo.farrington} Reference values too far back in time
-    and hence not being in the \code{epoch} slot of the \code{sts}
-    object are now ignored (previously the resulting NAs caused the
+    \item \code{algo.farrington()}: Reference values too far back in time
+    and hence not being in the \code{"epoch"} slot of the \code{"sts"}
+    object are now ignored (previously the resulting \code{NA}s caused the
     function to halt). A warning is displayed in this case.
     
     \item \code{hhh4}: The entry \eqn{(5,6)} of the marginal Fisher
