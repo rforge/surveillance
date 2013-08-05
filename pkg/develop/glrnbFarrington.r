@@ -235,7 +235,7 @@ glrnbFarrington <- function(sts, control = list(range = NULL, b = 3, w = 3,
 					                          fitFun=control$fitFun,
 											  glmWarnings=control$glmWarnings,epochAsDate,
 					                          dayToConsider,dataPred=dataPred,verbose=control$verbose)
-			
+				
 			# Get mu0 and alpha from the fitted model for the CUSUM
 			mu0 <- finalModel$pred$fit
 
@@ -386,10 +386,10 @@ algo.glmNB <- function(dataGLM,timeTrend,populationOffset,sinCos,
 	
 	# if model converged with time trend 
 	if ("wtime" %in% names(coef(model))){
-
+		
 		# get the prediction for range
 		pred <- predict.glm(model,newdata=dataPred,se.fit=TRUE,type="response")
-									 
+							 
 		# check if three criterion ok
 		
 		 #is the p-value for the trend significant (0.05) level
@@ -400,7 +400,7 @@ algo.glmNB <- function(dataGLM,timeTrend,populationOffset,sinCos,
 		#no horrible predictions
 
 		noExtrapolation <- (sum(pred$fit > max(dataGLM$response))==0)
-			
+		
 		#All 3 criteria have to be met in order to include the trend. Otherwise
 		#it is removed. Only necessary to check this if a trend is requested.
 		doTrend <- (atLeastThreeYears && significant && noExtrapolation) 
@@ -416,7 +416,7 @@ algo.glmNB <- function(dataGLM,timeTrend,populationOffset,sinCos,
 		doTrend <- FALSE
 	}
 
-	
+
 	#done with time trend
 	######################################################################
 
@@ -465,11 +465,12 @@ glrnb.data.glm <- function(dayToConsider, b,
 								as.numeric(vectorOfDates[blockIndexes][1]))/as.numeric(diff(vectorOfDates))[1] +1
 
 
-	trigo.t <- sin(2*pi*wtime/freq)+ cos(2*pi*wtime/freq)
+	cos.t <-  cos(2*pi*wtime/freq)
+	sin.t <- sin(2*pi*wtime/freq)
 	
 	dataGLM <- data.frame(response=response,wtime=wtime,population=pop,
 						 vectorOfDates=vectorOfDates[blockIndexes],
-						 trigo.t=trigo.t)
+						 cos.t=cos.t,sin.t=sin.t)
 	
 	return(dataGLM)
 
@@ -507,7 +508,7 @@ formulaGLM.glrnb <- function(populationOffset=FALSE,timeBool=TRUE,sinCos=TRUE){
   # With sinus cosinus?
 
   if(sinCos){
-  formulaString <- paste(formulaString,"+ trigo.t",sep ="")}
+  formulaString <- paste(formulaString,"+ cos.t +sin.t",sep ="")}
 
 
   # Return formula as a string
@@ -645,15 +646,15 @@ timeTrend,populationOffset,sinCos,reweight,weightsThreshold,glmWarnings,verbose,
     
     #Add wtime, response and phi to the model
     model$phi <- phi
+	
 	model$theta <- model$theta
     model$wtime <- dataGLM$wtime
     model$response <- dataGLM$response
     model$population <- dataGLM$population
     if (reweight) {
 	model$weights <- omega
-    } else{
-    model$weights <- NA
-    }
+     }
+	
     #Done
     return(model)
 
@@ -679,11 +680,12 @@ glrnb.pred.glm <- function(dayToConsider,timeN,vectorOfDates,observed,population
 								as.numeric(vectorOfDates[blockIndexes][1]))/as.numeric(diff(vectorOfDates))[1] +timeOne+1
 
 
-	trigo.t <- sin(2*pi*wtime/freq)+ cos(2*pi*wtime/freq)
+	cos.t <-  cos(2*pi*wtime/freq)
+	sin.t <- sin(2*pi*wtime/freq)
 	
 	dataPred <- data.frame(response=response,wtime=wtime,population=pop,
 						 vectorOfDates=vectorOfDates[blockIndexes],
-						 trigo.t=trigo.t)
+						 cos.t=cos.t,sin.t=sin.t)
 	
 	return(dataPred)
 
