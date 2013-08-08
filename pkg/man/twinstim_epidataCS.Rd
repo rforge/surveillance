@@ -117,8 +117,8 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
     an object of class \code{"\linkS4class{SpatialPolygons}"} indicating the
     observation region. Must have the same \code{proj4string} as \code{events}
     and all events must be within \code{W}.
-    The function \code{\link{simplify.owin}} 
-    from the package \pkg{spatstat} may be useful if polygonal operations take
+    The function \code{\link[spatstat]{simplify.owin}} 
+    from package \pkg{spatstat} may be useful if polygonal operations take
     too long or memory is limited (see also the \dQuote{Note} section below).
   }
 

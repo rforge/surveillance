@@ -7,7 +7,7 @@
 
 
 
-\section{Changes in surveillance version 1.6-0 (2013-07-31)}{
+\section{Changes in surveillance version 1.6-0 (2013-08-08)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -81,6 +81,10 @@
 
     \item \code{pit()} allows for a list of predictive distributions
     (\code{pdistr}), one for each observation \code{x}.
+
+    \item New spatial auxiliary function \code{polyAtBorder()}
+    indicating polygons at the border (for a \code{"SpatialPolygons"}
+    object).
   }
 }
 

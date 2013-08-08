@@ -108,6 +108,7 @@ export(inside.gpc.poly)
 S3method(scale, gpc.poly)   # redefined method for gpc.poly in spatial_stuff.R
 export(nbOrder)
 export(poly2adjmat)
+export(polyAtBorder)
 
 # randomly break tied event times or coordinates
 export(untie)                           # new S3-generic
