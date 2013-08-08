@@ -206,13 +206,13 @@ checksiaf <- function (siaf, pargrid, type=1)
 }
 
 checksiaf.Fcircle <- function (Fcircle, f, pargrid, type=1,
-                               B=20, rmax=100, nGQ=30)
+                               rs=runif(20, 0, 100), nGQ=30)
 {
-    pargrid <- pargrid[rep(1:nrow(pargrid), B),]
-    rpargrid <- cbind(runif(B, 0, rmax), pargrid)
+    pargrid <- pargrid[rep(1:nrow(pargrid), each=length(rs)),,drop=FALSE]
+    rpargrid <- cbind(rs, pargrid, deparse.level=0)
     res <- t(apply(rpargrid, 1, function (x) {
         c(ana = Fcircle(x[1], x[-1], type),
-          num = polyCub.SV(discpoly(c(0,0), x[1], class="owin"),
+          num = polyCub.SV(discpoly(c(0,0), x[1], npoly=128, class="owin"),
                            function (s) f(s, x[-1], type),
                            alpha=0, nGQ=nGQ))
     }))
