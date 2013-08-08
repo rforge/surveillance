@@ -127,9 +127,10 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     # Also precalculate possible origins of events (other infected individuals)
     cat("Mapping events to 'stgrid' cells and",
         "determining potential event sources...\n")
+    withPB <- interactive()
     gridcellsOfEvents <- integer(nEvents)
     eventSources <- vector(nEvents, mode = "list")
-    pb <- txtProgressBar(min=0, max=nEvents, initial=0, style=3)
+    if (withPB) pb <- txtProgressBar(min=0, max=nEvents, initial=0, style=3)
     for (i in seq_len(nEvents)) {
         idx <- gridcellOfEvent(events$time[i], events$tile[i], stgrid)
         if (is.na(idx)) {
@@ -140,9 +141,9 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
         eventSources[[i]] <- determineSources(
             i, events$time, removalTimes, eventDists[i,], events$eps.s, events$type, qmatrix
         )
-        setTxtProgressBar(pb, i)
+        if (withPB) setTxtProgressBar(pb, i)
     }
-    close(pb)
+    if (withPB) close(pb)
 
     # Attach endemic covariates from stgrid to events
     cat("Attaching endemic covariates from 'stgrid' to 'events'...\n")
