@@ -18,7 +18,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
          na.action = na.fail, start = NULL, partial = FALSE,
          control.siaf = list(F = list(), Deriv = list()),
          optim.args = list(), finetune = FALSE,
-         model = FALSE, cumCIF = TRUE, cumCIF.pb = TRUE, verbose = TRUE)
+         model = FALSE, cumCIF = TRUE,
+         cumCIF.pb = interactive(), verbose = TRUE)
 }
 
 \arguments{
@@ -223,7 +224,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   }
   \item{cumCIF.pb}{
     logical indicating if a progress bar should be shown
-    during the calculation of \code{cumCIF}. Defaults to \code{TRUE}.
+    during the calculation of \code{cumCIF}. Defaults to do so in an
+    interactive \R session.
   }
   \item{verbose}{
     logical indicating if information should be printed during
