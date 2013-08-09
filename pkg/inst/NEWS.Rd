@@ -7,7 +7,7 @@
 
 
 
-\section{Changes in surveillance version 1.6-0 (2013-08-08)}{
+\section{Changes in surveillance version 1.6-0 (2013-08-09)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -169,6 +169,9 @@
     updated but not \code{@epoch}.
 
     \item \code{pit} gave \code{NA} results if any \code{x[-1]==0}.
+
+    \item The returned \code{optim.args$par} vector in \code{twinstim()}
+    was missing any fixed parameters.
   }
 }
 

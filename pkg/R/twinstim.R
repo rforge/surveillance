@@ -1297,7 +1297,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
     
     ### Append optimizer configuration
-    
+
+    optim.args$par <- initpars        # reset to also include fixed coefficients
     fit$optim.args <- optim.args
     if (model) {
         fit$functions <- functions
