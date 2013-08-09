@@ -916,6 +916,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         optim.args$par[names(start)] <- start
     }
 
+    initpars <- optim.args$par
+
 
     ### Fixed parameters during optimization
 
@@ -931,9 +933,9 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             stopifnot(fixed %in% seq_len(npars))
             fixed
         } else if (is.character(fixed)) {
-            if (any(!fixed %in% names(optim.args$par)))
+            if (any(!fixed %in% names(initpars)))
                 stop("'optim.args$fixed' must be a subset of: ",
-                     paste0("\"",names(optim.args$par), "\"", collapse=", "))
+                     paste0("\"",names(initpars), "\"", collapse=", "))
             fixed
         } else if (is.logical(fixed)) {
             stopifnot(length(fixed) == npars)
@@ -942,8 +944,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             stop("'optim.args$fixed' must be a numeric, character or logical vector")
         }
     }
-    fixed <- logical(npars)   # FALSE
-    names(fixed) <- names(optim.args$par)
+    fixed <- setNames(logical(npars), names(initpars)) # FALSE
     fixed[whichfixed] <- TRUE
     fixedsiafpars <- hassiafpars && all(fixed[paste("e.siaf", 1:nsiafpars, sep=".")])
     fixedtiafpars <- hastiafpars && all(fixed[paste("e.tiaf", 1:ntiafpars, sep=".")])
@@ -968,7 +969,6 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
 
     if (any(fixed)) {
         ## modify negll, negsc and neghess for subvector optimization
-        initpars <- optim.args$par
         optim.args$par <- initpars[!fixed]
         if (verbose) {
             if (all(fixed)) {
