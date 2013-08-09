@@ -1093,41 +1093,42 @@ update.twinstim <- function (object, endemic, epidemic,
             return(.update.twinstim.model(object, model))
         }
     }
+
+    ## CAVE: we don't use object$formula directly since we also use
+    ## update.twinstim() with twinstim_step* objects (where object$formula is
+    ## not a list but one of endemic or epidemic).
     if (!missing(endemic))
-        call$endemic <- if (is.null(call$endemic)) endemic else {
-            update.formula(call$endemic, endemic)
-            ##<- update.formula did simplify but order of terms is retained
-        }
+        call$endemic <- if (is.null(call$endemic))
+            endemic else update.formula(call$endemic, endemic)
     if (!missing(epidemic))
-        call$epidemic <- if (is.null(call$epidemic)) epidemic else {
-            update.formula(call$epidemic, epidemic)
-        }
+        call$epidemic <- if (is.null(call$epidemic))
+            epidemic else update.formula(call$epidemic, epidemic)
+    ## Note: update.formula uses terms.formula(...,simplify=TRUE), but
+    ##       the principle order of terms is retained. Offsets will be moved to 
+    ##       the end and a missing intercept will be denoted by a final -1.
+    
     if (!missing(control.siaf))
-        call$control.siaf <- if (is.null(call$control.siaf)) control.siaf else {
-            modifyList(eval.parent(call$control.siaf), control.siaf)
-        }
-    if (!missing(optim.args)) {
-        call["optim.args"] <- list(     # use list() to enable optim.args=NULL
-            if (is.list(optim.args)) {
-                modifyList(object$optim.args, optim.args)
-            } else optim.args           # = NULL
-            )
+        call$control.siaf <- modifyList(object$control.siaf, control.siaf)
+    
+    call["optim.args"] <- if (missing(optim.args)) object["optim.args"] else {
+        list( # use list() to enable optim.args=NULL
+             if (is.list(optim.args)) {
+                 modifyList(object$optim.args, optim.args)
+             } else optim.args           # = NULL
+             )
     }
     ## Set initial values (will be appropriately subsetted and/or extended with
     ## zeroes inside twinstim())
-    if (use.estimates)
-        call$start <- coef(object)
-    if ((missing(optim.args) || !"par" %in% names(optim.args)) &&
-        !is.null(call$optim.args$par)) {
-        ## old par-vector usually doesn't match updated model, thus we move
-        ## it into start-vector (actually only useful if it was named)
-        call$start <- call("c", call$optim.args$par, call$start)
+    call$start <- if (missing(optim.args) ||
+                      (!is.null(optim.args) && !"par" %in% names(optim.args))) {
+        ## old optim.args$par probably doesn't match updated model,
+        ## thus we set it as "start"-argument
         call$optim.args$par <- NULL
-    }
+        if (use.estimates) coef(object) else object$optim.args$par
+    } else NULL
     if ("start" %in% names(extras)) {
-        call$start <- call("c", call$start, extras$start)
-        ##<- if names appear both in the first and second set, the last
-        ##   occurrence will be chosen in twinstim()
+        newstart <- eval.parent(extras$start)
+        call$start[names(newstart)] <- newstart
         extras$start <- NULL
     }
     ## CAVE: the remainder is copied from stats::update.default (as at R-2.15.0)

@@ -88,7 +88,8 @@ stepComponent <- function (object, component = c("endemic", "epidemic"),
     object_step <- do.call(paste0("twinstim_step", component), alist(object))
     
     ## silent optimizations
-    if (trace <= 2) object_step$call$optim.args$control$trace <- 0
+    if (trace <= 2) object_step$call$optim.args$control$trace <-
+        object_step$optim.args$control$trace <- 0
     object_step$call$verbose <- verbose
 
     ## Run the selection procedure
@@ -96,7 +97,10 @@ stepComponent <- function (object, component = c("endemic", "epidemic"),
                 trace = trace, ...)
     
     ## Restore original trace and verbose arguments
-    if (trace <= 2) res$call$optim.args <- object$call$optim.args
+    if (trace <= 2) {
+        res$call$optim.args$control <- object$call$optim.args$control
+        res$optim.args$control <- object$optim.args$control
+    }
     res$call$verbose <- object$call$verbose
 
     ## Convert back to original class
