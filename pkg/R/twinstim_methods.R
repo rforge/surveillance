@@ -1094,7 +1094,7 @@ update.twinstim <- function (object, endemic, epidemic,
         }
     }
 
-    ## CAVE: we don't use object$formula directly since we also use
+    ## FIXME: we don't use object$formula directly since we also use
     ## update.twinstim() with twinstim_step* objects (where object$formula is
     ## not a list but one of endemic or epidemic).
     if (!missing(endemic))
@@ -1108,7 +1108,8 @@ update.twinstim <- function (object, endemic, epidemic,
     ##       the end and a missing intercept will be denoted by a final -1.
     
     if (!missing(control.siaf))
-        call$control.siaf <- modifyList(object$control.siaf, control.siaf)
+        call$control.siaf <- if (is.null(object$control.siaf)) # if constantsiaf
+            control.siaf else modifyList(object$control.siaf, control.siaf)
     
     call["optim.args"] <- if (missing(optim.args)) object["optim.args"] else {
         list( # use list() to enable optim.args=NULL

@@ -1293,7 +1293,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     fit$timeRange <- c(t0, T)           # for simulate.twinstim's defaults
     fit$formula <- list(endemic = endemic, epidemic = epidemic,
                         siaf = siaf, tiaf = tiaf)
-    fit$control.siaf <- control.siaf
+    fit$control.siaf <- control.siaf    # might be NULL
 
     
     ### Append optimizer configuration
