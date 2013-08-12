@@ -1094,15 +1094,17 @@ update.twinstim <- function (object, endemic, epidemic,
         }
     }
 
-    ## FIXME: we don't use object$formula directly since we also use
-    ## update.twinstim() with twinstim_step* objects (where object$formula is
-    ## not a list but one of endemic or epidemic).
-    if (!missing(endemic))
-        call$endemic <- if (is.null(call$endemic))
-            endemic else update.formula(call$endemic, endemic)
-    if (!missing(epidemic))
-        call$epidemic <- if (is.null(call$epidemic))
-            epidemic else update.formula(call$epidemic, epidemic)
+    ## Why we no longer use call$endemic but update object$formula$endemic:
+    ## call$endemic would be an unevaluated expression eventually receiving the
+    ## parent.frame() as environment, cp.: 
+    ##(function(e) {ecall <- match.call()$e; eval(call("environment", ecall))})(~1+start)
+    ## This could cause large files if the fitted model is saved.
+    ## Furthermore, call$endemic could refer to some object containing
+    ## the formula, which is no longer visible.    
+    call$endemic <- if (missing(endemic)) object$formula$endemic else
+        update.formula(object$formula$endemic, endemic)
+    call$epidemic <- if (missing(epidemic)) object$formula$epidemic else
+        update.formula(object$formula$epidemic, epidemic)
     ## Note: update.formula uses terms.formula(...,simplify=TRUE), but
     ##       the principle order of terms is retained. Offsets will be moved to 
     ##       the end and a missing intercept will be denoted by a final -1.

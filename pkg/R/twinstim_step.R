@@ -14,31 +14,45 @@
 
 ### To make step() work, we are dealing with modified twinstim objects:
 ### object$formula is replaced by the result of terms(object), which selects only
-### one of the two components!
+### one of the two components! The original full formula specification is
+### retained in the new "formulae" component.
 ### We let this special class inherit from "twinstim" such that, e.g.,
 ### extractAIC.twinstim is used for its objects. However, this is tricky since
 ### the classes are actually incompatible in the formula specification. Only
 ### methods which don't use the $formula part work, but this constraint holds
-### for what is needed to run step().
+### for what is needed to run step(), if we define some additional specific
+### methods for this class.
 
 twinstim_stependemic <- twinstim_stepepidemic <- function (object)
 {
-    stepclass <- grep("twinstim_step", sys.call()[[1L]], value=TRUE)
+    stepClass <- grep("twinstim_step", sys.call()[[1L]], value=TRUE)
     ##<- since sys.call()[[1L]] may also be surveillance:::...
     if (identical(class(object), "twinstim")) {
-        class(object) <- c(stepclass, "twinstim")
-        object$formula <- object$formula[[sub("twinstim_step", "", stepclass)]]
-    } else if (!inherits(object, stepclass)) stop("unintended use")
+        component <- sub("twinstim_step", "", stepClass)
+        object$formulae <- object$formula
+        object$formula <- object$formulae[[component]]
+        class(object) <- c(stepClass, "twinstim")
+    } else if (!inherits(object, stepClass)) stop("unintended use")
     object
 }
 
 
 ## In the first step() loop, object$call$formula is set to terms(object). Since
 ## there is no "formula" argument to twinstim(), we must remove it from the call
-## before update()ing
-.drop.formula.from.call <- function (object)
+## before update()ing. We also have to convert object$formula to the complete
+## formula specification (a named list) and remove the original one ($formulae).
+.step2twinstim <- function (object)
 {
+    ##if (identical(class(object), "twinstim")) return(object)
+    component <- sub("^twinstim_step", "", class(object)[1])
+    stopifnot(component %in% c("endemic", "epidemic"))
     object$call$formula <- NULL
+    object$formula <- modifyList(
+        object$formulae,
+        setNames(list(formula(object$formula)), component)
+        )
+    object$formulae <- NULL
+    class(object) <- "twinstim"
     object
 }
 
@@ -47,21 +61,21 @@ twinstim_stependemic <- twinstim_stepepidemic <- function (object)
 
 update.twinstim_stependemic <- function (object, endemic, ..., evaluate = TRUE)
 {
+    ## object <- .step2twinstim(object); res <- NextMethod()
     cl <- match.call(expand.dots=TRUE)
     cl[[1L]] <- as.name("update.twinstim")
-    cl$object <- as.call(list(quote(surveillance:::.drop.formula.from.call),
-                              cl$object))
+    cl$object <- as.call(list(quote(surveillance:::.step2twinstim), cl$object))
     res <- eval.parent(cl)
     
     ## we need to keep the special class such that step() will keep invoking
     ## the special update- and terms-methods on the result
-    stepclass <- sub("update.", "", .Method, fixed=TRUE)
+    stepClass <- sub("update.", "", .Method, fixed=TRUE)
     ##<- or: .Class[1L], or: grep("step", class(object), value=TRUE)
     if (evaluate) {
-        do.call(stepclass, alist(res))
+        do.call(stepClass, alist(res))
     } else {
         substitute(surveillance:::FUN(res),
-                   list(FUN=as.name(stepclass), res=res))
+                   list(FUN=as.name(stepClass), res=res))
     }
 }
 
@@ -104,13 +118,7 @@ stepComponent <- function (object, component = c("endemic", "epidemic"),
     res$call$verbose <- object$call$verbose
 
     ## Convert back to original class
-    newformula <- formula(res$formula)
-    res$formula <- object$formula
-    res$formula[[component]] <- newformula
-    class(res) <- class(object)
-
-    ## Done (assure to have no call$formula element)
-    .drop.formula.from.call(res)
+    .step2twinstim(res)
 }
 
 
