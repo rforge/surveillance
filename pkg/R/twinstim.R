@@ -44,7 +44,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     on.exit(suppressWarnings(rm(cl, cumCIF, cumCIF.pb, data, doHessian,
         eventDists, eventsData, finetune, neghess, fisherinfo, fit, fixed,
         functions, globalEndemicIntercept, h.Intercept, inmfe, initpars,
-        ll, negll, loglik, 
+        ll, negll, loglik, msgConvergence, msgNotConverged,
         mfe, mfhEvents, mfhGrid, model, my.na.action, na.action, namesOptimUser,
         namesOptimArgs, nlminbControl, nlminbRes, nlmObjective, nlmControl,
         nlmRes, nmRes, optim.args, optimArgs, control.siaf,
@@ -367,7 +367,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             ## score for the same set of parameters at the end of each iteration
         } else {
             if (!constantsiaf && verbose)
-                cat("Continuing without memoisation of 'siaf$f' cubature ...\n")
+                message("Continuing without memoisation of 'siaf$f' cubature ...")
             ## However, trivial caching is used manually in case of fixed
             ## "siafpars" and in LambdagEvents()
             .siafInt
@@ -785,7 +785,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 unname(hInt_blocks[.idx])   # Nin-vector
             } else 0
         eInts <- if (hase) { # epidemic component
-                siafInt <- do.call(".siafInt", .siafInt.args) # N-vector
+                siafInt <- do.call("..siafInt", .siafInt.args) # N-vector
                 gs <- gammapred * siafInt # N-vector
                 sapply(includes, function (i) {
                     timeSources <- determineSources(i, eventTimes, removalTimes,
@@ -996,15 +996,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         if (fixedsiafpars) {
             if (verbose) cat("pre-evaluating 'siaf' integrals with fixed parameters ...\n")
             .siafInt.args[[1]] <- initpars[paste("e.siaf", 1:nsiafpars, sep=".")]
-            siafInt <- do.call(".siafInt", .siafInt.args)
-            ## re-define .siafInt such that it just returns the pre-evaluated integrals
-            .siafInt.orig <- .siafInt
-            body(.siafInt) <- expression(siafInt)
-            ## restore the original function at the end
-            on.exit({
-                .siafInt <- .siafInt.orig
-                rm(.siafInt.orig)
-            }, add=TRUE)
+            siafInt <- do.call("..siafInt", .siafInt.args) # ..siafInt is memoise()d
         }
         if (fixedtiafpars) {
             if (verbose) cat("pre-evaluating 'tiaf' integrals with fixed parameters ...\n")
@@ -1253,12 +1245,6 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     # Note: this function is also used by residuals.twinstim
     LambdagEvents <- function (cumCIF.pb = TRUE)
     {
-        if (hase) {
-            ## tiny hack such that siaf integrals are not evaluated N-fold
-            .siafInt.orig <- .siafInt
-            body(.siafInt) <<- expression(siafInt)
-            on.exit(.siafInt <<- .siafInt.orig)
-        }
         heIntEvents <- matrix(NA_real_, Nin, 2L)
         if (cumCIF.pb) pb <- txtProgressBar(min=0, max=Nin, initial=0, style=3)
         for (i in 1:Nin) {
