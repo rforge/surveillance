@@ -7,7 +7,7 @@
 
 
 
-\section{Changes in surveillance version 1.6-0 (2013-08-09)}{
+\section{Changes in surveillance version 1.6-0 (2013-08-13)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -172,6 +172,10 @@
 
     \item The returned \code{optim.args$par} vector in \code{twinstim()}
     was missing any fixed parameters.
+
+    \item \code{hhh4()} did not work with time-varying neighbourhood
+    weights due to an error in the internal \code{checkWeightsArray()}
+    function.
   }
 }
 

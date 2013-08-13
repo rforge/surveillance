@@ -33,10 +33,12 @@ checkWeightsArray <- function (W, nUnits, nTime, name)
     if (any(dim(W)[1:2] != nUnits) || isTRUE(dim(W)[3] != nTime))
         stop("'", name, "' must conform to dimensions ",
              nUnits, " x ", nUnits, " (x ", nTime, ")")
-    if (any(!diag(W) %in% 0))
-        stop("'diag(", name, ")' must only contain zeroes")
     if (any(is.na(W)))
         stop("missing values in '", name, "' are not allowed")
+    diags <- if (is.matrix(W)) diag(W) else apply(W, 3, diag)
+    if (any(diags != 0))
+        stop("'", name, "' must only contain zeroes on the diagonal",
+             if (!is.matrix(W)) "s")
 }
 
 checkWeights <- function (weights, nUnits, nTime,

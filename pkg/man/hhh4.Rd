@@ -89,8 +89,11 @@ hhh4(stsObj,
 	  \item{lag = 1}{autoregression on \eqn{y_{j,t-lag}}{y_j,t-lag}  
 	    (currently only \code{lag = 1} is possible)}
 	  \item{weights = neighbourhood(stsObj)}{
-	    weights \eqn{w_{ji}}{w_ji}. By default, 
-	    the neighbourhood matrix of \code{stsObj} is used.}
+	    neighbourhood weights \eqn{w_{ji}}{w_ji}. By default, 
+	    the neighbourhood slot of \code{stsObj} is used.
+	    Time-varying weights are possible by specifying an
+	    array of \code{dim()} \code{c(nUnits, nUnits, nTime)}, where
+	    \code{nUnits=ncol(stsObj)} and \code{nTime=nrow(stsObj)}.}
 	  \item{initial = NULL}{vector with initial values for
 	    parameter if \code{f = ~1} (not really used ATM)}
 	}
