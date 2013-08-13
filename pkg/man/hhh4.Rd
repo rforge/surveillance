@@ -211,6 +211,7 @@ model1 <- list(ar = list(f = ~ 1), end = list(f =f.end),
 res <- hhh4(salmonella, model1)
 summary(res, idx2Exp=1, amplitudeShift=TRUE)
 
+
 ## multivariate time series: 
 # measles cases in Lower Saxony, Germany
 data(measles.weser)
@@ -237,7 +238,23 @@ model3 <- list(ar = list(f = ~ 1),
                end = list(f = f.end3, offset= population(measles)),
                family = "NegBin1")
 # run model
-summary(hhh4(measles, control=model3), idx2Exp=1:2, amplitudeShift=TRUE)
+res3 <- hhh4(measles, control=model3)
+summary(res3, idx2Exp=1:2, amplitudeShift=TRUE)
+
+\dontshow{
+## check that neighbourhood weights array yields same result
+.neweights <- array(neighbourhood(measles),
+                   dim = c(rep(ncol(measles),2),nrow(measles)),
+                   dimnames = c(dimnames(neighbourhood(measles)), list(NULL)))
+res3_tv <- hhh4(measles, control = modifyList(model3,
+                list(ne=list(weights=.neweights))))
+.disregardComponents <- function(ah4) {
+    ah4["call"] <- list(NULL)
+    ah4$control$ne["weights"] <- list(NULL)
+    ah4
+}
+stopifnot(all.equal(.disregardComponents(res3), .disregardComponents(res3_tv)))
+}
 
 \dontrun{
 ######################################################################
