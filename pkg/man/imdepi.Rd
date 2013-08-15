@@ -106,9 +106,9 @@ data(imdepifit)
 }
 
 \source{
-  National Reference Centre for Meningococci (NRZM) -- hosted by the
+  German Reference Centre for Meningococci (NRZM) -- hosted by the
   Department of Hygiene and Microbiology,
-  Julius-Maximilians-Universit\enc{ä}{ae}t W\enc{ü}{ue}rzburg, Germany.
+  Julius-Maximilians-Universit\enc{ä}{ae}t W\enc{ü}{ue}rzburg, Germany.\cr
   Thanks to Dr. Johannes Elias and Prof. Dr. Ulrich Vogel from the NRZM
   for providing the IMD event data. See \url{http://www.meningococcus.de/}
   and \url{http://episcangis.hygiene.uni-wuerzburg.de/} for further
