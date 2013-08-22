@@ -138,8 +138,8 @@ siaf.constant <- function ()
            ## simulation will be handled specially in simEpidataCS, this is only
            ## included here for completeness
            simulate = as.function(alist(n=, pars=NULL, type=NULL, ub=,
-                                        surveillance:::runifdisc(n, ub)),
-                                  envir = .GlobalEnv),
+                                        runifdisc(n, ub)),
+                                  envir = getNamespace("surveillance")),
            npars = 0L
     )
     attr(res, "constant") <- TRUE

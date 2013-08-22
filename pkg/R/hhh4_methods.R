@@ -119,13 +119,14 @@ logLik.ah4 <- function(object,...){
    return(val)
 }
 
-AIC.ah4 <- function (object, ..., k = 2){
-  if(object$dim["random"]==0){
-	stats:::AIC.default(object, ..., k=k)
-  } else {
-	warning("AIC not well defined for models with random effects.\n")
-    return(NULL)
-  }
+AIC.ah4 <- function (object, ..., k = 2)
+{
+    if(object$dim["random"]==0){
+        NextMethod("AIC")
+    } else {
+	warning("AIC not well defined for models with random effects")
+        NA_real_
+    }
 }
 
 coef.ah4 <- function(object, se=FALSE, reparamPsi=TRUE, idx2Exp=NULL,
@@ -198,7 +199,8 @@ ranef.ah4 <- function(object, tomatrix = FALSE, ...){
   } else return(NULL)
   if (!tomatrix) return(ranefvec)
 
-  model <- surveillance:::interpretControl(object$control,object$stsObj)
+  ## transform to a nUnits x c matrix (c %in% 1:3)
+  model <- interpretControl(object$control,object$stsObj)
   idxRE <- model$indexRE
   idxs <- unique(idxRE)
   names(idxs) <- model$namesFE[idxs]
