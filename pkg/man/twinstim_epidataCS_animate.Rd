@@ -21,8 +21,8 @@ Spatio-Temporal Animation of a Continuous-Time Continuous-Space Epidemic
 \usage{
 \method{animate}{epidataCS}(object, interval = c(0,Inf), time.spacing = NULL,
         nmax = NULL, sleep = NULL, legend.opts = list(), timer.opts = list(),
-        pch = 15:18, col.current = "red", col.I = "#C16E41", col.R = "#B3B3B3",
-        col.influence = "#FEE0D2", ...)
+        pch = 15:18, col.current = "red", col.I = "#C16E41",
+        col.R = "#B3B3B3", col.influence = "#FEE0D2", main = NULL, ...)
 }
 
 \arguments{
@@ -91,6 +91,7 @@ Spatio-Temporal Animation of a Continuous-Time Continuous-Space Epidemic
     then recovered events will not be shown.}
   \item{col.influence}{color with which the influence region is drawn. Use
     \code{NA} if no influence regions should be drawn.}
+  \item{main}{optional main title placed above the map.}
   \item{\dots}{
     further graphical parameters passed to the plot-method of the
     \code{\link{SpatialPolygons-class}}.

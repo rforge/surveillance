@@ -315,7 +315,7 @@ print.summary.epidataCS <- function (x, ...)
 animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
     nmax = NULL, sleep = NULL, legend.opts = list(), timer.opts = list(),
     pch = 15:18, col.current = "red", col.I = "#C16E41", col.R = "#B3B3B3",
-    col.influence = "#FEE0D2", ...)
+    col.influence = "#FEE0D2", main = NULL, ...)
 {
     stopifnot(is.numeric(interval), length(interval) == 2L)
     with.animation <- suppressWarnings(require("animation"))
@@ -416,6 +416,7 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
         infectious <- I(t)
         removed <- R(t)
         plot(object$W, ...)
+        title(main = main)
         if (doLegend) do.call(legend, legend.opts)
         if (doTimer) {
             ttxt <- sprintf(timerformat, t)
