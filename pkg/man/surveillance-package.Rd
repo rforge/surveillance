@@ -102,7 +102,7 @@
   Marc Geilhufe, Kurt Hornik, Marcos Prates, Brian D. Ripley,
   Barry Rowlingson, Christopher W. Ryan,
   Klaus Stark, Yann Le Strat, Andr\enc{é}{e} Michael Toschke,
-  Achim Zeileis.
+  Wei Wei, Achim Zeileis.
 }
 
 \author{

@@ -315,7 +315,7 @@ print.summary.epidataCS <- function (x, ...)
 animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
     nmax = NULL, sleep = NULL, legend.opts = list(), timer.opts = list(),
     pch = 15:18, col.current = "red", col.I = "#C16E41", col.R = "#B3B3B3",
-    col.influence = "#FEE0D2", main = NULL, ...)
+    col.influence = "#FEE0D2", main = NULL, verbose = TRUE, ...)
 {
     stopifnot(is.numeric(interval), length(interval) == 2L)
     with.animation <- suppressWarnings(require("animation"))
@@ -411,6 +411,8 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
         } else idxs
     }
     told <- -Inf
+    if (verbose)
+        pb <- txtProgressBar(min=0, max=max(loopIndex), initial=0, style=3)
     for(it in loopIndex) {
         t <- if (sequential) s$eventTimes[it] else it
         infectious <- I(t)
@@ -439,8 +441,10 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
         iTableNew <- eventCoordsTypes[infectiousNew,,drop=FALSE]
         if (nrow(iTableNew) > 0L) multpoints(iTableNew, col = col.current)
         told <- t
+        if (verbose) setTxtProgressBar(pb, it)
         Sys.sleep(sleep)
     }
+    if (verbose) close(pb)
     invisible(NULL)
 }
 
