@@ -13,7 +13,6 @@
 % FIXME: functions without documentation atm
 %% \alias{print.summary.ah4}
 %% \alias{plot.ah4}
-%% \alias{predict.ah4}
 %% \alias{update.ah4}
 
 \title{
