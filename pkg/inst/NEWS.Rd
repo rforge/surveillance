@@ -7,7 +7,7 @@
 
 
 
-\section{Changes in surveillance version 1.6-0 (2013-08-13)}{
+\section{Changes in surveillance version 1.6-0 (2013-08-28)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -55,6 +55,9 @@
     \item Re-implementation of \code{oneStepAhead()} for
     \code{hhh4}-models with a bug fix, some speed-up and more options.
 
+    \item Slight speed-up for \code{hhh4()} and \code{twinstim()} fits,
+    e.g., by more use of \code{.rowSums()} and \code{.colSums()}.
+
     \item Some further new features, minor changes, and bug fixes are
     described in the following subsections.
   }
@@ -85,6 +88,9 @@
     \item New spatial auxiliary function \code{polyAtBorder()}
     indicating polygons at the border (for a \code{"SpatialPolygons"}
     object).
+
+    \item \code{animate.epidataCS()} allows for a \code{main} title and
+    can show a progress bar.
   }
 }
 

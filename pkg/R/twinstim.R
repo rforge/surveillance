@@ -510,11 +510,10 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             ncolsRes = 1L, score = matrix(1,N,ncolsRes), f = siaf$f, g = tiaf$g)
             # second line arguments are for score functions with defaults for loglik
         {
-            e <- matrix(0, N, ncolsRes)
-            for (i in includes) {
+            e <- sapply(includes, function (i) {
                 sources <- eventSources[[i]]
                 nsources <- length(sources)
-                e[i,] <- if (nsources == 0L) 0 else {
+                if (nsources == 0L) rep.int(0, ncolsRes) else {
                     scoresources <- score[sources,,drop=FALSE]
                     predsources <- gammapred[sources]
                     repi <- rep.int(i, nsources)
@@ -526,8 +525,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                     .colSums(scoresources * predsources * fsources * gsources,
                              nsources, ncolsRes)
                 }
-            }
-            e[includes,,drop=nargs()==3L]   # drop = TRUE for loglik
+            }, USE.NAMES=FALSE)         # result is a vector if ncolsRes=1 !!!
+            if (ncolsRes == 1L) e else t(e)
         }
     }
 
@@ -658,8 +657,9 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         {
             score_gamma <- local({
                 nom <- .eEvents(gammapred, siafpars, tiafpars,
-                                ncolsRes=q, score=mme)
+                                ncolsRes=q, score=mme) # Nin-vector if q=1
                 sEventsSum <- .colSums(nom / lambdaEvents, Nin, q)
+                            # |-> dotted version also works for vector-arguments
                 sInt <- .colSums(mme * (qSum * gammapred * siafInt * tiafInt), N, q)
                 sEventsSum - sInt
             })
