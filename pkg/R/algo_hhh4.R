@@ -906,7 +906,8 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
   lpen <- c(lpen)                       # drop 1x1 matrix dimensions
   
   ## log-likelihood
-  ll.units <- .colSums(model$family(Y,mu,psi), nTime, nUnits, na.rm=TRUE)
+  ll.units <- .colSums(model$family(Y,mu,psi),
+                       length(subset), nUnits, na.rm=TRUE)
 
   ## penalized log-likelihood
   ll <- sum(ll.units) + lpen
