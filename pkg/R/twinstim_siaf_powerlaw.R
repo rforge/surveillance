@@ -35,7 +35,7 @@ siaf.powerlaw <- function (nTypes = 1, logpars = TRUE,
     f <- function (s, logpars, types = NULL) {}
     body(f) <- as.call(c(as.name("{"),
         tmp,
-        expression(sLength <- sqrt(rowSums(s^2))),
+        expression(sLength <- sqrt(.rowSums(s^2, nrow(s), 2L))),
         expression((sLength+sigma)^-d)
     ))
 
@@ -69,7 +69,7 @@ siaf.powerlaw <- function (nTypes = 1, logpars = TRUE,
     body(deriv) <- as.call(c(as.name("{"),
         tmp,
         expression(
-            sLength <- sqrt(rowSums(s^2)),
+            sLength <- sqrt(.rowSums(s^2, nrow(s), 2L)),
             rsigmad <- (sLength+sigma)^d,
             derivlogsigma <- -d*sigma / rsigmad / (sLength+sigma),
             derivlogd <- -log(rsigmad) / rsigmad,

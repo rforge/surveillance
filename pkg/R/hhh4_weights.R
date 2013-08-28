@@ -185,7 +185,7 @@ zetaweights <- function (nbmat, d = 1, maxlag = max(nbmat), normalize = FALSE)
     wji[is.na(wji)] <- 0              # for lags > maxlag
 
     ## set dim and names
-    dim(wji) <- dim(nbmat)
+    dim(wji) <- dimW <- dim(nbmat)
     dimnames(wji) <- dimnames(nbmat)
 
     ## if (shared) {
@@ -195,11 +195,8 @@ zetaweights <- function (nbmat, d = 1, maxlag = max(nbmat), normalize = FALSE)
     ##     wji <- wji / sum(zeta) / multbyrow
     ## }
     if (normalize) { # normalize such that each row sums to 1
-        wji <- wji / rowSums(wji)
-    }
-
-    ## Done
-    wji
+        wji / .rowSums(wji, dimW[1], dimW[2])
+    } else wji
 }
 
 
@@ -237,6 +234,7 @@ powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
         if (log) quote(d <- exp(d)),    # such that d is again on original scale
         substitute(W <- weights.call, list(weights.call=weights.call)),
         expression(
+            nUnits <- nrow(W),           # such that we can use .rowSums()
             is.na(nbmat) <- nbmat == 0L, # w_jj(d)=0 => w_jj'(d)=0, sum over j!=i,
             logo <- log(nbmat)           # have to set NA because we do log(o)
             )
@@ -245,8 +243,8 @@ powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
 
     ## first derivative
     tmp1 <- expression(
-        norm <- rowSums(nbmat^-d, na.rm=TRUE),
-        tmpnorm <- rowSums(nbmat^-d * -log(nbmat), na.rm=TRUE) / norm,
+        norm <- .rowSums(nbmat^-d, nUnits, nUnits, na.rm=TRUE),
+        tmpnorm <- .rowSums(nbmat^-d * -log(nbmat), nUnits, nUnits, na.rm=TRUE) / norm,
         tmp1 <- logo + tmpnorm
         )
     deriv1 <- if (normalize) {
@@ -265,7 +263,8 @@ powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
             header,
             if (normalize) {
                 c(tmp1, expression(
-                    tmp2 <- rowSums(nbmat^-d * log(nbmat)^2, na.rm=TRUE) / norm - tmpnorm^2,
+                    tmp2 <- .rowSums(nbmat^-d * log(nbmat)^2, nUnits, nUnits,
+                                     na.rm=TRUE) / norm - tmpnorm^2,
                     deriv <- W * (tmp1^2 - tmp2)
                     ))
             } else expression(deriv <- W * logo^2),

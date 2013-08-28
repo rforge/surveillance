@@ -75,8 +75,8 @@ inside.gpc.poly <- function(x, y = NULL, polyregion, mode.checked = FALSE)
             ifelse(pip == 1, -Inf, 0)
         } else pip
     })
-    inside <- if (N == 1L) sum(locations) > 0 else rowSums(locations) > 0
-    return(inside)
+    if (N == 1) sum(locations) > 0 else
+    .rowSums(locations, N, length(polyregion@pts)) > 0
 }
 
 

@@ -58,15 +58,12 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
     tmp1 <- if (logsd) expression(sds <- exp(pars)) else expression(sds <- pars)
     tmp1.1 <- if (nTypes==1L) expression(sd <- sds) else expression(sd <- sds[type])
     tmp2 <- c(
-            expression(
-                sLengthSquared <- rowSums(s^2),
-                L <- length(sLengthSquared)
-                ),
-            if (nTypes == 1L) expression(sdss <- sds) else expression(
-                types <- rep(types, length.out = L),
-                sdss <- sds[types]
-                )
+        expression(sLengthSquared <- .rowSums(s^2, L <- nrow(s), 2L)),
+        if (nTypes == 1L) expression(sdss <- sds) else expression(
+            types <- rep(types, length.out = L),
+            sdss <- sds[types]
             )
+        )
 
     # spatial interaction function
     body(f) <- as.call(c(as.name("{"),

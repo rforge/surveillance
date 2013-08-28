@@ -792,7 +792,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
             .sources <- infectives[eventMatrix[infectives,"type"] %in% which(qmatrix[,.eventType])]
             if (length(.sources) > 0L) {
                 .sdiffs <- .eventLocation[rep.int(1L,length(.sources)),,drop=FALSE] - eventCoords[.sources,,drop=FALSE]
-                .sources <- .sources[sqrt(rowSums(.sdiffs^2)) <= eventMatrix[.sources,"eps.s"]]
+                .sources <- .sources[sqrt(.rowSums(.sdiffs^2, length(.sources), 2L)) <= eventMatrix[.sources,"eps.s"]]
             }
 
             # calculate actual intensity at this time, location and type

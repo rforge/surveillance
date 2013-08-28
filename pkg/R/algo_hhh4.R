@@ -857,6 +857,8 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
   if(any(is.na(theta))) stop("NAs in regression parameters.", ADVICEONERROR)
 
   ## unpack model
+  nTime <- model$nTime
+  nUnits <- model$nUnits
   subset <- model$subset
   Y <- model$response[subset,,drop=FALSE]
   #isNA <- model$isNA[subset,,drop=FALSE]
@@ -867,8 +869,7 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
   pars <- splitParams(theta, model)
   psi <- exp(pars$overdisp)             # = 1/psi, pars$overdisp = -log(psi)
   if(dimPsi > 1L) {
-      psi <- matrix(psi, ncol=model$nUnits, nrow=model$nTime,
-                    byrow=TRUE)[subset,,drop=FALSE]
+      psi <- matrix(psi, nTime, nUnits, byrow=TRUE)[subset,,drop=FALSE]
   }
   if (dimRE > 0) {
       randomEffects <- pars$random
@@ -905,8 +906,7 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
   lpen <- c(lpen)                       # drop 1x1 matrix dimensions
   
   ## log-likelihood
-  ddistr <- model$family
-  ll.units <- colSums(ddistr(Y,mu,psi), na.rm=TRUE)
+  ll.units <- .colSums(model$family(Y,mu,psi), nTime, nUnits, na.rm=TRUE)
 
   ## penalized log-likelihood
   ll <- sum(ll.units) + lpen

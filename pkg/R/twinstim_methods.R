@@ -406,11 +406,13 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
             }
         } else {  # as a function of location (int over time and types)
             factT <- fact * modelenv$tiafInt
+            nEvents <- nrow(eventCoords)
             function (xy) {
                 stopifnot(is.vector(xy, mode="numeric"), length(xy) == 2L)
-                point <- matrix(xy, nrow=nrow(eventCoords), ncol=2L, byrow=TRUE)
+                point <- matrix(xy, nrow=nEvents, ncol=2L, byrow=TRUE)
                 sdiff <- point - eventCoords
-                proximity <- qSum_types > 0 & rowSums(sdiff^2) <= eps.s^2
+                proximity <- qSum_types > 0 &
+                    .rowSums(sdiff^2, nEvents, 2L) <= eps.s^2
                 if (any(proximity)) {
                     fsources <- siaf$f(sdiff[proximity,,drop=FALSE],
                                        siafpars,
