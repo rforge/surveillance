@@ -384,8 +384,8 @@ h.intercept <- with(summary(imdepi),
 
 ## fit the endemic-only model
 m_noepi <- twinstim(
-    endemic = ~ 1 + offset(log(popdensity)) + I(start/365) +
-                sin(start * 2 * pi/365) + cos(start * 2 * pi/365),
+    endemic = addSeason2formula(~ offset(log(popdensity)) + I(start/365-3.5),
+                                S=1, period=365, timevar="start"),
     data = imdepi, subset = !is.na(agegrp),
     optim.args = list(par=c(h.intercept,rep(0,3)), # this is the default
                       method="nlminb", control = list(trace=1)),
