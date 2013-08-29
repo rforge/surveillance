@@ -228,8 +228,8 @@ tiaf.exponential(nTypes = 1)
     advantageous for the numerical log-likelihood maximization.} 
   \item{Deriv}{function computing the integral of \code{deriv} (passed as
     second argument) over a polygonal \code{"owin"} domain (first argument).
-    The third and fourth argument are
-    the parameter vector and the (\emph{single}) type, respectively.
+    The third argument is the parameter vector and the fourth argument
+    is a (\emph{single}) type and must be named \code{type}.
     There may be additional arguments, which can then be specified in
     the \code{control.siaf$Deriv} argument list of \code{twinstim}. If this
     function is missing, a general default (\code{\link[polyCub]{polyCub}}) 

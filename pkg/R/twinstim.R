@@ -423,10 +423,9 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     ## two-dimensional siaf$deriv function)
     if (useScore && hassiafpars) {
         .siafDeriv <- function (siafpars, ...) {
-            derivInti <- function (i)
-                siaf$Deriv(influenceRegion[[i]], siaf$deriv, siafpars,
-                           eventTypes[i], ...)
-            derivInt <- sapply(1:N, derivInti)
+            derivInt <- mapply(siaf$Deriv, influenceRegion, type=eventTypes,
+                               MoreArgs=list(siaf$deriv, siafpars, ...),
+                               USE.NAMES=FALSE)
             #<- N-vector or nsiafpars x N matrix => transform to N x nsiafpars
             if (is.matrix(derivInt)) t(derivInt) else as.matrix(derivInt)
         }
@@ -629,8 +628,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 sInt <- nTypes*exp(beta0) * .hIntTW(beta)
                 sEventsSum - sInt
             }) else if (nbeta0 > 1L) local({ # type-specific intercepts
-                ind <- sapply(1:nTypes, function (type) eventTypes == type)
-                #<- logical N x nTypes matrix
+                ind <- sapply(1:nTypes, function (type) eventTypes == type,
+                              USE.NAMES=FALSE) # logical N x nTypes matrix
                 sEvents <- if (hase) {
                         ind * hEvents / lambdaEvents
                     } else ind
@@ -719,7 +718,8 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         # for beta
         hScoreEvents <- if (hash) {
             scoreEvents_beta0 <- if (nbeta0 > 1L) local({ # type-specific intercepts
-                ind <- sapply(1:nTypes, function (type) eventTypes == type) # logical NxnTypes matrix
+                ind <- sapply(1:nTypes, function (type) eventTypes == type,
+                              USE.NAMES=FALSE) # logical N x nTypes matrix
                 if (hase) {
                     ind * hEvents / lambdaEvents
                 } else ind
@@ -813,7 +813,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                         gsources <- tiaf$g(tdiff, tiafpars, eventTypes[timeSources])
                         sum(qSum[timeSources] * gs[timeSources] * gsources)
                     }
-                })   # Nin-vector
+                }, USE.NAMES=FALSE)   # Nin-vector
             } else 0
         lambdaEventsIntW <- hInts + eInts   # Nin-vector
 
