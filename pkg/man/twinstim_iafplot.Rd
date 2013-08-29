@@ -135,13 +135,13 @@ iafplot(object, which = c("siaf", "tiaf"),
 }
 
 \examples{
-data(imdepifit)
+data("imdepifit")
 iafplot(imdepifit, "tiaf", types=1)   # tiaf.constant(), not very exciting
 iafplot(imdepifit, "siaf", types=1,   # same for types=2
         xlim=c(0,200), col.estimate=1, lwd=c(2,1))
 
-# bootstrap-CI (used if more than one parameter is affected)
-iafplot(imdepifit, "siaf", types=1, scaled=TRUE, xlim=c(0,200), xgrid=500,
+# scaled version and bootstrap-CI (used if 'siaf' has more than one parameter)
+iafplot(imdepifit, "siaf", types=1, scaled=TRUE, xlim=c(0,200),
         conf.type="bootstrap", col.estimate=2)
 }
 

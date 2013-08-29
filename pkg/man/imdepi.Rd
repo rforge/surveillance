@@ -24,7 +24,9 @@ data(imdepifit)
   \code{imdepi} is an object of class
   \code{"\link{epidataCS}"} (a list with components \code{events},
   \code{stgrid}, \code{W} and \code{qmatrix}).
-  \code{imdepifit} is an object of class \code{"\link{twinstim}"}.
+  \code{imdepifit} is an object of class \code{"\link{twinstim}"},
+  see \code{\link{summary.twinstim}} for some simple methods for fitted
+  \code{"twinstim"} models.
 }
 
 \details{

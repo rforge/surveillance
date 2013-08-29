@@ -166,8 +166,8 @@ intensity.twinstim(x,
 }
 
 \examples{
-data(imdepi)
-data(imdepifit)
+data("imdepi")
+data("imdepifit")
 
 # for the intensityplot we need the model environment, which can be
 # easily added by the intelligent update method (no need to refit the model)

@@ -43,7 +43,7 @@ especially useful if one wants to add the \code{model} environment
   Sebastian Meyer
   
   Inspiration and some pieces of code originate from
-  \code{update.default} by the R Core Team.
+  \code{\link{update.default}} by the R Core Team.
 }
 
 \seealso{
@@ -51,21 +51,20 @@ especially useful if one wants to add the \code{model} environment
 }
 
 \examples{
-if (surveillance.options("allExamples"))
-{
-  data(imdepi)
-  data(imdepifit)
+data("imdepi")
+data("imdepifit")
 
+## add another epidemic covariate (but fix siaf-parameter for speed)
+imdepifit2 <- update(imdepifit, epidemic = ~. + log(popdensity),
+                     optim.args = list(fixed="e.siaf.1"), cumCIF=FALSE)
+  
+## compare by AIC
+AIC(imdepifit, imdepifit2)
+
+if (surveillance.options("allExamples")) {
   ## enrich the fit by the model environment
   imdepifit <- update(imdepifit, model=TRUE)
   ## this enables, e.g., intensityplot()s and untrimmed R0 estimates
-
-  ## add another epidemic covariate
-  imdepifit2 <- update(imdepifit, epidemic = ~. + log(popdensity),
-    optim.args=list(fixed="e.siaf.1"), cumCIF=FALSE) # for reasons of speed
-  
-  ## compare with AIC
-  AIC(imdepifit, imdepifit2)
 }
 }
 

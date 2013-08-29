@@ -123,7 +123,7 @@ Sebastian Meyer
 
 \examples{
 # load a fit of the 'imdepi' data, see the example in ?twinstim
-data(imdepifit)
+data("imdepifit")
 
 # print method
 imdepifit

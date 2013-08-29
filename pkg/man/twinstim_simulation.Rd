@@ -303,8 +303,8 @@ spatio-temporal conditional intensity models to epidemic data.
 }
 
 \examples{
-data(imdepi)
-data(imdepifit)
+data("imdepi")
+data("imdepifit")
 
 ## load borders of Germany's districts (obtained from the
 ## Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, Germany,
