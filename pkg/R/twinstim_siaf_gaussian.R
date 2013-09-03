@@ -60,7 +60,7 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
     tmp2 <- c(
         expression(sLengthSquared <- .rowSums(s^2, L <- nrow(s), 2L)),
         if (nTypes == 1L) expression(sdss <- sds) else expression(
-            types <- rep(types, length.out = L),
+            types <- rep_len(types, L),
             sdss <- sds[types]
             )
         )

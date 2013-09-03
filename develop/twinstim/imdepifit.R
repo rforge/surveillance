@@ -1,6 +1,6 @@
 ################################################################################
 ### Author: Sebastian Meyer [sebastian *.* meyer *a*t* ifspm *.* uzh *.* ch]
-### Time-stamp: <[imdepifit.R] by SM Don 29/08/2013 17:13 (CEST)>
+### Time-stamp: <[imdepifit.R] by SM Die 03/09/2013 16:42 (CEST)>
 ### Project: reproduce data(imdepifit)
 ################################################################################
 
@@ -18,13 +18,14 @@ myimdepifit <- twinstim(
     control.siaf = list(F=list(adapt=0.25), Deriv=list(nGQ=13)), 
     optim.args = list(par = c(-20, -0.1, 0.2, 0.3, -12, -1, 0, 0, 3),
                       control = list(trace=1)),
-    model = FALSE, cumCIF = TRUE
+    model = FALSE, cumCIF = TRUE #, cores=2
 )
 
 ## compare with the one stored in the package
 data("imdepifit")
 all.equal(imdepifit, myimdepifit)
 ## only the "runtime" component should be different!
+rbind(imdepifit$runtime, myimdepifit$runtime)
 
 if (FALSE) # store updated fit in data-folder
 {

@@ -27,11 +27,11 @@ twinstim <- function (
     ### Preparations ###
     ####################
 
-    ptm <- proc.time()[[3]]
+    ptm <- proc.time()
     cl <- match.call()
     partial <- as.logical(partial)
     finetune <- if (partial) FALSE else as.logical(finetune)
-    singleCPU <- cores == 1L || !requireNamespace("parallel")
+    useParallel <- cores > 1L && requireNamespace("parallel")
 
     ## # Collect polyCub.midpoint warnings (and apply unique on them at the end)
     ## .POLYCUB.WARNINGS <- NULL
@@ -212,13 +212,15 @@ twinstim <- function (
         eventCoords <- coordinates(data$events)[inmfe,,drop=FALSE]
         eventDists <- as.matrix(dist(eventCoords, method = "euclidean"))
         influenceRegion <- data$events@data$.influenceRegion[inmfe]
-        iRareas <- sapply(influenceRegion, attr, "area")
+        iRareas <- sapply(influenceRegion, attr, "area",
+                          simplify=TRUE, USE.NAMES=FALSE)
         # determine possible event sources (need to re-do this because
         # subsetting has crashed old row indexes from the epidataCS object)
         # actually only eventSources of includes are needed
-        eventSources <- lapply(1:N, function (i) {
-            determineSources(i, eventTimes, removalTimes, eventDists[i,], eps.s, eventTypes, qmatrix)
-        })
+        eventSources <- lapply(seq_len(N), function (i)
+                               determineSources(i, eventTimes, removalTimes,
+                                                eventDists[i,],
+                                                eps.s, eventTypes, qmatrix))
         # calculate sum_{k=1}^K q_{kappa_j,k} for all j = 1:N
         qSum <- unname(rowSums(qmatrix)[eventTypes])   # N-vector
     } else if (verbose) message("no epidemic component in model")
@@ -386,8 +388,8 @@ twinstim <- function (
 
         ## Define function that integrates the two-dimensional 'siaf' function
         ## over the influence regions of the events
-        .siafInt <- .siafIntFUN(siaf = siaf, noCircularIR = all(eps.s > bdist))
-                                #cores = cores)
+        .siafInt <- .siafIntFUN(siaf = siaf, noCircularIR = all(eps.s > bdist),
+                                parallel = useParallel)
         .siafInt.args <- c(alist(siafpars), control.siaf$F)
 
         ## Memoisation of .siafInt
@@ -427,20 +429,14 @@ twinstim <- function (
     ## Define function that applies siaf$Deriv on all events (integrate the
     ## two-dimensional siaf$deriv function)
     if (useScore && hassiafpars) {
-        .siafDeriv <- function (siafpars, ...) { # TEMPLATE (parallel version)
-            derivInt <- parallel::mcmapply(      # only available since R 2.15.0
-                siaf$Deriv, influenceRegion, type=eventTypes,
-                MoreArgs=list(siaf$deriv, siafpars, ...),
-                SIMPLIFY=TRUE, USE.NAMES=FALSE,
-                mc.preschedule=TRUE, mc.cores=cores)
-            ##<- N-vector or nsiafpars x N matrix => transform to N x nsiafpars
-            if (is.matrix(derivInt)) t(derivInt) else as.matrix(derivInt)
-        }
-        if (singleCPU) {                # transform to single-CPU version
-            body(.siafDeriv)[[2]][[3]][[1]] <- quote(mapply)
-            body(.siafDeriv)[[2]][[3]]$mc.preschedule <- NULL
-            body(.siafDeriv)[[2]][[3]]$mc.cores <- NULL
-        }
+        .siafDeriv <- mapplyFUN(
+            alist(siaf$Deriv, influenceRegion, type=eventTypes,
+                  MoreArgs=list(siaf$deriv, siafpars, ...),
+                  SIMPLIFY=TRUE, USE.NAMES=FALSE),
+            ## depending on nsiafpars, mapply() will return an N-vector
+            ## or a nsiafpars x N matrix => transform to N x nsiafpars:
+            after = quote(if (is.matrix(res)) t(res) else as.matrix(res)),
+            parallel = useParallel)
         .siafDeriv.args <- c(alist(siafpars), control.siaf$Deriv)
     }
 
@@ -535,8 +531,8 @@ twinstim <- function (
                     .colSums(scoresources * predsources * fsources * gsources,
                              nsources, ncolsRes)
                 }
-            }, USE.NAMES=FALSE)         # result is a vector if ncolsRes=1 !!!
-            if (ncolsRes == 1L) e else t(e)
+            }, simplify=TRUE, USE.NAMES=FALSE) # a vector if ncolsRes=1
+            if (ncolsRes == 1L) e else t(e)    # otherwise of dim Nin x ncolsRes
         }
     }
 
@@ -550,7 +546,7 @@ twinstim <- function (
         if (hash) { # endemic component
             expression(
                 hIntTW <- .hIntTW(beta, uppert = uppert),
-                .beta0 <- rep(if (nbeta0==0L) 0 else beta0, length.out = nTypes),
+                .beta0 <- rep_len(if (nbeta0==0L) 0 else beta0, nTypes),
                 fact <- sum(exp(.beta0)),
                 hInt <- fact * hIntTW
             )
@@ -639,8 +635,9 @@ twinstim <- function (
                 sInt <- nTypes*exp(beta0) * .hIntTW(beta)
                 sEventsSum - unname(sInt)
             }) else if (nbeta0 > 1L) local({ # type-specific intercepts
-                ind <- sapply(1:nTypes, function (type) eventTypes == type,
-                              USE.NAMES=FALSE) # logical N x nTypes matrix
+                ind <- sapply(seq_len(nTypes),
+                              function (type) eventTypes == type,
+                              simplify=TRUE, USE.NAMES=FALSE) # logical N x nTypes matrix
                 sEvents <- if (hase) {
                         ind * hEvents / lambdaEvents
                     } else ind
@@ -729,8 +726,9 @@ twinstim <- function (
         # for beta
         hScoreEvents <- if (hash) {
             scoreEvents_beta0 <- if (nbeta0 > 1L) local({ # type-specific intercepts
-                ind <- sapply(1:nTypes, function (type) eventTypes == type,
-                              USE.NAMES=FALSE) # logical N x nTypes matrix
+                ind <- sapply(seq_len(nTypes),
+                              function (type) eventTypes == type,
+                              simplify=TRUE, USE.NAMES=FALSE) # logical N x nTypes matrix
                 if (hase) {
                     ind * hEvents / lambdaEvents
                 } else ind
@@ -806,7 +804,7 @@ twinstim <- function (
                 hGrid <- eval(hGridExpr)
                 # integral over W and types for each time block in mfhGrid
                 fact <- if (nbeta0 > 1L) sum(exp(beta0)) else if (nbeta0 == 1L) nTypes*exp(beta0) else nTypes
-                hInt_blocks <- fact * tapply(hGrid*ds, gridBlocks, sum, simplify = TRUE)
+                hInt_blocks <- fact * tapply(hGrid*ds, gridBlocks, sum, simplify=TRUE)
                 .idx <- match(eventBlocks[includes], names(hInt_blocks))
                 unname(hInt_blocks[.idx])   # Nin-vector
             } else 0
@@ -823,7 +821,7 @@ twinstim <- function (
                         gsources <- tiaf$g(tdiff, tiafpars, eventTypes[timeSources])
                         sum(qSum[timeSources] * gs[timeSources] * gsources)
                     }
-                }, USE.NAMES=FALSE)   # Nin-vector
+                }, simplify=TRUE, USE.NAMES=FALSE)   # Nin-vector
             } else 0
         lambdaEventsIntW <- hInts + eInts   # Nin-vector
 
@@ -1336,7 +1334,7 @@ twinstim <- function (
 
     if (verbose) cat("\nDone.\n")
     fit$call <- cl
-    fit$runtime <- proc.time()[[3]] - ptm
+    fit$runtime <- structure(proc.time() - ptm, cores=cores)
     class(fit) <- "twinstim"
     return(fit)
 

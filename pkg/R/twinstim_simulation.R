@@ -377,7 +377,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         if (!constantsiaf && !is.null(siaf$Fcircle) && !is.null(siaf$effRange))
         {
             ## pre-compute effective range of the 'siaf' (USED BY .siafInt)
-            effRangeTypes <- rep(siaf$effRange(siafpars), length.out = nTypes)
+            effRangeTypes <- rep_len(siaf$effRange(siafpars), nTypes)
         }
         .siafInt <- .siafIntFUN(siaf = siaf, noCircularIR = FALSE)
                                              # not certain beforehand
@@ -1188,7 +1188,7 @@ plot.simEpidataCSlist <- function (x,
         if (nsim > 4) which <- sample(which, 4L)
     }
     opar <- par(mfrow = mfrow); on.exit(par(opar))
-    main <- rep(main, length.out=length(which))
+    main <- rep_len(main, length(which))
     for (i in seq_along(which)) {
         do.call("plot", args=list(x=quote(x[[which[i]]]), aggregate=aggregate,
                         subset=substitute(subset), main = main[i], ...))

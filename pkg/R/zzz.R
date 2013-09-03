@@ -46,7 +46,7 @@ gpclibCheck <- function (fatal = TRUE)
 }
 
 
-### Function 'base::paste0()' only exists as of R version 2.15.0
+### Function 'base::paste0' only exists as of R version 2.15.0
 ### Define it as a wrapper for base::paste() for older versions
 
 if (getRversion() < "2.15.0" || R.version$"svn rev" < 57795 ||
@@ -60,6 +60,14 @@ if (getRversion() < "2.15.0" || R.version$"svn rev" < 57795 ||
         cl[[1]] <- as.name("paste")
         eval(cl, envir = parent.frame())
     }
+}
+
+
+### Function 'base::rep_len' only exists as of R version 3.0.0
+### Define it as a wrapper for base::rep() for older versions
+
+if (getRversion() < "3.0.0" || !exists("rep_len", baseenv())) {
+    rep_len <- function (x, length.out) rep(x, length.out=length.out)
 }
 
 

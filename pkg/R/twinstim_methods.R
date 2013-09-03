@@ -160,9 +160,13 @@ print.summary.twinstim <- function (x,
     cat("\nLog-likelihood:", format(x$loglik, digits = digits))
     cat("\nNumber of log-likelihood evaluations:", x$counts[1])
     cat("\nNumber of score function evaluations:", x$counts[2])
-    if (!is.null(x$runtime)) {
-        cat("\nRuntime:", format(x$runtime, digits=max(4, digits+1)), "seconds")
-    }
+    cores <- attr(x$runtime, "cores")
+    cat("\nRuntime",
+        if (!is.null(cores) && cores > 1) paste0(" (", cores, " cores)")
+        , ": ", format(
+        if (length(x$runtime)==0) NA_real_ else if (length(x$runtime)==1)
+        x$runtime else x$runtime[["elapsed"]],
+        digits=max(4, digits+1)), " seconds", sep="")
     cat("\n")
     correl <- x$correlation
     if (!is.null(correl)) {
@@ -334,8 +338,8 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
             eta <- drop(modelenv$mmhGrid %*% modelenv$beta)
             if (!is.null(modelenv$offsetGrid)) eta <- modelenv$offsetGrid + eta
             expeta <- exp(unname(eta))
-            .beta0 <- rep(if (modelenv$nbeta0==0L) 0 else modelenv$beta0,
-                          length = modelenv$nTypes)
+            .beta0 <- rep_len(if (modelenv$nbeta0==0L) 0 else modelenv$beta0,
+                              modelenv$nTypes)
             fact <- sum(exp(.beta0[types]))
             if (aggregate == "time") {      # int over W and types by BLOCK
                 fact * c(tapply(expeta * modelenv$ds, gridBlocks, sum,

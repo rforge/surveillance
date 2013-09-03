@@ -6,7 +6,7 @@
 ### S3-methods for "epidataCS" data objects, which represent
 ### CONTINUOUS SPATIO-temporal infectious disease case data
 ###
-### Copyright (C) 2009-2012 Sebastian Meyer
+### Copyright (C) 2009-2013 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -330,7 +330,7 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
     s <- summary(object)
     removalTimes <- s$eventTimes + object$events$eps.t
     eventCoordsTypes <- cbind(s$eventCoords, type = s$eventTypes)
-    pch <- rep(pch, length.out = s$nTypes)
+    pch <- rep_len(pch, s$nTypes)
     typeNames <- names(s$typeTable)
     multitype <- length(typeNames) > 1L
 
@@ -583,7 +583,7 @@ as.epidata.epidataCS <- function (data, tileCentroids, eps = 0.001, ...)
             as.matrix(indInts[rows])
         } else as.matrix(intervals::reduce(indInts[rows]))
     })
-    tileNames <- rep(names(tileInts), sapply(tileInts, nrow))
+    tileNames <- rep.int(names(tileInts), sapply(tileInts, nrow))
     tileItimes <- unlist(lapply(tileInts, function(ints) ints[,1]), use.names=FALSE)
     tileRtimes <- unlist(lapply(tileInts, function(ints) ints[,2]), use.names=FALSE)
 

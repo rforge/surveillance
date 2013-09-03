@@ -118,8 +118,9 @@ crudebeta0 <- function (nEvents, offset.mean, W.area, period, nTypes)
 ### simEpidataCS()).
 
 .siafIntFUN <- function (siaf,
-   noCircularIR #= all(eps.s > bdist) = all(sapply(influenceRegion, function(x)
-                #                           is.null(attr(x,"radius"))))
+    noCircularIR, #= all(eps.s>bdist) = all(sapply(influenceRegion, function(x)
+                  #                           is.null(attr(x,"radius"))))
+    parallel = FALSE
 ){
     ## the following variables are unused here, because the environment of
     ## FUN will be set to the parent.frame(), where the variables exist
@@ -134,59 +135,50 @@ crudebeta0 <- function (nEvents, offset.mean, W.area, period, nTypes)
             ## computation time (data are fixed during fitting)
             function (siafpars) iRareas
         } else {
-            function (siafpars) sapply(influenceRegion, attr, "area")
+            function (siafpars)
+                sapply(influenceRegion, attr, "area",
+                       simplify=TRUE, USE.NAMES=FALSE)
         }
     } else if (is.null(siaf$Fcircle) || # if siaf$Fcircle not available
                (is.null(siaf$effRange) && noCircularIR))
     {
-        function (siafpars, ...) {
-            siafInts <- sapply(seq_along(influenceRegion), function (i)
-                siaf$F(influenceRegion[[i]], siaf$f, siafpars, eventTypes[i], ...)
-            )
-            siafInts
-        }
+        ## Numerically integrate 'siaf' over each influence region
+        mapplyFUN(alist(siaf$F,
+                        influenceRegion, type=eventTypes,
+                        MoreArgs=list(siaf$f, siafpars, ...),
+                        SIMPLIFY=TRUE, USE.NAMES=FALSE),
+                  parallel = parallel)
     } else if (is.null(siaf$effRange)) # use Fcircle but only delta-trick
     {
-        function (siafpars, ...) {
-            ## Compute the integral of 'siaf' over each influence region
-            siafInts <- numeric(length(influenceRegion))
-            for(i in seq_along(siafInts)) {
-                eps <- eps.s[i]
-                bdisti <- bdist[i]
-                siafInts[i] <- if (eps <= bdisti) {
-                    ## influence region is completely inside W
-                    siaf$Fcircle(eps, siafpars, eventTypes[i])
-                } else {
-                    ## numerically integrate over polygonal influence region
-                    siaf$F(influenceRegion[[i]], siaf$f, siafpars,
-                           eventTypes[i], ...)
-                }
-            }
-            siafInts
-        }
+        mapplyFUN(
+            alist(function (iR, type, eps, bdisti)
+                  if (eps <= bdisti) # influence region completely inside W
+                      siaf$Fcircle(eps, siafpars, type)
+                  else # numerically integrate over influence region
+                      siaf$F(iR, siaf$f, siafpars, type, ...)
+                  ,
+                  influenceRegion, eventTypes, eps.s, bdist,
+                  SIMPLIFY = TRUE, USE.NAMES = FALSE),
+            parallel = parallel)
     } else { # fast Fcircle integration considering the delta-trick AND effRange
-        .ret <- function (siafpars, ...) {
-            ## Compute computationally effective range of the 'siaf' function
-            ## for the current 'siafpars' for each event (type)
-            effRangeTypes <- rep(siaf$effRange(siafpars), length.out=nTypes)
+        .ret <- mapplyFUN(
+            alist(function (iR, type, eps, bdisti, effRange)
+                  if (eps <= bdisti) # influence region completely inside W
+                      siaf$Fcircle(eps, siafpars, type)
+                  else if (effRange <= bdisti) # effective region inside W
+                      siaf$Fcircle(bdisti, siafpars, type)
+                  else # numerically integrate over influence region
+                      siaf$F(iR, siaf$f, siafpars, type, ...)
+                  ,
+                  influenceRegion, eventTypes, eps.s, bdist, effRanges,
+                  SIMPLIFY = TRUE, USE.NAMES = FALSE),
+            ## before: compute computationally effective range of the 'siaf'
+            ## for the current 'siafpars' for each event (type):
+            before = expression(
+            effRangeTypes <- rep_len(siaf$effRange(siafpars), nTypes),
             effRanges <- effRangeTypes[eventTypes]   # N-vector
-            ## Compute the integral of 'siaf' over each influence region
-            siafInts <- numeric(length(influenceRegion))
-            for(i in seq_along(siafInts)) {
-                eps <- eps.s[i]
-                bdisti <- bdist[i]
-                effRange <- effRanges[i]
-                siafInts[i] <- if (eps <= bdisti) { # influence region is completely inside W
-                    siaf$Fcircle(eps, siafpars, eventTypes[i])
-                } else if (effRange <= bdisti) { # effective region completely inside W
-                    siaf$Fcircle(bdisti, siafpars, eventTypes[i])
-                } else { # integrate over polygonal influence region
-                    siaf$F(influenceRegion[[i]], siaf$f, siafpars,
-                           eventTypes[i], ...)
-                }
-            }
-            siafInts
-        }
+            ),
+            parallel = parallel)        
         if (exists("effRangeTypes", where=parent.frame(), mode="numeric")) {
             ## in simEpidataCS effRangeTypes is pre-calculated outside siafInt to
             ## save computation time ('siafpars' is constant during simulation)
@@ -295,4 +287,34 @@ control2nlminb <- function (control, defaults)
              "' must be NULL (or missing), a list (-> continuous ",
              "function), or numeric (-> knots of step function)")
     }
+}
+
+
+### Construct a call/function for mapply or parallel::mcmapply, respectively
+## args: alist() of arguments for mapply()
+## before,after: expressions to be prepended/appended to the function body,
+##               where "res" will be the result of mapply()
+
+mapplyCall <- function (args, cores = 1L)
+{
+    parallel <- is.name(cores) || cores > 1L
+    mapplyFUN <- if (parallel) quote(parallel::mcmapply) else quote(mapply)
+    ## Note: mcmapply() is only available since R 2.15.0
+    parallelArgs <- list(mc.preschedule=TRUE, mc.cores=cores)
+    as.call(c(mapplyFUN, args, if (parallel) parallelArgs))
+}
+
+mapplyFUN <- function (args, before = list(), after = list(), parallel = TRUE)
+{
+    FUN <- as.function(alist(siafpars=, ...=, NULL),
+                       envir=parent.frame())
+    body(FUN) <- mapplyCall(args, if (parallel) quote(cores) else 1L)
+    if (length(after) + length(before) > 0) {
+        body(FUN) <- as.call(c(
+            list(as.name("{")),
+            before,
+            if (length(after)) call("<-", as.name("res"), body(FUN)) else body(FUN),
+            after))
+    }
+    FUN
 }
