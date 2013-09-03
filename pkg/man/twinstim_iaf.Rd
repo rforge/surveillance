@@ -197,7 +197,7 @@ tiaf.exponential(nTypes = 1)
     The third and fourth argument are
     the parameter vector and the (\emph{single}) type, respectively.
     There may be additional arguments, which can then be specified in
-    the \code{control.siaf$F} argument list of \code{twinstim}. If this
+    the \code{control.siaf$F} argument list of \code{twinstim}. If the \code{F}
     function is missing, a general default (\code{\link[polyCub]{polyCub}}) 
     will be used, with extra arguments \code{method} (default: \code{"SV"}) 
     and corresponding accuracy parameters.}
@@ -227,14 +227,15 @@ tiaf.exponential(nTypes = 1)
     calculation of the score function in \code{twinstim()}, which is
     advantageous for the numerical log-likelihood maximization.} 
   \item{Deriv}{function computing the integral of \code{deriv} (passed as
-    second argument) over a polygonal \code{"owin"} domain (first argument).
+    second argument) over a polygonal \code{"owin"} domain (first
+    argument). The return value is thus a vector of length \code{npars}.
     The third argument is the parameter vector and the fourth argument
     is a (\emph{single}) type and must be named \code{type}.
     There may be additional arguments, which can then be specified in
-    the \code{control.siaf$Deriv} argument list of \code{twinstim}. If this
-    function is missing, a general default (\code{\link[polyCub]{polyCub}}) 
-    will be used, with extra arguments \code{method} (default: \code{"SV"}) 
-    and corresponding accuracy parameters.}
+    the \code{control.siaf$Deriv} argument list of \code{twinstim}. If the
+    \code{Deriv} function is missing, a general default
+    (\code{\link[polyCub]{polyCub}}) will be used, with extra arguments
+    \code{method} (default: \code{"SV"}) and corresponding accuracy parameters.}
   \item{simulate}{optional function returning a sample drawn from the
     spatial kernel (only required for the simulation of \code{twinstim}
     models).  Its first argument is the size of the sample to

@@ -19,7 +19,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
          control.siaf = list(F = list(), Deriv = list()),
          optim.args = list(), finetune = FALSE,
          model = FALSE, cumCIF = TRUE,
-         cumCIF.pb = interactive(), verbose = TRUE)
+         cumCIF.pb = interactive(), cores = 1, verbose = TRUE)
 }
 
 \arguments{
@@ -225,7 +225,14 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   \item{cumCIF.pb}{
     logical indicating if a progress bar should be shown
     during the calculation of \code{cumCIF}. Defaults to do so in an
-    interactive \R session.
+    interactive \R session, and will be \code{FALSE} if \code{cores != 1}.
+  }
+  \item{cores}{
+    number of processes to use in parallel operation. By default
+    \code{twinstim} runs in single-CPU mode. Currently, only the
+    \pkg{multicore}-type of parallel computing via forking is
+    supported, which is not available on Windows, see
+    \code{\link[parallel]{mclapply}} in package \pkg{parallel}.
   }
   \item{verbose}{
     logical indicating if information should be printed during

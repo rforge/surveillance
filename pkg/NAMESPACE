@@ -22,7 +22,7 @@ importFrom(xtable, xtable) # if we wouldn't "Depend" on xtable, our
                            # user attaches the xtable package himself
 ## required functions from stats and utils
 importFrom(stats, pnorm, cov2cor, ks.test, formula, rnorm, runif, step,
-           update.formula, terms.formula, rpois, rnbinom)
+           update.formula, terms.formula, rpois, rnbinom, setNames)
 importFrom(utils, packageVersion, modifyList)
 
 import(methods)

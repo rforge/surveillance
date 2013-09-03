@@ -12,12 +12,15 @@
 ################################################################################
 
 
-twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
+twinstim <- function (
+    endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     data, subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
     na.action = na.fail, start = NULL, partial = FALSE,
     control.siaf = list(F=list(), Deriv=list()),
     optim.args = list(), finetune = FALSE,
-    model = FALSE, cumCIF = TRUE, cumCIF.pb = interactive(), verbose = TRUE)
+    model = FALSE, cumCIF = TRUE,
+    cumCIF.pb = interactive(), cores = 1, verbose = TRUE
+    )
 {
 
     ####################
@@ -28,6 +31,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     cl <- match.call()
     partial <- as.logical(partial)
     finetune <- if (partial) FALSE else as.logical(finetune)
+    singleCPU <- cores == 1L || !requireNamespace("parallel")
 
     ## # Collect polyCub.midpoint warnings (and apply unique on them at the end)
     ## .POLYCUB.WARNINGS <- NULL
@@ -383,6 +387,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
         ## Define function that integrates the two-dimensional 'siaf' function
         ## over the influence regions of the events
         .siafInt <- .siafIntFUN(siaf = siaf, noCircularIR = all(eps.s > bdist))
+                                #cores = cores)
         .siafInt.args <- c(alist(siafpars), control.siaf$F)
 
         ## Memoisation of .siafInt
@@ -422,16 +427,22 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     ## Define function that applies siaf$Deriv on all events (integrate the
     ## two-dimensional siaf$deriv function)
     if (useScore && hassiafpars) {
-        .siafDeriv <- function (siafpars, ...) {
-            derivInt <- mapply(siaf$Deriv, influenceRegion, type=eventTypes,
-                               MoreArgs=list(siaf$deriv, siafpars, ...),
-                               USE.NAMES=FALSE)
-            #<- N-vector or nsiafpars x N matrix => transform to N x nsiafpars
+        .siafDeriv <- function (siafpars, ...) { # TEMPLATE (parallel version)
+            derivInt <- parallel::mcmapply(      # only available since R 2.15.0
+                siaf$Deriv, influenceRegion, type=eventTypes,
+                MoreArgs=list(siaf$deriv, siafpars, ...),
+                SIMPLIFY=TRUE, USE.NAMES=FALSE,
+                mc.preschedule=TRUE, mc.cores=cores)
+            ##<- N-vector or nsiafpars x N matrix => transform to N x nsiafpars
             if (is.matrix(derivInt)) t(derivInt) else as.matrix(derivInt)
+        }
+        if (singleCPU) {                # transform to single-CPU version
+            body(.siafDeriv)[[2]][[3]][[1]] <- quote(mapply)
+            body(.siafDeriv)[[2]][[3]]$mc.preschedule <- NULL
+            body(.siafDeriv)[[2]][[3]]$mc.cores <- NULL
         }
         .siafDeriv.args <- c(alist(siafpars), control.siaf$Deriv)
     }
-
 
 
 
@@ -626,7 +637,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                     } else rep.int(1, Nin)
                 sEventsSum <- sum(sEvents)
                 sInt <- nTypes*exp(beta0) * .hIntTW(beta)
-                sEventsSum - sInt
+                sEventsSum - unname(sInt)
             }) else if (nbeta0 > 1L) local({ # type-specific intercepts
                 ind <- sapply(1:nTypes, function (type) eventTypes == type,
                               USE.NAMES=FALSE) # logical N x nTypes matrix
@@ -635,7 +646,7 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                     } else ind
                 sEventsSum <- .colSums(sEvents, N, nTypes)
                 sInt <- exp(beta0) * .hIntTW(beta)
-                sEventsSum - sInt
+                sEventsSum - unname(sInt)
             }) else numeric(0L) # i.e. nbeta0 == 0L
 
             score_beta <- if (p > 0L) local({
@@ -732,10 +743,10 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
             scoreEvents_beta <- if (p > 0L) {
                 if (hase) {
                     mmhEvents * hEvents / lambdaEvents
-                } else mmhEvents   # Ninxp matrix
+                } else mmhEvents   # Nin x p matrix
             } else zeromatrix
 
-            cbind(scoreEvents_beta0, scoreEvents_beta)
+            unname(cbind(scoreEvents_beta0, scoreEvents_beta, deparse.level=0))
         } else zeromatrix
 
         # for gamma, siafpars and tiafpars
@@ -752,22 +763,21 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
                 .eEvents(gammapred, siafpars, tiafpars, ncolsRes = ntiafpars, g = tiaf$deriv)  # Ninxntiafpars matrix
             } else zeromatrix
 
-            eScoreEvents_nom <- cbind(scoreEvents_gamma_nom, scoreEvents_siafpars_nom, scoreEvents_tiafpars_nom)
+            eScoreEvents_nom <- cbind(scoreEvents_gamma_nom,
+                                      scoreEvents_siafpars_nom,
+                                      scoreEvents_tiafpars_nom,
+                                      deparse.level=0)
             eScoreEvents_nom / lambdaEvents
         } else zeromatrix
 
-        scoreEvents <- cbind(hScoreEvents, eScoreEvents)
+        scoreEvents <- cbind(hScoreEvents, eScoreEvents, deparse.level=0)
 
-        # Build the optional variation process (Martinussen & Scheike, p64)
-        info <- matrix(0, nrow = npars, ncol = npars,
-                    dimnames = list(names(theta), names(theta)))
-        for (i in 1:Nin) {
-            x <- scoreEvents[i,,drop=FALSE]  # single-ROW matrix
-            info <- info + crossprod(x) # t(x) %*% x
-        }
-
-        # Return the estimated Fisher information matrix
-        info
+        ## Build the optional variation process (Martinussen & Scheike, p64)
+        ## info <- matrix(0, nrow = npars, ncol = npars,
+        ##                dimnames = list(names(theta), names(theta)))
+        ## for (i in 1:Nin) info <- info + crossprod(scoreEvents[i,,drop=FALSE])
+        ## oh dear, this is nothing else but t(scoreEvents) %*% scoreEvents
+        crossprod(scoreEvents)
     }
 
 
@@ -1221,7 +1231,11 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     ### Add Fisher information matrices
 
     # estimation of the expected Fisher information matrix
-    if (useScore) fit$fisherinfo <- fisherinfo(fit$coefficients)
+    if (useScore)
+        fit$fisherinfo <- structure(
+            fisherinfo(fit$coefficients),
+            dimnames = list(names(initpars), names(initpars))
+            )
 
     # If requested, add observed fisher info (= negative hessian at maximum)
     if (any(!fixed) && !is.null(optimRes$hessian)) {
@@ -1259,25 +1273,35 @@ twinstim <- function (endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     
     # calculate cumulative ground intensities at event times
     # Note: this function is also used by residuals.twinstim
-    LambdagEvents <- function (cumCIF.pb = TRUE)
+    LambdagEvents <- function (cores = 1L, cumCIF.pb = interactive())
     {
-        heIntEvents <- matrix(NA_real_, Nin, 2L)
+        if (cores != 1L) cumCIF.pb <- FALSE
         if (cumCIF.pb) pb <- txtProgressBar(min=0, max=Nin, initial=0, style=3)
-        for (i in 1:Nin) {
-            heIntEvents[i,] <- heIntTWK(beta0, beta, gammapred, siafpars,
-                                        tiafpars, uppert = eventTimes[includes[i]])
-            if (cumCIF.pb) setTxtProgressBar(pb, i)
+        heIntEvents <- if (cores == 1L) {
+            sapply(seq_len(Nin), function (i) {
+                if (cumCIF.pb) setTxtProgressBar(pb, i)
+                heIntTWK(beta0, beta, gammapred, siafpars, tiafpars,
+                         eventTimes[includes[i]])
+            }, simplify=TRUE, USE.NAMES=FALSE)
+        } else {                        # cannot use progress bar
+            simplify2array(parallel::mclapply(
+                eventTimes[includes], heIntTWK,
+                beta0=beta0, beta=beta,
+                gammapred=gammapred, siafpars=siafpars,tiafpars=tiafpars,
+                mc.preschedule=TRUE, mc.cores=cores
+                ), higher=FALSE)
         }
         if (cumCIF.pb) close(pb)
-        LambdagEvents <- .rowSums(heIntEvents, Nin, 2L)
-        names(LambdagEvents) <- rownames(mmhEvents) # this is NULL if only h.intercept
-                                                    # (cf. bug report #14992)
-        if (is.null(names(LambdagEvents))) names(LambdagEvents) <- rownames(mme)
+        LambdagEvents <- setNames(.colSums(heIntEvents, 2L, Nin),
+                                  rownames(mmhEvents))
+        if (is.null(names(LambdagEvents))) # in R <2.15.2, rownames(mmhEvents) is
+                                           # NULL if only h.intercept, bug #14992
+            names(LambdagEvents) <- rownames(mme)
         LambdagEvents
     }
     if (cumCIF) {
         if (verbose) cat("\nCalculating the fitted cumulative intensities at events...\n")
-        fit$tau <- LambdagEvents(cumCIF.pb)
+        fit$tau <- LambdagEvents(cores, cumCIF.pb)
     }
 
     # calculate observed R0's: mu_j = spatio-temporal integral of e_j(t,s) over
