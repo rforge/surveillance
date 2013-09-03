@@ -430,9 +430,11 @@ twinstim <- function (
     ## two-dimensional siaf$deriv function)
     if (useScore && hassiafpars) {
         .siafDeriv <- mapplyFUN(
-            alist(siaf$Deriv, influenceRegion, type=eventTypes,
-                  MoreArgs=list(siaf$deriv, siafpars, ...),
-                  SIMPLIFY=TRUE, USE.NAMES=FALSE),
+            c(alist(siaf$Deriv, influenceRegion, type=eventTypes),
+              list(MoreArgs=quote(list(siaf$deriv, siafpars, ...)),
+                   SIMPLIFY=TRUE, USE.NAMES=FALSE)),
+            ##<- we explicitly quote() the ...-part instead of simply including
+            ##   it in the above alist() - only to make checkUsage() happy
             ## depending on nsiafpars, mapply() will return an N-vector
             ## or a nsiafpars x N matrix => transform to N x nsiafpars:
             after = quote(if (is.matrix(res)) t(res) else as.matrix(res)),

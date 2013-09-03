@@ -125,7 +125,7 @@ crudebeta0 <- function (nEvents, offset.mean, W.area, period, nTypes)
     ## the following variables are unused here, because the environment of
     ## FUN will be set to the parent.frame(), where the variables exist
     ## they are only included to avoid the notes in R CMD check 
-    iRareas <- influenceRegion <- eventTypes <- eps.s <- bdist <- nTypes <- NULL
+    iRareas <- influenceRegion <- eventTypes <- eps.s <- bdist <- effRanges <- NULL
     
     ## define the siaf integration function depending on the siaf specification 
     FUN <- if (attr(siaf, "constant"))
@@ -143,35 +143,39 @@ crudebeta0 <- function (nEvents, offset.mean, W.area, period, nTypes)
                (is.null(siaf$effRange) && noCircularIR))
     {
         ## Numerically integrate 'siaf' over each influence region
-        mapplyFUN(alist(siaf$F,
-                        influenceRegion, type=eventTypes,
-                        MoreArgs=list(siaf$f, siafpars, ...),
-                        SIMPLIFY=TRUE, USE.NAMES=FALSE),
-                  parallel = parallel)
+        mapplyFUN(
+            c(alist(siaf$F, influenceRegion, type=eventTypes),
+              list(MoreArgs=quote(list(siaf$f, siafpars, ...)),
+                   SIMPLIFY=TRUE, USE.NAMES=FALSE)),
+            ##<- we explicitly quote() the ...-part instead of simply including
+            ##   it in the above alist() - only to make checkUsage() happy
+            parallel = parallel)
     } else if (is.null(siaf$effRange)) # use Fcircle but only delta-trick
     {
         mapplyFUN(
-            alist(function (iR, type, eps, bdisti)
-                  if (eps <= bdisti) # influence region completely inside W
-                      siaf$Fcircle(eps, siafpars, type)
-                  else # numerically integrate over influence region
-                      siaf$F(iR, siaf$f, siafpars, type, ...)
-                  ,
-                  influenceRegion, eventTypes, eps.s, bdist,
-                  SIMPLIFY = TRUE, USE.NAMES = FALSE),
+            c(alist(function (iR, type, eps, bdisti, siafpars, ...)
+                    if (eps <= bdisti) # influence region completely inside W
+                        siaf$Fcircle(eps, siafpars, type)
+                    else # numerically integrate over influence region
+                        siaf$F(iR, siaf$f, siafpars, type, ...)
+                    ,
+                    influenceRegion, eventTypes, eps.s, bdist),
+              list(MoreArgs=quote(list(siafpars, ...)),
+                   SIMPLIFY=TRUE, USE.NAMES=FALSE)),
             parallel = parallel)
     } else { # fast Fcircle integration considering the delta-trick AND effRange
         .ret <- mapplyFUN(
-            alist(function (iR, type, eps, bdisti, effRange)
-                  if (eps <= bdisti) # influence region completely inside W
-                      siaf$Fcircle(eps, siafpars, type)
-                  else if (effRange <= bdisti) # effective region inside W
-                      siaf$Fcircle(bdisti, siafpars, type)
-                  else # numerically integrate over influence region
-                      siaf$F(iR, siaf$f, siafpars, type, ...)
-                  ,
-                  influenceRegion, eventTypes, eps.s, bdist, effRanges,
-                  SIMPLIFY = TRUE, USE.NAMES = FALSE),
+            c(alist(function (iR, type, eps, bdisti, effRange, siafpars, ...)
+                    if (eps <= bdisti) # influence region completely inside W
+                        siaf$Fcircle(eps, siafpars, type)
+                    else if (effRange <= bdisti) # effective region inside W
+                        siaf$Fcircle(bdisti, siafpars, type)
+                    else # numerically integrate over influence region
+                        siaf$F(iR, siaf$f, siafpars, type, ...)
+                    ,
+                    influenceRegion, eventTypes, eps.s, bdist, effRanges),
+              list(MoreArgs=quote(list(siafpars, ...)),
+                   SIMPLIFY=TRUE, USE.NAMES=FALSE)),
             ## before: compute computationally effective range of the 'siaf'
             ## for the current 'siafpars' for each event (type):
             before = expression(
