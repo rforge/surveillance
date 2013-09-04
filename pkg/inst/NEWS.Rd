@@ -7,7 +7,7 @@
 
 
 
-\section{Changes in surveillance version 1.6-0 (2013-08-28)}{
+\section{Changes in surveillance version 1.6-0 (2013-09-03)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -55,8 +55,13 @@
     \item Re-implementation of \code{oneStepAhead()} for
     \code{hhh4}-models with a bug fix, some speed-up and more options.
 
-    \item Slight speed-up for \code{hhh4()} and \code{twinstim()} fits,
+    \item Slight speed-up for \code{hhh4()} fits,
     e.g., by more use of \code{.rowSums()} and \code{.colSums()}.
+
+    \item Crucial speed-up for \code{twinstim()} fits by more efficient
+    code: \code{mapply}, dropped clumsy \code{for}-loop in
+    \code{fisherinfo}, new argument \code{cores} for parallel
+    computing via forking (not available on Windows).
 
     \item Some further new features, minor changes, and bug fixes are
     described in the following subsections.
@@ -116,6 +121,9 @@
     \item Argument order of \code{pit()} has changed, which is also
     faster now and got additional arguments \code{relative} and
     \code{plot}.
+
+    \item \code{twinstim(...)$runtime} now contains the complete
+    information from \code{proc.time()}.
   }
 }
 
