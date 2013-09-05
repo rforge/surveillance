@@ -180,8 +180,9 @@ print.summary.twinstim <- function (x,
             print(correl)
             cat("---\nCorr. codes:  ", correlcodes, "\n", sep="")
         } else {
-            correl <- format(round(correl, 2), nsmall = 2, digits = digits)
+            correl <- format(round(correl, 2), nsmall = 2)
             correl[!lower.tri(correl)] <- ""
+            colnames(correl) <- substr(colnames(correl), 1, 5)
             print(correl[-1, -p, drop = FALSE], quote = FALSE)
         }
         }
