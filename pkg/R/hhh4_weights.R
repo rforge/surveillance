@@ -214,7 +214,7 @@ powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
         ## specifying 'maxlag' in zetaweights is actually optional since it has
         ## the default value max(nbmat). however, repeatedly asking for this
         ## maximum would be really inefficient.
-    }
+    } else stopifnot(isScalar(maxlag))
 
     ## main function which returns the weight matrix
     weights.call <- call("zetaweights",

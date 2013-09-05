@@ -287,6 +287,11 @@ tiaf.exponential(nTypes = 1)
 }
 
 \references{
+  Meyer, S. and Held, L. (2013):
+  Modelling power-law spread of infectious diseases.
+  \emph{arXiv:1308.5115}\cr
+  arXiv-Link: \url{http://arxiv.org/abs/1308.5115}
+
   Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2012):
   A space-time conditional intensity model for invasive meningococcal
   disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.\cr
