@@ -158,22 +158,17 @@ subset.epidataCS <- function (x, subset, select, drop = FALSE, ...)
 ## Subset epidataCS object using head and tail methods (which use [.epidataCS)
 
 head.epidataCS <- function (x, n = 6L, ...)
-{
-    ## cl <- match.call()
-    ## cl[[1]] <- quote(utils:::head.data.frame)
-    ## eval(cl, parent.frame())
-    utils:::head.data.frame(x, n = n, ...) # we need the data.frame method
-}
+    head.matrix(x, n = n, ...)
 
 tail.epidataCS <- function (x, n = 6L, ...)
 {
-    # ugly hack for utils:::tail.data.frame because I don't want to register a
+    # ugly hack for tail.matrix because I don't want to register a
     # dim-method for class "epidataCS"
     nrow <- function (x) base::nrow(x$events)
-    my.tail.data.frame <- utils:::tail.data.frame
-    environment(my.tail.data.frame) <- environment()
+    my.tail.matrix <- tail.matrix
+    environment(my.tail.matrix) <- environment()
     ##<- such that the function uses my local nrow definition
-    my.tail.data.frame(x, n = n, ...)
+    my.tail.matrix(x, n = n, addrownums=FALSE, ...)
 }
 
 
@@ -218,7 +213,7 @@ print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
     # 'print.data.frame', hence the use of options()
     odigits <- options(digits=digits); on.exit(options(odigits))
     visibleCols <- grep("^\\..+", names(x$events@data), invert = TRUE)
-    print(utils:::head.data.frame(x$events[visibleCols], n = n), ...)
+    print(head.matrix(x$events[visibleCols], n = n), ...)
     if (n < nEvents) cat("[....]\n")
     cat("\n")
     invisible(x)
