@@ -71,8 +71,8 @@ update.twinstim_stependemic <- function (object, endemic, ..., evaluate = TRUE)
     if (evaluate) {
         do.call(stepClass, alist(res))
     } else {
-        substitute(surveillance:::FUN(res),
-                   list(FUN=as.name(stepClass), res=res))
+        as.call(list(call(":::", as.name("surveillance"), as.name(stepClass)),
+                     res))
         ## the call will only be evaluated within stats:::drop1.default() or
         ## stats:::add1.default, where the "stepClass" constructor function
         ## (twinstim_stependemic or twinstim_stepepidemic) is not visible;
