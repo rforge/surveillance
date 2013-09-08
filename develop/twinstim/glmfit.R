@@ -1,6 +1,6 @@
 ################################################################################
 ## Author: Sebastian Meyer [sebastian *.* meyer *a*t* ifspm *.* uzh *.* ch]
-## Time-stamp: <[glmfit.R] by SM Mit 28/08/2013 21:23 (CEST)>
+## Time-stamp: <[glmfit.R] by SM Son 08/09/2013 13:54 (CEST)>
 ## Project: Reproduce endemic-only twinstim fit by an equivalent Poisson-GLM fit
 ################################################################################
 
@@ -45,7 +45,7 @@ summary(myglm)
 
 myglmoffset <- glm(update(formula(m_noepi)$endemic, nEvents ~ .),
                    data=mystgrid, family=poisson,
-                   offset=log((mystgrid$stop-mystgrid$start) * mystgrid$area))
+                   offset=log((stop-start) * area))
 summary(myglmoffset)
 # estimates and standard errors reproduced (apart from numerical differences)
 
@@ -69,4 +69,3 @@ myglmtypes <- glm(update(formula(m_noepi)$endemic, nEvents ~ type + . - 1),
                   offset=log((stop-start) * area))
 summary(myglmtypes)
 # in accordance with the results from the corresponding twinstim-fit ! :)
-

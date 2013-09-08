@@ -61,11 +61,8 @@ twinstim_stependemic <- twinstim_stepepidemic <- function (object)
 
 update.twinstim_stependemic <- function (object, endemic, ..., evaluate = TRUE)
 {
-    ## object <- .step2twinstim(object); res <- NextMethod()
-    cl <- match.call(expand.dots=TRUE)
-    cl[[1L]] <- as.name("update.twinstim")
-    cl$object <- as.call(list(quote(surveillance:::.step2twinstim), cl$object))
-    res <- eval.parent(cl)
+    object <- .step2twinstim(object)
+    res <- NextMethod("update")         # use update.twinstim()
     
     ## we need to keep the special class such that step() will keep invoking
     ## the special update- and terms-methods on the result
@@ -76,6 +73,10 @@ update.twinstim_stependemic <- function (object, endemic, ..., evaluate = TRUE)
     } else {
         substitute(surveillance:::FUN(res),
                    list(FUN=as.name(stepClass), res=res))
+        ## the call will only be evaluated within stats:::drop1.default() or
+        ## stats:::add1.default, where the "stepClass" constructor function
+        ## (twinstim_stependemic or twinstim_stepepidemic) is not visible;
+        ## we thus have to use ":::".
     }
 }
 
