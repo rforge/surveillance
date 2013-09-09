@@ -8,10 +8,14 @@ useDynLib(surveillance)
 ###############
 
 ### Fully import all packages listed as Depends in the given order
-### (except for Rcpp, which is only used on the C-level, and
-### stats, utils, and xtable, from which only selected methods are imported)
+### (except for stats, utils, and xtable,
+### from which only selected methods are imported)
 
 import(grDevices, graphics)
+import(Rcpp)
+## although Rcpp is only used on C-level we need to "ensure that Rcpp is loaded
+## so any dynamic linking to its code can be resolved.  (There may be none, but
+## there could be, now or in future.)" (B. Ripley, 2013-09-08)
 
 ## required generics (that's why we "Depend" on these packages)
 importFrom(stats, coef, vcov, logLik, nobs, residuals, confint, AIC, extractAIC,
@@ -26,7 +30,6 @@ importFrom(stats, pnorm, cov2cor, ks.test, formula, rnorm, runif, step,
 importFrom(utils, packageVersion, modifyList, head.matrix)
 
 import(methods)
-##import(Rcpp)   # not used on the R-level
 
 #importMethodsFrom(stats4, plot)   # import S4-generic
 #<- would be nice, but then gives strange warnings for S3 methods from stats
