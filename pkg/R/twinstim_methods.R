@@ -268,7 +268,7 @@ xtable.summary.twinstim <- function (x, caption = NULL, label = NULL,
                         CI = sprintf(cifmt, expcis[,1], expcis[,2]),
                         "p-value" = formatPval(tab[,4], eps=eps.pvalue),
                         check.names = FALSE, stringsAsFactors=FALSE)
-    names(rrtab)[2] <- paste0(100*ci.level, "%-CI")
+    names(rrtab)[2] <- paste0(100*ci.level, "% CI")
 
     ## append caption etc.
     class(rrtab) <- c("xtable", "data.frame")
@@ -646,16 +646,17 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
         if (is.null(ylim))
             ylim <- c(0, FUN(if (which=="siaf") cbind(0,0) else 0, pars, 1L))
         if (is.null(xlab)) xlab <- if (which == "siaf") {
-            expression("Distance " * group("||",bold(s)-bold(s)[j],"||") *
-                " from host")
+            expression("Distance " *
+                       x *              # group("||",bold(s)-bold(s)[j],"||") *
+                       " from host")
         } else {
-            expression("Distance " * t-t[j] * " from host")
+            expression("Time " * t * " since infectious")
         }
         if (is.null(ylab)) {
             ylab <- if (which == "siaf") {
-                expression(f(group("||",bold(s)-bold(s)[j],"||")))
+                expression(f(x))        # f(group("||",bold(s)-bold(s)[j],"||"))
             } else {
-                expression(g(t-t[j]))
+                expression(g(t))
             }
             if (scaled) {
                 ylab <- as.expression(as.call(list(quote(paste),

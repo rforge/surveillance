@@ -6,6 +6,17 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.6-1 (2013-09-10)}{
+
+\subsection{SYNOPSIS}{
+  \itemize{
+    \item ...
+  }
+}
+
+}
+
+
 
 \section{Changes in surveillance version 1.6-0 (2013-09-03)}{
 
