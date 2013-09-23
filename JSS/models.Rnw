@@ -7,7 +7,7 @@ source("setup.R")
 \section{Epidemic modelling} \label{sec:models}
 
 
-Model frameworks, model selection, residuals, ...
+Regression frameworks, model selection, residuals, ...
 
 
 \input{models_twinstim}

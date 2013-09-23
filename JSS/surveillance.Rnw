@@ -2,21 +2,21 @@
 \usepackage[utf8]{inputenc}   % character encoding of LaTeX source files
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% almost as usual
 \author{Sebastian Meyer\\University of Zurich \And
-        Michaela Paul\\Novartis? \And
+        Michaela Paul\\Novartis \And
         Leonhard Held\\University of Zurich \And
         Michael Höhle\\Stockholm University}
-\title{Spatio-Temporal Modelling in Infectious Disease Epidemiology Using the
-  \proglang{R} package \pkg{surveillance}}
+\title{Spatio-Temporal Modelling of Infectious Diseases Using the
+  \proglang{R} Package \pkg{surveillance}}
 
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Sebastian Meyer, Michaela Paul, Leonhard Held, Michael Höhle}
-\Plaintitle{Spatio-Temporal Modelling in Infectious Disease Epidemiology Using the R package surveillance}
-\Shorttitle{\pkg{surveillance}: Spatio-Temporal Modelling in Infectious Disease Epidemiology}
+\Plaintitle{Spatio-Temporal Modelling of Infectious Diseases Using the R Package surveillance}
+\Shorttitle{\pkg{surveillance}: Spatio-Temporal Modelling of Infectious Diseases}
 
 %% an abstract and keywords
 \input{abstract}
@@ -44,7 +44,7 @@
 
   \bigskip
   Michaela Paul\\
-  E-mail: \email{Michaela.Paul}
+  E-mail: \email{Michaela.Paul@novartis.com}
 
   \bigskip
   Leonhard Held\\
@@ -98,15 +98,31 @@ Financial support by the Swiss National Science Foundation
   prediction of infectious diseases}) is gratefully acknowledged.
 
 
+
 %--------------
 % BIBLIOGRAPHY (all titles must be in uppercase title style)
 %--------------
 
-\nocite{R:2.15.3}
+<<Rbib, echo=FALSE>>=
+Rbib <- lapply(c("base", "surveillance", "polyCub", "sp"), function (package) {
+    bibentry <- citation(package, auto=package %in% c("surveillance", "polyCub"))[[1]]
+    ## if (package=="surveillance")        # state CRAN version (not devel)
+    ##     bibentry$note <- sub("version.*$", "version 1.6-0", bibentry$note)
+    bibentry$key <- paste("R", package, sep=":")
+    bibentry$title <- if (package=="base") {
+        sub("^R", "\\\\proglang{R}", bibentry$title)
+    } else sub(paste0("^", package), paste0("\\\\pkg{",package,"}"), bibentry$title)
+    bibentry
+    })
+Rbib <- do.call("c", Rbib)
+writeLines(toBibtex(Rbib), "R.bib")
+@
+
+\nocite{R:base}
 \iffalse
 \bibliography{literatur}  % full database (inserted here for RefTeX)
 \fi
-\bibliography{references} % bibfile for this document
+\bibliography{references,R} % bibfile for this document
 
 
 

@@ -3,6 +3,9 @@
 \usepackage{fixltx2e}         % patches for LaTeX2e
 
 %%% Typesetting
+%\usepackage{microtype}        % micro-typo: character protrusion, font expansion
+%\usepackage{ellipsis}         % correct white space around \dots
+%\usepackage{url}              % manages line breaks in URLs
 %\usepackage{setspace}         % modify line spacing
 %\onehalfspacing               % for finer control: \setstretch
 
@@ -13,15 +16,15 @@
 %\usepackage{bbm}              % \mathbbm: alternative to \mathbb from amsfonts
 \usepackage{bm}               % \bm: alternative to \boldsymbol from amsfonts
 \usepackage{mathtools}        % tools for math typesetting + amsmath-bugfixes
-\usepackage[shortlabels]{enumitem}     % supersedes the enumerate package
-\usepackage{rotfloat}         % strict placement [H], support for sidewaystable
 \usepackage{booktabs}         % make tables look nicer
 \usepackage{subfig}           % successor of subfigure -> \subfloat[Title]{...}
 
 %%% Further packages
-%\usepackage{marginnote}       % text in margin (also in floats <-> \marginpar)
+\usepackage{marginnote}       % text in margin (also in floats <-> \marginpar)
 %\usepackage{longtable}        % long tables with pagebreak
+%\usepackage{rotfloat}         % strict placement [H], support for sidewaystable
 %\usepackage{lscape}           % landscape pages
+%usepackage[shortlabels]{enumitem}     % supersedes the enumerate package
 %\usepackage[english, algoruled, vlined, linesnumbered]{algorithm2e}
 %\DontPrintSemicolon \NoCaptionOfAlgo
 %\usepackage[left,running]{lineno} % activate by \linenumbers
@@ -40,8 +43,8 @@
 \DeclareMathOperator{\Exp}{Exp} % Exponential distribution
 \DeclareMathOperator{\N}{N}     % Normal distribution
 %\DeclareMathOperator{\E}{E}     % Expectation
-\DeclareMathOperator{\Var}{Var} % Variance
-\DeclareMathOperator{\se}{se}   % Standard error
-\DeclareMathOperator{\Cov}{Cov} % covariance
-\DeclareMathOperator{\Corr}{Corr} % correlation
+%\DeclareMathOperator{\Var}{Var} % Variance
+%\DeclareMathOperator{\se}{se}   % Standard error
+%\DeclareMathOperator{\Cov}{Cov} % covariance
+%\DeclareMathOperator{\Corr}{Corr} % correlation
 \DeclareMathOperator{\logit}{logit}   % logit-transform

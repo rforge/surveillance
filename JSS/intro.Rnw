@@ -6,5 +6,7 @@ source("setup.R")
 
 \section{Introduction} \label{sec:intro}
 
-%- why Modellierung von Epidemic Phenomena
-%      - The R package surveillance
+
+- why modelling of epidemic phenomena
+
+- The R package surveillance (including history and spread) and related (R) packages

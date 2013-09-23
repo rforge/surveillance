@@ -12,3 +12,19 @@ source("setup.R")
 %      - Beispiele: meningokokken, Hagelloch measles, Influenza in
 % Süddeutschland
 %      - Visualisierung
+
+\subsection{Individual case reports}
+
+\subsection{Complete event history of a closed population}
+
+\subsection{Count data}
+
+Note that the distance matrix between regions can be
+generated from the adjacency indicator matrix $\bm{A}$:
+Since $(\bm{A}^k)_{ij}$ is the number of paths of length $k$ between regions $i$
+and $j$, %Ex. 3.1.2 in Bondy & Murty (2008), Ch.1/Ex.41 in Diestel (2010),
+         %Ch.3.1/Fact 6 in the Handbook of Graph Theory (2003)
+positive entries in $\bm{A}^k$ indicate neighbours \emph{up to} order $k$.
+% Example: $(A^2)_{ij} = \sum_{k=1}^I a_{ik} a_{kj}$ is positive iff there is a
+% region $k$ adjacent to both $i$ and $j$.
+\citep{Diestel2010}

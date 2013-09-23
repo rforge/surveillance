@@ -7,14 +7,15 @@ DEPENDS  = ${TEXFILES} $(patsubst %.Rnw,%.tex,${RNWFILES}) ${BIBFILE}
 
 R = R
 ROPTS = --slave --no-save --no-restore
+RSETUPFILE = setup.R
 
 .PHONY: clean
 
 ${MASTER}.pdf:	${MASTER}.tex ${DEPENDS}
 	texi2pdf --batch --quiet $<
 
-%.tex: %.Rnw setup.R
+%.tex: %.Rnw ${RSETUPFILE}
 	echo "library('knitr'); knit('$<')" | ${R} ${ROPTS}
-	
+
 clean:
-	rm -f *.dvi *.log *.toc *.bmt *.bbl *.blg *.idx *.ilg *.ind *.mtc* *.flc *.out *.nav *.snm *.vrb #*.aux
+	rm -f *.dvi *.log *.toc *.bmt *.blg *.idx *.ilg *.ind *.mtc* *.flc *.out *.nav *.snm *.vrb *.bbl *.aux
