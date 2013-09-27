@@ -476,61 +476,61 @@ ri <- function(type=c("iid","car")[1],
   return(result)
 }
 
-# check specification of formula
-checkFormula <- function(f, env, component){
+### check specification of formula
+## f: one of the component formulae (ar$f, ne$f, or end$f)
+## env: the "data" argument of hhh4()
+## component: 1, 2, or 3, corresponding to the ar/ne/end component, respectively
+checkFormula <- function(f, env, component)
+{
   term <- terms.formula(f, specials=c("fe","ri"))
+  
   # check if there is an overall intercept
   intercept.all <- attr(term, "intercept") == 1
   
-  # list with variables in the component
-  vars <- as.list(attr(term,"variables"))
-  nVars <- length(vars)-1 # minus 1 because first element is "list"
-  
-  if(!intercept.all & nVars==0) stop("formula",deparse(substitute(f)),"contains no variables\n")
-  
-  if(intercept.all){
-    res <- c(eval(fe(1),envir=env),list(offsetComp=component))
+  # list of terms in the component
+  vars <- as.list(attr(term,"variables"))[-1] # first element is "list"
+  nVars <- length(vars)
+
+  # begin with intercept
+  res <- if (intercept.all) {
+      c(eval(fe(1),envir=env), list(offsetComp=component))
   } else {
-    res <- NULL
+      if (nVars==0)
+          stop("formula ", deparse(substitute(f)), " contains no variables")
+      NULL
   }
   
   # find out fixed effects without "fe()" specification
   # (only if there are variables in addition to an intercept "1")
-  if(nVars >0){
-	fe.raw <- setdiff(1:nVars, unlist(attr(term, "specials")))
-  } else {
-	fe.raw <- numeric(0)
-  }
+  fe.raw <- setdiff(seq_len(nVars), unlist(attr(term, "specials")))
+  
   # evaluate covariates
-  if(length(fe.raw)>0){
-    for(i in fe.raw)
-      res <- cbind(res, c(eval(substitute(fe(x), list(x=vars[[i+1]])),envir=env),list(offsetComp=component)))
-  }
+  for(i in fe.raw)
+      res <- cbind(res, c(
+          eval(substitute(fe(x), list(x=vars[[i]])), envir=env),
+          list(offsetComp=component)
+          ))
   
   # fixed effects
-  FE <- attr(term, "specials")$fe
-  if(!is.null(FE)){
-    for(i in FE){
-      res <- cbind(res,c(eval(vars[[i+1]], envir=env),list(offsetComp=component)))
-    }  
-  }
+  for(i in attr(term, "specials")$fe)
+      res <- cbind(res, c(
+          eval(vars[[i]], envir=env),
+          list(offsetComp=component)
+          ))
   
   res <- cbind(res, deparse.level=0) # ensure res has matrix dimensions
-  if(sum(unlist(res["intercept",])) > 1) {
-    stop("There can only be one intercept in the formula ", deparse(substitute(f)))
-  }
+  if(sum(unlist(res["intercept",])) > 1)
+      stop("There can only be one intercept in the formula ", deparse(substitute(f)))
   
-  # random effects
+  # random intercepts
   RI <- attr(term, "specials")$ri
-
-  if(length(RI)>1){
-    stop("There can only be one random intercept in the formula ",deparse(substitute(f)))
-  }
-  if(!is.null(RI)){
-    for(i in RI){
-      res <- cbind(res,c(eval(vars[[i+1]], envir=env),list(offsetComp=component)))
-    }      
-  }
+  if(length(RI)>1)
+      stop("There can only be one random intercept in the formula ", deparse(substitute(f)))
+  for(i in RI)
+      res <- cbind(res, c(
+          eval(vars[[i]], envir=env),
+          list(offsetComp=component)
+          ))
   
   return(res)
 }
