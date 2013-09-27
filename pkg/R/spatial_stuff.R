@@ -179,7 +179,8 @@ nbOrder <- function (neighbourhood, maxlag = 1)
 
 polyAtBorder <- function (SpP, snap=sqrt(.Machine$double.eps))
 {
-    W <- unionSpatialPolygons(SpP)      # length(W@polygons) == 1
+    SpP <- as(SpP, "SpatialPolygons")
+    W <- unionSpatialPolygons(SpP)      # -> length(W@polygons) == 1
     Wcoords <- unique(do.call("rbind",
                               lapply(W@polygons[[1]]@Polygons, coordinates)))
     atBorder <- sapply(SpP@polygons, function (x) {
