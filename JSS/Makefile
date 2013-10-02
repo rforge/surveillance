@@ -12,7 +12,7 @@ RSETUPFILE = setup.R
 .PHONY: clean
 
 ${MASTER}.pdf:	${MASTER}.tex ${DEPENDS}
-	texi2pdf --batch --quiet $<
+	texi2pdf --batch $<
 
 %.tex: %.Rnw ${RSETUPFILE}
 	echo "library('knitr'); knit('$<')" | ${R} ${ROPTS}

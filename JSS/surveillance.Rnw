@@ -10,13 +10,13 @@
         Michaela Paul\\Novartis \And
         Leonhard Held\\University of Zurich \And
         Michael Höhle\\Stockholm University}
-\title{Spatio-Temporal Modelling of Infectious Diseases Using the
+\title{Spatio-Temporal Modeling of Infectious Diseases Using the
   \proglang{R} Package \pkg{surveillance}}
 
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Sebastian Meyer, Michaela Paul, Leonhard Held, Michael Höhle}
-\Plaintitle{Spatio-Temporal Modelling of Infectious Diseases Using the R Package surveillance}
-\Shorttitle{\pkg{surveillance}: Spatio-Temporal Modelling of Infectious Diseases}
+\Plaintitle{Spatio-Temporal Modeling of Infectious Diseases Using the R Package surveillance}
+\Shorttitle{\pkg{surveillance}: Spatio-Temporal Modeling of Infectious Diseases}
 
 %% an abstract and keywords
 \input{abstract}
@@ -93,6 +93,7 @@
 We thank ...
 %We also appreciate helpful comments on earlier versions of this manuscript by
 %two anonymous referees.
+
 Financial support by the Swiss National Science Foundation
 (project 137919: \emph{Statistical methods for spatio-temporal modelling and
   prediction of infectious diseases}) is gratefully acknowledged.

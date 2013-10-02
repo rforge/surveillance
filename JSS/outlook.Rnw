@@ -6,10 +6,9 @@ source("setup.R")
 
 \section{Outlook} \label{sec:outlook}
 
-%      - weitere Anwendungsgebiete über infektiöse Krankheiten
-%      - Möglichkeit manche der Modellierung ein einen
-% Ausbruchsdetektionskontext
-%        zu setzen
+- further applications besides modelling epidemics of infectious diseases
+
+- use models for outbreak detection/prediction
 
 
 

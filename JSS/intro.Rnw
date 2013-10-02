@@ -7,6 +7,16 @@ source("setup.R")
 \section{Introduction} \label{sec:intro}
 
 
-- why modelling of epidemic phenomena
+why statistical modelling of epidemic phenomena?
 
-- The R package surveillance (including history and spread) and related (R) packages
+Unfortunately, newly published statistical methodology still rarely includes
+software to actually apply the methods in practice and thus only serves for
+academic purposes. In infectious disease epidemiology few examples exist:
+SaTScan, stpp, ...
+The surveillance package tries to further fill this gap by providing
+implementations of three recently developed model frameworks for the analysis of
+epidemic spread.
+
+The R package surveillance goes back to ...
+As far as we know, the surveillance package is nowadays successfully used in
+practice at several public health institutions including ... 

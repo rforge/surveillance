@@ -4,7 +4,7 @@ source("setup.R")
 @
 
 
-\section{Epidemic modelling} \label{sec:models}
+\section{Epidemic modeling} \label{sec:models}
 
 
 Regression frameworks, model selection, residuals, ...
