@@ -121,7 +121,7 @@ $6\sigma$ (i.e., very high quantile) circle around $\bm{s}_j$ lay completely
 inside $\bm{W}$. Then, the spatial integral was approximated by the integral
 over this circular domain only, which is available analytically for the
 Gaussian density via the $\chi^2$ distribution
-\citep[Formula 26.3.24]{Abramowitz-stegun-1970}.
+\citep[Formula 26.3.24]{Abramowitz.Stegun1972}.
 Although analytical integration
 over circular domains is also possible for the power-law kernels (see
 Appendix \ref{appendix:twinstim:Fcircle}),

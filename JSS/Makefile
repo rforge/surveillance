@@ -15,7 +15,7 @@ ${MASTER}.pdf:	${MASTER}.tex ${DEPENDS}
 	texi2pdf --batch $<
 
 %.tex: %.Rnw ${RSETUPFILE}
-	echo "library('knitr'); knit('$<')" | ${R} ${ROPTS}
+	@echo "library('knitr'); knit('$<')" | ${R} ${ROPTS}
 
 clean:
 	rm -f *.dvi *.log *.toc *.bmt *.blg *.idx *.ilg *.ind *.mtc* *.flc *.out *.nav *.snm *.vrb *.bbl *.aux

@@ -67,6 +67,20 @@
 
 @STRING{STSIN = {Statistica Sinica}}
 
+@BOOK{Abramowitz-stegun-1970,
+  title = {{H}andbook of {M}athematical {F}unctions with {F}ormulas, {G}raphs,
+	and {M}athematical {T}ables},
+  publisher = {Dover Publications},
+  year = {1970},
+  editor = {Milton Abramowitz and Irene A. Stegun},
+  author = {Milton Abramowitz and Irene A. Stegun},
+  address = {New York},
+  edition = {9},
+  biburl = {http://www.bibsonomy.org/bibtex/26e1c79af94753bc1444ddfabcf82e899/cafo78},
+  owner = {sebastian},
+  timestamp = {2013.10.02}
+}
+
 @ARTICLE{albert.barabasi2002,
   author = {Albert, Réka and Barabási , Albert-László},
   title = {{S}tatistical mechanics of complex networks},
@@ -294,6 +308,22 @@
 	modelling},
   owner = {sebastian},
   timestamp = {2013.08.19}
+}
+
+@BOOK{Diestel2010,
+  title = {{G}raph {T}heory},
+  publisher = {Springer-Verlag},
+  year = {2010},
+  author = {Reinhard Diestel},
+  volume = {173},
+  series = {Graduate Texts in Mathematics},
+  address = {Heidelberg},
+  edition = {4th},
+  file = {:books/Diestel2005.pdf:PDF},
+  owner = {sebastian},
+  quality = {1},
+  timestamp = {2013.08.15},
+  url = {http://diestel-graph-theory.com}
 }
 
 @INCOLLECTION{diggle2007,
@@ -869,6 +899,20 @@
   owner = {sebastian}
 }
 
+@ARTICLE{kermack.mckendrick1927,
+  author = {Kermack, W. O. and McKendrick, A. G.},
+  title = {{A} contribution to the mathematical theory of epidemics},
+  journal = {Proceedings of the Royal Society of London. Series A},
+  year = {1927},
+  volume = {115},
+  pages = {700--721},
+  number = {772},
+  doi = {10.1098/rspa.1927.0118},
+  file = {kermack.mckendrick1927.pdf:articles/kermack.mckendrick1927.pdf:PDF},
+  owner = {sebastian},
+  timestamp = {2013.04.30}
+}
+
 @ARTICLE{lawson.leimich2000,
   author = {Lawson, Andrew B. and Leimich, Petra},
   title = {{A}pproaches to the space-time modelling of infectious disease behaviour},
@@ -966,6 +1010,43 @@
   url = {http://www.jstor.org/stable/2281544}
 }
 
+@MASTERSTHESIS{meyer2009,
+  author = {Sebastian Meyer},
+  title = {{S}patio-{T}emporal {I}nfectious {D}isease {E}pidemiology based on
+	{P}oint {P}rocesses},
+  school = {Department of Statistics, Ludwig-Maximilians-Universität},
+  year = {2009},
+  type = {Master's Thesis},
+  address = {München},
+  month = dec,
+  abstract = {In this Master's Thesis, a novel combination of point process models
+	continuous in space-time is proposed for infectious disease data.
+	Modelling is driven by the conditional intensity function, which
+	enables a step towards a regression framework for self-exciting spatio-temporal
+	point processes. The model is an extension of the discrete space
+	additive-multiplicative conditional intensity model proposed by Höhle
+	(2009), and also borrows from earthquake research, especially from
+	the formulation of the space-time ETAS model in Ogata (2003). Estimation
+	is performed by means of full maximum likelihood, which for general
+	point processes in space requires the evaluation of two-dimensional
+	integrals. Therefore, various methods of numerical integration are
+	investigated as a prerequisite for maximum likelihood inference.
+	
+	The particular application of interest is the stochastic modelling
+	of the transmission dynamics of the two most common meningococcal
+	strains observed in Germany in 2002--2008. The application showed
+	that the proposed model and its estimation by the provided thoroughly
+	\texttt{R} implementation are applicable and valuable for the analysis
+	of spatio-temporal infectious disease data.},
+  file = {meyer2009.pdf:theses/meyer2009.pdf:PDF},
+  keywords = {stochastic epidemic modelling; spatio-temporal point processes; conditional
+	intensity function; two-dimensional numerical integration; invasive
+	meningococcal disease},
+  owner = {sebastian},
+  timestamp = {2012.06.13},
+  url = {http://epub.ub.uni-muenchen.de/11703/}
+}
+
 @ARTICLE{meyer.etal2011,
   author = {Meyer, Sebastian and Elias, Johannes and Höhle, Michael},
   title = {{A} space-time conditional intensity model for invasive meningococcal
@@ -997,6 +1078,37 @@
   owner = {sebastian},
   publisher = {Blackwell Publishing Inc},
   timestamp = {2012.06.27}
+}
+
+@ARTICLE{meyer.held2013,
+  author = {Meyer, Sebastian and Held, Leonhard},
+  title = {{M}odelling power-law spread of infectious diseases},
+  year = {2013},
+  note = {Submitted to Annals of Applied Statistics},
+  abstract = {Short-time human travel behaviour can be well described by a power
+	law with respect to distance. We incorporate this information in
+	space-time models for infectious disease surveillance data to better
+	capture the dynamics of disease spread. Two previously established
+	model classes are extended, which both decompose disease risk additively
+	into endemic and epidemic components: a space-time point process
+	model for individual point-referenced data, and a multivariate time
+	series model for aggregated count data. In both frameworks, the power-law
+	spread is embedded into the epidemic component and its decay parameter
+	is estimated jointly with all other unknown parameters using (penalised)
+	likelihood inference. The performance of the new approach is investigated
+	by a re-analysis of individual cases of invasive meningococcal disease
+	in Germany (2002-2008), and count data on influenza in 140 administrative
+	districts of Southern Germany (2001-2008). In both applications,
+	the power-law formulations substantially improve model fit and predictions.
+	Implementation in the R package surveillance allows to apply the
+	approach in other settings.},
+  file = {meyer.held2013.pdf:articles/meyer.held2013.pdf:PDF},
+  keywords = {power law; distance decay function; infectious disease surveillance;
+	stochastic epidemic modelling},
+  owner = {sebastian},
+  quality = {1},
+  timestamp = {2013.08.26},
+  url = {http://arxiv.org/abs/1308.5115}
 }
 
 @ARTICLE{nelder.mead1965,
@@ -1234,6 +1346,17 @@
   owner = {sebastian}
 }
 
+@MISC{sommariva.vianello2007:code,
+  author = {Alvise Sommariva and Marco Vianello},
+  title = {\texttt{polygauss}: {MATLAB} code for {G}auss-like cubature over
+	polygons},
+  howpublished = {\url{http://www.math.unipd.it/~alvise/software.html}},
+  year = {2007},
+  lastchecked = {7 October 2009},
+  owner = {sebastian},
+  timestamp = {2013.05.17}
+}
+
 @ARTICLE{soubeyrand.etal2008,
   author = {Soubeyrand, Samuel and Held, Leonhard and Höhle, Michael and Sache,
 	Ivan},
@@ -1383,5 +1506,19 @@
   address = {Cambridge, Massachusetts, USA},
   owner = {sebastian},
   timestamp = {2012.12.19}
+}
+
+@BOOK{Abramowitz.Stegun1972,
+  title = {{H}andbook of {M}athematical {F}unctions with {F}ormulas, {G}raphs,
+	and {M}athematical {T}ables},
+  publisher = {Dover Publications},
+  year = {1972},
+  editor = {Milton Abramowitz and Irene A. Stegun},
+  address = {New York},
+  comment = {Ninth Dover printing / tenth U.S. Government Printing Office printing},
+  file = {:books/abramowitz_and_stegun/frameindex.htm:URL},
+  isbn = {0-486-61272-4},
+  owner = {sebastian},
+  timestamp = {2013.10.02}
 }
 
