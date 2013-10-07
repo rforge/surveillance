@@ -38,6 +38,6 @@ ${MASTER}.aux:
 	pdflatex -interaction=nonstopmode ${MASTER}.tex
 
 clean:
-	rm -f *.dvi *.log *.toc *.bmt *.blg *.idx *.ilg *.ind *.mtc* *.flc *.out *.nav *.snm *.vrb #*.bbl *.aux
+	rm -f *.dvi *.log *.toc *.bmt *.blg *.idx *.ilg *.ind *.mtc* *.flc *.out *.nav *.snm *.vrb *.bbl #*.aux
 
 .PHONY: clean

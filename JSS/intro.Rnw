@@ -7,16 +7,36 @@ source("setup.R")
 \section{Introduction} \label{sec:intro}
 
 
-why statistical modelling of epidemic phenomena?
+why statistical modeling of epidemic phenomena?
 
-Unfortunately, newly published statistical methodology still rarely includes
-software to actually apply the methods in practice and thus only serves for
-academic purposes. In infectious disease epidemiology few examples exist:
-SaTScan, stpp, ...
-The surveillance package tries to further fill this gap by providing
-implementations of three recently developed model frameworks for the analysis of
-epidemic spread.
+Newly developed statistical methodology often lacks readily available
+software to apply the methods in practice. Without implementation research
+findings serve for academic purposes only.
+In infectious disease epidemiology, a few exceptions of this deficiency are
+the \proglang{SaTScan} software \citep{SaTScan:9.1.1}, and the \proglang{R}
+packages \pkg{stpp} \citep{gabriel.etal2013} and \pkg{amei} \citep{merl.etal2010}.
+The \pkg{surveillance} package tries to fill this gap.
 
-The R package surveillance goes back to ...
-As far as we know, the surveillance package is nowadays successfully used in
-practice at several public health institutions including ... 
+The open-source \proglang{R} package \pkg{surveillance} was initiated in 2004 at
+the University of Munich as part of the DFG/SFB386 research project ``Statistical
+methodology for infectious disease surveillance'' with the goal of providing
+data structures and a computational framework for methodological developments
+as well as a disease monitoring and modeling tool for epidemiologists and
+public health authorities.
+The package's functionality can be divided into two categories:
+Prospective change point (aberration) detection algorithms
+\citep[described in][]{hoehle.mazick2010},
+and retrospective modeling of epidemics (the focus of this paper). 
+
+As far as we know, \pkg{surveillance} is nowadays successfully used in
+practice at several public health institutions including \marginnote{verify, update}
+\begin{itemize}
+\item Governmental Institute of Public Health of Lower Saxony (\cite{hulth.etal2010})
+\item Swedish Institute for Communicable Disease Control: % (Smittskyddsinstitutet)
+  Computer Assisted Search for Epidemics (CASE) project \citep{cakici.etal2010}
+\item National Public Health Institute of Finland % (Kansanterveyslaitos)
+\item French National Reference Centre for Salmonella (Institut Pasteur) % Centre National de R\'ef\'erence des Salmonella, France
+\item Infectious Disease Surveillance and Analysis System, Dept. of
+  Animal Production and Health, Sri Lanka (\cite{robertson.etal2010})
+\end{itemize}
+

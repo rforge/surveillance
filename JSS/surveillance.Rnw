@@ -81,10 +81,10 @@
 %% There are also the commands \E, \VAR, \COV, \Prob (using \mathsf).
 
 
-\include{intro}
-\include{dataio}
-\include{models}
-\include{outlook}
+\input{intro}
+\input{dataio}
+\input{models}
+\input{outlook}
 
 
 
