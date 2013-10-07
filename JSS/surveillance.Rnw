@@ -123,7 +123,7 @@ writeLines(toBibtex(Rbib), "R.bib")
 \iffalse
 \bibliography{literatur}  % full database (inserted here for RefTeX)
 \fi
-\bibliography{references,R} % bibfile for this document
+\bibliography{references_sebastian,references,R} % local bibfiles
 
 
 
