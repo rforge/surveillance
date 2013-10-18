@@ -10,13 +10,13 @@
         Michaela Paul\\Novartis \And
         Leonhard Held\\University of Zurich \And
         Michael Höhle\\Stockholm University}
-\title{Spatio-Temporal Modeling of Infectious Diseases Using the
+\title{Spatio-Temporal Modeling of Epidemic Phenomena Using the
   \proglang{R} Package \pkg{surveillance}}
 
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Sebastian Meyer, Michaela Paul, Leonhard Held, Michael Höhle}
-\Plaintitle{Spatio-Temporal Modeling of Infectious Diseases Using the R Package surveillance}
-\Shorttitle{\pkg{surveillance}: Spatio-Temporal Modeling of Infectious Diseases}
+\Plaintitle{Spatio-Temporal Modeling of Epidemic Phenomena Using the R Package surveillance}
+\Shorttitle{\pkg{surveillance}: Spatio-Temporal Modeling of Epidemic Phenomena}
 
 %% an abstract and keywords
 \input{abstract}
@@ -82,8 +82,11 @@
 
 
 \input{intro}
-\input{dataio}
 \input{models}
+\input{twinstim}
+\input{twinSIR}
+\input{hhh4}
+%\input{simulation}   % maybe separate section?
 \input{outlook}
 
 

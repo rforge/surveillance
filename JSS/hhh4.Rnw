@@ -4,29 +4,7 @@ source("setup.R")
 @
 
 
-\section{Notation and classes for epidemic data} \label{sec:dataio}
-
-I/O, visualization
-
-examples: IMD, Hagelloch measles, influenza in Southern Germany
-
-The \code{S3} classes \code{"epidataCS"} (continuous space) and \code{"epidata"}
-(discrete space) represent such point process event
-data, possibly with the specification of additional external covariates which
-may vary in space and/or time.
-
-
-\subsection{Individual case reports}
-
-
-
-\subsection{Complete event history of a closed population}
-
-
-
-\subsection{Count data}
-
-
+\section[Multivariate time series of counts]{\code{hhh4}: Multivariate time series of counts} \label{sec:hhh4}
 
 
 Note that the distance matrix between regions can be

@@ -1,0 +1,9 @@
+%% need no \usepackage{Sweave.sty}
+<<setup,cache=FALSE,include=FALSE>>=
+source("setup.R")
+@
+
+
+\section[Epidemic history of a fixed population]{\code{twinSIR}: Individual-level epidemic history of a fixed population} \label{sec:twinSIR}
+
+

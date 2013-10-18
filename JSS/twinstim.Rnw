@@ -4,7 +4,7 @@ source("setup.R")
 @
 
 
-\subsection[twinstim]{\code{twinstim}} \label{sec:models:twinstim}
+\section[Individual case reports]{\code{twinstim}: individual case reports} \label{sec:twinstim}
 
 
   \begin{itemize}
@@ -16,82 +16,21 @@ source("setup.R")
   \end{itemize}
 
   
+\subsection{Data I/O}
+
+
+
+\subsection{Visualization}
   
   
-\subsubsection{On the reproduction number} \label{twinstim:R0}
+  
 
 
-The point process model \eqref{eqn:twinstim} features a
-reproduction number derived from its branching process interpretation.
-New infections may either originate from the endemic component representing
-immigration independent of the history of the epidemic, or they are triggered by
-some previously infected individual via the epidemic component. As soon as an
-individual becomes infected, it spreads the disease
-according to an inhomogeneous Poisson process with rate 
-$\eta_j \cdot g(t-t_j)\cdot f(\norm{\bm{s}-\bm{s_j}})$ around its origin.
-Since this process is independent of the individuals parentage and of other
-infections, 
-\begin{equation*}
-  \mu_j = \eta_j \cdot
-  \left[ \int_0^{T-t_j} g(t) \,dt \right] \cdot
-  \left[ \int_{\bm{W}-\bm{s_j}} f(\bm{s}) \,d\bm{s} \right]
-\end{equation*}
-is the expected number of secondary infections triggered by an infective $j$
-during the remaining observation period $[t_j,T]$ in the observation region
-$\bm{W}$. 
-Thus, infectives with $\mu_j < 1$ are expected to cause less than one secondary
-infection.
-
-An interesting insight provides a comparison with the basic reproduction number
-obtained from the simple SIR (susceptible-infected-recovered) compartmental model
-for a closed population without demographics \citep{kermack.mckendrick1927}
-represented by a system of ordinary differential equations:
-\begin{align*}
-  \frac{dS}{dt} &= -\beta S I 
-  & \frac{dI}{dt} &= \beta S I - \gamma I 
-  & \frac{dR}{dt} &= \gamma I
-\end{align*}
-Here, $N=S(t) + I(t) + R(t)$ is the (constant) population size, $\beta$ is the
-transmission rate given contact between a susceptible and an infectious
-individual, 
-and $\gamma$ is the recovery rate ($1/\gamma$ is the average infectious period).
-For this model, the basic reproduction number, i.e.\ the average number of
-secondary cases arising from a single infective put into an entirely susceptible
-population, is $R_0 = N \beta / \gamma$
-\citep[see, e.g.,][Section 2.1]{Keeling.Rohani2008}.
-A similar, but spatio-temporal epidemic model can be established from the point
-process model \eqref{eqn:twinstim} with the following settings:
-no endemic component,
-homogeneous individuals ($\eta_j \equiv \beta$),
-homogeneous mixing in space ($f(\bm{s}) \equiv 1$),
-and exponential decay of infectivity ($g(t) = e^{-\alpha t}$).
-Then, for $T \rightarrow \infty$,
-\begin{equation*}
-  \mu = \beta \cdot
-  \left[ \int_0^\infty e^{-\alpha t} \,dt \right] \cdot
-  \left[ \int_{\bm{W}-\bm{s_j}} 1 \,d\bm{s} \right] =
-  \beta \cdot \abs{\bm{W}} / \alpha \:,
-\end{equation*}
-which corresponds to the above basic reproduction number interpreting
-$\abs{\bm{W}}$ as the population size, $\beta$ as the transmission rate and
-$\alpha$ as the removal rate.
-Like in classic epidemic models, the process is sub-critical if $\mu < 1$ holds,
-which means that its eventual extinction is almost sure. However, in the full
-point process model \eqref{eqn:twinstim} with an endemic component, new
-infections may always occur via ``immigration''. Hence, the reproduction number
-as estimated from this model is adjusted for such new infections occurring
-independently of previous infections. It therefore tends to be lower than the
-one estimated from a classical non-spatial SIR model without immigration of
-infectives.
+\subsection{Computational issues with the spatial kernel}
 
 
 
-
-\section{Computational issues with the spatial kernel}
-
-
-
-\subsection{Numerical integration}
+\subsubsection{Numerical integration}
 \label{twinstim:polyCub}
 
 Evaluation of both the log-likelihood and the score function involves solution
@@ -177,7 +116,7 @@ number of nodes using the estimates from the previous fit as initial values.
 
 
 
-\subsection{Numerical integration over circular domains}
+\subsubsection{Numerical integration over circular domains}
 \label{twinstim:Fcircle}
 
 
