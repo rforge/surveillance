@@ -628,8 +628,10 @@ plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL,xaxis.years=TRUE, xa
 
 
 #xaxis.years=TRUE,startyear = 2001, firstweek = 1, legend=TRUE
-plot.sts.time <- function(x, type, method=x@control$name, disease=x@control$data,same.scale=TRUE,par.list=list(mfrow=magic.dim(nAreas),mar=par()$mar),...) {
-
+plot.sts.time <- function(x, type, method=x@control$name,
+                          disease=x@control$data,
+                          same.scale=TRUE, par.list=list(), ...)
+{
   #Plot as one if type = time + unit 
   as.one=all(!is.na(pmatch(c("time","unit"),type[[3]] ))) & is.na(pmatch("|",type[[3]]))
   
@@ -649,40 +651,28 @@ plot.sts.time <- function(x, type, method=x@control$name, disease=x@control$data
     alarm <- matrix(alarm,ncol=1)
   nAreas <- ncol(observed)
 
-  if (binaryTS) {
-    pi <-  ifelse(population == 0,  0,observed / population)
-    if (identical(dim(x@upperbound), population)) {
-      un <-  ifelse(population == 0, 0, x@upperbound / population)
-    } else {
-      un <- 0
-    }
-    max <-  max(max(pi),max(un),na.rm=TRUE)
-  } else {
-    max <-  max(max(observed),max(x@upperbound),na.rm=TRUE)
-  }
-
-  #Check empty arguments
-  if (is.null(par.list[["mfrow",exact=TRUE]])) {
-    par.list$mfrow <- magic.dim(nAreas)
-  } 
-  
+  #default mfrow
+  par.list <- modifyList(list(mfrow=magic.dim(nAreas), mar=c(5,4,1,1)),
+                         par.list)
 
   #multivariate time series
   if(nAreas > 1){
-    #all areas in one plot
-    if(as.one) {
-      #### This is currently not supported
+    if(as.one) { # all areas in one plot
+      stop("this type of plot is currently not implemented")
     } else {
       #set window size
-      oldpar <- par()
-      par(par.list)
+      oldpar <- par(par.list)
 
       #All plots on same scale? If yes, then check if a scale
       #is already specified using the ylim argument
       args <- list(...)
       if(same.scale) {
         if (is.null(args$ylim)) {
-          args$ylim <- c(-1/20*max, max)
+            max <- if (binaryTS) {
+                max(ifelse(population == 0, 0,
+                           pmax(observed,x@upperbound,na.rm=TRUE)/population))
+            } else max(observed,x@upperbound,na.rm=TRUE)
+            args$ylim <- c(-1/20*max, max)
         }
       } else {
         args$ylim <- NULL
@@ -693,14 +683,11 @@ plot.sts.time <- function(x, type, method=x@control$name, disease=x@control$data
         #Changed call of plot.sts.time.one to invocation using "call"
         argsK <- merge.list(args,list("x"=x,"k"=k,"domany"=TRUE,"legend"=NULL))
         do.call("plot.sts.time.one",args=argsK)
-        #Add title - do this using the cex.main size
-        cex.main <- list(...)[["cex.main",exact=TRUE]]
-        if (is.null(cex.main)) { cex.main <- 1 }
-        mtext(colnames(observed)[k],line=-1.3,cex=cex.main)     
+        title(main=colnames(observed)[k], line=-1)
       }
+      
       #reset graphical params
-      #par(mfrow=c(1,1), mar=c(5, 4, 4, 2)+0.1)
-      oldwarn <- options()$warn ; options(warn=-1) ; par(oldpar) ; options(warn=oldwarn)
+      par(oldpar)
     }
   } else {  #univariate time series
     plot.sts.time.one(x=x, domany=FALSE,...)
