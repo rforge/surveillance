@@ -16,3 +16,59 @@ positive entries in $\bm{A}^k$ indicate neighbours \emph{up to} order $k$.
 % Example: $(A^2)_{ij} = \sum_{k=1}^I a_{ik} a_{kj}$ is positive iff there is a
 % region $k$ adjacent to both $i$ and $j$.
 \citep{Diestel2010}
+
+
+\marginnote{Why is \code{hhh4()} of class named ``ah4'' instead of
+  ``hhh4'' as expected (as for lm, glm, twinstim, twinSIR, ...)?}
+
+
+<<measles.weser>>=
+data("measles.weser")
+# FIXME: this is still of class "disProg" -> update to "sts"
+load("~/Projekte/twinstim/data/BKG-GDZ/simplified/districtsD-highres.RData")
+measles <- disProg2sts(measles.weser, map=districtsD[paste0(0,colnames(measles.weser$observed)),])
+measles  # head(,n=1) only? really include head(neighbourhood)? maybe summarized
+@ 
+
+<<measles_plot, out.width=".9\\linewidth", fig.width=9, fig.height=6>>=
+# plot(measles.weser, as.one=FALSE)   # disProg-method
+plot(measles)
+@ 
+
+<<hhh4_measles_hhh2005>>=
+measlesModel_hhh2005 <- list(
+    ar = list(f = ~ 1),
+    ne = list(f = ~ 1, weights = neighbourhood(measles) == 1),
+    end = list(f = addSeason2formula(
+               ~0 + fe(1, which=rep(TRUE,ncol(measles))) + fe(t),
+               S=1, period=52),
+               offset = population(measles)),
+    family = "NegBin1"
+    )
+measlesFit_hhh2005 <- hhh4(measles, measlesModel_hhh2005)
+summary(measlesFit_hhh2005, idx2Exp=1:2, amplitudeShift=TRUE)
+@ 
+
+<<verify_by_old_algo_hhh, echo=FALSE>>=
+measlesFit_hhh2005_disProg <- algo.hhh(
+    measles.weser,
+    control = list(linear=TRUE, nseason=1, neighbours=TRUE,
+                   negbin="single", lambda=TRUE),
+    thetastart = c(rep(0, 20),0.5), verbose=FALSE
+    )
+.comp <- cbind(
+    old = c(coef(measlesFit_hhh2005_disProg)[c(16,17,19,20,1:15,18)],
+            1/coef(measlesFit_hhh2005_disProg)["psi"]),
+    new = coef(measlesFit_hhh2005, idx2Exp=1:2)
+    )
+#plot(.comp, panel.first=abline(0,1))
+stopifnot(all.equal(.comp[,1], .comp[,2], tolerance=0.0001))
+@
+
+
+
+
+<<eval=FALSE>>=
+## parametric powerlaw weights require neighbourhood orders in the data
+neighbourhood(measles) <- nbOrder(neighbourhood(measles), maxlag=Inf)
+@

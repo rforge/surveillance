@@ -1,8 +1,9 @@
 
 ## knitr stuff
-opts_chunk$set(echo=FALSE, results='markup', fig.path='plots/R-',
+library("knitr")
+opts_chunk$set(echo=TRUE, results='markup', fig.path='plots/R-',
                out.width='.49\\linewidth', fig.width=6, fig.height=6,
-               cache=TRUE, cache.path='.cache/')
+               fig.align="center", cache=TRUE, cache.path='.cache/')
 render_sweave()  # use Sweave environments
 set_header(highlight = '')  # do not use the Sweave.sty package
 
@@ -21,4 +22,3 @@ local({
     lattice.options(default.args = latticeDefaults)
 })
 library("surveillance")
-surveillance.options(gpclib=TRUE)

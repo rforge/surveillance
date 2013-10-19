@@ -60,10 +60,6 @@
   Stockholm University\\
   E-mail: \email{hoehle@math.su.se}
 }
-%% It is also possible to add a telephone and fax number
-%% before the e-mail in the following format:
-%% Telephone: +43/512/507-7103
-%% Fax: +43/512/507-2851
 
 %% for those who use Sweave please include the following line (with % symbols):
 %% need no \usepackage{Sweave.sty}
@@ -82,11 +78,15 @@
 
 
 \input{intro}
+
 \input{models}
+
 \input{twinstim}
 \input{twinSIR}
 \input{hhh4}
+
 %\input{simulation}   % maybe separate section?
+
 \input{outlook}
 
 
@@ -94,17 +94,23 @@
 \section*{Acknowledgements}
 
 We thank ...
+
+Many have helped us by using, i.e.\ testing our package and reporting
+deficiencies: ...
+
 %We also appreciate helpful comments on earlier versions of this manuscript by
 %two anonymous referees.
 
-Financial support by the Swiss National Science Foundation
-(project 137919: \emph{Statistical methods for spatio-temporal modelling and
+Financial support by the Munich Center of Health Sciences (2007--2010)
+and the Swiss National Science Foundation since 2007
+(projects \#116776 and \#124429: \emph{Multivariate analysis of dependent count data},
+and project \#137919: \emph{Statistical methods for spatio-temporal modelling and
   prediction of infectious diseases}) is gratefully acknowledged.
 
 
 
 %--------------
-% BIBLIOGRAPHY (all titles must be in uppercase title style)
+% BIBLIOGRAPHY (all titles should be in uppercase title style)
 %--------------
 
 <<Rbib, echo=FALSE>>=

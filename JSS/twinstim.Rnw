@@ -8,6 +8,8 @@ source("setup.R")
 
 
   \begin{itemize}
+    \item Make a table listing all functions for twinstim intended to be used
+    
   \item Permutation test to evaluate importance of epidemic component
     
   \item variables are allowed to appear in both components.
@@ -15,6 +17,7 @@ source("setup.R")
     
   \end{itemize}
 
+  
   
 \subsection{Data I/O}
 

@@ -83,3 +83,44 @@ as estimated from this model is adjusted for such new infections occurring
 independently of previous infections. It therefore tends to be lower than the
 one estimated from a classical non-spatial SIR model without immigration of
 infectives.
+
+
+
+\subsection{Endemic-only models}
+
+Here we show that the spatio-temporal point process model
+\eqref{eqn:twinstim} \emph{without} the epidemic component is actually
+equivalent to a Poisson regression model. This provides a nice link to
+the count data model \eqref{eqn:meanHHH}, which is also Poisson if the
+overdispersion parameter $\psi \rightarrow 0$.
+Both endemic-only models are actually equivalent if we assume a Poisson
+distribution for $Y_{it}$ and omit the random intercepts $b_i^{(\nu)}$.
+
+For an endemic-only point process model, the conditional intensity function
+\[
+\lambda(t, \bm{s}) = \exp\left( \log\rho_{[t][\bm{s}]} + \beta_0 +
+\bm{\beta}^\top \bm{z}_{[t][\bm{s}]} \right)
+\]
+is piecewise constant on the spatio-temporal grid with cells $([t],[\bm{s}])$.
+Hence the log-likelihood of the point process model simplifies to
+\begin{align*}
+l(\bm{\theta}) &=
+\left[ \sum_{i=1}^{n} \log\lambda(t_i, \bm{s}_i) \right] -
+\int_0^T \int_{\bm{W}} \lambda(t,\bm{s}) \,dt\,d\bm{s} \\
+&={} \sum_{[t],[\bm{s}]} Y_{[t][\bm{s}]} \log\lambda([t], [\bm{s}]) -
+\abs{[t]} \, \abs{[\bm{s}]} \, \lambda([t], [\bm{s}])
+%% &= \sum_{[t],[\bm{s}]} \abs{[t]} \, \abs{[\bm{s}]} \left(
+%%   \frac{Y_{[t][\bm{s}]}}{\abs{[t]} \, \abs{[\bm{s}]}}
+%%   \log\lambda([t], [\bm{s}]) - \lambda([t], [\bm{s}]) \right)
+%% &= \left[ \sum_{i=1}^{n} \log\rho_{[t_i][\bm{s_i}]} + \beta_0 + \bm{\beta}^\top
+%% \bm{z}_{[t_i][\bm{s_i}]} \right] -
+%% \sum_{[t],[\bm{s}]} \abs{[t]} \, \abs{[\bm{s}]} \, \exp\big( \log\rho_{[t][\bm{s}]} + \beta_0 +
+%% \bm{\beta}^\top \bm{z}_{[t][\bm{s}]} \big) \\
+\end{align*}
+where $Y_{[t][\bm{s}]}$ is the aggregated number of events observed in cell
+$([t],[\bm{s}])$, and $\abs{[t]}$ and $\abs{[\bm{s}]}$ denote length and area of
+a cell, respectively.
+Except for an additive constant,
+the above log-likelihood is the same as obtained from a Poisson
+regression model $Y_{[t][\bm{s}]} ~ Po(e_{[t][\bm{s}]} \cdot \lambda([t], [\bm{s}]))$,
+with offset $e_{[t][\bm{s}]} = \abs{[t]} \, \abs{[\bm{s}]}$.

@@ -8,7 +8,7 @@ source("setup.R")
 
 - further applications besides modelling epidemics of infectious diseases
 
-- use models for outbreak detection/prediction
+- use models for outbreak prediction
 
 
 
