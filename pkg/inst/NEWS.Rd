@@ -6,11 +6,19 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.6-1 (2013-09-10)}{
+\section{Changes in surveillance version 1.6-1 (2013-10-21)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
-    \item ...
+    \item Small documentation improvements
+  }
+}
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item Nicer default axis labels for \code{iafplot()}.
+    \item For \code{twinstim()}, the default is now to \code{trace}
+    every iteration instead of every fifth only.
   }
 }
 

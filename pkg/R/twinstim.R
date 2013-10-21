@@ -1084,7 +1084,7 @@ twinstim <- function (
         }
         optimRes1 <- if (optimMethod == "nlminb") {
             nlminbControl <- control2nlminb(optimArgs$control,
-                                            defaults = list(trace=5L, rel.tol=1e-6))
+                                            defaults = list(trace=1L, rel.tol=1e-6))
             ## sqrt(.Machine$double.eps) is the default reltol used in optim,
             ## which usually equals about 1.49e-08.
             ## The default rel.tol of nlminb (1e-10) seems too small
@@ -1133,7 +1133,7 @@ twinstim <- function (
             nlmRes$convergence <- if (nlmRes$code %in% 1:2) 0L else nlmRes$code
             nlmRes
         } else { # use optim()
-            optimArgs$control <- modifyList(list(trace=1L, REPORT=5L),
+            optimArgs$control <- modifyList(list(trace=1L, REPORT=1L),
                                             optimArgs$control)
             if (finetune) optimArgs$hessian <- FALSE
             res <- do.call("optim", optimArgs)
