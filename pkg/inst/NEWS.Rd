@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.6-1 (2013-10-21)}{
+\section{Changes in surveillance version 1.6-1 (2013-10-23)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -19,6 +19,9 @@
     \item Nicer default axis labels for \code{iafplot()}.
     \item For \code{twinstim()}, the default is now to \code{trace}
     every iteration instead of every fifth only.
+    \item Slightly changed default arguments for \code{plot.epidata}:
+    \code{lwd} (1->2), \code{rug.opts} (\code{col} is set according to
+    \code{which.rug})
   }
 }
 
