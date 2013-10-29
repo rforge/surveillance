@@ -401,9 +401,10 @@ checkstgrid <- function (stgrid, T)
             }
         res[[i]] <- as(scale(iRgpc, center=center), "owin") # coerce via polyCub
         ## if iR is actually a circle of radius eps, attach eps as attribute
-        r <- if (eps <= events$.bdist[i]) eps else NULL
-        attr(res[[i]], "radius") <- r
-        attr(res[[i]], "area") <- if(is.null(r)) area.owin(res[[i]]) else pi*r^2
+        attr(res[[i]], "area") <- if (eps <= events$.bdist[i]) {
+            attr(res[[i]], "radius") <- eps
+            pi * eps^2
+        } else area.owin(res[[i]])
     }
     attr(res, "nCircle2Poly") <- npoly
     return(res)
