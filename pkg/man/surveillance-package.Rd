@@ -123,6 +123,6 @@
 #available from http://surveillance.r-forge.r-project.org/
 \dontrun{demo(cost)}
 #Code from a more recent book chapter about using the package for the
-#monitoring of Danish mortality data (Hoehle, 2009).
+#monitoring of Danish mortality data (Hoehle and Mazick, 2010).
 \dontrun{demo(biosurvbook)}
 }
