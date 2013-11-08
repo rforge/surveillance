@@ -99,7 +99,7 @@ siaf.powerlaw <- function (nTypes = 1, logpars = TRUE,
             deriv1 <- function (s, paridx)
                 deriv(s, logpars, type)[,paridx,drop=TRUE],
             intderiv1 <- function (paridx)
-                polyCub::polyCub.SV(polydomain, deriv1, paridx=paridx,
+                polyCub.SV(polydomain, deriv1, paridx=paridx,
                            nGQ = nGQ, alpha = a[paridx]),
             res.logsigma <- intderiv1(1L),
             res.logd <- intderiv1(2L),

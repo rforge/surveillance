@@ -506,9 +506,6 @@ intensityplot.twinstim <- function (x,
         
         ## set up grid of coordinates where 'which' will be evaluated
         if (isScalar(sgrid)) {
-            if (!requireNamespace("maptools")) {
-                stop("auto-generation of 'sgrid' requires package \"maptools\"")
-            }
             sgrid <- maptools::Sobj_SpatialGrid(.tiles, n = sgrid)$SG
             ## ensure that sgrid has exactly the same proj4string as .tiles
             ## since CRS(proj4string(.tiles)) might have modified the string

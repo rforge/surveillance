@@ -851,7 +851,7 @@ hcl.colors <- function(x, ncolors=100, use.color=TRUE)
     } else {
         if (use.color) heat.colors(ncolors) else grey.colors(ncolors)
     }
-    list(col=rev(GYR), min=0, max=max(x), trans=base::identity)
+    list(col=rev(GYR), min=0, max=max(x), trans=identity)
 }
 
 #Helper function for plot.sts.spacetime

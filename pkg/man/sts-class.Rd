@@ -147,19 +147,18 @@
 
 \author{M. \enc{Höhle}{Hoehle}}
 \examples{
-  if (requireNamespace("maptools")) {
-    # load disProg-object "ha" and convert to S4-class "sts"
-    data("ha")
-    shp <- system.file("shapes/berlin.shp",package="surveillance")
-    ha.sts <- disProg2sts(ha, map=maptools::readShapePoly(shp,IDvar="SNAME"))
-  } else {
-    # load pre-built sts-object
-    data("ha.sts")
-    # the only difference is that here German umlauts have been removed from
-    # 'ha.sts@map@data$BEZIRK' for compatibility reasons
-  }
-  
-  plot(ha.sts, type=observed ~ 1 | unit)
-  
+if (requireNamespace("maptools")) {
+   # load disProg-object "ha" and convert to S4-class "sts"
+   data("ha")
+   shpfile <- system.file("shapes/berlin.shp",package="surveillance")
+   ha.sts <- disProg2sts(ha, map=maptools::readShapePoly(shpfile,IDvar="SNAME"))
+} else {
+   data("ha.sts")
+   # is almost identical to the above except that German umlauts
+   # have been replaced in 'ha.sts@map@data$BEZIRK' for compatibility reasons
+}
+
+ha.sts
+plot(ha.sts, type=observed ~ 1 | unit)
 }
 \keyword{classes}

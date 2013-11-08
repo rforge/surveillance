@@ -303,7 +303,6 @@ mapplyCall <- function (args, cores = 1L)
 {
     parallel <- is.name(cores) || cores > 1L
     mapplyFUN <- if (parallel) quote(parallel::mcmapply) else quote(mapply)
-    ## Note: mcmapply() is only available since R 2.15.0
     parallelArgs <- list(mc.preschedule=TRUE, mc.cores=cores)
     as.call(c(mapplyFUN, args, if (parallel) parallelArgs))
 }

@@ -1292,15 +1292,11 @@ twinstim <- function (
                 ), higher=FALSE)
         }
         if (cumCIF.pb) close(pb)
-        LambdagEvents <- setNames(.colSums(heIntEvents, 2L, Nin),
-                                  rownames(mmhEvents))
-        if (is.null(names(LambdagEvents))) # in R <2.15.2, rownames(mmhEvents) is
-                                           # NULL if only h.intercept, bug #14992
-            names(LambdagEvents) <- rownames(mme)
-        LambdagEvents
+        setNames(.colSums(heIntEvents, 2L, Nin), rownames(mmhEvents))
     }
     if (cumCIF) {
-        if (verbose) cat("\nCalculating the fitted cumulative intensities at events...\n")
+        if (verbose)
+            cat("\nCalculating fitted cumulative intensities at events...\n")
         fit$tau <- LambdagEvents(cores, cumCIF.pb)
     }
 
@@ -1325,6 +1321,7 @@ twinstim <- function (
     ### Append optimizer configuration
 
     optim.args$par <- initpars        # reset to also include fixed coefficients
+    if (any(fixed)) optim.args$fixed <- names(initpars)[fixed] # restore
     fit$optim.args <- optim.args
     if (model) {
         fit$functions <- functions

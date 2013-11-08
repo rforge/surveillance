@@ -1449,7 +1449,7 @@ marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL){
   if(any(is.na(sd.corr))){
     # in order to avoid nlminb from running into an infinite loop (cf. bug
     # report #15052), we have to emergency stop() in this case.
-    # As of R 2.15.2, nlminb() will throw an error if it receives NA from
+    # As of R 2.15.2, nlminb() throws an error if it receives NA from
     # any of the supplied functions.
     stop("NAs in variance parameters.", ADVICEONERROR)
   }
@@ -1534,7 +1534,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
     #return(rep.int(0,dimSigma))
     ## continuing with the generalized inverse often works, otherwise we would
     ## have to stop() here, because nlminb() cannot deal with NA's
-    F.inv <- MASS::ginv(fisher)
+    F.inv <- ginv(fisher)
   }
   F.inv.RE <- F.inv[thetaIdxRE,thetaIdxRE]
 
@@ -1612,7 +1612,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
     #return(matrix(Inf,dimSigma,dimSigma))
     ## continuing with the generalized inverse often works, otherwise we would
     ## have to stop() here, because nlminb() cannot deal with NA's
-    F.inv <- MASS::ginv(fisher)
+    F.inv <- ginv(fisher)
   }
   F.inv.RE <- F.inv[thetaIdxRE,thetaIdxRE]
   ## declare F.inv.RE as a symmetric matrix?
@@ -1637,7 +1637,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
 
   # function to convert dS.i and dS.j matrices to sparse matrix objects
   dS2sparse <- if (dimCorr > 0) function (x) {
-      Matrix::forceSymmetric(as(x, "sparseMatrix")) # dS.i & dS.j are symmetric
+      forceSymmetric(as(x, "sparseMatrix")) # dS.i & dS.j are symmetric
   } else function (x) { #as(x, "diagonalMatrix")
       new("ddiMatrix", Dim = dim(x), diag = "N", x = diag(x))
   }
