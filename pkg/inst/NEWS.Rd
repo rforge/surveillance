@@ -19,7 +19,7 @@
     \code{"epidataCS"} objects, one reason being that 
     \pkg{polyclip} uses integer arithmetic.
     Change of \code{twinstim()} estimates for a newly created
-    \cpde{"epidataCS"} compared with the same data prepared in earlier
+    \code{"epidataCS"} compared with the same data prepared in earlier
     versions should be very small (e.g., for \code{data("imdepifit")}
     the mean relative difference of coefficients is 3.7e-08, while the
     \code{logLik()} is \code{all.equal()}).

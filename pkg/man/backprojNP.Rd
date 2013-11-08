@@ -172,7 +172,8 @@ backprojNP(sts, incu.pmf,
 }
 
 \author{
-  Michael \enc{Höhle}{Hoehle} with help by Daniel \enc{Sabanés Bové} for the Rcpp interface
+  Michael \enc{Höhle}{Hoehle} with help by
+  Daniel \enc{Sabanés Bové}{Sabanes Bove} for the \pkg{Rcpp} interface
 }
 
 \note{
