@@ -3,7 +3,7 @@
 \alias{twinstim}
 
 \title{
-  Fit a Two-Component Spatio-Temporal Conditional Intensity Model
+  Fit a Two-Component Spatio-Temporal Point Process Model
 }
 
 \description{
