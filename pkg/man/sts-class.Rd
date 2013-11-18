@@ -77,7 +77,8 @@
     \item{\code{neighbourhood}:}{Symmetric matrix of size
       \eqn{(number of regions)^2} describing the neighbourhood structure. It
       may either be a binary adjacency matrix or contain neighbourhood orders.}
-    \item{\code{populationFrac}:}{Object of class \code{matrix}.}
+    \item{\code{populationFrac}:}{A \code{matrix} of population 
+      fractions (with dimensions \code{dim(observed)}).}
     \item{\code{map}:}{Object of class \code{SpatialPolygonsDataFrame}
       providing a shape of the areas which are monitored. }
     \item{\code{control}:}{Object of class \code{list}, thais is a

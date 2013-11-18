@@ -53,11 +53,13 @@ init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0
     }
     
     #popFrac
-    if (is.null(populationFrac)) {
-      populationFrac <- matrix(1/nAreas,nrow=nObs,ncol=nAreas)
-    }
-    if (nAreas ==1 & (!multinomialTS)){
-      populationFrac <- matrix(1,nrow=nObs, ncol=1)
+    if (nAreas==1 && (!multinomialTS)) {
+        populationFrac <- matrix(1,nrow=nObs, ncol=1)
+    } else if (is.null(populationFrac)) {
+        populationFrac <- matrix(1/nAreas,nrow=nObs,ncol=nAreas)
+    } else if (is.vector(populationFrac, mode="numeric") &&
+               length(populationFrac) == nAreas) {
+        populationFrac <- matrix(populationFrac, nObs, nAreas, byrow=TRUE)
     }
     
     #labels for observed and state
