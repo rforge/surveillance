@@ -350,7 +350,7 @@ fe <- function(x,          # covariate
     stop("Covariate \'",deparse(substitute(x)),"\' is not suitably specified\n")
   }
   
-  intercept <- ifelse(all(terms==1), TRUE, FALSE)
+  intercept <- all(terms==1)
   
   # overall or unit-specific effect?
   unitSpecific <- !is.null(which)
@@ -519,13 +519,12 @@ checkFormula <- function(f, env, component)
           ))
   
   res <- cbind(res, deparse.level=0) # ensure res has matrix dimensions
-  if(sum(unlist(res["intercept",])) > 1)
-      stop("There can only be one intercept in the formula ", deparse(substitute(f)))
   
   # random intercepts
   RI <- attr(term, "specials")$ri
-  if(length(RI)>1)
-      stop("There can only be one random intercept in the formula ", deparse(substitute(f)))
+  if (sum(unlist(res["intercept",])) + length(RI) > 1)
+      stop("There can only be one intercept in the formula ",
+           deparse(substitute(f)))
   for(i in RI)
       res <- cbind(res, c(
           eval(vars[[i]], envir=env),
