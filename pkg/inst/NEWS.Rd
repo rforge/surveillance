@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.7-0 (2013-11-07)}{
+\section{Changes in surveillance version 1.7-0 (2013-11-19)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -65,6 +65,8 @@
     \item \code{twinstim()} saves the vector of \code{fixed}
     coefficients as part of the returned \code{optim.args} component,
     such that these will again be held fixed upon \code{update()}.
+    \item The \code{plot}-method for \code{hhh4()}-fits allows for
+    region selection by name.
   }
 }
 
