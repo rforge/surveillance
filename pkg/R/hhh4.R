@@ -110,19 +110,23 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
 
   ## check for degenerate fisher info
   if(inherits(cov, "try-error")){ # fisher info is singular
-    cat("Fisher info singular!\n")
+    if (control$verbose)
+        cat("WARNING: Final Fisher information matrix is singular!\n")
     convergence <- FALSE
   } else if(any(!is.finite(diag(cov))) || any(diag(cov)<0)){
-    cat("Infinite or negative cov!\n")
+    if (control$verbose)
+        cat("WARNING: non-finite or negative covariance of regression parameters!\n")
     convergence <- FALSE
   }
 
   if (!convergence) {
-      cat("Penalized loglikelihood =", loglik, "\n")
-      thetastring <- paste(round(thetahat,2), collapse=", ")
-      thetastring <- strwrap(thetastring, exdent=10, prefix="\n", initial="")
-      cat("theta = (", thetastring, ")\n")
-      cat("WARNING: Results are not reliable!", ADVICEONERROR)
+      if (control$verbose) {
+          cat("Penalized loglikelihood =", loglik, "\n")
+          thetastring <- paste(round(thetahat,2), collapse=", ")
+          thetastring <- strwrap(thetastring, exdent=10, prefix="\n", initial="")
+          cat("theta = (", thetastring, ")\n")
+      }
+      warning("Results are not reliable!", ADVICEONERROR)
       res <- myoptim
       res$convergence <- convergence
       res$call <- match.call()
@@ -286,10 +290,9 @@ setControl <- function (control, stsObj)
                    function(x) is.list(control$optimizer[[x]]))))
       stop("'control$optimizer' must be a list of lists")
 
-  if (!length(control$verbose) == 1L ||
-      (!is.logical(control$verbose) && !is.numeric(control$verbose)))
-      stop("'control$verbose' must be a numeric or logical value")
   control$verbose <- as.integer(control$verbose)
+  if (length(control$verbose) != 1L || control$verbose < 0)
+      stop("'control$verbose' must be a logical or non-negative numeric value")
 
   if (!is.list(control$start) ||
       any(! sapply(c("fixed", "random", "sd.corr"),
@@ -1031,7 +1034,7 @@ penScore <- function(theta, sd.corr, model)
   ## add penalty to random effects gradient
   s.pen <- if(dimRE > 0) c(Sigma.inv %*% randomEffects) else numeric(0L)
   if(length(gradients$re) != length(s.pen)) # FIXME: could this ever happen?
-      cat("length of s(b) != Sigma.inv %*% b\n") # should probably better stop()
+      stop("length of s(b) != Sigma.inv %*% b")
   grRandom <- c(gradients$re - s.pen)
 
   ## Done
@@ -1435,7 +1438,7 @@ getSigma <- function(sd, correlation, dimSigma, dimBlocks, Sigmai=NULL){
 ## Approximate marginal likelihood for variance components
 ## Parameter and model unpacking at the beginning (up to the ###...-line) is
 ## identical in marScore() and marFisher()
-marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL){
+marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL, verbose=FALSE){
 
   dimVar <- model$nVar
   dimCorr <- model$nCorr
@@ -1494,7 +1497,7 @@ marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL){
 }
 
 
-marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
+marScore <- function(sd.corr, theta, model, fisher.unpen=NULL, verbose=FALSE){
 
   dimVar <- model$nVar
   dimCorr <- model$nCorr
@@ -1529,7 +1532,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   # inverse of penalized fisher info
   F.inv <- try(solve(fisher),silent=TRUE)
   if(inherits(F.inv,"try-error")){
-    cat("\n WARNING (in marScore): penalized Fisher is singular!\n")
+    if(verbose) cat("  WARNING (in marScore): penalized Fisher is singular!\n")
     #return(rep.int(0,dimSigma))
     ## continuing with the generalized inverse often works, otherwise we would
     ## have to stop() here, because nlminb() cannot deal with NA's
@@ -1572,7 +1575,7 @@ marScore <- function(sd.corr, theta,  model, fisher.unpen=NULL){
 }
 
 
-marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
+marFisher <- function(sd.corr, theta, model, fisher.unpen=NULL, verbose=FALSE){
   
   dimVar <- model$nVar
   dimCorr <- model$nCorr
@@ -1607,7 +1610,7 @@ marFisher <- function(sd.corr, theta,  model, fisher.unpen=NULL){
   # inverse of penalized fisher info
   F.inv <- try(solve(fisher),silent=TRUE)
   if(inherits(F.inv,"try-error")){
-    cat("\n WARNING (in marFisher): penalized Fisher is singular!\n")
+    if(verbose) cat("  WARNING (in marFisher): penalized Fisher is singular!\n")
     #return(matrix(Inf,dimSigma,dimSigma))
     ## continuing with the generalized inverse often works, otherwise we would
     ## have to stop() here, because nlminb() cannot deal with NA's
@@ -1915,10 +1918,10 @@ checkParBounds <- function (par, lower, upper)
 {
     if (is.null(names(par))) names(par) <- seq_along(par)
     if (any(atl <- par <= lower))
-        cat("WARNING: parameters reached lower bounds:",
+        cat("  WARNING: parameters reached lower bounds:",
             paste(names(par)[atl], par[atl], sep="=", collapse=", "), "\n")
     if (any(atu <- par >= upper))
-        cat("WARNING: parameters reached upper bounds:",
+        cat("  WARNING: parameters reached upper bounds:",
             paste(names(par)[atu], par[atu], sep="=", collapse=", "), "\n")
 }
 
@@ -1939,9 +1942,8 @@ defaultOptimControl <- function (method = "nlminb", lower = -Inf, upper = Inf,
     defaults.optim <- list(maxit=iter.max, fnscale=-1, trace=max(0,verbose-1),
                            lower=if (luOptimMethod) lower else -Inf,
                            upper=if (luOptimMethod) upper else Inf)
-    defaults <- switch(method, "nr" = defaults.nr, "nlm" = defaults.nlm,
-                       "nlminb" = defaults.nlminb, defaults.optim)
-    return(defaults)
+    switch(method, "nr" = defaults.nr, "nlm" = defaults.nlm,
+           "nlminb" = defaults.nlminb, defaults.optim)
 }
 
 setOptimControl <- function (method, control, ...)
@@ -1971,8 +1973,8 @@ fitHHH <- function(theta, sd.corr, model,
       method <- cntrl$method; cntrl$method <- NULL
       if (length(start) == 1 && method == "Nelder-Mead") {
           method <- "Brent"
-          cat("NOTE: switched optimizer from \"Nelder-Mead\" to \"Brent\"",
-              " (dim(", deparse(substitute(start)), ")=1)\n", sep="")
+          message("Switched optimizer from \"Nelder-Mead\" to \"Brent\"",
+                  " (dim(", deparse(substitute(start)), ")=1)")
       }
       list(paste("updateParams",
                  if (method %in% c("nlminb", "nlm", "nr"))
@@ -1996,7 +1998,8 @@ fitHHH <- function(theta, sd.corr, model,
   updateVariance <- function (sd.corr, theta, fisher.unpen)
       do.call(updateVarianceControl[[1]],
               alist(sd.corr, marLogLik, marScore, marFisher,
-                    theta=theta, model=model, fisher.unpen=fisher.unpen,
+                    theta=theta, model=model,
+                    fisher.unpen=fisher.unpen, verbose=verbose>1,
                     control=updateVarianceControl[[2]]))
 
   ## Let's go
@@ -2056,7 +2059,7 @@ fitHHH <- function(theta, sd.corr, model,
           ##     updateVarianceControl[[1]] <- "updateParams_optim"
           ##     updateVarianceControl[[2]]$method <-
           ##         if (length(sd.corr) == 1L) "Brent" else "Nelder-Mead"
-          ##     cat("WARNING: at least one updated variance parameter is not a number\n",
+          ##     cat("  WARNING: at least one updated variance parameter is not a number\n",
           ##         "\t-> NO UPDATE of variance\n",
           ##         "\t-> SWITCHING to robust", dQuote(updateVarianceControl[[2]]$method),
           ##         "for variance updates\n")

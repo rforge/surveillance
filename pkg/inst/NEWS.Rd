@@ -6,6 +6,39 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.7-1 (2013-11-20)}{
+
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item \code{oneStepAhead()}:
+    \itemize{
+      \item New argument \code{type} with a new \code{type}
+      \code{"first"} to base all subsequent one-step-ahead predictions
+      on a single initial fit. 
+      \item Nicer interpretation of \code{verbose} levels, and
+      \code{txtProgressBar()}. 
+    }
+  }
+}
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item Take \code{verbose=FALSE} in \code{hhh4()} more seriously.
+    \item \code{hhh4()} issues a \code{warning()} if non-convergent.
+    \item \code{oneStepAhead()}:
+    \itemize{
+      \item Default of \code{tp[2]} is now the penultimate time point of
+      the fitted subset (not of the whole \code{stsObj}).
+      \item \code{+1} on rownames of \code{$pred} (now the same as for
+      \code{$observed}). 
+    }
+  }
+}
+
+}
+
+
+
 \section{Changes in surveillance version 1.7-0 (2013-11-19)}{
 
 \subsection{SYNOPSIS}{

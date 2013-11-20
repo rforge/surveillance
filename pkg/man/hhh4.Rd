@@ -135,11 +135,12 @@ hhh4(stsObj,
 	\code{method="nlminb"} adding \code{iter.max=50} increases the 
 	maximum number of inner iterations from 20 (default) to 50.
       }
-      \item{\code{verbose}}{Logical if additional information is to be printed
-	during the computations}
-      \item{\code{start}}{List with initials, overrides any initial
-	values in formulas (this is currently the only way to specify
-	initial values)}
+      \item{\code{verbose}}{non-negative integer (usually in the range
+	\code{0:3}) specifying the amount of tracing information to be
+	output during optimization.}
+      \item{\code{start}}{a list of initial parameter values; overrides
+	any initial values in formulas (this is currently the only way
+	to specify initial values).}
       \item{\code{data}}{a data frame or, more generally, a named list
 	with covariates that are to be included as fixed effects (see
 	\code{\link{fe}}) in any of the 3 component formulae.

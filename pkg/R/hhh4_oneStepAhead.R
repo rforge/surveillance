@@ -14,18 +14,17 @@
 oneStepAhead <- function(result, # ah4-object (i.e. a hhh4 model fit)
                          tp,     # scalar: one-step-ahead predictions for time
                                  # points (tp+1):nrow(stsObj), or tp=c(from, to)
-                         which.start = c("current", "final", "none"),
+                         type = c("rolling", "first", "final"),
+                         which.start = c("current", "final"), #if type="rolling"
                          keep.estimates = FALSE,
                          verbose = TRUE) # verbose-1 is used as verbose setting
                                          # for sequentially refitted hhh4 models
 {
     stopifnot(inherits(result, "ah4"))
-    which.start <- match.arg(which.start)
-    refit <- which.start != "none"
-    use.current <- which.start == "current"
-    ## i.e., use fitted parameters from previous time point as initial values
+    type <- match.arg(type)
+    which.start <- if (type == "rolling") match.arg(which.start) else "final"
     startfinal <- ah4coef2start(result)
-    
+
     ## get model terms
     model <- result[["terms"]]
     if (is.null(model))
@@ -35,18 +34,20 @@ oneStepAhead <- function(result, # ah4-object (i.e. a hhh4 model fit)
     
     ## check that tp is within the time period of the data
     stopifnot(tp %in% seq_len(nTime-1L), length(tp) %in% 1:2)
-    if (length(tp) == 1) tp <- c(tp, nTime-1) # historical default
+    if (length(tp) == 1) tp <- c(tp, max(model$subset)-1)
     tps <- tp[1]:tp[2]
     ntps <- length(tps)
     observed <- model$response[tps+1,,drop=FALSE]
     rownames(observed) <- tps+1
-    
-    ## adjust verbosity for model refitting
-    result$control$verbose <- verbose - (ntps>1)
 
+    ## adjust verbosity for model refitting
+    verbose <- as.integer(verbose)
+    result$control$verbose <- max(0, verbose - (ntps>1))
+    if (type != "rolling" && verbose > 1L) verbose <- 1L
+    
     ## initialize result
     pred <- matrix(NA_real_, nrow=ntps, ncol=nUnits,
-                   dimnames=list(tps, colnames(observed)))
+                   dimnames=list(tps+1, colnames(observed)))
     psi <- if (model$nOverdisp > 0) {
         psiNames <- grep("overdisp", names(model$initialTheta), value=TRUE)
         matrix(NA_real_, nrow=ntps, ncol=model$nOverdisp,
@@ -66,13 +67,18 @@ oneStepAhead <- function(result, # ah4-object (i.e. a hhh4 model fit)
 
     ## sequential one-step ahead predictions
     fit <- result
+    do_pb <- verbose == 1L
+    if (do_pb) pb <- txtProgressBar(min=0, max=ntps, initial=0, style=3)
     for(i in seq_along(tps)) {
-        if (verbose) cat(tps[i], "\n")
-        if (refit) {
-            fit.old <- fit
+        if (verbose > 1L || (do_pb && type=="first" && i==1)) {
+            cat("\nOne-step-ahead prediction @ t =", tps[i], "...\n")
+        } else if (do_pb) setTxtProgressBar(pb, i) 
+        if (type == "rolling" || (type == "first" && i == 1L)) {
+            fit.old <- fit # backup
             fit <- update.ah4(result, subset.upper=tps[i],
-                              start=if (use.current)
-                                    ah4coef2start(fit.old) else startfinal,
+                              start = switch(which.start,
+                                             current=ah4coef2start(fit),
+                                             final=startfinal),
                               keep.terms=TRUE) # need "model" -> $terms
         }
         if (fit$convergence) {
@@ -86,12 +92,21 @@ oneStepAhead <- function(result, # ah4-object (i.e. a hhh4 model fit)
                 Sigma.orig[i,] <- getSdCorr(fit)
                 logliks[i,] <- c(fit$loglikelihood, fit$margll)
             }
-        } else { # do a grid search ?
-            if (verbose) cat("-> NO convergence at time point", tps[i], "\n")
-            if (refit) fit <- fit.old
+        } else {
+            if (do_pb) cat("\n")
+            switch(type,
+                   rolling = {
+                       cat("WARNING: No convergence @ t =", tps[i], "!\n")
+                       ## FIXME: do a grid search ?
+                       fit <- fit.old
+                   },
+                   first = stop("no convergence at first time point t=",tps[i]),
+                   final = stop("input is no valid hhh4()-fit (not converged)")
+                   )
         }
     }
+    if (do_pb) close(pb)
     
-    list(pred=pred, psi=psi, observed=observed, allConverged=all(!is.na(pred)),
+    list(pred=pred, observed=observed, psi=psi, allConverged=all(!is.na(pred)),
          coefficients=coefficients, Sigma.orig=Sigma.orig, logliks=logliks)
 }
