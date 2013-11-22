@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.7-1 (2013-11-20)}{
+\section{Changes in surveillance version 1.7-1 (2013-11-22)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -18,6 +18,9 @@
       \item Nicer interpretation of \code{verbose} levels, and
       \code{txtProgressBar()}. 
     }
+
+    \item New \code{data("measlesWeserEms")}, an updated version of
+    \code{data("measles.weser")}.
   }
 }
 
