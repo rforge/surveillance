@@ -34,13 +34,26 @@ data("measlesWeserEms")
     \dQuote{SK Wilhemshaven} (03405) with zero counts, which are ignored in
     \code{data("measles.weser")}.
 
+    \item it corrects the time lag error for year 2002 caused by a
+    redundant pseudo-week \dQuote{0} with 0 counts only
+    (the row \code{measles.weser$observed[53,]} is nonsense).
+    
     \item it has one more case attributed to \dQuote{LK Oldenburg}
     (03458) during 2001/W17, i.e., 2 cases instead of 1. This reflects
     the official data as of \dQuote{Jahrbuch 2005}, whereas
     \code{data("measles.weser")} is as of \dQuote{Jahrbuch 2004}.
 
     \item it contains a map of the region (as a
-    \code{"\linkS4class{SpatialPolygonsDataFrame}"}).
+    \code{"\linkS4class{SpatialPolygonsDataFrame}"}) with the following
+    variables:
+    \describe{
+      \item{\code{GEN}}{district label.}
+      \item{\code{AREA}}{district area in m^2.}
+      \item{\code{POPULATION}}{number of inhabitants (as of 31/12/2003).}
+      \item{\code{vacc2.2004}}{proportion of doubly vaccinated
+	abecedarians among the ones presenting their vaccination card at
+	school entry in the year 2004.}
+    }
 
     \item it uses the correct format for the official district keys,
     i.e., 5 digits (initial 0).
@@ -70,6 +83,14 @@ data("measlesWeserEms")
   Population numbers are obtained from the Federal Statistical Office of
   Lower Saxony (\acronym{NLS}):
   \url{http://www.lskn.niedersachsen.de/portal/live.php?navigation_id=25688&article_id=87679&_psmand=40}
+
+  Vaccination coverage was obtained from the public health department of
+  Lower Saxony:
+  Niedersächsisches Landesgesundheitsamt (2005): Impfreport --
+  Durchimpfung von Kindern im Einschulungsalter in Niedersachsen im
+  Erhebungsjahrgang 2004. Online available from
+  \url{http://www.nlga.niedersachsen.de/portal/live.php?navigation_id=27093&article_id=19385&_psmand=20},
+  also as an interactive version.
 }
 
 \examples{

@@ -1,10 +1,11 @@
 ################################################################################
 ### Author: Sebastian Meyer [sebastian *.* meyer *a*t* ifspm *.* uzh *.* ch]
-### Time-stamp: <[measlesWeserEms.R] by SM Fre 22/11/2013 16:19 (CET)>
+### Time-stamp: <[measlesWeserEms.R] by SM Mit 27/11/2013 16:29 (CET)>
 ### Project: Update "measles.weser" data and save as "sts" object
 ### Description: Add map and two missing districts,
-###              correct one observed count,
+###              correct time lag in 2002 and one observed count,
 ###              rename district keys (0....)
+###              add data on vaccination coverage
 ################################################################################
 
 
@@ -29,8 +30,21 @@ observed <- cbind(observed, "03401"=0, "03405"=0)
 ## order by key
 observed <- observed[,order(colnames(observed))]
 
-## Correction: as of Jahrbuch 2005, there is one more case attributed to
-##             LK Oldenburg (03458) during 2001/W17, i.e. 2 cases instead of 1.
+
+### Corrections
+
+## there is a time lag error for year 2002 probably caused by RKI's
+## redundant pseudo-week \dQuote{0} with 0 counts only:
+observed[53,]
+## The real week 1 of 2002 only starts from row 54,
+## and thus observed[104,] is only 2002/W51
+## Remove nonsense week
+observed <- observed[-53,]
+## Now we have to add the missing week 2002/W52 (there were no cases)
+observed <- rbind(observed, 0)
+
+## as of Jahrbuch 2005, there is one more case attributed to
+## LK Oldenburg (03458) during 2001/W17, i.e. 2 cases instead of 1.
 cbind("2001" = colSums(observed[1:52,]),
       "2002" = colSums(observed[53:104,]))
 observed[17,"03458"] <- 2
@@ -79,6 +93,18 @@ comppopfrac
 stopifnot(all.equal(comppopfrac[,1], comppopfrac[,2], tolerance=0.005))
 
 
+## add vaccination coverage
+
+vaccdata <- read.delim("vaccWeserEms.csv", colClasses=c(key="character"))
+lattice::xyplot(vacc2/doc ~ factor(year), groups=key, data=vaccdata, type="b") #ylim=c(0,1)
+with(vaccdata, tapply(vacc2/doc, year, FUN=rank))
+## quiet stable ranking of regions
+## we take the 2004 data, which is the first year with data for all districts and
+## regions are more heterogeneous in the early phase.
+stopifnot(subset(vaccdata, year==2004)$key == row.names(weserems_map))
+weserems_map$vacc2.2004 <- with(subset(vaccdata, year==2004), vacc2/doc)
+
+
 ### neighbourhood matrix
 
 weserems_nb <- poly2adjmat(weserems_map)
@@ -97,5 +123,5 @@ measlesWeserEms <- new("sts",
                        populationFrac=prop.table(weserems_map$POPULATION),
                        map=weserems_map, epochAsDate=FALSE, multinomialTS=FALSE)
 
-save(measlesWeserEms, file="../data/measlesWeserEms.RData")
-tools::resaveRdaFiles("../data/measlesWeserEms.RData")
+save(measlesWeserEms, file="../../pkg/data/measlesWeserEms.RData")
+tools::resaveRdaFiles("../../pkg/data/measlesWeserEms.RData")
