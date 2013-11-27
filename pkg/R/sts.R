@@ -1035,3 +1035,10 @@ setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, opti
   return(res)
 })
 
+
+### Convert an "sts" object to a simple "ts" object
+
+setAs(from="sts", to="ts", def = function (from)
+  {
+      ts(data=from@observed, start=from@start, frequency=from@freq)
+  })

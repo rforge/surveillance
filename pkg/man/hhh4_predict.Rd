@@ -7,7 +7,8 @@
 }
 
 \usage{
-\method{predict}{ah4}(object, newSubset=control$subset, type="response", \dots)
+\method{predict}{ah4}(object, newSubset=object$control$subset,
+        type="response", \dots)
 }
 
 \arguments{

@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.7-1 (2013-11-22)}{
+\section{Changes in surveillance version 1.7-1 (2013-11-27)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -19,8 +19,14 @@
       \code{txtProgressBar()}. 
     }
 
-    \item New \code{data("measlesWeserEms")}, an updated version of
+    \item New \code{data("measlesWeserEms")}, a corrected version of
     \code{data("measles.weser")}.
+
+    \item The \code{plot()}-method for fitted \code{hhh4()} objects now
+    also offers maps of estimated random intercepts, is finally
+    documented and more customizable.
+    Note that argument order and some names have changed:
+    \code{i} -> \code{units}, \code{title} -> \code{names}.
   }
 }
 

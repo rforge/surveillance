@@ -1,19 +1,19 @@
+\encoding{latin1}
 \name{measles.weser}
 \alias{measles.weser}
 \alias{measlesWeserEms}
 \docType{data}
 \keyword{datasets}
 
-\title{Measles epidemics in the Weser-Ems region of Lower Saxony,
-  Germany, 2001-2002}
+\title{Measles in the Weser-Ems region of Lower Saxony, Germany, 2001-2002}
 
 \description{
   Weekly counts of new measles cases for the 17 administrative
   districts (NUTS-3 level) of the \dQuote{Weser-Ems} region of Lower
   Saxony, Germany, during 2001 and 2002, as reported to the Robert Koch
   institute according to the Infection Protection Act
-  (\dQuote{Infektionsschutzgesetz}, \acronym{IfSG}).
-  \code{data("measlesWeserEms")} is an updated version of
+  (\dQuote{Infektionsschutzgesetz}, \acronym{IfSG}).\cr
+  \code{data("measlesWeserEms")} is a corrected version of
   \code{data("measles.weser")} (see Format section below).
 }
 
@@ -75,8 +75,8 @@ data("measlesWeserEms")
   A shapefile of Germany's districts as of 01/01/2009 was obtained from
   the Service Center (\url{http://www.geodatenzentrum.de}) of the German
   Federal Agency for Cartography and Geodesy (\url{http://www.bkg.bund.de}).
-  The map of the 17 districts of the \dQuote{Weser-Ems} region, included
-  as \code{slot(measlesWeserEms, "map")}, is a simplified subset of this
+  The map of the 17 districts of the \dQuote{Weser-Ems} region
+  (\code{measlesWeserEms@map}) is a simplified subset of this
   shapefile using a 30\% reduction via the Douglas-Peucker reduction method
   as implemented at \url{http://MapShaper.org}.
 
@@ -86,7 +86,7 @@ data("measlesWeserEms")
 
   Vaccination coverage was obtained from the public health department of
   Lower Saxony:
-  Nieders√§chsisches Landesgesundheitsamt (2005): Impfreport --
+  Nieders\enc{‰}{ae}chsisches Landesgesundheitsamt (2005): Impfreport --
   Durchimpfung von Kindern im Einschulungsalter in Niedersachsen im
   Erhebungsjahrgang 2004. Online available from
   \url{http://www.nlga.niedersachsen.de/portal/live.php?navigation_id=27093&article_id=19385&_psmand=20},

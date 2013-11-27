@@ -32,6 +32,7 @@
 % other methods
 \alias{initialize,sts-method}
 \alias{as.data.frame,sts-method}
+\alias{coerce,sts,ts-method}
 
 \encoding{latin1}
 

@@ -106,6 +106,9 @@ print.summary.ah4 <- function(x, digits = max(3, getOption("digits") - 3), ...){
   invisible(x)
 }
 
+terms.ah4 <- function (x, ...) 
+    if (is.null(x$terms)) interpretControl(x$control,x$stsObj) else x$terms
+
 logLik.ah4 <- function(object,...){
   if(!object$convergence)
 	stop("algorithm did not converge\n")
@@ -200,7 +203,7 @@ ranef.ah4 <- function(object, tomatrix = FALSE, ...){
   if (!tomatrix) return(ranefvec)
 
   ## transform to a nUnits x c matrix (c %in% 1:3)
-  model <- interpretControl(object$control,object$stsObj)
+  model <- terms(object)
   idxRE <- model$indexRE
   idxs <- unique(idxRE)
   names(idxs) <- model$namesFE[idxs]
@@ -233,67 +236,21 @@ confint.ah4 <- function (object, parm, level = 0.95, reparamPsi = TRUE, idx2Exp 
 }
 
 ## mean predictions for a subset of 1:nrow(object$stsObj)
-predict.ah4 <- function(object, newSubset=control$subset, type="response", ...)
+predict.ah4 <- function(object, newSubset=object$control$subset, type="response", ...)
 {
-    control <- object$control
     if (type == "response" &&
-        all((m <- match(newSubset, control$subset, nomatch=0L)) > 0)) {
+        all((m <- match(newSubset, object$control$subset, nomatch=0L)) > 0)) {
         ## we can extract fitted means from object
         object$fitted.values[m,,drop=FALSE]
-    } else { ## means for time points not fitted (not part of control$subset)
-        data <- object$stsObj
-        coefs <- coef(object, reparamPsi=FALSE)
-        model <- interpretControl(control, data)
-        predicted <- meanHHH(coefs, model, subset=newSubset)
+    } else { ## means for time points not fitted (not part of object$control$subset)
+        predicted <- meanHHH(coef(object, reparamPsi=FALSE),
+                             terms(object),
+                             subset=newSubset)
         if (type=="response") predicted$mean else {
             type <- match.arg(type, names(predicted))
             predicted[[type]]
         }
     }
-}
-
-# plot estimated mean 
-# this needs to be made more customizable
-plot.ah4 <- function(x, i=1, m=NULL, ylim=NULL,
-                     ylab="No. infected", xlab="", title=NULL,
-                     col=c("grey30","grey60","grey85"), border=col,
-                     cex=.6, pch=19, hide0s=FALSE, legend=FALSE, ...)
-{
-  stopifnot(length(i) == 1)
-  if(is.character(i) && is.na(i <- match(.i <- i, colnames(x$stsObj))))
-      stop("region '", .i, "' does not exist")
-  if(is.null(title)) title <- colnames(x$stsObj)[i]
-  obs <- observed(x$stsObj)[x$control$subset,i]
-  if(is.null(ylim)) ylim <- c(0, max(obs,na.rm=TRUE))
-
-  start <- x$stsObj@start
-  start[2] <-  start[2]+1
-  plot(ts(obs,frequency=x$stsObj@freq,start=start),
-       ylim=ylim,ylab=ylab,type="n",las=1,xlab=xlab)
-  title(main=title,line=0.5)
-
-  if(is.null(m))
-    m <- meanHHH(coef(x,reparamPsi=FALSE),interpretControl(x$control,x$stsObj))
-  m$endemic[is.na(m$mean)] <- 0
-  m$epi.own[is.na(m$mean)] <- 0
-  m$mean[is.na(m$mean)] <- 0
-    
-  tp <- (1:(length(obs)))/x$stsObj@freq +x$stsObj@start[1] + x$stsObj@start[2]/x$stsObj@freq
-  if(!is.null(dim(as.matrix(m$epidemic)))) { # FIXME: will this ever be FALSE?
-    polygon(c(tp[1],tp,tail(tp,1)),c(0,as.matrix(m$mean)[,i],0),col=col[1],border=border[1])
-    if(!is.null(dim(m$epi.own)))
-      polygon(c(tp[1],tp,tail(tp,1)),c(0,as.matrix(m$endemic)[,i]+as.matrix(m$epi.own)[,i],0),col=col[2],border=border[2])
-  }
-  polygon(c(tp[1],tp,tail(tp,1)),c(0,as.matrix(m$endemic)[,i],0),col=col[3],border=border[3])
-  ptidx <- if (hide0s) obs > 0 else TRUE
-  points(tp[ptidx],obs[ptidx],pch=pch,cex=cex)
- 
-  if(legend){
-      legend("topright", bty="n", legend=c("observed","ne","ar","end"),
-             pch=c(pch,rep(NA,3)), lty=c(NA,rep(1,3)), lwd=8, pt.lwd=1,
-             col=c(1,col))
-  }
-
 }
 
 

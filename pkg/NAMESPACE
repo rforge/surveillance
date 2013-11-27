@@ -348,6 +348,13 @@ S3method(predict, ahg)
 S3method(residuals, ahg)
 S3method(logLik, ahg)
 
+export(simHHH, simHHH.default)
+S3method(simHHH, default)
+S3method(simHHH, ah)
+
+
+### hhh4-specific
+
 export(hhh4) 
 export(addSeason2formula)
 export(zetaweights, powerlaw)
@@ -365,12 +372,10 @@ S3method(ranef, ah4)
 S3method(confint, ah4)
 S3method(predict, ah4)
 S3method(plot, ah4)
+export(plotHHH4_fitted, plotHHH4_ri, plotHHH4_fitted1)
 S3method(update, ah4)
-
-export(simHHH, simHHH.default)
-S3method(simHHH, default)
-S3method(simHHH, ah)
 S3method(simulate, ah4)
+S3method(terms, ah4)
 
 export(oneStepAhead)
 export(scores)

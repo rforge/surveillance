@@ -12,8 +12,8 @@
 \alias{confint.ah4}
 % FIXME: functions without documentation atm
 %% \alias{print.summary.ah4}
-%% \alias{plot.ah4}
 %% \alias{update.ah4}
+%% \alias{terms.ah4}
 
 \title{
 Print, Summary and Extraction Methods for \code{"ah4"} Objects
@@ -82,7 +82,7 @@ from a call to \code{\link{hhh4}}.
   \item{level}{the confidence level required.}
 }
 
-\details{
+\value{
   The function \code{coef} returns all estimated (regression)
   parameters from a model as propsed by Paul and Held (2011), see 
   \code{\link{hhh4}}. 
@@ -103,13 +103,16 @@ from a call to \code{\link{hhh4}}.
   for one or more parameters in the fitted model.
 }
 
-\value{
-  See also the documentation for the generic functions \code{\link{coef}},
-  \code{\link{AIC}}, \code{\link{logLik}} and \code{\link{confint}}.
+\seealso{
+  There is also a \code{\link[=plot.ah4]{plot}}-method for fitted
+  \code{hhh4} models.
+  
+  Related generic functions: \code{\link{coef}},
+  \code{\link{AIC}}, \code{\link{logLik}}, \code{\link{confint}}.
 }
 
 \author{
-  Michaela Paul
+  Michaela Paul and Sebastian Meyer
 }
 
 \references{

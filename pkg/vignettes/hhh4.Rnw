@@ -551,7 +551,7 @@ decomposed into the three components, is obtained with
 \setkeys{Gin}{width=.8\textwidth}
 \begin{center}
 <<plot-fit_men, fig=T, width=8,height=5>>=
-plot(result, i = 2, col = c("orange", "blue", "grey85"), legend = TRUE)
+plot(result, units = "meningococcus")
 @
 \end{center}
 
