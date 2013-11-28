@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.7-1 (2013-11-27)}{
+\section{Changes in surveillance version 1.7-1 (2013-11-28)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -41,6 +41,10 @@
       \item \code{+1} on rownames of \code{$pred} (now the same as for
       \code{$observed}). 
     }
+    \item Fitted \code{hhh4()} objects no longer contain the associated
+    \code{"sts"} data twice: it is now only stored as \code{$stsObj}
+    component, the hidden duplicate in \code{$control$data$.sts} was
+    dropped, which makes fitted objects substantially smaller.
   }
 }
 

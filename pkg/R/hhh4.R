@@ -482,7 +482,7 @@ checkFormula <- function(f, component, data, stsObj)
   # check if there is an overall intercept
   intercept.all <- attr(term, "intercept") == 1
   
-  # list of terms in the component
+  # list of variables in the component
   vars <- as.list(attr(term,"variables"))[-1] # first element is "list"
   nVars <- length(vars)
 
