@@ -56,7 +56,7 @@ hhh4(stsObj,
                                 variance = list(method="nlminb")),
                verbose = FALSE,
                start = list(fixed=NULL, random=NULL, sd.corr=NULL),
-               data = data.frame(t = epoch(stsObj)-1),
+               data = list(t = epoch(stsObj)-1),
                keep.terms = FALSE
                ),
      check.analyticals = FALSE
@@ -141,9 +141,9 @@ hhh4(stsObj,
       \item{\code{start}}{a list of initial parameter values; overrides
 	any initial values in formulas (this is currently the only way
 	to specify initial values).}
-      \item{\code{data}}{a data frame or, more generally, a named list
-	with covariates that are to be included as fixed effects (see
-	\code{\link{fe}}) in any of the 3 component formulae.
+      \item{\code{data}}{a named list of covariates that are to be
+	included as fixed effects (see \code{\link{fe}}) in any of the 3
+	component formulae.
 	By default, the time variable \code{t} is available and used for
 	seasonal effects created by \code{\link{addSeason2formula}}.
 	In general, covariates in this list can be either vectors of
@@ -289,23 +289,20 @@ opt <- list(stop = list(tol=1e-5, niter=200),
 # A0
 cntrl_A0 <- list(ar = list(f = ~ -1),
                  end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt,
-                 verbose = 1, data = data.frame(t = epoch(fluBYBW)-1))
+                 family = "NegBin1", optimizer = opt, verbose = 1)
 summary(res_A0 <- hhh4(fluBYBW,cntrl_A0))
 
 # B0
 cntrl_B0 <- list(ar = list(f = ~ 1),
                  end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt,
-                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 family = "NegBin1", optimizer = opt, verbose=1)
 res_B0 <- hhh4(fluBYBW,cntrl_B0)               
  
 
 # C0
 cntrl_C0 <- list(ar = list(f = ~ -1 + ri(type="iid", corr="all")),
                  end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt,
-                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 family = "NegBin1", optimizer = opt, verbose=1)
 res_C0 <- hhh4(fluBYBW,cntrl_C0)               
 
 
@@ -317,8 +314,7 @@ wji <- neighbourhood(fluBYBW)/rowSums(neighbourhood(fluBYBW))
 cntrl_A1 <- list(ar = list(f = ~ -1),
                  ne = list(f = ~ 1, weights = wji),
                  end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt,
-                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 family = "NegBin1", optimizer = opt, verbose=1)
 res_A1 <- hhh4(fluBYBW,cntrl_A1)               
 
 
@@ -326,8 +322,7 @@ res_A1 <- hhh4(fluBYBW,cntrl_A1)
 cntrl_B1 <- list(ar = list(f = ~ 1),
                  ne = list(f = ~ 1, weights = wji),
                  end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt,
-                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 family = "NegBin1", optimizer = opt, verbose=1)
 res_B1 <- hhh4(fluBYBW,cntrl_B1)               
 
 
@@ -335,8 +330,7 @@ res_B1 <- hhh4(fluBYBW,cntrl_B1)
 cntrl_C1 <- list(ar = list(f = ~ -1 + ri(type="iid", corr="all")),
                  ne = list(f = ~ 1, weights = wji),
                  end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt,
-                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 family = "NegBin1", optimizer = opt, verbose=1)
 res_C1 <- hhh4(fluBYBW,cntrl_C1)               
 
 
@@ -344,8 +338,7 @@ res_C1 <- hhh4(fluBYBW,cntrl_C1)
 cntrl_A2 <- list(ar = list(f = ~ -1),
                  ne = list(f = ~ -1 + ri(type="iid",corr="all"), weights=wji),
                  end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt,
-                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 family = "NegBin1", optimizer = opt, verbose=1)
 res_A2 <- hhh4(fluBYBW,cntrl_A2)               
 
 
@@ -353,16 +346,14 @@ res_A2 <- hhh4(fluBYBW,cntrl_A2)
 cntrl_B2 <- list(ar = list(f = ~ 1),
                  ne = list(f = ~ -1 + ri(type="iid",corr="all"), weights =wji),
                  end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt,
-                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                 family = "NegBin1", optimizer = opt, verbose=1)
 res_B2 <- hhh4(fluBYBW,cntrl_B2)               
 
 # C2
 cntrl_C2 <- list(ar = list(f = ~ -1 + ri(type="iid", corr="all")),
                  ne = list(f = ~ -1 + ri(type="iid",corr="all"), weights =wji),
                  end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt,
-                 verbose=1, data=data.frame(t=epoch(fluBYBW)-1),
+                 family = "NegBin1", optimizer = opt, verbose=1,
                  start=list(fixed=fixef(res_B0),random=c(rep(0,140),
                          ranef(res_B0)), sd.corr=c(-.5,res_B0$Sigma.orig,0)))
 res_C2 <- hhh4(fluBYBW,cntrl_C2)               
@@ -374,8 +365,7 @@ cntrl_D <- list(ar = list(f = ~ 1),
                 end = list(f =addSeason2formula(f = ~ -1 + ri(type="car") + 
                                              I((t-208)/100), S=3, period=52), 
                           offset = population(fluBYBW)),
-                family = "NegBin1", optimizer = opt,
-                verbose=1, data=data.frame(t=epoch(fluBYBW)-1))
+                family = "NegBin1", optimizer = opt, verbose=1)
 res_D <- hhh4(fluBYBW,cntrl_D)               
 
 }

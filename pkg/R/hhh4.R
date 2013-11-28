@@ -48,8 +48,7 @@ CONTROL.hhh4 <- alist(
     verbose = FALSE,           # level of reporting during hhh4() processing
     start = list(fixed=NULL,random=NULL,sd.corr=NULL),  # list with initials,
                                # overrides any initial values in formulas 
-    data = data.frame(t=epoch(stsObj)-1), # data.frame or named list with
-                               # covariates that appear in any of the formulae
+    data = list(t=epoch(stsObj)-1), # named list of covariates from any of the formulae
     keep.terms = FALSE
 )
 
@@ -164,7 +163,7 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
                  fitted.values=fitted,
                  control=control,
                  terms=if(control$keep.terms) model else NULL,
-                 stsObj=stsObj,         # FIXME: stsObj also in 'control$data'
+                 stsObj=stsObj,
                  lag=1, nObs=sum(!model$isNA[control$subset,]),
                  nTime=length(model$subset), nUnit=ncol(stsObj))
        ## FIXME: nTime has a different meaning here than everywhere else!!!
@@ -188,14 +187,9 @@ setControl <- function (control, stsObj)
   defaultControl <- lapply(CONTROL.hhh4, eval, envir=environment())
   environment(defaultControl$ar$f) <- environment(defaultControl$ne$f) <-
       environment(defaultControl$end$f) <- .GlobalEnv
-  defaultControl$data <- as.list(defaultControl$data) # since we will add stsObj
-  ##<- NROW(stsObj) only works as intended since R 2.15.0, but this is required
-  ##   for adding stsObj to a data.frame; thus we switch to a list
+  defaultControl$data <- as.list(defaultControl$data)
   control <- modifyList(defaultControl, control)
 
-  ## add stsObj (maybe overwrite an old one from the control object)
-  control$data$.sts <- stsObj
-  
   ## add nTime and nUnits to control list
   control$nTime <- nTime                # FIXME: are these actually
   control$nUnits <- nUnits              #        used anywhere?
@@ -323,12 +317,12 @@ isInModel <- function(formula, name=deparse(substitute(formula))){
 # used to incorporate covariates and unit-specific effects
 fe <- function(x,          # covariate 
                which=NULL, # Null= overall, vector with booleans = unit-specific
-               initial=NULL # vector of inital values for parameters
-               ){
-  sts <- get("env",parent.frame(1))$.sts
-  nTime <- nrow(sts)
-  nUnits <- ncol(sts)
-               
+               initial=NULL) # vector of inital values for parameters
+{
+  stsObj <- get("stsObj", envir=parent.frame(1), inherits=TRUE) #checkFormula()
+  nTime <- nrow(stsObj)
+  nUnits <- ncol(stsObj)
+  
   if(!is.numeric(x)){
     stop("Covariate \'",deparse(substitute(x)),"\' is not numeric\n")
   }
@@ -380,7 +374,7 @@ fe <- function(x,          # covariate
   summ <- ifelse(unitSpecific,"colSums","sum")
     
   name <- deparse(substitute(x))
-  if(unitSpecific) name <- paste(name, colnames(sts)[which], sep=".")
+  if(unitSpecific) name <- paste(name, colnames(stsObj)[which], sep=".")
     
   result <- list(terms=terms,
                 name=name,
@@ -406,12 +400,9 @@ fe <- function(x,          # covariate
 ri <- function(type=c("iid","car")[1], 
                corr=c("none","all")[1],
                initial.var=NULL,  # initial value for variance
-               initial.re=NULL 
-               ){
-  x <- 1
-  
-  sts <- get("env",parent.frame(1))$.sts
-  
+               initial.re=NULL)
+{
+  stsObj <- get("stsObj", envir=parent.frame(1), inherits=TRUE) #checkFormula()
   type <- match.arg(type, c("iid","car"))
   corr <- match.arg(corr, c("none","all"))
   corr <- switch(corr, 
@@ -420,10 +411,10 @@ ri <- function(type=c("iid","car")[1],
                   
   if(type=="iid"){
     Z <- 1
-    dim.re <- ncol(sts)
+    dim.re <- ncol(stsObj)
     mult <- "*"
   } else if(type=="car"){ # construct penalty matrix K
-    K <- neighbourhood(sts)
+    K <- neighbourhood(stsObj)
     checkNeighbourhood(K)
     K <- K == 1                         # indicate first-order neighbours
     ne <- colSums(K)                    # number of first-order neighbours
@@ -459,7 +450,7 @@ ri <- function(type=c("iid","car")[1],
     initial.var <- -.5
   }
 
-  result <- list(terms=x,
+  result <- list(terms=1,
                 name=paste("ri(",type,")",sep=""),
                 Z.intercept=Z,
                 which=NULL,
@@ -481,9 +472,10 @@ ri <- function(type=c("iid","car")[1],
 
 ### check specification of formula
 ## f: one of the component formulae (ar$f, ne$f, or end$f)
-## env: the "data" argument of hhh4()
 ## component: 1, 2, or 3, corresponding to the ar/ne/end component, respectively
-checkFormula <- function(f, env, component)
+## data: the data-argument of hhh4()
+## stsObj: the stsObj is not used directly in checkFormula, but in fe() and ri()
+checkFormula <- function(f, component, data, stsObj)
 {
   term <- terms.formula(f, specials=c("fe","ri"))
   
@@ -496,7 +488,7 @@ checkFormula <- function(f, env, component)
 
   # begin with intercept
   res <- if (intercept.all) {
-      c(eval(fe(1),envir=env), list(offsetComp=component))
+      c(fe(1), list(offsetComp=component))
   } else {
       if (nVars==0)
           stop("formula ", deparse(substitute(f)), " contains no variables")
@@ -510,14 +502,14 @@ checkFormula <- function(f, env, component)
   # evaluate covariates
   for(i in fe.raw)
       res <- cbind(res, c(
-          eval(substitute(fe(x), list(x=vars[[i]])), envir=env),
+          eval(substitute(fe(x), list(x=vars[[i]])), envir=data),
           list(offsetComp=component)
           ))
   
   # fixed effects
   for(i in attr(term, "specials")$fe)
       res <- cbind(res, c(
-          eval(vars[[i]], envir=env),
+          eval(vars[[i]], envir=data),
           list(offsetComp=component)
           ))
   
@@ -530,7 +522,7 @@ checkFormula <- function(f, env, component)
            deparse(substitute(f)))
   for(i in RI)
       res <- cbind(res, c(
-          eval(vars[[i]], envir=env),
+          eval(vars[[i]], envir=data),
           list(offsetComp=component)
           ))
   
@@ -574,11 +566,8 @@ neOffsetFUN <- function (Y, neweights, nbmat, data, lag)
 
 # interpret and check the specifications of each component
 # control must contain all arguments, i.e. setControl was used
-interpretControl <- function(control, stsObj){
-
-  # get environment for evaluation of covariates
-  env <- control$data
-  
+interpretControl <- function (control, stsObj)
+{
   nTime <- nrow(stsObj)
   nUnits <- ncol(stsObj)
 
@@ -603,8 +592,8 @@ interpretControl <- function(control, stsObj){
 
   ## create list of offsets of the three components
   Ym1 <- rbind(matrix(NA_integer_, ar$lag, nUnits), head(Y, nTime-ar$lag))
-  Ym1.ne <- neOffsetFUN(Y, ne$weights, neighbourhood(stsObj), control$data,
-                        ne$lag)
+  Ym1.ne <- neOffsetFUN(Y, ne$weights,
+                        neighbourhood(stsObj), control$data, ne$lag)
   offsets <- list(ar=Ym1, ne=Ym1.ne, end=end$offset)
   ## -> offset$ne is a function of the parameter vector 'd', which returns a
   ##    nTime x nUnits matrix -- or 0 (scalar) if there is no NE component
@@ -625,17 +614,13 @@ interpretControl <- function(control, stsObj){
 
   ## get terms for all components
   all.term <- NULL
-  if(ar$isMatrix){                      # ar$f is a matrix
-      stop("not yet implemented")
-  } else if(ar$inModel){                # ar$f is a formula
-      all.term <- cbind(all.term, checkFormula(ar$f, env=env, component=1))
-  }
-  if(ne$inModel){
-      all.term <- cbind(all.term, checkFormula(ne$f, env=env, component=2))
-  }
-  if(end$inModel){
-      all.term <- cbind(all.term, checkFormula(end$f,env=env, component=3))
-  }
+  if(ar$isMatrix) stop("not yet implemented") # ar$f is a matrix
+  if(ar$inModel) # ar$f is a formula
+      all.term <- cbind(all.term, checkFormula(ar$f, 1, control$data, stsObj))
+  if(ne$inModel)
+      all.term <- cbind(all.term, checkFormula(ne$f, 2, control$data, stsObj))
+  if(end$inModel)
+      all.term <- cbind(all.term, checkFormula(end$f,3, control$data, stsObj))
   
   dim.fe <- sum(unlist(all.term["dim.fe",]))
   dim.re.group <- unlist(all.term["dim.re",], use.names=FALSE)
