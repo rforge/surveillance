@@ -2,13 +2,6 @@
 \usepackage[english]{babel}   % language of the manuscript is American English
 \usepackage{fixltx2e}         % patches for LaTeX2e
 
-%%% Typesetting
-%\usepackage{microtype}        % micro-typo: character protrusion, font expansion
-%\usepackage{ellipsis}         % correct white space around \dots
-%\usepackage{url}              % manages line breaks in URLs
-%\usepackage{setspace}         % modify line spacing
-%\onehalfspacing               % for finer control: \setstretch
-
 %%% Standard packages
 \usepackage[sumlimits, intlimits, namelimits]{amsmath} % limits above/below op.
 \usepackage{amssymb}          % extra math symbols
@@ -17,9 +10,13 @@
 \usepackage{bm}               % \bm: alternative to \boldsymbol from amsfonts
 \usepackage{mathtools}        % tools for math typesetting + amsmath-bugfixes
 \usepackage{booktabs}         % make tables look nicer
-\usepackage{subfig}           % successor of subfigure -> \subfloat[Title]{...}
+%\usepackage{subfig}           % successor of subfigure -> \subfloat[Title]{...}
+\usepackage{subcaption}       % alternative to subfig
+\newcommand{\subfloat}[2][need a sub-caption]{\subcaptionbox{#1}{#2}} % -> knitr
 
 %%% Further packages
+\usepackage{array}            % format tabular columns
+\usepackage{multirow}         % combine rows in tabular
 \usepackage{marginnote}       % text in margin (also in floats <-> \marginpar)
 \renewcommand*{\marginfont}{\color{red}\sffamily\footnotesize}
 %\usepackage{longtable}        % long tables with pagebreak
@@ -49,3 +46,7 @@
 %\DeclareMathOperator{\Cov}{Cov} % covariance
 %\DeclareMathOperator{\Corr}{Corr} % correlation
 \DeclareMathOperator{\logit}{logit}   % logit-transform
+
+%% Project-specific
+\newcommand{\Endemic}[1]{{\color{DarkGreen} #1}}
+\newcommand{\Epidemic}[1]{{\color{FireBrick} #1}}

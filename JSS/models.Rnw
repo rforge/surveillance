@@ -9,80 +9,85 @@
 
 History, place our models in the world of epidemic models
 
-putting the modeling into a regression-oriented framework
 
-stochastic models: stochastic SIR, branching process, TSIR (Finkenstädt, Grenfell)
-
-model selection, residuals, ...
-
-
-
-
-\subsection{On the reproduction number} \label{R0}
-
-
-The point process model \eqref{eqn:twinstim} features a
-reproduction number derived from its branching process interpretation.
-New infections may either originate from the endemic component representing
-immigration independent of the history of the epidemic, or they are triggered by
-some previously infected individual via the epidemic component. As soon as an
-individual becomes infected, it spreads the disease
-according to an inhomogeneous Poisson process with rate 
-$\eta_j \cdot g(t-t_j)\cdot f(\norm{\bm{s}-\bm{s_j}})$ around its origin.
-Since this process is independent of the individuals parentage and of other
-infections, 
-\begin{equation*}
-  \mu_j = \eta_j \cdot
-  \left[ \int_0^{T-t_j} g(t) \,dt \right] \cdot
-  \left[ \int_{\bm{W}-\bm{s_j}} f(\bm{s}) \,d\bm{s} \right]
-\end{equation*}
-is the expected number of secondary infections triggered by an infective $j$
-during the remaining observation period $[t_j,T]$ in the observation region
-$\bm{W}$. 
-Thus, infectives with $\mu_j < 1$ are expected to cause less than one secondary
-infection.
-
-An interesting insight provides a comparison with the basic reproduction number
-obtained from the simple SIR (susceptible-infected-recovered) compartmental model
+The simple SIR (susceptible-infected-recovered) compartmental model
 for a closed population without demographics \citep{kermack.mckendrick1927}
-represented by a system of ordinary differential equations:
-\begin{align*}
-  \frac{dS}{dt} &= -\beta S I 
-  & \frac{dI}{dt} &= \beta S I - \gamma I 
+is represented by a system of ordinary differential equations:
+\begin{align} \label{eqn:kermack.mckendrick}
+  \frac{dS}{dt} &= -\beta S I
+  & \frac{dI}{dt} &= \beta S I - \gamma I
   & \frac{dR}{dt} &= \gamma I
-\end{align*}
+\end{align}
 Here, $N=S(t) + I(t) + R(t)$ is the (constant) population size, $\beta$ is the
 transmission rate given contact between a susceptible and an infectious
 individual, 
 and $\gamma$ is the recovery rate ($1/\gamma$ is the average infectious period).
 For this model, the basic reproduction number, i.e.\ the average number of
 secondary cases arising from a single infective put into an entirely susceptible
-population, is $R_0 = N \beta / \gamma$
+population, is
+\begin{equation} \label{eqn:R0:kermack.mckendrick}
+R_0 = N \cdot \frac{\beta}{\gamma}
+\end{equation}
 \citep[see, e.g.,][Section 2.1]{Keeling.Rohani2008}.
-A similar, but spatio-temporal epidemic model can be established from the point
-process model \eqref{eqn:twinstim} with the following settings:
-no endemic component,
-homogeneous individuals ($\eta_j \equiv \beta$),
-homogeneous mixing in space ($f(\bm{s}) \equiv 1$),
-and exponential decay of infectivity ($g(t) = e^{-\alpha t}$).
-Then, for $T \rightarrow \infty$,
-\begin{equation*}
-  \mu = \beta \cdot
-  \left[ \int_0^\infty e^{-\alpha t} \,dt \right] \cdot
-  \left[ \int_{\bm{W}-\bm{s_j}} 1 \,d\bm{s} \right] =
-  \beta \cdot \abs{\bm{W}} / \alpha \:,
-\end{equation*}
-which corresponds to the above basic reproduction number interpreting
-$\abs{\bm{W}}$ as the population size, $\beta$ as the transmission rate and
-$\alpha$ as the removal rate.
-Like in classic epidemic models, the process is sub-critical if $\mu < 1$ holds,
-which means that its eventual extinction is almost sure. However, in the full
-point process model \eqref{eqn:twinstim} with an endemic component, new
-infections may always occur via ``immigration''. Hence, the reproduction number
-as estimated from this model is adjusted for such new infections occurring
-independently of previous infections. It therefore tends to be lower than the
-one estimated from a classical non-spatial SIR model without immigration of
-infectives.
+
+
+stochastic models: stochastic SIR, branching process, TSIR (Finkenstädt, Grenfell)
+
+
+The spatio-temporal epidemic models implemented in \pkg{surveillance} embed the
+retrospective modeling task in a regression-oriented framework.
+
+
+Although our models are designed for different types of spatio-temporal
+surveillance data, they are all inspired by the work of \citet{held.etal2005}
+decomposing disease risk additively into ``endemic'' and ``epidemic''
+components. The endemic component captures
+exogeneous factors such as population, socio-demographic variables, long-term
+trends and seasonality, climate, or concurrent counts of related diseases in
+humans or animals (all varying in time and/or space).
+Explicit dependence between observed cases is then
+introduced through epidemic components driven by the observed past.
+
+
+The spatio-temporal point process model proposed by
+\citet{meyer.etal2011} is designed for 
+time-space-mark data $\{(t_i,\bm{s}_i,\bm{m}_i): i = 1,\dotsc,n\}$
+of individual case reports
+to describe the occurrence of infectious events (e.g., measles cases) and their
+potential to trigger secondary cases.
+Formally, the model characterises a spatio-temporal point process in
+a region $\bm{W}$ observed during a period $(0,T]$ through the conditional
+intensity function
+
+\begin{table}[ht]
+\caption{Spatio-temporal epidemic models in \pkg{surveillance}.}
+\footnotesize
+\begin{tabular}{>{\bfseries}c|c|c|c}
+\toprule
+           & \code{twinstim}        & \code{twinSIR} & \code{hhh4} \\
+           & \citep*{meyer.etal2011} & \citep{hoehle2009} & \citep{held.paul2012} \\
+\midrule
+\multirow{2}{*}{Resolution} & \multirow{2}{*}{individual events (CSCT)} & individual SI[R][S]
+history & event counts aggregated\\
+& & of fixed population (CT) & in space and time\\[1ex]
+\multirow{2}{*}{Example} & \multirow{2}{*}{infectious disease case reports} &
+farm-based epidemics, & week$\times$district counts\\
+& & local outbreaks & from public health surveillance\\[1ex]
+Model & spatio-temporal PP & multivariate temporal PP &
+multivariate time series (NegBin)\\
+\midrule
+Rate & $\lambda(\bm{s}, t)$ & $\lambda_i(t) \given \{i\in S(t)\}$ & $\mu_{it}$\\
+$=$ &&&\\
+Endemic & $\nu_{[\bm{s}][t]} \rho_{[\bm{s}][t]}$ & $\nu_i(t) \lambda_0(t)$ & $\nu_{it} e_{it}$\\
+$+$ &&&\\
+Epidemic &
+$\sum\limits_{j: t_j < t} \eta_j \cdot f(\norm{\bm{s}-\bm{s}_j}) \cdot g(t-t_j)$ &
+$\sum\limits_{j \in I(t)} f(||s_i - s_j||)$ &
+$\lambda_{it} \,Y_{i,t-1} + \phi_{it} \, \sum\limits_{j \ne i} w_{ji} Y_{j,t-1}$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 
 
 

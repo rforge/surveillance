@@ -2,22 +2,27 @@
 \alias{plot.ah4}
 \alias{plotHHH4_fitted}
 \alias{plotHHH4_fitted1}
+\alias{plotHHH4_season}
 \alias{plotHHH4_ri}
 
 \title{Plot Method for Fitted \code{hhh4}-models}
 
 \description{
-  Fitted \code{\link{hhh4}} models can be plotted in two ways (see
-  argument \code{type} below): Either the fitted component means (of
-  selected units) are plotted along time along with the observed
-  counts, or, if the units of the corresponding multivariate
-  \code{"\linkS4class{sts}"} object represent different regions, a map
-  of estimated region-specific intercepts of a selected model component
-  can be produced.
+  There are three \code{type}s of plots for fitted \code{\link{hhh4}} models:
+  \itemize{
+    \item Plot the \code{"fitted"} component means (of selected units)
+    along time along with the observed counts.
+    \item Plot the estimated \code{"season"}ality of the three
+    components and the dominant eigenvalue of the epidemic components.
+    \item If the units of the corresponding multivariate
+    \code{"\linkS4class{sts}"} object represent different regions, a map
+    of estimated region-specific intercepts (\code{"ri"}) of a selected
+    model component can be produced.
+  }
 }
 
 \usage{
-\method{plot}{ah4}(x, type=c("fitted", "ri"), ...)
+\method{plot}{ah4}(x, type=c("fitted", "season", "ri"), ...)
 
 plotHHH4_fitted(x, units = 1, names = NULL,
                 col = c("orange", "blue", "grey85", "black"),
@@ -26,16 +31,24 @@ plotHHH4_fitted(x, units = 1, names = NULL,
                 legend = TRUE, legend.args = list(),
                 legend.observed = TRUE, ...)
 
-plotHHH4_ri(x, component, sp.layout = NULL,
-            gpar.missing = list(col = "darkgrey", lty = 2, lwd = 2),
-            ...)
-
 plotHHH4_fitted1(x, unit = 1, main = NULL,
                  col = c("grey30", "grey60", "grey85", "grey0"),
                  pch = 19, pt.cex = 0.6, border = col, 
                  start = x$stsObj@start, end = NULL,
                  ylim = NULL, xlab = "", ylab = "No. infected",
                  hide0s = FALSE, meanHHH = NULL)
+
+plotHHH4_season(...,
+                components=c("ar", "ne", "end", "maxEV"),
+                xlim=NULL, ylim=NULL,
+                xlab=NULL, ylab=NULL, main=NULL,
+                par.settings = list(), matplot.args = list(),
+                legend = NULL, legend.args = list(),
+                refline.args = list())
+
+plotHHH4_ri(x, component, sp.layout = NULL,
+            gpar.missing = list(col = "darkgrey", lty = 2, lwd = 2),
+            ...)
 }
 
 \arguments{
@@ -46,7 +59,9 @@ plotHHH4_fitted1(x, unit = 1, main = NULL,
     of a specific model \code{component}. The latter of course requires
     the model \code{x} to contain the selected random intercepts, and
     \code{x$stsObj} to contain a map.}
-  \item{\dots}{further arguments passed on to other functions.\cr
+  \item{\dots}{for \code{plotHHH4_season}, one or more fitted
+    \code{\link{hhh4}} objects.
+    Otherwise further arguments passed on to other functions.\cr
     For the \code{plot}-method they go to the specific plot
     \code{type} function.\cr
     \code{plotHHH4_fitted} passes them to \code{plotHHH4_fitted1}, which is called
@@ -56,8 +71,10 @@ plotHHH4_fitted1(x, unit = 1, main = NULL,
     It indexes \code{colnames(x$stsObj)}. The \code{unit} for
     \code{plotHHH4_fitted1} must be of length 1 only.}
   \item{names,main}{main title(s) for the selected
-    \code{unit}(\code{s}). If \code{NULL} (default), the appropriate
-    subset of \code{colnames(x$stsObj)} will be used.}
+    \code{unit}(\code{s}) / \code{components}. If \code{NULL} (default),
+    \code{plotHHH4_fitted1} will use the appropriate element of
+    \code{colnames(x$stsObj)}, whereas \code{plotHHH4_season} uses
+    default titles.}
   \item{col,border}{length 4 vector specifying the colors for the
     spatio-temporal, autoregressive, endemic, and observed elements in
     this order. For \code{plotHHH4_fitted}, a length 3 vector also
@@ -82,13 +99,32 @@ plotHHH4_fitted1(x, unit = 1, main = NULL,
     a line for the dots corresponding to observed counts.}
   \item{start,end}{time range to plot specified by vectors of length two
     in the form \code{c(year,number)}, see \code{"\linkS4class{sts}"}.}
-  \item{ylim}{y-axis range, defaults to
-    \code{c(0,max(observed(x$stsObj)[,unit]))}}.
-  \item{xlab,ylab}{axis labels.}
+  \item{xlim}{numeric vector of length 2 specifying the time-of-year
+    range, default to \code{c(1,x$stsObj@freq)}.}
+  \item{ylim}{y-axis range.
+    For \code{type="fitted"}, this defaults to 
+    \code{c(0,max(observed(x$stsObj)[,unit]))}.
+    For \code{type="season"}, \code{ylim} must be a list of length
+    \code{length(components)} specifying the range for every component
+    plot, or a named list to customize only a subset of these. If only
+    one \code{ylim} is specified, it will be recycled for all
+    \code{components} plots.}
+  \item{xlab,ylab}{axis labels. For \code{plotHHH4_season}, \code{ylab}
+    specifies the y-axis labels for all \code{components} plots in a
+    list (similar to \code{ylim}).}
   \item{hide0s}{logical indicating if dots for zero observed counts
     should be omitted. Especially useful if there are too many.}
   \item{meanHHH}{(internal) use different component means than those
     estimated and available from \code{x}.}
+  \item{components}{vector of components for which to plot estimated
+    seasonality. Additionally, a seasonality plot of the dominant
+    eigenvalue of the epidemic components is available
+    (\code{"maxEV"}).}
+  \item{matplot.args}{list of line style specifications passed to
+    \code{\link{matplot}}, e.g., \code{lty}, \code{lwd}, \code{col}.}
+  \item{refline.args}{list of line style specifications passed to
+    \code{\link{abline}} to draw the reference line in the plot of
+    the dominant eigenvalue, e.g., \code{lty} and \code{col}.}
   \item{component}{component for which to plot the estimated
     region-specific random intercepts. Must partially match one of
     \code{colnames(ranef(x, tomatrix=TRUE))}.}
@@ -103,6 +139,8 @@ plotHHH4_fitted1(x, unit = 1, main = NULL,
   \code{plotHHH4_fitted1} invisibly returns a matrix of the fitted
   component means for the selected \code{unit}, and \code{plotHHH4_fitted}
   returns these in a list for all \code{units}.\cr
+  \code{plotHHH4_season} invisibly returns the plotted y-values, i.e. the
+  multiplicative seasonality effect of the \code{components}.\cr
   \code{plotHHH4_ri} returns the generated \code{\link{spplot}}, which
   is a \pkg{lattice} plot of class \code{"\link[=trellis.object]{trellis}"}.
 }
@@ -129,6 +167,9 @@ measlesFit <- hhh4(measlesWeserEms, measlesModel)
 
 ## fitted values for a single unit
 plot(measlesFit, units=2)
+
+## seasonality plot
+plot(measlesFit, type="season")
 
 ## random intercepts of the endemic component
 plot(measlesFit, type="ri", component="end")

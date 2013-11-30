@@ -86,14 +86,14 @@
 
 @ARTICLE{gabriel.etal2013,
   author = {Edith Gabriel and Barry S. Rowlingson and Peter J. Diggle},
-  title = {stpp: an {R} package for plotting, simulating and analyzing spatio-temporal
-	point patterns},
+  title = {\pkg{stpp}: an \textsf{R} package for plotting, simulating and analyzing
+	spatio-temporal point patterns},
   journal = JSS,
   year = {2013},
   volume = {53},
   pages = {1--29},
   number = {2},
-  month = {4},
+  month = apr,
   abstract = {stpp is an R package for analyzing, simulating and displaying space-time
 	point patterns. It covers many of the models encountered in applications
 	of point process methods to the study of spatio-temporal phenomena.
@@ -112,14 +112,118 @@
   url = {http://www.jstatsoft.org/v53/i02}
 }
 
-@INBOOK{hoehle.mazick2010,
-  chapter = {Aberration detection in R illustrated by Danish mortality monitoring},
-  pages = {215--238},
-  title = {{B}iosurveillance: {M}ethods and {C}ase {S}tudies},
+@ARTICLE{held.etal2005,
+  author = {Held, Leonhard and Höhle, Michael and Hofmann, Mathias},
+  title = {{A} statistical framework for the analysis of multivariate infectious
+	disease surveillance counts},
+  journal = {Statistical Modelling},
+  year = {2005},
+  volume = {5},
+  pages = {187--199},
+  number = {3},
+  abstract = {A framework for the statistical analysis of counts from infectious
+	disease surveillance databases is proposed. In its simplest form,
+	the model can be seen as a Poisson branching process model with immigration.
+	Extensions to include seasonal effects, time trends and overdispersion
+	are outlined. The model is shown to provide an adequate fit and reliable
+	one-step-ahead prediction intervals for a typical infectious disease
+	time series. In addition, a multivariate formulation is proposed,
+	which is well suited to capture space-time dependence caused by the
+	spatial spread of a disease over time. An analysis of two multivariate
+	time series is described. All analyses have been done using general
+	optimization routines, where ML estimates and corresponding standard
+	errors are readily available.},
+  doi = {10.1191/1471082X05st098oa},
+  file = {held.etal2005.pdf:articles/held.etal2005.pdf:PDF},
+  owner = {birgit},
+  timestamp = {2011.01.24}
+}
+
+@ARTICLE{held.paul2012,
+  author = {Held, Leonhard and Paul, Michaela},
+  title = {{M}odeling seasonality in space-time infectious disease surveillance
+	data},
+  journal = BIMJ,
+  year = {2012},
+  volume = {54},
+  pages = {824--843},
+  number = {6},
+  abstract = {Infectious disease data from surveillance systems are typically available
+	as multivariate times series of disease counts in specific administrative
+	geographical regions. Such databases are useful resources to infer
+	temporal and spatiotemporal transmission parameters to better understand
+	and predict disease spread. However, seasonal variation in disease
+	notification is a common feature of surveillance data and needs to
+	be taken into account appropriately. In this paper, we extend a time
+	series model for spatiotemporal surveillance counts to incorporate
+	seasonal variation in three distinct components. A simulation study
+	confirms that the different types of seasonality are identifiable
+	and that a predictive approach suggested for model selection performs
+	well. Application to surveillance data on influenza in Southern Germany
+	reveals a better model fit and improved one-step-ahead predictions
+	if all three components allow for seasonal variation.},
+  doi = {10.1002/bimj.201200037},
+  file = {held.paul2012.pdf:articles/held.paul2012.pdf:PDF},
+  keywords = {Infectious diseases, Multivariate time series of counts, Proper scoring
+	rules, Seasonality, Spatiotemporal data},
+  owner = {sebastian},
+  timestamp = {2012.09.04}
+}
+
+@ARTICLE{herzog.etal2011,
+  author = {Herzog, S. A. and Paul, Michaela and Held, Leonhard},
+  title = {{H}eterogeneity in vaccination coverage explains the size and occurrence
+	of measles epidemics in {G}erman surveillance data},
+  journal = {Epidemiology and Infection},
+  year = {2011},
+  volume = {139},
+  pages = {505--515},
+  abstract = {The objective of this study was to characterize empirically the association
+	between vaccination coverage and the size and occurrence of measles
+	epidemics in Germany. In order to achieve this we analysed data routinely
+	collected by the Robert Koch Institute, which comprise the weekly
+	number of reported measles cases at all ages as well as estimates
+	of vaccination coverage at the average age of entry into the school
+	system. Coverage levels within each federal state of Germany are
+	incorporated into a multivariate time-series model for infectious
+	disease counts, which captures occasional outbreaks by means of an
+	autoregressive component. The observed incidence pattern of measles
+	for all ages is best described by using the log proportion of unvaccinated
+	school starters in the autoregressive component of the model.},
+  doi = {10.1017/S0950268810001664},
+  file = {herzog.etal2011.pdf:articles/herzog.etal2011.pdf:PDF},
+  issn = {1469-4409},
+  issue = {04},
+  keywords = {Infectious disease epidemiology, measles (rubeola), MMR vaccination,
+	modelling},
+  numpages = {11},
+  owner = {sebastian},
+  timestamp = {2013.08.22}
+}
+
+@ARTICLE{hoehle2009,
+  author = {Michael Höhle},
+  title = {{A}dditive-multiplicative regression models for spatio-temporal epidemics},
+  journal = BIMJ,
+  year = {2009},
+  volume = {51},
+  pages = {961--978},
+  number = {6},
+  month = dec,
+  doi = {10.1002/bimj.200900050},
+  file = {hoehle2009.pdf:articles/hoehle2009.pdf:PDF},
+  issn = {0323-3847},
+  owner = {sebastian}
+}
+
+@INCOLLECTION{hoehle.mazick2010,
+  author = {Michael Höhle and Anne Mazick},
+  title = {{A}berration detection in {R} illustrated by {D}anish mortality monitoring},
+  booktitle = {Biosurveillance: Methods and Case Studies},
   publisher = {Chapman \& Hall/CRC},
   year = {2010},
   editor = {Taha A. Kass-Hout and Xaiohui Zhang},
-  author = {Michael Höhle and Anne Mazick},
+  pages = {215--238},
   file = {preprint:articles/hoehle.mazick2010.pdf:PDF},
   owner = {sebastian},
   quality = {1},
@@ -164,14 +268,14 @@
 
 @ARTICLE{merl.etal2010,
   author = {Daniel Merl and Leah R. Johnson and Robert B. Gramacy and Marc Mangel},
-  title = {amei: an {R} package for the adaptive management of epidemiological
-	interventions},
+  title = {\pkg{amei}: an \textsf{R} package for the adaptive management of
+	epidemiological interventions},
   journal = JSS,
   year = {2010},
   volume = {36},
   pages = {1--32},
   number = {6},
-  month = {8},
+  month = aug,
   abstract = {The amei package for R is a tool that provides a flexible statistical
 	framework for generating optimal epidemiological interventions that
 	are designed to minimize the total expected cost of an emerging epidemic.
@@ -230,6 +334,70 @@
   url = {http://epub.ub.uni-muenchen.de/11703/}
 }
 
+@ARTICLE{meyer.etal2011,
+  author = {Meyer, Sebastian and Elias, Johannes and Höhle, Michael},
+  title = {{A} space-time conditional intensity model for invasive meningococcal
+	disease occurrence},
+  journal = BMS,
+  year = {2012},
+  volume = {68},
+  pages = {607--616},
+  number = {2},
+  abstract = {A novel point process model continuous in space-time is proposed for
+	quantifying the transmission dynamics of the two most common meningococcal
+	antigenic sequence types observed in Germany 2002-2008. Modeling
+	is based on the conditional intensity function (CIF), which is described
+	by a superposition of additive and multiplicative components. As
+	an epidemiological interesting finding, spread behavior was shown
+	to depend on type in addition to age: basic reproduction numbers
+	were 0.25 (95% CI 0.19-0.34) and 0.11 (95% CI 0.07-0.17) for types
+	B:P1.7-2,4:F1-5 and C:P1.5,2:F3-3, respectively. Altogether, the
+	proposed methodology represents a comprehensive and universal regression
+	framework for the modeling, simulation, and inference of self-exciting
+	spatiotemporal point processes based on the CIF. Usability of the
+	modeling in biometric practice is promoted by an implementation in
+	the R package surveillance.},
+  doi = {10.1111/j.1541-0420.2011.01684.x},
+  file = {meyer.etal2011.pdf:articles/meyer.etal2011.pdf:PDF;Web Appendices:supplementary/meyer.etal2011-WebAppendices.pdf:PDF},
+  issn = {1541-0420},
+  keywords = {Conditional intensity function, infectious disease surveillance data,
+	spatiotemporal point process, stochastic epidemic modeling},
+  owner = {sebastian},
+  publisher = {Blackwell Publishing Inc},
+  timestamp = {2012.06.27}
+}
+
+@ARTICLE{pebesma2012,
+  author = {Edzer Pebesma},
+  title = {\pkg{spacetime}: {S}patio-{T}emporal {D}ata in \textsf{R}},
+  journal = JSS,
+  year = {2012},
+  volume = {51},
+  pages = {1--30},
+  number = {7},
+  abstract = {This document describes classes and methods designed to deal with
+	different types of spatio-temporal data in R implemented in the R
+	package spacetime, and provides examples for analyzing them. It builds
+	upon the classes and methods for spatial data from package sp, and
+	for time series data from package xts. The goal is to cover a number
+	of useful representations for spatio-temporal sensor data, and results
+	from predicting (spatial and/or temporal interpolation or smoothing),
+	aggregating, or subsetting them, and to represent trajectories. The
+	goals of this paper is to explore how spatio-temporal data can be
+	sensibly represented in classes, and to find out which analysis and
+	visualisation methods are useful and feasible. We discuss the time
+	series convention of representing time intervals by their starting
+	time only. This document is the main reference for the R package
+	spacetime, and is available (in updated form) as a vignette in this
+	package.},
+  file = {pebesma2012.pdf:articles/pebesma2012.pdf:PDF},
+  keywords = {time series analysis, spatial data, spatio-temporal statistics, geographic
+	information systems.},
+  owner = {sebastian},
+  timestamp = {2013.10.21},
+  url = {http://www.jstatsoft.org/v51/i07/}
+}
+
 @ARTICLE{sommariva.vianello2007,
   author = {Alvise Sommariva and Marco Vianello},
   title = {{P}roduct {G}auss cubature over polygons based on {G}reen's integration
@@ -271,7 +439,10 @@
   publisher = {Dover Publications},
   year = {1972},
   editor = {Milton Abramowitz and Irene A. Stegun},
+  series = {National Bureau of Standards Applied Mathematics Series},
   address = {New York},
+  booktitle = {{H}andbook of {M}athematical {F}unctions with {F}ormulas, {G}raphs,
+	and {M}athematical {T}ables},
   comment = {Ninth Dover printing / tenth U.S. Government Printing Office printing},
   file = {:books/abramowitz_and_stegun/frameindex.htm:URL},
   isbn = {0-486-61272-4},

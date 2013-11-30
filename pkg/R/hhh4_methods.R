@@ -277,3 +277,7 @@ ah4coef2start <- function (fit)
     list(fixed = fixef(fit, reparamPsi=FALSE),
          random = ranef(fit, reparamPsi=FALSE),
          sd.corr = getSdCorr(fit))
+
+## character vector of model components that are "inModel"
+componentsHHH4 <- function (object)
+    names(which(sapply(object$control[c("ar", "ne", "end")], "[[", "inModel")))

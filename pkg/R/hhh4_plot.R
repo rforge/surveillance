@@ -3,7 +3,7 @@
 ### Free software under the terms of the GNU General Public License, version 2,
 ### a copy of which is available at http://www.r-project.org/Licenses/.
 ###
-### Plot-method for fitted hhh4() models
+### Plot-method(s) for fitted hhh4() models
 ###
 ### Copyright (C) 2010-2013 Michaela Paul and Sebastian Meyer
 ### $Revision$
@@ -11,14 +11,18 @@
 ################################################################################
 
 
-plot.ah4 <- function (x, type=c("fitted", "ri"), ...)
+plot.ah4 <- function (x, type=c("fitted", "season", "ri"), ...)
 {
-    cl <- match.call()
+    cl <- sys.call()
     cl$type <- NULL
     cl[[1L]] <- as.name(paste("plotHHH4", match.arg(type), sep="_"))
     eval(cl, envir=parent.frame())
 }
 
+
+###
+### Time series of fitted component means and observed counts for selected units
+###
 
 plotHHH4_fitted <- function (x, units = 1, names = NULL,
                              col = c("orange","blue","grey85","black"),
@@ -48,8 +52,7 @@ plotHHH4_fitted <- function (x, units = 1, names = NULL,
     }
     if (length(legend) > 0) {
         legendidx <- 1L + c(if (legend.observed) 0L,
-                            which(sapply(x$control[c("ne","ar","end")],
-                                         "[[", "inModel")))
+                            which(c("ne","ar","end") %in% componentsHHH4(x)))
         default.args <- list(
             x="topright", col=c(col[4],col[1:3])[legendidx], lwd=6,
             lty=c(NA,1,1,1)[legendidx], pch=c(pch,NA,NA,NA)[legendidx],
@@ -70,7 +73,9 @@ plotHHH4_fitted <- function (x, units = 1, names = NULL,
     invisible(meanHHHunits)
 }
 
-## plot estimated component means for a single region
+
+### plot estimated component means for a single region
+
 plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
                              col=c("grey30","grey60","grey85","grey0"),
                              pch=19, pt.cex=0.6, border=col,
@@ -128,6 +133,10 @@ plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
 }
 
 
+###
+### Map of estimated random intercepts of a specific component
+###
+
 plotHHH4_ri <- function (x, component, sp.layout = NULL,
                          gpar.missing = list(col="darkgrey", lty=2, lwd=2),
                          ...)
@@ -150,3 +159,267 @@ plotHHH4_ri <- function (x, component, sp.layout = NULL,
     spplot(map[!is.na(map$ranef),], zcol = "ranef",
            sp.layout = sp.layout, ...)
 }
+
+
+###
+### Plot estimated seasonality (sine-cosine terms) of one or several hhh4-fits
+###
+
+plotHHH4_season <- function (...,
+                             components=c("ar", "ne", "end", "maxEV"),
+                             xlim=NULL, ylim=NULL,
+                             xlab=NULL, ylab=NULL, main=NULL,
+                             par.settings = list(), matplot.args = list(),
+                             legend = NULL, legend.args = list(),
+                             refline.args = list())
+{
+    objects <- list(...)
+    objnams <- unlist(lapply(match.call(expand.dots=FALSE)$..., as.character),
+                      use.names=FALSE)
+    names(objects) <- if (is.null(names(objects))) objnams else {
+        ifelse(nzchar(names(objects)), names(objects), objnams)
+    }
+    
+    freq <- unique(sapply(objects, function(x) x$stsObj@freq))
+    if (length(freq)>1)
+        stop("supplied hhh4-models obey different frequencies")
+    components <- match.arg(components, several.ok=TRUE)
+
+    ## x-axis
+    if (is.null(xlim))
+        xlim <- c(1,freq)
+    if (is.null(xlab))
+        xlab <- if(freq==52) "Week" else if(freq==12) "Month" else "Time"
+
+    ## auxiliary function for an argument list "x" with named "defaults" list
+    withDefaults <- function(x, defaults)
+    {
+        if (is.null(x)) defaults else if (is.list(x)) {
+            if (is.null(names(x))) {    # x must be complete
+                stopifnot(length(x) == length(defaults))
+                setNames(x, names(defaults))
+            } else modifyList(defaults, x) # x might be a subset of parameters
+        } else if (is.atomic(x)) {
+            setNames(rep(list(x), length(defaults)), names(defaults))
+        } else stop("'", deparse(substitute(x)), "' is not suitably specified")
+    }
+    
+    ## component-specific arguments 
+    ylim <- withDefaults(ylim,
+                         list(ar=NULL, ne=NULL, end=NULL, maxEV=NULL))
+    ylab <- withDefaults(ylab,
+                         list(ar=expression(hat(lambda)),
+                              ne=expression(hat(phi)),
+                              end=expression(hat(nu)),
+                              maxEV="dominant eigenvalue"))
+    main <- withDefaults(main,
+                         list(ar="autoregressive component",
+                              ne="spatiotemporal component",    
+                              end="endemic component",
+                              maxEV="dominant eigenvalue"))
+    anyMain <- any(unlist(lapply(main, nchar),
+                          recursive=FALSE, use.names=FALSE) > 0)
+
+    ## basic graphical settings
+    if (is.list(par.settings)) {
+        par.defaults <- list(mfrow=sort(n2mfrow(length(components))),
+                             mar=c(4,5,if(anyMain) 2 else 1,1)+.1, las=1)
+        par.settings <- modifyList(par.defaults, par.settings)
+        opar <- do.call("par", par.settings)
+        on.exit(par(opar))
+    }
+
+    ## line style
+    matplot.args <- modifyList(list(type="l", col=c(1,2,6,3), lty=c(1,3,2,4),
+                                    lwd=1.7, cex=1, pch=NULL),
+                               matplot.args)
+
+    ## legend options
+    if (is.null(legend)) legend <- length(objects) > 1
+    if (is.logical(legend)) legend <- which(legend)
+    if (!is.list(legend.args)) {
+        if (length(legend) > 0)
+            warning("ignored 'legend' since 'legend.args' is not a list")
+        legend <- integer(0L)
+    }
+    if (length(legend) > 0) {
+        default.args <- c(
+            list(x="topright", inset=0.02, legend=names(objects), bty="n"),
+            matplot.args[c("col", "lwd", "lty", "pch")],
+            with(matplot.args, list(pt.cex=cex, text.col=col))
+            )
+        legend.args <- modifyList(default.args, legend.args)
+    }
+
+    ## plot seasonality in individual model components
+    seasons <- list()
+    for(comp in setdiff(components, "maxEV")){
+        s2 <- lapply(objects, getSeason, component = comp)
+        seasons[[comp]] <- exp(sapply(s2, function(intseas) do.call("+", intseas)))
+        do.call("matplot",
+                c(list(seasons[[comp]], xlim=xlim,
+                       ylim=if (is.null(ylim[[comp]]))
+                       c(0,max(1,seasons[[comp]])) else ylim[[comp]],
+                       xlab=xlab, ylab=ylab[[comp]],
+                       main=main[[comp]]), matplot.args))
+        if (match(comp, components) %in% legend)
+            do.call("legend", legend.args)
+    }
+
+    ## plot seasonality of dominant eigenvalue
+    if ("maxEV" %in% components) {
+        maxevt <- sapply(objects, function(ah4)
+                         getMaxEV_season(ah4)$maxEV.season)
+        do.call("matplot",
+                c(list(maxevt, xlim=xlim,
+                       ylim=if (is.null(ylim[["maxEV"]]))
+                       c(0,max(2,maxevt)) else ylim[["maxEV"]],
+                       xlab=xlab, ylab=ylab[["maxEV"]],
+                       main=main[["maxEV"]]), matplot.args))
+        if (is.list(refline.args))
+            do.call("abline", modifyList(list(h=1, lty=3, col="grey"),
+                                         refline.args))
+        if (4 %in% legend) do.call("legend", legend.args)
+    }
+
+    ## invisibly return the data that has been plotted
+    invisible(c(seasons, list(maxEV=maxevt)))
+}
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# get estimated seasonal pattern in the different components
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getSeason <- function(x, component=c("ar", "ne", "end"))
+{
+    stopifnot(inherits(x, "ah4"))
+    component <- match.arg(component)
+    freq <- x$stsObj@freq
+    if (!component %in% componentsHHH4(x))
+        return(list(intercept=-Inf, season=rep.int(0, freq)))
+    
+    time <- seq_len(freq)
+    est <- fixef(x, reparamPsi=FALSE)
+    intercept <- est[grep(paste0("^", component, "\\.(1|ri)"), names(est))]
+    if (length(intercept) == 0)  intercept <- 0
+
+  season <- switch(component, 
+    "ar"={
+	  # only look at AR component
+	  est <- est[grep("ar.",names(est))]
+	  idx <- which(substr(names(est),start=1,stop=6) %in% c("ar.sin","ar.cos"))
+	  if(length(idx)==0) return(list(intercept=intercept,season=rep(0,length(time))))
+	  # get formula
+	  f <- x$control$ar$f
+	  # extract season components
+	  ff <- strsplit(as.character(f)[2],"+",fixed=TRUE)[[1]]
+	  ffs <- as.formula(paste("~", paste(ff[which(substr(ff,start=1,stop=4) %in% c(" sin"," cos"))],collapse="+")))
+	  model.matrix(ffs, data.frame(t=time))[,-1] %*% est[idx]
+	  },
+    "ne"={
+	  # only look at NE component
+	  est <- est[grep("ne.",names(est))]
+	  idx <- which(substr(names(est),start=1,stop=6) %in% c("ne.sin","ne.cos"))
+	  if(length(idx)==0) return(list(intercept=intercept,season=rep(0,length(time))))
+	  # get formula
+	  f <- x$control$ne$f
+	  # extract season components
+	  ff <- strsplit(as.character(f)[2],"+",fixed=TRUE)[[1]]
+	  ffs <- as.formula(paste("~", paste(ff[which(substr(ff,start=1,stop=4) %in% c(" sin"," cos"))],collapse="+")))
+	  model.matrix(ffs, data.frame(t=time))[,-1] %*% est[idx]
+	  },
+    "end"={
+	  # only look at end component
+	  est <- est[grep("end.",names(est))]
+	  idx <- which(substr(names(est),start=1,stop=7) %in% c("end.sin","end.cos"))
+	  if(length(idx)==0) return(list(intercept=intercept,season=rep(0,length(time))))
+	  # get formula
+	  f <- x$control$end$f
+	  # extract season components
+	  ff <- strsplit(as.character(f)[2],"+",fixed=TRUE)[[1]]
+	  ffs <- as.formula(paste("~", paste(ff[which(substr(ff,start=1,stop=4) %in% c(" sin"," cos"))],collapse="+")))
+	  model.matrix(ffs, data.frame(t=time))[,-1] %*% est[idx]
+	  }
+  )
+  return(list(intercept=intercept, season=season))
+}
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# compute dominant eigenvalue of Lambda_t
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+getMaxEV_season <- function (x){
+    stopifnot(inherits(x, "ah4"))
+    nUnits <- ncol(x$stsObj)
+    time <- 1:x$stsObj@freq
+    if (all(!c("ar","ne") %in% componentsHHH4(x))) return(NULL)
+    model <- terms(x)
+
+    component <- unlist(model$terms["offsetComp",])
+    random <- unlist(model$terms["random",])
+    idxFE <- model$indexFE
+    idxRE <- model$indexRE
+    idxIntercepts <- unlist(model$terms["intercept",])
+    
+    fe.lambda <- fixef(x)[grep("ar.", names(fixef(x)),fixed=TRUE)]
+    fe.phi <- fixef(x)[grep("ne.", names(fixef(x)),fixed=TRUE)]
+    
+    # random effects
+    re.lambda <- (ranef(x))[idxFE[component==1 & random]==idxRE]
+    re.phi <- (ranef(x))[idxFE[component==2 & random]==idxRE]
+
+	# intercepts
+	int.lambda <- (fixef(x))[idxFE[component==1 & idxIntercepts]]
+ 	int.phi <- (fixef(x))[idxFE[component==2 & idxIntercepts]]
+
+	# season
+	season.lambda <- c(0,getSeason(x, "ar")$season, rep(0,length(time)))[1:(length(time)+1)] # add zero for level
+	season.phi <- c(0,getSeason(x, "ne")$season, rep(0,length(time)))[1:(length(time)+1)]
+
+  
+	# only look at the level alpha + a_i
+    coef.lambda <- if (length(re.lambda)>0) exp(int.lambda+re.lambda) else exp(int.lambda)
+    coef.phi <- if (length(re.phi)>0) exp(int.phi+re.phi) else exp(int.phi)
+    
+    ## univariate time series
+    if (ncol(x$stsObj) == 1) {
+      return(coef.lambda)
+    }
+    
+    ## multivariate time series
+	# get weights w_ji
+    wji <- x$control$ne$weights
+    if (is.list(wji)) { # parametric neighbourhood weights
+        wji <- wji$w(coef(x)[grep("^neweights\\.", names(coef(x)))],
+                     neighbourhood(x$stsObj), x$control$data)
+    }
+    if (is.matrix(wji)) diag(wji) <- 0
+    
+    ## assume that lambda is either fixed or iid
+    createLambda <- function(t=1){
+        Lambda <- matrix(0, nUnits, nUnits)
+        if(length(coef.lambda) >0) {
+            diag(Lambda) <- coef.lambda*exp(season.lambda[t])
+        }
+        if (length(coef.phi) > 0) {
+            phi.weights <- matrix(coef.phi*exp(season.phi[t]), nrow = nUnits, ncol = nUnits, byrow = F) * wji
+            Lambda[wji > 0] <- phi.weights[wji > 0]
+        }
+        return(Lambda)
+    }
+    getEV <- function(t){
+        Lambda <- createLambda(t)
+        ev <- eigen(Lambda,only.values=TRUE)$values
+        if (is.complex(ev)) {
+            warning("Lambda_",t," has complex eigenvalues")
+            ev <- abs(ev)   # if complex, use abs EVs
+        }
+        maxEV <- max(ev)
+        return(maxEV)
+    }
+
+    maxEV <- sapply(1:(length(time)+1), getEV)
+    #maxEV <- max(eigen(Lambda,only.values=T)$values)
+    return(list(maxEV.const = maxEV[1], maxEV.season=maxEV[-1], Lambda = createLambda(1)))
+}
+

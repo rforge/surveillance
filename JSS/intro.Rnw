@@ -22,13 +22,29 @@ Prospective change point (aberration) detection algorithms
 \citep[described in][]{hoehle.mazick2010},
 and retrospective space-time modeling of epidemics (the focus of this paper). 
 
-Other \proglang{R} packages implementing epidemic models are
-\pkg{stpp} \citep{gabriel.etal2013} and \pkg{amei} \citep{merl.etal2010}.
+Other \proglang{R} packages:
+\pkg{stpp} \citep{gabriel.etal2013}
 
-In the temporal domain: \pkg{outbreaker}, \pkg{EpiEstim}, \pkg{stochasticGEM}
+\pkg{spacetime} \citep{pebesma2012}: defines classes and methods for
+spatio-temporal data (building upon the packages \pkg{sp} and \pkg{xts},
+respectively). Use class ``STF'' (full grid layout) for weekly disease counts for a
+set of administrative regions, class ``STI'' (irregular layout) for space-time
+point patterns.
+
+\pkg{spatstat}: class ``ppx'' for a multidimensional space-time point pattern
+with any kinds of marks.
+
+\pkg{epibase}
+
+In the temporal domain: \pkg{amei} \citep{merl.etal2010}, \pkg{outbreaker},
+\pkg{EpiEstim}, \pkg{stochasticGEM}
 (archived on CRAN, no longer maintained), \pkg{EpiModel}
 
 For the more prospective task, \proglang{SaTScan} software \citep{SaTScan:9.1.1}
+
+The \href{https://sites.google.com/site/therepiproject/}{\proglang{R}-epi project} is
+dedicated to infectious disease epidemiology using \proglang{R}, providing an
+overview of packages, documentation, and tutorials.
 
 %% As far as we know, \pkg{surveillance} is nowadays successfully used in
 %% practice at several public health institutions including \marginnote{verify, update}

@@ -44,6 +44,7 @@
 
   \bigskip
   Michaela Paul\\
+  % FIXME: add affiliation
   E-mail: \email{Michaela.Paul@novartis.com}
 
   \bigskip
@@ -95,7 +96,7 @@
 
 We thank ...
 
-Many have helped us by using, i.e.\ testing our package and reporting
+Many have helped us by using (i.e.\ testing) our package and reporting
 deficiencies: ...
 
 %We also appreciate helpful comments on earlier versions of this manuscript by
@@ -113,15 +114,21 @@ and project \#137919: \emph{Statistical methods for spatio-temporal modelling an
 % BIBLIOGRAPHY (all titles should be in uppercase title style)
 %--------------
 
-<<Rbib, echo=FALSE>>=
-Rbib <- lapply(c("base", "surveillance", "polyCub", "sp"), function (package) {
-    bibentry <- citation(package, auto=package %in% c("surveillance", "polyCub"))[[1]]
+<<Rbib, echo=FALSE, cache=FALSE>>=
+packages <- c("base",
+              "surveillance", "polyCub",
+              "sp", "spdep", "stpp", "spacetime",
+              "outbreaker", "EpiEstim", "EpiModel", "amei",
+              "survival")
+Rbib <- lapply(packages, function (package) {
+    bibentry <- citation(package, auto=if(package %in% c("surveillance")) TRUE)[[1]]
     ## if (package=="surveillance")        # state CRAN version (not devel)
     ##     bibentry$note <- sub("version.*$", "version 1.6-0", bibentry$note)
     bibentry$key <- paste("R", package, sep=":")
     bibentry$title <- if (package=="base") {
         sub("^R", "\\\\proglang{R}", bibentry$title)
-    } else sub(paste0("^", package), paste0("\\\\pkg{",package,"}"), bibentry$title)
+    } else sub(paste0("^\\{?(",package,")\\}?"),
+               paste0("{\\\\pkg{",package,"}}"), bibentry$title)
     bibentry
     })
 Rbib <- do.call("c", Rbib)

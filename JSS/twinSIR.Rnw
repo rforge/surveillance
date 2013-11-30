@@ -7,3 +7,89 @@ source("setup.R")
 \section[Epidemic history of a fixed population]{\code{twinSIR}: Individual-level epidemic history of a fixed population} \label{sec:twinSIR}
 
 
+
+\subsection{Data I/O}
+
+
+The input data structure for \code{twinSIR} inherits from counting processes as
+implemented by the class \code{Surv} of package \pkg{survival} \citep{R:survival}.
+Specifically, the observation period is splitted up into \emph{consecutive} time
+intervals of constant infection intensities. As $\lambda_i(t)$ only changes at
+the time points, where the set of infected individuals $I(t)$ or some endemic
+covariate change, those occurrences define the break points of the time
+intervals. To make things clearer we look into the \code{"epidata"} representing
+the Hagelloch 1861 epidemic.
+
+<<hagelloch>>=
+data("hagelloch")
+head(hagelloch)
+@
+
+The data frame consists of several blocks of \Sexpr{nlevels(hagelloch[["id"]])}
+rows for each of those time intervals. All rows in a block share the same
+\code{start} and \code{stop} values and 
+there is one row per individual in the block. Each row describes the
+(fixed) state of the individual during the interval given by the \code{start}
+and \code{stop} columns. This includes the coordinates of the individual
+which are supposed to be fixed during the whole course of the epidemic.
+In contrast, there are also the time dependent covariates ....
+The susceptibility status and the I- and R-events of the
+epidemic are captured by the columns \code{atRiskY}, \code{event} and
+\code{Revent}, respectively. The \code{atRiskY} column indicates if the
+individual was at risk of becoming infected during the time interval
+(\code{start}; \code{stop}]. The event columns indicate, which individual was
+infected or removed at the \code{stop} time. Note that there may not be more
+than one event in a single block, i.e.\ at most one entry in the \code{event}
+and \code{Revent} columns is 1, all others are 0.
+This rule follows the assumption that there are no concurrent events.
+
+In order to make use of the functionality of the package, the data has to be
+converted to an object of class \code{"epidata"}.
+The function \code{as.epidata()} does the following: 
+\begin{itemize}
+\item identify the columns in the input data
+\item check the input data for consistency
+\item add the variable \code{BLOCK} as an index for the time intervals
+\item reorder the columns
+\item sort the data by the \code{BLOCK} and id column
+\item generate the \emph{epidemic} covariates $\bm{x}_i(t)$
+\item attach useful attributes to the resulting data frame
+\end{itemize}
+
+<<distancekernel, echo=FALSE>>=
+knots <- c(0.1, 0.2)
+f <- list(B1 = function(D) D < knots[1],
+          B2 = function(D) D >= knots[1] & D < knots[2],
+          B3 = function(D) D >= knots[2] & is.finite(D))
+@
+
+Besides the creation of a standardized data format for epidemics, the main
+purpose of the function is the calculation of the epidemic
+covariates one would like to incorporate in the intensity model.
+As an example, we will fit a decreasing step function as the distance kernel,
+specifically $f(u) = \sum_{m=1}^\Sexpr{length(f)} \alpha_m \, B_m(u)$ with
+<<echo=FALSE, results="asis">>=
+.allknots <- c(0, knots, "\\infty")
+cat(paste("$B_{", seq_along(f), "} = ", "I_{[", .allknots[-length(.allknots)],
+          ";", .allknots[-1], ")}(u)$", sep="", collapse = ", "), "\n")
+@
+
+We convert the input data to an object of class \code{"epidata"} by
+<<data2epidata, eval=FALSE>>=
+<<distancekernel>>
+myepi <- as.epidata(hagelloch,
+    id.col = "id", start.col = "start", stop.col = "stop",
+    atRiskY.col = "atRiskY", event.col = "event", Revent.col = "Revent",
+    coords.cols = c("x.loc", "y.loc"), f = f)
+@
+and obtain the following data frame:
+<<epidata-structure, eval=FALSE>>=
+head(myepi)
+str(myepi)
+@ 
+
+Apart from being the input format for \code{twinSIR()} models, \code{"epidata"}
+has also several associated methods:
+<<epidata-methods>>=
+methods(class="epidata")
+@ 

@@ -26,12 +26,12 @@ ${MASTER}.pdf: ${MASTER}.tex ${PDFDEPENDS}
 references_sebastian.bib: ${MASTER}.aux
 	@if [ -s ${BIBDB} ]; then \
 		jabref --nogui --aux=$<,$@ ${BIBDB}; \
+		sed -i "1i% !!! THIS IS AN AUTO-GENERATED FILE !!!" $@; \
 		rm -f $@.bak; \
 	else \
 		echo Note: ${BIBDB} not available, only touching $@; \
 		touch $@; \
 	fi
-	@sed -i "1i% !!! THIS IS AN AUTO-GENERATED FILE !!!" $@
 
 # if there is no aux-file we need to generate one first
 ${MASTER}.aux:

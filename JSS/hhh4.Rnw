@@ -7,6 +7,25 @@ source("setup.R")
 \section[Multivariate time series of counts]{\code{hhh4}: Multivariate time series of counts} \label{sec:hhh4}
 
 
+
+\marginnote{Why is \code{hhh4()} of class named ``ah4'' instead of
+  ``hhh4'' as expected (as for lm, glm, coxph, twinstim, twinSIR, ...)?}
+
+corrected version of \code{data("measles.weser")} ...
+
+
+
+\subsection{Data structure}
+
+<<>>=
+data("measlesWeserEms")
+slotNames(measlesWeserEms)
+measlesWeserEms
+@ 
+
+
+
+
 Note that the distance matrix between regions can be
 generated from the adjacency indicator matrix $\bm{A}$:
 Since $(\bm{A}^k)_{ij}$ is the number of paths of length $k$ between regions $i$
@@ -17,58 +36,207 @@ positive entries in $\bm{A}^k$ indicate neighbours \emph{up to} order $k$.
 % region $k$ adjacent to both $i$ and $j$.
 \citep{Diestel2010}
 
+In practice: \code{poly2adjmat} \code{nbOrder} (wrappers to functionality of
+package \pkg{spdep} \citep{R:spdep})
 
-\marginnote{Why is \code{hhh4()} of class named ``ah4'' instead of
-  ``hhh4'' as expected (as for lm, glm, twinstim, twinSIR, ...)?}
+<<weserems_nbOrder, cache=TRUE>>=
+weserems_nb <- poly2adjmat(measlesWeserEms@map)
+weserems_nbOrder <- nbOrder(weserems_nb, maxlag=10)
+@
 
 
-<<measles.weser>>=
+<<measles_mvts, out.width=".9\\linewidth", fig.width=9, fig.height=6>>=
+measlesWeserEmsHHH <- measlesWeserEms[,-c(1,5)]
+plot(measlesWeserEmsHHH)
+@ 
+
+<<eval=FALSE>>=
 data("measles.weser")
-# FIXME: this is still of class "disProg" -> update to "sts"
-load("~/Projekte/twinstim/data/BKG-GDZ/simplified/districtsD-highres.RData")
-measles <- disProg2sts(measles.weser, map=districtsD[paste0(0,colnames(measles.weser$observed)),])
-measles  # head(,n=1) only? really include head(neighbourhood)? maybe summarized
+cbind(measles.weser$populationFrac[1,], population(measlesWeserEmsHHH)[1,])
+## unfortunately slightly different population data...
+@
+
+
+<<measles, fig.cap="Condensed temporal and spatial view of the measles counts.",fig.subcap=c("Aggregated time series.", "Spatial distribution.")>>=
+plot(measlesWeserEms, type=observed~time)
+plot(measlesWeserEms, type=observed~1|unit)  # FIXME: -> snapshot()
 @ 
 
-<<measles_plot, out.width=".9\\linewidth", fig.width=9, fig.height=6>>=
-# plot(measles.weser, as.one=FALSE)   # disProg-method
-plot(measles)
-@ 
-
-<<hhh4_measles_hhh2005>>=
-measlesModel_hhh2005 <- list(
+<<measles_HHH2005, cache=TRUE>>=
+measlesModel_HHH2005 <- list(
     ar = list(f = ~ 1),
-    ne = list(f = ~ 1, weights = neighbourhood(measles) == 1),
+    ne = list(f = ~ 1, weights = neighbourhood(measlesWeserEmsHHH) == 1),
     end = list(f = addSeason2formula(
-               ~0 + fe(1, which=rep(TRUE,ncol(measles))) + fe(t),
+               ~0 + fe(1, which=rep(TRUE,ncol(measlesWeserEmsHHH))) + fe(t),
                S=1, period=52),
-               offset = population(measles)),
+               offset = population(measlesWeserEmsHHH)),
     family = "NegBin1"
     )
-measlesFit_hhh2005 <- hhh4(measles, measlesModel_hhh2005)
-summary(measlesFit_hhh2005, idx2Exp=1:2, amplitudeShift=TRUE)
+measlesFit_HHH2005 <- hhh4(measlesWeserEmsHHH, measlesModel_HHH2005)
+summary(measlesFit_HHH2005, idx2Exp=1:2, amplitudeShift=TRUE)
 @ 
 
-<<verify_by_old_algo_hhh, echo=FALSE>>=
-measlesFit_hhh2005_disProg <- algo.hhh(
+<<measlesFitted_HHH2005, fig.width=9, fig.height=6, out.width=".9\\linewidth", fig.scap=NA, fig.cap="Fitted components in the original model by \\citet{held.etal2005} for the six districts with more than 20 cases. Dots are only drawn for positive weekly counts.">>=
+.regions <- names(which(colSums(observed(measlesWeserEms)) > 20))
+regionname <- function (keys) {
+    submap <- measlesWeserEms@map[keys,]
+    paste0(submap$GEN, " (", row.names(submap), ")")
+}
+plot(measlesFit_HHH2005, units=.regions, names=regionname(.regions), hide0s=TRUE)
+@ 
+
+<<verify_by_old_algo_hhh, eval=FALSE, echo=FALSE>>=
+data("measles.weser")
+measlesFit_HHH2005_disProg <- algo.hhh(
     measles.weser,
     control = list(linear=TRUE, nseason=1, neighbours=TRUE,
                    negbin="single", lambda=TRUE),
     thetastart = c(rep(0, 20),0.5), verbose=FALSE
     )
 .comp <- cbind(
-    old = c(coef(measlesFit_hhh2005_disProg)[c(16,17,19,20,1:15,18)],
-            1/coef(measlesFit_hhh2005_disProg)["psi"]),
-    new = coef(measlesFit_hhh2005, idx2Exp=1:2)
+    old = c(coef(measlesFit_HHH2005_disProg)[c(16,17,19,20,1:15,18)],
+            1/coef(measlesFit_HHH2005_disProg)["psi"]),
+    new = coef(measlesFit_HHH2005, idx2Exp=1:2)
     )
 #plot(.comp, panel.first=abline(0,1))
-stopifnot(all.equal(.comp[,1], .comp[,2], tolerance=0.0001))
+## hhh4() result is confirmed by algo.hhh() using the old disProg object.
+## Different population data have no crucial impact,
+## but the week lag error in 2002 does.
 @
 
+\citet{held.etal2005}:
+``The estimates in the full model are $\hat\lambda = 0.62 (0.08)$, $\hat\phi =
+0.016 (0.003)$ and $\hat\psi = 0.49 (0.06)$ with $\log L = -942.6$''
+
+Possible model extensions:
+\begin{itemize}
+\item random intercepts (in all components)
+\item epidemic seasonality
+\item power-law weighting
+\item account for regional vaccination level? (\cite{herzog.etal2011})\\
+  \href{http://www.apps.nlga.niedersachsen.de/cms/flash/impf2012/impfreport2011.html}{$\rightarrow$ data publicly available}
+\end{itemize}
 
 
 
-<<eval=FALSE>>=
-## parametric powerlaw weights require neighbourhood orders in the data
-neighbourhood(measles) <- nbOrder(neighbourhood(measles), maxlag=Inf)
-@
+<<measlesFit_HHH2005_RI, cache=TRUE, dependson="measles_HHH2005", results="hide">>=
+measlesFit_HHH2005_IID <- update(
+    measlesFit_HHH2005,
+    end = list(f = addSeason2formula(~0 + ri(type="iid") + t,
+                                     S=1, period=52),
+               offset = population(measlesWeserEmsHHH))
+    )
+measlesFit_HHH2005_CAR <- update(
+    measlesFit_HHH2005,
+    end = list(f = addSeason2formula(~0 + ri(type="car") + t,
+                                     S=1, period=52),
+               offset = population(measlesWeserEmsHHH)),
+    ne = NULL  # CAR and ne are not jointly identifiable
+    )
+@ 
+
+<<>>=
+summary(measlesFit_HHH2005_IID, idx2Exp=1:2, amplitudeShift=TRUE)
+summary(measlesFit_HHH2005_CAR, idx2Exp=1, amplitudeShift=TRUE)
+@ 
+
+<<measles_HHH2005_RI, fig.cap="Estimated random intercepts of the endemic component (excluding the two district with no cases).",fig.subcap=c("IID-type.", "CAR-type.")>>=
+plot(measlesFit_HHH2005_IID, type="ri", component="end", at=seq(-1.9,2.8,length.out=15))
+plot(measlesFit_HHH2005_CAR, type="ri", component="end", at=seq(-1.9,2.8,length.out=15))
+@ 
+
+
+
+\clearpage
+
+<<measlesFit0, cache=TRUE>>=
+measlesModel0 <- list(
+    ar = list(f = ~ 1),
+    ne = list(f = ~ 1, weights = neighbourhood(measlesWeserEms) == 1),
+    end = list(f = addSeason2formula(~0 + ri(type="iid"), S=1, period=52),
+               offset = population(measlesWeserEms)),
+    family = "NegBin1"
+    )
+measlesFit0 <- hhh4(measlesWeserEms, measlesModel0)
+summary(measlesFit0, idx2Exp=1:2, amplitudeShift=TRUE)
+@ 
+
+<<measles0_RI, fig.cap="Estimated random intercepts of the endemic component in \\code{measlesFit0}.">>=
+plot(measlesFit0, type="ri", component="end", at=seq(-1.9,2.8,length.out=15))
+@ 
+
+\clearpage
+
+<<measlesFit1, cache=TRUE, dependson="measlesFit0", results="hide">>=
+measlesFit1 <- update(
+    measlesFit0,
+    ar = list(f = ~ 0 + ri(type="iid")), 
+    ne = list(f = ~ 0 + ri(type="iid"), weights = neighbourhood(measlesWeserEms) == 1)
+    )
+@ 
+
+<<measlesFit2, cache=TRUE, dependson="measlesFit1", results="hide">>=
+measlesFit2 <- update(
+    measlesFit1,
+    ar = list(f = addSeason2formula(~ 0 + ri(type="iid"), S=1, period=52)), 
+    ne = list(f = addSeason2formula(~ 0 + ri(type="iid"), S=1, period=52),
+              weights = neighbourhood(measlesWeserEms) == 1)
+    )
+@ 
+
+<<measlesFit3, cache=TRUE, dependson="measlesFit2", results="hide">>=
+measlesFit3 <- update(
+    measlesFit2,
+    ne = list(f = addSeason2formula(~ 0 + ri(type="iid"), S=1, period=52),
+              weights = powerlaw(maxlag=5))
+    )
+@ 
+<<>>=
+coef(measlesFit3, se=TRUE)["neweights.d",]
+@ 
+
+
+<<measlesFitted2, fig.width=9, fig.height=6, out.width=".9\\linewidth", fig.scap=NA, fig.cap="Fitted components in the extended model for the six districts with more than 20 cases. Dots are only drawn for positive weekly counts.">>=
+summary(measlesFit2, amplitudeShift=TRUE)
+plot(measlesFit2, units=.regions, names=regionname(.regions), hide0s=TRUE)
+@ 
+
+
+
+<<measlesPred, cache=TRUE, dependson=paste0("measlesFit", 0:3)>>=
+getScores <- function (fit) {
+    measlesPred <- oneStepAhead(fit, tp=78, verbose=FALSE)
+    scores(measlesPred)
+}
+measlesScoresFit0 <- getScores(measlesFit0)
+measlesScoresFit1 <- getScores(measlesFit1)
+measlesScoresFit2 <- getScores(measlesFit2)
+measlesScoresFit3 <- getScores(measlesFit3)
+rbind("HHH2005 + endemic RI" = colMeans(measlesScoresFit0),
+      "+ epidemic RI" = colMeans(measlesScoresFit1),
+      "+ epidemic seasonality" = colMeans(measlesScoresFit2),
+      "+ power law" = colMeans(measlesScoresFit3))
+@ 
+
+<<measlesScoresTest>>=
+permutationTest(measlesScoresFit0[,"logs"], measlesScoresFit1[,"logs"]) # FIXME: help
+permutationTest(measlesScoresFit1[,"logs"], measlesScoresFit2[,"logs"]) # FIXME: help
+# FIXME: export score functions (rps, ...)
+@ 
+
+\clearpage
+
+
+<<measlesFit2_vacc, eval=FALSE>>=
+vaccdata <- list(
+    vacc2 = matrix(measlesWeserEms@map@data[,"vacc2.2004"],
+                   nrow=nrow(measlesWeserEms),
+                   ncol = ncol(measlesWeserEms),
+                   byrow=TRUE)
+    )
+measlesFit2_vacc <- update(
+    measlesFit2,
+    ar = list(f = addSeason2formula(~ 0 + ri(type="iid") + vacc2, S=1, period=52)), 
+    data = vaccdata
+    )
+@ 

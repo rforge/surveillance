@@ -26,7 +26,7 @@ source("setup.R")
 \subsection{Visualization}
   
   
-  
+
 
 
 \subsection{Computational issues with the spatial kernel}
@@ -162,6 +162,57 @@ for $z \in (0;1]$ and
 \end{cases}
 \]
 
+
+
+\subsection{The reproduction number} \label{twinstim:R0}
+
+
+The point process model \eqref{eqn:twinstim} features a
+reproduction number derived from its branching process interpretation.
+New infections may either originate from the endemic component representing
+immigration independent of the history of the epidemic, or they are triggered by
+some previously infected individual via the epidemic component. As soon as an
+individual becomes infected, it spreads the disease
+according to an inhomogeneous Poisson process with rate 
+$\eta_j \cdot g(t-t_j)\cdot f(\norm{\bm{s}-\bm{s_j}})$ around its origin.
+Since this process is independent of the individuals parentage and of other
+infections, 
+\begin{equation} \label{eqn:R0:twinstim}
+  \mu_j = \eta_j \cdot
+  \left[ \int_0^{T-t_j} g(t) \,dt \right] \cdot
+  \left[ \int_{\bm{W}-\bm{s_j}} f(\bm{s}) \,d\bm{s} \right]
+\end{equation}
+is the expected number of secondary infections triggered by an infective $j$
+during the remaining observation period $[t_j,T]$ in the observation region
+$\bm{W}$. 
+Thus, infectives with $\mu_j < 1$ are expected to cause less than one secondary
+infection.
+The reproduction number $\mu_j$ can also be motivated by looking at
+a spatio-temporal version of the simple SIR model \eqref{kermack.mckendrick}
+established from the point process model \eqref{eqn:twinstim}:
+no endemic component,
+homogeneous individuals ($\eta_j \equiv \beta$),
+homogeneous mixing in space ($f(\bm{s}) \equiv 1$),
+and exponential decay of infectivity ($g(t) = e^{-\alpha t}$).
+Then, for $T \rightarrow \infty$,
+\begin{equation*}
+  \mu = \beta \cdot
+  \left[ \int_0^\infty e^{-\alpha t} \,dt \right] \cdot
+  \left[ \int_{\bm{W}-\bm{s_j}} 1 \,d\bm{s} \right] =
+  \beta \cdot \abs{\bm{W}} / \alpha \:,
+\end{equation*}
+which corresponds to the basic reproduction number
+\eqref{eqn:R0:kermack.mckendrick} known from the simple SIR model, by
+interpreting $\abs{\bm{W}}$ as the population size, $\beta$ as the transmission
+rate and $\alpha$ as the removal rate.
+Like in classic epidemic models, the process is sub-critical if $\mu < 1$ holds,
+which means that its eventual extinction is almost sure. However, it is crucial
+to understand that in the full point process model \eqref{eqn:twinstim} with an
+endemic component, new infections may always occur via ``immigration''.
+Hence, the reproduction number as estimated from this model is adjusted for such
+new infections occurring independently of previous infections. It therefore
+tends to be lower than the one estimated from a classical non-spatial SIR model
+without immigration of infectives.
 
 
 
