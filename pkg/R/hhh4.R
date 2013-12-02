@@ -49,7 +49,7 @@ CONTROL.hhh4 <- alist(
     start = list(fixed=NULL,random=NULL,sd.corr=NULL),  # list with initials,
                                # overrides any initial values in formulas 
     data = list(t=epoch(stsObj)-1), # named list of covariates from any of the formulae
-    keep.terms = FALSE
+    keep.terms = FALSE   # keep the result of interpretControl(control, stsObj)?
 )
 
 

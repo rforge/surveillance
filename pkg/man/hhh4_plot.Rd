@@ -44,7 +44,7 @@ plotHHH4_season(...,
                 xlab=NULL, ylab=NULL, main=NULL,
                 par.settings = list(), matplot.args = list(),
                 legend = NULL, legend.args = list(),
-                refline.args = list())
+                refline.args = list(), startseason = 0)
 
 plotHHH4_ri(x, component, sp.layout = NULL,
             gpar.missing = list(col = "darkgrey", lty = 2, lwd = 2),
@@ -55,10 +55,11 @@ plotHHH4_ri(x, component, sp.layout = NULL,
   \item{x}{a fitted \code{\link{hhh4}} object.}
   \item{type}{type of plot: either \code{"fitted"} component means of
     selected \code{units} along time along with the observed counts, or
-    a map of estimated region-specific random intercepts (\code{"ri"})
-    of a specific model \code{component}. The latter of course requires
-    the model \code{x} to contain the selected random intercepts, and
-    \code{x$stsObj} to contain a map.}
+    \code{"season"}ality plots of the model components and the epidemic
+    dominant eigenvalue, or a map of estimated region-specific random
+    intercepts (\code{"ri"}) of a specific model \code{component}.
+    The latter requires the model \code{x} to contain the selected
+    random intercepts, and \code{x$stsObj} to contain a map.}
   \item{\dots}{for \code{plotHHH4_season}, one or more fitted
     \code{\link{hhh4}} objects.
     Otherwise further arguments passed on to other functions.\cr
@@ -125,6 +126,9 @@ plotHHH4_ri(x, component, sp.layout = NULL,
   \item{refline.args}{list of line style specifications passed to
     \code{\link{abline}} to draw the reference line in the plot of
     the dominant eigenvalue, e.g., \code{lty} and \code{col}.}
+  \item{startseason}{the time point \eqn{t} of the start of a season,
+    usually this is \code{$control$data$t[1] = 0} and represents
+    \code{$stsObj@start}.}
   \item{component}{component for which to plot the estimated
     region-specific random intercepts. Must partially match one of
     \code{colnames(ranef(x, tomatrix=TRUE))}.}
@@ -140,7 +144,9 @@ plotHHH4_ri(x, component, sp.layout = NULL,
   component means for the selected \code{unit}, and \code{plotHHH4_fitted}
   returns these in a list for all \code{units}.\cr
   \code{plotHHH4_season} invisibly returns the plotted y-values, i.e. the
-  multiplicative seasonality effect of the \code{components}.\cr
+  multiplicative seasonality effect within each of \code{components}.
+  Note that this will include the intercept, i.e. the point estimate of
+  \eqn{exp(intercept + seasonality)} is plotted and returned.\cr
   \code{plotHHH4_ri} returns the generated \code{\link{spplot}}, which
   is a \pkg{lattice} plot of class \code{"\link[=trellis.object]{trellis}"}.
 }
