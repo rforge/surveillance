@@ -171,7 +171,7 @@ plotHHH4_season <- function (...,
                              xlab = NULL, ylab = NULL, main = NULL,
                              par.settings = list(), matplot.args = list(),
                              legend = NULL, legend.args = list(),
-                             refline.args = list(), startseason = 0)
+                             refline.args = list())
 {
     objects <- list(...)
     objnams <- unlist(lapply(match.call(expand.dots=FALSE)$..., as.character),
@@ -254,8 +254,7 @@ plotHHH4_season <- function (...,
     ## plot seasonality in individual model components
     seasons <- list()
     for(comp in setdiff(components, "maxEV")){
-        s2 <- lapply(objects, getSeason,
-                     component = comp, startseason = startseason)
+        s2 <- lapply(objects, getSeason, component = comp)
         seasons[[comp]] <- exp(sapply(s2, function(intseas) do.call("+", intseas)))
         do.call("matplot",              # x defaults to 1:freq
                 c(list(seasons[[comp]], xlim=xlim,
@@ -291,10 +290,11 @@ plotHHH4_season <- function (...,
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # get estimated seasonal pattern in the different components
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-getSeason <- function(x, component = c("ar", "ne", "end"), startseason = 0)
+getSeason <- function(x, component = c("ar", "ne", "end"))
 {
     stopifnot(inherits(x, "ah4"))
     component <- match.arg(component)
+    startseason <- getSeasonStart(x)
     freq <- x$stsObj@freq
     
     ## return -Inf is component is not in the model (-> exp(-Inf) = 0)
@@ -314,9 +314,9 @@ getSeason <- function(x, component = c("ar", "ne", "end"), startseason = 0)
         sub(paste0("^",component,"\\."), "", names(coefSinCos)),
         intercept=FALSE)
     mmSinCos <- model.matrix(fSinCos,
-                             data=data.frame(t=seq_len(freq) + startseason-1))
-    ##<- subtract 1 since first week/month in hhh4-model defaults to t=0
-    
+                             data=data.frame(t=startseason-1 + seq_len(freq)))
+
+    ## Done
     list(intercept=intercept, season=mmSinCos %*% coefSinCos)
 }
 
@@ -324,7 +324,7 @@ getSeason <- function(x, component = c("ar", "ne", "end"), startseason = 0)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # compute dominant eigenvalue of Lambda_t
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-getMaxEV_season <- function (x, startseason = 0)
+getMaxEV_season <- function (x)
 {
     stopifnot(inherits(x, "ah4"))
     nUnits <- x$nUnit
@@ -333,8 +333,8 @@ getMaxEV_season <- function (x, startseason = 0)
     coefs <- fixef(x, reparamPsi=FALSE)
     
     ## global intercepts and seasonality
-    s2.lambda <- getSeason(x, "ar", startseason)
-    s2.phi <- getSeason(x, "ne", startseason)
+    s2.lambda <- getSeason(x, "ar")
+    s2.phi <- getSeason(x, "ne")
     
     ## random <- unlist(model$terms["random",])
     ## idxFE <- model$indexFE
@@ -389,4 +389,20 @@ getMaxEV_season <- function (x, startseason = 0)
     list(maxEV.season = maxEV.season,
          maxEV.const  = maxEV.const,
          Lambda.const = createLambda(0))
+}
+
+
+## Determine the time point t of the start of a season in a hhh4() fit.
+## If \code{object$stsObj@start[2] == 1}, it simply equals
+## \code{object$control$data$t[1]}. Otherwise, the \code{stsObj} time series
+## starts within a year (at sample \code{s}, say) and the beginning of
+## the next season is
+## \code{object$control$data$t[1] + object$stsObj@freq - s + 1}.
+getSeasonStart <- function (object)
+{
+    if ((startsample <- object$stsObj@start[2]) == 1) {
+        object$control$data$t[1]
+    } else {
+        object$control$data$t[1] + object$stsObj@freq-startsample + 1
+    }
 }

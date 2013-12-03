@@ -3,9 +3,10 @@
 \alias{plotHHH4_fitted}
 \alias{plotHHH4_fitted1}
 \alias{plotHHH4_season}
+\alias{getMaxEV_season}
 \alias{plotHHH4_ri}
 
-\title{Plot Method for Fitted \code{hhh4}-models}
+\title{Plots for Fitted \code{hhh4}-models}
 
 \description{
   There are three \code{type}s of plots for fitted \code{\link{hhh4}} models:
@@ -44,7 +45,8 @@ plotHHH4_season(...,
                 xlab=NULL, ylab=NULL, main=NULL,
                 par.settings = list(), matplot.args = list(),
                 legend = NULL, legend.args = list(),
-                refline.args = list(), startseason = 0)
+                refline.args = list())
+getMaxEV_season(x)
 
 plotHHH4_ri(x, component, sp.layout = NULL,
             gpar.missing = list(col = "darkgrey", lty = 2, lwd = 2),
@@ -126,9 +128,6 @@ plotHHH4_ri(x, component, sp.layout = NULL,
   \item{refline.args}{list of line style specifications passed to
     \code{\link{abline}} to draw the reference line in the plot of
     the dominant eigenvalue, e.g., \code{lty} and \code{col}.}
-  \item{startseason}{the time point \eqn{t} of the start of a season,
-    usually this is \code{$control$data$t[1] = 0} and represents
-    \code{$stsObj@start}.}
   \item{component}{component for which to plot the estimated
     region-specific random intercepts. Must partially match one of
     \code{colnames(ranef(x, tomatrix=TRUE))}.}
@@ -147,12 +146,24 @@ plotHHH4_ri(x, component, sp.layout = NULL,
   multiplicative seasonality effect within each of \code{components}.
   Note that this will include the intercept, i.e. the point estimate of
   \eqn{exp(intercept + seasonality)} is plotted and returned.\cr
+  \code{getMaxEV_season} returns a list with elements
+  \code{"maxEV.season"} (as plotted by
+  \code{plotHHH4_season(..., components="maxEV")},
+  \code{"maxEV.const"} and \code{"Lambda.const"} (the Lambda matrix and
+  its dominant eigenvalue if time effects are ignored).\cr
   \code{plotHHH4_ri} returns the generated \code{\link{spplot}}, which
   is a \pkg{lattice} plot of class \code{"\link[=trellis.object]{trellis}"}.
 }
 
 \author{
   Sebastian Meyer
+}
+
+\references{
+  Held, L. and Paul, M. (2012): Modeling seasonality in space-time
+  infectious disease surveillance data.
+  \emph{Biometrical Journal}, \bold{54}, 824-843.\cr
+  DOI-Link: \url{http://dx.doi.org/10.1002/bimj.201200037}
 }
 
 \seealso{
@@ -176,6 +187,9 @@ plot(measlesFit, units=2)
 
 ## seasonality plot
 plot(measlesFit, type="season")
+
+## dominant eigenvalue of the Lambda matrix (cf. Held and Paul, 2012)
+getMaxEV_season(measlesFit)$maxEV.const  # here simply exp(AR intercept)
 
 ## random intercepts of the endemic component
 plot(measlesFit, type="ri", component="end")
