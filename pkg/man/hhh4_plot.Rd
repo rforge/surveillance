@@ -36,7 +36,7 @@ plotHHH4_fitted1(x, unit = 1, main = NULL,
                  col = c("grey30", "grey60", "grey85", "grey0"),
                  pch = 19, pt.cex = 0.6, border = col, 
                  start = x$stsObj@start, end = NULL,
-                 ylim = NULL, xlab = "", ylab = "No. infected",
+                 xlim = NULL, ylim = NULL, xlab = "", ylab = "No. infected",
                  hide0s = FALSE, meanHHH = NULL)
 
 plotHHH4_season(...,
@@ -62,8 +62,8 @@ plotHHH4_ri(x, component, sp.layout = NULL,
     intercepts (\code{"ri"}) of a specific model \code{component}.
     The latter requires the model \code{x} to contain the selected
     random intercepts, and \code{x$stsObj} to contain a map.}
-  \item{\dots}{for \code{plotHHH4_season}, one or more fitted
-    \code{\link{hhh4}} objects.
+  \item{\dots}{For \code{plotHHH4_season}, one or more
+    \code{\link{hhh4}}-fits, or a single list of these.
     Otherwise further arguments passed on to other functions.\cr
     For the \code{plot}-method they go to the specific plot
     \code{type} function.\cr
@@ -102,8 +102,8 @@ plotHHH4_ri(x, component, sp.layout = NULL,
     a line for the dots corresponding to observed counts.}
   \item{start,end}{time range to plot specified by vectors of length two
     in the form \code{c(year,number)}, see \code{"\linkS4class{sts}"}.}
-  \item{xlim}{numeric vector of length 2 specifying the time-of-year
-    range, default to \code{c(1,x$stsObj@freq)}.}
+  \item{xlim}{numeric vector of length 2 specifying the x-axis range.
+    The default (\code{NULL}) is to plot the complete time range.}
   \item{ylim}{y-axis range.
     For \code{type="fitted"}, this defaults to 
     \code{c(0,max(observed(x$stsObj)[,unit]))}.

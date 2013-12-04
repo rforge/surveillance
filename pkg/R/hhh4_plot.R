@@ -79,8 +79,8 @@ plotHHH4_fitted <- function (x, units = 1, names = NULL,
 plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
                              col=c("grey30","grey60","grey85","grey0"),
                              pch=19, pt.cex=0.6, border=col,
-                             start=x$stsObj@start, end=NULL, ylim=NULL,
-                             xlab="", ylab="No. infected", 
+                             start=x$stsObj@start, end=NULL,
+                             xlim=NULL, ylim=NULL, xlab="", ylab="No. infected",
                              hide0s=FALSE, meanHHH=NULL)
 {
     stsObj <- x$stsObj
@@ -91,30 +91,35 @@ plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
 
     ## get observed counts
     obs <- observed(stsObj)[,unit]
-    if (is.null(ylim)) ylim <- c(0, max(obs,na.rm=TRUE))
 
     ## time range for plotting
     timevec2point <- function (timevec, frequency = stsObj@freq, toleft=FALSE)
         timevec[1L] + (timevec[2L] - toleft)/frequency
     start0 <- timevec2point(stsObj@start, toleft=TRUE) # start of the sts object
     start <- timevec2point(start)
-    if (start < start0) stop("'start' is before 'x$stsObj@start'")
-    tp <- start0 + seq_along(obs)/stsObj@freq
-    tpsubset <- tp[x$control$subset]
+    tp <- start0 + seq_along(obs)/stsObj@freq # all observation time points
+    if (start < start0 || start > tp[length(tp)])
+        stop("'start' is not within the time range of 'x$stsObj'")
     end <- if (is.null(end)) tp[length(tp)] else timevec2point(end)
     stopifnot(start < end)
+    tpInRange <- which(tp >= start & tp <= end)            # plot only those
+    tpSubset <- tp[intersect(x$control$subset, tpInRange)] # fitted time points
 
     ## get fitted component means
     if (is.null(meanHHH))
         meanHHH <- meanHHH(coef(x,reparamPsi=FALSE), terms(x))
     meanHHHunit <- sapply(meanHHH, "[", i=TRUE, j=unit)
+    stopifnot(is.matrix(meanHHHunit), !is.null(colnames(meanHHHunit)),
+              nrow(meanHHHunit) == length(x$control$subset))
+    meanHHHunit <- meanHHHunit[x$control$subset %in% tpInRange,,drop=FALSE]
     
     ## establish basic plot window
-    plot(c(start,end), ylim, xlab=xlab, ylab=ylab, type="n")
+    if (is.null(ylim)) ylim <- c(0, max(obs[tpInRange],na.rm=TRUE))
+    plot(c(start,end), ylim, xlim=xlim, xlab=xlab, ylab=ylab, type="n")
     title(main=main, line=0.5)
 
     ## draw polygons
-    xpoly <- c(tpsubset[1], tpsubset, tail(tpsubset,1))
+    xpoly <- c(tpSubset[1], tpSubset, tail(tpSubset,1))
     polygon(xpoly, c(0,meanHHHunit[,"mean"],0),
             col=col[1], border=border[1])
     if (x$control$ar$inModel)
@@ -124,8 +129,8 @@ plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
         polygon(xpoly, c(0,meanHHHunit[,"endemic"],0),
                 col=col[3], border=border[3])
 
-    ## add observed counts
-    ptidx <- if (hide0s) obs > 0 else TRUE
+    ## add observed counts within [start;end]
+    ptidx <- if (hide0s) intersect(tpInRange, which(obs > 0)) else tpInRange
     points(tp[ptidx], obs[ptidx], col=col[4], pch=pch, cex=pt.cex)
 
     ## invisibly return the fitted component means for the selected region
@@ -174,11 +179,19 @@ plotHHH4_season <- function (...,
                              refline.args = list())
 {
     objects <- list(...)
-    objnams <- unlist(lapply(match.call(expand.dots=FALSE)$..., as.character),
-                      use.names=FALSE)
-    names(objects) <- if (is.null(names(objects))) objnams else {
-        ifelse(nzchar(names(objects)), names(objects), objnams)
+    if (length(objects) == 1L && is.list(objects[[1L]]) &&
+        inherits(objects[[1L]][[1L]], "ah4")) { # ... is a single list of fits
+        objects <- objects[[1L]]
+        if (is.null(names(objects))) names(objects) <- seq_along(objects)
+    } else {
+        objnams <- unlist(lapply(match.call(expand.dots=FALSE)$..., deparse),
+                          use.names=FALSE)
+        names(objects) <- if (is.null(names(objects))) objnams else {
+            ifelse(nzchar(names(objects)), names(objects), objnams)
+        }
     }
+    if (!all(sapply(objects, inherits, what="ah4")))
+        stop("'...' must consist of hhh4()-fits only")
     
     freq <- unique(sapply(objects, function(x) x$stsObj@freq))
     if (length(freq)>1)
