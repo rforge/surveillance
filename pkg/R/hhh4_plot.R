@@ -202,7 +202,7 @@ plotHHH4_season <- function (...,
     if (is.null(xlim))
         xlim <- c(1,freq)
     if (is.null(xlab))
-        xlab <- if(freq==52) "Week" else if(freq==12) "Month" else "Time"
+        xlab <- if (freq==52) "week" else if (freq==12) "month" else "time"
 
     ## auxiliary function for an argument list "x" with named "defaults" list
     withDefaults <- function(x, defaults)
