@@ -198,7 +198,7 @@ file in the current distribution</li>
 <blockquote>
   <blockquote>
     <ul>
-      <li>A good (but slightly outdated) introduction to the package is
+      <li>A good (but slightly outdated) introduction to the outbreak detection part of the package is
 provided in the paper <a
  href="http://dx.doi.org/10.1007/s00180-007-0074-8"><span
  style="font-family: monospace;">surveillance</span>: An R package for
@@ -227,7 +227,7 @@ Statistics, Universidade Federal de Minas Gerais (UFMG), Belo
 Horizonte, Brazil, Nov 27-28, 2008. 
 </li>
       <li><a href="hoehle-surveillance.pdf">Invited talk</a> held at
-the ESCAIDE satellite workshop on <ii>Computer supported outbreak
+the 2008 ESCAIDE satellite workshop on <ii>Computer supported outbreak
 detection and signal management</ii> (<a href="hoehle-surveillance.R">R-File</a>,
         <a href="ha.csv">Data</a> from SurvStat@RKI)
       </li>
@@ -257,8 +257,8 @@ further preprints.<br>
 <blockquote>
   <blockquote>
     <ul>
-      <li><a href="http://www.stat.uni-muenchen.de/%7Ehoehle">Michael
-Höhle</a>, Department of Statistics, University of Munich, Germany
+      <li><a href="http://www.math.su.se/%7Ehoehle">Michael
+Höhle</a>, Department of Mathematics, Stockholm University, Sweden
 (Project Admin)</li>
       <li><a href="http://www.biostat.uzh.ch/aboutus/people/smeyer.html">Sebastian
 Meyer</a>, Institute of Social and Preventive Medicine, University of 
@@ -266,6 +266,7 @@ Zurich, Switzerland</li>
       <li><a href="http://www.biostat.uzh.ch/aboutus/people/mpaul.html">Michaela
 Paul</a>, Institute of Social and Preventive Medicine, University of
 Zurich, Switzerland</li>
+      <li><a href="http://www.normalesup.org/~masalmon/">Ma&eumllle Salmon, Department for Infectious Disease Epidemiology, Robert Koch Institute, Germany</li>
       <li>Former student programmers: C. Lang, A. Riebler, V. Wimmer</li>
       <li>Contributions by: T. Correa, L. Held, M. Hofmann, D. Sabanés Bové, S. Steiner,
 M. Virtanen</li>
