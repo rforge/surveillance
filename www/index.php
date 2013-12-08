@@ -242,8 +242,10 @@ public health</a> [<a href="http://epub.ub.uni-muenchen.de/2093/">preprint</a>].
 further preprints.<br>
       </li>
       <li>Sometimes pictures says more than 1000 words:</li>
-      <code>algo.glrnb</code><p>
-      <img src="survlr.png" align="middle"><p>
+      <code>algo.farrington</code> + <code>algo.glrnb</code> + <code>nowcast</code><p>
+      <img src="detectandnowcast.png" align="middle"><p>
+      <code>backprojNP</code><p>
+      <img src="bakproj.png" align="middle"><p>
       <code>twinSIR</code><p>
 <!--  convert -density 100x100 mpbb-intensity.pdf mpbb-intensity.png -->
       <img src="mpbb-intensity.png" align="middle"><p>
