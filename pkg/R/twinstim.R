@@ -554,22 +554,29 @@ twinstim <- function (
             )
         } else { expression(hInt <- 0) },
         if (hase) { # epidemic component
-            expression(
-                siafInt <- do.call("..siafInt", .siafInt.args), # N-vector
-                if (!is.null(uppert)) { # && isScalar(uppert) && t0 <= uppert && uppert < T
-                    gIntUpper <- pmin(uppert-eventTimes, eps.t)
-                    subtimeidx <- eventTimes < uppert
-                    tiafIntSub <- .tiafInt(tiafpars,
-                                           from = gIntLower[subtimeidx],
-                                           to   = gIntUpper[subtimeidx],
-                                           type = eventTypes[subtimeidx])
-                    eInt <- sum(qSum[subtimeidx] * gammapred[subtimeidx] *
-                                siafInt[subtimeidx] * tiafIntSub)
-                } else {
-                    tiafInt <- .tiafInt(tiafpars)
-                    eInt <- sum(qSum * gammapred * siafInt * tiafInt)
-                }
-            )
+            c(expression(siafInt <- do.call("..siafInt", .siafInt.args)),#N-vector
+              if (useParallel) expression( # print "try-catch"ed errors
+                  if (any(.nonfinitesiafint <- !is.finite(siafInt)))
+                  stop("invalid result of 'siaf$F' integration:\n",
+                       paste(unique(siafInt[.nonfinitesiafint]), sep="\n"),
+                       call.=FALSE)
+                  ),
+              expression(
+                  if (!is.null(uppert)) { # && isScalar(uppert) && t0 <= uppert && uppert < T
+                      gIntUpper <- pmin(uppert-eventTimes, eps.t)
+                      subtimeidx <- eventTimes < uppert
+                      tiafIntSub <- .tiafInt(tiafpars,
+                                             from = gIntLower[subtimeidx],
+                                             to   = gIntUpper[subtimeidx],
+                                             type = eventTypes[subtimeidx])
+                      eInt <- sum(qSum[subtimeidx] * gammapred[subtimeidx] *
+                                  siafInt[subtimeidx] * tiafIntSub)
+                  } else {
+                      tiafInt <- .tiafInt(tiafpars)
+                      eInt <- sum(qSum * gammapred * siafInt * tiafInt)
+                  }
+                  )
+              )
         } else expression(eInt <- 0),
         expression(c(hInt, eInt))
     ))
@@ -1020,9 +1027,16 @@ twinstim <- function (
 
         ## if siafpars or tiafpars are fixed, pre-evaluate integrals    
         if (fixedsiafpars) {
-            if (verbose) cat("pre-evaluating 'siaf' integrals with fixed parameters ...\n")
+            if (verbose)
+                cat("pre-evaluating 'siaf' integrals with fixed parameters ...\n")
+            if (!"memoise" %in% loadedNamespaces())
+                cat("WARNING: Memoization of siaf integration not available!\n",
+                    "         Repeated integrations with same parameters ",
+                    "are redundant and slow!\n",
+                    "         Really consider installing package \"memoise\"!\n",
+                    sep="")
             .siafInt.args[[1]] <- initpars[paste("e.siaf", 1:nsiafpars, sep=".")]
-            siafInt <- do.call("..siafInt", .siafInt.args) # ..siafInt is memoise()d
+            siafInt <- do.call("..siafInt", .siafInt.args) # memoise()d
         }
         if (fixedtiafpars) {
             if (verbose) cat("pre-evaluating 'tiaf' integrals with fixed parameters ...\n")

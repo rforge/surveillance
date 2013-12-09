@@ -201,7 +201,9 @@ checksiaf <- function (siaf, pargrid, type=1)
 
     ## Check 'simulate'
     if (!is.null(siaf$simulate)) {
+        cat("Simulating ... ")
         checksiaf.simulate(siaf$simulate, siaf$f, pargrid[1,], type=type)
+        cat("(-> check the plot)\n")
     }
 }
 
