@@ -245,7 +245,7 @@ further preprints.<br>
       <code>algo.farrington</code> + <code>algo.glrnb</code> + <code>nowcast</code><p>
       <img src="detectandnowcast.png" align="middle"><p>
       <code>backprojNP</code><p>
-      <img src="bakproj.png" align="middle"><p>
+      <img src="backproj.png" align="middle"><p>
       <code>twinSIR</code><p>
 <!--  convert -density 100x100 mpbb-intensity.pdf mpbb-intensity.png -->
       <img src="mpbb-intensity.png" align="middle"><p>
@@ -266,7 +266,7 @@ Zurich, Switzerland</li>
       <li><a href="http://www.biostat.uzh.ch/aboutus/people/mpaul.html">Michaela
 Paul</a>, Institute of Social and Preventive Medicine, University of
 Zurich, Switzerland</li>
-      <li><a href="http://www.normalesup.org/~masalmon/">Ma&eumllle Salmon, Department for Infectious Disease Epidemiology, Robert Koch Institute, Germany</li>
+      <li><a href="http://www.normalesup.org/~masalmon/">Ma&eumllle Salmon</a>, Department for Infectious Disease Epidemiology, Robert Koch Institute, Germany</li>
       <li>Former student programmers: C. Lang, A. Riebler, V. Wimmer</li>
       <li>Contributions by: T. Correa, L. Held, M. Hofmann, D. Sabanés Bové, S. Steiner,
 M. Virtanen</li>
