@@ -663,7 +663,12 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
         }
         plot(xlim, ylim, type="n", xlab = xlab, ylab = ylab, ...)
     }
-    
+
+    ## store evaluated interaction function in a matrix (will be returned)
+    typeNames <- rownames(object$qmatrix)[types]
+    res <- matrix(NA_real_, length(xgrid), 1L+length(types),
+                  dimnames = list(NULL, c("x", typeNames)))
+    res[,1L] <- xgrid
     for (i in seq_along(types)) {
         ## select parameters on which to evaluate iaf
         parSample <- switch(conf.type, parbounds = {
@@ -704,15 +709,14 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
         }
         
         ## add point estimate
-        lines(x=xgrid,
-              y=FUN(if(which=="siaf") cbind(xgrid,0) else xgrid, pars, types[i]),
-              lty=lty[1], col=col.estimate[i], lwd=lwd[1])
+        lines(x = xgrid, y = res[,1L+i] <-
+              FUN(if(which=="siaf") cbind(xgrid,0) else xgrid, pars, types[i]),
+              lty = lty[1], col = col.estimate[i], lwd = lwd[1])
     }
     
     ## add legend
     if (isTRUE(legend) || is.list(legend)) {
-        default.legend <- list(x = "topright",
-                               legend = rownames(object$qmatrix)[types],
+        default.legend <- list(x = "topright", legend = typeNames,
                                col = col.estimate, lty = lty[1], lwd = lwd[1],
                                bty = "n", cex = 0.9, title="type")
         legend.args <- if (is.list(legend)) {
@@ -720,7 +724,9 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
         } else default.legend
         do.call("legend", legend.args)
     }
-    invisible()
+
+    ## Invisibly return interaction function evaluated on xgrid (by type)
+    invisible(res)
 }
 
 

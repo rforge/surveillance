@@ -116,7 +116,12 @@ iafplot(object, which = c("siaf", "tiaf"),
 
 \value{
   A plot is created -- see e.g. Figure 3(b) in Meyer et al. (2012).
-  \code{NULL} is returned (invisibly).
+  
+  The function invisibly returns a matrix of the plotted values of the
+  interaction function (evaluated on \code{xgrid}, by type). The first
+  column of the matrix contains the distance \eqn{x}, and the remaining
+  \code{length(types)} columns contain the (scaled) function values for
+  each type.
 }
 
 \references{
