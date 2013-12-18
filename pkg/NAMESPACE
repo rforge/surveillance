@@ -101,7 +101,8 @@ export(magic.dim, primeFactors, bestCombination)   # similar to n2mfrow
 export(isoWeekYear)
 export(refvalIdxByDate)
 export(ks.plot.unif)
-export(checkResidualProcess)            # for twinstim and twinSIR
+export(checkResidualProcess)       # for twinstim and twinSIR
+export(qlomax)                     # quantile function of the Lomax distribution
 
 # spatial utilities
 export(discpoly)
@@ -259,7 +260,8 @@ export(intensityplot.simEpidata)        # for convenience
 export(as.epidataCS)
 export(twinstim)
 export(simEpidataCS)
-export(siaf.constant, siaf.gaussian, siaf.lomax, qlomax, siaf.powerlaw, siaf.powerlawL)
+export(siaf.constant, siaf.gaussian,
+       siaf.powerlaw, siaf.powerlawL, siaf.student)
 export(tiaf.constant, tiaf.exponential)
 export(epidataCS2sts)
 

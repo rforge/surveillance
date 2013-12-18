@@ -2,9 +2,9 @@
 \name{twinstim_iaf}
 \alias{siaf.constant}
 \alias{siaf.gaussian}
-\alias{siaf.lomax}
 \alias{siaf.powerlaw}
 \alias{siaf.powerlawL}
+\alias{siaf.student}
 \alias{tiaf.constant}
 \alias{tiaf.exponential}
 
@@ -30,12 +30,9 @@
 siaf.constant()
 siaf.gaussian(nTypes = 1, logsd = TRUE, density = FALSE, F.adaptive = TRUE,
               effRangeMult = 6, validpars = NULL)
-siaf.lomax(nTypes = 1, logpars = TRUE, density = FALSE,
-           effRangeProb = NULL, validpars = NULL)
-siaf.powerlaw(nTypes = 1, logpars = TRUE,
-              effRangeProb = NULL, validpars = NULL)
-siaf.powerlawL(nTypes = 1, logpars = TRUE,
-               effRangeProb = NULL, validpars = NULL)
+siaf.powerlaw(nTypes = 1, validpars = NULL)
+siaf.powerlawL(nTypes = 1, validpars = NULL)
+siaf.student(nTypes = 1, validpars = NULL)
 
 # predefined temporal interaction functions
 tiaf.constant()
@@ -49,37 +46,26 @@ tiaf.exponential(nTypes = 1)
     share the same spatial interaction function, in which case
     \code{nTypes=1}. Otherwise \code{nTypes} should equal the number of
     event types of the epidemic, in which case every type has its own
-    (log-)scale or (log-)shape, respectively. Currently, the constructor
-    function for the Lomax and the power law kernels \code{siaf.lomax},
-    \code{siaf.powerlaw}, \code{siaf.powerlawL}, respectively,
-    only allows a type-invariant kernel (\code{nTypes=1}).
+    (log-)scale or (log-)shape, respectively.\cr
+    Currently, the constructor function for the power-law kernels
+    \code{siaf.powerlaw}, \code{siaf.powerlawL}, and \code{siaf.student},
+    respectively, only allows a type-invariant kernel (\code{nTypes=1}).
   }
-  \item{logsd, logpars}{
+  \item{logsd}{
     logical indicating if the kernel should be parametrized
-    with the log-standard deviation (or log(scale) and log(shape)) as
-    the parameter(s) in question to enforce positivity. This
-    is the recommended default and avoids constrained optimisation
-    (L-BFGS-B) or the use of \code{validpars}. The alternative
-    (\code{FALSE}) is only implemented for \code{siaf.gaussian}.
+    with the log-standard deviation as the parameter in question to
+    enforce positivity. This is the recommended default and avoids
+    constrained optimisation (L-BFGS-B) or the use of
+    \code{validpars}.\cr
+    The power-law kernels always use the log-scale for their scale and
+    shape parameters.
   }
   \item{density}{
-    logical. If \code{TRUE}, a density is used as the
-    interaction function: for \code{siaf.gaussian}, the density of the
-    bivariate, isotropic normal distribution, for \code{siaf.lomax},
-    \eqn{f(||\bold{s}||)} is the density of the (univariate) Lomax
-    distribution (\eqn{f(\bold{s})} is not a bivariate density here).
-    However, in this case, the magnitude of the
-    interaction function depends on the parameters of the distribution,
-    which interferes with the identification of an epidemic
-    intercept. Hence, the use of \code{density = TRUE} is not
-    recommended.\cr
-    For \code{density = FALSE}, \code{siaf.gaussian} uses the kernel of
-    the bivariate normal density, and \code{siaf.lomax} is normalized to
-    unity at the origin, i.e. \eqn{f(\bold{s}) / f(\bold{0})} is used.
-    However, the latter still has proportionality constants in the kernel,
-    which is why the use of \code{siaf.lomax} is deprecated.
-    The new \code{siaf.powerlaw} replaces \code{siaf.lomax} and uses the
-    pure kernel of the Lomax density (see Details).
+    logical indicating if the density or just its kernel should be used.
+    If \code{density=TRUE}, \code{siaf.gaussian} uses the density of the
+    bivariate, isotropic normal distribution as the spatial interaction
+    function. Otherwise (default), only the kernel of the bivariate
+    normal density is used.
   }
   \item{F.adaptive}{
     If \code{F.adaptive = TRUE}, then an adaptive bandwidth of
@@ -105,16 +91,9 @@ tiaf.exponential(nTypes = 1)
     Setting \code{effRangeMult=NULL} will disable
     the integral approximation with an effective integration range.
   }
-  \item{effRangeProb}{
-    numeric scalar in \eqn{(0,1)}, which determines the effective range for
-    numerical integration in terms of the corresponding quantile of the
-    univariate Lomax distribution. May also be \code{NULL} (default),
-    which disables the integral approximation with an effective
-    integration range.
-  }
   \item{validpars}{
     function taking one argument, the parameter vector, indicating if it
-    is valid. If \code{logsd=FALSE} or \code{logpars=FALSE} and one
+    is valid. If \code{logsd=FALSE} and one
     prefers not to use \code{method="L-BFGS-B"} for fitting the
     \code{twinstim}, then \code{validpars} should be set to
     \code{function (pars) pars > 0}.
@@ -138,18 +117,9 @@ tiaf.exponential(nTypes = 1)
       density of the bivariate, isotropic Gaussian distribution with
       zero mean and covariance matrix \eqn{\sigma_\kappa^2 I_2}.
     }
-    \item{\code{siaf.lomax}:}{
-      \eqn{f(s) = (\sigma / (||s|| + \sigma))^{\alpha+1}},\cr
-      which is the density of the univariate Lomax distribution scaled
-      to 1 at the origin, i.e. divided by \eqn{\alpha / \sigma}.
-      If \code{density=TRUE}, the original Lomax density is used.
-      Due to potential identifiability issues with an epidemic
-      intercept, \code{siaf.lomax} is deprecated and
-      \code{siaf.powerlaw} should be used instead!
-    }
     \item{\code{siaf.powerlaw}:}{
       \eqn{f(s) = (||s|| + \sigma)^{-d}},\cr
-      which is the pure kernel of the Lomax density, i.e. without any
+      which is the kernel of the Lomax density, i.e. without any
       proportionality constants. The parameters are optimized on the
       log-scale to ensure positivity, i.e.
       \eqn{\sigma = \exp(\tilde{\sigma})} and \eqn{d = \exp(\tilde{d})},
@@ -164,6 +134,17 @@ tiaf.exponential(nTypes = 1)
       The parameters are optimized on the log-scale to ensure positivity, i.e.
       \eqn{\sigma = \exp(\tilde{\sigma})} and \eqn{d = \exp(\tilde{d})},
       where \eqn{(\tilde{\sigma}, \tilde{d})} is the parameter vector.
+    }
+    \item{\code{siaf.student}:}{
+      \eqn{f(s) = (||s||^2 + \sigma^2)^{-d}},\cr
+      which is a reparametrized \eqn{t}-kernel.
+      For \eqn{d=1}, this is the kernel of the Cauchy density with scale
+      \code{sigma}. In Geostatistics, a correlation function of this
+      kind is known as the Cauchy model.\cr
+      The parameters are optimized on the log-scale to ensure
+      positivity, i.e. \eqn{\sigma = \exp(\tilde{\sigma})} and
+      \eqn{d = \exp(\tilde{d})}, where \eqn{(\tilde{\sigma}, \tilde{d})}
+      is the parameter vector.
     }
   }
   
@@ -323,10 +304,13 @@ tiaf.exponential()
 siaf.gaussian(2, F.adaptive=TRUE)
 
 # Type-independent power-law kernel
-siaf.powerlaw()   # siaf.lomax() is deprecated
+siaf.powerlaw()
 
 # "lagged" power-law
 siaf.powerlawL()
+
+# (reparametrized) t-kernel
+siaf.student()
 }
 
 \keyword{models}

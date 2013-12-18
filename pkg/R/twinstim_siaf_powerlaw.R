@@ -13,15 +13,13 @@
 ################################################################################
 
 
-siaf.powerlaw <- function (nTypes = 1, logpars = TRUE,
-                           effRangeProb = NULL, validpars = NULL)
+siaf.powerlaw <- function (nTypes = 1, validpars = NULL)
 {
     nTypes <- as.integer(nTypes)
     stopifnot(length(nTypes) == 1L, nTypes > 0L)
 
     ## for the moment we don't make this type-specific
     if (nTypes != 1) stop("type-specific shapes are not yet implemented")
-    if (!logpars) stop("only the 'logpars' parametrization is implemented")
 
     ## helper expression, note: logpars=c(logscale=logsigma, logd=logd)
     tmp <- expression(
@@ -108,16 +106,16 @@ siaf.powerlaw <- function (nTypes = 1, logpars = TRUE,
             )
     ))
 
-    ## "effective" integration range (based on some high quantile)
-    effRange <- if (isScalar(effRangeProb)) {
-        stop("'effRange' is currently not supported for power law's")
-        effRange <- function (logpars) {}
-        body(effRange) <- as.call(c(as.name("{"),
-            substitute(qlomax(effRangeProb, exp(logpars[[1]]), exp(logpars[[2]])-1),
-                       list(effRangeProb=effRangeProb)) # only works for d > 1!
-        ))
-        effRange
-    } else NULL
+    ## ## "effective" integration range (based on some high quantile)
+    ## effRange <- if (isScalar(effRangeProb)) {
+    ##     stop("'effRange' is currently not supported for power law's")
+    ##     effRange <- function (logpars) {}
+    ##     body(effRange) <- as.call(c(as.name("{"),
+    ##         substitute(qlomax(effRangeProb, exp(logpars[[1]]), exp(logpars[[2]])-1),
+    ##                    list(effRangeProb=effRangeProb)) # only works for d > 1!
+    ##     ))
+    ##     effRange
+    ## } else NULL
 
     ## simulate from the power-law kernel (within a maximum distance 'ub')
     simulate <- function (n, logpars, type, ub)
@@ -179,9 +177,21 @@ siaf.powerlaw <- function (nTypes = 1, logpars = TRUE,
     environment(f) <- environment(F) <- environment(Fcircle) <-
         environment(deriv) <- environment(Deriv) <-
             environment(simulate) <- .GlobalEnv
-    if (is.function(effRange)) environment(effRange) <- .GlobalEnv
 
     ## return the kernel specification
-    list(f=f, F=F, Fcircle=Fcircle, effRange=effRange, deriv=deriv, Deriv=Deriv,
+    list(f=f, F=F, Fcircle=Fcircle, deriv=deriv, Deriv=Deriv,
          simulate=simulate, npars=2L, validpars=validpars)
 }
+
+
+## ## integrate x*f(x) from 0 to R (vectorized)
+## intrfr.powerlaw <- function (R, sigma, d)
+## {
+##     if (d == 1) {
+##         ## FIXME
+##     } else if (d==2) {
+##         ## FIXME
+##     } else { ## FIXME: check
+##         R*(R+sigma)^(1-d)/(1-d) - ((R+sigma)^(2-d)-sigma^(2-d)) / ((1-d)*(2-d))
+##     }
+## }

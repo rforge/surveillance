@@ -14,6 +14,37 @@
 ### $Date$
 ################################################################################
 
+## \item{density}{
+##     \eqn{f(||\bold{s}||)} is the density of the (univariate) Lomax
+##     distribution (\eqn{f(\bold{s})} is not a bivariate density here).
+##     However, in this case, the magnitude of the
+##     interaction function depends on the parameters of the distribution,
+##     which interferes with the identification of an epidemic
+##     intercept. Hence, the use of \code{density = TRUE} is not
+##     recommended.\cr
+##     If \code{density=FALSE}, \code{siaf.lomax} is normalized to unity at the
+##     origin, i.e. \eqn{f(\bold{s}) / f(\bold{0})} is used.
+##     However, the latter still has proportionality constants in the kernel,
+##     which is why the use of \code{siaf.lomax} is deprecated.
+##     The new \code{siaf.powerlaw} replaces \code{siaf.lomax} and uses the
+##     pure kernel of the Lomax density.
+## }
+## \item{effRangeProb}{
+##     numeric scalar in \eqn{(0,1)}, which determines the effective range for
+##     numerical integration in terms of the corresponding quantile of the
+##     univariate Lomax distribution. May also be \code{NULL} (default),
+##     which disables the integral approximation with an effective
+##     integration range.
+## }
+## \item{\code{siaf.lomax}:}{
+##     \eqn{f(s) = (\sigma / (||s|| + \sigma))^{\alpha+1}},\cr
+##     which is the density of the univariate Lomax distribution scaled
+##     to 1 at the origin, i.e. divided by \eqn{\alpha / \sigma}.
+##     If \code{density=TRUE}, the original Lomax density is used.
+##     Due to potential identifiability issues with an epidemic
+##     intercept, \code{siaf.lomax} is deprecated and
+##     \code{siaf.powerlaw} should be used instead!
+## }
 
 ## density=FALSE returns standardized Lomax kernel, i.e. f(x) = f_Lomax(x)/f(0),
 ## such that the kernel function starts at 1. f_Lomax(0) = alpha / sigma

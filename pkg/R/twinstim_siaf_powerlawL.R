@@ -12,15 +12,13 @@
 ################################################################################
 
 
-siaf.powerlawL <- function (nTypes = 1, logpars = TRUE,
-                            effRangeProb = NULL, validpars = NULL)
+siaf.powerlawL <- function (nTypes = 1, validpars = NULL)
 {
     nTypes <- as.integer(nTypes)
     stopifnot(length(nTypes) == 1L, nTypes > 0L)
 
     ## for the moment we don't make this type-specific
     if (nTypes != 1) stop("type-specific shapes are not yet implemented")
-    if (!logpars) stop("only the 'logpars' parametrization is implemented")
 
     ## helper expression, note: logpars=c(logscale=logsigma, logd=logd)
     tmp <- expression(
@@ -109,19 +107,19 @@ siaf.powerlawL <- function (nTypes = 1, logpars = TRUE,
             )
     ))
 
-    ## "effective" integration range (based on quantile of the Pareto distri)
-    effRange <- if (isScalar(effRangeProb)) {
-        stop("'effRange' is currently not supported for power law's")
-        effRange <- function (logpars) {}
-        body(effRange) <- as.call(c(as.name("{"),
-            tmp,
-            expression(
-                alpha <- d-1,  # only works for alpha > 0, i.e. d > 1 !
-                sigma/(1-effRangeProb)^(1/alpha)
-                )
-        ))
-        effRange
-    } else NULL
+    ## ## "effective" integration range (based on quantile of the Pareto distri)
+    ## effRange <- if (isScalar(effRangeProb)) {
+    ##     stop("'effRange' is currently not supported for power law's")
+    ##     effRange <- function (logpars) {}
+    ##     body(effRange) <- as.call(c(as.name("{"),
+    ##         tmp,
+    ##         expression(
+    ##             alpha <- d-1,  # only works for alpha > 0, i.e. d > 1 !
+    ##             sigma/(1-effRangeProb)^(1/alpha)
+    ##             )
+    ##     ))
+    ##     effRange
+    ## } else NULL
 
     ## simulate from the lagged power-law kernel (within a maximum distance 'ub')
     simulate <- function (n, logpars, type, ub)
@@ -179,9 +177,8 @@ siaf.powerlawL <- function (nTypes = 1, logpars = TRUE,
     environment(f) <- environment(F) <- environment(Fcircle) <-
         environment(deriv) <- environment(Deriv) <-
             environment(simulate) <- .GlobalEnv
-    if (is.function(effRange)) environment(effRange) <- .GlobalEnv
 
     ## return the kernel specification
-    list(f=f, F=F, Fcircle=Fcircle, effRange=effRange, deriv=deriv, Deriv=Deriv,
+    list(f=f, F=F, Fcircle=Fcircle, deriv=deriv, Deriv=Deriv,
          simulate=simulate, npars=2L, validpars=validpars)
 }

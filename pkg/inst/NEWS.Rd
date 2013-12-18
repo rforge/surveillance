@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.7-1 (2013-11-30)}{
+\section{Changes in surveillance version 1.7-1 (2013-12-18)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -27,11 +27,17 @@
     of estimated random intercepts. It is documented and more customizable.
     Note that argument order and some names have changed:
     \code{i} -> \code{units}, \code{title} -> \code{names}.
+
+    \item New spatial interaction function \code{siaf.student()}
+    implementing a \eqn{t}-kernel for \code{twinstim()} models.
   }
 }
 
 \subsection{MINOR CHANGES}{
   \itemize{
+    \item \code{iafplot()} invisibly returns a matrix containing the plotted
+    values of the (scaled) interaction function. Previously, nothing
+    (\code{NULL}) was returned.
     \item Take \code{verbose=FALSE} in \code{hhh4()} more seriously.
     \item \code{hhh4()} issues a \code{warning()} if non-convergent.
     \item \code{oneStepAhead()}:
@@ -45,6 +51,11 @@
     \code{"sts"} data twice: it is now only stored as \code{$stsObj}
     component, the hidden duplicate in \code{$control$data$.sts} was
     dropped, which makes fitted objects substantially smaller.
+    \item \code{siaf.lomax()} is now defunct (it has been deprecated
+    since version 1.5-2); use \code{siaf.powerlaw()} instead.
+    \item Unsupported options (\code{logpars=FALSE},
+    \code{effRangeProb}) have been dropped from \code{siaf.powerlaw()}
+    and \code{siaf.powerlawL()}.
   }
 }
 

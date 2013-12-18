@@ -162,41 +162,65 @@ siaf.fallback.F <- function(polydomain, f, pars, type, method = "SV", ...)
 }
 
 ## numerical integration of deriv over a polygonal domain
-siaf.fallback.Deriv <- function (polydomain, deriv, pars, type, method = "SV", ...)
+siaf.fallback.Deriv <- function (polydomain, deriv, pars, type,
+                                 method = "SV", ...)
 {
     deriv1 <- function (s, paridx)
         deriv(s, pars, type)[,paridx,drop=TRUE]
     intderiv1 <- function (paridx)
         polyCub(polydomain, deriv1, method, paridx=paridx, ...)
-    derivInt <- sapply(seq_along(pars), intderiv1)
-    derivInt
+    sapply(seq_along(pars), intderiv1)
 }
 
 
 
-######################################
-### Check Fcircle, deriv, and simulate
-######################################
+################################################
+### Check F, Fcircle, deriv, Deriv, and simulate
+################################################
 
-checksiaf <- function (siaf, pargrid, type=1)
+checksiaf <- function (siaf, pargrid, type=1, method="SV")
 {
     stopifnot(is.list(siaf), is.numeric(pargrid), !is.na(pargrid),
               length(pargrid) > 0)
     pargrid <- as.matrix(pargrid)
     stopifnot(siaf$npars == ncol(pargrid))
+
+    ## Check 'F'
+    if (!is.null(siaf$F)) {
+        cat("'F' vs. cubature using method = \"", method ,"\" ... ", sep="")
+        comp.F <- checksiaf.F(siaf$F, siaf$f, pargrid, type=type, method=method)
+        cat(all.equal(comp.F[,1],comp.F[,2]), "\n")
+    }
     
     ## Check 'Fcircle'
     if (!is.null(siaf$Fcircle)) {
         cat("'Fcircle' vs. numerical cubature ... ")
-        res <- checksiaf.Fcircle(siaf$Fcircle, siaf$f, pargrid, type=type)
-        cat(all.equal(res[,1],res[,2]), "\n")
+        comp.Fcircle <- checksiaf.Fcircle(siaf$Fcircle, siaf$f,
+                                          pargrid, type=type)
+        cat(all.equal(comp.Fcircle[,1],comp.Fcircle[,2]), "\n")
     }
     
     ## Check 'deriv'
     if (!is.null(siaf$deriv)) {
         cat("'deriv' vs. numerical derivative ... ")
-        maxRelDiffs <- checksiaf.deriv(siaf$deriv, siaf$f, pargrid, type=type)
-        cat("maxRelDiff =", max(maxRelDiffs), "\n")
+        maxRelDiffs.deriv <- checksiaf.deriv(siaf$deriv, siaf$f,
+                                             pargrid, type=type)
+        if (any(maxRelDiffs.deriv > 1e-6))
+            cat("maxRelDiff =", max(maxRelDiffs.deriv)) else cat(TRUE)
+        cat("\n")
+    }
+
+    ## Check 'Deriv'
+    if (!is.null(siaf$Deriv)) {
+        cat("'Deriv' vs. cubature using method = \"", method ,"\" ... ", sep="")
+        comp.Deriv <- checksiaf.Deriv(siaf$Deriv, siaf$deriv,
+                                      pargrid, type=type,
+                                      method=method)
+        if (siaf$npars > 1) cat("\n")
+        for (j in 1:siaf$npars) {
+            if (siaf$npars > 1) cat("\tsiaf parameter ", j, ": ", sep="")
+            cat(all.equal(comp.Deriv[,j],comp.Deriv[,siaf$npars+j]), "\n")
+        }
     }
 
     ## Check 'simulate'
@@ -205,6 +229,24 @@ checksiaf <- function (siaf, pargrid, type=1)
         checksiaf.simulate(siaf$simulate, siaf$f, pargrid[1,], type=type)
         cat("(-> check the plot)\n")
     }
+
+    ## invisibly return check results
+    invisible(mget(c("comp.F", "comp.Fcircle",
+                     "maxRelDiffs.deriv", "comp.Deriv"),
+                   ifnotfound=list(NULL), inherits=FALSE))
+}
+
+checksiaf.F <- function (F, f, pargrid, type=1, method="SV")
+{
+    data("letterR", package="spatstat", envir=environment())
+    poly <- shift.owin(letterR, -c(3,2))
+    res <- t(apply(pargrid, 1, function (pars) {
+        given <- F(poly, f, pars, type)
+        num <- siaf.fallback.F(poly, f, pars, type, method=method)
+        c(given, num)
+    }))
+    colnames(res) <- c("Deriv", method)
+    res
 }
 
 checksiaf.Fcircle <- function (Fcircle, f, pargrid, type=1,
@@ -243,6 +285,21 @@ checksiaf.deriv <- function (deriv, f, pargrid, type=1, rmax=100)
         })
     }
     maxreldiffs
+}
+
+checksiaf.Deriv <- function (Deriv, deriv, pargrid, type=1, method="SV")
+{
+    data("letterR", package="spatstat", envir=environment())
+    poly <- shift.owin(letterR, -c(3,2))
+    res <- t(apply(pargrid, 1, function (pars) {
+        given <- Deriv(poly, deriv, pars, type)
+        num <- siaf.fallback.Deriv(poly, deriv, pars, type, method=method)
+        c(given, num)
+    }))
+    paridxs <- seq_len(ncol(pargrid))
+    colnames(res) <- c(paste("Deriv",paridxs,sep="."),
+                       paste(method,paridxs,sep="."))
+    res
 }
 
 checksiaf.simulate <- function (simulate, f, pars, type=1, B=3000, ub=10)
