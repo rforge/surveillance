@@ -1,20 +1,38 @@
 library("surveillance")
 
-### check siaf derivatives and Fcircle
-testsiaf <- function (siaf, pargrid, type=1)
-{
-    ints <- surveillance:::checksiaf.Fcircle(
-        siaf$Fcircle, siaf$f, pargrid, type=type, rs=c(1,5,10,50,100), nGQ=15)
-    stopifnot(isTRUE(all.equal(ints[,1], ints[,2], tolerance=0.005)))
-
-    maxRelDiffs_deriv <- surveillance:::checksiaf.deriv(
-        siaf$deriv, siaf$f, pargrid, type=type)
-    stopifnot(maxRelDiffs_deriv < 0.0001)
-}
-
 ### Gaussian kernel
-testsiaf(siaf.gaussian(1, F.adaptive=TRUE), as.matrix(c(1,3,6)))
+checks.gaussian <- surveillance:::checksiaf(
+    siaf.gaussian(logsd=TRUE, F.adaptive=TRUE),
+    pargrid = log(1),
+    tolerance = 0.01)
+stopifnot(unlist(lapply(checks.gaussian, attr, "all.equal")))
 
-### Power law kernels
-testsiaf(siaf.powerlaw(), t(c(-1.5, 0.5)))
-testsiaf(siaf.powerlawL(), t(c(-1, 0.4)))
+### Power-law kernel
+checks.powerlaw <- surveillance:::checksiaf(
+    siaf.powerlaw(),
+    pargrid = t(c(0.5, -0.5)),
+    tolerance = 0.0005)
+stopifnot(unlist(lapply(checks.powerlaw, attr, "all.equal")))
+
+### Lagged power law
+checks.powerlawL <- surveillance:::checksiaf(
+    siaf.powerlawL(),
+    pargrid = t(c(-0.5, -0.5)),
+    tolerance = 0.0005)
+stopifnot(unlist(lapply(checks.powerlawL, attr, "all.equal")))
+
+### Student t-kernel
+checks.student <- surveillance:::checksiaf(
+    siaf.student(),
+    pargrid = t(c(0.5, -0.5)),
+    tolerance = 1e-6)
+stopifnot(unlist(lapply(checks.student, attr, "all.equal")))
+
+
+## showsiaf <- function (siaf, pars) {
+##     data("letterR", package="spatstat", envir=environment())
+##     poly <- spatstat::shift.owin(letterR, -c(3,2))
+##     plotpolyf(poly, siaf$f, pars, print.args=list(split=c(1,1,2,1), more=TRUE))
+##     plotpolyf(poly, function (...) siaf$deriv(...)[,1], pars, print.args=list(split=c(2,1,2,1)))
+## }
+## showsiaf(siaf.student(), c(0.5,-0.5))

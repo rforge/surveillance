@@ -63,21 +63,18 @@ siaf.student <- function (nTypes = 1, validpars = NULL)
     ))
 
     ## Numerical integration of 'deriv' over a polygonal domain
-    Deriv <- function (polydomain, deriv, logpars, type = NULL, ...) {}
-    body(Deriv) <- as.call(c(as.name("{"),
-        tmp,
-        expression(
-            res.logsigma <- .polyCub.iso(polydomain$bdry,
-                                         intrfr.student.dlogsigma,
-                                         sigma, d, center=c(0,0),
-                                         control=list(...)),
-            res.logd <- .polyCub.iso(polydomain$bdry,
-                                     intrfr.student.dlogd,
-                                     sigma, d, center=c(0,0),
-                                     control=list(...)),
-            c(res.logsigma, res.logd)
-            )
-    ))
+    Deriv <- function (polydomain, deriv, logpars, type = NULL, ...)
+    {
+        res.logsigma <- .polyCub.iso(polydomain$bdry,
+                                     intrfr.student.dlogsigma,
+                                     exp(logpars[[1L]]), exp(logpars[[2L]]),
+                                     center=c(0,0), control=list(...))
+        res.logd <- .polyCub.iso(polydomain$bdry,
+                                 intrfr.student.dlogd,
+                                 exp(logpars[[1L]]), exp(logpars[[2L]]),
+                                 center=c(0,0), control=list(...))
+        c(res.logsigma, res.logd)
+    }
 
     ## simulate from the power-law kernel (within a maximum distance 'ub')
     ## Sampling from f_{2D}(s) \propto f(||s||), truncated to ||s|| <= ub,

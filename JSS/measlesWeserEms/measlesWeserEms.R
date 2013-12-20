@@ -1,6 +1,6 @@
 ################################################################################
 ### Author: Sebastian Meyer [sebastian *.* meyer *a*t* ifspm *.* uzh *.* ch]
-### Time-stamp: <[measlesWeserEms.R] by SM Mit 27/11/2013 16:29 (CET)>
+### Time-stamp: <[measlesWeserEms.R] by SM Mon 09/12/2013 11:48 (CET)>
 ### Project: Update "measles.weser" data and save as "sts" object
 ### Description: Add map and two missing districts,
 ###              correct time lag in 2002 and one observed count,
@@ -93,7 +93,10 @@ comppopfrac
 stopifnot(all.equal(comppopfrac[,1], comppopfrac[,2], tolerance=0.005))
 
 
-## add vaccination coverage
+## add data on vaccination coverage
+## Extracted from the vaccination report "Durchimpfung von Kindern im
+## Einschulungsalter in Niedersachsen im Erhebungsjahrgang 2004"
+## by the Niedersächsisches Landesgesundheitsamt (Dezember 2005)
 
 vaccdata <- read.delim("vaccWeserEms.csv", colClasses=c(key="character"))
 lattice::xyplot(vacc2/doc ~ factor(year), groups=key, data=vaccdata, type="b") #ylim=c(0,1)
