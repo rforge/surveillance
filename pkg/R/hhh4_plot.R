@@ -5,13 +5,13 @@
 ###
 ### Plot-method(s) for fitted hhh4() models
 ###
-### Copyright (C) 2010-2013 Michaela Paul and Sebastian Meyer
+### Copyright (C) 2010-2014 Michaela Paul and Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
 
 
-plot.ah4 <- function (x, type=c("fitted", "season", "ri"), ...)
+plot.hhh4 <- function (x, type=c("fitted", "season", "ri"), ...)
 {
     cl <- sys.call()
     cl$type <- NULL
@@ -180,7 +180,7 @@ plotHHH4_season <- function (...,
 {
     objects <- list(...)
     if (length(objects) == 1L && is.list(objects[[1L]]) &&
-        inherits(objects[[1L]][[1L]], "ah4")) { # ... is a single list of fits
+        inherits(objects[[1L]][[1L]], c("hhh4","ah4"))) { # ... is a single list of fits
         objects <- objects[[1L]]
         if (is.null(names(objects))) names(objects) <- seq_along(objects)
     } else {
@@ -190,7 +190,7 @@ plotHHH4_season <- function (...,
             ifelse(nzchar(names(objects)), names(objects), objnams)
         }
     }
-    if (!all(sapply(objects, inherits, what="ah4")))
+    if (!all(sapply(objects, inherits, what=c("hhh4","ah4"))))
         stop("'...' must consist of hhh4()-fits only")
     
     freq <- unique(sapply(objects, function(x) x$stsObj@freq))
@@ -281,8 +281,8 @@ plotHHH4_season <- function (...,
 
     ## plot seasonality of dominant eigenvalue
     if ("maxEV" %in% components) {
-        seasons[["maxEV"]] <- sapply(objects, function(ah4)
-                                     getMaxEV_season(ah4)$maxEV.season)
+        seasons[["maxEV"]] <- sapply(objects, function(obj)
+                                     getMaxEV_season(obj)$maxEV.season)
         do.call("matplot",
                 c(list(seasons[["maxEV"]], xlim=xlim,
                        ylim=if (is.null(ylim[["maxEV"]]))
@@ -305,7 +305,7 @@ plotHHH4_season <- function (...,
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 getSeason <- function(x, component = c("ar", "ne", "end"))
 {
-    stopifnot(inherits(x, "ah4"))
+    stopifnot(inherits(x, c("hhh4","ah4")))
     component <- match.arg(component)
     startseason <- getSeasonStart(x)
     freq <- x$stsObj@freq
@@ -339,7 +339,7 @@ getSeason <- function(x, component = c("ar", "ne", "end"))
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 getMaxEV_season <- function (x)
 {
-    stopifnot(inherits(x, "ah4"))
+    stopifnot(inherits(x, c("hhh4","ah4")))
     nUnits <- x$nUnit
     freq <- x$stsObj@freq
     components <- componentsHHH4(x)

@@ -147,13 +147,13 @@ exportMethods(nrow, ncol, dim, colnames, epochInYear, year)
 exportMethods(aggregate)
 exportMethods(as.data.frame)
 
-# methods for accessing/replacing slots of an sts object (as defined in AllGeneric.R)
+# methods for accessing/replacing slots of an sts object (cf. AllGeneric.R)
 exportMethods(epoch,observed,alarms,upperbound,population,control,multinomialTS,neighbourhood)
 exportMethods("epoch<-","observed<-","alarms<-","upperbound<-","population<-","control<-","multinomialTS<-","neighbourhood<-")
 
 export(linelist2sts)
 
-export(wrap.algo, farrington, bayes, rki, cusum, glrpois, glrnb, outbreakP) # rogerson, hmm
+export(wrap.algo, farrington, bayes, rki, cusum, glrpois, glrnb, outbreakP) # FIXME: rogerson, hmm ??
 export(earsC)
 export(farringtonFlexible)
 export(categoricalCUSUM, pairedbinCUSUM, pairedbinCUSUM.runlength)
@@ -180,7 +180,8 @@ export(estimateGLRNbHook)
 export(algo.compare, algo.quality, algo.summary)
 
 ## outbreak detection algorithms (old disProg implementations)
-export(algo.bayes, algo.bayes1, algo.bayes2, algo.bayes3, algo.bayesLatestTimepoint,
+export(algo.bayes, algo.bayes1, algo.bayes2, algo.bayes3,
+       algo.bayesLatestTimepoint,
        algo.call,
        algo.cdc, algo.cdcLatestTimepoint,
        algo.cusum,
@@ -193,7 +194,7 @@ export(algo.bayes, algo.bayes1, algo.bayes2, algo.bayes3, algo.bayesLatestTimepo
        algo.rogerson,
        algo.twins)
 
-## auxiliary functions for algo.farrington (FIXME: why do we export these internals?)
+## auxiliary functions for algo.farrington (FIXME: why export these internals?)
 export(algo.farrington.assign.weights,
        algo.farrington.fitGLM, algo.farrington.fitGLM.fast,
        algo.farrington.fitGLM.populationOffset, algo.farrington.threshold)
@@ -205,9 +206,7 @@ S3method(plot, survRes.one)
 S3method(print, algoQV)
 S3method(xtable, algoQV)
 
-export(test, testSim)   # FIXME: do we really want that?
-# if not, then we have to prefix all test() and testSim() calls in the
-# corresponding examples in the Rd files by "surveillance:::"
+export(test, testSim)   # FIXME: remove these test functions? -> Demo?
 
 
 ### conversion between old disProg and new sts classes
@@ -332,7 +331,7 @@ S3method("[[", simEpidataCSlist)
 S3method(plot, simEpidataCSlist)
 
 
-### hhh-specific
+### algo.hhh-specific
 
 export(algo.hhh)
 export(algo.hhh.grid)
@@ -360,28 +359,44 @@ S3method(simHHH, ah)
 export(hhh4) 
 export(addSeason2formula)
 export(zetaweights, powerlaw)
-export(ranef)  # S3-generic
-export(fixef)  # S3-generic
+export(oneStepAhead, scores)
+export(fixef)  # new S3-generic (same meaning as in package nlme)
+export(ranef)  # new S3-generic (same meaning as in package nlme)
 
+S3method(print, hhh4)
+S3method(summary, hhh4)
+S3method(print, summary.hhh4)
+S3method(logLik, hhh4)
+S3method(AIC, hhh4)
+S3method(terms, hhh4)
+S3method(coef, hhh4)
+S3method(fixef, hhh4)
+S3method(ranef, hhh4)
+S3method(confint, hhh4)
+S3method(predict, hhh4)
+S3method(update, hhh4)
+S3method(simulate, hhh4)
+S3method(plot, hhh4)
+export(plotHHH4_fitted, plotHHH4_fitted1,
+       plotHHH4_season, getMaxEV_season,
+       plotHHH4_ri)
+
+## backwards-compatibility for old class name "ah4"
 S3method(print, ah4)
-S3method(print, summary.ah4)
 S3method(summary, ah4)
-S3method(coef, ah4)
+S3method(print, summary.ah4)
 S3method(logLik, ah4)
 S3method(AIC, ah4)
+S3method(terms, ah4)
+S3method(coef, ah4)
 S3method(fixef, ah4)
 S3method(ranef, ah4)
 S3method(confint, ah4)
 S3method(predict, ah4)
-S3method(plot, ah4)
-export(plotHHH4_fitted, plotHHH4_fitted1, plotHHH4_season, getMaxEV_season, plotHHH4_ri)
 S3method(update, ah4)
 S3method(simulate, ah4)
-S3method(terms, ah4)
+S3method(plot, ah4)
 
-export(oneStepAhead)
-export(scores)
-
-# functions not yet documented, but used in (dontrun) part of example(hhh4)
+## FIXME: functions not yet documented, but used in example(hhh4)
 export(permutationTest)
 export(pit)

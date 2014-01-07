@@ -129,11 +129,11 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
       res <- myoptim
       res$convergence <- convergence
       res$call <- match.call()
-      class(res) <- "ah4"
+      class(res) <- "hhh4"
       return(res)
   }
 
-  ## optimization successful, return a full "ah4" object
+  ## optimization successful, return a full "hhh4" object
   fitted <- meanHHH(thetahat, model, total.only=TRUE)
 
   if(dimRandomEffects>0){
@@ -167,7 +167,7 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
                  lag=1, nObs=sum(!model$isNA[control$subset,]),
                  nTime=length(model$subset), nUnit=ncol(stsObj))
        ## FIXME: nTime has a different meaning here than everywhere else!!!
-  class(result) <- "ah4"
+  class(result) <- "hhh4"
   result
 }
 

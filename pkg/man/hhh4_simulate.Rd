@@ -1,6 +1,6 @@
 \encoding{latin1}
-\name{simulate.ah4}
-\alias{simulate.ah4}
+\name{hhh4_simulate}
+\alias{simulate.hhh4}
 
 \title{Simulates data based on the model proposed by Paul and Held (2011)
 }
@@ -11,14 +11,14 @@
 }
 
 \usage{
-\method{simulate}{ah4}(object, nsim = 1, seed = NULL, y.start = NULL,
+\method{simulate}{hhh4}(object, nsim = 1, seed = NULL, y.start = NULL,
          subset = 1:nrow(object$stsObj), coefs = coef(object),
          components=c("ar","ne","end"), simplify=nsim>1, ...)
 }
 
 \arguments{
   \item{object}{
-    an object of class \code{"ah4"}.
+    an object of class \code{"hhh4"}.
   }
   \item{nsim}{
     number of time series to simulate. Defaults to \code{1}.

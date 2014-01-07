@@ -1,49 +1,49 @@
 \encoding{latin1}
 \name{hhh4_methods}
-\alias{print.ah4}
-\alias{summary.ah4}
-\alias{logLik.ah4}
-\alias{AIC.ah4}
-\alias{coef.ah4}
+\alias{print.hhh4}
+\alias{summary.hhh4}
+\alias{logLik.hhh4}
+\alias{AIC.hhh4}
+\alias{coef.hhh4}
 \alias{ranef}
 \alias{fixef}
-\alias{fixef.ah4}
-\alias{ranef.ah4}
-\alias{confint.ah4}
+\alias{fixef.hhh4}
+\alias{ranef.hhh4}
+\alias{confint.hhh4}
 % FIXME: functions without documentation atm
-%% \alias{print.summary.ah4}
-%% \alias{update.ah4}
-%% \alias{terms.ah4}
+%% \alias{print.summary.hhh4}
+%% \alias{update.hhh4}
+%% \alias{terms.hhh4}
 
 \title{
-Print, Summary and Extraction Methods for \code{"ah4"} Objects
+Print, Summary and other Standard Methods for \code{"hhh4"} Objects
 }
 
 \description{
 Besides \code{print} and \code{summary} methods there are also some standard
-extraction methods defined for objects of class \code{"ah4"} resulting
+extraction methods defined for objects of class \code{"hhh4"} resulting
 from a call to \code{\link{hhh4}}.
 }
 
 \usage{
-\method{print}{ah4}(x, digits = max(3, getOption("digits") - 3),
+\method{print}{hhh4}(x, digits = max(3, getOption("digits") - 3),
        reparamPsi = TRUE, ...)
-\method{summary}{ah4}(object, ...)
+\method{summary}{hhh4}(object, ...)
 
-\method{coef}{ah4}(object, se = FALSE, reparamPsi = TRUE, 
+\method{coef}{hhh4}(object, se = FALSE, reparamPsi = TRUE, 
        idx2Exp = NULL, amplitudeShift = FALSE, ...)
-\method{fixef}{ah4}(object, ...)
-\method{ranef}{ah4}(object, tomatrix = FALSE, ...)
+\method{fixef}{hhh4}(object, ...)
+\method{ranef}{hhh4}(object, tomatrix = FALSE, ...)
 
-\method{AIC}{ah4}(object, ..., k = 2)
-\method{logLik}{ah4}(object, ...)
+\method{logLik}{hhh4}(object, ...)
+\method{AIC}{hhh4}(object, ..., k = 2)
 
-\method{confint}{ah4}(object, parm, level = 0.95, 
+\method{confint}{hhh4}(object, parm, level = 0.95, 
        reparamPsi = TRUE, idx2Exp = NULL, amplitudeShift = FALSE, ...)
 }
 
 \arguments{
-  \item{x, object}{an object of class \code{"ah4"}.}
+  \item{x, object}{an object of class \code{"hhh4"}.}
   \item{digits}{the number of significant digits to use when printing
   }
   \item{reparamPsi}{
@@ -104,10 +104,10 @@ from a call to \code{\link{hhh4}}.
 }
 
 \seealso{
-  There is also a \code{\link[=plot.ah4]{plot}}-method for fitted
+  There is also a \code{\link[=plot.hhh4]{plot}}-method for fitted
   \code{hhh4} models.
   
-  Related generic functions: \code{\link{coef}},
+  Corresponding generic functions: \code{\link{coef}},
   \code{\link{AIC}}, \code{\link{logLik}}, \code{\link{confint}}.
 }
 
@@ -120,9 +120,6 @@ from a call to \code{\link{hhh4}}.
     random  effects model for multivariate time series of infectious
     disease counts. Statistics in Medicine, \bold{30}, 1118--1136.
 }
-
-%\examples{
-%}
 
 \keyword{methods}
 \keyword{print}

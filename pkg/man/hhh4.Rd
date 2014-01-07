@@ -1,10 +1,6 @@
-% hhh4
 \encoding{latin1}
 \name{hhh4}
 \alias{hhh4}
-% FIXME: functions without documentation atm
-\alias{permutationTest}
-\alias{pit}
 
 \title{Random effects HHH model fit as described in Paul and Held (2011)} 
 
@@ -165,7 +161,7 @@ hhh4(stsObj,
     This is mainly intended for internal use by the package developers.}
 }
 
-\value{Returns an object of class \code{ah4} with elements
+\value{Returns an object of class \code{"hhh4"} with elements
   \item{coefficients}{named vector with estimated (regression) parameters of the model}
   \item{se}{estimated standard errors (for regression parameters)}
   \item{cov}{covariance matrix (for regression parameters)}
@@ -193,15 +189,13 @@ hhh4(stsObj,
   references.
 }
 
-\note{
-  For the time being this function performs only modelling of
-  the multivariate time series. No surveillance/monitoring functionality
-  is available.
+\seealso{
+  \code{\link{algo.hhh}}, 
+  \code{\link{fe}}, \code{\link{ri}}
 }
-\seealso{\code{\link{algo.hhh}}, 
-\code{\link{fe}}, \code{\link{ri}}
-}
+
 \author{M. Paul, S. Meyer, and L. Held}
+
 \examples{
 #####################################################################
 # Fit some models from ?algo.hhh
@@ -257,10 +251,10 @@ summary(res3, idx2Exp=1:2, amplitudeShift=TRUE)
                    dimnames = c(dimnames(neighbourhood(measles)), list(NULL)))
 res3_tv <- hhh4(measles, control = modifyList(model3,
                 list(ne=list(weights=.neweights))))
-.disregardComponents <- function(ah4) {
-    ah4["call"] <- list(NULL)
-    ah4$control$ne["weights"] <- list(NULL)
-    ah4
+.disregardComponents <- function(obj) {
+    obj["call"] <- list(NULL)
+    obj$control$ne["weights"] <- list(NULL)
+    obj
 }
 stopifnot(all.equal(.disregardComponents(res3), .disregardComponents(res3_tv)))
 }
@@ -370,8 +364,7 @@ res_D <- hhh4(fluBYBW,cntrl_D)
 
 }
 }
-\keyword{ts}
-\keyword{regression}
+
 \references{
   Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework 
     for the analysis of multivariate infectious disease surveillance counts, 
@@ -386,6 +379,5 @@ res_D <- hhh4(fluBYBW,cntrl_D)
     disease counts. Statistics in Medicine, \bold{30}, 1118--1136
 }
 
-
-
-
+\keyword{ts}
+\keyword{regression}

@@ -6,8 +6,18 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.7-1 (2013-12-18)}{
+\section{Changes in surveillance version 1.8-0 (2014-01-07)}{
 
+\subsection{SYNOPSIS}{
+  \itemize{
+    \item \code{hhh4()} fits now have class \code{"hhh4"} instead of
+    \code{"ah4"}, for consistency with \code{twinstim()},
+    \code{twinSIR()}, and to follow the common convention (cp. \code{lm()}).
+    Standard S3-methods for the old \code{"ah4"} name are still
+    available for backwards compatibility but may be removed in the future.
+  }
+}
+  
 \subsection{NEW FEATURES}{
   \itemize{
     \item \code{oneStepAhead()}:
@@ -168,7 +178,7 @@
     (multivariate time series of counts) by the new function
     \code{epidataCS2sts}.
 
-    \item Simulation from \code{hhh4} models (class \code{"ah4"}) has
+    \item Simulation from \code{hhh4} models has
     been re-implemented, which fixes a bug and makes it more flexible
     and compatible with a wider class of models.
 

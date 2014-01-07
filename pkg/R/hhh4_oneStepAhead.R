@@ -5,13 +5,13 @@
 ###
 ### Compute one-step-ahead predictions (means) at a series of time points
 ###
-### Copyright (C) 2011-2013 Michaela Paul and Sebastian Meyer
+### Copyright (C) 2011-2014 Michaela Paul and Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
 
 
-oneStepAhead <- function(result, # ah4-object (i.e. a hhh4 model fit)
+oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
                          tp,     # scalar: one-step-ahead predictions for time
                                  # points (tp+1):nrow(stsObj), or tp=c(from, to)
                          type = c("rolling", "first", "final"),
@@ -20,10 +20,10 @@ oneStepAhead <- function(result, # ah4-object (i.e. a hhh4 model fit)
                          verbose = TRUE) # verbose-1 is used as verbose setting
                                          # for sequentially refitted hhh4 models
 {
-    stopifnot(inherits(result, "ah4"))
+    stopifnot(inherits(result, c("ah4", "hhh4")))
     type <- match.arg(type)
     which.start <- if (type == "rolling") match.arg(which.start) else "final"
-    startfinal <- ah4coef2start(result)
+    startfinal <- hhh4coef2start(result)
 
     ## get model terms
     model <- result[["terms"]]
@@ -75,11 +75,11 @@ oneStepAhead <- function(result, # ah4-object (i.e. a hhh4 model fit)
         } else if (do_pb) setTxtProgressBar(pb, i) 
         if (type == "rolling" || (type == "first" && i == 1L)) {
             fit.old <- fit # backup
-            fit <- update.ah4(result, subset.upper=tps[i],
-                              start = switch(which.start,
-                                             current=ah4coef2start(fit),
-                                             final=startfinal),
-                              keep.terms=TRUE) # need "model" -> $terms
+            fit <- update.hhh4(result, subset.upper=tps[i],
+                               start = switch(which.start,
+                                              current=hhh4coef2start(fit),
+                                              final=startfinal),
+                               keep.terms=TRUE) # need "model" -> $terms
         }
         if (fit$convergence) {
             coefs <- coef(fit, reparamPsi=FALSE)

@@ -1,4 +1,17 @@
-print.ah4 <- function (x, digits = max(3, getOption("digits") - 3),reparamPsi=TRUE, ...) 
+################################################################################
+### Part of the surveillance package, http://surveillance.r-forge.r-project.org
+### Free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
+###
+### Standard methods for hhh4-fits
+###
+### Copyright (C) 2010-2014 Michaela Paul and Sebastian Meyer
+### $Revision$
+### $Date$
+################################################################################
+
+
+print.hhh4 <- function (x, digits = max(3, getOption("digits") - 3),reparamPsi=TRUE, ...) 
 {
   if(!x$convergence)
     cat('Results are not reliable! Try different starting values. \n')
@@ -31,7 +44,7 @@ print.ah4 <- function (x, digits = max(3, getOption("digits") - 3),reparamPsi=TR
   }
 }
 
-summary.ah4 <- function(object, ...){
+summary.hhh4 <- function(object, ...){
   # do not summarize results in case of non-convergence
   if(!object$convergence){
     cat('Results are not reliable! Try different starting values. \n')
@@ -59,11 +72,11 @@ summary.ah4 <- function(object, ...){
   re <- ranef(object)
 
   ret <- c(ret, list(fixef=fe, ranef=re, REmat=REmat, AIC=aic, BIC=bic))
-  class(ret) <- "summary.ah4"
+  class(ret) <- "summary.hhh4"
   return(ret)
 }
 
-print.summary.ah4 <- function(x, digits = max(3, getOption("digits") - 3), ...){
+print.summary.hhh4 <- function(x, digits = max(3, getOption("digits") - 3), ...){
   if(!x$convergence){
     cat('Results are not reliable! Try different starting values. \n')
 	invisible(x)
@@ -106,10 +119,13 @@ print.summary.ah4 <- function(x, digits = max(3, getOption("digits") - 3), ...){
   invisible(x)
 }
 
-terms.ah4 <- function (x, ...) 
-    if (is.null(x$terms)) interpretControl(x$control,x$stsObj) else x$terms
+terms.hhh4 <- function (x, ...)
+{
+    if (is.null(x$terms))
+        interpretControl(x$control,x$stsObj) else x$terms
+}
 
-logLik.ah4 <- function(object,...){
+logLik.hhh4 <- function(object,...){
   if(!object$convergence)
 	stop("algorithm did not converge\n")
 
@@ -122,7 +138,7 @@ logLik.ah4 <- function(object,...){
    return(val)
 }
 
-AIC.ah4 <- function (object, ..., k = 2)
+AIC.hhh4 <- function (object, ..., k = 2)
 {
     if(object$dim["random"]==0){
         NextMethod("AIC")
@@ -132,7 +148,7 @@ AIC.ah4 <- function (object, ..., k = 2)
     }
 }
 
-coef.ah4 <- function(object, se=FALSE, reparamPsi=TRUE, idx2Exp=NULL,
+coef.hhh4 <- function(object, se=FALSE, reparamPsi=TRUE, idx2Exp=NULL,
                      amplitudeShift=FALSE, ...)
 {
   coefs <- object$coefficients
@@ -190,13 +206,13 @@ coef.ah4 <- function(object, se=FALSE, reparamPsi=TRUE, idx2Exp=NULL,
     return(coefs)
 }
 
-fixef.ah4 <- function(object,...){
+fixef.hhh4 <- function(object,...){
   if(object$dim[1]>0){
     return(head(coef(object,...), object$dim[1]))
   } else return(NULL)
 }
 
-ranef.ah4 <- function(object, tomatrix = FALSE, ...){
+ranef.hhh4 <- function(object, tomatrix = FALSE, ...){
   if(object$dim[2]>0){
     ranefvec <- tail(coef(object,...), object$dim[2])
   } else return(NULL)
@@ -217,7 +233,7 @@ ranef.ah4 <- function(object, tomatrix = FALSE, ...){
   return(mat)
 }
 
-confint.ah4 <- function (object, parm, level = 0.95, reparamPsi = TRUE, idx2Exp = NULL, amplitudeShift = FALSE, ...) 
+confint.hhh4 <- function (object, parm, level = 0.95, reparamPsi = TRUE, idx2Exp = NULL, amplitudeShift = FALSE, ...) 
 {
     cf <- coef(object, reparamPsi=reparamPsi, idx2Exp=idx2Exp, amplitudeShift=amplitudeShift, se=TRUE)
     pnames <- rownames(cf)
@@ -236,7 +252,7 @@ confint.ah4 <- function (object, parm, level = 0.95, reparamPsi = TRUE, idx2Exp 
 }
 
 ## mean predictions for a subset of 1:nrow(object$stsObj)
-predict.ah4 <- function(object, newSubset=object$control$subset, type="response", ...)
+predict.hhh4 <- function(object, newSubset=object$control$subset, type="response", ...)
 {
     if (type == "response" &&
         all((m <- match(newSubset, object$control$subset, nomatch=0L)) > 0)) {
@@ -260,20 +276,20 @@ predict.ah4 <- function(object, newSubset=object$control$subset, type="response"
 ## use.estimates: use fitted parameters as new start values
 ##                (only applicable if same model)
 
-update.ah4 <- function (object, ..., subset.upper=NULL, use.estimates=FALSE)
+update.hhh4 <- function (object, ..., subset.upper=NULL, use.estimates=FALSE)
 {
     control <- object$control
     control <- modifyList(control, list(...))
     if (isScalar(subset.upper))
         control$subset <- control$subset[control$subset <= subset.upper]
     if (use.estimates)
-        control$start <- ah4coef2start(object)
+        control$start <- hhh4coef2start(object)
     hhh4(object$stsObj, control)
 }
 
 
-## convert fitted parameters from "ah4" to list suitable for control$start
-ah4coef2start <- function (fit)
+## convert fitted parameters to a list suitable for control$start
+hhh4coef2start <- function (fit)
     list(fixed = fixef(fit, reparamPsi=FALSE),
          random = ranef(fit, reparamPsi=FALSE),
          sd.corr = getSdCorr(fit))

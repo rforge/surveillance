@@ -5,7 +5,7 @@
 ###
 ### Helper functions for neighbourhood weight matrices in hhh4()
 ###
-### Copyright (C) 2012-2013 Sebastian Meyer
+### Copyright (C) 2012-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -108,26 +108,6 @@ weightedSumNE <- function (observed, weights, lag)
   
   rbind(matrix(NA_real_, lag, nUnits),
         res[seq_len(nTime-lag),,drop=FALSE])
-}
-
-## slower alternative, where the weights are always converted to a 3D array
-weightedSumNE.old <- function(observed, weights, lag)
-{
-  dimY <- dim(observed)
-  nTime <- dimY[1L]
-  nUnits <- dimY[2L]
-  
-  nhood <- array(weights, c(nUnits,nUnits,nTime))
-  
-  res <- matrix(NA_real_, nrow = nTime, ncol = nUnits,
-                dimnames = list(NULL, colnames(observed)))
-  for(i in seq_len(nUnits)){
-    weights.i <- t(nhood[,i,])
-    weightedObs <- observed * weights.i
-    res[,i] <- rowSums(weightedObs, na.rm=TRUE)
-  }
-  
-  rbind(matrix(NA_real_, lag, nUnits), head(res, nTime-lag))
 }
 
 
@@ -280,3 +260,32 @@ powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
 }
 
 
+
+#############################################
+### Utility functions for fitted hhh4-objects
+#############################################
+
+
+### extract the (final) weight matrix/array from a fitted hhh4 object
+
+getNEweights <- function (object, pars = coefW(object))
+{
+    neweights <- object$control$ne$weights
+    
+    if (!is.list(neweights))  # NULL or fixed weight structure
+        return(neweights)
+
+    ## parametric weights
+    nd <- length(neweights$initial)
+    if (length(pars) != nd) stop("'pars' must be of length ", nd)
+    neweights$w(pars, neighbourhood(object$stsObj), object$control$data)
+}
+
+
+### extract parameters of neighbourhood weights from hhh4-object or coef vector
+
+coefW <- function (object)
+{
+    coefs <- if (inherits(object, c("hhh4","ah4"))) object$coefficients else object
+    coefs[grep("^neweights", names(coefs))]
+}

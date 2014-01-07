@@ -5,23 +5,23 @@
 ###
 ### Simulate from a HHH4 model
 ###
-### Copyright (C) 2012-2013 Michaela Paul and Sebastian Meyer
+### Copyright (C) 2012-2014 Michaela Paul and Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
 
 
-### Simulate-method for ah4-objects
+### Simulate-method for hhh4-objects
 
-simulate.ah4 <- function (object, # result from a call to hhh4
-                          nsim=1, # number of replicates to simulate
-                          seed=NULL,
-                          y.start=NULL, # initial counts for epidemic components
-                          subset=1:nrow(object$stsObj),
-                          coefs=coef(object), # coefficients used for simulation
-                          components=c("ar","ne","end"), # which comp to include
-                          simplify=nsim>1, # counts array only (no full sts)
-                          ...)
+simulate.hhh4 <- function (object, # result from a call to hhh4
+                           nsim=1, # number of replicates to simulate
+                           seed=NULL,
+                           y.start=NULL, # initial counts for epidemic components
+                           subset=1:nrow(object$stsObj),
+                           coefs=coef(object), # coefficients used for simulation
+                           components=c("ar","ne","end"), # which comp to include
+                           simplify=nsim>1, # counts array only (no full sts)
+                           ...)
 {
     ## Determine seed (this part is copied from stats:::simulate.lm with
     ## Copyright (C) 1995-2012 The R Core Team)
@@ -178,29 +178,4 @@ checkCoefs <- function (object, coefs, reparamPsi=TRUE)
         stop(sQuote("coefs"), " must be of length ", length(theta))
     names(coefs) <- names(theta)
     coefs
-}
-
-
-### extract the (final) weight matrix/array from a fitted ah4 object
-
-getNEweights <- function (object, pars = coefW(object))
-{
-    neweights <- object$control$ne$weights
-    
-    if (!is.list(neweights))  # NULL or fixed weight structure
-        return(neweights)
-
-    ## parametric weights
-    nd <- length(neweights$initial)
-    if (length(pars) != nd) stop("'pars' must be of length ", nd)
-    neweights$w(pars, neighbourhood(object$stsObj), object$control$data)
-}
-
-
-### extract parameters of neighbourhood weights from ah4-object or coef vector
-
-coefW <- function (object)
-{
-    coefs <- if (inherits(object, "ah4")) object$coefficients else object
-    coefs[grep("^neweights", names(coefs))]
 }

@@ -76,3 +76,30 @@ formatPval <- function (pv, eps = 1e-4)
         format.pval(p, digits = if (p<10*eps) 1 else 2, eps = eps)
     sapply(pv, format1)
 }
+
+
+
+###############################################################
+### backwards-compatibility for old class name "ah4" (<= 1.7-0)
+###############################################################
+
+local({
+    for (generic in c("print", "summary", "print.summary", "terms", "logLik",
+                      "AIC", "coef", "fixef", "ranef", "confint", "predict",
+                      "update", "plot", "simulate")) {
+        methodname <- paste(generic, "hhh4", sep=".")
+        method <- get(methodname)
+        ## mark ah4-method as deprecated (as of next major release)
+        ## body(method) <- as.call(append(
+        ##     as.list(body(method)),
+        ##     substitute(
+        ##         .Deprecated(new,
+        ##                     msg=c(
+        ##                     "Since surveillance 1.8-0, hhh4()-results are of",
+        ##                     " class \"hhh4\" instead of \"ah4\".",
+        ##                     "\nOld \"ah4\"-methods will be removed.")),
+        ##         list(new=methodname)),
+        ##     after=1L))
+        assign(paste(generic, "ah4", sep="."), method, pos=parent.frame(2L))
+    }
+})

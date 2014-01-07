@@ -25,7 +25,7 @@ scores(object, unit = NULL, sign = FALSE, individual = FALSE)
 }
 
 \arguments{
-  \item{result}{fitted \code{\link{hhh4}} model object of class \code{"ah4"}.}
+  \item{result}{fitted \code{\link{hhh4}} model (class \code{"hhh4"}).}
   \item{tp}{numeric vector of length 1 or 2.
     One-step-ahead predictions are computed from time points 
     \code{tp[1]}, \ldots, \code{tp[2]} (yielding predictions for time

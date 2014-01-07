@@ -1,5 +1,5 @@
-\name{plot.ah4}
-\alias{plot.ah4}
+\name{plot.hhh4}
+\alias{plot.hhh4}
 \alias{plotHHH4_fitted}
 \alias{plotHHH4_fitted1}
 \alias{plotHHH4_season}
@@ -23,7 +23,7 @@
 }
 
 \usage{
-\method{plot}{ah4}(x, type=c("fitted", "season", "ri"), ...)
+\method{plot}{hhh4}(x, type=c("fitted", "season", "ri"), ...)
 
 plotHHH4_fitted(x, units = 1, names = NULL,
                 col = c("orange", "blue", "grey85", "black"),
@@ -167,7 +167,7 @@ plotHHH4_ri(x, component, sp.layout = NULL,
 }
 
 \seealso{
-  other methods for \code{hhh4} fits, e.g., \code{\link{summary.ah4}}.
+  other methods for \code{hhh4} fits, e.g., \code{\link{summary.hhh4}}.
 }
 
 \examples{
