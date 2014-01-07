@@ -43,10 +43,12 @@ mycoeflist <- function (coefs, npars)
 }
 
 
-## asymptotic variance-covariance matrix (inverse of fisher information matrix)
+## asymptotic variance-covariance matrix (inverse of expected fisher information)
 vcov.twinstim <- function (object, ...)
 {
-    solve(object$fisherinfo)  # inverse of estimated expected fisher information
+    if (is.null(object$fisherinfo)) {
+        stop("Fisher information not available; use, e.g., -optimHess()")
+    } else solve(object$fisherinfo)
 }
 
 ## Extract log-likelihood of the model (which also enables the use of AIC())
