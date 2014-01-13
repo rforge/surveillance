@@ -6,7 +6,7 @@
 ### Methods for objects of class "twinstim", specifically:
 ### vcov, logLik, print, summary, plot (intensity, iaf), R0, residuals, update
 ###
-### Copyright (C) 2009-2013 Sebastian Meyer
+### Copyright (C) 2009-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -1122,9 +1122,10 @@ update.twinstim <- function (object, endemic, epidemic,
     ##       the principle order of terms is retained. Offsets will be moved to 
     ##       the end and a missing intercept will be denoted by a final -1.
     
-    if (!missing(control.siaf))
-        call$control.siaf <- if (is.null(object$control.siaf)) # if constantsiaf
-            control.siaf else modifyList(object$control.siaf, control.siaf)
+    if (!missing(control.siaf)) {
+        call$control.siaf <- object$control.siaf # =NULL if constantsiaf
+        call$control.siaf[names(control.siaf)] <- control.siaf
+    }
     
     call["optim.args"] <- if (missing(optim.args)) object["optim.args"] else {
         list( # use list() to enable optim.args=NULL

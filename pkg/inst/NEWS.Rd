@@ -70,6 +70,11 @@
     \item Unsupported options (\code{logpars=FALSE},
     \code{effRangeProb}) have been dropped from \code{siaf.powerlaw()}
     and \code{siaf.powerlawL()}.
+    \item \code{update.twinstim()} no longer uses recursive
+    \code{modifyList()} for the \code{control.siaf} argument. Instead,
+    the supplied new list elements (\code{"F"}, \code{"Deriv"})
+    completely replace the respective elements from the original
+    \code{control.siaf} specification.
   }
 }
 
