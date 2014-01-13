@@ -299,7 +299,7 @@ componentsHHH4 <- function (object)
     names(which(sapply(object$control[c("ar", "ne", "end")], "[[", "inModel")))
 
 ## deviance residuals
-residuals.hhh4 <- function (object, type = c("deviance", "response"))
+residuals.hhh4 <- function (object, type = c("deviance", "response"), ...)
 {
     type <- match.arg(type)
     obs <- observed(object$stsObj)[object$control$subset,]

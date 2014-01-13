@@ -93,14 +93,14 @@ siaf.step <- function (knots, maxRange = Inf, nTypes = 1, validpars = NULL)
         exp(logvals) * ringAreas[1L+seq_len(npars)]
     }
 
-    simulate <- function (n, logvals, type, ub) {
-        .NotYetImplemented()
-    }
+    ## simulate <- function (n, logvals, type, ub) {
+    ##     .NotYetImplemented()
+    ## }
     
     ## Done
     res <- list(f = f, F = F, Fcircle = Fcircle,
                 deriv = deriv, Deriv = Deriv,
-                simulate = simulate,
+                ## simulate = simulate,
                 npars = npars, validpars = validpars)
     attr(res, "knots") <- knots
     attr(res, "maxRange") <- maxRange

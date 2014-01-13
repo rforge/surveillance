@@ -28,6 +28,15 @@ checks.student <- surveillance:::checksiaf(
     tolerance = 1e-6)
 stopifnot(unlist(lapply(checks.student, attr, "all.equal")))
 
+### Step function kernel
+spatstat::spatstat.options(npixel=600)
+checks.step <- surveillance:::checksiaf(
+    siaf.step(c(0.1,0.5,1)),
+    pargrid = -cbind(0.5,0.1,0.2),
+    method = "midpoint",
+    tolerance = 1e-3)
+stopifnot(unlist(lapply(checks.step, attr, "all.equal")))
+
 
 ## showsiaf <- function (siaf, pars) {
 ##     data("letterR", package="spatstat", envir=environment())
