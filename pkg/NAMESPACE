@@ -58,7 +58,7 @@ importFrom(MASS, glm.nb)   # for algo.glrnb
 
 ### hhh4-specific
 
-importFrom(MASS, ginv)
+importFrom(MASS, ginv, negative.binomial)
 importFrom(Matrix, Matrix)
 importClassesFrom(Matrix, ddiMatrix)
 importMethodsFrom(Matrix, coerce, diag, forceSymmetric, solve)
@@ -75,7 +75,8 @@ importMethodsFrom(Matrix, coerce, diag, forceSymmetric, solve)
 
 importFrom(spatstat, area.owin, as.im.function, coords.ppp, diameter,
                      diameter.owin, disc, distppl, inside.owin, intersect.owin,
-                     is.polygonal, marks, runifpoint, shift.owin)
+                     is.polygonal, marks, runifpoint, shift.owin,
+                     spatstat.options, vertices)
 
 importFrom(polyCub, polyCub, polyCub.SV, polyCub.midpoint, xylist)
 importMethodsFrom(polyCub, coerce)
@@ -259,7 +260,8 @@ export(intensityplot.simEpidata)        # for convenience
 export(as.epidataCS)
 export(twinstim)
 export(simEpidataCS)
-export(siaf.constant, siaf.gaussian,
+export(siaf.constant, siaf.step,
+       siaf.gaussian,
        siaf.powerlaw, siaf.powerlawL, siaf.student)
 export(tiaf.constant, tiaf.exponential)
 export(epidataCS2sts)
@@ -373,6 +375,7 @@ S3method(coef, hhh4)
 S3method(fixef, hhh4)
 S3method(ranef, hhh4)
 S3method(confint, hhh4)
+S3method(residuals, hhh4)
 S3method(predict, hhh4)
 S3method(update, hhh4)
 S3method(simulate, hhh4)

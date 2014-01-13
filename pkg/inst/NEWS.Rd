@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-01-07)}{
+\section{Changes in surveillance version 1.8-0 (2014-01-10)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -38,8 +38,12 @@
     Note that argument order and some names have changed:
     \code{i} -> \code{units}, \code{title} -> \code{names}.
 
-    \item New spatial interaction function \code{siaf.student()}
-    implementing a \eqn{t}-kernel for \code{twinstim()} models.
+    \item (Deviance) \code{residuals()}-method for fitted \code{hhh4()}
+    models.
+
+    \item New spatial interaction functions for \code{twinstim()}
+    models: \code{siaf.student()} implements a \eqn{t}-kernel, and
+    \code{siaf.step} a step function.
   }
 }
 

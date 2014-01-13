@@ -14,6 +14,7 @@
 %% \alias{print.summary.hhh4}
 %% \alias{update.hhh4}
 %% \alias{terms.hhh4}
+%% \alias{residuals.hhh4}
 
 \title{
 Print, Summary and other Standard Methods for \code{"hhh4"} Objects

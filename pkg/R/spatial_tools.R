@@ -5,7 +5,7 @@
 ###
 ### Auxiliary functions for operations on spatial data
 ###
-### Copyright (C) 2009-2013 Sebastian Meyer
+### Copyright (C) 2009-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -84,7 +84,7 @@ unionSpatialPolygons <- function (SpP,
     W
 }
 
-    
+
 ### Compute distance from points to boundary
 ### copied in part from function bdist.points() of the "spatstat" package
 ### authored by A. Baddeley and R. Turner (DEPENDS ON spatstat::distppl)
@@ -93,12 +93,12 @@ unionSpatialPolygons <- function (SpP,
 ## Note that we do not check if points are actually inside the polygonal domain
 bdist <- function (xy, poly)
 {
-    result <- rep.int(Inf, nrow(xy))
+    result <- rep.int(Inf, length(xy)/2)
     bdry <- if (is.polygonal(poly)) {
         poly$bdry
     } else if (inherits(poly, "gpc.poly")) {
         poly@pts
-    } else stop("'poly' must be \"owin\" or \"gpc.poly\"")
+    } else stop("'poly' must be a polygonal \"owin\" or a \"gpc.poly\"")
     for (i in seq_along(bdry)) {
         polly <- bdry[[i]]
         px <- polly$x

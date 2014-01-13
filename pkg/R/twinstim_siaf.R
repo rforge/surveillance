@@ -6,7 +6,7 @@
 ### Spatial interaction functions for twinstim's epidemic component.
 ### Specific implementations are in seperate files (e.g.: Gaussian, power law).
 ###
-### Copyright (C) 2009-2013 Sebastian Meyer
+### Copyright (C) 2009-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -279,23 +279,10 @@ checksiaf.deriv <- function (deriv, f, pargrid, type=1, rmax=100)
     rgrid <- seq(-rmax,rmax,len=21) / sqrt(2)
     rgrid <- rgrid[rgrid != 0] # some siafs are always 1 at (0,0) (deriv=0)
     sgrid <- cbind(rgrid, rgrid)
-    maxreldiffs <- if (requireNamespace("maxLik")) {
-        apply(pargrid, 1, function (pars) {
-            maxLik::compareDerivatives(f, deriv, t0=pars, s=sgrid,
-                                       print=FALSE)$maxRelDiffGrad
-        })
-    } else { # use stats::numericDeriv
-        apply(pargrid, 1, function (pars) {
-            ana <- deriv(sgrid, pars, types=type)
-            logsigma <- pars[1L]; logd <- pars[2L]
-            num <- attr(numericDeriv(quote(f(sgrid, c(logsigma,logd),
-                                             types=type)),
-                                     theta=c("logsigma", "logd")),
-                        "gradient")
-            max((ana-num)/(0.5*(abs(ana)+abs(num))))
-        })
-    }
-    maxreldiffs
+    apply(pargrid, 1, function (pars) {
+        maxLik::compareDerivatives(f, deriv, t0=pars, s=sgrid,
+                                   print=FALSE)$maxRelDiffGrad
+    })
 }
 
 checksiaf.Deriv <- function (Deriv, deriv, pargrid, type=1, method="SV", ...)

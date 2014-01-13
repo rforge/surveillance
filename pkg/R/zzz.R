@@ -84,9 +84,10 @@ formatPval <- function (pv, eps = 1e-4)
 ###############################################################
 
 local({
-    for (generic in c("print", "summary", "print.summary", "terms", "logLik",
-                      "AIC", "coef", "fixef", "ranef", "confint", "predict",
-                      "update", "plot", "simulate")) {
+    methods17 <- c("print", "summary", "print.summary", "terms", "logLik",
+                   "AIC", "coef", "fixef", "ranef", "confint", "predict",
+                   "update", "plot", "simulate")
+    for (generic in methods17) {
         methodname <- paste(generic, "hhh4", sep=".")
         method <- get(methodname)
         ## mark ah4-method as deprecated (as of next major release)

@@ -297,3 +297,37 @@ hhh4coef2start <- function (fit)
 ## character vector of model components that are "inModel"
 componentsHHH4 <- function (object)
     names(which(sapply(object$control[c("ar", "ne", "end")], "[[", "inModel")))
+
+## deviance residuals
+residuals.hhh4 <- function (object, type = c("deviance", "response"))
+{
+    type <- match.arg(type)
+    obs <- observed(object$stsObj)[object$control$subset,]
+    fit <- fitted(object)
+    if (type == "response")
+        return(obs - fit)
+
+    ## deviance residuals
+    ## Cf. residuals.ah, it calculates:
+    ## deviance = sign(y - mean) * sqrt(2 * (distr(y) - distr(mean)))
+    ## pearson = (y - mean)/sqrt(variance)
+    dev.resids <- switch(object$control$family,
+        "Poisson" = poisson()$dev.resids,
+        "NegBin1" = {
+            psi <- exp(object$coefficients[object$dim[1L]])
+            negative.binomial(psi)$dev.resids
+        },
+        "NegBinM" = {
+            psicoefidx <- seq.int(to=object$dim[1L],
+                                  length.out=object$nUnit)
+            psi <- matrix(
+                exp(object$coefficients[psicoefidx]),
+                object$nTime, object$nUnit, byrow=TRUE)
+            negative.binomial(psi)$dev.resids # CAVE: non-standard use
+        },
+        stop("not implemeted for \"", object$control$family, "\"-models"))
+
+    di2 <- dev.resids(y=obs, mu=fit, wt=1)
+    sign(obs-fit) * sqrt(pmax.int(di2, 0))
+}
+

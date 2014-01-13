@@ -5,7 +5,7 @@
 ###
 ### Gaussian spatial interaction function for twinstim's epidemic component
 ###
-### Copyright (C) 2009-2013 Sebastian Meyer
+### Copyright (C) 2009-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -103,15 +103,15 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
     # derivative of f wrt pars
     derivexpr <- if (logsd) { # derive f wrt psi=log(sd) !!
         if (density) {
-            quote(deriv[cbind(1:L,colidx)] <- exp(-frac) / pi/sdss^2 * (frac-1))
+            quote(deriv[cbind(seq_len(L),colidx)] <- exp(-frac) / pi/sdss^2 * (frac-1))
         } else {
-            quote(deriv[cbind(1:L,colidx)] <- exp(-frac) * 2*frac)
+            quote(deriv[cbind(seq_len(L),colidx)] <- exp(-frac) * 2*frac)
         }
     } else { # derive f wrt sd !!
         if (density) {
-            quote(deriv[cbind(1:L,colidx)] <- exp(-frac) / pi/sdss^3 * (frac-1))
+            quote(deriv[cbind(seq_len(L),colidx)] <- exp(-frac) / pi/sdss^3 * (frac-1))
         } else {
-            quote(deriv[cbind(1:L,colidx)] <- exp(-frac) * 2*frac/sdss)
+            quote(deriv[cbind(seq_len(L),colidx)] <- exp(-frac) * 2*frac/sdss)
         }
     }
     derivexpr <- do.call("substitute", args=list(expr=derivexpr,
