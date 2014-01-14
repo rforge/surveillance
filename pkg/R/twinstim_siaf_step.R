@@ -100,7 +100,7 @@ siaf.step <- function (knots, maxRange = Inf, nTypes = 1, validpars = NULL)
         knots2upper <- c(knots[knots < upper], upper)
         heights <- c(1,exp(logvals))[seq_along(knots2upper)]
         ## first, sample the "rings" of the points
-        rings <- sample.int(length(ringVolumes), size=n, replace=TRUE,
+        rings <- sample.int(length(heights), size=n, replace=TRUE,
                             prob=heights*diff.default(c(0,knots2upper^2)))
         ## sample points from these rings
         runifdisc(n, knots2upper[rings], c(0,knots2upper)[rings])
