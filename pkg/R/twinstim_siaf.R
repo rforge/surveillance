@@ -316,4 +316,5 @@ checksiaf.simulate <- function (simulate, f, pars, type=1, B=3000, ub=10)
     contour(kdens, add=TRUE, col=2, lwd=2,
             labcex=1.5, vfont=c("sans serif", "bold"))
     ##x11(); image(kdens, add=TRUE)
+    invisible(simpoints)
 }
