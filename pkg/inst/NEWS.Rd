@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-01-10)}{
+\section{Changes in surveillance version 1.8-0 (2014-01-14)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -75,6 +75,18 @@
     the supplied new list elements (\code{"F"}, \code{"Deriv"})
     completely replace the respective elements from the original
     \code{control.siaf} specification.
+  }
+}
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item Fixed a bug in \code{algo.glrnb} where the overdispersion
+    parameter \code{alpha} from the automatically fitted \code{glm.nb}
+    model (fitted by \code{estimateGLRNbHook}) was incorrectly taken as
+    \code{mod[[1]]$theta} instead of \code{1/mod[[1]]$theta}. The error is
+    due to a different parametrization of the negative binomial
+    distribution compared to the parametrization in \enc{Höhle}{Hoehle}
+    and Paul (2008).
   }
 }
 
