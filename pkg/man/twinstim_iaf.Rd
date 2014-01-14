@@ -18,18 +18,17 @@
   (\eqn{f} and \eqn{g}, respectively), 
   i.e. how infectivity decays with increasing spatial and temporal
   distance from the source of infection.
-  It is of course possible to define own functions (which are
-  implemented as list objects with required components described in the
-  \dQuote{Value} section below), but the package also predefines some 
-  dispersal kernels returned by the constructor functions documented
-  here.
+  It is of course possible to define own functions (see
+  \code{\link{siaf}} and \code{\link{tiaf}}, respectively), but the
+  package also predefines some useful dispersal kernels returned by the
+  constructor functions documented here.
 }
 
 \usage{
 # predefined spatial interaction functions
 siaf.constant()
-siaf.gaussian(nTypes = 1, logsd = TRUE, density = FALSE, F.adaptive = TRUE,
-              effRangeMult = 6, validpars = NULL)
+siaf.gaussian(nTypes = 1, logsd = TRUE, density = FALSE,
+              F.adaptive = TRUE, effRangeMult = 6, validpars = NULL)
 siaf.powerlaw(nTypes = 1, validpars = NULL)
 siaf.powerlawL(nTypes = 1, validpars = NULL)
 siaf.student(nTypes = 1, validpars = NULL)
@@ -93,10 +92,10 @@ tiaf.exponential(nTypes = 1)
   }
   \item{validpars}{
     function taking one argument, the parameter vector, indicating if it
-    is valid. If \code{logsd=FALSE} and one
-    prefers not to use \code{method="L-BFGS-B"} for fitting the
-    \code{twinstim}, then \code{validpars} should be set to
-    \code{function (pars) pars > 0}.
+    is valid (see also \code{\link{siaf}}).
+    If \code{logsd=FALSE} and one prefers not to use
+    \code{method="L-BFGS-B"} for fitting the \code{twinstim}, then
+    \code{validpars} could be set to \code{function (pars) pars > 0}.
   }
 }
 
@@ -165,106 +164,8 @@ tiaf.exponential(nTypes = 1)
 
 \value{
   The specification of an interaction function, which is a list.
-  
-  For spatial kernels, this list contains the following components:
-  \item{f}{spatial interaction function (\code{siaf}). It must accept
-    two arguments, the first one being a (2-column) coordinate matrix, the
-    second one a parameter vector. For marked \code{twinstim}, it must
-    accept the type of the event (integer code) as its third argument
-    (either a single type for all locations or separate types for each
-    location).}
-  \item{F}{function computing the integral of \eqn{f(s)} (passed as
-    second argument) over a polygonal \code{"owin"} domain (first argument).
-    The third and fourth argument are
-    the parameter vector and the (\emph{single}) type, respectively.
-    There may be additional arguments, which can then be specified in
-    the \code{control.siaf$F} argument list of \code{twinstim}. If the \code{F}
-    function is missing, a general default (\code{\link[polyCub]{polyCub}}) 
-    will be used, with extra arguments \code{method} (default: \code{"SV"}) 
-    and corresponding accuracy parameters.}
-  \item{Fcircle}{optional function for fast calculation of the
-    (two-dimensional) integral of \eqn{f(s)} over a circle with radius
-    \code{r} (first argument). Further arguments are as for \code{f}. It
-    must not be vectorized (will always be called with single radius
-    and a single type). If this function is specified, integration of
-    the \code{siaf} over the spatial influence region of an event will
-    be faster if the region is actually circular. This is the case if
-    the event is located at least a distance \code{eps.s} from the border
-    of the observation region \code{W}, or if the distance to the border
-    is larger than the effective integration range (if specified, see
-    \code{effRange} below).}
-  \item{effRange}{optional function returning the \dQuote{effective}
-    range of \eqn{f(s)} for the given set of parameters (the first and
-    only argument) such that the circle with radius \code{effRange}
-    contains the numerically essential proportion of the 
-    integral mass. For the Gaussian kernel the default is
-    \code{function (logsd) 6*exp(logsd)}. The return value must be a
-    vector of length \code{nTypes} (effective range for each type). This
-    function is only used if \code{Fcircle} is also specified.}
-  \item{deriv}{optional derivative of \eqn{f(s)} \emph{with respect to
-      the parameters}. It takes the same arguments as \code{f} but
-    returns a matrix with as many rows as there were coordinates in the
-    input and \code{npars} columns. This derivative is necessary for the
-    calculation of the score function in \code{twinstim()}, which is
-    advantageous for the numerical log-likelihood maximization.} 
-  \item{Deriv}{function computing the integral of \code{deriv} (passed as
-    second argument) over a polygonal \code{"owin"} domain (first
-    argument). The return value is thus a vector of length \code{npars}.
-    The third argument is the parameter vector and the fourth argument
-    is a (\emph{single}) type and must be named \code{type}.
-    There may be additional arguments, which can then be specified in
-    the \code{control.siaf$Deriv} argument list of \code{twinstim}. If the
-    \code{Deriv} function is missing, a general default
-    (\code{\link[polyCub]{polyCub}}) will be used, with extra arguments
-    \code{method} (default: \code{"SV"}) and corresponding accuracy parameters.}
-  \item{simulate}{optional function returning a sample drawn from the
-    spatial kernel (only required for the simulation of \code{twinstim}
-    models).  Its first argument is the size of the sample to
-    generate, further arguments are as for \code{f} (but the optional
-    third argument specifies a single event type only).  The function must
-    return a two-column \emph{matrix} of the sampled locations.
-    Note that the simulation method actually samples only one location
-    at a time, thus it is sufficient to have a working
-    \code{function(n=1, pars, type)}.
-  }
-  \item{npars}{the number of parameters of the spatial interaction
-    function \code{f} (i.e. the length of its second argument).}
-    
-  For temporal kernels, the components are:
-  \item{g}{temporal interaction function (\code{tiaf}). It must accept
-    two arguments, the first one being a vector of time points, the
-    second one a parameter vector. For marked \code{twinstim}, it must
-    accept the type of the event (integer code) as its third argument
-    (either a single type for all locations or separate types for each
-    location).}
-  \item{G}{a primitive of \eqn{g(t)} (with respect to time). It must
-    accept the same arguments as \code{g}, for instance a \emph{vector}
-    of time points (not just a single one).}
-  \item{deriv}{optional derivative of \eqn{g(t)} \emph{with respect to
-      the parameters}. It takes the same arguments as \code{g} but
-    returns a matrix with as many rows as there were time points in the
-    input and \code{npars} columns. This derivative is necessary for the
-    calculation of the score function in \code{twinstim()}, which is
-    advantageous for the numerical log-likelihood maximization.}
-  \item{Deriv}{optional primitive of \code{deriv} (with respect to
-    time). It must accept the same arguments as \code{deriv}, \code{g} and
-    \code{G} and returns a matrix with as many rows as there were time
-    points in the input and \code{npars} columns. The integrated
-    derivative is necessary for the score function in \code{twinstim}.}
-  \item{npars}{the number of parameters of the temporal interaction
-    function \code{g} (i.e. the length of its second argument).}
-  
-  In \emph{both} cases, there may be an additional component
-  \code{validpars} as a way to specify parameter constraints:
-  \item{validpars}{
-    optional function taking one argument, the parameter vector, indicating if it
-    is valid. This function is rarely needed in practice, because usual
-    box-constrained parameters can be taken into account by using L-BFGS-B
-    as the optimization method in \code{twinstim} (with arguments
-    \code{lower} and \code{upper}), and positivity constraints by using
-    log-parametrizations. This component is not necessary (and ignored) if
-    \code{npars == 0}.
-  }
+  See \code{\link{siaf}} and \code{\link{tiaf}}, respectively, for a
+  description of its components.  
 }
 
 \references{
@@ -290,7 +191,7 @@ tiaf.exponential(nTypes = 1)
 }
 
 \seealso{
-\code{\link{twinstim}}.
+\code{\link{twinstim}}, \code{\link{siaf}}, \code{\link{tiaf}}
 }
 
 \examples{

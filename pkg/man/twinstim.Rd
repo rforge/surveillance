@@ -38,23 +38,33 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     component in the model.
   }
   \item{siaf}{
-    spatial interaction function. May be \code{NULL} or missing
-    (corresponding to \code{siaf.constant()}, i.e. constant infectivity 
-    independent of the spatial distance from the host), a list
-    (specifying a continuous kernel, as e.g., returned by the functions
-    \code{\link{siaf.gaussian}} or \code{\link{siaf.powerlaw}}), or numeric
-    (knots of a step function).
+    spatial interaction function. Possible specifications are:
+    \itemize{
+      \item \code{NULL} or missing, corresponding to
+      \code{siaf.constant()}, i.e. spatially homogeneous 
+      infectivity independent of the distance from the host
+      \item a list as returned by \code{\link{siaf}} or by a
+      predefined interaction function such as
+      \code{\link{siaf.gaussian}} or \code{\link{siaf.powerlaw}}
+      \item a numeric vector corresponding to the knots of a step
+      function, i.e. the same as \code{\link{siaf.step}(knots)}
+    }
     If you run into \dQuote{false convergence} with a non-constant
     \code{siaf} specification, the numerical accuracy of the cubature
     methods is most likely too low (see the \code{control.siaf}
     argument).
   }
   \item{tiaf}{
-    temporal interaction function. May be \code{NULL} (or missing,
-    corresponding to constant infectivity independent of the temporal
-    distance from the host), a list (specifying a continuous function,
-    as e.g., returned by \code{\link{tiaf.exponential}}), or numeric
-    (knots of a step function). 
+    temporal interaction function. Possible specifications are:
+    \itemize{
+      \item \code{NULL} or missing, corresponding to
+      \code{tiaf.constant()}, i.e. time-constant infectivity
+      \item a list as returned by \code{\link{tiaf}} or by a
+      predefined interaction function such as
+      \code{\link{tiaf.exponential}}
+      %% \item a numeric vector corresponding to the knots of a step
+      %% function, i.e. the same as \code{\link{tiaf.step}(knots)}
+    }
   }
   \item{qmatrix}{
     square indicator matrix (0/1 or \code{FALSE}/\code{TRUE}) for

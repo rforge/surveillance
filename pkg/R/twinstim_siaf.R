@@ -17,52 +17,9 @@
 ### "Constructor" ###
 #####################
 
-## f: spatial interaction function (siaf). must accept two arguments, a
-##    coordinate matrix and a parameter vector. for marked twinstim, it must
-##    accept a third argument which is the type of the event (either a single
-##    type for all locations or separate types for each location).
-## F: function that integrates 'f' (2nd argument) over a polygonal domain (of
-##    class "owin", 1st argument). The third and fourth arguments are the
-##    parameters and the type, respectively. There may be additional arguments
-##    which are passed by the control.siaf list in twinstim(). 
-## Fcircle: optional function for fast calculation of the integral of f over a
-##    circle with radius r (first argument). Further arguments like f. It
-##    must not be vectorized for model fitting (will be passed single
-##    radius and single type). 
-## effRange: optional function returning the effective range (domain) of f for
-##    the given set of parameters such that the circle with radius effRange
-##    contains the numerical essential proportion the integral mass, e.g.
-##    function (sigma) 6*sigma. The return value must be a vector of length
-##    nTypes (effRange for each type). Must be supplied together with Fcircle. 
-## deriv: optional derivative of f with respect to the parameters. Takes the
-##    same arguments as f but returns a matrix with as many rows as there were
-##    coordinates in the input and npars columns. The derivative is necessary
-##    for the score function. 
-## Deriv: function which integrates 'deriv' (2nd argument) over a polygonal
-##    domain (of class "owin", 1st argument). The third and fourth argument are
-##    the parameters and the type, respectively. There may be additional
-##    arguments which are passed by the control.siaf list in twinstim(). 
-## simulate: optional function returning a sample drawn from the spatial kernel
-##    (i.e. a two-column matrix of 'n' points). The arguments are 'n' (size of
-##    the sample), 'pars' (parameter vector of the spatial kernel), for marked
-##    twinstim also 'type' (a single type of event being generated), and
-##    optionally 'ub' (upper bound, truncation of the kernel).
-## npars: number of parameters
-## validpars: optional function indicating if a specific parameter vector is
-##    valid. If missing or NULL, it will be set to function
-##    (pars) TRUE. This function is rarely needed in practice, because usual box
-##    constrained parameters can be taken into account by using L-BFGS-B as the
-##    optimization method (with arguments 'lower' and 'upper'). 
-## knots: not implemented. Knots (> 0) of a spatial interaction STEP function of the distance
-
-siaf <- function (f, F, Fcircle, effRange, deriv, Deriv, simulate, npars, validpars, knots)
+siaf <- function (f, F, Fcircle, effRange, deriv, Deriv, simulate, npars,
+                  validpars = NULL)
 {
-    # if siaf is a step function specified by knots
-    if (!missing(knots)) {
-        return(sort(unique(as.vector(knots,mode="numeric")), decreasing=FALSE))
-    }
-
-    # if siaf is a continuous function
     npars <- as.integer(npars)
     if (length(npars) != 1 || npars < 0L) {
         stop("'siaf$npars' must be a single nonnegative number")
@@ -109,7 +66,7 @@ siaf <- function (f, F, Fcircle, effRange, deriv, Deriv, simulate, npars, validp
             formals(simulate) <- c(formals(simulate), alist(ub=))
     }
     ## Check if the validpars are of correct form
-    validpars <- if (!haspars || missing(validpars) || is.null(validpars))
+    validpars <- if (!haspars || is.null(validpars))
         NULL else match.fun(validpars)
     ## Done, return result.
     list(f = f, F = F, Fcircle = Fcircle, effRange = effRange,
@@ -131,16 +88,17 @@ siaf.constant <- function ()
     ## one could also use utils::globalVariables() in R >= 2.15.1 as follows:
     ## if (getRversion() >= "2.15.1") utils::globalVariables("r")
     res <- list(
-           f = as.function(alist(s=, pars=NULL, types=NULL, rep.int(1,nrow(s))),
-                           envir = .GlobalEnv),
-           Fcircle = as.function(alist(r=, pars=NULL, type=NULL, pi*r^2),
-                                 envir = .GlobalEnv),
-           ## simulation will be handled specially in simEpidataCS, this is only
-           ## included here for completeness
-           simulate = as.function(alist(n=, pars=NULL, type=NULL, ub=,
-                                        runifdisc(n, ub)),
-                                  envir = getNamespace("surveillance")),
-           npars = 0L
+        f = as.function(alist(s=, pars=NULL, types=NULL, rep.int(1,nrow(s))),
+                        envir = .GlobalEnv),
+        ## integration over polydomains is handled specially in twinstim
+        Fcircle = as.function(alist(r=, pars=NULL, type=NULL, pi*r^2),
+                              envir = .GlobalEnv),
+        ## simulation will be handled specially in simEpidataCS, this is only
+        ## included here for completeness
+        simulate = as.function(alist(n=, pars=NULL, type=NULL, ub=,
+                                     runifdisc(n, ub)),
+                               envir = getNamespace("surveillance")),
+        npars = 0L
     )
     attr(res, "constant") <- TRUE
     res

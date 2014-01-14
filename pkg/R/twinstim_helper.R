@@ -5,7 +5,7 @@
 ###
 ### Some internal helper functions for "twinstim".
 ###
-### Copyright (C) 2009-2013 Sebastian Meyer
+### Copyright (C) 2009-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -284,8 +284,9 @@ control2nlminb <- function (control, defaults)
         attr(ret, "constant") <- isTRUE(attr(iaf, "constant"))
         ret
     } else if (is.vector(iaf, mode = "numeric")) {
-        stop("'knots' are not implemented for '",type,"'")
-        do.call(type, args = list(knots = iaf))
+        if (type == "tiaf") {
+            stop("'knots' are not implemented for '",type,"'")
+        } else do.call(paste(type,"step",sep="."), args = list(knots = iaf))
     } else {
         stop("'", as.character(substitute(iaf)),
              "' must be NULL (or missing), a list (-> continuous ",
