@@ -16,7 +16,8 @@ siaf.step <- function (knots, maxRange = Inf, nTypes = 1, validpars = NULL)
     knots <- sort(unique(as.vector(knots,mode="numeric")))
     stopifnot(isScalar(maxRange), knots > 0, maxRange > knots)
     nknots <- length(knots)             # = number of parameters (per type)
-    allknots <- unique(c(0,knots,maxRange,Inf))
+    allknots <- c(0, knots, unique(c(maxRange,Inf)))
+    allknotsPos <- c(0,knots,maxRange)  # pos. domain, =allknots if maxRange=Inf
 
     nTypes <- as.integer(nTypes)
     stopifnot(length(nTypes) == 1L, nTypes > 0L)
@@ -29,7 +30,10 @@ siaf.step <- function (knots, maxRange = Inf, nTypes = 1, validpars = NULL)
     ##     logvals[(type-1)*nknots + seq_len(nknots)]
 
     ## auxiliary function calculating the areas of the "rings" of the
-    ## two-dimensional step function intersected with a polydomain
+    ## two-dimensional step function intersected with a polydomain.
+    ## Returns a numeric vector of length
+    ## length(allknotsPos)-1 == nknots+1 (i.e. not appending the area of the
+    ## 0-height ring from maxRange to Inf in case maxRange < Inf)
     .ringAreas <- function (polydomain, npoly = 256) {
         polyvertices <- vertices(polydomain)
         polyarea <- area.owin(polydomain)
@@ -39,7 +43,7 @@ siaf.step <- function (knots, maxRange = Inf, nTypes = 1, validpars = NULL)
         ## disable redundant checking when creating disc()s:
         oopt <- spatstat.options(checkpolygons=FALSE)
         on.exit(spatstat.options(oopt))
-        sliceAreas <- sapply(allknots[-1L], function (r) {
+        sliceAreas <- sapply(allknotsPos[-1L], function (r) {
             if (r <= bdist) pi * r^2 else if (r >= R) polyarea else
             area.owin(intersectPolyCircle.owin(polydomain,c(0,0),r,npoly=npoly))
         }, simplify=TRUE, USE.NAMES=FALSE)
@@ -62,45 +66,50 @@ siaf.step <- function (knots, maxRange = Inf, nTypes = 1, validpars = NULL)
     }
 
     F <- function (polydomain, f, logvals, type = NULL, npoly = 256) {
-        ringAreas <- ringAreas(polydomain, npoly=npoly)
-        sum(c(1, exp(logvals)) * ringAreas[seq_len(1L+npars)])
+        ## sum of the volumes of the intersections of "rings" with 'polydomain'
+        sum(c(1, exp(logvals)) * ringAreas(polydomain, npoly=npoly))
     }
 
     Fcircle <- function (r, logvals, type = NULL) { # exact integration on disc
-        vals <- c(1, exp(logvals), 0)
-        knots2r <- c(allknots[allknots < r], r)
-        vals2r <- vals[seq_len(length(knots2r)-1L)]
-        sum(vals2r * pi * diff(knots2r^2)) # sum of "ring" volumes
+        ## this is just the sum of the "ring" volumes
+        sum(c(1, exp(logvals)) * pi * diff(pmin.int(allknotsPos, r)^2))
     }
 
     deriv <- function (s, logvals, types = NULL) {
         sLength <- sqrt(.rowSums(s^2, L <- length(s)/2, 2L))
         whichvals <- .bincode(sLength, allknots, right=FALSE) - 1L
-        ## NOTE: sLength >= maxRange => whichvals > npars (=> f=0)
+        ## NOTE: sLength >= maxRange => whichvals > nknots (=> f=0)
         ## we do a bare-bone implementation of relevant parts of
-        ## deriv <- outer(whichvals, seq_len(npars), "==")
-        Y <- rep.int(seq_len(npars), rep.int(L,npars)) # column index
-        Z <- rep.int(exp(logvals), rep.int(L,npars))   # value
+        ## deriv <- outer(whichvals, seq_len(nknots), "==")
+        Y <- rep.int(seq_len(nknots), rep.int(L,nknots)) # column index
+        Z <- rep.int(exp(logvals), rep.int(L,nknots))   # value
         ##<- 6x faster than rep(..., each=L)
-        #X <- rep.int(whichvals, npars)
+        #X <- rep.int(whichvals, nknots)
         deriv <- (Y == whichvals) * Z
-        dim(deriv) <- c(L, npars)
+        dim(deriv) <- c(L, nknots)
         deriv
     }
 
     Deriv <- function (polydomain, deriv, logvals, type = NULL, npoly = 256) {
         ringAreas <- ringAreas(polydomain, npoly=npoly)
-        exp(logvals) * ringAreas[1L+seq_len(npars)]
+        exp(logvals) * ringAreas[-1L]
     }
 
-    ## simulate <- function (n, logvals, type, ub) {
-    ##     .NotYetImplemented()
-    ## }
+    simulate <- function (n, logvals, type = NULL, ub) {
+        upper <- min(maxRange, ub)
+        knots2upper <- c(knots[knots < upper], upper)
+        heights <- c(1,exp(logvals))[seq_along(knots2upper)]
+        ## first, sample the "rings" of the points
+        rings <- sample.int(length(ringVolumes), size=n, replace=TRUE,
+                            prob=heights*diff.default(c(0,knots2upper^2)))
+        ## sample points from these rings
+        runifdisc(n, knots2upper[rings], c(0,knots2upper)[rings])
+    }
     
     ## Done
     res <- list(f = f, F = F, Fcircle = Fcircle,
                 deriv = deriv, Deriv = Deriv,
-                ## simulate = simulate,
+                simulate = simulate,
                 npars = npars, validpars = validpars)
     attr(res, "knots") <- knots
     attr(res, "maxRange") <- maxRange
