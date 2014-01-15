@@ -96,6 +96,8 @@ export(surveillance.options, reset.surveillance.options)
 export(animate)          # new S3-generic
 export(R0)               # new S3-generic
 export(intensityplot)    # new S3-generic
+export(fixef)            # new S3-generic (same meaning as in package nlme)
+export(ranef)            # new S3-generic (same meaning as in package nlme)
 export(formatPval)       # yapf -- yet another p-value formatter
 export(anscombe.residuals)
 export(magic.dim, primeFactors, bestCombination)   # similar to n2mfrow
@@ -358,13 +360,17 @@ S3method(simHHH, ah)
 
 ### hhh4-specific
 
+## main functions
 export(hhh4) 
 export(addSeason2formula)
-export(zetaweights, powerlaw)
+export(zetaweights, W.powerlaw)
 export(oneStepAhead, scores)
-export(fixef)  # new S3-generic (same meaning as in package nlme)
-export(ranef)  # new S3-generic (same meaning as in package nlme)
 
+## FIXME: functions not yet documented, but used in example(hhh4)
+export(permutationTest)
+export(pit)
+
+## S3-methods
 S3method(print, hhh4)
 S3method(summary, hhh4)
 S3method(print, summary.hhh4)
@@ -399,7 +405,3 @@ S3method(predict, ah4)
 S3method(update, ah4)
 S3method(simulate, ah4)
 S3method(plot, ah4)
-
-## FIXME: functions not yet documented, but used in example(hhh4)
-export(permutationTest)
-export(pit)

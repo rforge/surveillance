@@ -1,5 +1,5 @@
-\name{powerlaw}
-\alias{powerlaw}
+\name{hhh4_W_powerlaw}
+\alias{W.powerlaw}
 \title{
   Power-Law Neighbourhood Weights for \code{hhh4} Models
 }
@@ -13,7 +13,8 @@
 }
 
 \usage{
-powerlaw(maxlag, normalize = TRUE, log = FALSE, initial = if (log) 0 else 1)
+W.powerlaw(maxlag, normalize = TRUE,
+           log = FALSE, initial = if (log) 0 else 1)
 }
 
 \arguments{
@@ -24,14 +25,15 @@ powerlaw(maxlag, normalize = TRUE, log = FALSE, initial = if (log) 0 else 1)
     neighbourhood order in the network of regions.}
   \item{normalize}{logical indicating if the weights should be normalized
     such that the rows of the weight matrix sum to 1.}
-  \item{log}{logical indicating if the decay parameter should be
+  \item{log}{logical indicating if the decay parameter \eqn{d} should be
     estimated on the log-scale to ensure positivity.}
   \item{initial}{scalar initial value for the (log-)decay parameter.}
 }
 
 \value{
   a list which can be passed as a specification of parametric
-  neighbourhood weights in \code{\link{hhh4}}.
+  neighbourhood weights in the \code{control$ne$weights} argument of
+  \code{\link{hhh4}}.
 }
 
 \references{
@@ -63,7 +65,7 @@ if (requireNamespace("spdep")) {
 
   ## a simple hhh4 model with power-law decay of spatial interaction
   m <- list(ar = list(f = ~ 1),
-            ne = list(f = ~ 1, weights = powerlaw(maxlag=4, log=FALSE)),
+            ne = list(f = ~ 1, weights = W.powerlaw(maxlag=4, log=FALSE)),
             end = list(f = addSeason2formula(~-1 + ri(), S=1, period=52),
                        offset = population(measles)),
             family = "NegBin1", verbose=TRUE)

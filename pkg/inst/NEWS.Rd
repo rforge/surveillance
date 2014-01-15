@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-01-14)}{
+\section{Changes in surveillance version 1.8-0 (2014-01-15)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -44,6 +44,12 @@
     \item New spatial interaction functions for \code{twinstim()}
     models: \code{siaf.student()} implements a \eqn{t}-kernel, and
     \code{siaf.step} a step function.
+
+    \item Inference for neighbourhood weights in \code{hhh4()} models:
+    \code{W.powerlaw()} and \code{W.np()} both implement weights
+    depending on the order of neighbourhood between regions, a power-law
+    decay and nonparametric weights (i.e., unconstrained estimation of
+    individual weights for each neighbourhood order).
   }
 }
 
