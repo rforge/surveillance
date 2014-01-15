@@ -364,6 +364,7 @@ S3method(simHHH, ah)
 export(hhh4) 
 export(addSeason2formula)
 export(zetaweights, W.powerlaw)
+export(W.np)
 export(oneStepAhead, scores)
 
 ## FIXME: functions not yet documented, but used in example(hhh4)

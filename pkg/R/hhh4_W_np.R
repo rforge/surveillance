@@ -19,8 +19,10 @@
 ###   and to0 indicates which weight is assumed for orders > maxlag, either zero
 ###   or the same as for order 'maxlag'
 
-W.np <- function (maxlag, to0 = FALSE)
+W.np <- function (maxlag, to0 = FALSE, normalize = FALSE,
+                  initial = log(zetaweights(2:maxlag)))
 {
+    if (normalize) stop("normalization is not implemented yet")
     if (missing(maxlag)) {
         stop("'maxlag' must be specified (usually < max. neighbourhood order)")
     } else stopifnot(isScalar(maxlag), maxlag > 1) # at least one parameter
@@ -70,6 +72,5 @@ W.np <- function (maxlag, to0 = FALSE)
 
     ## Done
     environment(w) <- environment(dw) <- environment(d2w) <- .GlobalEnv
-    list(w = w, dw = dw, d2w = d2w,
-         initial = log(zetaweights(seq.int(2,maxlag))))
+    list(w = w, dw = dw, d2w = d2w, initial = initial)
 }

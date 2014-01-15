@@ -1,12 +1,13 @@
-\name{hhh4_W_powerlaw}
+\name{hhh4_W}
 \alias{W.powerlaw}
+\alias{W.np}
 \title{
-  Power-Law Neighbourhood Weights for \code{hhh4} Models
+  Power-Law and Nonparametric Neighbourhood Weights for \code{hhh4}-Models
 }
 
 \description{
   Set up a power-law weight structure for the neighbourhood
-  component of \code{\link{hhh4}} models, i.e., without normalization
+  component of \code{\link{hhh4}}-models, i.e., without normalization
   we have \eqn{w_{ji} = o_{ji}^{-d}}{w_ji = o_ji^-d}, where
   \eqn{o_{ji}}{o_ji} is the order of neighbourhood between regions
   \eqn{i} and \eqn{j}, see \code{\link{nbOrder}}.
@@ -15,19 +16,32 @@
 \usage{
 W.powerlaw(maxlag, normalize = TRUE,
            log = FALSE, initial = if (log) 0 else 1)
+
+W.np(maxlag, to0 = FALSE, normalize = FALSE,
+     initial = log(zetaweights(2:maxlag)))
 }
 
 \arguments{
-  \item{maxlag}{single integer specifying up to which order of
-    neighbourhood the weights should be positive; they will be set to 0
-    for higher orders. If spatial dependence is not to be truncated at
-    some high order, \code{maxlag} should be set to the maximum
-    neighbourhood order in the network of regions.}
+  \item{maxlag,to0}{a single integer specifying a limiting order of
+    neighbourhood.\cr
+    For \code{W.powerlaw}, weights are positive
+    up to \code{maxlag} and set to 0 for higher orders. If spatial
+    dependence is not to be truncated at some high order, \code{maxlag}
+    should be set to the maximum neighbourhood order in the network of
+    regions.\cr
+    For \code{W.np}, individual weights are estimated up to order
+    \code{maxlag}. Higher orders are either assumed to have 0 weight
+    (\code{to0=TRUE}), or the weight at \code{maxlag} is carried forward
+    (\code{to0=FALSE}, default).
+    Since the first-order weight is fixed to 1 for identifiability,
+    \code{maxlag-1} parameters are to be estimated in this nonparametric
+    specification.
+  }
   \item{normalize}{logical indicating if the weights should be normalized
     such that the rows of the weight matrix sum to 1.}
   \item{log}{logical indicating if the decay parameter \eqn{d} should be
     estimated on the log-scale to ensure positivity.}
-  \item{initial}{scalar initial value for the (log-)decay parameter.}
+  \item{initial}{initial value of the parameter vector.}
 }
 
 \value{
@@ -47,11 +61,12 @@ W.powerlaw(maxlag, normalize = TRUE,
   Sebastian Meyer
 }
 
-\seealso{
+\seealso{  
   \code{\link{nbOrder}} to determine the matrix of neighbourhood orders
   from a binary adjacency matrix.
   
-  \code{\link{siaf.powerlaw}} for modelling power-law distance decay in
+  \code{\link{siaf.powerlaw}}, and \code{\link{siaf.step}} for modelling
+  distance decay as power law or step function in 
   \code{\link{twinstim}} space-time point process models.
 }
 
