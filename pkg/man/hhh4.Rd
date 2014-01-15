@@ -181,12 +181,14 @@ hhh4(stsObj,
   \item{lag}{ specified lag of the autoregression, ATM always \eqn{= 1} }
   \item{nObs}{number of observations used for fitting the model}
   \item{nTime}{ number of time points used for fitting the model }
-  \item{nUnit}{ number of units (e.g. areas) used for fitting the model }
+  \item{nUnit}{ number of units (e.g. areas) used for fitting the model}
+  \item{runtime}{the \code{\link{proc.time}}-queried time taken
+    to fit the model, i.e., a named numeric vector of length 5 of class
+    \code{"proc_time"}}
 }
 
 \details{
-  For further details see \code{vignette("hhh4")} and the
-  references.
+  For further details see \code{vignette("hhh4")} and the references.
 }
 
 \seealso{
@@ -252,8 +254,7 @@ summary(res3, idx2Exp=1:2, amplitudeShift=TRUE)
 res3_tv <- hhh4(measles, control = modifyList(model3,
                 list(ne=list(weights=.neweights))))
 .disregardComponents <- function(obj) {
-    obj["call"] <- list(NULL)
-    obj$control$ne["weights"] <- list(NULL)
+    obj$call <- obj$control$ne$weights <- obj$runtime <- NULL
     obj
 }
 stopifnot(all.equal(.disregardComponents(res3), .disregardComponents(res3_tv)))

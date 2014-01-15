@@ -50,6 +50,8 @@
     depending on the order of neighbourhood between regions, a power-law
     decay and nonparametric weights (i.e., unconstrained estimation of
     individual weights for each neighbourhood order).
+
+    \item \code{hhh4()} now stores the runtime just like \code{twinstim()}.
   }
 }
 

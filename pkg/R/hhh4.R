@@ -58,6 +58,8 @@ CONTROL.hhh4 <- alist(
 
 hhh4 <- function (stsObj, control, check.analyticals = FALSE)
 {
+  ptm <- proc.time()
+  
   ## Convert old disProg class to new sts class
   if(inherits(stsObj, "disProg")) stsObj <- disProg2sts(stsObj)
   
@@ -165,8 +167,9 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
                  terms=if(control$keep.terms) model else NULL,
                  stsObj=stsObj,
                  lag=1, nObs=sum(!model$isNA[control$subset,]),
-                 nTime=length(model$subset), nUnit=ncol(stsObj))
-       ## FIXME: nTime has a different meaning here than everywhere else!!!
+                 nTime=length(model$subset), nUnit=ncol(stsObj),
+                 ## FIXME: nTime has a different meaning here than everywhere else!!!
+                 runtime=proc.time()-ptm)
   class(result) <- "hhh4"
   result
 }

@@ -322,9 +322,10 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     is thus retained in the workspace if \code{model=TRUE}.
   }
   \item{call}{the matched call.}
-  \item{runtime}{contains the \code{\link{proc.time}}-queried time taken
-    to fit the model, i.e. a named numeric vector of length 5, with
-    the number of \code{cores} set as additional attribute.}
+  \item{runtime}{the \code{\link{proc.time}}-queried time taken
+    to fit the model, i.e., a named numeric vector of length 5 of class
+    \code{"proc_time"}, with the number of \code{cores} set as
+    additional attribute.}
 
   If \code{model=TRUE}, the model evaluation environment is assigned to
   this list and can thus be queried by calling \code{environment()} on

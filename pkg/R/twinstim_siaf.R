@@ -207,7 +207,7 @@ checksiaf <- function (siaf, pargrid, type = 1, method = "SV", tolerance = 1e-5)
 
 checksiaf.F <- function (F, f, pargrid, type=1, method="SV", ...)
 {
-    letterR <- NULL                     # to make codetools::checkUsage() happy
+    letterR <- "cheating on codetools::checkUsage"
     data("letterR", package="spatstat", envir=environment())
     poly <- shift.owin(letterR, -c(3,2))
     res <- t(apply(pargrid, 1, function (pars) {
@@ -245,7 +245,7 @@ checksiaf.deriv <- function (deriv, f, pargrid, type=1, rmax=100)
 
 checksiaf.Deriv <- function (Deriv, deriv, pargrid, type=1, method="SV", ...)
 {
-    letterR <- NULL                     # to make codetools::checkUsage() happy
+    letterR <- "cheating on codetools::checkUsage"
     data("letterR", package="spatstat", envir=environment())
     poly <- shift.owin(letterR, -c(3,2))
     res <- t(apply(pargrid, 1, function (pars) {
