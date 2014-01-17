@@ -37,7 +37,7 @@ zetaweights <- function (nbmat, d = 1, maxlag = max(nbmat), normalize = FALSE)
     dimnames(wji) <- dimnames(nbmat)
 
     if (normalize) { # normalize such that each row sums to 1
-        wji / .rowSums(wji, dimW[1], dimW[2])
+        wji / .rowSums(wji, dimW[1L], dimW[2L])
     } else wji
 }
 
@@ -111,7 +111,7 @@ W.powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
                     ))
             } else expression(deriv <- W * logo^2),
             if (log) c(
-                do.call("substitute", list(deriv1[[1]], list(deriv=as.name("deriv1")))),
+                do.call("substitute", list(deriv1[[1L]], list(deriv=as.name("deriv1")))),
                 expression(deriv <- deriv * d^2 + deriv1 * d) # this is the non-log d
                 ),
             footer

@@ -6,7 +6,7 @@
 ### hhh4 is an extended version of algo.hhh for the sts-class
 ### The function allows the incorporation of random effects and covariates.
 ###
-### Copyright (C) 2010-2013 Michaela Paul and Sebastian Meyer
+### Copyright (C) 2010-2014 Michaela Paul and Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -2116,8 +2116,10 @@ addSeason2formula <- function(f=~1,       # formula to start with
 ## a given model (the result of interpretControl(control, stsObj))
 ## and given parameters theta (regression par.) and sd.corr (variance par.).
 ## This is a wrapper around functionality of the numDeriv and maxLik packages.
-checkAnalyticals <- function (model, theta, sd.corr,
-                              methods=c("numDeriv","maxLik"))
+checkAnalyticals <- function (model,
+                              theta = model$initialTheta,
+                              sd.corr = model$initialSigma,
+                              methods = c("numDeriv","maxLik"))
 {
     cat("\nPenalized log-likelihood:\n")
     resCheckPen <- sapply(methods, function(derivMethod) {

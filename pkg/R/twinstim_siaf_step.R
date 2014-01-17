@@ -14,7 +14,7 @@
 siaf.step <- function (knots, maxRange = Inf, nTypes = 1, validpars = NULL)
 {
     knots <- sort(unique(as.vector(knots,mode="numeric")))
-    stopifnot(isScalar(maxRange), knots > 0, maxRange > knots)
+    stopifnot(knots > 0, is.finite(knots), isScalar(maxRange), maxRange > knots)
     nknots <- length(knots)             # = number of parameters (per type)
     allknots <- c(0, knots, unique(c(maxRange,Inf)))
     allknotsPos <- c(0,knots,maxRange)  # pos. domain, =allknots if maxRange=Inf

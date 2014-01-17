@@ -1,6 +1,7 @@
 \encoding{latin1}
 \name{twinstim_iaf}
 \alias{siaf.constant}
+\alias{siaf.step}
 \alias{siaf.gaussian}
 \alias{siaf.powerlaw}
 \alias{siaf.powerlawL}
@@ -20,13 +21,14 @@
   distance from the source of infection.
   It is of course possible to define own functions (see
   \code{\link{siaf}} and \code{\link{tiaf}}, respectively), but the
-  package also predefines some useful dispersal kernels returned by the
-  constructor functions documented here.
+  package already predefines some useful dispersal kernels returned by
+  the constructor functions documented here.
 }
 
 \usage{
 # predefined spatial interaction functions
 siaf.constant()
+siaf.step(knots, maxRange = Inf, nTypes = 1, validpars = NULL)
 siaf.gaussian(nTypes = 1, logsd = TRUE, density = FALSE,
               F.adaptive = TRUE, effRangeMult = 6, validpars = NULL)
 siaf.powerlaw(nTypes = 1, validpars = NULL)
@@ -39,6 +41,21 @@ tiaf.exponential(nTypes = 1)
 }
 
 \arguments{
+  \item{knots}{numeric vector of distances at which the step function
+    switches to a new height. The length of this vector determines the
+    number of parameters to estimate. For identifiability, the step
+    function has height 1 in the first interval \eqn{[0,knots_1)}. Note
+    that the implementation is right-continuous, i.e., intervals are
+    \eqn{[a,b)}.}
+  \item{maxRange}{a scalar larger than any of \code{knots}.
+    Per default (\code{maxRange=Inf}), the step function
+    never drops to 0 but keeps the last height for any distance larger
+    than the last knot. However, this might not work in some cases,
+    where the last parameter value would become very small and lead to
+    numerical problems. It is then possible to truncate spatial
+    interaction at a distance \code{maxRange} (just like what the
+    variable \code{eps.s} does in the \code{"\link{epidataCS}"}
+    object).}
   \item{nTypes}{
     determines the number of parameters ((log-)scales or (log-)shapes)
     of the kernels. In a multitype epidemic, the different types may
@@ -46,9 +63,8 @@ tiaf.exponential(nTypes = 1)
     \code{nTypes=1}. Otherwise \code{nTypes} should equal the number of
     event types of the epidemic, in which case every type has its own
     (log-)scale or (log-)shape, respectively.\cr
-    Currently, the constructor function for the power-law kernels
-    \code{siaf.powerlaw}, \code{siaf.powerlawL}, and \code{siaf.student},
-    respectively, only allows a type-invariant kernel (\code{nTypes=1}).
+    Currently, \code{nTypes > 1} is only implemented for
+    \code{siaf.gaussian} and \code{tiaf.exponential}.
   }
   \item{logsd}{
     logical indicating if the kernel should be parametrized
@@ -105,6 +121,22 @@ tiaf.exponential(nTypes = 1)
   \describe{
     \item{\code{siaf.constant}:}{
       \eqn{f(s) = 1}
+    }
+    \item{\code{siaf.step}:}{
+      \eqn{f(s) = \sum_{k=0}^K \alpha_k I_k(||s||)},\cr
+      where \eqn{\alpha_0 = 1}, and \eqn{\alpha_1, \dots, \alpha_K} are
+      the parameters (heights) to estimate. \eqn{I_k(||s||)} indicates
+      if distance \eqn{||s||} belongs to the \eqn{k}th interval
+      according to \code{c(0,knots,maxRange)}, where \eqn{k=0} indicates
+      the interval \code{c(0,knots[1])}.\cr
+      Note that \code{siaf.step} makes use of the \pkg{memoise} package
+      if it is available -- and that is highly recommended to speed up
+      calculations. Specifically, the areas of the intersection of a
+      polygonal domain (influence region) with the \dQuote{rings} of the
+      two-dimensional step function will be cached such that they are
+      only calculated once for every \code{polydomain} (in the first
+      iteration of the \code{twinstim} optimization). They are used in
+      the integration components \code{F} and \code{Deriv}.
     }
     \item{\code{siaf.gaussian}:}{
       \eqn{f(s|\kappa) = \exp(-||s||/2/\sigma_\kappa^2)}\cr
@@ -212,6 +244,9 @@ siaf.powerlawL()
 
 # (reparametrized) t-kernel
 siaf.student()
+
+# step function kernel
+siaf.step(c(10,20,50), maxRange=100)
 }
 
 \keyword{models}
