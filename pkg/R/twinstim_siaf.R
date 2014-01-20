@@ -107,7 +107,7 @@ siaf.constant <- function ()
 
 
 ##########################################
-### naive defaults for the siaf primitives
+### Naive defaults for the siaf primitives
 ##########################################
 
 ## numerical integration of f over a polygonal domain (single "owin" and type)
@@ -128,6 +128,47 @@ siaf.fallback.Deriv <- function (polydomain, deriv, pars, type,
     intderiv1 <- function (paridx)
         polyCub(polydomain, deriv1, method, paridx=paridx, ...)
     sapply(seq_along(pars), intderiv1)
+}
+
+
+
+####################################
+### Simulation via polar coordinates (used, e.g., for siaf.powerlaw)
+####################################
+
+## Simulate from an isotropic spatial interaction function
+## f_{2D}(s) \propto f(||s||), ||s|| <= ub.
+## within a maximum distance 'ub' via polar coordinates and the inverse
+## transformation method:
+## p_{2D}(r,theta) = r * f_{2D}(x,y) \propto r*f(r)
+## => angle theta ~ U(0,2*pi) and sample r according to r*f(r)
+siaf.simulatePC <- function (intrfr)    # e.g., intrfr.powerlaw
+{
+    as.function(c(alist(n=, siafpars=, type=, ub=), substitute({
+        ## Note: in simEpidataCS, simulation is always bounded to eps.s and to
+        ## the largest extend of W, thus, 'ub' is finite
+        stopifnot(is.finite(ub))
+
+        ## Normalizing constant of r*f(r) on [0;ub]
+        normconst <- intrfr(ub, siafpars, type)
+
+        ## => cumulative distribution function
+        CDF <- function (q) intrfr(q, siafpars, type) / normconst
+
+        ## For inversion sampling, we need the quantile function CDF^-1
+        ## However, this is not available in closed form, so we use uniroot
+        ## (which requires a finite upper bound)
+        QF <- function (p) uniroot(function(q) CDF(q)-p, lower=0, upper=ub)$root
+
+        ## Now sample r as QF(U), where U ~ U(0,1)
+        r <- sapply(runif(n), QF)
+        ## Check simulation of r via kernel estimate:
+        ## plot(density(r, from=0, to=ub)); curve(p(x)/normconst,add=TRUE,col=2)
+        
+        ## now rotate each point by a random angle to cover all directions
+        theta <- stats::runif(n, 0, 2*pi)
+        r * cbind(cos(theta), sin(theta))
+    })), envir=parent.frame())
 }
 
 

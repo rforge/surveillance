@@ -8,7 +8,7 @@
 ### the Cauchy density with scale sigma; in Geostatistics, a correlation
 ### function of this kind is known as the Cauchy model.
 ###
-### Copyright (C) 2013 Sebastian Meyer
+### Copyright (C) 2013-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -40,13 +40,12 @@ siaf.student <- function (nTypes = 1, validpars = NULL)
 
     ## numerically integrate f over a polygonal domain
     F <- function (polydomain, f, logpars, type = NULL, ...)
-        .polyCub.iso(polydomain$bdry, intrfr.student,
-                     exp(logpars[[1L]]), exp(logpars[[2L]]),
+        .polyCub.iso(polydomain$bdry, intrfr.student, logpars, #type,
                      center=c(0,0), control=list(...))
     
     ## fast integration of f over a circular domain
     ## is not relevant for this heavy-tail kernel since we don't use
-    ## effRange, and usually eps.s=Inf
+    ## 'effRange', and usually eps.s=Inf
     ##Fcircle <- function (r, logpars, type = NULL) {}
 
     ## derivative of f wrt logpars
@@ -66,54 +65,16 @@ siaf.student <- function (nTypes = 1, validpars = NULL)
     Deriv <- function (polydomain, deriv, logpars, type = NULL, ...)
     {
         res.logsigma <- .polyCub.iso(polydomain$bdry,
-                                     intrfr.student.dlogsigma,
-                                     exp(logpars[[1L]]), exp(logpars[[2L]]),
+                                     intrfr.student.dlogsigma, logpars, #type,
                                      center=c(0,0), control=list(...))
         res.logd <- .polyCub.iso(polydomain$bdry,
-                                 intrfr.student.dlogd,
-                                 exp(logpars[[1L]]), exp(logpars[[2L]]),
+                                 intrfr.student.dlogd, logpars, #type,
                                  center=c(0,0), control=list(...))
         c(res.logsigma, res.logd)
     }
 
-    ## simulate from the power-law kernel (within a maximum distance 'ub')
-    ## Sampling from f_{2D}(s) \propto f(||s||), truncated to ||s|| <= ub,
-    ## works via polar coordinates and the inverse transformation method:
-    ## p_{2D}(r,theta) = r * f_{2D}(x,y) \propto r*f(r)
-    ## => sample angle theta from U(0,2*pi) and r according to r*f(r)
-    simulate <- function (n, logpars, type, ub)
-    {
-        ## Note: in simEpidataCS, simulation is always bounded to eps.s and to
-        ## the largest extend of W, thus, 'ub' is finite
-        stopifnot(is.finite(ub))
-        sigma <- exp(logpars[[1L]])
-        d <- exp(logpars[[2L]])
-
-        ## Normalizing constant of r*f(r) on [0;ub]
-        normconst <- intrfr.student(ub, sigma, d)
-        ## normconst <- if (is.finite(ub)) intrfr.student(ub, sigma, d) else {
-        ##     ## for sampling on [0;Inf] the density is only proper if d > 1
-        ##     if (d <= 1) stop("improper density for d<=1, 'ub' must be finite")
-        ##     sigma^(2-2*d) / (2*d-2) # = intrfr.student(Inf, sigma, d)
-        ## }
-
-        ## => cumulative distribution function
-        CDF <- function (q) intrfr.student(q, sigma, d) / normconst
-
-        ## For inversion sampling, we need the quantile function CDF^-1
-        ## However, this is not available in closed form, so we use uniroot,
-        ## which requires a finite upper bound!
-        QF <- function (p) uniroot(function(q) CDF(q)-p, lower=0, upper=ub)$root
-
-        ## Now sample r as QF(U), where U ~ U(0,1)
-        r <- sapply(runif(n), QF)
-        ## Check simulation via kernel estimate:
-        ## plot(density(r, from=0, to=ub)); curve(p(x) / normconst, add=TRUE, col=2)
-        
-        ## now rotate each point by a random angle to cover all directions
-        theta <- stats::runif(n, 0, 2*pi)
-        r * cbind(cos(theta), sin(theta))
-    }
+    ## simulation from the kernel
+    simulate <- siaf.simulatePC(intrfr.student)
 
     ## set function environments to the global environment
     environment(f) <-  environment(deriv) <- .GlobalEnv
@@ -128,8 +89,10 @@ siaf.student <- function (nTypes = 1, validpars = NULL)
 
 
 ## integrate x*f(x) from 0 to R (vectorized)
-intrfr.student <- function (R, sigma, d)
+intrfr.student <- function (R, logpars, types = NULL)
 {
+    sigma <- exp(logpars[[1L]])
+    d <- exp(logpars[[2L]])
     if (d == 1) {
         log(R^2+sigma^2) / 2 - log(sigma)
     } else {
@@ -138,12 +101,18 @@ intrfr.student <- function (R, sigma, d)
 }
 
 ## integrate x * (df(x)/dlogsigma) from 0 to R (vectorized)
-intrfr.student.dlogsigma <- function (R, sigma, d)
+intrfr.student.dlogsigma <- function (R, logpars, types = NULL)
+{
+    sigma <- exp(logpars[[1L]])
+    d <- exp(logpars[[2L]])
     sigma^2 * ( (R^2+sigma^2)^-d - sigma^(-2*d) )
+}
 
 ## integrate x * (df(x)/dlogd) from 0 to R (vectorized)
-intrfr.student.dlogd <- function (R, sigma, d)
+intrfr.student.dlogd <- function (R, logpars, types = NULL)
 {
+    sigma <- exp(logpars[[1L]])
+    d <- exp(logpars[[2L]])
     if (d == 1) {
         log(sigma)^2 - log(R^2+sigma^2)^2 / 4
     } else { # thanks to Maple 17
