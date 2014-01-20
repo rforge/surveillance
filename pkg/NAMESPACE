@@ -262,10 +262,11 @@ export(intensityplot.simEpidata)        # for convenience
 export(as.epidataCS)
 export(twinstim)
 export(simEpidataCS)
-export(siaf.constant, siaf.step,
+export(siaf,
+       siaf.constant, siaf.step,
        siaf.gaussian,
        siaf.powerlaw, siaf.powerlawL, siaf.student)
-export(tiaf.constant, tiaf.exponential)
+export(tiaf, tiaf.constant, tiaf.exponential)
 export(epidataCS2sts)
 
 S3method(nobs, epidataCS)

@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-01-15)}{
+\section{Changes in surveillance version 1.8-0 (2014-01-20)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -45,13 +45,19 @@
     models: \code{siaf.student()} implements a \eqn{t}-kernel, and
     \code{siaf.step} a step function.
 
+    \item \code{siaf.powerlaw()}'s integration over polygonal domains in
+    the \code{F} and \code{Deriv} components is much faster and more
+    accurate now since it partially uses analytic expressions
+    (with \code{polyCub.iso()}) instead of \code{polyCub.SV()}.
+
     \item Inference for neighbourhood weights in \code{hhh4()} models:
     \code{W.powerlaw()} and \code{W.np()} both implement weights
     depending on the order of neighbourhood between regions, a power-law
     decay and nonparametric weights (i.e., unconstrained estimation of
     individual weights for each neighbourhood order).
 
-    \item \code{hhh4()} now stores the runtime just like \code{twinstim()}.
+    \item \code{hhh4()} now stores the runtime just like
+    \code{twinstim()}.
   }
 }
 
