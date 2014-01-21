@@ -180,17 +180,17 @@ farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
     
     if (is.null(control[["thresholdMethod",exact=TRUE]]))
     { control$thresholdMethod="delta"}
-    thresholdMethod<- match.arg(control$thresholdMethod, c("delta","nbPlugin","pban"),several.ok=FALSE)
+    thresholdMethod<- match.arg(control$thresholdMethod, c("delta","nbPlugin","muan"),several.ok=FALSE)
 	
     # Adapt the argument for the glm function
-	control$typePred <- switch(thresholdMethod, "delta"="response","nbPlugin"="link","pban"="link")
+	control$typePred <- switch(thresholdMethod, "delta"="response","nbPlugin"="link","muan"="link")
 
 
      # Which threshold function?
 	 control$thresholdFunction <- switch(thresholdMethod, 
 	                                     "delta"="algo.farrington.threshold.farrington",
 										 "nbPlugin"="algo.farrington.threshold.noufaily",
-										 "pban"="algo.farrington.threshold.noufaily")
+										 "muan"="algo.farrington.threshold.noufaily")
 
     ######################################################################
     # Check options
@@ -681,7 +681,7 @@ algo.farrington.threshold.noufaily <- function(predFit,predSeFit,phi,
 	if (mu0Quantile==Inf){
 		lu <- c(NA,NA)
 		q <- NA
-	# else is when the method is "pban"
+	# else is when the method is "muan"
 	} else{
 		# Two cases depending on phi value
 		if (phi>1){
