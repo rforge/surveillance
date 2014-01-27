@@ -49,17 +49,14 @@ siaf.student <- function (nTypes = 1, validpars = NULL)
     ##Fcircle <- function (r, logpars, type = NULL) {}
 
     ## derivative of f wrt logpars
-    deriv <- function (s, logpars, types = NULL) {}
-    body(deriv) <- as.call(c(as.name("{"),
-        tmp,
-        expression(
-            s2 <- .rowSums(s^2, nrow(s), 2L),
-            s2sigma2d <- (s2+sigma^2)^d,
-            derivlogsigma <- -2*d*sigma^2 / s2sigma2d / (s2+sigma^2),
-            derivlogd <- -log(s2sigma2d) / s2sigma2d,
-            cbind(derivlogsigma, derivlogd)
-            )
-    ))
+    deriv <- f
+    body(deriv)[[length(body(deriv))]] <- # assignment for return value of f
+        substitute(fvals <- x, list(x=body(deriv)[[length(body(deriv))]]))
+    body(deriv) <- as.call(c(as.list(body(deriv)), expression(
+        derivlogsigma <- -2*d*sigma^2 * fvals / (s2+sigma^2),
+        derivlogd <- log(fvals) * fvals,
+        cbind(derivlogsigma, derivlogd, deparse.level = 0)
+        )))
 
     ## Numerical integration of 'deriv' over a polygonal domain
     Deriv <- function (polydomain, deriv, logpars, type = NULL, ...)
