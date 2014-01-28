@@ -281,6 +281,10 @@ control2nlminb <- function (control, defaults)
         do.call(paste(type, "constant", sep="."), args=alist())
     } else if (is.list(iaf)) {
         ret <- do.call(type, args = iaf)
+        ## keep special attributes
+        attr(ret, "knots") <- attr(iaf, "knots")
+        attr(ret, "maxRange") <- attr(iaf, "maxRange")
+        ## indicate if this is a constant iaf
         attr(ret, "constant") <- isTRUE(attr(iaf, "constant"))
         ret
     } else if (is.vector(iaf, mode = "numeric")) {
