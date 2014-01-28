@@ -10,7 +10,7 @@
 \format{
   A \code{sts} object. 
 }
-\source{}
+%\source{}
 \examples{
 data(salmHospitalized)
 }

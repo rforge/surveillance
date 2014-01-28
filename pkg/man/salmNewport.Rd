@@ -1,5 +1,5 @@
 \name{salmNewport}
-\alias{salmNewpora}
+\alias{salmNewport}
 \docType{data}
 \title{Salmonella Newport cases in Germany 2004-2013}
 \description{
