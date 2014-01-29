@@ -49,7 +49,9 @@ siaf.powerlaw <- function (nTypes = 1, validpars = NULL)
         expression(
             fofr <- (r+sigma)^-d,
             fof0 <- sigma^-d,
-            basevolume <- pi * r^2 * fofr, # cylinder volume up to height f(r)
+            ## calculate cylinder volume up to height f(r)
+            basevolume <- if (is.infinite(r)) 0 else pi * r^2 * fofr,
+            ## r=Inf is used in R0(,trimmed=F), Fcircle(Inf) is finite if d>2
             Ifinvsq <- function (z) {
                 if (d == 1) {
                     -1/z - 2*sigma*log(z) + sigma^2*z
