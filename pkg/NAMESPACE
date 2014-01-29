@@ -146,6 +146,7 @@ exportClasses(sts, stsBP)
 
 # generics for sts class defined in sts.R
 exportMethods("[", plot)
+exportMethods(toLatex)
 exportMethods(nrow, ncol, dim, colnames, epochInYear, year)
 exportMethods(aggregate)
 exportMethods(as.data.frame)
