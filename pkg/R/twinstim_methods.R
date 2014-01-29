@@ -873,11 +873,6 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, ...)
         
     } else {                     # untrimmed R0 for original events or newevents
 
-        if (any(is.infinite(eps.t), is.infinite(eps.s))) {
-            message("infinite interaction ranges yield infinite R0 values ",
-                    "because 'trimmed = FALSE'")
-        }
-        
         ## integrals of interaction functions for all combinations of type and
         ## eps.s/eps.t in newevents
         typeTcombis <- expand.grid(type=types, eps.t=unique(eps.t),
@@ -908,6 +903,12 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, ...)
 
         siafInt <- typeScombis$fInt[eventscombiidxS]
         tiafInt <- typeTcombis$gInt[eventscombiidxT]
+
+        if (any(is.infinite(eps.t) & !is.finite(tiafInt),
+                is.infinite(eps.s) & !is.finite(siafInt))) {
+            message("infinite interaction ranges yield non-finite R0 values ",
+                    "because 'trimmed = FALSE'")
+        }
         
     }
 
