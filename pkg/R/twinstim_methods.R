@@ -605,7 +605,7 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
     pars <- c(gamma0, iafpars)
     ## type of confidence band
     force(conf.type)                    # per default depends on 'pars'
-    if (length(pars) == 0 || any(is.na(conf.type)) || is.null(conf.type)) {
+    if (length(pars) == 0 || is.na(conf.type) || is.null(conf.type)) {
         conf.type <- "none"
     }
     conf.type <- match.arg(conf.type,
@@ -679,8 +679,10 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
             do.call("expand.grid", as.data.frame(t(cis)))
         }, bootstrap = {
             ## bootstrapping parameter values
-            rbind(pars, mvrnorm(conf.B, mu=pars,
-                                Sigma=vcov(object)[idxpars,idxpars,drop=FALSE]))
+            rbind(pars,
+                  mvrnorm(conf.B, mu=pars,
+                          Sigma=vcov(object)[idxpars,idxpars,drop=FALSE]),
+                  deparse.level=0)
         })
         
         ## add confidence limits
@@ -705,8 +707,9 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
                 }
             }
             if (!is.null(lowerupper)) {
-                matlines(x=xgrid, y=lowerupper, type="l", lty=lty[2],
-                         col=col.conf[i], lwd=lwd[2])
+                atn <- if(length(types)==1) "CI" else paste0("CI.",typeNames[i])
+                matlines(x=xgrid, y=attr(res, atn) <- lowerupper,
+                         type="l", lty=lty[2], col=col.conf[i], lwd=lwd[2])
             }
         }
         

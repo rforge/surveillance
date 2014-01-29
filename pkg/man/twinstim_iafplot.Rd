@@ -42,22 +42,26 @@ iafplot(object, which = c("siaf", "tiaf"),
     different models.
   }
   \item{conf.type}{
-    type of confidence interval to produce. If \code{"bootstrap"},
-    \code{conf.B} parameter values (vectors) are sampled from the
-    asymptotic (multivariate) normal distribution of the ML estimate(s) of the
-    interaction function parameters; the interaction function is then
-    evaluated on the \code{xgrid} (i.e. temporal or
-    spatial distances from the host) for each parameter realization to
-    obtain a \code{conf.level} confidence interval at each point of the
-    \code{xgrid}. 
-    If \code{"parbounds"}, the \code{conf.level} Wald confidence
+    type of confidence interval to produce.\cr
+    If \code{conf.type="bootstrap"}, \code{conf.B} parameter values
+    (vectors) are sampled from the asymptotic (multivariate) normal
+    distribution of the ML estimate(s) of the interaction function
+    parameters; the interaction function is then evaluated on the
+    \code{xgrid} (i.e. temporal or spatial distances from the host) for
+    each parameter realization to obtain a \code{conf.level} confidence
+    interval at each point of the \code{xgrid} (or to plot the
+    interaction functions of all bootstrap samples if
+    \code{conf.level=NA}).\cr 
+    If \code{conf.type="parbounds"}, the \code{conf.level} Wald confidence
     intervals for the interaction function parameters are calculated and
     the interaction function is evaluated on the \code{xgrid}
     (distances from the host) for all combinations of the bounds
     of the parameters and the point-wise extremes of those functions are
     plotted. This type of confidence interval is actually only valid in
     the case of only one interaction function parameter, but could also
-    be used as a rough indication if bootstrapping takes too long.
+    be used as a rough indication if bootstrapping takes too long.\cr
+    If \code{conf.type="none"} or \code{NA} or \code{NULL}, no
+    confidence interval will be calculated.
   }
   \item{conf.level}{
     the confidence level required. For \code{conf.type = "bootstrap"} it
@@ -122,6 +126,13 @@ iafplot(object, which = c("siaf", "tiaf"),
   column of the matrix contains the distance \eqn{x}, and the remaining
   \code{length(types)} columns contain the (scaled) function values for
   each type.
+  
+  The pointwise confidence intervals of the interaction functions are
+  returned in similar matrices as attributes: if
+  \code{length(types)==1}, there is a single attribute \code{"CI"},
+  whereas for multiple types, the attributes are named
+  \code{paste0("CI.",typeNames)} (where the \code{typeNames} are
+  retrieved from \code{object$qmatrix}).
 }
 
 \references{
