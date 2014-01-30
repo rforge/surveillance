@@ -94,13 +94,17 @@ iafplot(object, which = c("siaf", "tiaf"),
   }
   \item{xlim, ylim}{
     vectors of length two containing the x- and y-axis limit of the
-    plot. The default y-axis ranges from 0 to 1 (or to
+    plot. The default y-axis range (\code{ylim=NULL}) is from 0 to 1 (or to
     \eqn{exp(\gamma_0)}, if \code{scaled}).
-    The default x-axis ranges from 0 to the length of the
-    observation period (\code{which="tiaf"}) or the length of the
-    diagonale of the bounding box of the observation region
-    (\code{which="siaf"}), respectively, or to the maximum of
-    \code{xgrid} if given as a vector of evaluation points.
+    The default x-axis (\code{xlim=NULL}) starts at 0, and the upper
+    limit is determined as follows:  if \code{xgrid} is given as a
+    vector of evaluation points \code{xlim[2]} is set to
+    \code{max(xgrid)}. Otherwise, it is set to the length of the
+    observation period (\code{which="tiaf"}) or the diagonale length of
+    the bounding box of the observation region (\code{which="siaf"}),
+    respectively. However, if the model environment is stored in
+    \code{object}, it is set to the unique finite value of 
+    \code{eps.t}/\code{eps.s} if that exists.
   }
   \item{add}{
     add to an existing plot?

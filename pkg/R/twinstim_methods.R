@@ -622,12 +622,19 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
     
     ## grid of x-values (t or ||s||) on which FUN will be evaluated
     if (is.null(xlim)) {
+        modelenv <- environment(object)
         xmax <- if (add) {
             par("usr")[2] / (if (par("xaxs")=="r") 1.04 else 1)
         } else if (which == "siaf") {
-            sqrt(sum((object$bbox[,"max"] - object$bbox[,"min"])^2))
+            if (!is.null(unique.eps.s <- unique(modelenv$eps.s)) &&
+                length(unique.eps.s) == 1 && is.finite(unique.eps.s)) {
+                unique.eps.s
+            } else sqrt(sum((object$bbox[,"max"] - object$bbox[,"min"])^2))
         } else {
-            diff(object$timeRange)
+            if (!is.null(unique.eps.t <- unique(modelenv$eps.t)) &&
+                length(unique.eps.t) == 1 && is.finite(unique.eps.t)) {
+                unique.eps.t
+            } else diff(object$timeRange)
         }
         xlim <- c(0, xmax)
     }
