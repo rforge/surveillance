@@ -1047,7 +1047,7 @@ setAs(from="sts", to="ts", def = function (from)
 
  
 ################
-toLatex.sts <- function(object, caption = "", labels = NULL,
+toLatex.sts <- function(object, caption = "",label=" ", labels = NULL,
                         subset = NULL, 
                         alarmPrefix = "\\textbf{\\textcolor{red}{",
                         alarmSuffix = "}}", ubColumnLabel = "UB", ...) {
@@ -1101,6 +1101,7 @@ toLatex.sts <- function(object, caption = "", labels = NULL,
     tableLabels <- labels
   
   tableCaption <- caption
+  tableLabel <- label
   
   epochAsDate <- baseSts@epochAsDate
   epochStr <- switch( as.character(baseSts@freq), 
@@ -1198,7 +1199,7 @@ toLatex.sts <- function(object, caption = "", labels = NULL,
   # prepare everything for xtable
   newColNames <- c(colnames(dataTable)[1:noCols], tableLabelsWithUB)
   colnames(dataTable) <- newColNames
-  xDataTable <- xtable(dataTable, caption = tableCaption, digits = c(0))
+  xDataTable <- xtable(dataTable, label = tableLabel, caption = tableCaption, digits = c(0))
   toLatex(xDataTable, ...) 
 }
 ####################
