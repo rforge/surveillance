@@ -16,6 +16,7 @@
 \arguments{
 \item{stsObjects}{A list of sts objects; must not be NULL or empty.}
 \item{caption}{A caption for the table. Default is the empty string.}
+\item{label}{A label for the table. Default is the empty string.}
 \item{labels}{A list of labels for each sts object. E.g. subtypes of a pathogen. Default is NULL}
 \item{subset}{A range of values which should be displayed. If Null, then all data in the sts objects will be displayed. Else only a subset of 
 data. Therefore range needs to be a numerical vector of indexes from 1 to length(@observed).}
