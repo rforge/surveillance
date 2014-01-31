@@ -44,7 +44,7 @@ twinstim <- function (
     ##            })
     ## }
     
-    # Clean the model environment when exiting the function
+    ## Clean the model environment when exiting the function
     on.exit(suppressWarnings(rm(cl, cumCIF, cumCIF.pb, data, doHessian,
         eventDists, eventsData, finetune, neghess, fisherinfo, fit, fixed,
         functions, globalEndemicIntercept, h.Intercept, inmfe, initpars,
@@ -57,6 +57,10 @@ twinstim <- function (
         partialloglik, ptm, qmatrix, res, negsc, score, start, subset, tmpexpr,
         typeSpecificEndemicIntercept, useScore, verbose, whichfixed, 
         inherits = FALSE)))
+    
+    ## also set fixed[st]iafpars to FALSE (for free posteriori evaluations, and
+    ## to be defined for score function evaluation with optim.args=NULL)
+    on.exit(fixedsiafpars <- fixedtiafpars <- FALSE, add = TRUE)
 
 
     ### Verify that 'data' inherits from "epidataCS"
@@ -981,9 +985,6 @@ twinstim <- function (
     fixed[whichfixed] <- TRUE
     fixedsiafpars <- hassiafpars && all(fixed[paste("e.siaf", 1:nsiafpars, sep=".")])
     fixedtiafpars <- hastiafpars && all(fixed[paste("e.tiaf", 1:ntiafpars, sep=".")])
-
-    ## in the end, we set fixed[st]iafpars to FALSE (for free posteriori evaluations)
-    on.exit(fixedsiafpars <- fixedtiafpars <- FALSE, add = TRUE)
 
 
     ### Define negative log-likelihood (score, hessian) for minimization
