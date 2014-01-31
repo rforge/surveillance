@@ -7,6 +7,7 @@
 \alias{siaf.powerlawL}
 \alias{siaf.student}
 \alias{tiaf.constant}
+\alias{tiaf.step}
 \alias{tiaf.exponential}
 
 \title{
@@ -37,6 +38,7 @@ siaf.student(nTypes = 1, validpars = NULL)
 
 # predefined temporal interaction functions
 tiaf.constant()
+tiaf.step(knots, maxRange = Inf, nTypes = 1, validpars = NULL)
 tiaf.exponential(nTypes = 1, validpars = NULL)
 }
 
@@ -52,10 +54,10 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
     never drops to 0 but keeps the last height for any distance larger
     than the last knot. However, this might not work in some cases,
     where the last parameter value would become very small and lead to
-    numerical problems. It is then possible to truncate spatial
+    numerical problems. It is then possible to truncate
     interaction at a distance \code{maxRange} (just like what the
-    variable \code{eps.s} does in the \code{"\link{epidataCS}"}
-    object).}
+    variables \code{eps.s} and \code{eps.t} do in the
+    \code{"\link{epidataCS}"} object).}
   \item{nTypes}{
     determines the number of parameters ((log-)scales or (log-)shapes)
     of the kernels. In a multitype epidemic, the different types may
@@ -64,7 +66,7 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
     event types of the epidemic, in which case every type has its own
     (log-)scale or (log-)shape, respectively.\cr
     Currently, \code{nTypes > 1} is only implemented for
-    \code{siaf.gaussian} and \code{tiaf.exponential}.
+    \code{siaf.gaussian}, \code{tiaf.step}, and \code{tiaf.exponential}.
   }
   \item{logsd}{
     logical indicating if the kernel should be parametrized
@@ -179,10 +181,18 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
     }
   }
   
-  Furthermore, there are two predefined temporal interaction functions:
+  The predefined temporal interaction functions are defined as follows:
   \describe{
     \item{\code{tiaf.constant}:}{
       \eqn{g(t) = 1}
+    }
+    \item{\code{tiaf.step}:}{
+      \eqn{g(t) = \sum_{k=0}^K \alpha_k I_k(t)},\cr
+      where \eqn{\alpha_0 = 1}, and \eqn{\alpha_1, \dots, \alpha_K} are
+      the parameters (heights) to estimate. \eqn{I_k(t)} indicates
+      if \eqn{t} belongs to the \eqn{k}th interval
+      according to \code{c(0,knots,maxRange)}, where \eqn{k=0} indicates
+      the interval \code{c(0,knots[1])}.
     }
     \item{\code{tiaf.exponential}:}{
       \eqn{g(t|\kappa) = \exp(-\alpha_\kappa t)},\cr
@@ -229,7 +239,9 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
 \examples{
 # constant temporal dispersal
 tiaf.constant()
-# or exponential decay specification
+# step function kernel
+tiaf.step(c(3,7), maxRange=14, nTypes=2)
+# exponential decay specification
 tiaf.exponential()
 
 # Type-dependent Gaussian spatial interaction function using an adaptive

@@ -267,7 +267,9 @@ export(siaf,
        siaf.constant, siaf.step,
        siaf.gaussian,
        siaf.powerlaw, siaf.powerlawL, siaf.student)
-export(tiaf, tiaf.constant, tiaf.exponential)
+export(tiaf,
+       tiaf.constant, tiaf.step,
+       tiaf.exponential)
 export(epidataCS2sts)
 
 S3method(nobs, epidataCS)
