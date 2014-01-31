@@ -605,7 +605,7 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
     pars <- c(gamma0, iafpars)
     ## type of confidence band
     force(conf.type)                    # per default depends on 'pars'
-    if (length(pars) == 0 || is.na(conf.type) || is.null(conf.type)) {
+    if (length(pars) == 0 || is.null(conf.type) || is.na(conf.type)) {
         conf.type <- "none"
     }
     conf.type <- match.arg(conf.type,
