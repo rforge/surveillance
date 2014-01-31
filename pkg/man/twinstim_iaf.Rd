@@ -37,7 +37,7 @@ siaf.student(nTypes = 1, validpars = NULL)
 
 # predefined temporal interaction functions
 tiaf.constant()
-tiaf.exponential(nTypes = 1)
+tiaf.exponential(nTypes = 1, validpars = NULL)
 }
 
 \arguments{
