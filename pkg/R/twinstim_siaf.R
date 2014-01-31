@@ -88,7 +88,9 @@ siaf.constant <- function ()
     ## one could also use utils::globalVariables() in R >= 2.15.1 as follows:
     ## if (getRversion() >= "2.15.1") utils::globalVariables("r")
     res <- list(
-        f = as.function(alist(s=, pars=NULL, types=NULL, rep.int(1,nrow(s))),
+        f = as.function(alist(s=, pars=NULL, types=NULL,
+                              rep.int(1, length(s)/2)),
+        ##<- nrow() would take extra time in standardGeneric()
                         envir = .GlobalEnv),
         ## integration over polydomains is handled specially in twinstim
         Fcircle = as.function(alist(r=, pars=NULL, type=NULL, pi*r^2),
