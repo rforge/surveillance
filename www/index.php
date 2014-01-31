@@ -276,8 +276,9 @@ M. Virtanen</li>
 
 <hr><b>Financial support:</b>
 <blockquote>
-  <blockquote> The development of models and algorithms implemented in
-surveillance was financially supported by :
+  <blockquote>
+<!-- The development of models and algorithms implemented in
+<strong>surveillance</strong> was financially supported by : -->
     <ul>
       <li>German Science Foundation (DFG, 2003-2006)</li>
       <li><a href="http://www.en.mc-health.uni-muenchen.de/index.html">Munich
