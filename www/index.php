@@ -279,10 +279,11 @@ M. Virtanen</li>
   <blockquote> The development of models and algorithms implemented in
 surveillance was financially supported by :
     <ul>
+      <li>German Science Foundation (DFG, 2003-2006)</li>
       <li><a href="http://www.en.mc-health.uni-muenchen.de/index.html">Munich
 Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
-      <li>Swiss National Science Foundation (SNF, since 2007) </li>
-      <li>German Science Foundation (DFG, 2003-2006)</li>
+      <li>Swiss National Science Foundation (SNF, 2007--2010, projects <a href="http://p3.snf.ch/Project-116776">#116776</a> and <a href="http://p3.snf.ch/Project-124429">#124429</a>)</li>
+      <li>Swiss National Science Foundation (SNF, 2012--2015, project <a href="http://p3.snf.ch/Project-137919">#137919</a>)</li>
     </ul>
   </blockquote>
 </blockquote>
