@@ -284,6 +284,7 @@ control2nlminb <- function (control, defaults)
         ## keep special attributes
         attr(ret, "knots") <- attr(iaf, "knots")
         attr(ret, "maxRange") <- attr(iaf, "maxRange")
+        attr(ret, "Boundary.knots") <- attr(iaf, "Boundary.knots")
         ## indicate if this is a constant iaf
         attr(ret, "constant") <- isTRUE(attr(iaf, "constant"))
         ret
