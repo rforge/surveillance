@@ -75,7 +75,10 @@ iafplot(object, which = c("siaf", "tiaf"),
   \item{xgrid}{
     either a numeric vector of x-values (distances from the host) where
     to evaluate \code{which}, or a scalar representing the desired number of
-    evaluation points in the interval \code{c(0,xlim[2])}.
+    evaluation points in the interval \code{c(0,xlim[2])}.\cr
+    If the interaction function is a step function
+    (\code{\link{siaf.step}} or \code{\link{tiaf.step}}), \code{xgrid}
+    is ignored and internally set to \code{c(0, knots)}.
   }
   \item{col.estimate}{
     vector of colours to use for the function point estimates of the different \code{types}.
@@ -97,14 +100,19 @@ iafplot(object, which = c("siaf", "tiaf"),
     plot. The default y-axis range (\code{ylim=NULL}) is from 0 to 1 (or to
     \eqn{exp(\gamma_0)}, if \code{scaled}).
     The default x-axis (\code{xlim=NULL}) starts at 0, and the upper
-    limit is determined as follows:  if \code{xgrid} is given as a
-    vector of evaluation points \code{xlim[2]} is set to
-    \code{max(xgrid)}. Otherwise, it is set to the length of the
-    observation period (\code{which="tiaf"}) or the diagonale length of
-    the bounding box of the observation region (\code{which="siaf"}),
-    respectively. However, if the model environment is stored in
-    \code{object}, it is set to the unique finite value of 
-    \code{eps.t}/\code{eps.s} if that exists.
+    limit is determined as follows (in decreasing order of precedence):
+    \itemize{
+      \item If \code{xgrid} is a vector of evaluation points, \code{xlim[2]} is
+      set to \code{max(xgrid)}.
+      \item If the model environment is stored in \code{object}, it is set to
+      the unique finite value of \code{eps.t}/\code{eps.s} if that exists.
+      \item If the interaction function is a step function with
+      \code{maxRange<Inf}, i.e. it drops to 0 at \code{maxRange},
+      \code{xlim[2]} is set to \code{maxRange}.
+      \item Otherwise, it is set to the length of the observation period
+      (\code{which="tiaf"}) or the diagonale length of the bounding box of
+      the observation region (\code{which="siaf"}), respectively.
+    }
   }
   \item{add}{
     add to an existing plot?

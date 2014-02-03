@@ -586,7 +586,10 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
     ...)
 {
     which <- match.arg(which)
-    IAF <- object$formula[[which]][[if (which=="siaf") "f" else "g"]]
+    IAFobj <- object$formula[[which]]
+    IAF <- IAFobj[[if (which=="siaf") "f" else "g"]]
+    isStepFun <- !is.null(knots <- attr(IAFobj, "knots")) &&
+        !is.null(maxRange <- attr(IAFobj, "maxRange"))
     coefs <- coef(object)
     ## epidemic intercept (case of no intercept is not addressed atm)
     if (scaled) {
@@ -629,16 +632,20 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
             if (!is.null(unique.eps.s <- unique(modelenv$eps.s)) &&
                 length(unique.eps.s) == 1 && is.finite(unique.eps.s)) {
                 unique.eps.s
-            } else sqrt(sum((object$bbox[,"max"] - object$bbox[,"min"])^2))
+            } else if (isStepFun && maxRange < Inf) maxRange else
+            sqrt(sum((object$bbox[,"max"] - object$bbox[,"min"])^2))
         } else {
             if (!is.null(unique.eps.t <- unique(modelenv$eps.t)) &&
                 length(unique.eps.t) == 1 && is.finite(unique.eps.t)) {
                 unique.eps.t
-            } else diff(object$timeRange)
+            } else if (isStepFun && maxRange < Inf) maxRange else
+            diff(object$timeRange)
         }
         xlim <- c(0, xmax)
     }
-    xgrid <- if (isScalar(xgrid)) {
+    xgrid <- if (isStepFun) {
+        c(0, knots[knots<xlim[2L]])
+    } else if (isScalar(xgrid)) {
         seq(0, xlim[2], length.out=xgrid)
     } else {
         stopifnot(!is.na(xgrid), is.vector(xgrid, mode="numeric"))
@@ -714,16 +721,42 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
                 }
             }
             if (!is.null(lowerupper)) {
-                atn <- if(length(types)==1) "CI" else paste0("CI.",typeNames[i])
-                matlines(x=xgrid, y=attr(res, atn) <- lowerupper,
-                         type="l", lty=lty[2], col=col.conf[i], lwd=lwd[2])
+                attr(res, if(length(types)==1) "CI" else
+                     paste0("CI.",typeNames[i])) <- lowerupper
+                if (isStepFun) {
+                    segments(rep.int(xgrid,2L), lowerupper,
+                             rep.int(c(xgrid[-1L], min(maxRange, xlim[2L])), 2L), lowerupper,
+                             lty=lty[2], col=col.conf[i], lwd=lwd[2])
+                    #points(rep.int(xgrid,2L), lowerupper, pch=16, col=col.conf[i])
+                } else {
+                    matlines(x=xgrid, y=lowerupper,
+                             type="l", lty=lty[2], col=col.conf[i], lwd=lwd[2])
+                }
             }
         }
         
         ## add point estimate
-        lines(x = xgrid, y = res[,1L+i] <-
-              FUN(if(which=="siaf") cbind(xgrid,0) else xgrid, pars, types[i]),
-              lty = lty[1], col = col.estimate[i], lwd = lwd[1])
+        res[,1L+i] <- FUN(if(which=="siaf") cbind(xgrid,0) else xgrid,
+                          pars, types[i])
+        if (isStepFun) {
+            segments(xgrid, res[,1L+i],
+                     c(xgrid[-1L], min(maxRange, xlim[2L])), res[,1L+i],
+                     lty = lty[1], col = col.estimate[i], lwd = lwd[1])
+            points(xgrid, res[,1L+i], pch=16, col=col.estimate[i])
+            segments(xgrid[-1L], res[-length(xgrid),1L+i],
+                     xgrid[-1L], res[-1L,1L+i],
+                     lty = 3, col = col.estimate[i], lwd = lwd[1])
+            if (maxRange <= xlim[2L]) {
+                segments(maxRange, res[length(xgrid),1L+i], maxRange, 0,
+                         lty = 3, col = col.estimate[i], lwd = lwd[1])
+                segments(maxRange, 0, xlim[2L], 0,
+                         lty = lty[1], col = col.estimate[i], lwd = lwd[1])
+                points(maxRange, 0, pch=16, col=col.estimate[i])
+            }
+        } else {
+            lines(x = xgrid, y = res[,1L+i],
+                  lty = lty[1], col = col.estimate[i], lwd = lwd[1])
+        }
     }
     
     ## add legend

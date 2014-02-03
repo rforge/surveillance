@@ -66,10 +66,15 @@
 
 \subsection{MINOR CHANGES}{
   \itemize{
-    \item \code{iafplot()} invisibly returns a matrix containing the plotted
-    values of the (scaled) interaction function (and the confidence
-    interval as an attribute). Previously, nothing (\code{NULL}) was returned.
-    \item \code{iafplot()} has better default axis ranges.
+    \item \code{iafplot()} ...
+    \itemize{
+      \item invisibly returns a matrix containing the plotted
+      values of the (scaled) interaction function (and the confidence
+      interval as an attribute).
+      Previously, nothing (\code{NULL}) was returned.
+      \item has better default axis ranges.
+      \item adapts to the new step function kernels.
+    }
     \item Take \code{verbose=FALSE} in \code{hhh4()} more seriously.
     \item \code{hhh4()} issues a \code{warning()} if non-convergent.
     \item \code{oneStepAhead()}:
