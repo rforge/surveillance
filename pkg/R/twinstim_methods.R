@@ -577,7 +577,7 @@ formals(intensityplot.twinstim)[names(formals(intensity.twinstim))] <-
 ### Plot fitted tiaf or siaf(cbind(0, r)), r=distance
 
 iafplot <- function (object, which = c("siaf", "tiaf"),
-    types = 1:nrow(object$qmatrix), scaled = FALSE,
+    types = 1:nrow(object$qmatrix), scaled = FALSE, log = "",
     conf.type = if (length(pars) > 1) "bootstrap" else "parbounds",
     conf.level = 0.95, conf.B = 999,
     xgrid = 101, col.estimate = rainbow(length(types)), col.conf = col.estimate,
@@ -585,6 +585,7 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
     add = FALSE, xlab = NULL, ylab = NULL, legend = !add && (length(types) > 1),
     ...)
 {
+    if (add) log <- paste0("", if (par("xlog")) "x", if (par("ylog")) "y")
     which <- match.arg(which)
     IAFobj <- object$formula[[which]]
     IAF <- IAFobj[[if (which=="siaf") "f" else "g"]]
@@ -622,46 +623,57 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
             exp(gamma0) * IAF(x, iafpars, types)
         }
     } else IAF
+    ## if (loglog) {
+    ##     body(FUN)[[length(body(FUN))]] <-
+    ##         call("log", body(FUN)[[length(body(FUN))]])
+    ## }
     
     ## grid of x-values (t or ||s||) on which FUN will be evaluated
     if (is.null(xlim)) {
-        modelenv <- environment(object)
         xmax <- if (add) {
-            par("usr")[2] / (if (par("xaxs")=="r") 1.04 else 1)
-        } else if (which == "siaf") {
-            if (!is.null(unique.eps.s <- unique(modelenv$eps.s)) &&
-                length(unique.eps.s) == 1 && is.finite(unique.eps.s)) {
-                unique.eps.s
-            } else if (isStepFun && maxRange < Inf) maxRange else
-            sqrt(sum((object$bbox[,"max"] - object$bbox[,"min"])^2))
+            xmax <- par("usr")[2] / (if (par("xaxs")=="r") 1.04 else 1)
+            if (par("xlog")) 10^xmax else xmax
         } else {
-            if (!is.null(unique.eps.t <- unique(modelenv$eps.t)) &&
-                length(unique.eps.t) == 1 && is.finite(unique.eps.t)) {
-                unique.eps.t
-            } else if (isStepFun && maxRange < Inf) maxRange else
-            diff(object$timeRange)
+            modelenv <- environment(object)
+            if (which == "siaf") {
+                if (!is.null(unique.eps.s <- unique(modelenv$eps.s)) &&
+                    length(unique.eps.s) == 1 && is.finite(unique.eps.s)) {
+                    unique.eps.s
+                } else if (isStepFun && maxRange < Inf) maxRange else
+                sqrt(sum((object$bbox[,"max"] - object$bbox[,"min"])^2))
+            } else {
+                if (!is.null(unique.eps.t <- unique(modelenv$eps.t)) &&
+                    length(unique.eps.t) == 1 && is.finite(unique.eps.t)) {
+                    unique.eps.t
+                } else if (isStepFun && maxRange < Inf) maxRange else
+                diff(object$timeRange)
+            }
         }
-        xlim <- c(0, xmax)
+        xlim <- c(0.5*grepl("x", log), xmax)
     }
     xgrid <- if (isStepFun) {
-        c(0, knots[knots<xlim[2L]])
+        c(if (grepl("x", log)) {
+            if (xlim[1L] < knots[1L]) xlim[1L] else NULL
+        } else 0, knots[knots<xlim[2L]])
     } else if (isScalar(xgrid)) {
-        seq(0, xlim[2], length.out=xgrid)
+        if (grepl("x", log)) {
+            exp(seq(log(xlim[1L]), log(xlim[2]), length.out=xgrid))
+        } else seq(xlim[1L], xlim[2L], length.out=xgrid)
     } else {
         stopifnot(!is.na(xgrid), is.vector(xgrid, mode="numeric"))
         ## xgrid-specification overrides default xlim
-        if (is.null(match.call()$xlim)) xlim <- c(0, max(xgrid))
+        if (is.null(match.call()$xlim)) xlim <- range(xgrid)
         sort(xgrid)
     }
     
     ## initialize plotting frame
     if (!add) {
         if (is.null(ylim))
-            ylim <- c(0, FUN(if (which=="siaf") cbind(0,0) else 0, pars, 1L))
+            ylim <- if (grepl("y", log)) {
+                sort(FUN(if (which=="siaf") cbind(xlim,0) else xlim, pars, 1L))
+            } else c(0, FUN(if (which=="siaf") cbind(0,0) else 0, pars, 1L))
         if (is.null(xlab)) xlab <- if (which == "siaf") {
-            expression("Distance " *
-                       x *              # group("||",bold(s)-bold(s)[j],"||") *
-                       " from host")
+            expression("Distance " * x * " from host")
         } else {
             expression("Time " * t * " since infectious")
         }
@@ -671,13 +683,14 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
             } else {
                 expression(g(t))
             }
+            ## if (loglog) ylab[[1]] <- substitute(log(ylab), list(ylab=ylab[[1]]))
             if (scaled) {
-                ylab <- as.expression(as.call(list(quote(paste),
-                    quote(e^{gamma[0]}), quote(phantom() %.% phantom()),
-                    ylab[[1]])))
+                ylab <- ##if (loglog) as.expression(call("+", quote(gamma[0]), ylab[[1]])) else
+                    as.expression(call("paste", quote(e^{gamma[0]}),
+                        quote(phantom() %.% phantom()), ylab[[1]]))
             }
         }
-        plot(xlim, ylim, type="n", xlab = xlab, ylab = ylab, ...)
+        plot(xlim, ylim, type="n", xlab = xlab, ylab = ylab, log = log, ...)
     }
 
     ## store evaluated interaction function in a matrix (will be returned)

@@ -13,7 +13,7 @@
 
 \usage{
 iafplot(object, which = c("siaf", "tiaf"),
-        types = 1:nrow(object$qmatrix), scaled = FALSE,
+        types = 1:nrow(object$qmatrix), scaled = FALSE, log="",
         conf.type = if (length(pars) > 1) "bootstrap" else "parbounds",
         conf.level = 0.95, conf.B = 999, xgrid = 101,
         col.estimate = rainbow(length(types)), col.conf = col.estimate,
@@ -41,6 +41,10 @@ iafplot(object, which = c("siaf", "tiaf"),
     for the comparison of estimated interaction functions from
     different models.
   }
+  \item{log}{a character string passed to \code{\link{plot.default}}
+    indicating which axes should be logarithmic.
+    If \code{add=TRUE}, \code{log} is set according to
+    \code{par("xlog")} and \code{par("ylog")}.}
   \item{conf.type}{
     type of confidence interval to produce.\cr
     If \code{conf.type="bootstrap"}, \code{conf.B} parameter values

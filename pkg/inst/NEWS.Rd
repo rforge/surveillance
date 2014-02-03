@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-01-31)}{
+\section{Changes in surveillance version 1.8-0 (2014-02-03)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -74,6 +74,8 @@
       Previously, nothing (\code{NULL}) was returned.
       \item has better default axis ranges.
       \item adapts to the new step function kernels.
+      \item supports logarithmic axes (via new \code{log} argument
+      passed on to \code{plot.default}).
     }
     \item Take \code{verbose=FALSE} in \code{hhh4()} more seriously.
     \item \code{hhh4()} issues a \code{warning()} if non-convergent.
