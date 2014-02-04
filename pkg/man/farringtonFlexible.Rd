@@ -113,6 +113,7 @@ instead one uses a quantile from the asymptotic normal distribution of the expec
 in the GLM; in order to take into account both the estimation error and the prediction error.   }        }
 \item Computation of exceedance score
 }
+Warning: monthly data containing the last day of each month as date should be analysed with \code{epochAsDate=FALSE} in the \code{sts} object. Otherwise February makes it impossible to find some reference time points. 
 }
 \value{
 An object of class \code{sts} with the slots \code{upperbound} and \code{alarm} filled by appropriate output of the algorithm.
