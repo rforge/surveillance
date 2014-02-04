@@ -581,10 +581,13 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
     conf.type = if (length(pars) > 1) "bootstrap" else "parbounds",
     conf.level = 0.95, conf.B = 999,
     xgrid = 101, col.estimate = rainbow(length(types)), col.conf = col.estimate,
-    alpha.B = 0.15, lwd = c(3,1), lty = c(1,2), xlim = NULL, ylim = NULL,
-    add = FALSE, xlab = NULL, ylab = NULL, legend = !add && (length(types) > 1),
-    ...)
+    alpha.B = 0.15, lwd = c(3,1), lty = c(1,2),
+    verticals = TRUE, do.points = TRUE,
+    add = FALSE, xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL,
+    legend = !add && (length(types) > 1), ...)
 {
+    if (isTRUE(verticals)) verticals <- list()
+    if (isTRUE(do.points)) do.points <- list()
     if (add) log <- paste0("", if (par("xlog")) "x", if (par("ylog")) "y")
     which <- match.arg(which)
     IAFobj <- object$formula[[which]]
@@ -740,7 +743,7 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
                     segments(rep.int(xgrid,2L), lowerupper,
                              rep.int(c(xgrid[-1L], min(maxRange, xlim[2L])), 2L), lowerupper,
                              lty=lty[2], col=col.conf[i], lwd=lwd[2])
-                    #points(rep.int(xgrid,2L), lowerupper, pch=16, col=col.conf[i])
+                    ##points(rep.int(xgrid,2L), lowerupper, pch=16, col=col.conf[i])
                 } else {
                     matlines(x=xgrid, y=lowerupper,
                              type="l", lty=lty[2], col=col.conf[i], lwd=lwd[2])
@@ -755,16 +758,30 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
             segments(xgrid, res[,1L+i],
                      c(xgrid[-1L], min(maxRange, xlim[2L])), res[,1L+i],
                      lty = lty[1], col = col.estimate[i], lwd = lwd[1])
-            points(xgrid, res[,1L+i], pch=16, col=col.estimate[i])
-            segments(xgrid[-1L], res[-length(xgrid),1L+i],
-                     xgrid[-1L], res[-1L,1L+i],
-                     lty = 3, col = col.estimate[i], lwd = lwd[1])
-            if (maxRange <= xlim[2L]) {
-                segments(maxRange, res[length(xgrid),1L+i], maxRange, 0,
-                         lty = 3, col = col.estimate[i], lwd = lwd[1])
+            ## add points
+            if (is.list(do.points)) {
+                pointStyle <- modifyList(list(pch=16, col=col.estimate[i]),
+                                         do.points)
+                do.call("points", c(list(xgrid, res[,1L+i]), pointStyle))
+            }
+            ## add vertical connections:
+            if (is.list(verticals)) {
+                verticalStyle <- modifyList(
+                    list(lty = 3, col = col.estimate[i], lwd = lwd[1L]),
+                    verticals)
+                do.call("segments", c(
+                    list(xgrid[-1L], res[-length(xgrid),1L+i],
+                         xgrid[-1L], res[-1L,1L+i]), verticalStyle))
+            }
+            if (maxRange <= xlim[2L]) { ## add horizontal=0 afterwards
                 segments(maxRange, 0, xlim[2L], 0,
                          lty = lty[1], col = col.estimate[i], lwd = lwd[1])
-                points(maxRange, 0, pch=16, col=col.estimate[i])
+                if (is.list(verticals))
+                    do.call("segments", c(
+                        list(maxRange, res[length(xgrid),1L+i],
+                             maxRange, 0), verticalStyle))
+                if (is.list(do.points))
+                    do.call("points", c(list(maxRange, 0), pointStyle))
             }
         } else {
             lines(x = xgrid, y = res[,1L+i],

@@ -17,8 +17,9 @@ iafplot(object, which = c("siaf", "tiaf"),
         conf.type = if (length(pars) > 1) "bootstrap" else "parbounds",
         conf.level = 0.95, conf.B = 999, xgrid = 101,
         col.estimate = rainbow(length(types)), col.conf = col.estimate,
-        alpha.B = 0.15, lwd = c(3,1), lty = c(1,2), xlim = NULL, ylim = NULL,
-        add = FALSE, xlab = NULL, ylab = NULL,
+        alpha.B = 0.15, lwd = c(3,1), lty = c(1,2),
+        verticals = TRUE, do.points = TRUE,
+        add = FALSE, xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL,
         legend = !add && (length(types) > 1), ...)
 }
 
@@ -99,6 +100,12 @@ iafplot(object, which = c("siaf", "tiaf"),
     estimates (first element) and confidence limits (second element),
     respectively. 
   }
+  \item{verticals,do.points}{graphical settings for step function
+    kernels. These can be logical (as in \code{\link{plot.stepfun}}) or
+    lists of graphical parameters.}
+  \item{add}{
+    add to an existing plot?
+  }
   \item{xlim, ylim}{
     vectors of length two containing the x- and y-axis limit of the
     plot. The default y-axis range (\code{ylim=NULL}) is from 0 to 1 (or to
@@ -117,9 +124,6 @@ iafplot(object, which = c("siaf", "tiaf"),
       (\code{which="tiaf"}) or the diagonale length of the bounding box of
       the observation region (\code{which="siaf"}), respectively.
     }
-  }
-  \item{add}{
-    add to an existing plot?
   }
   \item{xlab, ylab}{
     labels for the axes with \code{NULL} providing sensible defaults.
