@@ -408,7 +408,9 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek,xaxis.units,c
       qStart <- qStart[qIdx] ; qName <- qName[qIdx]
       #Find week in data closest to these dates
       weekIdx <- sapply(qStart, function(d) which.min(abs(as.numeric(date - d))))
-
+      #Problem if no quarters in date range
+      if (length(weekIdx)==0) {weekIdx <- 1}
+      
       date <- date[weekIdx]
       #Year the ISO week belongs to
       year <- as.numeric(formatDate(date,"%G"))
