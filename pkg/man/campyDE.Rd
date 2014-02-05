@@ -43,33 +43,18 @@ data(campyDE)
   A complete data description and an analysis of the data can be found in:
   
   Bayesian model algorithm for monitoring reported cases of
-  campylobacteriosis in Germany (2013), Manitz J and Höhle M,
-  Biometrical Journal, 55(4), pp. 509–526.
+  campylobacteriosis in Germany (2013), Manitz J and H�hle M,
+  Biometrical Journal, 55(4), pp. 509 526.
 }  
 \examples{
+  #Load the data
   data("campyDE")
 
-  \dontrun{
-  #Trial run code. To be made an actual working example.
-  #load("../data/campyDE.RData")
-  source("../R/boda.R")
-
   #Make an sts object from the data.frame
-  cam.sts <- new("sts",epoch=as.numeric(campyDE$date),observed=campyDE$case, state=campyDE$state, epochAsDate=TRUE)
+  cam.sts <-  new("sts",epoch=as.numeric(campyDE$date),observed=campyDE$case,
+                   state=campyDE$state, epochAsDate=TRUE)
+
+  #Plot the result
   plot(cam.sts)
-
-  # define monitoring period
-#  range <- which(epoch(cam.sts)>=as.Date("2007-01-01"))
-  range <- which(epoch(cam.sts)>=as.Date("2011-12-10"))
-#  range <- which(epoch(cam.sts)>=as.Date("2011-11-01"))
-
-  control <- list(range=range, co.arg=NULL, trend=TRUE, season=TRUE,prior='iid', alpha=0.025, mc.betaT1=100, mc.yT1=10)
-#debug("bodaFit")
-  #Apply the boda algorithm (NOTE: requires the INLA package to be installed)
-  cam.boda1 <- boda(cam.sts, control=control)
-
-  plot(cam.boda1,xlab='time [weeks]', ylab='No. reported',dx.upperbound=0)
-
-  } 
 }
 \keyword{datasets}

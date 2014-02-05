@@ -1,6 +1,6 @@
 ######################################################################
 # An implementation of the Bayesian Outbreak Detection Algorithm (BODA)
-# described in Manitz and Höhle (2013), Biometrical Journal.
+# described in Manitz and H{\"o}hle (2013), Biometrical Journal.
 #
 # Note: The algorithm requires the non CRAN package INLA to run.
 # You can install this package by writing
@@ -10,24 +10,24 @@
 #
 # Author:
 # The initial code was written by J. Manitz, which was then later
-# adapted and modified for integration into the package by by M. Höhle.
+# adapted and modified for integration into the package by by M. H�hle.
 #
 # Date:
 #  Code continuously developed during 2010-2014
 #
 # Changes:
 #  MH@2014-02-05
-#   changed tcltk progress bar to text based one and modified code to
-#   use S4 sts object (no wrapping wanted)
-#                 
+#   changed tcltk progress bar to text based one and modified code,
+#   use S4 sts object (no wrapping wanted) and changed to new INLA
+#   function name for calculating the transformed marginal.
 ######################################################################
 
 
-boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=FALSE, prior='iid', alpha=0.05, mc.betaT1=100, mc.yT1=10)) {
+boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=FALSE, prior=c('iid','rw1','rw2'), alpha=0.05, mc.betaT1=100, mc.yT1=10, verbose=FALSE)) {
 
   #Check if the INLA package is available.
   if (!require("INLA")) {
-      stop("The boda function requires the INLA package to be installed. The package is not available on CRAN, but can be downloaded by calling source(\"http://www.math.ntnu.no/inla/givemeINLA.R\") as described at http://www.r-inla.org/download for details.")
+      stop("The boda function requires the INLA package to be installed. The package is not available on CRAN, but can be downloaded by calling source(\"http://www.math.ntnu.no/inla/givemeINLA.R\") as described at http://www.r-inla.org/download in detail.")
   }
   
   #Stop if the sts object is multivariate
@@ -39,8 +39,10 @@ boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=
   observed <- as.vector(observed(sts))
   state <- as.vector(sts@state)
   time <- 1:length(observed)
-  # clean model data from given outbreaks
-#  observed[which(state==1)] <- NA
+
+  
+  # clean model data from given outbreaks -- this is now part of the modelling
+  #  observed[which(state==1)] <- NA
 
   ### define range
   # missing range
@@ -55,12 +57,18 @@ boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=
   #set order of range
   control$range <- sort(control$range) 
 
+  ### show extra output from INLA
+  if(is.null(control$verbose)) {
+      control$verbose <- FALSE
+  }
+  
   ### setting for different models
   if(is.null(control$trend)){ control$trend <- FALSE }
   if(is.null(control$season)){ control$season <- FALSE }
   if(!is.logical(control$trend)||!is.logical(control$season)){ 
     stop('trend and season are logical parameters.')
   }
+  ### Prior
   prior <- match.arg(control$prior, c('iid','rw1','rw2'))
   if(is.vector(control$co.arg)){
     control$co.arg <- as.matrix(control$co.arg,ncol=1)
@@ -69,7 +77,7 @@ boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=
   # setting for threshold calcuation
   if(is.null(control$alpha)){ control$alpha <- 0.05 }
   if(control$alpha <= 0 | control$alpha >= 1){
-    stop("significance level 'alpha' has to be a probability, thus between 0 and 1.")
+    stop("The significance level 'alpha' has to be a probability, and thus has to be between 0 and 1.")
   }
   # setting for monte carlo integration
   if(is.null(control$mc.betaT1)){ control$mc.betaT1 <- 100 }
@@ -141,28 +149,28 @@ boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=
   control$name <- paste('boda(prior=',prior,')',sep='')
   sts@control <- control
   
-  # return results as an sts object
-#  
-#  result <- list(alarm=as.matrix(alarm[control$range]), upperbound=as.matrix(xi[control$range]), sts=sts, control=control)
-#  class(result) <- 'survRes'
-  
+  # return result as an sts object
   return(sts[control$range,])
 }
 
 
 #######################################################################
-# Helper function for fitting the Bayesian GAM using INLA
+# Helper function for fitting the Bayesian GAM using INLA and computing
+# the (1-alpha)*100% quantile for the posterior predictive of y[T1]
 #
 # Parameters:
-#  dat -
-#  modelformula -
-#  prior -
-#  alpha -
-#  mc.betaT1 -
-#  mc.yT1 -
+#  dat - data.frame containing the data
+#  modelformula - formula to use for fitting the model with inla
+#  prior - what type of prior for the spline c('iid','rw1','rw2')
+#  alpha - quantile to compute in the predictive posterior
+#  mc.betaT1 - no. of Monte Carlo samples for the mu/size param in the NegBin
+#  mc.yT1 - no. of samples for y.
+#
+# Returns:
+#  (1-alpha)*100% quantile for the posterior predictive of y[T1]
 ######################################################################
 
-bodaFit <- function(dat=dat, modelformula=modelformula,prior=prior,alpha=alpha, mc.betaT1=mc.betaT1, mc.yT1=mc.yT1) {
+bodaFit <- function(dat=dat, modelformula=modelformula,prior=prior,alpha=alpha, mc.betaT1=mc.betaT1, mc.yT1=mc.yT1,...) {
   
   # set time point
   T1 <- nrow(dat)
@@ -173,9 +181,9 @@ bodaFit <- function(dat=dat, modelformula=modelformula,prior=prior,alpha=alpha, 
   if(is.null(model)){
     return(qi=NA)
   }
-
+  
   ### mc simulation
-# draw sample from marginal posteriori of etaT1. hoehle: inla.marginal.transform does not exist anymore! Also: Isn't there a better way to predict the missing observation?!!? 
+# draw sample from marginal posteriori of etaT1. hoehle: inla.marginal.transform does not exist anymore! [Q]: Isn't there a better way to obtain the predictive distribution of the missing observation in INLA?!!? [A]: Apparently not.
   marg <- try(inla.tmarginal(function(x) exp(x),model$marginals.fitted.values[[T1]]), silent=TRUE)
   if(inherits(marg,'try-error')){
       return(qi=NA)
@@ -184,19 +192,24 @@ bodaFit <- function(dat=dat, modelformula=modelformula,prior=prior,alpha=alpha, 
   if(inherits(mT1,'try-error')){
       return(qi=NA)
   }
-# add size hyperprior variety
+  # take variation in size hyperprior into account by also sampling from it
   mtheta <- model$internal.marginals.hyperpar[[1]]
   theta <- inla.rmarginal(n=mc.betaT1,mtheta)
   if(inherits(theta,'try-error')){
       return(qi=NA)
   }
-# draw responses
-  yT1 <- NULL #numeric(mc.betaT1*mc.yT1)
+  
+  #Draw (mc.betaT1 \times mc.yT1) responses. Would be nice, if we could
+  #determine the quantile of the predictive posterior in more direct form
+  yT1 <- numeric(mc.betaT1*mc.yT1) #NULL
+  idx <- seq(mc.yT1)
   for(j in seq(mc.betaT1)) {
-      yT1 <- c(yT1,rnbinom(n=mc.yT1,size=exp(theta[j]),mu=E*mT1[j]))
+      idx <- idx + mc.yT1 
+      yT1[idx] <- rnbinom(n=mc.yT1,size=exp(theta[j]),mu=E*mT1[j])
   }
-  #Determine the upper (1-alpha)*100% quantile
-  qi <- quantile(yT1, probs=(1-0.05), type=3, na.rm=TRUE) # 2049
+  
+  #Determine the upper (1-alpha)*100% quantile of the predictive posterior
+  qi <- quantile(yT1, probs=(1-alpha), type=3, na.rm=TRUE) 
   
   return(qi)
 } 

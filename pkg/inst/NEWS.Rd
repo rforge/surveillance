@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-02-03)}{
+\section{Changes in surveillance version 1.8-0 (2014-02-05)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -20,6 +20,16 @@
   
 \subsection{NEW FEATURES}{
   \itemize{
+    \item The package contains a new monitoring function
+    \code{boda}. This is a first experimental surveillance
+    implementation of the Bayesian Outbreak Detection Algorithm (BODA)
+    proposed in Manitz and \enc{Höhle}{Hoehle} (2012). The function
+    relies on the non-CRAN package INLA, which has to be installed first
+    in order to use this function. Expect initial problems. The
+    Campylobacteriosis data set \code{campyDE}, where absolute humidity
+    is used as concurrent covariate to adjust the outbreak detection is
+    also added to the package.
+    
     \item \code{oneStepAhead()}:
     \itemize{
       \item New argument \code{type} with a new \code{type}

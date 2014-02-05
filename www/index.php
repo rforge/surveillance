@@ -54,9 +54,10 @@ monitoring of epidemic phenomena. This includes count, binary and categorical da
 <li> Potential users of the package are biostatisticians, epidemiologists and others working in, e.g., applied infectious disease epidemiology. However, applications could just as
 well originate from environmetrics, reliability engineering,
 econometrics or social sciences. 
-      <li> The main application is in the detection of aberrations in
+      <li> One application is in the proespective detection of aberrations in
 routine collected public health data seen as univariate and
-multivariate time series of counts. </li>
+multivariate time series of counts. Another application is as a more general modelling tool for regression modelling of spatio-temporal epidemic phenomena. 
+</li>
       <li> <tt>surveillance</tt> provides an S4 class data structure
 and framework for methodological developments of change-point
 algorithms for time series of counts. </li>
@@ -65,13 +66,14 @@ series:</li>
       <ul>
         <li><code>cdc</code> - Stroup et al. (1989)</li>
         <li><code>farrington</code> - Farrington et al. (1996)</li>
-        <li><code>rki</code> - The system used at the Robert Koch
+        <li><code>farringtonFlexible</code> - Improved Farrington algorithm of Noufaily et al. (2012)</li>
+        <li><code>rki</code> - The system previously used at the Robert Koch
 Institute, Germany </li>
         <li><code>bayes</code> - A Bayesian predictive posterior
 approach, see
 Höhle (2007)<br>
         </li>
-        <li><code>hmm</code> - An online version of the Hidden Markov
+        <li><code>hmm</code> - A predictive version of the Hidden Markov
 Model approach by
 Le Strat and Carrat (1999)
         </li>
@@ -129,7 +131,7 @@ CUSUMs is available as function <code>LRCUSUM.runlength.</code></li>
 <li> Retrospective continuous time modelling and simulation of epidemic phenomena (experimental from version 1.3-0 on):  
 <ul>
 <li><code>twinSIR</code> - continuous-time and discrete-space modelling as described in H&ouml;hle (2009). The <code>epidata</code> class provides the appropriate data structure for such data.
-<li><code>twinstim</code> - continuous-time and continuous-space modelling as desribed in
+<li><code>twinstim</code> - continuous-time and continuous-space modelling as described in
 <a href="http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x">Meyer et al. (2012)</a>.
 The <code>epidataCS</code> data provides a novel data class for point-referenced space-time data.
 </ul>
@@ -242,6 +244,7 @@ public health</a> [<a href="http://epub.ub.uni-muenchen.de/2093/">preprint</a>].
 further preprints.<br>
       </li>
       <li>Sometimes pictures says more than 1000 words:</li>
+      <p>
       <code>algo.farrington</code> + <code>algo.glrnb</code> + <code>nowcast</code><p>
       <img src="detectandnowcast.png" align="middle"><p>
       <code>backprojNP</code><p>
