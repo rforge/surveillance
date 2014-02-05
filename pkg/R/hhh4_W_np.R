@@ -19,7 +19,7 @@
 ###   and to0 indicates which weight is assumed for orders > maxlag, either zero
 ###   or the same as for order 'maxlag'
 
-W.np <- function (maxlag, to0 = FALSE, normalize = FALSE,
+W.np <- function (maxlag, to0 = FALSE, normalize = TRUE,
                   initial = log(zetaweights(2:maxlag)))
 {
     if (missing(maxlag)) {

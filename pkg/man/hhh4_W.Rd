@@ -6,9 +6,9 @@
 }
 
 \description{
-  Set up a power-law weight structure for the neighbourhood
-  component of \code{\link{hhh4}}-models, i.e., without normalization
-  we have \eqn{w_{ji} = o_{ji}^{-d}}{w_ji = o_ji^-d}, where
+  Set up a power-law or nonparametric weight structure for the neighbourhood
+  component of \code{\link{hhh4}}-models. Without normalization,
+  power-law weights are \eqn{w_{ji} = o_{ji}^{-d}}{w_ji = o_ji^-d}, where
   \eqn{o_{ji}}{o_ji} is the order of neighbourhood between regions
   \eqn{i} and \eqn{j}, see \code{\link{nbOrder}}.
 }
@@ -17,7 +17,7 @@
 W.powerlaw(maxlag, normalize = TRUE,
            log = FALSE, initial = if (log) 0 else 1)
 
-W.np(maxlag, to0 = FALSE, normalize = FALSE,
+W.np(maxlag, to0 = FALSE, normalize = TRUE,
      initial = log(zetaweights(2:maxlag)))
 }
 
@@ -38,7 +38,7 @@ W.np(maxlag, to0 = FALSE, normalize = FALSE,
     specification.
   }
   \item{normalize}{logical indicating if the weights should be normalized
-    such that the rows of the weight matrix sum to 1.}
+    such that the rows of the weight matrix sum to 1 (default).}
   \item{log}{logical indicating if the decay parameter \eqn{d} should be
     estimated on the log-scale to ensure positivity.}
   \item{initial}{initial value of the parameter vector.}

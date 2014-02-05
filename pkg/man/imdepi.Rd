@@ -88,8 +88,8 @@ data(imdepifit)
   }
   We have actually not included any time-dependent covariates here, we
   just established this grid with a (reduced -> fast) temporal
-  resolution of monthly intervals so that we can model endemic time
-  trends and seasonality (in this discretized time).
+  resolution of \emph{monthly} intervals so that we can model endemic
+  time trends and seasonality (in this discretized time).
   
   The entry \code{W} contains the observation window as a
   \code{\link{SpatialPolygons}} object. In this case the boundaries of
