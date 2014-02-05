@@ -23,11 +23,18 @@
 ######################################################################
 
 
-boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=FALSE, prior=c('iid','rw1','rw2'), alpha=0.05, mc.betaT1=100, mc.yT1=10, verbose=FALSE)) {
+boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=FALSE, prior=c('iid','rw1','rw2'), alpha=0.05, mc.betaT1=100, mc.yT1=10, verbose=FALSE,multicore=TRUE)) {
 
   #Check if the INLA package is available.
   if (!require("INLA")) {
       stop("The boda function requires the INLA package to be installed. The package is not available on CRAN, but can be downloaded by calling source(\"http://www.math.ntnu.no/inla/givemeINLA.R\") as described at http://www.r-inla.org/download in detail.")
+  }
+
+  #Possibly speed up the computations by using multiple cores.
+  if (is.null(control$multicore)) { control$multicore <- TRUE }
+  if (control$multicore) {
+      noCores <- if (require("parallel")) detectCores(logical = TRUE) else 1
+      inla.setOption("num.threads", noCores)
   }
   
   #Stop if the sts object is multivariate
