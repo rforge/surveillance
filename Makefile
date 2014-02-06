@@ -18,6 +18,7 @@
 ##   15 Nov 2012 (SM): removed automatic date in DESCRIPTION file since R-Forge
 ##                     now includes date and revision in its built packages
 ##   10 Dec 2012 (SM): add message about warnings in examples in "check"
+##    6 Feb 2014 (SM): set _R_CHECK_FORCE_SUGGESTS_ to FALSE (for INLA package)
 ################################################################################
 
 ## Define variable for R and sed script which enables the use of alternatives,
@@ -70,7 +71,7 @@ ${SYSDATA}: pkg/sysdata/sysdata.R
 	mv pkg/sysdata/sysdata.rda $@
 
 check: build
-	$R CMD check --as-cran --timings surveillance_${VERSION}.tar.gz
+	_R_CHECK_FORCE_SUGGESTS_=FALSE $R CMD check --as-cran --timings surveillance_${VERSION}.tar.gz
 ## further option: --use-gct (for better detection of memory bugs/segfaults)
 	@echo "timings <- read.table(file.path('surveillance.Rcheck','surveillance-Ex.timings'), header=TRUE, row.names='name'); \
 	timings <- timings[order(timings$$elapsed, decreasing=TRUE),'elapsed',drop=FALSE]; \
