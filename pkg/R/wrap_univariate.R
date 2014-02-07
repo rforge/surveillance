@@ -79,7 +79,7 @@ farrington <- function(sts, control=list(range=NULL, b=3, w=3, reweight=TRUE, ve
 #Bayes wrapper (this can be implemented more efficiently)
 bayes <- function(sts, control = list(range = range, b = 0, w = 6, actY = TRUE,alpha=0.05),...) {
   if (sts@epochAsDate) {
-    warning("algo.cdc currently can't handle Date entries. Computing reference values based on freq")
+    warning("algo.bayes currently can't handle Date entries. Computing reference values based on freq")
   }
   wrap.algo(sts,algo="algo.bayes",control=control)
 }

@@ -23,7 +23,7 @@
 ######################################################################
 
 
-boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=FALSE, prior=c('iid','rw1','rw2'), alpha=0.05, mc.betaT1=100, mc.yT1=10, verbose=FALSE,multicore=TRUE)) {
+boda <- function(sts, control=list(range=NULL, X=NULL, trend=FALSE, season=FALSE, prior=c('iid','rw1','rw2'), alpha=0.05, mc.munu=100, mc.y=10, verbose=FALSE,multicore=TRUE)) {
 
   #Check if the INLA package is available.
   if (!require("INLA")) {
@@ -31,7 +31,7 @@ boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=
   }
 
   #Possibly speed up the computations by using multiple cores.
-  if (is.null(control$multicore)) { control$multicore <- TRUE }
+  if (is.null(control[["multicore",exact=TRUE]])) { control$multicore <- TRUE }
   if (control$multicore) {
       noCores <- if (require("parallel")) detectCores(logical = TRUE) else 1
       inla.setOption("num.threads", noCores)
@@ -53,7 +53,7 @@ boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=
 
   ### define range
   # missing range
-  if(is.null(control$range)){ 
+  if(is.null(control[["range",exact=TRUE]])){ 
     warning('No range given. Range is defined as time from second period until end of time series.')
     control$range <- (sts@freq+1):length(observed)
   }
@@ -65,31 +65,31 @@ boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=
   control$range <- sort(control$range) 
 
   ### show extra output from INLA
-  if(is.null(control$verbose)) {
+  if(is.null(control[["verbose",exact=TRUE]])) {
       control$verbose <- FALSE
   }
   
   ### setting for different models
-  if(is.null(control$trend)){ control$trend <- FALSE }
-  if(is.null(control$season)){ control$season <- FALSE }
+  if(is.null(control[["trend",exact=TRUE]])){ control$trend <- FALSE }
+  if(is.null(control[["season",exact=TRUE]])){ control$season <- FALSE }
   if(!is.logical(control$trend)||!is.logical(control$season)){ 
     stop('trend and season are logical parameters.')
   }
   ### Prior
   prior <- match.arg(control$prior, c('iid','rw1','rw2'))
-  if(is.vector(control$co.arg)){
-    control$co.arg <- as.matrix(control$co.arg,ncol=1)
+  if(is.vector(control$X)){
+    control$X <- as.matrix(control$X,ncol=1)
   }
 
   # setting for threshold calcuation
-  if(is.null(control$alpha)){ control$alpha <- 0.05 }
+  if(is.null(control[["alpha",exact=TRUE]])){ control$alpha <- 0.05 }
   if(control$alpha <= 0 | control$alpha >= 1){
     stop("The significance level 'alpha' has to be a probability, and thus has to be between 0 and 1.")
   }
   # setting for monte carlo integration
-  if(is.null(control$mc.betaT1)){ control$mc.betaT1 <- 100 }
-  if(is.null(control$mc.yT1)){ control$mc.yT1 <- 10 }
-  if(!control$mc.betaT1>0 || control$mc.betaT1!=round(control$mc.betaT1,0) || !control$mc.yT1>0 || control$mc.yT1!=round(control$mc.yT1,0)){
+  if(is.null(control[["mc.munu",exact=TRUE]])){ control$mc.munu <- 100 }
+  if(is.null(control[["mc.y",exact=TRUE]])){ control$mc.y <- 10 }
+  if(!control$mc.munu>0 || control$mc.munu!=round(control$mc.munu,0) || !control$mc.y>0 || control$mc.y!=round(control$mc.y,0)){
     stop('Number of Monte Carlo trials has to be an integer larger than zero')
   }
   
@@ -112,16 +112,16 @@ boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=
     dat <- data.frame(dat, timeS=time)
   }
   # covariables
-  co.arg.formula <- NULL
-  if(!is.null(control$co.arg)){
-    if(nrow(control$co.arg)!=length(observed)){
-      stop("Argument for covariates 'co.arg' has to have the same length like the time series")
+  X.formula <- NULL
+  if(!is.null(control$X)){
+    if(nrow(control$X)!=length(observed)){
+      stop("Argument for covariates 'X' has to have the same length like the time series")
     }
-    for(i in 1:ncol(control$co.arg)){
-      co.arg.formula <- (paste(co.arg.formula ,'+', colnames(control$co.arg)[i]))
+    for(i in 1:ncol(control$X)){
+      X.formula <- (paste(X.formula ,'+', colnames(control$X)[i]))
     }
-    modelformula <- paste(modelformula, co.arg.formula, sep="")
-    dat <- data.frame(dat, control$co.arg)
+    modelformula <- paste(modelformula, X.formula, sep="")
+    dat <- data.frame(dat, control$X)
   }
   modelformula <- as.formula(modelformula)
 
@@ -142,7 +142,7 @@ boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=
 
     # fit model and calculate quantile using INLA & MC sampling
 #    browser()
-    xi[i] <- bodaFit(dat=dati, modelformula=modelformula, prior=prior, alpha=control$alpha, mc.betaT1=control$mc.betaT1, mc.yT1=control$mc.yT1)
+    xi[i] <- bodaFit(dat=dati, modelformula=modelformula, prior=prior, alpha=control$alpha, mc.munu=control$mc.munu, mc.y=control$mc.y)
 
     # update progress bar
     setTxtProgressBar(pb, i)
@@ -170,14 +170,14 @@ boda <- function(sts, control=list(range=NULL, co.arg=NULL, trend=FALSE, season=
 #  modelformula - formula to use for fitting the model with inla
 #  prior - what type of prior for the spline c('iid','rw1','rw2')
 #  alpha - quantile to compute in the predictive posterior
-#  mc.betaT1 - no. of Monte Carlo samples for the mu/size param in the NegBin
-#  mc.yT1 - no. of samples for y.
+#  mc.munu - no. of Monte Carlo samples for the mu/size param in the NegBin
+#  mc.y - no. of samples for y.
 #
 # Returns:
 #  (1-alpha)*100% quantile for the posterior predictive of y[T1]
 ######################################################################
 
-bodaFit <- function(dat=dat, modelformula=modelformula,prior=prior,alpha=alpha, mc.betaT1=mc.betaT1, mc.yT1=mc.yT1,...) {
+bodaFit <- function(dat=dat, modelformula=modelformula,prior=prior,alpha=alpha, mc.munu=mc.munu, mc.y=mc.y,...) {
   
   # set time point
   T1 <- nrow(dat)
@@ -195,24 +195,24 @@ bodaFit <- function(dat=dat, modelformula=modelformula,prior=prior,alpha=alpha, 
   if(inherits(marg,'try-error')){
       return(qi=NA)
   }
-  mT1 <- try(inla.rmarginal(n=mc.betaT1,marg), silent=TRUE)
+  mT1 <- try(inla.rmarginal(n=mc.munu,marg), silent=TRUE)
   if(inherits(mT1,'try-error')){
       return(qi=NA)
   }
   # take variation in size hyperprior into account by also sampling from it
   mtheta <- model$internal.marginals.hyperpar[[1]]
-  theta <- inla.rmarginal(n=mc.betaT1,mtheta)
+  theta <- inla.rmarginal(n=mc.munu,mtheta)
   if(inherits(theta,'try-error')){
       return(qi=NA)
   }
   
-  #Draw (mc.betaT1 \times mc.yT1) responses. Would be nice, if we could
+  #Draw (mc.munu \times mc.y) responses. Would be nice, if we could
   #determine the quantile of the predictive posterior in more direct form
-  yT1 <- numeric(mc.betaT1*mc.yT1) #NULL
-  idx <- seq(mc.yT1)
-  for(j in seq(mc.betaT1)) {
-      idx <- idx + mc.yT1 
-      yT1[idx] <- rnbinom(n=mc.yT1,size=exp(theta[j]),mu=E*mT1[j])
+  yT1 <- numeric(mc.munu*mc.y) #NULL
+  idx <- seq(mc.y)
+  for(j in seq(mc.munu)) {
+      idx <- idx + mc.y 
+      yT1[idx] <- rnbinom(n=mc.y,size=exp(theta[j]),mu=E*mT1[j])
   }
   
   #Determine the upper (1-alpha)*100% quantile of the predictive posterior

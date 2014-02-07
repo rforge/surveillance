@@ -47,13 +47,24 @@
   }
 }
 \details{
-  Using the reference values for calculating an upper limit (threshold) via the negative
-  binomial distribution, alarm is given if the actual value is bigger or equal than this threshold.
-  \code{algo.bayes} calls \code{algo.bayesLatestTimepoint} for the values specified
-  in \code{range} and for the system specified in \code{control}.
+  Using the reference values the \eqn{(1-\alpha)\cdot
+    100\%}{(1-alpha)*100\%} quantile of the
+  predictive posterior distribution is calculated as a threshold.
+  An alarm is given if the actual value is bigger or equal than this threshold.
+  It is possible to show using analytical computations that the predictive
+  posterior in this case is the negative
+  binomial distribution. Note: \code{algo.rki} or \code{algo.farrington}
+  use two-sided prediction intervals -- if one wants to compare with
+  these procedures it is necessary to use an alpha, which is half the
+  one used for these procedures.
+
+  Note also that \code{algo.bayes} calls
+  \code{algo.bayesLatestTimepoint} for the values specified in
+  \code{range} and for the system specified in \code{control}.
   \code{algo.bayes1}, \code{algo.bayes2}, \code{algo.bayes3} call
-  \code{algo.bayesLatestTimepoint} for the values specified
-  in \code{range} for the Bayes 1 system, Bayes 2 system or Bayes 3 system.
+  \code{algo.bayesLatestTimepoint} for the values specified in
+  \code{range} for the Bayes 1 system, Bayes 2 system or Bayes 3 system.
+
   \itemize{
   \item \code{"Bayes 1"} reference values from 6 weeks ago and alpha=0.05 fixed.
   \item \code{"Bayes 2"} reference values from 6 weeks ago and

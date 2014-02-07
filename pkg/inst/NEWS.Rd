@@ -115,6 +115,8 @@
 
 \subsection{BUG FIXES}{
   \itemize{
+    \item Fixed a bug during alarm plots (\code{plot.sts.alarm}),
+    where the use of \code{alarm.symbol} was ignored.
     \item Fixed a bug in \code{algo.glrnb} where the overdispersion
     parameter \code{alpha} from the automatically fitted \code{glm.nb}
     model (fitted by \code{estimateGLRNbHook}) was incorrectly taken as

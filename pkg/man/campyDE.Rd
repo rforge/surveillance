@@ -28,7 +28,11 @@ data(campyDE)
       corresponds to the first two weeks of the year (TRUE) or not
       (FALSE).}
     \item{christmas}{Boolean indicating whether the reporting week
-      corresponds to the last two weeks of the year (TRUE) or not (FALSE).}
+      corresponds to the last two weeks of the year (TRUE) or not
+      (FALSE).}
+    \item{O104period}{Boolean indicating whether the reporting week
+      corresponds to the W21-W30 period of increased gastroenteritis
+      awareness during the O104:H4 STEC outbreak.}
   }
 }
 \source{
@@ -49,6 +53,10 @@ data(campyDE)
 \examples{
   #Load the data
   data("campyDE")
+
+  #O104 period is W21-W30 in 2011
+  all(campyDE$O104period == ((campyDE$date >= as.Date("2011-05-23")) & (campyDE$date < as.Date("2011-07-31"))))
+
 
   #Make an sts object from the data.frame
   cam.sts <-  new("sts",epoch=as.numeric(campyDE$date),observed=campyDE$case,

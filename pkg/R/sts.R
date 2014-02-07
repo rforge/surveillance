@@ -560,7 +560,7 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, a
 }
 
 
-plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, epochsAsDate=x@epochAsDate, xlab="time", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,cex.yaxis=1,...) {
+plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL,xaxis.years=TRUE, xaxis.units=TRUE, epochsAsDate=x@epochAsDate, xlab="time", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4), outbreak.symbol = list(pch=3, col=3, cex=1, lwd=1),alarm.symbol=list(pch=24, col=2, cex=1,lwd=1),cex=1,cex.yaxis=1,...) {
 
   k <- 1
   #Extract slots -- depending on the algorithms: x@control$range
@@ -619,7 +619,7 @@ plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL,xaxis.years=TRUE, xa
   for (i in 1:nrow(x)) {
     idx <- (1:ncol(x))[x@alarm[i,] > 0]
     for (j in idx) {
-      points(i,j,pch=3,col=lvl[j]+1)
+      points(i,j,pch=alarm.symbol$pch,col=alarm.symbol$col[lvl[j]],cex=alarm.symbol$cex,lwd=alarm.symbol$lwd)
     }
   }
 
