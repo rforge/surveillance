@@ -160,7 +160,7 @@ intrfr.powerlaw.dlogd <- function (R, logpars, types = NULL)
             sigma/2 * log(R+sigma)^2 + R
     } else if (d == 2) {
         (-log(R+sigma) * ((R+sigma)*log(R+sigma) + 2*sigma) +
-         ((R+sigma)*log(sigma)) * (log(sigma) + 2) + 2*R) / (R+sigma)
+         (R+sigma)*log(sigma)*(log(sigma)+2) + 2*R) / (R+sigma)
     } else {
         (sigma^(2-d) * (logpars[[1L]]*(-d^2 + 3*d - 2) - 2*d + 3) +
          (R+sigma)^(1-d) * (log(R+sigma)*(d-1)*(d-2) * (R*(d-1) + sigma) +
