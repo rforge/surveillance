@@ -90,9 +90,10 @@
 }
 
 \section{Acknowledgements}{
-  T. Correa, L. Held, M. Hofmann, C. Lang, A. Riebler,
-  D. Saban\enc{é}{e}s Bov\enc{é}{e}, M. Salmon, S. Steiner, M. Virtanen,
-  and V. Wimmer made substantial contributions of code.
+  T. Correa, L. Held, M. Hofmann, C. Lang, J. Manitz, A. Riebler,
+  D. Saban\enc{é}{e}s Bov\enc{é}{e}, M. Salmon, D. Schumacher,
+  S. Steiner, M. Virtanen, and V. Wimmer
+  made substantial contributions of code.
 
   The authors would like to thank the following people for ideas,
   discussions, testing and feedback:

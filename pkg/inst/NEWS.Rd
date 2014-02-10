@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-02-05)}{
+\section{Changes in surveillance version 1.8-0 (2014-02-10)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -82,8 +82,11 @@
       values of the (scaled) interaction function (and the confidence
       interval as an attribute).
       Previously, nothing (\code{NULL}) was returned.
+      \item detects a type-specific interaction function and by default
+      uses \code{types=1} if it is not type-specific.
       \item has better default axis ranges.
-      \item adapts to the new step function kernels.
+      \item adapts to the new step function kernels (with new arguments
+      \code{verticals} and \code{do.points}).
       \item supports logarithmic axes (via new \code{log} argument
       passed on to \code{plot.default}).
     }

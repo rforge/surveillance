@@ -12,13 +12,13 @@
 }
 
 \usage{
-iafplot(object, which = c("siaf", "tiaf"),
-        types = 1:nrow(object$qmatrix), scaled = FALSE, log="",
+iafplot(object, which = c("siaf", "tiaf"), types = NULL,
+        scaled = FALSE, log="",
         conf.type = if (length(pars) > 1) "bootstrap" else "parbounds",
         conf.level = 0.95, conf.B = 999, xgrid = 101,
         col.estimate = rainbow(length(types)), col.conf = col.estimate,
         alpha.B = 0.15, lwd = c(3,1), lty = c(1,2),
-        verticals = TRUE, do.points = TRUE,
+        verticals = FALSE, do.points = FALSE,
         add = FALSE, xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL,
         legend = !add && (length(types) > 1), ...)
 }
@@ -34,7 +34,10 @@ iafplot(object, which = c("siaf", "tiaf"),
   }
   \item{types}{
     integer vector indicating for which event \code{types} 
-    the interaction function should be plotted in case of a marked twinstim.
+    the interaction function should be plotted in case of a marked
+    twinstim. The default \code{types=NULL} checks if the interaction
+    function is type-specific: if so, \code{types=1:nrow(object$qmatrix)}
+    is used, otherwise \code{types=1}.
   }
   \item{scaled}{
     logical indicating if the interaction function should be multiplied

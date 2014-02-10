@@ -576,50 +576,32 @@ formals(intensityplot.twinstim)[names(formals(intensity.twinstim))] <-
 
 ### Plot fitted tiaf or siaf(cbind(0, r)), r=distance
 
-iafplot <- function (object, which = c("siaf", "tiaf"),
-    types = 1:nrow(object$qmatrix), scaled = FALSE, log = "",
+iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
+    scaled = FALSE, log = "",
     conf.type = if (length(pars) > 1) "bootstrap" else "parbounds",
     conf.level = 0.95, conf.B = 999,
     xgrid = 101, col.estimate = rainbow(length(types)), col.conf = col.estimate,
     alpha.B = 0.15, lwd = c(3,1), lty = c(1,2),
-    verticals = TRUE, do.points = TRUE,
+    verticals = FALSE, do.points = FALSE,
     add = FALSE, xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL,
     legend = !add && (length(types) > 1), ...)
 {
     if (isTRUE(verticals)) verticals <- list()
     if (isTRUE(do.points)) do.points <- list()
     if (add) log <- paste0("", if (par("xlog")) "x", if (par("ylog")) "y")
+    coefs <- coef(object)
+    typeNames <- rownames(object$qmatrix)
+    nTypes <- length(typeNames)
+    
+    ## interaction function
     which <- match.arg(which)
     IAFobj <- object$formula[[which]]
     IAF <- IAFobj[[if (which=="siaf") "f" else "g"]]
     isStepFun <- !is.null(knots <- attr(IAFobj, "knots")) &&
         !is.null(maxRange <- attr(IAFobj, "maxRange"))
-    coefs <- coef(object)
-    ## epidemic intercept (case of no intercept is not addressed atm)
-    if (scaled) {
-        idxgamma0 <- match("e.(Intercept)", names(coefs), nomatch=0L)
-        if (idxgamma0 == 0L) {
-            message("no scaling due to missing epidemic intercept")
-            scaled <- FALSE
-        }
-    } else idxgamma0 <- 0L              # if no scaling, gamma0 is 0-length
-    gamma0 <- coefs[idxgamma0]
-    ## parameters of the interaction function
-    idxiafpars <- grep(paste0("^e\\.",which), names(coefs))
-    iafpars <- coefs[idxiafpars]
-    ## concatenate parameters
-    idxpars <- c(idxgamma0, idxiafpars)
-    pars <- c(gamma0, iafpars)
-    ## type of confidence band
-    force(conf.type)                    # per default depends on 'pars'
-    if (length(pars) == 0 || is.null(conf.type) || is.na(conf.type)) {
-        conf.type <- "none"
-    }
-    conf.type <- match.arg(conf.type,
-                           choices = c("parbounds", "bootstrap", "none"))
 
-    ## add intercept-factor to IAF if scaled=TRUE
-    FUN <- if (scaled) {
+    ## scaling by epidemic intercept
+    FUN <- if (scaled) { # add intercept-factor to IAF if scaled=TRUE
         function (x, pars, types) {
             gamma0 <- pars[1L]
             iafpars <- pars[-1L]
@@ -630,7 +612,30 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
     ##     body(FUN)[[length(body(FUN))]] <-
     ##         call("log", body(FUN)[[length(body(FUN))]])
     ## }
-    
+    if (scaled) { # epidemic intercept
+        idxgamma0 <- match("e.(Intercept)", names(coefs), nomatch=0L)
+        if (idxgamma0 == 0L) {
+            message("no scaling due to missing epidemic intercept")
+            scaled <- FALSE
+        }
+    } else idxgamma0 <- 0L              # if no scaling, gamma0 is 0-length
+    gamma0 <- coefs[idxgamma0]
+
+    ## parameters of the interaction function
+    idxiafpars <- grep(paste0("^e\\.",which), names(coefs))
+    iafpars <- coefs[idxiafpars]
+    ## concatenate parameters
+    idxpars <- c(idxgamma0, idxiafpars)
+    pars <- c(gamma0, iafpars)
+
+    ## type of confidence band
+    force(conf.type)                    # per default depends on 'pars'
+    if (length(pars) == 0 || is.null(conf.type) || is.na(conf.type)) {
+        conf.type <- "none"
+    }
+    conf.type <- match.arg(conf.type,
+                           choices = c("parbounds", "bootstrap", "none"))
+
     ## grid of x-values (t or ||s||) on which FUN will be evaluated
     if (is.null(xlim)) {
         xmax <- if (add) {
@@ -668,7 +673,22 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
         if (is.null(match.call()$xlim)) xlim <- range(xgrid)
         sort(xgrid)
     }
-    
+
+    ## type selection
+    if (is.null(types)) { # check if the interaction function is type-specific
+        if (nTypes == 1L || IAFobj$npars < 2) {
+            types <- 1L
+        } else { # we compare the values for different types
+            .fByType <- sapply(seq_len(nTypes), function (type)
+                               IAF(if (which=="siaf") cbind(0,xgrid) else xgrid,
+                                   iafpars, type))
+            types <- if (all(apply(.fByType[,-1L,drop=FALSE], 2L,
+                                   function (fvals)
+                                   identical(.fByType[,1L], fvals))))
+                1L else seq_len(nTypes)
+        }
+    }
+
     ## initialize plotting frame
     if (!add) {
         if (is.null(ylim))
@@ -697,9 +717,9 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
     }
 
     ## store evaluated interaction function in a matrix (will be returned)
-    typeNames <- rownames(object$qmatrix)[types]
+    typeNamesSel <- typeNames[types]
     res <- matrix(NA_real_, length(xgrid), 1L+length(types),
-                  dimnames = list(NULL, c("x", typeNames)))
+                  dimnames = list(NULL, c("x", typeNamesSel)))
     res[,1L] <- xgrid
     for (i in seq_along(types)) {
         ## select parameters on which to evaluate iaf
@@ -738,7 +758,7 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
             }
             if (!is.null(lowerupper)) {
                 attr(res, if(length(types)==1) "CI" else
-                     paste0("CI.",typeNames[i])) <- lowerupper
+                     paste0("CI.",typeNamesSel[i])) <- lowerupper
                 if (isStepFun) {
                     segments(rep.int(xgrid,2L), lowerupper,
                              rep.int(c(xgrid[-1L], min(maxRange, xlim[2L])), 2L), lowerupper,
@@ -791,7 +811,7 @@ iafplot <- function (object, which = c("siaf", "tiaf"),
     
     ## add legend
     if (isTRUE(legend) || is.list(legend)) {
-        default.legend <- list(x = "topright", legend = typeNames,
+        default.legend <- list(x = "topright", legend = typeNamesSel,
                                col = col.estimate, lty = lty[1], lwd = lwd[1],
                                bty = "n", cex = 0.9, title="type")
         legend.args <- if (is.list(legend)) {

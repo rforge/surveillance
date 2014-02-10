@@ -1,7 +1,7 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
 Version: 1.8-0
-Date: 2014-01-31
+Date: 2014-02-10
 Authors@R: c(person("Michael", "Höhle",
                     email = "Michael.Hoehle@stat.uni-muenchen.de",
                     role = c("aut", "cre", "ths")),
@@ -17,9 +17,11 @@ Authors@R: c(person("Michael", "Höhle",
              person("T.", "Correa", role = "ctb"),
              person("M.", "Hofmann", role = "ctb"),
              person("C.", "Lang", role = "ctb"),
+	     person("J.", "Manitz", role = "ctb"),
              person("A.", "Riebler", role = "ctb"),
              person("D.", "Sabanés Bové", role = "ctb"),
              person("M.", "Salmon", role = "ctb"),
+             person("D.", "Schumacher", role = "ctb"),
              person("S.", "Steiner", role = "ctb"),
              person("M.", "Virtanen", role = "ctb"),
              person("V.", "Wimmer", role = "ctb"),
