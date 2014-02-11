@@ -82,11 +82,13 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     stopifnot(isScalar(nCircle2Poly))
     nCircle2Poly <- as.integer(nCircle2Poly)
     
-    # Small helper function converting event index to (time, tile) string
+    # Small helper function converting event index to (time, tile, type) string
     eventidx2string <- function (eventIdx) {
-        paste(c("time", "tile", "type"), "=",
-              unlist(events@data[eventIdx,c("time","tile","type")]),
-              collapse = ", ")
+        with(events@data,
+             paste(c("time", "tile", "type"), "=",
+                   c(time[eventIdx], dQuote(tile[eventIdx]),
+                     dQuote(type[eventIdx])),
+                   collapse = ", "))
     }
 
     # Check that all events are part of W
