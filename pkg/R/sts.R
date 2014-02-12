@@ -457,7 +457,7 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek,xaxis.units,c
   invisible()
 }
 
-plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, axes=TRUE, xaxis.units=TRUE, epochsAsDate=x@epochAsDate, xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1), outbreak.symbol = list(pch=3, col=3, cex=1),alarm.symbol=list(pch=24, col=2, cex=1),cex=1,legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0.5,hookFunc=function() {},...) {
+plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, axes=TRUE, xaxis.units=TRUE, epochsAsDate=x@epochAsDate, xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1), outbreak.symbol = list(pch=3, col=3, cex=1,lwd=1),alarm.symbol=list(pch=24, col=2, cex=1,lwd=1),cex=1,legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0.5,hookFunc=function() {},...) {
 
   #Extract slots -- depending on the algorithms: x@control$range
   observed   <- x@observed[,k]
@@ -522,13 +522,13 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL,xaxis.years=TRUE, a
   #Draw outbreak symbols
   alarmIdx <- which(!is.na(alarm) & (alarm == 1))
   if (length(alarmIdx)>0) {
-    matpoints( alarmIdx, rep(-1/40*ylim[2],length(alarmIdx)), pch=alarm.symbol$pch, col=alarm.symbol$col, cex= alarm.symbol$cex)
+    matpoints( alarmIdx, rep(-1/40*ylim[2],length(alarmIdx)), pch=alarm.symbol$pch, col=alarm.symbol$col, cex= alarm.symbol$cex, lwd=alarm.symbol$lwd)
   }
   
   #Draw alarm symbols
   stateIdx <- which(state == 1)
   if (length(stateIdx)>0) {
-    matpoints( stateIdx, rep(-1/20*ylim[2],length(stateIdx)), pch=outbreak.symbol$pch, col=outbreak.symbol$col,cex = outbreak.symbol$cex)
+    matpoints( stateIdx, rep(-1/20*ylim[2],length(stateIdx)), pch=outbreak.symbol$pch, col=outbreak.symbol$col,cex = outbreak.symbol$cex,lwd=outbreak.symbol$lwd)
   }
 
   #Label x-axis 
