@@ -2,7 +2,7 @@
 \alias{algo.glrnb}
 \encoding{latin1}
 
-\title{Cound data regression charts}
+\title{Count data regression charts}
 \description{
  Count data regression charts for the monitoring of surveillance time series.
 }
@@ -159,8 +159,3 @@ Poisson regression charts for the monitoring of surveillance time
 series (2006), \enc{Höhle}{Hoehle}, M., SFB386 Discussion Paper 500.
 }
 
-
-
-% Hook
-
-%Rnw file 
