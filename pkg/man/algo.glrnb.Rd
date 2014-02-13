@@ -1,5 +1,6 @@
 \name{algo.glrnb}
 \alias{algo.glrnb}
+\alias{glrnb}
 \encoding{latin1}
 
 \title{Count data regression charts}

@@ -1,6 +1,7 @@
 \encoding{latin1}
 \name{algo.outbreakP}
 \alias{algo.outbreakP}
+\alias{outbreakP}
 \alias{calc.outbreakP.statistic}
 \title{Semiparametric surveillance of outbreaks}
 \description{

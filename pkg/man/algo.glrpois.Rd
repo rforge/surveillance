@@ -1,5 +1,6 @@
 \name{algo.glrpois}
 \alias{algo.glrpois}
+\alias{glrpois}
 \encoding{latin1}
 
 \title{Poisson regression charts}

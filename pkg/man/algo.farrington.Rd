@@ -1,5 +1,6 @@
 \name{algo.farrington}
 \alias{algo.farrington}
+\alias{farrington}
 \encoding{latin1}
 
 \title{Surveillance for a count data time series using the Farrington method.}
