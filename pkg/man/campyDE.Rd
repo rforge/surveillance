@@ -55,8 +55,10 @@ data(campyDE)
   data("campyDE")
 
   #O104 period is W21-W30 in 2011
-  all(campyDE$O104period == ((campyDE$date >= as.Date("2011-05-23")) & (campyDE$date < as.Date("2011-07-31"))))
-
+  stopifnot(all(campyDE$O104period == (
+      (campyDE$date >= as.Date("2011-05-23")) &
+      (campyDE$date < as.Date("2011-07-31"))
+  )))
 
   #Make an sts object from the data.frame
   cam.sts <-  new("sts",epoch=as.numeric(campyDE$date),observed=campyDE$case,
