@@ -1,6 +1,5 @@
 \name{algo.bayes}
 \alias{algo.bayes}
-\alias{bayes}
 \alias{algo.bayesLatestTimepoint}
 \alias{algo.bayes1}
 \alias{algo.bayes2}

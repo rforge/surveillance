@@ -1,7 +1,6 @@
 \name{algo.rki}
 \alias{algo.rkiLatestTimepoint}
 \alias{algo.rki}
-\alias{rki}
 \alias{algo.rki1}
 \alias{algo.rki2}
 \alias{algo.rki3}

@@ -1,6 +1,5 @@
 \name{algo.cusum}
 \alias{algo.cusum}
-\alias{cusum}
 \title{CUSUM method}
 \encoding{latin1}
 \description{ 

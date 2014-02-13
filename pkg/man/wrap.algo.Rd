@@ -1,8 +1,12 @@
 \name{wrap.algo}
 \alias{wrap.algo}
-
-
-
+\alias{farrington}
+\alias{bayes}
+\alias{rki}
+\alias{cusum}
+\alias{glrpois}
+\alias{glrnb}
+\alias{outbreakP}
 %% FIXME: hmm and rogerson are currently undocumented and unexported
 %\alias{hmm}
 %\alias{rogerson}
