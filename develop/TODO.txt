@@ -1,6 +1,5 @@
 ######################################################################
-# Text file containing a list of things to fix or items for additional
-# implementation.
+# List of things to fix or items for additional implementation.
 #
 # $Date$
 ######################################################################
@@ -29,8 +28,8 @@
 21/04/2011 incorporate a NAMESPACE :) (as of R 2.14.0 this is obligatory)
 19/06/2012 move vignettes into a vignettes directory or create .Rinstignore
            (as of R 2.14.0 the preferred location for vignette sources is
-            directory ‘vignettes’ and not ‘inst/doc’)
-18/04/2013 Author@R field in the ‘DESCRIPTION’ file.
+            directory "vignettes" and not "inst/doc")
+18/04/2013 Author@R field in the "DESCRIPTION" file.
 
 
 
@@ -111,19 +110,23 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 # Features
 ##########
 
-#Open issues / feature requests
+# Feature requests
 - as.epidataCS: "events" could be provided as an object of class ppx (which
   would include the window "W") or of class STIDF, then transform appropriately
   (but don't change "epidataCS" class definition).
   "stgrid" could be of class STFDF.
 - why don't we set environment(endemic)<-environment(epidemic)<-.GlobalEnv ???
   was that necessary for stepComponent to work?
-- implement step function support for interaction kernels
 - allow for spatial "prehistory", i.e. events outside of W as possible sources
   in the epidemic component only, but otherwise not part of the likelihood
+- update.epidataCS(): add or remove stgrid variables
+- marks<-.epidataCS(,add=TRUE): to add marks
+- validate (test) twinstim by twinSIR and glm if only endemic component
+- allow for type-specific endemic effects, i.e. interaction with type. ideas:
+use "special", or extra argument typeSpecificEffects=c("(Intercept)",
+"influenza0"), ... maybe we can just use the classical formula interface (":")?
 
-
-#Done
+# Done
 06/08/2010 (sebastian): Lambda(t) function, i.e. cumulative intensity function
 12/08/2010 (sebastian): speed-up calculation of tau importantly by only evaluating .siafInt(siafpars) once
 08/11/2010 (sebastian): Implementation of simulation algorithm
@@ -137,7 +140,7 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 10/12/2012 (sebastian): intensityplot-method for simEpidataCS passing by
                         twinstim() with all parameters fixed
 11/05/2013 (sebastian): allow for use of rgeos instead of gpclib for polygon operations
-
+13/02/2014 (sebastian): implement step function support for interaction kernels
 
 
 #======================================================================

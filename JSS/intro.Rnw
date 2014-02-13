@@ -61,6 +61,35 @@ overview of packages, documentation, and tutorials.
 %% \end{itemize}
 
 
+%% Online sources on R packages for spatio(-temporal) analysis
+%% -----------------------------------------------------------
+%% http://cran.at.r-project.org/web/views/Spatial.html
+%% http://r-spatial.sourceforge.net/
+%% https://stat.ethz.ch/mailman/listinfo/r-sig-geo
+%% http://geodacenter.asu.edu/r-spatial-projects/ (A number of notes about spatial analysis appeared in R News in 2001-2002)
+%% http://www.spatstat.org/spatstat/spatstat2.html
+%% http://www.geog.uu.nl/~pebesma/wun/
+%% http://homepages.paradise.net.nz/david.harte/SSLib/
+
+
+%% R packages
+%% ----------
+%% geostatistical data: gstat, geoR/geoRglm, fields, RandomFields, spBayes
+%% point patterns:
+%%     spatial (Ripley: "Functions for kriging and point pattern analysis")
+%%     splancs (Rowlingson, Diggle, Bivand: "Spatial and Space-Time Point Pattern Analysis")
+%%     spatstat (Baddeley, Turner: "Spatial Point Pattern analysis, model-fitting, simulation, tests")
+%%     [spatgraphs (neighbourhood graphs for spatial point processes), MarkedPointProcess (Analysis of Marks), spatialkernel (Nonparameteric (edge-corrected kernel density) estimation of spatial segregation), spatclus (Spatial Cluster Detection)] <- bad R style
+%%     PtProcess, SSLib (fitting/modelling the conditional intensity function for events ordered by time !!!)
+%%     spsurvey (Olson, Stevens: "Spatial Survey Design and Analysis", spatial sampling)
+%% lattice/area data: spdep, DCluster (detection of spatial clusters of diseases), spgwr
+
+
+
+
+
+
+
 putting the modeling into a regression-oriented framework
 
 
