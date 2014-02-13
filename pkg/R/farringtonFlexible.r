@@ -276,7 +276,7 @@ farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
 								noPeriods=control$noPeriods,typePred=control$typePred,
 								fitFun=control$fitFun,glmWarnings=control$glmWarnings,
 								epochAsDate=epochAsDate,dayToConsider=dayToConsider,
-								diffDates=diffDates,populationNow=population[k],k,
+								diffDates=diffDates,populationNow=population[k,j],k,
 								verbose=control$verbose)
             
 			pred <- finalModel$pred
@@ -292,7 +292,7 @@ farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
 			argumentsThreshold <- list(predFit=pred$fit,predSeFit=pred$se.fit,
 	                                                phi=finalModel$phi,
                                                         skewness.transform=control$powertrans,
-                                                        alpha=control$alpha, y=observed[k],
+                                                        alpha=control$alpha, y=observed[k,j],
 							method=control$thresholdMethod
                                                         )
 
@@ -315,7 +315,6 @@ farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
             
             #Do we have an alarm -- i.e. is observation beyond CI??
             #upperbound only relevant if we can have an alarm (enoughCases)
- 
             sts@alarm[k,j] <- !is.na(X) && (X>=1)
             sts@upperbound[k,j] <- ifelse(enoughCases,lu$upper,NA)
             
