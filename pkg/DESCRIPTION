@@ -43,7 +43,7 @@ Suggests: parallel, msm, spc, colorspace, animation,
         quadprog,
         memoise, polyclip, rgeos, gpclib, maptools, intervals,
         spdep, numDeriv, maxLik,
-        testthat, RUnit, digest, coda, splancs, gamlss,
+        testthat, coda, splancs, gamlss,
         INLA
 Description: A package implementing statistical methods for the modeling and
         change-point detection in time series of counts, proportions and

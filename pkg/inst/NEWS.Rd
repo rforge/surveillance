@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-02-10)}{
+\section{Changes in surveillance version 1.8-0 (2014-02-12)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -113,6 +113,8 @@
     the supplied new list elements (\code{"F"}, \code{"Deriv"})
     completely replace the respective elements from the original
     \code{control.siaf} specification.
+    \item Now using \CRANpkg{testthat} for package testing instead of
+    the outdated \CRANpkg{RUnit}.
   }
 }
 
