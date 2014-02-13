@@ -1048,7 +1048,10 @@ setAs(from="sts", to="ts", def = function (from)
   
 
  
-################
+####################
+# toLatex method
+####################  
+
 toLatex.sts <- function(object, caption = "",label=" ", labels = NULL,
                         subset = NULL, 
                         alarmPrefix = "\\textbf{\\textcolor{red}{",
@@ -1193,8 +1196,8 @@ toLatex.sts <- function(object, caption = "",label=" ", labels = NULL,
   if (is.null(subset))
     subset <- 1:nrow(dataTable)
   else if (min(subset) < 1 || max(subset) > nrow(dataTable))
-    stop("subset parameter must be in the inverval between 1 
-         and length(observed)")
+    stop("'subset' must be a subset of 1:nrow(observed), i.e., 1:",
+         nrow(dataTable))
   
   dataTable <- dataTable[subset,]
   
@@ -1204,9 +1207,7 @@ toLatex.sts <- function(object, caption = "",label=" ", labels = NULL,
   xDataTable <- xtable(dataTable, label = tableLabel, caption = tableCaption, digits = c(0))
   toLatex(xDataTable, ...) 
 }
-####################
-# toLatex method
-####################  
-setMethod("toLatex", "sts",toLatex.sts )
- 
-    
+
+setMethod("toLatex", "sts", toLatex.sts)
+setMethod("toLatex", "list", toLatex.sts)
+##<- FIXME: actually need a formal class for lists of sts objects
