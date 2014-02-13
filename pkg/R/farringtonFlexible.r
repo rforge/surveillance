@@ -315,7 +315,7 @@ farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
             
             #Do we have an alarm -- i.e. is observation beyond CI??
             #upperbound only relevant if we can have an alarm (enoughCases)
-            sts@alarm[k,j] <- !is.na(X) && (X>=1)
+            sts@alarm[k,j] <- !is.na(X) && (X>=1) && observed[k,j]!=0
             sts@upperbound[k,j] <- ifelse(enoughCases,lu$upper,NA)
             
             # Possible bug alarm although upperbound <- 0? 

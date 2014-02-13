@@ -81,7 +81,7 @@ checkEquals(weights[6:10],rep(0.4,5))
 ################################################################################
 
 ################################################################################
-# RESIDUALS FUNCTION
+# ALARM TEST
 ################################################################################
 
 # residuals should be zero
@@ -420,7 +420,17 @@ checkEquals(finalModel$doTrend,FALSE)
 # END OF GLM FUNCTION TESTS
 ################################################################################
 
-
+################################################################################
+# END ALARM TESTS
+################################################################################
+test <- farringtonFlexible(salm)
+# No alarm when observed is 0
+checkTrue(sum(observed(test)[test@alarm==TRUE]>rep(0,sum(test@alarm==TRUE)))==sum(test@alarm==TRUE))
+# No alarm when the observed counts are UNDER the threshold
+checkTrue(sum(observed(test)[test@alarm==TRUE]>=upperbound(test)[test@alarm==TRUE])==sum(test@alarm==TRUE))
+################################################################################
+# RESIDUALS FUNCTION
+################################################################################
 
 
 
