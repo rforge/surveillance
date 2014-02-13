@@ -74,4 +74,5 @@ Description: A package implementing statistical methods for the modeling and
         temporal, spatial or spatio-temporal fashion.
 License: GPL-2
 URL: http://surveillance.r-forge.r-project.org/
+BugReports: https://r-forge.r-project.org/tracker/?func=browse&group_id=45&atid=237
 Encoding: latin1
