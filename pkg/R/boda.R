@@ -10,7 +10,7 @@
 #
 # Author:
 # The initial code was written by J. Manitz, which was then later
-# adapted and modified for integration into the package by by M. Höhle.
+# adapted and modified for integration into the package by M. Hoehle.
 #
 # Date:
 #  Code continuously developed during 2010-2014
