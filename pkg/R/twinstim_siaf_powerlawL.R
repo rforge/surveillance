@@ -6,7 +6,7 @@
 ### _L_agged power-law kernel f(s) = (||s||/sigma)^-d for ||s|| >= sigma, else 1
 ### Similar to the density of the Pareto distribution (but value 1 for < sigma)
 ###
-### Copyright (C) 2013 Sebastian Meyer
+### Copyright (C) 2013-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -30,24 +30,16 @@ siaf.powerlawL <- function (nTypes = 1, validpars = NULL)
 
     ## spatial kernel
     f <- function (s, logpars, types = NULL) {}
-    body(f) <- as.call(c(as.name("{"),
-        tmp,
-        expression(sLength <- sqrt(.rowSums(s^2, nrow(s), 2L))),
-        expression(ifelse(sLength < sigma, 1, (sLength/sigma)^-d))
-    ))
+    body(f) <- as.call(c(as.name("{"), tmp, expression(
+        sLength <- sqrt(.rowSums(s^2, L <- length(s)/2, 2L)),
+        fvals <- rep.int(1, L),
+        inPLrange <- which(sLength > sigma),
+        fvals[inPLrange] <- (sLength[inPLrange]/sigma)^-d,
+        fvals
+        )))
 
     ## numerically integrate f over a polygonal domain
     F <- siaf.fallback.F
-    ## alternative (too slow): subtract the inner sigma-region with constant f=1 from polydomain
-    ## F <- function (polydomain, f, logpars, type=NULL, nGQ=20L, nCircle2Poly=32)
-    ## {
-    ##     sigma <- exp(logpars[[1L]])
-    ##     intinner <- pi*sigma^2
-    ##     poly <- setdiff(owin2gpc(polydomain),
-    ##                     discpoly(c(0,0), sigma, npoly=nCircle2Poly, class="gpc.poly"))
-    ##     intpoly <- polyCub.SV(poly, f, logpars, type=type, alpha=0, nGQ=nGQ)
-    ##     intinner + intpoly
-    ## }
     
     ## fast integration of f over a circular domain
     Fcircle <- function (r, logpars, type = NULL) {}
@@ -69,18 +61,15 @@ siaf.powerlawL <- function (nTypes = 1, validpars = NULL)
 
     ## derivative of f wrt logpars
     deriv <- function (s, logpars, types = NULL) {}
-    body(deriv) <- as.call(c(as.name("{"),
-        tmp,
-        expression(
-            sLength <- sqrt(.rowSums(s^2, nrow(s), 2L)),
-            f <- (sLength/sigma)^-d,
-            derivlogsigma <- d*f,
-            derivlogd <- f*log(f),
-            idx0 <- sLength < sigma,
-            derivlogsigma[idx0] <- derivlogd[idx0] <- 0,
-            cbind(derivlogsigma, derivlogd)
-            )
-    ))
+    body(deriv) <- as.call(c(as.name("{"), tmp, expression(
+        sLength <- sqrt(.rowSums(s^2, L <- length(s)/2, 2L)),
+        derivlogsigma <- derivlogd <- numeric(L),
+        inPLrange <- which(sLength > sigma),
+        fPL <- (sLength[inPLrange]/sigma)^-d,
+        derivlogsigma[inPLrange] <- d * fPL,
+        derivlogd[inPLrange] <- fPL * log(fPL),
+        cbind(derivlogsigma, derivlogd)
+        )))
 
     ## Numerical integration of 'deriv' over a polygonal domain
     Deriv <- function (polydomain, deriv, logpars, type = NULL, nGQ = 20L) {}
@@ -106,20 +95,6 @@ siaf.powerlawL <- function (nTypes = 1, validpars = NULL)
             res
             )
     ))
-
-    ## ## "effective" integration range (based on quantile of the Pareto distri)
-    ## effRange <- if (isScalar(effRangeProb)) {
-    ##     stop("'effRange' is currently not supported for power law's")
-    ##     effRange <- function (logpars) {}
-    ##     body(effRange) <- as.call(c(as.name("{"),
-    ##         tmp,
-    ##         expression(
-    ##             alpha <- d-1,  # only works for alpha > 0, i.e. d > 1 !
-    ##             sigma/(1-effRangeProb)^(1/alpha)
-    ##             )
-    ##     ))
-    ##     effRange
-    ## } else NULL
 
     ## simulate from the lagged power-law kernel (within a maximum distance 'ub')
     simulate <- function (n, logpars, type, ub)

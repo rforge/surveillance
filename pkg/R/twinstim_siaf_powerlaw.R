@@ -123,7 +123,7 @@ intrfr.powerlaw <- function (R, logpars, types = NULL)
         (R*(R+sigma)^(1-d) - ((R+sigma)^(2-d) - sigma^(2-d))/(2-d)) / (1-d)
     }
 }
-## local({ ## validation via numerical integration
+## local({ # validation via numerical integration -> tests/testthat/test-siafs.R
 ##     p <- function (r, sigma, d) r * (r+sigma)^-d
 ##     Pnum <- function (r, sigma, d) sapply(r, function (.r) {
 ##         integrate(p, 0, .r, sigma=sigma, d=d)$value
@@ -139,18 +139,9 @@ intrfr.powerlaw.dlogsigma <- function (R, logpars, types = NULL)
     pars <- exp(logpars)
     -prod(pars) * intrfr.powerlaw(R, log(pars+c(0,1)), types)
 }
-## local({ ## validation via numerical integration
-##     p <- function (r, sigma, d) r * -d*sigma / (r+sigma)^(d+1)
-##     Pnum <- function (r, sigma, d) sapply(r, function (.r) {
-##         integrate(p, 0, .r, sigma=sigma, d=d)$value
-##     })
-##     r <- c(1,2,5,10,20,50,100)
-##     dev.null <- sapply(c(1,2,1.6), function(d) stopifnot(isTRUE(
-##         all.equal(intrfr.powerlaw.dlogsigma(r, log(c(3, d))), Pnum(r, 3, d)))))
-## })
 
 ## integrate x * (df(x)/dlogd) from 0 to R (vectorized)
-## (thanks to Maple 17)
+## (thanks to Maple 17) -> validated in tests/testthat/test-siafs.R
 intrfr.powerlaw.dlogd <- function (R, logpars, types = NULL)
 {
     sigma <- exp(logpars[[1L]])
@@ -168,12 +159,3 @@ intrfr.powerlaw.dlogd <- function (R, logpars, types = NULL)
          ) * d / (d-1)^2 / (d-2)^2
     }
 }
-## local({ ## validation via numerical integration
-##     p <- function (r, sigma, d) r * -log((r+sigma)^d) / (r+sigma)^d
-##     Pnum <- function (r, sigma, d) sapply(r, function (.r) {
-##         integrate(p, 0, .r, sigma=sigma, d=d)$value
-##     })
-##     r <- c(1,2,5,10,20,50,100)
-##     dev.null <- sapply(c(1,2,1.6), function(d) stopifnot(isTRUE(
-##         all.equal(intrfr.powerlaw.dlogd(r, log(c(3, d))), Pnum(r, 3, d)))))
-## })
