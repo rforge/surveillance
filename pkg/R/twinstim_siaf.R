@@ -179,7 +179,8 @@ siaf.simulatePC <- function (intrfr)    # e.g., intrfr.powerlaw
 ### Check F, Fcircle, deriv, Deriv, and simulate
 ################################################
 
-checksiaf <- function (siaf, pargrid, type = 1, method = "SV", tolerance = 1e-5)
+checksiaf <- function (siaf, pargrid, type = 1, tolerance = 1e-5,
+                       method = "SV", ...)
 {
     stopifnot(is.list(siaf), is.numeric(pargrid), !is.na(pargrid),
               length(pargrid) > 0)
@@ -189,8 +190,8 @@ checksiaf <- function (siaf, pargrid, type = 1, method = "SV", tolerance = 1e-5)
     ## Check 'F'
     if (!is.null(siaf$F)) {
         cat("'F' vs. cubature using method = \"", method ,"\" ... ", sep="")
-        comp.F <- checksiaf.F(siaf$F, siaf$f, pargrid,
-                              type=type, method=method)
+        comp.F <- checksiaf.F(siaf$F, siaf$f, pargrid, type=type,
+                              method=method, ...)
         cat(attr(comp.F, "all.equal") <-
             all.equal(comp.F[,1], comp.F[,2],
                       check.attributes=FALSE, tolerance=tolerance),
@@ -201,7 +202,7 @@ checksiaf <- function (siaf, pargrid, type = 1, method = "SV", tolerance = 1e-5)
     if (!is.null(siaf$Fcircle)) {
         cat("'Fcircle' vs. cubature using method = \"",method,"\" ... ", sep="")
         comp.Fcircle <- checksiaf.Fcircle(siaf$Fcircle, siaf$f, pargrid,
-                                          type=type, method=method)
+                                          type=type, method=method, ...)
         cat(attr(comp.Fcircle, "all.equal") <-
             all.equal(comp.Fcircle[,1], comp.Fcircle[,2],
                       check.attributes=FALSE, tolerance=tolerance),
@@ -223,7 +224,7 @@ checksiaf <- function (siaf, pargrid, type = 1, method = "SV", tolerance = 1e-5)
     if (!is.null(siaf$Deriv)) {
         cat("'Deriv' vs. cubature using method = \"", method ,"\" ... ", sep="")
         comp.Deriv <- checksiaf.Deriv(siaf$Deriv, siaf$deriv, pargrid,
-                                      type=type, method=method)
+                                      type=type, method=method, ...)
         if (siaf$npars > 1) cat("\n")
         attr(comp.Deriv, "all.equal") <-
             sapply(seq_len(siaf$npars), function (j) {
@@ -307,8 +308,8 @@ checksiaf.simulate <- function (simulate, f, pars, type=1, B=3000, ub=10)
     ## Simulate B points on the disc with radius 'ub'
     simpoints <- simulate(B, pars, type=type, ub=ub)
 
-    ## Graphical check
-    par(mar=c(1,2,2,1))
+    ## Graphical check in 2D
+    opar <- par(mfrow=c(2,1), mar=c(4,3,2,1)); on.exit(par(opar))
     plot(as.im.function(function(x,y,...) f(cbind(x,y), pars, type),
                         W=discpoly(c(0,0), ub, class="owin")),
          axes=TRUE, main="Simulation from the spatial kernel")
@@ -317,5 +318,13 @@ checksiaf.simulate <- function (simulate, f, pars, type=1, B=3000, ub=10)
     contour(kdens, add=TRUE, col=2, lwd=2,
             labcex=1.5, vfont=c("sans serif", "bold"))
     ##x11(); image(kdens, add=TRUE)
+
+    ## Graphical check of distance distribution
+    MASS::truehist(sqrt(rowSums(simpoints^2)), xlab="Distance")
+    rfr <- function (r) r*f(cbind(r,0), pars, type)
+    rfrnorm <- integrate(rfr, 0, ub)$value
+    curve(rfr(x) / rfrnorm, add=TRUE, col=2, lwd=2)
+
+    ## invisibly return simulated points
     invisible(simpoints)
 }
