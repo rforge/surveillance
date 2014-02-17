@@ -34,10 +34,15 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
 {
     nTypes <- as.integer(nTypes)
     stopifnot(length(nTypes) == 1L, nTypes > 0L)
+    if (isScalar(F.adaptive)) {
+        adapt <- F.adaptive
+        F.adaptive <- TRUE
+    } else adapt <- 0.1
 
     f <- function (s, pars, types) {}       # coordinate matrix s, length(types) = 1 or nrow(s)
     F <- if (F.adaptive) {
-        function(polydomain, f, pars, type, adapt=0.1) {}
+        as.function(c(alist(polydomain=, f=, pars=, type=),
+                      list(adapt=adapt), quote({})))
     } else siaf.fallback.F
     Fcircle <- function (r, pars, type) {}  # single radius and type
     effRange <- function (pars) {}

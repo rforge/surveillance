@@ -90,9 +90,11 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
     (\code{\link[polyCub]{polyCub.midpoint}} in package \pkg{polyCub})
     of the Gaussian interaction
     kernel, where \code{adapt} is an extra parameter of the returned
-    \code{siaf$F} function and defaults to 0.1, but it may also be
-    specified in the \code{control.siaf$F} argument list of
-    \code{twinstim}.\cr  
+    \code{siaf$F} function and defaults to 0.1. It can be customized
+    either by the \code{control.siaf$F} argument list of
+    \code{twinstim}, or by a numeric specification of \code{F.adaptive}
+    in the constructing call, e.g., \code{F.adaptive = 0.05} to achieve
+    higher accuracy.\cr
     Otherwise, if \code{F.adaptive = FALSE}, a general cubature
     method (\code{\link[polyCub]{polyCub}}) is returned as \code{siaf$F}
     component, where the \code{method} and accuracy (\code{eps},
