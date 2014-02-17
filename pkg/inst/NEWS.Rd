@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-02-12)}{
+\section{Changes in surveillance version 1.8-0 (2014-02-17)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -17,7 +17,7 @@
     available for backwards compatibility but may be removed in the future.
   }
 }
-  
+
 \subsection{NEW FEATURES}{
   \itemize{
     \item The package contains a new monitoring function
@@ -58,10 +58,10 @@
     \item New predefined temporal interaction function for \code{twinstim()}:
     \code{tiaf.step()} implements a step function.
 
-    \item \code{siaf.powerlaw()}'s integration over polygonal domains in
-    the \code{F} and \code{Deriv} components is much faster and more
-    accurate now since it partially uses analytic expressions
-    (with \code{polyCub.iso()}) instead of \code{polyCub.SV()}.
+    \item Numerical integration over polygonal domains in the \code{F}
+    and \code{Deriv} components of \code{siaf.powerlaw()} and
+    \code{siaf.powerlawL()} is much faster and more accurate now since
+    we use \code{polyCub.iso()} instead of \code{polyCub.SV()}.
 
     \item Inference for neighbourhood weights in \code{hhh4()} models:
     \code{W.powerlaw()} and \code{W.np()} both implement weights
@@ -71,6 +71,8 @@
 
     \item \code{hhh4()} now stores the runtime just like
     \code{twinstim()}.
+
+    \item New \code{toLatex}-method for \code{"sts"} objects.
   }
 }
 
@@ -105,6 +107,8 @@
     dropped, which makes fitted objects substantially smaller.
     \item \code{siaf.lomax()} is now defunct (it has been deprecated
     since version 1.5-2); use \code{siaf.powerlaw()} instead.
+    \item Allow the default \code{adapt}ive bandwidth to be specified via the
+    \code{F.adaptive} argument in \code{siaf.gaussian()}.
     \item Unsupported options (\code{logpars=FALSE},
     \code{effRangeProb}) have been dropped from \code{siaf.powerlaw()}
     and \code{siaf.powerlawL()}.
