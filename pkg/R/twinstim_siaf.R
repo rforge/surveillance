@@ -323,7 +323,8 @@ checksiaf.simulate <- function (simulate, f, pars, type=1, B=3000, ub=10)
     MASS::truehist(sqrt(rowSums(simpoints^2)), xlab="Distance")
     rfr <- function (r) r*f(cbind(r,0), pars, type)
     rfrnorm <- integrate(rfr, 0, ub)$value
-    curve(rfr(x) / rfrnorm, add=TRUE, col=2, lwd=2)
+    do.call("curve", list(quote(rfr(x)/rfrnorm), add=TRUE, col=2, lwd=2))
+    ##<- use do.call-construct to prevent codetools::checkUsage from noting "x"
 
     ## invisibly return simulated points
     invisible(simpoints)
