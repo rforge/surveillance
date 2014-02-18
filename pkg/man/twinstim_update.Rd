@@ -27,7 +27,11 @@ especially useful if one wants to add the \code{model} environment
   \item{model}{see \code{\link{twinstim}}. If this is the only argument
     to update, re-fitting is cleverly circumvented.}
   \item{\dots}{Additional arguments to the call, or arguments with changed
-    values.}
+    values.\cr
+    If \code{start} values are specified, they need to be in the same
+    format as in the original call \code{object$call$start},
+    which is either a named list of named numeric vectors or a named
+    numeric vector; see the argument description in \code{\link{twinstim}}.}
   \item{use.estimates}{logical indicating if the estimates of
   \code{object} should be used as initial values for the new fit
   (in the \code{start} argument of \code{twinstim}). Defaults to \code{TRUE}.}

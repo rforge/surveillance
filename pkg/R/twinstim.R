@@ -561,7 +561,9 @@ twinstim <- function (
             c(expression(siafInt <- do.call("..siafInt", .siafInt.args)),#N-vector
               if (useParallel) expression( # print "try-catch"ed errors
                   if (any(.nonfinitesiafint <- !is.finite(siafInt)))
-                  stop("invalid result of 'siaf$F' integration:\n",
+                  stop("invalid result of 'siaf$F' for 'siafpars=c(",
+                       paste(signif(siafpars, getOption("digits")),
+                             collapse=", "), ")':\n",
                        paste(unique(siafInt[.nonfinitesiafint]), sep="\n"),
                        call.=FALSE)
                   ),
@@ -898,8 +900,9 @@ twinstim <- function (
         setting$qmatrix <- qmatrix   # -> information about nTypes and typeNames
         setting$formula <- list(endemic = endemic, epidemic = epidemic,
                                 siaf = siaf, tiaf = tiaf)
-        setting$call <- cl
         # Return settings
+        setting$call <- cl
+        environment(setting) <- environment()
         if (verbose)
             message("optimization skipped",
                     " (returning functions in data environment)")

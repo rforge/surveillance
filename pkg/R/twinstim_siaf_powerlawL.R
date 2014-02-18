@@ -62,6 +62,10 @@ siaf.powerlawL <- function (nTypes = 1, validpars = NULL)
     ))
 
     ## derivative of f wrt logpars
+    ## CAVE: the derivative of f wrt logsigma is mathematically NaN at x=sigma
+    ## this non-differentiability at the treshhold causes false convergence
+    ## warnings by nlminb but is otherwise not relevant (could use slow and
+    ## robust Nelder-Mead instead)
     deriv <- function (s, logpars, types = NULL) {}
     body(deriv) <- as.call(c(as.name("{"), tmp, expression(
         sLength <- sqrt(.rowSums(s^2, L <- length(s)/2, 2L)),
