@@ -691,7 +691,16 @@ twinstim <- function (
                                 ncolsRes=nsiafpars, f=siaf$deriv)
                 sEventsSum <- .colSums(nom / lambdaEvents, Nin, nsiafpars)
                 derivInt <- do.call(".siafDeriv", .siafDeriv.args) # N x nsiafpars matrix
-                sInt <- .colSums(derivInt * (qSum * gammapred * tiafInt), N, nsiafpars)
+                ## if useParallel, derivInt may contain "try-catch"ed errors
+                ## in which case we receive a one-column character or list matrix
+                if (!is.numeric(derivInt)) # we can throw a helpful error message
+                    stop("invalid result of 'siaf$Deriv' for 'siafpars=c(",
+                         paste(signif(siafpars, getOption("digits")),
+                               collapse=", "), ")':\n",
+                         paste(unique(derivInt[sapply(derivInt, is.character)]), sep="\n"),
+                         call.=FALSE)
+                sInt <- .colSums(derivInt * (qSum * gammapred * tiafInt),
+                                 N, nsiafpars)
                 sEventsSum - sInt
             }) else numeric(nsiafpars) # if 'fixedsiafpars', this part is unused
 

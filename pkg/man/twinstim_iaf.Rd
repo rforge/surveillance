@@ -172,11 +172,11 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
       However, there is a caveat associated with this kernel: Its
       derivative wrt \eqn{\tilde{\sigma}} is mathematically undefined at
       the threshold \eqn{||s||=\sigma}. This local non-differentiability
-      is likely to cause false convergence warnings by \code{nlminb} at
-      the end of \code{twinstim}'s likelihood maximization but is
-      otherwise noncritical. Possible work-arounds are to use the slow
-      and robust \code{method="Nelder-Mead"}, or to just ignore the
-      warning and verify the result by sets of different start values.
+      makes \code{twinstim}'s likelihood maximization sensitive wrt
+      parameter start values, and is likely to cause false convergence
+      warnings by \code{\link{nlminb}}. Possible work-arounds are to use
+      the slow and robust \code{method="Nelder-Mead"}, or to just ignore
+      the warning and verify the result by sets of different start values.
     }
     \item{\code{siaf.student}:}{
       \eqn{f(s) = (||s||^2 + \sigma^2)^{-d}},\cr
