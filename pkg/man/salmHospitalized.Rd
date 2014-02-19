@@ -10,7 +10,7 @@
 \format{
   A \code{sts} object. 
 }
-%\source{  The data are queried from the Survstat@RKI database of the German
+\source{  The data are queried from the Survstat@RKI database of the German
   Robert Koch Institute (http://www3.rki.de/SurvStat/). }
 \examples{
 data(salmHospitalized)
