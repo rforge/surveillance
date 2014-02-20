@@ -366,17 +366,29 @@ res_D <- hhh4(fluBYBW,cntrl_D)
 }
 
 \references{
-  Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005) A statistical framework 
-    for the analysis of multivariate infectious disease surveillance counts, 
-    Statistical Modelling, \bold{5}, 187--199.
+  Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005):
+    A statistical framework for the analysis of multivariate infectious
+    disease surveillance counts.
+    \emph{Statistical Modelling}, \bold{5}, 187--199.
     
-  Paul, M., Held, L. and Toschke, A. M. (2008) Multivariate modelling of 
-    infectious disease surveillance data, Statistics in Medicine, \bold{27}, 
-    6250--6267.    
+  Paul, M., Held, L. and Toschke, A. M. (2008):
+    Multivariate modelling of infectious disease surveillance data.
+    \emph{Statistics in Medicine}, \bold{27}, 6250--6267.    
 
-  Paul, M. and Held, L. (2011) Predictive assessment of a non-linear
-    random  effects model for multivariate time series of infectious
-    disease counts. Statistics in Medicine, \bold{30}, 1118--1136
+  Paul, M. and Held, L. (2011):
+    Predictive assessment of a non-linear random effects model for
+    multivariate time series of infectious disease counts.
+    \emph{Statistics in Medicine}, \bold{30}, 1118--1136
+
+  Held, L. and Paul, M. (2012):
+    Modeling seasonality in space-time infectious disease surveillance data.
+    \emph{Biometrical Journal}, \bold{54}, 824--843
+    
+  Meyer, S. and Held, L. (2014):
+    Power-law models for infectious disease spread.
+    Revised for \emph{Annals of Applied Statistics}.
+    \emph{arXiv:1308.5115}\cr
+    arXiv-Link: \url{http://arxiv.org/abs/1308.5115}
 }
 
 \keyword{ts}

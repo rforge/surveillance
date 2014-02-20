@@ -141,6 +141,7 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
       only calculated once for every \code{polydomain} (in the first
       iteration of the \code{twinstim} optimization). They are used in
       the integration components \code{F} and \code{Deriv}.
+      See Meyer and Held (2014) for a use case and further details.
     }
     \item{\code{siaf.gaussian}:}{
       \eqn{f(s|\kappa) = \exp(-||s||/2/\sigma_\kappa^2)}\cr
@@ -221,8 +222,9 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
 }
 
 \references{
-  Meyer, S. and Held, L. (2013):
-  Modelling power-law spread of infectious diseases.
+  Meyer, S. and Held, L. (2014):
+  Power-law models for infectious disease spread.
+  Revised for \emph{Annals of Applied Statistics}.
   \emph{arXiv:1308.5115}\cr
   arXiv-Link: \url{http://arxiv.org/abs/1308.5115}
 

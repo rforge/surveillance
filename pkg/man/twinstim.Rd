@@ -45,7 +45,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
       infectivity independent of the distance from the host
       \item a list as returned by \code{\link{siaf}} or by a
       predefined interaction function such as
-      \code{\link{siaf.gaussian}} or \code{\link{siaf.powerlaw}}
+      \code{\link{siaf.gaussian}} as in Meyer et al. (2012) or
+      \code{\link{siaf.powerlaw}} as in Meyer and Held (2014)
       \item a numeric vector corresponding to the knots of a step
       function, i.e. the same as \code{\link{siaf.step}(knots)}
     }
@@ -350,17 +351,23 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   Martinussen, T. and Scheike, T. H. (2006):
   Dynamic Regression Models for Survival Data.
   Springer.
-  
-  Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2012):
-  A space-time conditional intensity model for invasive meningococcal
-  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.\cr
-  DOI-Link: \url{http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x}
-  
+
   Meyer, S. (2010):
   Spatio-Temporal Infectious Disease Epidemiology based on Point Processes.
   Master's Thesis, Ludwig-Maximilians-Universit\enc{ä}{ae}t
   M\enc{ü}{ue}nchen.\cr
   Available as \url{http://epub.ub.uni-muenchen.de/11703/}
+  
+  Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2012):
+  A space-time conditional intensity model for invasive meningococcal
+  disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.\cr
+  DOI-Link: \url{http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x}
+
+  Meyer, S. and Held, L. (2014):
+  Power-law models for infectious disease spread.
+  Revised for \emph{Annals of Applied Statistics}.
+  \emph{arXiv:1308.5115}\cr
+  arXiv-Link: \url{http://arxiv.org/abs/1308.5115}
 
   Rathbun, S. L. (1996):
   Asymptotic properties of the maximum likelihood estimator for
@@ -369,8 +376,10 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
 }
 
 \author{
-  Sebastian Meyer with documentation contributions by Michael
-  H\enc{ö}{oe}hle and Mayeul Kauffmann.
+  Sebastian Meyer
+
+  Contributions to this documentation by
+  Michael H\enc{ö}{oe}hle and Mayeul Kauffmann.
 }
 
 \seealso{

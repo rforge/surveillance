@@ -6,11 +6,12 @@
 }
 
 \description{
-  Set up a power-law or nonparametric weight structure for the neighbourhood
-  component of \code{\link{hhh4}}-models. Without normalization,
-  power-law weights are \eqn{w_{ji} = o_{ji}^{-d}}{w_ji = o_ji^-d}, where
-  \eqn{o_{ji}}{o_ji} is the order of neighbourhood between regions
-  \eqn{i} and \eqn{j}, see \code{\link{nbOrder}}.
+  Set up power-law or nonparametric weights for the neighbourhood
+  component of \code{\link{hhh4}}-models as proposed by Meyer and Held (2014).
+  Without normalization, power-law weights are
+  \eqn{w_{ji} = o_{ji}^{-d}}{w_ji = o_ji^-d}, where \eqn{o_{ji}}{o_ji}
+  is the order of neighbourhood between regions \eqn{i} and \eqn{j},
+  see \code{\link{nbOrder}}.
 }
 
 \usage{
@@ -51,8 +52,9 @@ W.np(maxlag, to0 = FALSE, normalize = TRUE,
 }
 
 \references{
-  Meyer, S. and Held, L. (2013):
-  Modelling power-law spread of infectious diseases.
+  Meyer, S. and Held, L. (2014):
+  Power-law models for infectious disease spread.
+  Revised for \emph{Annals of Applied Statistics}.
   \emph{arXiv:1308.5115}\cr
   arXiv-Link: \url{http://arxiv.org/abs/1308.5115}
 }
