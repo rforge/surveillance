@@ -178,7 +178,6 @@ hhh4(stsObj,
   \item{terms}{ the terms object used in the fit if \code{keep.terms = TRUE}
     and \code{NULL} otherwise}
   \item{stsObj}{ the supplied \code{stsObj} }
-  \item{lag}{ specified lag of the autoregression, ATM always \eqn{= 1} }
   \item{nObs}{number of observations used for fitting the model}
   \item{nTime}{ number of time points used for fitting the model }
   \item{nUnit}{ number of units (e.g. areas) used for fitting the model}

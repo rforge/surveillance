@@ -30,11 +30,11 @@ from a call to \code{\link{hhh4}}.
 
 \usage{
 \method{print}{hhh4}(x, digits = max(3, getOption("digits") - 3),
-       reparamPsi = TRUE, ...)
+      reparamPsi = TRUE, ...)
 \method{summary}{hhh4}(object, ...)
 
 \method{coef}{hhh4}(object, se = FALSE, reparamPsi = TRUE, 
-       idx2Exp = NULL, amplitudeShift = FALSE, ...)
+     idx2Exp = NULL, amplitudeShift = FALSE, ...)
 \method{fixef}{hhh4}(object, ...)
 \method{ranef}{hhh4}(object, tomatrix = FALSE, ...)
 
@@ -44,7 +44,7 @@ from a call to \code{\link{hhh4}}.
 \method{BIC}{hhh4}(object, ...)
 
 \method{confint}{hhh4}(object, parm, level = 0.95, 
-       reparamPsi = TRUE, idx2Exp = NULL, amplitudeShift = FALSE, ...)
+        reparamPsi = TRUE, idx2Exp = NULL, amplitudeShift = FALSE, ...)
 }
 
 \arguments{

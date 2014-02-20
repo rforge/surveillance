@@ -126,7 +126,7 @@ terms.hhh4 <- function (x, ...)
 }
 
 nobs.hhh4 <- function (object, ...) {
-    object$nObs
+    if (object$convergence) object$nObs else NA_real_
 }
 
 logLik.hhh4 <- function(object, ...)
@@ -136,7 +136,7 @@ logLik.hhh4 <- function(object, ...)
         NA_real_
     }
     attr(val, "df") <- if (object$dim["random"])
-        NA_integer_ else object$dim["fixed"]
+        NA_integer_ else object$dim[["fixed"]]  # use "[[" to drop the name
     attr(val, "nobs") <- nobs(object)
     class(val) <- "logLik"
     val

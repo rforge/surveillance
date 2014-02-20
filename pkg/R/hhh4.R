@@ -165,7 +165,7 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
                  control=control,
                  terms=if(control$keep.terms) model else NULL,
                  stsObj=stsObj,
-                 lag=1, nObs=sum(!model$isNA[control$subset,]),
+                 nObs=sum(!model$isNA[control$subset,]),
                  nTime=length(model$subset), nUnit=ncol(stsObj),
                  ## FIXME: nTime has a different meaning here than everywhere else!!!
                  runtime=proc.time()-ptm)

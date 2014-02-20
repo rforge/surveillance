@@ -74,7 +74,7 @@
 
     \item New \code{toLatex}-method for \code{"sts"} objects.
 
-    \item Added methods of \code{nobs} and \code{BIC} for the
+    \item Added methods of \code{nobs()} and \code{BIC()} for the
     \code{"hhh4"} class.
   }
 }
@@ -108,9 +108,11 @@
     \code{"sts"} data twice: it is now only stored as \code{$stsObj}
     component, the hidden duplicate in \code{$control$data$.sts} was
     dropped, which makes fitted objects substantially smaller.
-    \item \code{logLik.hhh4} gives a warning and returns
-    \code{NA_real_} if the fit is non-convergent; previously, an error
-    was thrown in this case.
+    \item \code{logLik.hhh4()} always returns an object of class
+    \code{"logLik"} now; for random effects models, its \code{"df"}
+    attribute is \code{NA_real_}. Furthermore, for non-convergent fits,
+    \code{logLik.hhh4()} gives a warning and returns \code{NA_real_};
+    previously, an error was thrown in this case. 
     \item \code{siaf.lomax()} is now defunct (it has been deprecated
     since version 1.5-2); use \code{siaf.powerlaw()} instead.
     \item Allow the default \code{adapt}ive bandwidth to be specified via the
