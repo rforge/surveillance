@@ -65,7 +65,7 @@ summary.hhh4 <- function(object, ...){
   } else{
 	REmat <- NULL
 	aic <- AIC(object)
-    bic <- AIC(object,k=log(object$nObs))
+        bic <- BIC(object)
   }
 
   fe <- fixef(object,se=TRUE, ...)
@@ -125,27 +125,39 @@ terms.hhh4 <- function (x, ...)
         interpretControl(x$control,x$stsObj) else x$terms
 }
 
-logLik.hhh4 <- function(object,...){
-  if(!object$convergence)
-	stop("algorithm did not converge\n")
+nobs.hhh4 <- function (object, ...) {
+    object$nObs
+}
 
-  val <- object$loglikelihood
-  if(object$dim["random"]==0){
+logLik.hhh4 <- function(object, ...)
+{
+    if (!object$convergence) {
+        warning("algorithm did not converge")
+        return(NA_real_)
+    }
+    
+    val <- object$loglikelihood
+    if(object$dim["random"]==0){
 	attr(val, "df") <- length(coef(object))
-	attr(val, "nobs") <- object$nObs
+	attr(val, "nobs") <- nobs(object)
 	class(val) <- "logLik"
-  }
-   return(val)
+    }
+    val
 }
 
 AIC.hhh4 <- function (object, ..., k = 2)
 {
-    if(object$dim["random"]==0){
-        NextMethod("AIC")
-    } else {
-	warning("AIC not well defined for models with random effects")
+    if (object$dim["random"]) {
+        warning("AIC not well defined for models with random effects")
         NA_real_
-    }
+    } else NextMethod("AIC")
+}
+BIC.hhh4 <- function (object, ...)
+{
+    if (object$dim["random"]) {
+        warning("BIC not well defined for models with random effects")
+        NA_real_
+    } else NextMethod("BIC")
 }
 
 coef.hhh4 <- function(object, se=FALSE, reparamPsi=TRUE, idx2Exp=NULL,

@@ -2,8 +2,10 @@
 \name{hhh4_methods}
 \alias{print.hhh4}
 \alias{summary.hhh4}
+\alias{nobs.hhh4}
 \alias{logLik.hhh4}
 \alias{AIC.hhh4}
+\alias{BIC.hhh4}
 \alias{coef.hhh4}
 \alias{ranef}
 \alias{fixef}
@@ -36,8 +38,10 @@ from a call to \code{\link{hhh4}}.
 \method{fixef}{hhh4}(object, ...)
 \method{ranef}{hhh4}(object, tomatrix = FALSE, ...)
 
+\method{nobs}{hhh4}(object, ...)
 \method{logLik}{hhh4}(object, ...)
 \method{AIC}{hhh4}(object, ..., k = 2)
+\method{BIC}{hhh4}(object, ...)
 
 \method{confint}{hhh4}(object, parm, level = 0.95, 
        reparamPsi = TRUE, idx2Exp = NULL, amplitudeShift = FALSE, ...)
@@ -84,32 +88,27 @@ from a call to \code{\link{hhh4}}.
 }
 
 \value{
-  The function \code{coef} returns all estimated (regression)
-  parameters from a model as propsed by Paul and Held (2011), see 
-  \code{\link{hhh4}}. 
+  The \code{\link{coef}}-method returns all estimated (regression)
+  parameters from a \code{\link{hhh4}} model as proposed by Paul and
+  Held (2011). 
   If the model includes random effects, those can be extracted with
-  \code{ranef}, whereas \code{fixef} returns the fixed
-  parameters.
+  \code{ranef}, whereas \code{fixef} returns the fixed parameters.
 
-  The function \code{AIC} returns the value of the AIC criterion
-  only for models without random effects; otherwise it is not well
-  defined and \code{NA} is returned.
+  The \code{\link{nobs}}-method returns the number of observations used
+  for model fitting.
+  The \code{\link{logLik}}-method returns an object of class
+  \code{"logLik"} in the case of a model without random effects, and the
+  value of the penalized log-likelihood at the MLE otherwise.
+  The \code{\link{AIC}}/\code{\link{BIC}}-method returns the value of
+  the AIC/BIC criterion only for models without random effects;
+  otherwise it is not well defined and \code{NA_real_} is returned. 
 
-  The function \code{logLik} returns an object of class \code{"logLik"}
-  in the case of a model without random effects, and the value of the 
-  penalized log-likelihood at the parameter estimates otherwise.
-
-  The function \code{confint} returns Wald-type confidence intervals 
-  (assuming asymptotic normality) 
-  for one or more parameters in the fitted model.
+  The \code{\link{confint}}-method returns Wald-type confidence
+  intervals (assuming asymptotic normality).
 }
 
 \seealso{
-  There is also a \code{\link[=plot.hhh4]{plot}}-method for fitted
-  \code{hhh4} models.
-  
-  Corresponding generic functions: \code{\link{coef}},
-  \code{\link{AIC}}, \code{\link{logLik}}, \code{\link{confint}}.
+  the \code{\link[=plot.hhh4]{plot}}-method for fitted \code{hhh4} models.
 }
 
 \author{

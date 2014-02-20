@@ -56,6 +56,7 @@ logLik.twinstim <- function (object, ...)
 {
     r <- object$loglik
     attr(r, "df") <- length(coef(object))
+    attr(r, "nobs") <- nobs(object)
     class(r) <- "logLik"
     r
 }
