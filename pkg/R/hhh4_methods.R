@@ -131,17 +131,14 @@ nobs.hhh4 <- function (object, ...) {
 
 logLik.hhh4 <- function(object, ...)
 {
-    if (!object$convergence) {
+    val <- if (object$convergence) object$loglikelihood else {
         warning("algorithm did not converge")
-        return(NA_real_)
+        NA_real_
     }
-    
-    val <- object$loglikelihood
-    if(object$dim["random"]==0){
-	attr(val, "df") <- length(coef(object))
-	attr(val, "nobs") <- nobs(object)
-	class(val) <- "logLik"
-    }
+    attr(val, "df") <- if (object$dim["random"])
+        NA_integer_ else object$dim["fixed"]
+    attr(val, "nobs") <- nobs(object)
+    class(val) <- "logLik"
     val
 }
 

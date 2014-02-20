@@ -97,8 +97,10 @@ from a call to \code{\link{hhh4}}.
   The \code{\link{nobs}}-method returns the number of observations used
   for model fitting.
   The \code{\link{logLik}}-method returns an object of class
-  \code{"logLik"} in the case of a model without random effects, and the
-  value of the penalized log-likelihood at the MLE otherwise.
+  \code{"logLik"} with \code{"df"} and \code{"nobs"} attributes.
+  For a random effects model, the value of the \emph{penalized}
+  log-likelihood at the MLE is returned, but degrees of freedom are
+  not available (\code{NA_real_}).
   The \code{\link{AIC}}/\code{\link{BIC}}-method returns the value of
   the AIC/BIC criterion only for models without random effects;
   otherwise it is not well defined and \code{NA_real_} is returned. 

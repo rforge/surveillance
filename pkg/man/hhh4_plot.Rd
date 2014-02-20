@@ -84,7 +84,7 @@ plotHHH4_ri(x, component, sp.layout = NULL,
     works, in which case the default \code{"black"} will be used for the
     dots of observed counts.}
   \item{pch,pt.cex}{style specifications for the dots drawn to represent
-    the observed counts.}
+    the observed counts. \code{pch=NA} can be used to disable these dots.}
   \item{par.settings}{list of graphical parameters for
     \code{\link{par}}. Sensible defaults for \code{mfrow}, \code{mar} and
     \code{las} will be applied unless overridden or

@@ -51,7 +51,7 @@ plotHHH4_fitted <- function (x, units = 1, names = NULL,
         legend <- integer(0L)
     }
     if (length(legend) > 0) {
-        legendidx <- 1L + c(if (legend.observed) 0L,
+        legendidx <- 1L + c(if (legend.observed && !is.na(pch)) 0L,
                             which(c("ne","ar","end") %in% componentsHHH4(x)))
         default.args <- list(
             x="topright", col=c(col[4],col[1:3])[legendidx], lwd=6,
