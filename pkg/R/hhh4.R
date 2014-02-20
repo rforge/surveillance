@@ -13,7 +13,6 @@
 
 # - some function arguments are currently not used (but will eventually)
 # - formula formulation is experimental and not yet implemented in full generality 
-# - do some profiling...
 
 ## Error message issued in loglik, score and fisher functions upon NA parameters
 ADVICEONERROR <- "\n  Try different starting values, more iterations, or another optimizer.\n"
@@ -273,6 +272,12 @@ setControl <- function (control, stsObj)
            nTime, "x", nUnits, " matrix")
   }
 
+
+  ### stop if no component is included in the model
+  
+  if (length(componentsHHH4(list(control=control))) == 0L)
+      stop("none of the components 'ar', 'ne', 'end' is included in the model")
+  
 
   ### check remaining components of the control list
   

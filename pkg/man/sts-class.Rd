@@ -82,7 +82,7 @@
       fractions (with dimensions \code{dim(observed)}).}
     \item{\code{map}:}{Object of class \code{SpatialPolygonsDataFrame}
       providing a shape of the areas which are monitored. }
-    \item{\code{control}:}{Object of class \code{list}, thais is a
+    \item{\code{control}:}{Object of class \code{list}, this is a
       rather free data type to be returned by the surveillance algorithms. }
     \item{\code{epochAsDate}:}{Object of class \code{"logical"} stating
       whether to use a ISO 8601 representation of the \code{epoch} slot using
