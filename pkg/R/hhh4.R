@@ -25,18 +25,20 @@ ADVICEONERROR <- "\n  Try different starting values, more iterations, or another
 CONTROL.hhh4 <- alist(
     ar = list(f = ~ -1,        # a formula " exp(x'lamba)*y_t-1 "
                                # (ToDo: or a matrix " Lambda %*% y_t-1 ")
+              offset = 1,      # multiplicative offset
               lag = 1,         # autoregression on y_i,t-lag (currently unused)
               weights = NULL,  # for a contact matrix model (currently unused)
               initial = NULL   # initial parameters values if pred is a matrix
                                # or if pred = ~1 (not really used ATM)
     ),
     ne = list(f = ~ -1,        # a formula "exp(x'phi) * sum_j w_ji * y_j,t-lag"
+              offset = 1,      # multiplicative offset
               lag = 1,         # regression on y_j,t-lag  (currently unused)
               weights = neighbourhood(stsObj),  # weights w_ji
               initial = NULL   # initial parameter values if pred = ~1 (not really used ATM)
     ),
     end = list(f = ~ 1,        # a formula " exp(x'nu) * n_it "
-               offset = 1,     # optional offset e_it
+               offset = 1,     # optional multiplicative offset e_it
                initial = NULL  # initial parameter values if pred = ~1 (not really used ATM)
     ),
     family = c("Poisson", "NegBin1", "NegBinM"),
@@ -261,15 +263,20 @@ setControl <- function (control, stsObj)
       stop("'control$end$f' must be a formula")
   control$end$inModel <- isInModel(control$end$f)
 
-  if (is.matrix(control$end$offset) && is.numeric(control$end$offset)){
-      if (!identical(dim(control$end$offset), dim(stsObj)))
-          stop("'control$end$offset' must be a numeric matrix of size ",
-               nTime, "x", nUnits)
-      if (any(is.na(control$end$offset)))
-          stop("'control$end$offset' must not contain NA values")
-  } else if (!identical(as.numeric(control$end$offset), 1)) {
-      stop("'control$end$offset' must either be 1 or a numeric ",
-           nTime, "x", nUnits, " matrix")
+
+  ### check offsets
+
+  for (comp in c("ar", "ne", "end")) {
+      if (is.matrix(control[[comp]]$offset) && is.numeric(control[[comp]]$offset)){
+          if (!identical(dim(control[[comp]]$offset), dim(stsObj)))
+              stop("'control$",comp,"$offset' must be a numeric matrix of size ",
+                   nTime, "x", nUnits)
+          if (any(is.na(control[[comp]]$offset)))
+              stop("'control$",comp,"$offset' must not contain NA values")
+      } else if (!identical(as.numeric(control[[comp]]$offset), 1)) {
+          stop("'control$",comp,"$offset' must either be 1 or a numeric ",
+               nTime, "x", nUnits, " matrix")
+      }
   }
 
 
@@ -545,8 +552,9 @@ checkFormula <- function(f, component, data, stsObj)
 ## otherwise a list of such matrices,
 ## which for the gradient has length length(pars) and
 ## length(pars)*(length(pars)+1)/2 for the hessian.
-## If neweights=NULL (i.e. no ne component in model), the result is always 0.
-neOffsetFUN <- function (Y, neweights, nbmat, data, lag)
+## If neweights=NULL (i.e. no NE component in model), the result is always 0.
+## offset is a multiplicative offset for \phi_{it}, e.g., the population.
+neOffsetFUN <- function (Y, neweights, nbmat, data, lag = 1, offset = 1)
 {
     if (is.null(neweights)) { # no neighbourhood component
         as.function(alist(...=, 0), envir=.GlobalEnv)
@@ -560,12 +568,13 @@ neOffsetFUN <- function (Y, neweights, nbmat, data, lag)
             weights <- neweights[[name]](pars, nbmat, data)
             ## gradient and hessian are lists if length(pars$d) > 1L
             ## and single matrices/arrays if == 1 => _c_onditional lapply
-            res <- clapply(weights, function(W) weightedSumNE(Y, W, lag))
+            res <- clapply(weights, function (W)
+                           offset * weightedSumNE(Y, W, lag))
             ##<- clapply always returns a list (possibly of length 1)
             if (type=="response") res[[1L]] else res
         }
     } else { # fixed (known) weight structure (0-length pars)
-        initoffset <- weightedSumNE(Y, neweights, lag)
+        initoffset <- offset * weightedSumNE(Y, neweights, lag)
         function (pars, type = "response") initoffset
         ## this will not be called for other types
     } ## returns function (living in THIS environment)
@@ -601,8 +610,8 @@ interpretControl <- function (control, stsObj)
   ## create list of offsets of the three components
   Ym1 <- rbind(matrix(NA_integer_, ar$lag, nUnits), head(Y, nTime-ar$lag))
   Ym1.ne <- neOffsetFUN(Y, ne$weights,
-                        neighbourhood(stsObj), control$data, ne$lag)
-  offsets <- list(ar=Ym1, ne=Ym1.ne, end=end$offset)
+                        neighbourhood(stsObj), control$data, ne$lag, ne$offset)
+  offsets <- list(ar=ar$offset*Ym1, ne=Ym1.ne, end=end$offset)
   ## -> offset$ne is a function of the parameter vector 'd', which returns a
   ##    nTime x nUnits matrix -- or 0 (scalar) if there is no NE component
   ## -> offset$end might just be 1 (scalar)

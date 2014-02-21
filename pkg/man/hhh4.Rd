@@ -25,18 +25,22 @@
   are decomposed additively on the log scale,
   \eqn{w_{ji}}{w_ji} are known weights, 
   and \eqn{e_{it}}{e_it} is a (multiplicative) offset.
-  The linear predictors may contain random effects. 
+  The linear predictors may contain random effects.
+  It is also possible to include multiplicative offsets in the
+  autoregressive and neighbor-driven components.
 }
 
 \usage{
 hhh4(stsObj, 
      control = list(
                ar = list(f = ~ -1,
+                         offset = 1,
                          lag = 1,
                          weights = NULL,
                          initial = NULL
                          ),
                ne = list(f = ~ -1,
+                         offset = 1,
                          lag = 1,
                          weights = neighbourhood(stsObj),
                          initial = NULL
@@ -69,6 +73,8 @@ hhh4(stsObj,
           list with the following components: 
           \describe{
 	  \item{f = ~ -1}{a formula specifying \eqn{\log(\lambda_{it})}{log(\lambda_it)}}
+	  \item{offset = 1}{optional multiplicative offset, either 1 or
+	    a matrix of the same dimension as \code{observed(stsObj)}}
 	  \item{lag = 1}{autoregression on \eqn{y_{i,t-lag}}{y_i,t-lag}
 	    (currently only \code{lag = 1} is possible)}
 	  \item{weights = NULL}{optional weights, only used if model is
@@ -82,6 +88,8 @@ hhh4(stsObj,
        list with the following components:
 	\describe{
 	  \item{f = ~ -1}{a formula specifying \eqn{\log(\phi_{it})}{log(\phi_it)}}
+	  \item{offset = 1}{optional multiplicative offset, either 1 or
+	    a matrix of the same dimension as \code{observed(stsObj)}}
 	  \item{lag = 1}{autoregression on \eqn{y_{j,t-lag}}{y_j,t-lag}  
 	    (currently only \code{lag = 1} is possible)}
 	  \item{weights = neighbourhood(stsObj)}{
@@ -98,7 +106,8 @@ hhh4(stsObj,
 	with the following components
 	\describe{
 	  \item{f = ~ 1}{a formula specifying \eqn{\log(\nu_{it})}{log(\nu_it)}}
-	  \item{offset = 1}{optional multiplicative offset \eqn{e_{it}}{e_it}}
+	  \item{offset = 1}{optional multiplicative offset \eqn{e_{it}}{e_it},
+	    either 1 or a matrix of the same dimension as \code{observed(stsObj)}}
 	  \item{initial = NULL}{vector with initial values for
 	    parameter if \code{f = ~1} (not really used ATM)}
 	}

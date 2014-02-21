@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-02-20)}{
+\section{Changes in surveillance version 1.8-0 (2014-02-21)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -29,6 +29,9 @@
     Campylobacteriosis data set \code{campyDE}, where absolute humidity
     is used as concurrent covariate to adjust the outbreak detection is
     also added to the package.
+
+    \item \code{hhh4()} now allows the inclusion of multiplicative
+    offsets also in the epidemic components \code{"ar"} and \code{"ne"}.
     
     \item \code{oneStepAhead()}:
     \itemize{
