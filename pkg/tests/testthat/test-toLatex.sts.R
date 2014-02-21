@@ -42,6 +42,12 @@ test_that("caption is incorporated", {
   expect_true(grepl(testCaption, paste(as.character(latex), collapse = ' ')))
 })
 
+test_that("label is incorporated", {
+  testLabel <- "Please print my label"
+  latex <- toLatex(ha.sts, label = testLabel)
+  expect_true(grepl(testLabel, paste(as.character(latex), collapse = ' ')))
+})
+
 test_that("ubColumnLabel is incorporated", {
   testUBLabel <- "Upperbound"
   latex <- toLatex(ha.sts, ubColumnLabel = testUBLabel)
