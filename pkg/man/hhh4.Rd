@@ -174,9 +174,11 @@ hhh4(stsObj,
   \item{coefficients}{named vector with estimated (regression) parameters of the model}
   \item{se}{estimated standard errors (for regression parameters)}
   \item{cov}{covariance matrix (for regression parameters)}
-  \item{Sigma}{estimated variance components for random effects}
-  \item{Sigma.orig}{estimated variance components on internal scale used for optimization  }
-  \item{Sigma.cov}{ inverse of (minus Hessian matrix) for variance components }
+  \item{Sigma}{estimated variance components of random effects}
+  \item{Sigma.orig}{estimated variance components on internal scale used
+    for optimization}
+  \item{Sigma.cov}{inverse of marginal Fisher information (on internal
+    scale), i.e., the asymptotic covariance matrix of \code{Sigma.orig}}
   \item{call}{ the matched call }
   \item{dim}{ vector with number of fixed and random effects in the model }
   \item{loglikelihood}{(penalized) loglikelihood evaluated at the MLE}

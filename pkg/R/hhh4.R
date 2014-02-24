@@ -107,8 +107,7 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
   convergence <- myoptim$convergence == 0
   thetahat <- c(myoptim$fixef, myoptim$ranef)
   loglik <- myoptim$loglik
-  fisher <- myoptim$fisher
-  cov <- try(solve(fisher), silent=TRUE) # approximation to inverted fisher info
+  cov <- try(solve(myoptim$fisher), silent=TRUE)
 
   ## check for degenerate fisher info
   if(inherits(cov, "try-error")){ # fisher info is singular
@@ -120,7 +119,6 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
         cat("WARNING: non-finite or negative covariance of regression parameters!\n")
     convergence <- FALSE
   }
-
   if (!convergence) {
       if (control$verbose) {
           cat("Penalized loglikelihood =", loglik, "\n")
@@ -137,33 +135,32 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
   }
 
   ## optimization successful, return a full "hhh4" object
-  fitted <- meanHHH(thetahat, model, total.only=TRUE)
-
-  if(dimRandomEffects>0){
-    Sigma.orig <- myoptim$sd.corr
-    Sigma.cov <- solve(myoptim$fisherVar)
-    dimnames(Sigma.cov) <- list(names(Sigma.orig),names(Sigma.orig))
+  dimnames(cov) <- list(names(thetahat), names(thetahat))
+  if (dimRandomEffects>0) {
+      Sigma.orig <- myoptim$sd.corr
+      Sigma.cov <- solve(myoptim$fisherVar)
+      dimnames(Sigma.cov) <- list(names(Sigma.orig),names(Sigma.orig))
+      Sigma.trans <- getSigmai(head(Sigma.orig,model$nVar),
+                               tail(Sigma.orig,model$nCorr),
+                               model$nVar)
+      dimnames(Sigma.trans) <-
+          rep.int(list(sub("^sd\\.", "",
+                           head(names(Sigma.orig),model$nVar))), 2L)
   } else {
-    Sigma.orig <- Sigma.cov <- NULL
+      Sigma.orig <- Sigma.cov <- Sigma.trans <- NULL
   }
-
-  se <- sqrt(diag(cov))
-
-  margll <- marLogLik(Sigma.orig, thetahat, model)
-  Sigma.trans <- getSigmai(head(Sigma.orig,model$nVar),
-                           tail(Sigma.orig,model$nCorr),
-                           model$nVar)
-
+  
   ## Done
-  result <- list(coefficients=thetahat, se=se, cov=cov, 
+  result <- list(coefficients=thetahat, se=sqrt(diag(cov)), cov=cov, 
                  Sigma=Sigma.trans,     # estimated covariance matrix of ri's
                  Sigma.orig=Sigma.orig, # variance parameters on original scale
                  Sigma.cov=Sigma.cov,   # covariance matrix of Sigma.orig
                  call=match.call(),
                  dim=c(fixed=dimFixedEffects,random=dimRandomEffects),
-                 loglikelihood=loglik, margll=margll, 
+                 loglikelihood=loglik,
+                 margll=marLogLik(Sigma.orig, thetahat, model),
                  convergence=convergence,
-                 fitted.values=fitted,
+                 fitted.values=meanHHH(thetahat, model, total.only=TRUE),
                  control=control,
                  terms=if(control$keep.terms) model else NULL,
                  stsObj=stsObj,
@@ -574,8 +571,9 @@ neOffsetFUN <- function (Y, neweights, nbmat, data, lag = 1, offset = 1)
             if (type=="response") res[[1L]] else res
         }
     } else { # fixed (known) weight structure (0-length pars)
-        initoffset <- offset * weightedSumNE(Y, neweights, lag)
-        function (pars, type = "response") initoffset
+        env <- new.env(hash = FALSE, parent = emptyenv())  # small -> no hash
+        env$initoffset <- offset * weightedSumNE(Y, neweights, lag)
+        as.function(alist(pars=, type = "response", initoffset), envir=env)
         ## this will not be called for other types
     } ## returns function (living in THIS environment)
 }
@@ -1414,26 +1412,24 @@ getSigmaInv <- function(sd, correlation, dimSigma, dimBlocks, SigmaInvi=NULL){
   if(is.null(SigmaInvi)){
     SigmaInvi <- getSigmaiInv(sd,correlation,dimSigma)
   }
-  SigmaInv <- if(length(unique(dimBlocks))==1){  # kronecker product formulation possible
+  if(length(unique(dimBlocks))==1){  # kronecker product formulation possible
     kronecker(SigmaInvi,diag(nrow=dimBlocks[1]))
     # the result is a symmetric matrix if SigmaInvi is symmetric
   } else { # kronecker product not possible -> correlation=0 
-    diag(rep(diag(SigmaInvi),dimBlocks))
+    diag(rep.int(diag(SigmaInvi),dimBlocks))
   }
-  return(SigmaInv)
 }
 
 getSigma <- function(sd, correlation, dimSigma, dimBlocks, Sigmai=NULL){
   if(is.null(Sigmai)){
     Sigmai <- getSigmai(sd,correlation,dimSigma)
   }
-  Sigma <- if(length(unique(dimBlocks))==1){  # kronecker product formulation possible
+  if(length(unique(dimBlocks))==1){  # kronecker product formulation possible
     kronecker(Sigmai,diag(nrow=dimBlocks[1]))
     # the result is a symmetric matrix if Sigmai is symmetric
   } else { # kronecker product not possible -> correlation=0 
-    diag(rep(diag(Sigmai),dimBlocks))
+    diag(rep.int(diag(Sigmai),dimBlocks))
   }
-  return(Sigma)
 }
 
 

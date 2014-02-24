@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-02-21)}{
+\section{Changes in surveillance version 1.8-0 (2014-02-24)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -111,6 +111,8 @@
     \code{"sts"} data twice: it is now only stored as \code{$stsObj}
     component, the hidden duplicate in \code{$control$data$.sts} was
     dropped, which makes fitted objects substantially smaller.
+    \item The following components of a \code{hhh4()} fit now have names:
+    \code{"se"}, \code{"cov"}, \code{"Sigma"}.
     \item \code{logLik.hhh4()} always returns an object of class
     \code{"logLik"} now; for random effects models, its \code{"df"}
     attribute is \code{NA_real_}. Furthermore, for non-convergent fits,
