@@ -754,15 +754,6 @@ getSdCorr <- function(x){
   return(x$Sigma.orig)
 }
 
-getCov <- function(x){
-  Sigma <- x$Sigma
-  corr <- cov2cor(Sigma)
-  diag(corr) <- diag(Sigma)
-  rownames(corr) <- colnames(corr) <-
-      sub("^sd\\.","",names(x$Sigma.orig))[grep("^sd\\.",names(x$Sigma.orig))]
-  return(corr)
-}
-
 
 splitParams <- function(theta, model){
   fixed <- theta[seq_len(model$nFE)]
