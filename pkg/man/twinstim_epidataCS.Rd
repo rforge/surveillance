@@ -380,7 +380,11 @@ myimdepi <- as.epidataCS(events, stgrid, W, qmatrix, nCircle2Poly=16)
 \dontshow{
 ## should be equal as long as the internal structures of "epidataCS" and
 ## of the embedded classes ("owin", "SpatialPolygons", ...) do not change
-if (!identical(imdepi, myimdepi)) warning("@Sebastian: update data(imdepi)")
+if (!isTRUE(all.equal(imdepi, myimdepi, tolerance=5e-6)))
+    warning("@Sebastian: update data(imdepi)")
+## Note: in spatstat 1.36.0, option "fixpolygons" was introduced and
+## defaults to TRUE, which produces small numerical differences (<5e-6)
+## in '.influenceRegions' (since 'Wowin' is different)
 }
 
 ## take a look into the internal structure of an epidataCS-object
