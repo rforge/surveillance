@@ -75,8 +75,8 @@ hhh4(stsObj,
 	  \item{f = ~ -1}{a formula specifying \eqn{\log(\lambda_{it})}{log(\lambda_it)}}
 	  \item{offset = 1}{optional multiplicative offset, either 1 or
 	    a matrix of the same dimension as \code{observed(stsObj)}}
-	  \item{lag = 1}{autoregression on \eqn{y_{i,t-lag}}{y_i,t-lag}
-	    (currently only \code{lag = 1} is possible)}
+	  \item{lag = 1}{a positive integer meaning autoregression on
+	    \eqn{y_{i,t-lag}}}
 	  \item{weights = NULL}{optional weights, only used if model is
 	    a contact matrix (currently not implemented)}
 	  \item{initial = NULL}{vector with initial values for
@@ -90,8 +90,8 @@ hhh4(stsObj,
 	  \item{f = ~ -1}{a formula specifying \eqn{\log(\phi_{it})}{log(\phi_it)}}
 	  \item{offset = 1}{optional multiplicative offset, either 1 or
 	    a matrix of the same dimension as \code{observed(stsObj)}}
-	  \item{lag = 1}{autoregression on \eqn{y_{j,t-lag}}{y_j,t-lag}  
-	    (currently only \code{lag = 1} is possible)}
+	  \item{lag = 1}{a non-negative integer meaning dependency on
+	    \eqn{y_{j,t-lag}}}
 	  \item{weights = neighbourhood(stsObj)}{
 	    neighbourhood weights \eqn{w_{ji}}{w_ji}. By default, 
 	    the neighbourhood slot of \code{stsObj} is used.

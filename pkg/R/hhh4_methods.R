@@ -278,7 +278,8 @@ confint.hhh4 <- function (object, parm, level = 0.95,
 
 
 ## mean predictions for a subset of 1:nrow(object$stsObj)
-predict.hhh4 <- function(object, newSubset=object$control$subset, type="response", ...)
+predict.hhh4 <- function(object, newSubset = object$control$subset,
+                         type = "response", ...)
 {
     if (type == "response" &&
         all((m <- match(newSubset, object$control$subset, nomatch=0L)) > 0)) {

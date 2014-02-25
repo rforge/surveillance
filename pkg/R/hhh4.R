@@ -181,7 +181,7 @@ setControl <- function (control, stsObj)
 {
   stopifnot(is.list(control))
   nTime <- nrow(stsObj)
-  nUnits <- ncol(stsObj)
+  nUnit <- ncol(stsObj)
   if(nTime <= 2) stop("too few observations")
   
   ## arguments in 'control' override any corresponding default arguments
@@ -191,10 +191,6 @@ setControl <- function (control, stsObj)
   defaultControl$data <- as.list(defaultControl$data)
   control <- modifyList(defaultControl, control)
 
-  ## add nTime and nUnits to control list
-  control$nTime <- nTime                # FIXME: are these actually
-  control$nUnits <- nUnits              #        used anywhere?
-
   ## check that component specifications are list objects
   for (comp in c("ar", "ne", "end")) {
       if(!is.list(control[[comp]])) stop("'control$", comp, "' must be a list")
@@ -202,11 +198,10 @@ setControl <- function (control, stsObj)
 
   ## check lags in "ar" and "ne" components
   for (comp in c("ar", "ne")) {
-      if (!isScalar(control[[comp]]$lag))
-          stop("'control$", comp, "$lag' must be scalar")
+      if (!isScalar(control[[comp]]$lag) || control[[comp]]$lag < (comp=="ar"))
+          stop("'control$", comp, "$lag' must be a ",
+               if (comp=="ar") "positive" else "non-negative", " integer")
       control[[comp]]$lag <- as.integer(control[[comp]]$lag)
-      if (control[[comp]]$lag != 1L)
-          stop("currently, only 'control$", comp, "$lag=1' is supported")
   }
 
   
@@ -215,10 +210,10 @@ setControl <- function (control, stsObj)
   control$ar$isMatrix <- is.matrix(control$ar$f)
 
   if (is.matrix(control$ar$f)) {
-      if (any(dim(control$ar$f) != nUnits))
-          stop("'control$ar$f' must be a square matrix of size ", nUnits)
+      if (any(dim(control$ar$f) != nUnit))
+          stop("'control$ar$f' must be a square matrix of size ", nUnit)
       # use identity matrix if weight matrix is missing
-      if (is.null(control$ar$weights)) control$ar$weights <- diag(nrow=nUnits)
+      if (is.null(control$ar$weights)) control$ar$weights <- diag(nrow=nUnit)
       control$ar$inModel <- TRUE
   } else if (inherits(control$ar$f, "formula")) {
       if (!is.null(control$ar$weights)) {
@@ -232,8 +227,8 @@ setControl <- function (control, stsObj)
   }
 
   if (is.matrix(control$ar$weights)) {
-      if (any(dim(control$ar$weights) != nUnits))
-          stop("'control$ar$weights' must be a square matrix of size ", nUnits)
+      if (any(dim(control$ar$weights) != nUnit))
+          stop("'control$ar$weights' must be a square matrix of size ", nUnit)
   }
   
   
@@ -249,7 +244,7 @@ setControl <- function (control, stsObj)
           stop("there must not be an extra \"ne\" component ",
                "if 'control$ar$f' is a matrix")
       ## check ne$weights specification
-      checkWeights(control$ne$weights, nUnits, nTime,
+      checkWeights(control$ne$weights, nUnit, nTime,
                    neighbourhood(stsObj), control$data)
   } else control$ne$weights <- NULL
 
@@ -267,12 +262,12 @@ setControl <- function (control, stsObj)
       if (is.matrix(control[[comp]]$offset) && is.numeric(control[[comp]]$offset)){
           if (!identical(dim(control[[comp]]$offset), dim(stsObj)))
               stop("'control$",comp,"$offset' must be a numeric matrix of size ",
-                   nTime, "x", nUnits)
+                   nTime, "x", nUnit)
           if (any(is.na(control[[comp]]$offset)))
               stop("'control$",comp,"$offset' must not contain NA values")
       } else if (!identical(as.numeric(control[[comp]]$offset), 1)) {
           stop("'control$",comp,"$offset' must either be 1 or a numeric ",
-               nTime, "x", nUnits, " matrix")
+               nTime, "x", nUnit, " matrix")
       }
   }
 
@@ -573,9 +568,9 @@ neOffsetFUN <- function (Y, neweights, nbmat, data, lag = 1, offset = 1)
     } else { # fixed (known) weight structure (0-length pars)
         env <- new.env(hash = FALSE, parent = emptyenv())  # small -> no hash
         env$initoffset <- offset * weightedSumNE(Y, neweights, lag)
-        as.function(alist(pars=, type = "response", initoffset), envir=env)
-        ## this will not be called for other types
-    } ## returns function (living in THIS environment)
+        as.function(c(alist(pars=, type = "response"), quote(initoffset)),
+                    envir=env)     # it will not be called for other types
+    }
 }
 
 
