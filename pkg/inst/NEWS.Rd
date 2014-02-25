@@ -77,8 +77,10 @@
 
     \item New \code{toLatex}-method for \code{"sts"} objects.
 
-    \item Added methods of \code{vcov()}, \code{nobs()} and \code{BIC()}
-    for the \code{"hhh4"} class.
+    \item Added methods of \code{vcov()} and \code{nobs()}
+    for the \code{"hhh4"} class. For \code{AIC()} and \code{BIC()}, the
+    default methods work smoothly now (due to changes to
+    \code{logLik.hhh4()} documented below).
   }
 }
 

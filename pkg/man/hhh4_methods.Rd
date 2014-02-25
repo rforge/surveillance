@@ -4,8 +4,6 @@
 \alias{summary.hhh4}
 \alias{nobs.hhh4}
 \alias{logLik.hhh4}
-\alias{AIC.hhh4}
-\alias{BIC.hhh4}
 \alias{coef.hhh4}
 \alias{vcov.hhh4}
 \alias{ranef}
@@ -40,8 +38,6 @@ from a call to \code{\link{hhh4}}.
 
 \method{nobs}{hhh4}(object, ...)
 \method{logLik}{hhh4}(object, ...)
-\method{AIC}{hhh4}(object, ..., k = 2)
-\method{BIC}{hhh4}(object, ...)
 
 \method{vcov}{hhh4}(object, reparamPsi = TRUE, 
      idx2Exp = NULL, amplitudeShift = FALSE, ...)
@@ -79,10 +75,6 @@ from a call to \code{\link{hhh4}}.
     in a matrix with as many rows as there are regions and as many
     columns as there are random effects. Here, any CAR-effects are
     transformed to region-specific effects.}
-  \item{k}{
-    numeric specifying the \emph{penalty} per parameter to be used;
-    \code{k = 2} (default) is the classical AIC.
-  }
   \item{parm}{a vector of numbers or names, specifying which parameters 
     are to be given confidence intervals. If missing, all parameters
     are considered.}
@@ -103,9 +95,9 @@ from a call to \code{\link{hhh4}}.
   For a random effects model, the value of the \emph{penalized}
   log-likelihood at the MLE is returned, but degrees of freedom are
   not available (\code{NA_real_}).
-  The \code{\link{AIC}}/\code{\link{BIC}}-method returns the value of
-  the AIC/BIC criterion only for models without random effects;
-  otherwise it is not well defined and \code{NA_real_} is returned. 
+  As a consequence, \code{\link{AIC}} and \code{\link{BIC}} are only
+  well defined for models without random effects;
+  otherwise these functions return \code{NA_real_}.
 
   The \code{\link{vcov}}-method returns the estimated
   variance-covariance matrix of the \emph{regression} parameters.

@@ -85,7 +85,7 @@ formatPval <- function (pv, eps = 1e-4)
 
 local({
     methods17 <- c("print", "summary", "print.summary", "terms", "logLik",
-                   "AIC", "coef", "fixef", "ranef", "confint", "predict",
+                   "coef", "fixef", "ranef", "confint", "predict",
                    "update", "plot", "simulate")
     for (generic in methods17) {
         methodname <- paste(generic, "hhh4", sep=".")

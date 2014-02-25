@@ -78,8 +78,8 @@ summary.hhh4 <- function (object, ...)
              list(fixef = fixef(object, se=TRUE, ...),
                   ranef = ranef(object, ...),
                   REmat = .getREmat(object),
-                  AIC   = suppressWarnings(AIC(object)),
-                  BIC   = suppressWarnings(BIC(object))))
+                  AIC   = AIC(object),
+                  BIC   = BIC(object)))
     class(ret) <- "summary.hhh4"
     return(ret)
 }
@@ -120,24 +120,9 @@ logLik.hhh4 <- function(object, ...)
     }
     attr(val, "df") <- if (object$dim["random"])
         NA_integer_ else object$dim[["fixed"]]  # use "[[" to drop the name
-    attr(val, "nobs") <- nobs(object)
+    attr(val, "nobs") <- nobs.hhh4(object)
     class(val) <- "logLik"
     val
-}
-
-AIC.hhh4 <- function (object, ..., k = 2)
-{
-    if (object$dim["random"]) {
-        warning("AIC not well defined for models with random effects")
-        NA_real_
-    } else NextMethod("AIC")
-}
-BIC.hhh4 <- function (object, ...)
-{
-    if (object$dim["random"]) {
-        warning("BIC not well defined for models with random effects")
-        NA_real_
-    } else NextMethod("BIC")
 }
 
 coef.hhh4 <- function(object, se=FALSE,
