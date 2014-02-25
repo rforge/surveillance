@@ -148,6 +148,10 @@
     due to a different parametrization of the negative binomial
     distribution compared to the parametrization in \enc{Höhle}{Hoehle}
     and Paul (2008).
+
+    \item The score function of \code{hhh4()} was wrong when fitting
+    endemic-only models to a \code{subset} including the first time
+    point. This led to \dQuote{false convergence}.
   }
 }
 

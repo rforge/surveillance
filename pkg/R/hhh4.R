@@ -26,14 +26,14 @@ CONTROL.hhh4 <- alist(
     ar = list(f = ~ -1,        # a formula " exp(x'lamba)*y_t-1 "
                                # (ToDo: or a matrix " Lambda %*% y_t-1 ")
               offset = 1,      # multiplicative offset
-              lag = 1,         # autoregression on y_i,t-lag (currently unused)
+              lag = 1,         # autoregression on y_i,t-lag
               weights = NULL,  # for a contact matrix model (currently unused)
               initial = NULL   # initial parameters values if pred is a matrix
                                # or if pred = ~1 (not really used ATM)
     ),
     ne = list(f = ~ -1,        # a formula "exp(x'phi) * sum_j w_ji * y_j,t-lag"
               offset = 1,      # multiplicative offset
-              lag = 1,         # regression on y_j,t-lag  (currently unused)
+              lag = 1,         # regression on y_j,t-lag
               weights = neighbourhood(stsObj),  # weights w_ji
               initial = NULL   # initial parameter values if pred = ~1 (not really used ATM)
     ),
@@ -624,12 +624,15 @@ interpretControl <- function (control, stsObj)
   }
 
   ## determine all NA's (FIXME: why do we need this? Why include is.na(Y)?)
-  isNA <- is.na(offsets[[1L]]) | is.na(offsets[[2L]](initial.d)) | is.na(Y)
-
+  isNA <- is.na(Y)
+  if (ar$inModel)
+      isNA <- isNA | is.na(offsets[[1L]])
+  if (ne$inModel)
+      isNA <- isNA | is.na(offsets[[2L]](initial.d))
 
   ## get terms for all components
   all.term <- NULL
-  if(ar$isMatrix) stop("not yet implemented") # ar$f is a matrix
+  if(ar$isMatrix) stop("matrix-form of 'control$ar$f is not yet implemented")
   if(ar$inModel) # ar$f is a formula
       all.term <- cbind(all.term, checkFormula(ar$f, 1, control$data, stsObj))
   if(ne$inModel)
@@ -979,7 +982,7 @@ penScore <- function(theta, sd.corr, model)
       
       if(term["unitSpecific",i][[1]]){
         which <- term["which",i][[1]]
-        dTheta <- summ(dTheta,na.rm=TRUE)[ which ]
+        dTheta <- summ(dTheta)[ which ]
         grad.fe <- c(grad.fe,dTheta)
         
       } else if(term["random",i][[1]]){
@@ -989,7 +992,7 @@ penScore <- function(theta, sd.corr, model)
         grad.re <- c(grad.re, dRTheta)
         grad.fe <- c(grad.fe, sum(dTheta))
       } else{
-        grad.fe <- c(grad.fe, summ(dTheta,na.rm=TRUE))
+        grad.fe <- c(grad.fe, summ(dTheta))
       }
     }
     
@@ -2006,7 +2009,8 @@ fitHHH <- function(theta, sd.corr, model,
   if (dimRE == 0) { # optimization of regression coefficients only
       parReg <- updateRegression(theta, sd.corr)
       theta <- parReg$par
-      convergence <- parReg$convergence
+      if ((convergence <- parReg$convergence) != 0 && !is.null(parReg$message))
+          cat("! Non-convergence message from optimizer:", parReg$message, "\n")
   } else { # swing between updateRegression & updateVariance
       convergence <- 99
       i <- 0
@@ -2021,15 +2025,18 @@ fitHHH <- function(theta, sd.corr, model,
                                "fisher")
 
           if(verbose>0)
-              cat("Update of regression parameters:  max|x_0 - x_1| / max|x_0| =",
-                  parReg$rel.tol, "\n")
+              cat("Update of regression parameters: ",
+                  "max|x_0 - x_1| / max|x_0| =", parReg$rel.tol, "\n")
           
-          if(parReg$convergence!=0) {
-              if (!is.null(parReg$message)) print(parReg$message)
-              cat("Update of regression coefficients in iteration ", i, " unreliable\n")
+          if(parReg$convergence != 0) {
+              if (!is.null(parReg$message))
+                  cat("! Non-convergence message from optimizer:",
+                      parReg$message, "\n")
+              cat("Update of regression coefficients in iteration ",
+                  i, " unreliable\n")
           }
 
-          if(parReg$convergence >20 && shrinkage){
+          if(parReg$convergence > 20 && shrinkage){
               cat("\n\n***************************************\nshrinkage",
                   0.1*theta[abs(theta)>10],"\n")
               theta[abs(theta)>10] <- 0.1*theta[abs(theta)>10]

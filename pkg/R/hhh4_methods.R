@@ -176,7 +176,7 @@ vcov.hhh4 <- function (object,
         d[idx$toExp] <- newcoefs[idx$toExp]
     ## For the amplitude/shift-transformation, D is non-diagonal
     vcov <- if (length(idx$AS)) {
-        D <- diag(d, length(newcoefs))
+        D <- diag(d, length(d))
         D[idx$AS,idx$AS] <- jacobianAmplitudeShift(newcoefs[idx$AS])
         D %*% object$cov %*% t(D)
     } else t(t(object$cov*d)*d)  # 30 times faster than via matrix products
