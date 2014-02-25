@@ -11,120 +11,95 @@
 ################################################################################
 
 
-print.hhh4 <- function (x, digits = max(3, getOption("digits") - 3),reparamPsi=TRUE, ...) 
+## NOTE: we also apply print.hhh4 in print.summary.hhh4()
+print.hhh4 <- function (x, digits = max(3, getOption("digits")-3), ...)
 {
-  if(!x$convergence)
-    cat('Results are not reliable! Try different starting values. \n')
-  else {
-    if(!is.null(x$call)){
-      cat("\nCall: \n", paste(deparse(x$call), sep = "\n", collapse = "\n"), 
-        "\n\n", sep = "")
-	}
-
-    if (length(ranef(x))) {
-      cat('Random effects: \n')
-      V <- as.matrix(round(diag(getCov(x)),digits=digits))
-      corr <- round(getCov(x),digits=digits)
-      corr[upper.tri(corr,diag=TRUE)] <- ""
-      V.corr <- cbind(V,corr)
-      colnames(V.corr) <- c("Var","Corr",rep("",ncol(V.corr)-2))
-      print(noquote(V.corr))
-
-	  cat("\nFixed effects:\n")
-	  print.default(format(fixef(x, reparamPsi=TRUE,...), digits = digits), print.gap = 2, 
-		  quote = FALSE)
-    } else if (length(fixef(x))) {
-        cat("Coefficients:\n")
-        print.default(format(fixef(x, reparamPsi=TRUE,...), digits = digits), print.gap = 2, 
-            quote = FALSE)
+    if (!x$convergence) {
+        cat('Results are not reliable! Try different starting values.\n')
+        return(invisible(x))
     }
-    else cat("No coefficients\n")
+    if (!is.null(x$call)) {
+        cat("\nCall: \n", paste(deparse(x$call), sep = "\n", collapse = "\n"), 
+            "\n\n", sep = "")
+    }
+    if (x$dim["random"] > 0) {
+        cat('Random effects:\n')
+        .printREmat(if (is.null(x$REmat)) .getREmat(x) else x$REmat,
+                    digits = digits)
+        cat("\nFixed effects:\n")
+    } else if (x$dim["fixed"] > 0) {
+        cat("Coefficients:\n")
+    }
+    if (x$dim["fixed"] > 0) {
+        print.default(
+            format(if (is.null(x$fixef)) fixef(x, ...) else x$fixef,
+                   digits=digits),
+            quote = FALSE, print.gap = 2)
+    } else cat("No coefficients\n")
     cat("\n")
     invisible(x)
-  }
-}
-getCov <- function(x){
-  Sigma <- x$Sigma
-  corr <- cov2cor(Sigma)
-  diag(corr) <- diag(Sigma)
-  rownames(corr) <- colnames(corr) <-
-      sub("^sd\\.","",names(x$Sigma.orig))[grep("^sd\\.",names(x$Sigma.orig))]
-  return(corr)
 }
 
-summary.hhh4 <- function(object, ...){
-  # do not summarize results in case of non-convergence
-  if(!object$convergence){
-    cat('Results are not reliable! Try different starting values. \n')
+## get estimated covariance matrix of random effects
+.getREmat <- function (object)
+{
+    ## return NULL if model has no random effects
+    if (is.null(REmat <- object$Sigma)) return(NULL)
+
+    ## hhh4()$Sigma is named since r791 only -> derive names from Sigma.orig
+    if (is.null(dimnames(REmat)))
+        dimnames(REmat) <- rep.int(
+            list(sub("^sd\\.", "",
+                     names(object$Sigma.orig)[seq_len(nrow(REmat))])), 2L)
+    
+    attr(REmat, "correlation") <- cov2cor(REmat)
+    attr(REmat, "sd") <- sqrt(diag(REmat))
+    REmat
+}
+.printREmat <- function (REmat, digits = 4)
+{
+    V <- round(diag(REmat), digits=digits)
+    corr <- round(attr(REmat, "correlation"), digits=digits)
+    corr[upper.tri(corr,diag=TRUE)] <- ""
+    V.corr <- cbind(V, corr, deparse.level=0)
+    colnames(V.corr) <- c("Var", "Corr", rep.int("", ncol(corr)-1L))
+    print.default(V.corr, quote=FALSE)
+}
+
+summary.hhh4 <- function (object, ...)
+{
+    ## do not summarize results in case of non-convergence
+    if (!object$convergence) {
+        cat('Results are not reliable! Try different starting values.\n')
 	return(invisible(object))
-  }
-
-  ret <- object[c("call","convergence","dim","loglikelihood","margll","nTime","nUnit")]
-
-  # get estimated covariance matrix of random effects
-  if(object$dim["random"]>0){
-	REmat <- object$Sigma
-	attr(REmat, "correlation") <- cov2cor(REmat)
-	attr(REmat, "sd") <- sqrt(diag(REmat))
-    rownames(REmat) <- colnames(REmat) <- gsub("sd.", "", names(object$Sigma.orig))[grep("sd.", names(object$Sigma.orig))]
-
-	aic <- NULL
-	bic <- NULL
-  } else{
-	REmat <- NULL
-	aic <- AIC(object)
-        bic <- BIC(object)
-  }
-
-  fe <- fixef(object,se=TRUE, ...)
-  re <- ranef(object)
-
-  ret <- c(ret, list(fixef=fe, ranef=re, REmat=REmat, AIC=aic, BIC=bic))
-  class(ret) <- "summary.hhh4"
-  return(ret)
+    }
+    ret <- c(object[c("call", "convergence", "dim", "loglikelihood", "margll",
+                      "nTime", "nUnit")],
+             list(fixef = fixef(object, se=TRUE, ...),
+                  ranef = ranef(object, ...),
+                  REmat = .getREmat(object),
+                  AIC   = suppressWarnings(AIC(object)),
+                  BIC   = suppressWarnings(BIC(object))))
+    class(ret) <- "summary.hhh4"
+    return(ret)
 }
 
-print.summary.hhh4 <- function(x, digits = max(3, getOption("digits") - 3), ...){
-  if(!x$convergence){
-    cat('Results are not reliable! Try different starting values. \n')
-	invisible(x)
-  } else {
-    if(!is.null(x$call)){
-      cat("\nCall: \n", paste(deparse(x$call), sep = "\n", collapse = "\n"), 
-        "\n\n", sep = "")
-    }
+print.summary.hhh4 <- function (x, digits = max(3, getOption("digits")-3), ...)
+{
+    ## x$convergence is always TRUE if we have a summary
+    print.hhh4(x) # also works for summary.hhh4-objects
     
-    if(x$dim["random"]>0){
-      cat('Random effects: \n')
-      V <- as.matrix(round(diag(x$REmat),digits=digits))
-      corr <- round(attr(x$REmat, "correlation"),digits=digits)
-      corr[upper.tri(corr,diag=TRUE)] <- ""
-      V.corr <- cbind(V,corr)
-      colnames(V.corr) <- c("Var","Corr",rep("",ncol(V.corr)-2))
-      print(noquote(V.corr))
-    }
-        
-    cat('\nFixed effects: \n')
-    print(round(x$fixef,digits=digits),print.gap=2)
-
     if(x$dim["random"]==0){
-      cat('\nlog-likelihood:   ',round(x$loglikelihood,digits=digits-2),'\n')  
-      cat('AIC:              ',round(x$AIC,digits=digits-2),'\n')
-      cat('BIC:              ',round(x$BIC,digits=digits-2),'\n\n')
+        cat('Log-likelihood:   ',round(x$loglikelihood,digits=digits-2),'\n')  
+        cat('AIC:              ',round(x$AIC,digits=digits-2),'\n')
+        cat('BIC:              ',round(x$BIC,digits=digits-2),'\n\n')
     } else {
-      cat('\npenalized log-likelihood: ',round(x$loglikelihood,digits=digits-2),'\n')  
-      cat('marginal log-likelihood:  ',round(x$margll,digits=digits-2),'\n\n')        
+        cat('Penalized log-likelihood: ',round(x$loglikelihood,digits=digits-2),'\n')  
+        cat('Marginal log-likelihood:  ',round(x$margll,digits=digits-2),'\n\n')        
     }
-    
     cat('Number of units:         ',x$nUnit,'\n')
     cat('Number of time points:   ',x$nTime,'\n\n')
-    
-    if(any(x$fixef[,"Estimates"]== -20)){
-      cat("Warning: coefficients \'",rownames(x$fixef)[x$fixef[,"Estimates"]==-20] ,"\' could not be estimated accurately\n\n")
-    }
-  }
-  
-  invisible(x)
+    invisible(x)
 }
 
 terms.hhh4 <- function (x, ...)
@@ -186,7 +161,7 @@ coef.hhh4 <- function(object, se=FALSE,
     if (length(idx$AS)) {
         coefs[idx$AS] <- sinCos2amplitudeShift(coefs[idx$AS])
         coefnames[idx$AS] <- names(idx$AS)
-    }    
+    }
     ## set new names
     names(coefs) <- coefnames
     
@@ -246,8 +221,8 @@ getCoefIdxRenamed <- function (coefnames, reparamPsi=TRUE, idx2Exp=NULL,
     idxAS <- if (amplitudeShift) {
         idxAS <- sort(c(grep(".sin(", coefnames, fixed=TRUE),
                         grep(".cos(", coefnames, fixed=TRUE)))
-        names(idxAS) <- gsub(".sin", ".A", coefnames[idxAS], fixed=TRUE)
-        names(idxAS) <- gsub(".cos", ".s", names(idxAS), fixed=TRUE)
+        names(idxAS) <- sub(".sin", ".A", coefnames[idxAS], fixed=TRUE)
+        names(idxAS) <- sub(".cos", ".s", names(idxAS), fixed=TRUE)
         idxAS
     } else NULL
 

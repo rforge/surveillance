@@ -30,8 +30,7 @@ from a call to \code{\link{hhh4}}.
 }
 
 \usage{
-\method{print}{hhh4}(x, digits = max(3, getOption("digits") - 3),
-      reparamPsi = TRUE, ...)
+\method{print}{hhh4}(x, digits = max(3, getOption("digits") - 3), ...)
 \method{summary}{hhh4}(object, ...)
 
 \method{coef}{hhh4}(object, se = FALSE, reparamPsi = TRUE, 
@@ -55,13 +54,13 @@ from a call to \code{\link{hhh4}}.
   \item{digits}{the number of significant digits to use when printing
   }
   \item{reparamPsi}{
-    logical. If \code{TRUE}, the overdispersion parameter from the 
-    negative binomial distribution is transformed from internal (log-)scale
-    to a user scale (where zero corresponds to a Poisson distribution). 
+    logical. If \code{TRUE} (default), the overdispersion parameter from the 
+    negative binomial distribution is transformed from internal scale (-log)
+    to standard scale, where zero corresponds to a Poisson distribution. 
   }
   \item{\dots}{
-    For the \code{summary}, \code{fixef} and \code{ranef} methods: 
-    arguments passed to \code{coef}.\cr
+    For the \code{print}, \code{summary}, \code{fixef} and \code{ranef}
+    methods: arguments passed to \code{coef}.\cr
     For the remaining methods: unused (argument of the generic).
   }
   \item{se}{logical switch indicating if standard errors are required}
@@ -109,7 +108,9 @@ from a call to \code{\link{hhh4}}.
   otherwise it is not well defined and \code{NA_real_} is returned. 
 
   The \code{\link{vcov}}-method returns the estimated
-  variance-covariance matrix of the regression parameters.
+  variance-covariance matrix of the \emph{regression} parameters.
+  The estimated variance-covariance matrix of random effects is
+  available as \code{object$Sigma}.
   The \code{\link{confint}}-method returns Wald-type confidence
   intervals (assuming asymptotic normality).
 }

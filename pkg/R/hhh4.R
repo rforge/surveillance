@@ -145,7 +145,7 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
                                model$nVar)
       dimnames(Sigma.trans) <-
           rep.int(list(sub("^sd\\.", "",
-                           head(names(Sigma.orig),model$nVar))), 2L)
+                           names(Sigma.orig)[seq_len(model$nVar)])), 2L)
   } else {
       Sigma.orig <- Sigma.cov <- Sigma.trans <- NULL
   }
@@ -1971,8 +1971,13 @@ fitHHH <- function(theta, sd.corr, model,
            control = setOptimControl(method, cntrl, ...))
   }
 
+  ## ## artificial lower bound on intercepts of epidemic components
+  ## reg.lower <- rep.int(-Inf, length(theta))
+  ## reg.lower[grep("^(ar|ne)\\.(1|ri)", model$namesFE)] <- -20
+  
   ## set optimizer for regression parameters
   updateRegressionControl <- getUpdater(cntrl.regression, theta,
+                                        ## lower=reg.lower,
                                         iter.max=if(dimRE==0) 100,
                                         verbose=verbose+(dimRE==0))
   updateRegression <- function (theta, sd.corr)

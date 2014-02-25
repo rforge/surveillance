@@ -174,8 +174,8 @@ hhh4(stsObj,
   \item{coefficients}{named vector with estimated (regression) parameters of the model}
   \item{se}{estimated standard errors (for regression parameters)}
   \item{cov}{covariance matrix (for regression parameters)}
-  \item{Sigma}{estimated variance components of random effects}
-  \item{Sigma.orig}{estimated variance components on internal scale used
+  \item{Sigma}{estimated variance-covariance matrix of random effects}
+  \item{Sigma.orig}{estimated variance parameters on internal scale used
     for optimization}
   \item{Sigma.cov}{inverse of marginal Fisher information (on internal
     scale), i.e., the asymptotic covariance matrix of \code{Sigma.orig}}
