@@ -168,110 +168,105 @@ BIC.hhh4 <- function (object, ...)
 coef.hhh4 <- function(object, se=FALSE,
                       reparamPsi=TRUE, idx2Exp=NULL, amplitudeShift=FALSE, ...)
 {
-  if (object$control$family == "Poisson") reparamPsi <- FALSE
-  coefs <- object$coefficients
-  stdErr <- object$se
-  
-  if (reparamPsi) {
-    #extract psi coefficients
-    index <- grep("-log(overdisp",names(coefs), fixed=TRUE)
-
-    if (length(index) == 0L) { # backward compatibility (internal psi coef
-                               # was named "overdisp" prior to r406)
-      index <- grep("^overdisp", names(coefs))
-    } else {
-      psi.names <- names(coefs)[index]
-      # change labels from "-log(overdisp.xxx)" to "overdisp.xxx"
-      names(coefs)[index] <- substr(psi.names, start=6, stop=nchar(psi.names)-1)
+    if (object$control$family == "Poisson") reparamPsi <- FALSE
+    coefs <- object$coefficients
+    coefnames <- names(coefs)
+    idx <- getCoefIdxRenamed(coefnames, reparamPsi, idx2Exp, amplitudeShift,
+                             warn=!se)
+    
+    ## transform and rename
+    if (length(idx$Psi)) {
+        coefs[idx$Psi] <- exp(-coefs[idx$Psi])  # -log(overdisp) -> overdisp
+        coefnames[idx$Psi] <- names(idx$Psi)
     }
+    if (length(idx$toExp)) {
+        coefs[idx$toExp] <- exp(coefs[idx$toExp])
+        coefnames[idx$toExp] <- names(idx$toExp)
+    }
+    if (length(idx$AS)) {
+        coefs[idx$AS] <- sinCos2amplitudeShift(coefs[idx$AS])
+        coefnames[idx$AS] <- names(idx$AS)
+    }    
+    ## set new names
+    names(coefs) <- coefnames
     
-    #transform psi coefficients
-    coefs[index] <- exp(-coefs[index])
-    # se's using Delta rule: se[h(psi)] = se[psi] * |h'(psi)|
-    # h = exp(-psi), h' = -exp(-psi)
-    D <- diag(coefs[index],length(index))
-    stdErr[index] <- sqrt(diag(D %*% object$cov[index,index] %*% t(D)))
-  }
-  
-  if(length(idx2Exp)){
-    # extract coefficients on log-scale
-    exp.names <- names(coefs)[idx2Exp]
-    # change labels
-    names(coefs)[idx2Exp] <- paste0("exp(",exp.names,")")
-    
-    # transform
-    coefs[idx2Exp] <- exp(coefs[idx2Exp])
-    D <- diag(coefs[idx2Exp],length(idx2Exp))
-    stdErr[idx2Exp] <- sqrt(diag(D %*% object$cov[idx2Exp,idx2Exp] %*% t(D)))
-  }
-  
-  
-  if(amplitudeShift){
-    indexAS <- sort(c(grep(".sin",names(coefs),fixed=TRUE),
-                      grep(".cos",names(coefs),fixed=TRUE)))
-    namesSinCos <- names(coefs)[indexAS]
-    namesSinCos <- gsub(".sin",".A",namesSinCos)
-    namesSinCos <- gsub(".cos",".s",namesSinCos)
-    names(coefs)[indexAS] <- namesSinCos
-    coefs[indexAS] <- sinCos2amplitudeShift(coefs[indexAS])
-    D <- jacobianAmplitudeShift(coefs[indexAS])
-    cov <- D %*% object$cov[indexAS,indexAS] %*% t(D)
-    stdErr[indexAS] <- sqrt(diag(cov))
-  }
-
-  if (se) cbind("Estimates"=coefs, "Std. Error"=stdErr) else coefs
+    if (se) {
+        cov <- vcov.hhh4(object, reparamPsi=reparamPsi, idx2Exp=idx2Exp,
+                         amplitudeShift=amplitudeShift)
+        cbind("Estimates"=coefs, "Std. Error"=sqrt(diag(cov)))
+    } else coefs
 }
 
 vcov.hhh4 <- function (object,
                        reparamPsi=TRUE, idx2Exp=NULL, amplitudeShift=FALSE, ...)
 {
     if (object$control$family == "Poisson") reparamPsi <- FALSE
-    coefs <- object$coefficients
-    dim <- length(coefs)
-    coefnames <- names(coefs)
-
-    ## coefficient indexes
-    idxPsi <- grep("-log(overdisp", coefnames, fixed=TRUE)
-    idxAS <- sort(c(grep(".sin(", coefnames, fixed=TRUE),
-                    grep(".cos(", coefnames, fixed=TRUE)))
-    ## index sets must be disjoint
-    idxOccupied <- c(if (reparamPsi) idxPsi,
-                     if (amplitudeShift) idxAS)
-    idxOverlap <- intersect(idxOccupied, idx2Exp)
-    if (length(idxOverlap)) {
-        warning("following 'idx2Exp' were ignored due to overlap: ",
-                paste(idxOverlap, collapse=", "))
-        idx2Exp <- setdiff(idx2Exp, idxOverlap)
-    }
+    idx <- getCoefIdxRenamed(names(object$coefficients),
+                             reparamPsi, idx2Exp, amplitudeShift, warn=FALSE)
+    newcoefs <- coef.hhh4(object, se=FALSE, reparamPsi=reparamPsi,
+                          idx2Exp=idx2Exp, amplitudeShift=amplitudeShift)
 
     ## Use multivariate Delta rule => D %*% vcov %*% t(D), D: Jacobian.
     ## For idx2Exp and reparamPsi, we only transform coefficients independently,
     ## i.e. D is diagonal (with elements 'd')
-    d <- rep.int(1, dim)
-    if (reparamPsi) {
-        ## h = exp(-psi), h' = -exp(-psi)
-        d[idxPsi] <- -exp(-coefs[idxPsi])
-        coefnames[idxPsi] <- substr(coefnames[idxPsi], start=6,
-                                    stop=nchar(coefnames[idxPsi])-1L)
-    }
-    if (length(idx2Exp)) { # h = exp(coef), h' = exp(coef)
-        d[idx2Exp] <- exp(coefs[idx2Exp])
-        coefnames[idx2Exp] <- paste0("exp(", coefnames[idx2Exp], ")")
-    }
+    d <- rep.int(1, length(newcoefs))
+    if (length(idx$Psi)) # h = exp(-psi), h' = -exp(-psi)
+        d[idx$Psi] <- -newcoefs[idx$Psi]
+    if (length(idx$toExp)) # h = exp(coef), h' = exp(coef)
+        d[idx$toExp] <- newcoefs[idx$toExp]
     ## For the amplitude/shift-transformation, D is non-diagonal
-    vcov <- if (amplitudeShift) {
-        D <- diag(d, dim)
-        D[idxAS,idxAS] <-
-            jacobianAmplitudeShift(sinCos2amplitudeShift(coefs[idxAS]))
-        coefnames[idxAS] <- gsub(".sin",".A",coefnames[idxAS],fixed=TRUE)
-        coefnames[idxAS] <- gsub(".cos",".s",coefnames[idxAS],fixed=TRUE)
+    vcov <- if (length(idx$AS)) {
+        D <- diag(d, length(newcoefs))
+        D[idx$AS,idx$AS] <- jacobianAmplitudeShift(newcoefs[idx$AS])
         D %*% object$cov %*% t(D)
     } else t(t(object$cov*d)*d)  # 30 times faster than via matrix products
         
-    dimnames(vcov) <- list(coefnames, coefnames)
+    dimnames(vcov) <- list(names(newcoefs), names(newcoefs))
     vcov
 }
 
+getCoefIdxRenamed <- function (coefnames, reparamPsi=TRUE, idx2Exp=NULL,
+                               amplitudeShift=FALSE, warn=TRUE)
+{
+    ## indexes of overdispersion parameters
+    idxPsi <- if (reparamPsi) {
+        idxPsi <- grep("-log(overdisp", coefnames, fixed=TRUE)
+        ## change labels from "-log(overdisp.xxx)" to "overdisp.xxx"
+        names(idxPsi) <- substr(coefnames[idxPsi], start=6,
+                                stop=nchar(coefnames[idxPsi])-1L)
+        if (length(idxPsi) == 0L) { # backward compatibility (internal psi coef
+                                    # was named "overdisp" prior to r406)
+            idxPsi <- grep("^overdisp", coefnames)
+            names(idxPsi) <- coefnames[idxPsi]
+        }
+        idxPsi
+    } else NULL
+
+    ## indexes of sine-cosine coefficients
+    idxAS <- if (amplitudeShift) {
+        idxAS <- sort(c(grep(".sin(", coefnames, fixed=TRUE),
+                        grep(".cos(", coefnames, fixed=TRUE)))
+        names(idxAS) <- gsub(".sin", ".A", coefnames[idxAS], fixed=TRUE)
+        names(idxAS) <- gsub(".cos", ".s", names(idxAS), fixed=TRUE)
+        idxAS
+    } else NULL
+
+    ## indexes of coefficients to exp()-transform
+    idx2Exp <- if (length(idx2Exp)) { # index sets must be disjoint
+        if (length(idxOverlap <- intersect(c(idxPsi, idxAS), idx2Exp))) {
+            if (warn)
+                warning("following 'idx2Exp' were ignored due to overlap: ",
+                        paste(idxOverlap, collapse=", "))
+            idx2Exp <- setdiff(idx2Exp, idxOverlap)
+        }
+        if (length(idx2Exp))
+            names(idx2Exp) <- paste0("exp(", coefnames[idx2Exp], ")")
+        idx2Exp
+    } else NULL
+
+    ## done
+    list(Psi=idxPsi, AS=idxAS, toExp=idx2Exp)
+}
 
 fixef.hhh4 <- function(object,...){
   if(object$dim[1]>0){
@@ -300,19 +295,20 @@ ranef.hhh4 <- function(object, tomatrix = FALSE, ...){
   return(mat)
 }
 
+## inspired by stats::confint.default
 confint.hhh4 <- function (object, parm, level = 0.95,
                           reparamPsi=TRUE, idx2Exp=NULL, amplitudeShift=FALSE, ...)
 {
-    cf <- coef(object, reparamPsi=reparamPsi, idx2Exp=idx2Exp,
-               amplitudeShift=amplitudeShift, se=TRUE)
+    cf <- coef(object, se=TRUE, reparamPsi=reparamPsi, idx2Exp=idx2Exp,
+               amplitudeShift=amplitudeShift)
     pnames <- rownames(cf)
     if (missing(parm)) 
-        parm <- pnames#[seq_len(object$dim["fixed"])]  # confints for fixef only
+        parm <- pnames
     else if (is.numeric(parm)) 
         parm <- pnames[parm]
     a <- (1 - level)/2
     a <- c(a, 1 - a)
-    pct <- paste(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3),"%")
+    pct <- paste(format(100*a, trim=TRUE, scientific=FALSE, digits=3), "%")
     fac <- qnorm(a)
     ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(parm, pct))
     ses <- cf[parm,2]

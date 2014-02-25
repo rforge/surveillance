@@ -7,6 +7,7 @@
 \alias{AIC.hhh4}
 \alias{BIC.hhh4}
 \alias{coef.hhh4}
+\alias{vcov.hhh4}
 \alias{ranef}
 \alias{fixef}
 \alias{fixef.hhh4}
@@ -43,6 +44,8 @@ from a call to \code{\link{hhh4}}.
 \method{AIC}{hhh4}(object, ..., k = 2)
 \method{BIC}{hhh4}(object, ...)
 
+\method{vcov}{hhh4}(object, reparamPsi = TRUE, 
+     idx2Exp = NULL, amplitudeShift = FALSE, ...)
 \method{confint}{hhh4}(object, parm, level = 0.95, 
         reparamPsi = TRUE, idx2Exp = NULL, amplitudeShift = FALSE, ...)
 }
@@ -105,6 +108,8 @@ from a call to \code{\link{hhh4}}.
   the AIC/BIC criterion only for models without random effects;
   otherwise it is not well defined and \code{NA_real_} is returned. 
 
+  The \code{\link{vcov}}-method returns the estimated
+  variance-covariance matrix of the regression parameters.
   The \code{\link{confint}}-method returns Wald-type confidence
   intervals (assuming asymptotic normality).
 }

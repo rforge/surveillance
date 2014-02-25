@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-02-24)}{
+\section{Changes in surveillance version 1.8-0 (2014-02-25)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -77,8 +77,8 @@
 
     \item New \code{toLatex}-method for \code{"sts"} objects.
 
-    \item Added methods of \code{nobs()} and \code{BIC()} for the
-    \code{"hhh4"} class.
+    \item Added methods of \code{vcov()}, \code{nobs()} and \code{BIC()}
+    for the \code{"hhh4"} class.
   }
 }
 
