@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-02-25)}{
+\section{Changes in surveillance version 1.8-0 (2014-02-26)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -32,6 +32,12 @@
 
     \item \code{hhh4()} now allows the inclusion of multiplicative
     offsets also in the epidemic components \code{"ar"} and \code{"ne"}.
+
+    \item \code{hhh4()} now has support for \code{lag!=1} in the
+    autoregressive and neighbor-driven components. The applied lags are
+    stored as component \code{"lags"} of the return value (previously
+    there was an unused component \code{"lag"} which was always 1 and
+    has been removed now).
     
     \item \code{oneStepAhead()}:
     \itemize{

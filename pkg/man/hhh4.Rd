@@ -189,6 +189,10 @@ hhh4(stsObj,
   \item{terms}{ the terms object used in the fit if \code{keep.terms = TRUE}
     and \code{NULL} otherwise}
   \item{stsObj}{ the supplied \code{stsObj} }
+  \item{lags}{named integer vector of length two containing the lags
+    used for the epidemic components \code{"ar"} and \code{"ne"},
+    respectively. The corresponding lag is \code{NA} if the component
+    was not included in the model.}
   \item{nObs}{number of observations used for fitting the model}
   \item{nTime}{ number of time points used for fitting the model }
   \item{nUnit}{ number of units (e.g. areas) used for fitting the model}

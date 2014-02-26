@@ -19,7 +19,7 @@
 \usage{
 oneStepAhead(result, tp, type = c("rolling", "first", "final"),
              which.start = c("current", "final"),
-             keep.estimates = FALSE, verbose = TRUE)
+             keep.estimates = FALSE, verbose = TRUE, cores = 1)
 
 scores(object, unit = NULL, sign = FALSE, individual = FALSE)
 }
@@ -65,6 +65,12 @@ scores(object, unit = NULL, sign = FALSE, individual = FALSE)
     verbosity of \code{verbose-1} is used if there is more than one time
     point to predict, otherwise \code{verbose}.
   }
+  \item{cores}{the number of cores to use when computing
+    the predictions for the set of time points \code{tp} in parallel
+    (with \code{\link[parallel]{mclapply}}).
+    Note that parallelization is not possible in the default setting
+    \code{type="rolling"} and \code{which.start="current"} (use
+    \code{which.start="final"} for this to work).}
   \item{object}{result of \code{oneStepAhead}.}
   \item{unit}{integer specifying a specific unit for which the scores
     are computed. If \code{NULL} all units are considered.}

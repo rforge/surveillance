@@ -164,9 +164,11 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
                  control=control,
                  terms=if(control$keep.terms) model else NULL,
                  stsObj=stsObj,
+                 lags=sapply(control[c("ar","ne")], function (comp)
+                             if (comp$inModel) comp$lag else NA_integer_),
                  nObs=sum(!model$isNA[control$subset,]),
                  nTime=length(model$subset), nUnit=ncol(stsObj),
-                 ## FIXME: nTime has a different meaning here than everywhere else!!!
+                 ## CAVE: nTime is not nrow(stsObj) as usual!
                  runtime=proc.time()-ptm)
   class(result) <- "hhh4"
   result
@@ -745,11 +747,6 @@ interpretControl <- function (control, stsObj)
                  isNA = isNA
                  )
   return(result)
-}
-
-
-getSdCorr <- function(x){
-  return(x$Sigma.orig)
 }
 
 

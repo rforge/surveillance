@@ -32,7 +32,7 @@ print.hhh4 <- function (x, digits = max(3, getOption("digits")-3), ...)
     }
     if (x$dim["fixed"] > 0) {
         print.default(
-            format(if (is.null(x$fixef)) fixef(x, ...) else x$fixef,
+            format(if (is.null(x$fixef)) fixef.hhh4(x, ...) else x$fixef,
                    digits=digits),
             quote = FALSE, print.gap = 2)
     } else cat("No coefficients\n")
@@ -74,9 +74,9 @@ summary.hhh4 <- function (object, ...)
 	return(invisible(object))
     }
     ret <- c(object[c("call", "convergence", "dim", "loglikelihood", "margll",
-                      "nTime", "nUnit")],
-             list(fixef = fixef(object, se=TRUE, ...),
-                  ranef = ranef(object, ...),
+                      "lags", "nTime", "nUnit")],
+             list(fixef = fixef.hhh4(object, se=TRUE, ...),
+                  ranef = ranef.hhh4(object, ...),
                   REmat = .getREmat(object),
                   AIC   = AIC(object),
                   BIC   = BIC(object)))
@@ -97,8 +97,15 @@ print.summary.hhh4 <- function (x, digits = max(3, getOption("digits")-3), ...)
         cat('Penalized log-likelihood: ',round(x$loglikelihood,digits=digits-2),'\n')  
         cat('Marginal log-likelihood:  ',round(x$margll,digits=digits-2),'\n\n')        
     }
-    cat('Number of units:         ',x$nUnit,'\n')
-    cat('Number of time points:   ',x$nTime,'\n\n')
+    cat('Number of units:       ', x$nUnit, '\n')
+    cat('Number of time points: ', x$nTime, '\n')
+    if (!is.null(x$lags)) { # only available since surveillance 1.8-0
+        if (!is.na(x$lags["ar"]) && x$lags["ar"] != 1)
+            cat("Non-default autoregressive lag:  ", x$lags[["ar"]], "\n")
+        if (!is.na(x$lags["ne"]) && x$lags["ne"] != 1)
+            cat("Non-default neighbor-driven lag: ", x$lags[["ne"]], "\n")
+    }
+    cat("\n")
     invisible(x)
 }
 
@@ -228,39 +235,42 @@ getCoefIdxRenamed <- function (coefnames, reparamPsi=TRUE, idx2Exp=NULL,
     list(Psi=idxPsi, AS=idxAS, toExp=idx2Exp)
 }
 
-fixef.hhh4 <- function(object,...){
-  if(object$dim[1]>0){
-    return(head(coef(object,...), object$dim[1]))
-  } else return(NULL)
-}
-
-ranef.hhh4 <- function(object, tomatrix = FALSE, ...){
-  if(object$dim[2]>0){
-    ranefvec <- tail(coef(object,...), object$dim[2])
-  } else return(NULL)
-  if (!tomatrix) return(ranefvec)
-
-  ## transform to a nUnits x c matrix (c %in% 1:3)
-  model <- terms(object)
-  idxRE <- model$indexRE
-  idxs <- unique(idxRE)
-  names(idxs) <- model$namesFE[idxs]
-  mat <- sapply(idxs, function (idx) {
-      RE <- ranefvec[idxRE==idx]
-      Z <- model$terms["Z.intercept",][[idx]]
-      "%m%" <- get(model$terms["mult",][[idx]])
-      Z %m% RE
-  })
-  rownames(mat) <- colnames(model$response)
-  return(mat)
-}
-
-## inspired by stats::confint.default
-confint.hhh4 <- function (object, parm, level = 0.95,
-                          reparamPsi=TRUE, idx2Exp=NULL, amplitudeShift=FALSE, ...)
+fixef.hhh4 <- function (object,...)
 {
-    cf <- coef(object, se=TRUE, reparamPsi=reparamPsi, idx2Exp=idx2Exp,
-               amplitudeShift=amplitudeShift)
+    if (object$dim[1L] > 0) {
+        head(coef.hhh4(object, ...), object$dim[1L])
+    } else NULL
+}
+
+ranef.hhh4 <- function (object, tomatrix = FALSE, ...)
+{
+    if (object$dim[2L] > 0){
+        ranefvec <- tail(coef.hhh4(object, ...), object$dim[2L])
+    } else return(NULL)
+    if (!tomatrix) return(ranefvec)
+
+    ## transform to a nUnits x c matrix (c %in% 1:3)
+    model <- terms.hhh4(object)
+    idxRE <- model$indexRE
+    idxs <- unique(idxRE)
+    names(idxs) <- model$namesFE[idxs]
+    mat <- sapply(idxs, function (idx) {
+        RE <- ranefvec[idxRE==idx]
+        Z <- model$terms["Z.intercept",][[idx]]
+        "%m%" <- get(model$terms["mult",][[idx]])
+        Z %m% RE
+    })
+    rownames(mat) <- colnames(model$response)
+    return(mat)
+}
+
+## adaption of stats::confint.default authored by the R Core Team
+confint.hhh4 <- function (object, parm, level = 0.95,
+                          reparamPsi=TRUE, idx2Exp=NULL, amplitudeShift=FALSE,
+                          ...)
+{
+    cf <- coef.hhh4(object, se=TRUE, reparamPsi=reparamPsi, idx2Exp=idx2Exp,
+                    amplitudeShift=amplitudeShift, ...)
     pnames <- rownames(cf)
     if (missing(parm)) 
         parm <- pnames
@@ -286,8 +296,8 @@ predict.hhh4 <- function(object, newSubset = object$control$subset,
         ## we can extract fitted means from object
         object$fitted.values[m,,drop=FALSE]
     } else { ## means for time points not fitted (not part of object$control$subset)
-        predicted <- meanHHH(coef(object, reparamPsi=FALSE),
-                             terms(object),
+        predicted <- meanHHH(coef.hhh4(object, reparamPsi=FALSE),
+                             terms.hhh4(object),
                              subset=newSubset)
         if (type=="response") predicted$mean else {
             type <- match.arg(type, names(predicted))
@@ -317,9 +327,9 @@ update.hhh4 <- function (object, ..., subset.upper=NULL, use.estimates=FALSE)
 
 ## convert fitted parameters to a list suitable for control$start
 hhh4coef2start <- function (fit)
-    list(fixed = fixef(fit, reparamPsi=FALSE),
-         random = ranef(fit, reparamPsi=FALSE),
-         sd.corr = getSdCorr(fit))
+    list(fixed = fit$coefficients[seq_len(fit$dim[1L])],
+         random = fit$coefficients[fit$dim[1L]+seq_len(fit$dim[2L])],
+         sd.corr = fit$Sigma.orig)
 
 ## character vector of model components that are "inModel"
 componentsHHH4 <- function (object)
@@ -357,4 +367,3 @@ residuals.hhh4 <- function (object, type = c("deviance", "response"), ...)
     di2 <- dev.resids(y=obs, mu=fit, wt=1)
     sign(obs-fit) * sqrt(pmax.int(di2, 0))
 }
-
