@@ -26,7 +26,7 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
     type <- match.arg(type)
     which.start <- if (type == "rolling") match.arg(which.start) else "final"
     if (cores > 1 && which.start == "current")
-        stop("parallelization is not possible if 'which.start=\"current\"'")
+        stop("no parallelization for \"rolling\" if 'which.start=\"current\"'")
     startfinal <- hhh4coef2start(result)
 
     ## get model terms
@@ -37,7 +37,8 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
     nUnits <- model$nUnits
     
     ## check that tp is within the time period of the data
-    maxlag <- if (is.null(result$lags)) 1L else max(result$lags)
+    maxlag <- if (is.null(result$lags) || all(is.na(result$lags)))
+        1L else max(result$lags, na.rm=TRUE)
     stopifnot(tp %in% seq.int(maxlag,nTime-1L), length(tp) %in% 1:2)
     if (length(tp) == 1) tp <- c(tp, max(model$subset)-1)
     tps <- tp[1]:tp[2]
