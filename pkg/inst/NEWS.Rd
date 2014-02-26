@@ -41,6 +41,8 @@
     
     \item \code{oneStepAhead()}:
     \itemize{
+      \item Added support for parallel computation of predictions using
+      \code{mclapply()} from package \pkg{parallel}.
       \item New argument \code{type} with a new \code{type}
       \code{"first"} to base all subsequent one-step-ahead predictions
       on a single initial fit. 

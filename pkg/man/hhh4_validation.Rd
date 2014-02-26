@@ -61,9 +61,9 @@ scores(object, unit = NULL, sign = FALSE, individual = FALSE)
   \item{verbose}{
     non-negative integer (usually in the range \code{0:3}) specifying
     the amount of tracing information to output.
-    For the sequential \code{hhh4} model updates, a
-    verbosity of \code{verbose-1} is used if there is more than one time
-    point to predict, otherwise \code{verbose}.
+    During \code{hhh4} model updates, the following verbosity is used:
+    \code{0} if \code{cores > 1}, otherwise \code{verbose-1} if there
+    is more than one time point to predict, otherwise \code{verbose}.
   }
   \item{cores}{the number of cores to use when computing
     the predictions for the set of time points \code{tp} in parallel
@@ -83,12 +83,12 @@ scores(object, unit = NULL, sign = FALSE, individual = FALSE)
 
 \value{
 \code{oneStepAhead} returns a list with
-\item{pred}{matrix with one-step-ahead predictions}
-\item{psi}{overdispersion parameter on log-scale in case of a negative
-  binomial model and \code{NULL} otherwise}
+\item{pred}{matrix of one-step-ahead predictions}
 \item{observed}{matrix with observed counts at the predicted time-points}
+\item{psi}{overdispersion parameter on -log-scale in case of a
+  negative-binomial model and \code{NULL} otherwise}
 \item{allConverged}{logical indicating if all successive fits converged}
-If \code{keep.estimates = TRUE}, the following elements will be non-\code{NULL}:
+If \code{keep.estimates=TRUE}, there are the following additional elements:
 \item{coefficients}{matrix with estimated regression parameters from the successive fits}
 \item{Sigma.orig}{matrix with estimated variance parameters from the successive fits}
 \item{logliks}{matrix with columns \code{"loglikelihood"} and
@@ -131,10 +131,25 @@ model1 <- list(ar = list(f = ~ 1), end = list(f =f.end),
 result <- hhh4(salmonella, model1)
 
 # do one-step-ahead predictions for the last 5 weeks
-pred <- oneStepAhead(result, nrow(salmonella)-5)
+pred <- oneStepAhead(result, nrow(salmonella)-5,
+                     which.start="final", verbose=FALSE)
+
+\dontshow{
+## test equivalence of parallelized version
+if (isTRUE(parallel::detectCores() > 1)) stopifnot(identical(pred,
+    oneStepAhead(result, nrow(salmonella)-5,
+                 which.start="final", verbose=FALSE, cores=2)))
+}
 
 # compute mean scores
 colMeans(scores(pred))
+
+# type="final" just means fitted values
+stopifnot(identical(
+    unname(oneStepAhead(result, nrow(salmonella)-5,
+                        type="final", verbose=FALSE)$pred),
+    unname(tail(fitted(result), 5))))
+
 
 \dontrun{
 ######################################################################

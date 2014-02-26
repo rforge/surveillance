@@ -35,6 +35,8 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
         model <- result$terms <- with(result, interpretControl(control, stsObj))
     nTime <- model$nTime
     nUnits <- model$nUnits
+    psiIdx <- model$nFE + model$nd + seq_len(model$nOverdisp)
+    withPsi <- length(psiIdx) > 0L
     
     ## check that tp is within the time period of the data
     maxlag <- if (is.null(result$lags) || all(is.na(result$lags)))
@@ -52,26 +54,6 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
     if (type != "rolling" && verbose > 1L) verbose <- 1L
     do_pb <- verbose == 1L
     
-    ## initialize result
-    pred <- matrix(NA_real_, nrow=ntps, ncol=nUnits,
-                   dimnames=list(tps+1, colnames(observed)))
-    psi <- if (model$nOverdisp > 0) {
-        psiNames <- grep("overdisp", names(model$initialTheta), value=TRUE)
-        matrix(NA_real_, nrow=ntps, ncol=model$nOverdisp,
-               dimnames=list(tps, psiNames))
-    } else NULL
-    if (keep.estimates) {
-	coefficients <- matrix(NA_real_,
-                               nrow=ntps, ncol=length(model$initialTheta),
-                               dimnames=list(tps, names(model$initialTheta)))
-	Sigma.orig <- matrix(NA_real_, nrow=ntps, ncol=model$nSigma,
-                             dimnames=list(tps, names(result$Sigma.orig)))
-        logliks <- matrix(NA_real_, nrow=ntps, ncol=2L,
-                          dimnames=list(tps, c("loglikelihood", "margll")))
-    } else {
-        coefficients <- Sigma.orig <- logliks <- NULL
-    }
-
     ## initial fit
     fit <- if (type == "first") {
         if (do_pb)
@@ -80,12 +62,73 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
                     keep.terms = TRUE) # need "model" -> $terms
     } else result
     if (!fit$convergence) stop("initial fit did not converge")
-    
-    if (cores > 1L && requireNamespace("parallel")) {
-        stop("parallelization is not implemented yet")
-        ## parallel::mclapply(seq_along(tps), 
-        ##                    mc.preschedule=TRUE, mc.cores=cores)
+
+    ## result templates (named and filled with NA's)
+    pred <- matrix(NA_real_, nrow=ntps, ncol=nUnits,
+                   dimnames=list(tps+1, colnames(observed)))
+    if (withPsi)
+        psi <- matrix(NA_real_, nrow=ntps, ncol=length(psiIdx),
+                      dimnames=list(tps, names(model$initialTheta)[psiIdx]))
+    if (keep.estimates) {
+        coefficients <- matrix(NA_real_,
+                               nrow=ntps, ncol=length(model$initialTheta),
+                               dimnames=list(tps, names(model$initialTheta)))
+        Sigma.orig <- matrix(NA_real_, nrow=ntps, ncol=model$nSigma,
+                             dimnames=list(tps, names(result$Sigma.orig)))
+        logliks <- matrix(NA_real_, nrow=ntps, ncol=2L,
+                          dimnames=list(tps, c("loglikelihood", "margll")))
+    }
+
+    ## extract predictions and stuff for specific tp from fit
+    getPreds <- function (fit, tp) {
+        coefs <- unname(fit$coefficients)
+        c(list(pred = as.vector(
+               meanHHH(coefs, fit$terms, subset=tp+1L, total.only=TRUE))),
+          if (withPsi) list(psi = coefs[psiIdx]),
+          if (keep.estimates) list(
+              coefficients=coefs,
+              Sigma.orig=unname(fit$Sigma.orig),
+              logliks=c(fit$loglikelihood, fit$margll))
+          )
+    }
+
+    ## compute the predictions and save
+    ## pred, psi, coefficients, Sigma.orig, and logliks
+    if (cores > 1L) {
+
+        ## return value template (unnamed NA vectors)
+        resTemplate <- lapply(getPreds(fit, tps[1L]), "is.na<-", TRUE)
+
+        ## run parallel
+        res <- parallel::mclapply(tps, function (tp) {
+            if (verbose)
+                cat("One-step-ahead prediction @ t =", tp, "...\n")
+            if (type == "rolling") { # update fit
+                fit <- update.hhh4(result, subset.upper=tp, start=startfinal,
+                                   verbose=FALSE, # chaotic in parallel
+                                   keep.terms=TRUE) # need "model" -> $terms
+                if (!fit$convergence) {
+                    cat("WARNING: No convergence @ t =", tp, "!\n")
+                    return(resTemplate)
+                }
+            }
+            getPreds(fit, tp)
+        }, mc.preschedule=TRUE, mc.cores=cores)
+
+        ## gather results
+        .extractFromList <- function (what)
+            t(vapply(res, "[[", resTemplate[[what]], what, USE.NAMES=FALSE))
+        pred[] <- .extractFromList("pred")
+        if (withPsi)
+            psi[] <- .extractFromList("psi")
+        if (keep.estimates) {
+            coefficients[] <- .extractFromList("coefficients")
+            Sigma.orig[] <- .extractFromList("Sigma.orig")
+            logliks[] <- .extractFromList("logliks")
+        }
+        
     } else { ## sequential one-step ahead predictions
+
         if (do_pb) pb <- txtProgressBar(min=0, max=ntps, initial=0, style=3)
         for(i in seq_along(tps)) {
             if (verbose > 1L) {
@@ -107,21 +150,29 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
                     next
                 }
             }
+
+            res <- getPreds(fit, tps[i])
             
-            coefs <- fit$coefficients
-            pred[i,] <- meanHHH(coefs, fit$terms,
-                                subset=tps[i]+1L, total.only=TRUE)
-            if (model$nOverdisp > 0)
-                psi[i,] <- coefs[psiNames]
+            ## gather results
+            pred[i,] <- res$pred
+            if (withPsi)
+                psi[i,] <- res$psi
             if (keep.estimates) {
-                coefficients[i,] <- coefs
-                Sigma.orig[i,] <- fit$Sigma.orig
-                logliks[i,] <- c(fit$loglikelihood, fit$margll)
+                coefficients[i,] <- res$coefficients
+                Sigma.orig[i,] <- res$Sigma.orig
+                logliks[i,] <- res$logliks
             }
         }
         if (do_pb) close(pb)
+
     }
-    
-    list(pred=pred, observed=observed, psi=psi, allConverged=all(!is.na(pred)),
-         coefficients=coefficients, Sigma.orig=Sigma.orig, logliks=logliks)
+
+    ## done
+    c(list(pred = pred, observed = observed,
+           psi = if (withPsi) psi else NULL,
+           allConverged = all(!is.na(pred))),
+      if (keep.estimates) list(coefficients = coefficients,
+                               Sigma.orig = Sigma.orig,
+                               logliks = logliks)
+      )
 }
