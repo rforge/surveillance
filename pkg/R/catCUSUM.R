@@ -13,6 +13,7 @@
 #  h   - decision threshold of the Categorical CUSUM
 #########################################################################
 
+
 catcusum.LLRcompute <- function(y, pi0, pi1, h, dfun, n, calc.at=TRUE,...) {
   #Initialize variables
   t <- 0
