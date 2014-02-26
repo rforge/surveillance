@@ -188,7 +188,7 @@ categoricalCUSUM <- function(stsObj,
   # Add name and data name to control object
   control$name <- "multinomCUSUM"
   control$data <- NULL #not supported anymore
-
+  
 
   #New direct calculations on the sts object
   stsObj@observed <- stsObj@observed[control$range,,drop=FALSE]
@@ -197,7 +197,7 @@ categoricalCUSUM <- function(stsObj,
   stsObj@populationFrac <- stsObj@populationFrac[control$range,,drop=FALSE]
   stsObj@alarm <- alarm
   stsObj@upperbound <- upperbound
-
+  stsObj@control <- control
 
   #Fix the corresponding start entry
   if (stsObj@epochAsDate==FALSE){
