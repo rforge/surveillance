@@ -30,8 +30,9 @@ Authors@R: c(MH = person("Michael", "Höhle",
                                code from base R"))
 Author: Michael Höhle [aut, cre, ths], Sebastian Meyer [aut],
         Michaela Paul [aut], Leonhard Held [ctb, ths],
-        T. Correa [ctb], M. Hofmann [ctb], C. Lang [ctb], A. Riebler [ctb],
-        D. Sabanés Bové [ctb], M. Salmon [ctb], S. Steiner [ctb],
+        T. Correa [ctb], M. Hofmann [ctb], C. Lang [ctb], J. Manitz [ctb],
+        A. Riebler [ctb], D. Sabanés Bové [ctb], M. Salmon [ctb],
+        D. Schumacher [ctb], S. Steiner [ctb],
         M. Virtanen [ctb], V. Wimmer [ctb], R Core Team [ctb]
         (A few code segments are modified versions of code from base R)
 Maintainer: Michael Höhle <Michael.Hoehle@stat.uni-muenchen.de>
