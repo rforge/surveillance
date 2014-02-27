@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-02-26)}{
+\section{Changes in surveillance version 1.8-0 (2014-02-27)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -14,7 +14,11 @@
     \code{"ah4"}, for consistency with \code{twinstim()},
     \code{twinSIR()}, and to follow the common convention (cp. \code{lm()}).
     Standard S3-methods for the old \code{"ah4"} name are still
-    available for backwards compatibility but may be removed in the future.
+    available for backwards compatibility but may be removed in the
+    future.
+
+    \item Package \pkg{surveillance} now depends on
+    \CRANpkg{spatstat} >= 1.36-0.
   }
 }
 
@@ -142,6 +146,8 @@
     \code{control.siaf} specification.
     \item Now using \CRANpkg{testthat} for package testing instead of
     the outdated \CRANpkg{RUnit}.
+    \item The \code{multiplicity}-generic and its default method have
+    been integrated in \CRANpkg{spatstat} and are imported from there.
   }
 }
 

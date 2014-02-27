@@ -541,7 +541,7 @@ intensityplot.twinstim <- function (x,
                                                proj4string=.tiles@proj4string,
                                                bbox = .tiles@bbox)
             eventCoords.types <- SpatialPointsDataFrame(eventCoords.types,
-                data.frame(mult = multiplicity(eventCoords.types)))
+                data.frame(mult = multiplicity.Spatial(eventCoords.types)))
             eventCoords.types <- eventCoords.types[!duplicated(coordinates(eventCoords.types)),]
             points.args <- modifyList(list(pch=1, cex=0.5), points.args)
             pointcex <- cex.fun(eventCoords.types$mult)

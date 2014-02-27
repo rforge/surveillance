@@ -353,12 +353,9 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
         TRUE
     } else FALSE
 
-    # determines multiplicity of rows of a numeric matrix
-    # and returns unique rows with appended multiplicity column
-    countunique <- function (mat) {
-        count <- multiplicity(mat)
-        unique(cbind(mat, count))
-    }
+    ## determines multiplicities in a matrix (or data frame)
+    ## and returns unique rows with appended column of counts
+    countunique <- function(x) unique(cbind(x, count=multiplicity(x)))
     # wrapper for 'points' with specific 'cex' for multiplicity
     multpoints <- function (tableCoordsTypes, col) {
         tableMult <- countunique(tableCoordsTypes)
@@ -516,7 +513,7 @@ plot.epidataCS_space <- function (x, subset,
         ## do.call(base::subset,
         ##         args = list(x=quote(x$events), subset=substitute(subset)))
     }
-    events@data[["_MULTIPLICITY_"]] <- multiplicity(events)
+    events@data[["_MULTIPLICITY_"]] <- multiplicity.Spatial(events)
     events <- events[!duplicated(coordinates(events)),]
     pointcex <- cex.fun(events$"_MULTIPLICITY_")
     pointcex <- pointcex * points.args$cex

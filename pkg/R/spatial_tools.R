@@ -126,18 +126,11 @@ runifdisc <- function (n, r = 1, buffer = 0)
 }
 
 
-### Count number of instances at the same location of a SpatialPoint object
+### Count number of instances at the same location of a SpatialPoints object
+## NOTE: the default multiplicity-method has been integrated into the spatstat
+## package which we import
 
-multiplicity.default <- function (x, ...)
-{
-    distmat <- as.matrix(dist(x))
-    as.integer(rowSums(distmat == 0))
-}
-
-multiplicity.Spatial <- function (x, ...)
-{
-    multiplicity(coordinates(x))
-}
+multiplicity.Spatial <- function (x) multiplicity(coordinates(x))
 
     
 ### determines which polygons of a SpatialPolygons object are at the border,

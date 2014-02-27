@@ -75,7 +75,7 @@ importMethodsFrom(Matrix, coerce, diag, forceSymmetric, solve)
 
 importFrom(spatstat, area.owin, as.im.function, coords.ppp, diameter,
                      diameter.owin, disc, distppl, inside.owin, intersect.owin,
-                     is.polygonal, marks, runifpoint, shift.owin,
+                     is.polygonal, marks, multiplicity, runifpoint, shift.owin,
                      spatstat.options, vertices)
 
 importFrom(polyCub, polyCub, polyCub.SV, polyCub.midpoint, xylist)
@@ -132,8 +132,7 @@ S3method(intersectPolyCircle, SpatialPolygons)
 S3method(intersectPolyCircle, gpc.poly)
 
 # little helper: multiplicity of points
-export(multiplicity)                    # new S3-generic
-S3method(multiplicity, default)
+export(multiplicity)                    # as imported from spatstat
 S3method(multiplicity, Spatial)
 
 # Spatio-temporal cluster detection

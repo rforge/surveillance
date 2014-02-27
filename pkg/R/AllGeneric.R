@@ -14,9 +14,6 @@ intersectPolyCircle <- function (object, center, radius, ...)
 ## internal function with methods for "twinSIR" and "simEpidata"
 getModel <- function (object, ...) UseMethod("getModel")
 
-## (rather internal) generic with a default and a "Spatial" method
-multiplicity <- function (x, ...) UseMethod("multiplicity")
-
 
 ### Declare some existing R functions (which we import) to be S4-generic.
 ### This is not strictly necessary, but considered better programming style, and
