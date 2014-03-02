@@ -102,6 +102,7 @@ echo $contents; } ?>
 	Institute, Germany </li>
       <li><code>bayes</code> - A Bayesian predictive posterior
 	approach, see Höhle (2007)</li>
+      <li><code>boda</code> - Bayesian outbreak detection algorithm based on a Generalized Additive Model fitted with INLA, see Manitz and Höhle (2013)</li>
       <li><code>hmm</code> - A predictive version of the Hidden Markov
 	Model approach by Le Strat and Carrat (1999)</li>
       <li><code>rogerson</code> - Surveillance for time varying
@@ -403,7 +404,6 @@ Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
 <dd><a href="http://dx.doi.org/10.1093/aje/kwt069">Werber, D., King, L.A., Müller, L., Follin, P., Buchholz, U., Bernard, H., Rosner, B.M., Ethelberg, S., de Valk, H., Höhle, M. (<b>2013</b>)</a></dd>
 <dd><i>Associations of Age and Sex on Clinical Outcome and Incubation Period of Shiga toxin-producing Escherichia coli O104:H4 Infections, 2011</i></dd>
 <dd>American Journal of Epidemiology, 178(6):984-992</dd>
-
 
 </dl>
 
