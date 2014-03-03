@@ -161,7 +161,7 @@ echo $contents; } ?>
 
 <ul>
 
-  <li>For univariate and multivariate count data time series:
+  <li>Multivariate time series models for count data:
     <ul>
       <li><code>algo.hhh</code> - Held et al. (2005) and Paul et al. (2008)</li>
       <li><code>hhh4</code> - Paul and Held (2011)</li>
@@ -181,7 +181,13 @@ echo $contents; } ?>
     </ul>
   </li>
 
+  <li>See Meyer and Held (2014) for a joint description of the
+  <code>hhh4()</code> (count data) and <code>twinstim()</code> (individual-level
+  data) modelling frameworks -- with a view to account for power-law decay
+  of spatial interaction.</li>
+
 </ul>
+
 
 <hr/>
 <h3>Modelling Structural Delays and Reporting Delays in Surveillance Data</h3>
