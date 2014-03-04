@@ -127,8 +127,12 @@ boda <- function(sts, control=list(range=NULL, X=NULL, trend=FALSE, season=FALSE
 
 ##### sequential steps #####
 
-  # progress bar (now text based. Alternative: tcltk based)
-  pb <- txtProgressBar(min=min(control$range), max=max(control$range), initial=0,style=3)
+  #If there is more than one time point in range, then setup a progress bar 
+  #(now text based. Alternative: tcltk based)
+  useProgressBar <- length(control$range)>1
+  if (useProgressBar) {
+    pb <- txtProgressBar(min=min(control$range), max=max(control$range), initial=0,style=3)
+  }
 
   #Allocate vector of thresholds
   xi <- rep(NA,length(observed))
@@ -145,10 +149,10 @@ boda <- function(sts, control=list(range=NULL, X=NULL, trend=FALSE, season=FALSE
     xi[i] <- bodaFit(dat=dati, modelformula=modelformula, prior=prior, alpha=control$alpha, mc.munu=control$mc.munu, mc.y=control$mc.y)
 
     # update progress bar
-    setTxtProgressBar(pb, i)
+    if (useProgressBar) setTxtProgressBar(pb, i)
   }
   # close progress bar
-  close(pb)
+  if (useProgressBar) close(pb)
 
   # compare observed with threshold an trigger alarm: FALSE=no alarm
   sts@alarm[,1] <- observed > xi 
@@ -189,9 +193,14 @@ bodaFit <- function(dat=dat, modelformula=modelformula,prior=prior,alpha=alpha, 
     return(qi=NA)
   }
   
-  ### mc simulation
-# draw sample from marginal posteriori of etaT1. hoehle: inla.marginal.transform does not exist anymore! [Q]: Isn't there a better way to obtain the predictive distribution of the missing observation in INLA?!!? [A]: Apparently not.
+  
+  # draw sample from marginal posteriori of muT1 & etaT1 to determine predictive
+  # quantile by sampling. hoehle: inla.marginal.transform does not exist anymore!  
+  # Since the observation corresponding to T1 is NA we manually need to transform
+  # the fitted values (had there been an observation this is not necessary!!)
   marg <- try(inla.tmarginal(function(x) exp(x),model$marginals.fitted.values[[T1]]), silent=TRUE)
+  #browser()
+ 
   if(inherits(marg,'try-error')){
       return(qi=NA)
   }
