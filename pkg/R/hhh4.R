@@ -602,6 +602,11 @@ interpretControl <- function (control, stsObj)
     ## array(ne$weights, dim(ne$weights)) do not have this effect...
   }
 
+  ## for backwards compatibility with surveillance < 1.8-0, where the ar and ne
+  ## components of the control object did not have an offset
+  if (is.null(ar$offset)) ar$offset <- 1
+  if (is.null(ne$offset)) ne$offset <- 1
+  
   ## create list of offsets of the three components
   Ym1 <- rbind(matrix(NA_integer_, ar$lag, nUnits), head(Y, nTime-ar$lag))
   Ym1.ne <- neOffsetFUN(Y, ne$weights,
