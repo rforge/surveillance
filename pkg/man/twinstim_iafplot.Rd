@@ -58,16 +58,18 @@ iafplot(object, which = c("siaf", "tiaf"), types = NULL,
     \code{xgrid} (i.e. temporal or spatial distances from the host) for
     each parameter realization to obtain a \code{conf.level} confidence
     interval at each point of the \code{xgrid} (or to plot the
-    interaction functions of all bootstrap samples if
+    interaction functions of all Monte Carlo samples if
     \code{conf.level=NA}).\cr 
     If \code{conf.type="parbounds"}, the \code{conf.level} Wald confidence
     intervals for the interaction function parameters are calculated and
     the interaction function is evaluated on the \code{xgrid}
     (distances from the host) for all combinations of the bounds
     of the parameters and the point-wise extremes of those functions are
-    plotted. This type of confidence interval is actually only valid in
-    the case of only one interaction function parameter, but could also
-    be used as a rough indication if bootstrapping takes too long.\cr
+    plotted. This type of confidence interval is only valid in case of
+    a single parameter, i.e. \code{scaled + nsiafpars == 1}, but could
+    also be used as a rough indication if \code{"bootstrap"} takes too
+    long. A warning is thrown if the \code{"parbounds"} type is used for
+    multiple parameters.\cr 
     If \code{conf.type="none"} or \code{NA} or \code{NULL}, no
     confidence interval will be calculated.
   }
@@ -78,7 +80,8 @@ iafplot(object, which = c("siaf", "tiaf"), types = NULL,
     by \code{alpha.B}.
   }
   \item{conf.B}{
-    number of samples for the \code{"bootstrap"} confidence interval.
+    number of samples for the \code{"bootstrap"} (Monte Carlo)
+    confidence interval.
   }
   \item{xgrid}{
     either a numeric vector of x-values (distances from the host) where
@@ -179,7 +182,8 @@ iafplot(imdepifit, "tiaf", types=1)   # tiaf.constant(), not very exciting
 iafplot(imdepifit, "siaf", types=1,   # same for types=2
         xlim=c(0,200), col.estimate=1, lwd=c(2,1))
 
-# scaled version and bootstrap-CI (used if 'siaf' has more than one parameter)
+# scaled version and Monte Carlo-CI (to be used if 'siaf' has more than
+# one parameter or 'scaled = TRUE')
 iafplot(imdepifit, "siaf", types=1, scaled=TRUE, xlim=c(0,200),
         conf.type="bootstrap", col.estimate=2)
 }

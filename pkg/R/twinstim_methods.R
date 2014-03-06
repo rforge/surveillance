@@ -636,6 +636,9 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
     }
     conf.type <- match.arg(conf.type,
                            choices = c("parbounds", "bootstrap", "none"))
+    if (conf.type == "parbounds" && length(pars) > 1) {
+        warning("'conf.type=\"parbounds\"' is only valid for a single parameter")
+    }
 
     ## grid of x-values (t or ||s||) on which FUN will be evaluated
     if (is.null(xlim)) {
