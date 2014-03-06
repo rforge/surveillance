@@ -579,7 +579,7 @@ formals(intensityplot.twinstim)[names(formals(intensity.twinstim))] <-
 
 iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
     scaled = FALSE, log = "",
-    conf.type = if (length(pars) > 1) "bootstrap" else "parbounds",
+    conf.type = if (length(pars) > 1) "MC" else "parbounds",
     conf.level = 0.95, conf.B = 999,
     xgrid = 101, col.estimate = rainbow(length(types)), col.conf = col.estimate,
     alpha.B = 0.15, lwd = c(3,1), lty = c(1,2),
@@ -635,7 +635,8 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
         conf.type <- "none"
     }
     conf.type <- match.arg(conf.type,
-                           choices = c("parbounds", "bootstrap", "none"))
+                           choices = c("parbounds", "bootstrap", "MC", "none"))
+    if (conf.type == "bootstrap") conf.type <- "MC"  # "bootstrap" was used <1.8
     if (conf.type == "parbounds" && length(pars) > 1) {
         warning("'conf.type=\"parbounds\"' is only valid for a single parameter")
     }
@@ -731,8 +732,8 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
             cis <- confint(object, idxpars, level=conf.level)
             ## all combinations of parameter bounds
             do.call("expand.grid", as.data.frame(t(cis)))
-        }, bootstrap = {
-            ## bootstrapping parameter values
+        }, MC = { # Monte-Carlo confidence interval
+            ## sample parameters from their asymptotic multivariate normal dist.
             rbind(pars,
                   mvrnorm(conf.B, mu=pars,
                           Sigma=vcov(object)[idxpars,idxpars,drop=FALSE]),
@@ -746,7 +747,7 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
                                      pars, types[i]))
             lowerupper <- if (conf.type == "parbounds") {
                 t(apply(fvalsSample, 1, range))
-            } else { # bootstrapped parameter values
+            } else { # Monte-Carlo sample of parameter values
                 if (is.na(conf.level)) {
                     stopifnot(alpha.B >= 0, alpha.B <= 1)
                     .col <- col2rgb(col.conf[i], alpha=TRUE)[,1]

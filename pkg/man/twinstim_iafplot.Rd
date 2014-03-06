@@ -14,7 +14,7 @@
 \usage{
 iafplot(object, which = c("siaf", "tiaf"), types = NULL,
         scaled = FALSE, log="",
-        conf.type = if (length(pars) > 1) "bootstrap" else "parbounds",
+        conf.type = if (length(pars) > 1) "MC" else "parbounds",
         conf.level = 0.95, conf.B = 999, xgrid = 101,
         col.estimate = rainbow(length(types)), col.conf = col.estimate,
         alpha.B = 0.15, lwd = c(3,1), lty = c(1,2),
@@ -51,15 +51,17 @@ iafplot(object, which = c("siaf", "tiaf"), types = NULL,
     \code{par("xlog")} and \code{par("ylog")}.}
   \item{conf.type}{
     type of confidence interval to produce.\cr
-    If \code{conf.type="bootstrap"}, \code{conf.B} parameter values
-    (vectors) are sampled from the asymptotic (multivariate) normal
-    distribution of the ML estimate(s) of the interaction function
-    parameters; the interaction function is then evaluated on the
-    \code{xgrid} (i.e. temporal or spatial distances from the host) for
-    each parameter realization to obtain a \code{conf.level} confidence
-    interval at each point of the \code{xgrid} (or to plot the
-    interaction functions of all Monte Carlo samples if
-    \code{conf.level=NA}).\cr 
+    If \code{conf.type="MC"} (or \code{"bootstrap"}), \code{conf.B}
+    parameter vectors are sampled from the asymptotic
+    (multivariate) normal distribution of the ML estimate of the
+    interaction function parameters; the interaction function is then
+    evaluated on the \code{xgrid} (i.e. temporal or spatial distances
+    from the host) for each parameter realization to obtain a
+    \code{conf.level} confidence interval at each point of the
+    \code{xgrid} (or to plot the interaction functions of all
+    Monte-Carlo samples if \code{conf.level=NA}).
+    Note that the resulting plot is \code{\link{.Random.seed}}-dependent
+    for the Monte-Carlo type of confidence interval.\cr
     If \code{conf.type="parbounds"}, the \code{conf.level} Wald confidence
     intervals for the interaction function parameters are calculated and
     the interaction function is evaluated on the \code{xgrid}
@@ -67,20 +69,20 @@ iafplot(object, which = c("siaf", "tiaf"), types = NULL,
     of the parameters and the point-wise extremes of those functions are
     plotted. This type of confidence interval is only valid in case of
     a single parameter, i.e. \code{scaled + nsiafpars == 1}, but could
-    also be used as a rough indication if \code{"bootstrap"} takes too
-    long. A warning is thrown if the \code{"parbounds"} type is used for
-    multiple parameters.\cr 
+    also be used as a rough indication if the Monte-Carlo approach takes
+    too long. A warning is thrown if the \code{"parbounds"} type is used
+    for multiple parameters.\cr 
     If \code{conf.type="none"} or \code{NA} or \code{NULL}, no
     confidence interval will be calculated.
   }
   \item{conf.level}{
-    the confidence level required. For \code{conf.type = "bootstrap"} it
+    the confidence level required. For \code{conf.type = "MC"} it
     may also be specified as \code{NA}, in which case all \code{conf.B}
-    bootstrapped functions will be plotted with transparency value given
+    sampled functions will be plotted with transparency value given
     by \code{alpha.B}.
   }
   \item{conf.B}{
-    number of samples for the \code{"bootstrap"} (Monte Carlo)
+    number of samples for the \code{"MC"} (Monte Carlo)
     confidence interval.
   }
   \item{xgrid}{
@@ -99,7 +101,7 @@ iafplot(object, which = c("siaf", "tiaf"), types = NULL,
   }
   \item{alpha.B}{
     alpha transparency value (as relative opacity) used for the \code{conf.B}
-    bootstrapped interaction functions in case \code{conf.level = NA}
+    sampled interaction functions in case \code{conf.level = NA}
   }
   \item{lwd, lty}{
     numeric vectors of length two specifying the line width and type of point
@@ -182,10 +184,10 @@ iafplot(imdepifit, "tiaf", types=1)   # tiaf.constant(), not very exciting
 iafplot(imdepifit, "siaf", types=1,   # same for types=2
         xlim=c(0,200), col.estimate=1, lwd=c(2,1))
 
-# scaled version and Monte Carlo-CI (to be used if 'siaf' has more than
+# scaled version and Monte-Carlo-CI (to be used if 'siaf' has more than
 # one parameter or 'scaled = TRUE')
 iafplot(imdepifit, "siaf", types=1, scaled=TRUE, xlim=c(0,200),
-        conf.type="bootstrap", col.estimate=2)
+        conf.type="MC", col.estimate=2)
 }
 
 \keyword{hplot}
