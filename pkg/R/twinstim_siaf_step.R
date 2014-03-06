@@ -40,9 +40,6 @@ siaf.step <- function (knots, maxRange = Inf, nTypes = 1, validpars = NULL)
         bdist <- bdist(cbind(0,0), polydomain)
         ## distance to farest vertex (-> later steps not relevant)
         R <- sqrt(max(polyvertices[["x"]]^2 + polyvertices[["y"]]^2))
-        ## disable redundant checking when creating disc()s:
-        oopt <- spatstat.options(checkpolygons=FALSE)
-        on.exit(spatstat.options(oopt))
         sliceAreas <- sapply(allknotsPos[-1L], function (r) {
             if (r <= bdist) pi * r^2 else if (r >= R) polyarea else
             area.owin(intersectPolyCircle.owin(polydomain,c(0,0),r,npoly=npoly))
