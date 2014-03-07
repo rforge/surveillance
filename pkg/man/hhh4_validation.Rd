@@ -136,9 +136,10 @@ pred <- oneStepAhead(result, nrow(salmonella)-5,
 
 \dontshow{
 ## test equivalence of parallelized version
-if (isTRUE(parallel::detectCores() > 1)) stopifnot(identical(pred,
-    oneStepAhead(result, nrow(salmonella)-5,
-                 which.start="final", verbose=FALSE, cores=2)))
+if (.Platform$OS.type == "unix" && isTRUE(parallel::detectCores() > 1))
+    stopifnot(identical(pred,
+        oneStepAhead(result, nrow(salmonella)-5,
+                     which.start="final", verbose=FALSE, cores=2)))
 }
 
 # compute mean scores
