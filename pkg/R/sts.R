@@ -750,6 +750,7 @@ plot.sts.time <- function(x, type, method=x@control$name,
       par(oldpar)
     }
   } else {  #univariate time series
+    par.list$mfrow <- NULL #no mf formatting..
     oldpar <- par(par.list)
     plot.sts.time.one(x=x, domany=FALSE,...)
     par(oldpar)
