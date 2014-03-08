@@ -21,12 +21,12 @@ library("surveillance")
 data("momo")
 
 #Create a plot of the data as in Figure. 1 of the book chapter
-plot(momo[year(momo)>=2000,],ylab="No. of deaths",par.list=list(mar=c(4,2.2,2,1),cex.axis=1.5), type=observed ~ time | unit, col=c(gray(0.3),NA,NA),xaxis.units=FALSE,xlab="time (weeks)")
+plot(momo[year(momo)>=2000,],ylab="No. of deaths",par.list=list(mar=c(4,2.2,2,1),cex.axis=1.5), type=observed ~ time | unit, col=c(gray(0.3),NA,NA),xaxis.dateFormat="%Y",xaxis.tickFreq=list(year=TRUE),xlab="time (weeks)")
 
 
 par(mfrow=c(1,2),mar=c(4,4,2,1))
-plot(momo,ylab="No. of deaths",xlab="time (weeks)",legend.opts=NULL, type=observed ~ time,col=c(gray(0.3),NA,NA))
-plot(momo[,"[0,1)"],xlab="time (weeks)",ylab="No. of deaths",legend.opts=NULL,col=c(gray(0.3),NA,NA))
+plot(momo,ylab="No. of deaths",xlab="time (weeks)",legend.opts=NULL, type=observed ~ time,col=c(gray(0.3),NA,NA),xaxis.tickFreq=list(year=TRUE))
+plot(momo[,"[0,1)"],xlab="time (weeks)",ylab="No. of deaths",legend.opts=NULL,col=c(gray(0.3),NA,NA),xaxis.tickFreq=list(year=TRUE),)
 par(mfrow=c(1,1))
 
 #Monitoring starts in week 40, 2007

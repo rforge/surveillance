@@ -101,7 +101,8 @@ export(ranef)            # new S3-generic (same meaning as in package nlme)
 export(formatPval)       # yapf -- yet another p-value formatter
 export(anscombe.residuals)
 export(magic.dim, primeFactors, bestCombination)   # similar to n2mfrow
-export(isoWeekYear)
+export(isoWeekYear) #extract ISO 8601 date
+export(formatDate)  #ISO 8601 compatible %G and %V format( ) function. 
 export(refvalIdxByDate)
 export(ks.plot.unif)
 export(checkResidualProcess)       # for twinstim and twinSIR
