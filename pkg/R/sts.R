@@ -379,6 +379,8 @@ merge.list <- function (x, y, ...)
 atChange <- function(x,xm1) which(diff(c(xm1,x)) != 0)
 #Median index of factor
 atMedian <- function(x,xm1) tapply(seq_len(length(x)), INDEX=x, quantile, prob=0.5,type=3)
+#Only a label for every 2nd level from 
+at2ndChange <- function(x,xm1) {which(diff(c(xm1,x) %/% 2) != 0)}
 
 #Helper function to format the x-axis of the time series
 addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelFormat, xaxis.tickFreq,xaxis.labelFreq,...) {
@@ -424,11 +426,11 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelF
       mylabels.unit <- paste(year,"\n\n", (myat.unit-1) %% x@freq + 1,sep="")
       
       #Add axis
-      axis( at=(1:length(observed))  , labels=NA, side=1, line = 1 , ...) #cex=cex
-      axis( at=(1:length(observed))[month==1]  , labels=mylabels.unit[month==1] , side=1, line = 1 ,...)
+      axis( at=(1:length(observed)), labels=NA, side=1, line = 1, ...) 
+      axis( at=(1:length(observed))[month==1], labels=mylabels.unit[month==1] , side=1, line = 1 ,...)
       #Bigger tick marks at the first unit
       at <- (1:length(observed))[(myat.unit - 1) %% x@freq == 0]
-      axis( at=at  , labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
+      axis( at=at, labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
     } 
   } else {   
     ################################################################
@@ -455,10 +457,10 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelF
       #Find tick size by table loiokup
       tclFactor <- tickFactors[pmatch(format, names(tickFactors))]
       if (is.na(tclFactor)) { 
-        warning("No tcl factor found for",format,". Setting it at 1") <- 1
+        warning("No tcl factor found for",format,". Setting it at 1") 
         tclFactor <- 1
       }
-      axis(1,at=idx, label=NA,tcl=tclFactor*tcl,...)
+      axis(1,at=idx, labels=NA,tcl=tclFactor*tcl,...)
     }  
     
     ###Make the labels (depending on the selected level)###
@@ -473,7 +475,7 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelF
       #Format label and take the requested subset
       labels <- rep(NA,nrow(x))
       labels[labelIdx] <- formatDate(epoch(x)[labelIdx],xaxis.labelFormat)
-      axis(1,at=1:nrow(x), label=labels,tick=FALSE,...)    
+      axis(1,at=1:nrow(x), labels=labels,tick=FALSE,...)    
     }
   }#end epochAsDate
   #Done
