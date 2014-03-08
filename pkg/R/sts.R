@@ -375,14 +375,20 @@ merge.list <- function (x, y, ...)
 # Plot functions
 ##########################################################################
 
+#Every unit change
+atChange <- function(x,xm1) which(diff(c(xm1,x)) != 0)
+#Median index of factor
+atMedian <- function(x,xm1) tapply(seq_len(length(x)), INDEX=x, quantile, prob=0.5,type=3)
+
 #Helper function to format the x-axis of the time series
-addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.dateFormat, xaxis.tickFreq,xaxis.labelFreq,...) {
-  #Declare commonly used variables.
-  startyear <-  x@start[1]
+addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelFormat, xaxis.tickFreq,xaxis.labelFreq,...) {
   
-  #Weekly date are the most supported 
-  if (x@freq ==52) {
-    if (!epochsAsDate) {
+  #Old style if there are no Date objects
+  if (!epochsAsDate) {
+    #Declare commonly used variables.
+    startyear <-  x@start[1]
+    
+    if (x@freq ==52) {  #Weekly epochs are the most supported 
       # At which indices to put the "at" tick label. This will
       # be exactly those week numbers where the new quarter begins: 1, 14, 27 and 40 + i*52.
       # Note that week number and index is not the same due to the "firstweek" argument
@@ -407,93 +413,74 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.dateFo
       at <- weekIdx[which(quarter == "I")]
       axis( at=at, labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
       
-    } else {   #epochAsDate -- experimental functionality to handle ISO 8601
-      ##begin: code to improve
-      date <- epoch(x)#@epoch, origin="1970-01-01")
-      years <- unique(as.numeric(formatDate(date,"%Y")))
-      #Start of quarters in each year present in the data. 
-      qStart <- as.Date(paste(rep(years,each=4), c("-01-01","-04-01","-07-01","-10-01"),sep=""))
-      qName  <- rep(c("I","II","III","IV"), length.out=length(qStart))
-      qIdx   <- qStart <= max(date)+10 & qStart >= min(date)-10
-      qStart <- qStart[qIdx] ; qName <- qName[qIdx]
-      #Find week in data closest to these dates
-      weekIdx <- sapply(qStart, function(d) which.min(abs(as.numeric(date - d))))
-      #Problem if no quarters in date range
-      if (length(weekIdx)==0) {weekIdx <- 1}
-      quarter <- qName    
-      ##improve code
+    } else { ##other frequency (not really supported)
+      #A label at each unit
+      myat.unit <- seq(firstweek,length.out=length(observed) )
       
-      #Make the line. Use lwd.ticks to get full line but no marks.
-      axis( side=1,labels=FALSE,at=c(1,length(observed)),lwd.ticks=0,...) 
+      # get the right year order
+      month <- (myat.unit-1) %% x@freq + 1
+      year <- (myat.unit - 1) %/% x@freq + startyear
+      #construct the computed axis labels -- add quarters if xaxis.units is requested
+      mylabels.unit <- paste(year,"\n\n", (myat.unit-1) %% x@freq + 1,sep="")
       
-      #Make the ticks (depending on the selected level).
-      tcl <- par()$tcl
-      if (xaxis.tickFreq[["week",exact=TRUE]]) {
-        axis(1,at=seq(nrow(x)), label=NA,tcl=0.33*tcl,...) #Move with line
-      }
-      if (xaxis.tickFreq[["month",exact=TRUE]]) {
-        month <- as.numeric(format(epoch(x),"%m"))
-        where.monthstart = seq(nrow(x))[diff(month) %in% c(1,-11)]
-        axis(1,at=where.monthstart,label=NA,tcl=tcl,...)
-      }
-      if (xaxis.tickFreq[["quarter",exact=TRUE]]) {
-        axis(1,at=weekIdx,labels=NA, tcl=1.25*tcl,...) 
-      }
-      if (xaxis.tickFreq[["year",exact=TRUE]]) {
-        axis(1,at=weekIdx[which(quarter == "I")], labels=NA, tcl=1.5*tcl,...)
-      }
-      
-      #Make the labels (depending on the selected level)
-      if (!is.null(xaxis.dateFormat)) {
-        labelIdx <- NULL
-        isoYear <- isoWeekYear(epoch(x))$ISOYear
-        if (xaxis.labelFreq[["week",exact=TRUE]]) { labelIdx <- seq(nrow(x)) }
-        if (xaxis.labelFreq[["month",exact=TRUE]]) { labelIdx <- c(labelIdx,where.monthstart) }
-        if (xaxis.labelFreq[["quarter",exact=TRUE]]) { labelIdx <- c(labelIdx,weekIdx)}
-        if (xaxis.labelFreq[["year",exact=TRUE]]) { labelIdx <- c(labelIdx,tapply(1:nrow(x),isoYear,function(x) round(median(x)))) }
-        labelIdx <- sort(unique(labelIdx))
-        
-        #Format label and take the requested subset
-        labels <- rep(NA,nrow(x))
-        labels[labelIdx] <- formatDate(epoch(x)[labelIdx],xaxis.dateFormat)
-        axis(1,at=1:nrow(x), label=labels,tick=FALSE,...)
-      } #end make labels
-    }  #end epochAsDate
-  } else { ##other frequency (not really supported)
-    #A label at each unit
-    myat.unit <- seq(firstweek,length.out=length(observed) )
+      #Add axis
+      axis( at=(1:length(observed))  , labels=NA, side=1, line = 1 , ...) #cex=cex
+      axis( at=(1:length(observed))[month==1]  , labels=mylabels.unit[month==1] , side=1, line = 1 ,...)
+      #Bigger tick marks at the first unit
+      at <- (1:length(observed))[(myat.unit - 1) %% x@freq == 0]
+      axis( at=at  , labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
+    } 
+  } else {   
+    ################################################################
+    #epochAsDate -- experimental functionality to handle ISO 8601
+    ################################################################
     
-    # get the right year order
-    month <- (myat.unit-1) %% x@freq + 1
-    year <- (myat.unit - 1) %/% x@freq + startyear
-    #construct the computed axis labels -- add quarters if xaxis.units is requested
-    mylabels.unit <- paste(year,"\n\n", (myat.unit-1) %% x@freq + 1,sep="")
+    dates <- epoch(x)
+    #make one which has one extra element at beginning with same spacing
+    datesOneBefore <- c(dates[1]-(dates[2]-dates[1]),dates)
     
-    #Add axis
-    axis( at=(1:length(observed))  , labels=NA, side=1, line = 1 , ...) #cex=cex
-    axis( at=(1:length(observed))[month==1]  , labels=mylabels.unit[month==1] , side=1, line = 1 ,...)
-    #Bigger tick marks at the first unit
-    at <- (1:length(observed))[(myat.unit - 1) %% x@freq == 0]
-    axis( at=at  , labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
-  }
+    #Make the line. Use lwd.ticks to get full line but no marks.
+    axis( side=1,labels=FALSE,at=c(1,length(observed)),lwd.ticks=0,...) 
+    
+    ###Make the ticks (depending on the selected level).###
+    tcl <- par()$tcl
+    tickFactors <- surveillance.options("stsTickFactors")
+    
+    #Loop over all pairs in the xaxis.tickFreq list
+     for (i in seq(xaxis.tickFreq)) {
+      format <- names(xaxis.tickFreq)[i]
+      xm1x <- as.numeric(formatDate(datesOneBefore,format))                         
+      idx <- xaxis.tickFreq[[i]](x=xm1x[-1],xm1=xm1x[1])
+      
+      #Find tick size by table loiokup
+      tclFactor <- tickFactors[pmatch(format, names(tickFactors))]
+      if (is.na(tclFactor)) { 
+        warning("No tcl factor found for",format,". Setting it at 1") <- 1
+        tclFactor <- 1
+      }
+      axis(1,at=idx, label=NA,tcl=tclFactor*tcl,...)
+    }  
+    
+    ###Make the labels (depending on the selected level)###
+    if (!is.null(xaxis.labelFormat)) {
+      labelIdx <- NULL
+      for (i in seq(xaxis.labelFreq)) {
+        format <- names(xaxis.labelFreq)[i]
+        xm1x <- as.numeric(formatDate(datesOneBefore,format))                         
+        labelIdx <- c(labelIdx,xaxis.labelFreq[[i]](x=xm1x[-1],xm1=xm1x[1]))
+      }
+      
+      #Format label and take the requested subset
+      labels <- rep(NA,nrow(x))
+      labels[labelIdx] <- formatDate(epoch(x)[labelIdx],xaxis.labelFormat)
+      axis(1,at=1:nrow(x), label=labels,tick=FALSE,...)    
+    }
+  }#end epochAsDate
   #Done
   invisible()
 }
 
-#Small helper function to fill a tickFreq or labelFreq with default values
-safeGuardFreq <- function(list) {
-  if (is.null(list)) { list <- list("quarter"=TRUE) }
-  if (!is.list(list)) {stop("Argument should be a list")}
-  
-  if (is.null(list[["week",exact=TRUE]])) { list$week <- FALSE  }
-  if (is.null(list[["month",exact=TRUE]])) { list$month <- FALSE }
-  if (is.null(list[["quarter",exact=TRUE]])) { list$quarter <- FALSE }
-  if (is.null(list[["year",exact=TRUE]])) { list$year <- FALSE }
-  return(list)
-}
-
-
-plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL, axes=TRUE, xaxis.dateFormat="%Y\n\n%OQ", xaxis.tickFreq=list(quarter=TRUE),xaxis.labelFreq=list(quarter=TRUE),epochsAsDate=x@epochAsDate, xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1), outbreak.symbol = list(pch=3, col=3, cex=1,lwd=1),alarm.symbol=list(pch=24, col=2, cex=1,lwd=1),legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0L,hookFunc=function() {}, ...) {
+plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL, axes=TRUE, xaxis.tickFreq=list("%Q"=atChange),xaxis.labelFreq=xaxis.tickFreq,xaxis.labelFormat="%G\n\n%OQ", epochsAsDate=x@epochAsDate, xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1), outbreak.symbol = list(pch=3, col=3, cex=1,lwd=1),alarm.symbol=list(pch=24, col=2, cex=1,lwd=1),legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0L,hookFunc=function() {}, ...) {
 
   #Extract slots -- depending on the algorithms: x@control$range
   observed   <- x@observed[,k]
@@ -509,7 +496,7 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL, axes=TRUE, xaxis.d
   binaryTS <- x@multinomialTS
 
   #Control what axis style is used
-  xaxis.dates <- !is.null(xaxis.dateFormat) 
+  xaxis.dates <- !is.null(xaxis.labelFormat) 
 
   if (binaryTS) {
     observed <- ifelse(population!=0,observed/population,0)
@@ -534,11 +521,6 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL, axes=TRUE, xaxis.d
   if(is.null(ylim) ){
     ylim <- c(-1/20*max, max)
   }
-
-  #Handle tickFreq & labelFreq
-  xaxis.tickFreq <- safeGuardFreq(xaxis.tickFreq)
-  xaxis.labelFreq <- safeGuardFreq(xaxis.labelFreq)
-  
   
   # left/right help for constructing the columns
   dx.observed <- 0.5
@@ -577,7 +559,7 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL, axes=TRUE, xaxis.d
 
   #Label x-axis 
   if(xaxis.dates & axes) {
-    addFormattedXAxis(x, epochsAsDate, observed, firstweek,xaxis.dateFormat,xaxis.tickFreq,xaxis.labelFreq,...)
+    addFormattedXAxis(x, epochsAsDate, observed, firstweek,xaxis.labelFormat,xaxis.tickFreq,xaxis.labelFreq,...)
   }
   #Label y-axis
   if (axes) {
@@ -605,7 +587,7 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL, axes=TRUE, xaxis.d
 }
 
 
-plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL,xaxis.dateFormat="%Y\n\n%OQ", xaxis.units=TRUE, xaxis.tickFreq=list(quarter=TRUE),xaxis.labelFreq=list(quarter=TRUE),epochsAsDate=x@epochAsDate, xlab="time", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4), outbreak.symbol = list(pch=3, col=3, cex=1, lwd=1),alarm.symbol=list(pch=24, col=2, cex=1,lwd=1),cex=1,cex.yaxis=1,...) {
+plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL, xaxis.units=TRUE, xaxis.tickFreq=list("%Q"=atChange),xaxis.labelFreq=xaxis.tickFreq,xaxis.labelFormat="%G\n\n%OQ",epochsAsDate=x@epochAsDate, xlab="time", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4), outbreak.symbol = list(pch=3, col=3, cex=1, lwd=1),alarm.symbol=list(pch=24, col=2, cex=1,lwd=1),cex=1,cex.yaxis=1,...) {
 
   k <- 1
   #Extract slots -- depending on the algorithms: x@control$range
@@ -630,12 +612,8 @@ plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL,xaxis.dateFormat="%Y
   }
  
   #Control what axis style is used
-  xaxis.dates <- !is.null(xaxis.dateFormat) 
+  xaxis.dates <- !is.null(xaxis.labelFormat) 
 
-  #Handle tickFreq & labelFreq
-  xaxis.tickFreq <- safeGuardFreq(xaxis.tickFreq)
-  xaxis.labelFreq <- safeGuardFreq(xaxis.labelFreq)
-  
   # left/right help for constructing the columns
   dx.observed <- 0.5
   observedxl <- (1:length(observed))-dx.observed
@@ -662,7 +640,7 @@ plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL,xaxis.dateFormat="%Y
 
   #Label of x-axis 
   if(xaxis.dates){
-    addFormattedXAxis(x, epochsAsDate, observed, firstweek, xaxis.dateFormat,xaxis.tickFreq,xaxis.labelFreq,...)
+    addFormattedXAxis(x, epochsAsDate, observed, firstweek, xaxis.labelFormat,xaxis.tickFreq,xaxis.labelFreq,...)
   }
   axis( side=2, at=1:ncol(x),cex.axis=cex.yaxis, labels=colnames(x),las=2)
 

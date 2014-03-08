@@ -35,6 +35,13 @@
                          valid="a single logical value"
                          )
 
+#Tick sizes of sts xaxis relative to par()$tcl
+.Options$stsTickFactors <- list(
+  default=c("%d"=0.33,"%W"=0.33,"%V"=0.33,"%m"=1,"%Q"=1.25,"%Y"=1.5,"%G"=1.5),
+  check=function(x) is.numerical(x),
+  valid="vector of pairs"
+)
+  
 ## Function to activate the defaults
 reset.surveillance.options <- function ()
 {
