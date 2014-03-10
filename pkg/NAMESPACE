@@ -155,7 +155,7 @@ exportMethods(as.data.frame)
 exportMethods(epoch,observed,alarms,upperbound,population,control,multinomialTS,neighbourhood)
 exportMethods("epoch<-","observed<-","alarms<-","upperbound<-","population<-","control<-","multinomialTS<-","neighbourhood<-")
 
-export(atChange,atMedian) #for x-axis formatting
+export(atChange,at2ndChange,atMedian) #for x-axis formatting
 export(linelist2sts)
 
 export(wrap.algo, farrington, bayes, rki, cusum, glrpois, glrnb, outbreakP, boda) # FIXME: rogerson, hmm ??
