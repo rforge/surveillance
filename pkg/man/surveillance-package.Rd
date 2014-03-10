@@ -10,7 +10,7 @@
 }
 
 \description{
-  A package implementing statistical methods for the modeling and
+  A package implementing statistical methods for the modelling and
   change-point detection in time series of counts, proportions and
   categorical data, as well as for the modeling of continuous-time
   epidemic phenomena, e.g. discrete-space setups such as the spatially
@@ -75,18 +75,18 @@
   to simulate outbreak data, visualize the results of the monitoring in
   temporal, spatial or spatio-temporal fashion.
 
-  Furthermore, inference methods for the retrospective infectious disease
-  model in Held et al. (2005), Paul et al. (2008) ("algo.hhh") and Paul
-  and Held (2011) ("hhh4") handling multivariate time series of
-  counts. Furthermore, the fully Bayesian approach for univariate time
-  series of counts from Held et al. (2006) ("twins") is also implemented
-  Self-exciting spatio-temporal point processes are modeled through
-  additive-multiplicative conditional intensities as described in
-  H\enc{ö}{oe}hle (2009) ("twinSIR") and Meyer et al (2012) ("twinstim").
+  Furthermore, the package contains inference methods for the
+  retrospective infectious disease model in Held et al. (2005), Paul et
+  al. (2008) ("algo.hhh") and Paul and Held (2011) ("hhh4") handling
+  multivariate time series of counts. Furthermore, the fully Bayesian
+  approach for univariate time series of counts from Held et al. (2006)
+  ("twins") is also implemented. Self-exciting spatio-temporal point
+  processes are modeled through additive-multiplicative conditional
+  intensities as described in H\enc{ö}{oe}hle (2009) ("twinSIR") and
+  Meyer et al (2012) ("twinstim").
 
-  Altogether, the package contains several real-world datasets, the
-  ability to simulate outbreak data, visualize the results of the
-  monitoring in temporal, spatial or spatio-temporal fashion.
+  Altogether, the package allows the modelling and monitoring of
+  epidemic phenomena in temporal and spatio-temporal contexts.
 }
 
 \section{Acknowledgements}{
