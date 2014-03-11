@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-02-27)}{
+\section{Changes in surveillance version 1.8-0 (2014-03-11)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -58,7 +58,8 @@
     \code{data("measles.weser")}.
 
     \item The \code{plot()}-method for fitted \code{hhh4()} objects now
-    offers two additional types of plots: component seasonality and maps
+    offers three additional types of plots: component seasonality,
+    seasonal or time course of the dominant eigenvalue, and maps
     of estimated random intercepts. It is documented and more customizable.
     Note that argument order and some names have changed:
     \code{i} -> \code{units}, \code{title} -> \code{names}.

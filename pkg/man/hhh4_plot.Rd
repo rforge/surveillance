@@ -4,17 +4,21 @@
 \alias{plotHHH4_fitted1}
 \alias{plotHHH4_season}
 \alias{getMaxEV_season}
+\alias{plotHHH4_maxEV}
+\alias{getMaxEV}
 \alias{plotHHH4_ri}
 
 \title{Plots for Fitted \code{hhh4}-models}
 
 \description{
-  There are three \code{type}s of plots for fitted \code{\link{hhh4}} models:
+  There are four \code{type}s of plots for fitted \code{\link{hhh4}} models:
   \itemize{
     \item Plot the \code{"fitted"} component means (of selected units)
     along time along with the observed counts.
     \item Plot the estimated \code{"season"}ality of the three
     components and the dominant eigenvalue of the epidemic components.
+    \item Plot the complete time course of the \code{"maxEV"} (to be used
+    if the neighbourhood component contains time-varying weights).
     \item If the units of the corresponding multivariate
     \code{"\linkS4class{sts}"} object represent different regions, a map
     of estimated region-specific intercepts (\code{"ri"}) of a selected
@@ -48,6 +52,11 @@ plotHHH4_season(...,
                 refline.args = list(), unit = 1)
 getMaxEV_season(x, unit = 1)
 
+plotHHH4_maxEV(...,
+               matplot.args = list(), refline.args = list(),
+               legend.args = list())
+getMaxEV(x)
+
 plotHHH4_ri(x, component, sp.layout = NULL,
             gpar.missing = list(col = "darkgrey", lty = 2, lwd = 2),
             ...)
@@ -64,10 +73,10 @@ plotHHH4_ri(x, component, sp.layout = NULL,
     intercepts (\code{"ri"}) of a specific model \code{component}.
     The latter requires the model \code{x} to contain the selected
     random intercepts, and \code{x$stsObj} to contain a map.}
-  \item{\dots}{For \code{plotHHH4_season}, one or more
-    \code{\link{hhh4}}-fits, or a single list of these.
+  \item{\dots}{For \code{plotHHH4_season} and \code{plotHHH4_maxEV},
+    one or more \code{\link{hhh4}}-fits, or a single list of these.
     Otherwise further arguments passed on to other functions.\cr
-    For the \code{plot}-method they go to the specific plot
+    For the \code{plot}-method these go to the specific plot
     \code{type} function.\cr
     \code{plotHHH4_fitted} passes them to \code{plotHHH4_fitted1}, which is called
     sequentially for every unit in \code{units}.\cr
@@ -155,6 +164,9 @@ plotHHH4_ri(x, component, sp.layout = NULL,
   \code{plotHHH4_season(..., components="maxEV")},
   \code{"maxEV.const"} and \code{"Lambda.const"} (the Lambda matrix and
   its dominant eigenvalue if time effects are ignored).\cr
+  \code{plotHHH4_maxEV} (invisibly) and \code{getMaxEV} return the
+  dominant eigenvalue of the \eqn{\Lambda_t} matrix for all time points
+  \eqn{t} of \code{x$stsObj}.
   \code{plotHHH4_ri} returns the generated \code{\link{spplot}}, which
   is a \pkg{lattice} plot of class \code{"\link[=trellis.object]{trellis}"}.
 }
@@ -194,6 +206,7 @@ plot(measlesFit, type="season")
 
 ## dominant eigenvalue of the Lambda matrix (cf. Held and Paul, 2012)
 getMaxEV_season(measlesFit)$maxEV.const  # here simply exp(AR intercept)
+plot(measlesFit, type="maxEV")  # not very exciting here since constant
 
 ## random intercepts of the endemic component
 plot(measlesFit, type="ri", component="end")

@@ -395,6 +395,7 @@ S3method(simulate, hhh4)
 S3method(plot, hhh4)
 export(plotHHH4_fitted, plotHHH4_fitted1,
        plotHHH4_season, getMaxEV_season,
+       plotHHH4_maxEV, getMaxEV,
        plotHHH4_ri)
 
 ## backwards-compatibility for old class name "ah4"

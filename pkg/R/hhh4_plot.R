@@ -188,7 +188,7 @@ plotHHH4_maxEV <- function (...,
     ## line style
     matplot.args <- modifyList(
         list(type="l", col=c(1,2,6,3), lty=c(1,3,2,4), lwd=1.7, cex=1, pch=NULL,
-             xlab="", ylab="dominant eigenvalue"),
+             xlab="", ylab="dominant eigenvalue", ylim=c(0,max(2,maxEV))),
         matplot.args)
 
     ## main plot
@@ -200,6 +200,8 @@ plotHHH4_maxEV <- function (...,
                                      refline.args))
 
     ## add legend
+    if (missing(legend.args) && length(objects) == 1)
+        legend.args <- NULL             # omit legend
     if (is.list(legend.args)) {
         legend.args <- modifyList(
             c(list(x="topright", inset=0.02, legend=names(objects), bty="n"),
@@ -211,6 +213,13 @@ plotHHH4_maxEV <- function (...,
 
     ## done
     invisible(maxEV)
+}
+
+getMaxEV <- function (x)
+{
+    Lambda <- createLambda(x)
+    sapply(seq_len(nrow(x$stsObj)), function (t)
+           max(eigen(Lambda(t), only.values=TRUE)$values))
 }
 
 ## generate a function that computes the Lambda_t matrix
@@ -242,13 +251,6 @@ createLambda <- function (object)
             Lambda
         }
     }
-}
-
-getMaxEV <- function (x)
-{
-    Lambda <- createLambda(x)
-    sapply(seq_len(nrow(x$stsObj)), function (t)
-           max(eigen(Lambda(t), only.values=TRUE)$values))
 }
 
 
