@@ -376,11 +376,19 @@ merge.list <- function (x, y, ...)
 ##########################################################################
 
 #Every unit change
-atChange <- function(x,xm1) which(diff(c(xm1,x)) != 0)
+atChange <- function(x,xm1) {
+    which(diff(c(xm1,x)) != 0)
+}
 #Median index of factor
-atMedian <- function(x,xm1) tapply(seq_len(length(x)), INDEX=x, quantile, prob=0.5,type=3)
-#Only a label for every 2nd level from 
-at2ndChange <- function(x,xm1) {which(diff(c(xm1,x) %/% 2) != 0)}
+atMedian <- function(x,xm1) {
+    as.integer(tapply(seq_len(length(x)), INDEX=x, quantile, prob=0.5,type=3))
+}
+#Only every second unit change
+at2ndChange <- function(x,xm1) {
+    idxAtChange <- atChange(x,xm1)
+    idxAtChange[seq(idxAtChange) %% 2 == 1]
+}
+
 
 #Helper function to format the x-axis of the time series
 addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelFormat, xaxis.tickFreq,xaxis.labelFreq,...) {
