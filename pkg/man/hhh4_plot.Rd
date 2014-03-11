@@ -23,7 +23,7 @@
 }
 
 \usage{
-\method{plot}{hhh4}(x, type=c("fitted", "season", "ri"), ...)
+\method{plot}{hhh4}(x, type=c("fitted", "season", "maxEV", "ri"), ...)
 
 plotHHH4_fitted(x, units = 1, names = NULL,
                 col = c("orange", "blue", "grey85", "black"),
@@ -45,8 +45,8 @@ plotHHH4_season(...,
                 xlab=NULL, ylab=NULL, main=NULL,
                 par.settings = list(), matplot.args = list(),
                 legend = NULL, legend.args = list(),
-                refline.args = list())
-getMaxEV_season(x)
+                refline.args = list(), unit = 1)
+getMaxEV_season(x, unit = 1)
 
 plotHHH4_ri(x, component, sp.layout = NULL,
             gpar.missing = list(col = "darkgrey", lty = 2, lwd = 2),
@@ -58,7 +58,9 @@ plotHHH4_ri(x, component, sp.layout = NULL,
   \item{type}{type of plot: either \code{"fitted"} component means of
     selected \code{units} along time along with the observed counts, or
     \code{"season"}ality plots of the model components and the epidemic
-    dominant eigenvalue, or a map of estimated region-specific random
+    dominant eigenvalue (which may also be plotted along overall time by
+    \code{type="maxEV"}, especially if the model contains time-varying
+    neighbourhood weights), or a map of estimated region-specific random
     intercepts (\code{"ri"}) of a specific model \code{component}.
     The latter requires the model \code{x} to contain the selected
     random intercepts, and \code{x$stsObj} to contain a map.}
@@ -70,9 +72,11 @@ plotHHH4_ri(x, component, sp.layout = NULL,
     \code{plotHHH4_fitted} passes them to \code{plotHHH4_fitted1}, which is called
     sequentially for every unit in \code{units}.\cr
     \code{plotHHH4_ri} passes additional arguments to \code{\link{spplot}}.}
-  \item{units,unit}{integer or character vector specifying the units to plot.
-    It indexes \code{colnames(x$stsObj)}. The \code{unit} for
-    \code{plotHHH4_fitted1} must be of length 1 only.}
+  \item{units,unit}{integer or character vector specifying a single
+    \code{unit} or possibly multiple \code{units} to plot.
+    It indexes \code{colnames(x$stsObj)}. In the seasonality functions,
+    selection of a unit is only relevant if the model contains
+    unit-specific intercepts or seasonality terms.}
   \item{names,main}{main title(s) for the selected
     \code{unit}(\code{s}) / \code{components}. If \code{NULL} (default),
     \code{plotHHH4_fitted1} will use the appropriate element of
