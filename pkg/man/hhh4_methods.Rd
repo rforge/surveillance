@@ -29,7 +29,7 @@ from a call to \code{\link{hhh4}}.
 
 \usage{
 \method{print}{hhh4}(x, digits = max(3, getOption("digits") - 3), ...)
-\method{summary}{hhh4}(object, ...)
+\method{summary}{hhh4}(object, maxEV = FALSE, ...)
 
 \method{coef}{hhh4}(object, se = FALSE, reparamPsi = TRUE, 
      idx2Exp = NULL, amplitudeShift = FALSE, ...)
@@ -49,15 +49,20 @@ from a call to \code{\link{hhh4}}.
   \item{x, object}{an object of class \code{"hhh4"}.}
   \item{digits}{the number of significant digits to use when printing
   }
-  \item{reparamPsi}{
-    logical. If \code{TRUE} (default), the overdispersion parameter from the 
-    negative binomial distribution is transformed from internal scale (-log)
-    to standard scale, where zero corresponds to a Poisson distribution. 
-  }
+  \item{maxEV}{logical indicating if the summary should contain the
+    (range of the) dominant eigenvalue as a measure of the importance of
+    the epidemic components. By default, the value is not calculated as
+    this may take some seconds depending on the number of time points
+    and units in \code{object$stsObj}.}
   \item{\dots}{
     For the \code{print}, \code{summary}, \code{fixef} and \code{ranef}
     methods: arguments passed to \code{coef}.\cr
     For the remaining methods: unused (argument of the generic).
+  }
+  \item{reparamPsi}{
+    logical. If \code{TRUE} (default), the overdispersion parameter from the 
+    negative binomial distribution is transformed from internal scale (-log)
+    to standard scale, where zero corresponds to a Poisson distribution. 
   }
   \item{se}{logical switch indicating if standard errors are required}
   \item{idx2Exp}{vector with integers idicating the parameters

@@ -218,8 +218,18 @@ plotHHH4_maxEV <- function (...,
 getMaxEV <- function (x)
 {
     Lambda <- createLambda(x)
-    sapply(seq_len(nrow(x$stsObj)), function (t)
-           max(eigen(Lambda(t), only.values=TRUE)$values))
+    if (identical(type <- attr(Lambda, "type"), "zero")) {
+        rep.int(0, nrow(x$stsObj))
+    } else {
+        sapply(seq_len(nrow(x$stsObj)),
+               if (identical(type, "diagonal")) {
+                   function (t) max(Lambda(t))  # or max(diag(Lambda(t)))
+               } else { # type is NULL
+                   function (t)
+                       eigen(Lambda(t), symmetric=FALSE,
+                             only.values=TRUE)$values[1L]
+               }, simplify=TRUE, USE.NAMES=FALSE)
+    }
 }
 
 ## generate a function that computes the Lambda_t matrix
@@ -227,8 +237,16 @@ createLambda <- function (object)
 {
     nTime <- nrow(object$stsObj)
     nUnit <- object$nUnit
+    if (identical(componentsHHH4(object), "end")) { # no epidemic components
+        zeromat <- matrix(0, nUnit, nUnit)
+        Lambda <- function (t) zeromat
+        attr(Lambda, "type") <- "zero"
+        return(Lambda)
+    }
+    
     meanHHH <- meanHHH(object$coefficients, terms(object),
                        subset=seq_len(nTime))
+    
     W <- getNEweights(object)
     Wt <- if (is.null(W)) {
         NULL
@@ -237,8 +255,10 @@ createLambda <- function (object)
     } else {
         function (t) W[,,t]
     }
-    
-    if (is.null(Wt)) {        # no neighbourhood component
+
+    type <- NULL
+    Lambda <- if (is.null(Wt)) {        # no neighbourhood component
+        type <- "diagonal"
         function (t) {
             stopifnot(isScalar(t) && t > 0 && t <= nTime)
             diag(meanHHH$ar.exppred[t,], nUnit, nUnit)
@@ -251,6 +271,8 @@ createLambda <- function (object)
             Lambda
         }
     }
+    attr(Lambda, "type") <- type
+    Lambda
 }
 
 
@@ -445,9 +467,10 @@ getMaxEV_season <- function (x, unit = 1)
     ## get neighbourhood weights as a function of time
     W <- getNEweights(x)  # NULL, matrix or 3-dim array
     if (!is.null(W) && !is.matrix(W))
-        stop("neighbourhood weights are time-varying; use plotHHH4_maxEV()")
+        stop("neighbourhood weights are time-varying; ",
             # and thus probably changing within or across seasons
-    
+             "use getMaxEV() or plotHHH4_maxEV()")
+
     ## create the Lambda_t matrix
     createLambda <- function (t)
     {

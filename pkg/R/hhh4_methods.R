@@ -66,7 +66,7 @@ print.hhh4 <- function (x, digits = max(3, getOption("digits")-3), ...)
     print.default(V.corr, quote=FALSE)
 }
 
-summary.hhh4 <- function (object, ...)
+summary.hhh4 <- function (object, maxEV = FALSE, ...)
 {
     ## do not summarize results in case of non-convergence
     if (!object$convergence) {
@@ -79,7 +79,8 @@ summary.hhh4 <- function (object, ...)
                   ranef = ranef.hhh4(object, ...),
                   REmat = .getREmat(object),
                   AIC   = AIC(object),
-                  BIC   = BIC(object)))
+                  BIC   = BIC(object),
+                  maxEV_range = if (maxEV) unique(range(getMaxEV(object)))))
     class(ret) <- "summary.hhh4"
     return(ret)
 }
@@ -88,11 +89,14 @@ print.summary.hhh4 <- function (x, digits = max(3, getOption("digits")-3), ...)
 {
     ## x$convergence is always TRUE if we have a summary
     print.hhh4(x) # also works for summary.hhh4-objects
-    
+
+    if (!is.null(x$maxEV_range))
+        cat("Epidemic dominant eigenvalue: ",
+            paste(round(x$maxEV_range,2), collapse = " -- "), "\n\n")
     if(x$dim["random"]==0){
-        cat('Log-likelihood:   ',round(x$loglikelihood,digits=digits-2),'\n')  
-        cat('AIC:              ',round(x$AIC,digits=digits-2),'\n')
-        cat('BIC:              ',round(x$BIC,digits=digits-2),'\n\n')
+        cat('Log-likelihood:  ',round(x$loglikelihood,digits=digits-2),'\n')  
+        cat('AIC:             ',round(x$AIC,digits=digits-2),'\n')
+        cat('BIC:             ',round(x$BIC,digits=digits-2),'\n\n')
     } else {
         cat('Penalized log-likelihood: ',round(x$loglikelihood,digits=digits-2),'\n')  
         cat('Marginal log-likelihood:  ',round(x$margll,digits=digits-2),'\n\n')        
