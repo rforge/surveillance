@@ -33,7 +33,7 @@
     Campylobacteriosis data set \code{campyDE}, where absolute humidity
     is used as concurrent covariate to adjust the outbreak detection is
     also added to the package.
-
+    
     \item \code{hhh4()} now allows the inclusion of multiplicative
     offsets also in the epidemic components \code{"ar"} and \code{"ne"}.
 
@@ -99,6 +99,16 @@
 
 \subsection{MINOR CHANGES}{
   \itemize{
+    
+    \item The \code{plot()} method for \code{sts} objects with epochs as
+    dates is now made more flexible by introducing the arguments
+    \code{xaxis.tickFreq}, \code{xaxis.labelFreq} and
+    \code{xaxis.labelFormat}. These allow the specification of
+    tick-marks and labelling based on \code{strftime} compatible
+    conversion codes -- indenpently if data are daily, weekly, monthly,
+    etc. As a consequence, the old argument \code{xaxis.years} is
+    removed. See \code{plot.sts.time.one} for more information.
+
     \item \code{iafplot()} ...
     \itemize{
       \item invisibly returns a matrix containing the plotted
