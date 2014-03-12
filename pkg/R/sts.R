@@ -462,7 +462,7 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelF
       xm1x <- as.numeric(formatDate(datesOneBefore,format))                         
       idx <- xaxis.tickFreq[[i]](x=xm1x[-1],xm1=xm1x[1])
       
-      #Find tick size by table loiokup
+      #Find tick size by table lookup
       tclFactor <- tickFactors[pmatch(format, names(tickFactors))]
       if (is.na(tclFactor)) { 
         warning("No tcl factor found for",format,". Setting it at 1") 
@@ -480,10 +480,12 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelF
         labelIdx <- c(labelIdx,xaxis.labelFreq[[i]](x=xm1x[-1],xm1=xm1x[1]))
       }
       
-      #Format label and take the requested subset
-      labels <- rep(NA,nrow(x))
-      labels[labelIdx] <- formatDate(epoch(x)[labelIdx],xaxis.labelFormat)
-      axis(1,at=1:nrow(x), labels=labels,tick=FALSE,...)    
+      #Format labels (if any) for the requested subset
+      if (length(labelIdx)>0) {
+          labels <- rep(NA,nrow(x))
+          labels[labelIdx] <- formatDate(epoch(x)[labelIdx],xaxis.labelFormat)
+          axis(1,at=1:nrow(x), labels=labels,tick=FALSE,...)
+      }
     }
   }#end epochAsDate
   #Done
