@@ -803,9 +803,13 @@ plot.sts.spacetime <- function(x,type,legend=NULL,opts.col=NULL,labels=TRUE,wait
   
   #Make colors using the hcl.colors function
   gyr <- hcl.colors(o,ncolors=length(o),use.color=TRUE)
+  theCut <- cut(o,length(gyr$col))
+  #Assign min/max values resulting from the cut to color scheme
+  gyr$min <- min(o)
+  gyr$max <- max(o)
 
   #Cut into specified number of colors
-  o.cut <- matrix(as.numeric(cut(o,length(gyr$col))),nrow=nrow(o),ncol=ncol(o))
+  o.cut <- matrix(as.numeric(theCut),nrow=nrow(o),ncol=ncol(o))
   o.col <- matrix(gyr$col[o.cut],ncol=ncol(o.cut))
   o.col[is.na(o.col)] <- gray(1)
   dimnames(o.col) <- dimnames(o)
@@ -903,7 +907,7 @@ hcl.colors <- function(x, ncolors=100, use.color=TRUE)
     } else {
         if (use.color) heat.colors(ncolors) else grey.colors(ncolors)
     }
-    list(col=rev(GYR), min=0, max=max(x), trans=identity)
+    list(col=rev(GYR), trans=identity)
 }
 
 #Helper function for plot.sts.spacetime
