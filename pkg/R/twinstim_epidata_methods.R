@@ -407,7 +407,7 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
         t <- if (sequential) s$eventTimes[it] else it
         infectious <- I(t)
         removed <- R(t)
-        plot(object$W, ...)
+        plot(object$W, ...)             # FIXME: use default lwd = 2
         title(main = main)
         if (doLegend) do.call(legend, legend.opts)
         if (doTimer) {
