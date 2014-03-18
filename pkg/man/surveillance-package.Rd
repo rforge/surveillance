@@ -1,3 +1,5 @@
+% Unfortunately, setting \RdOpts{stage=build} globally does not work as expected
+
 \encoding{latin1}
 \name{surveillance-package}
 \alias{surveillance-package}
@@ -5,8 +7,7 @@
 \docType{package}
 
 \title{
-  Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
-%  Outbreak Detection and Retrospective Modeling for Surveillance Data
+  \Sexpr[stage=build]{(meta <- packageDescription("surveillance", encoding=NA))$Title}
 }
 
 \description{
@@ -41,10 +42,11 @@
 
 \details{
   \tabular{ll}{
-    Package: \tab surveillance\cr
-    URL: \tab \url{http://surveillance.r-forge.r-project.org/}\cr
-    License: \tab GPL version 2
-    (\url{http://www.gnu.org/licenses/old-licenses/gpl-2.0.html})\cr
+    Package: \tab \Sexpr[stage=build]{meta$Package}\cr
+    Version: \tab \Sexpr[stage=build]{meta$Version}\cr
+    License: \tab \Sexpr[stage=build]{meta$License}\cr
+    URL:     \tab \url{http://surveillance.r-forge.r-project.org/}\cr
+    % cannot use \Sexpr within \url; and results=rd with "\\url"-paste is buggy
   }
   
   \pkg{surveillance} is an \R package implementing statistical methods
@@ -89,26 +91,27 @@
   epidemic phenomena in temporal and spatio-temporal contexts.
 }
 
-\section{Acknowledgements}{
-  T. Correa, L. Held, M. Hofmann, C. Lang, J. Manitz, A. Riebler,
-  D. Saban\enc{é}{e}s Bov\enc{é}{e}, M. Salmon, D. Schumacher,
-  S. Steiner, M. Virtanen, and V. Wimmer
-  made substantial contributions of code.
+%% Author information is dynamically extracted from the DESCRIPTION file
+\author{
+  \Sexpr[stage=build]{authors <- unname(eval(parse(text=meta$"Authors@R")))}
+  \Sexpr[stage=build]{formatPerson <- function(person, short=FALSE) paste0(format(if (short) {person$given <- paste0(substr(person$given, 1, 1), "."); person} else person, include=c("given", "family")), collapse=", ")}
+  \Sexpr[stage=build]{formatPerson(authors[grep("aut", authors$role)])}
 
-  The authors would like to thank the following people for ideas,
-  discussions, testing and feedback:
-  Doris Altmann, Johannes Dreesman, Johannes Elias, Mayeul Kauffmann,
-  Marc Geilhufe, Kurt Hornik, Marcos Prates, Brian D. Ripley,
-  Barry Rowlingson, Christopher W. Ryan,
-  Klaus Stark, Yann Le Strat, Andr\enc{é}{e} Michael Toschke,
-  Wei Wei, Achim Zeileis.
+  \Sexpr[stage=build]{maintainer <- authors[grep("cre", authors$role)]}
+  Maintainer: \Sexpr[stage=build]{formatPerson(maintainer)} \email{\Sexpr[stage=build]{maintainer$email}}
 }
 
-\author{
-  Michael H\enc{ö}{oe}hle, Sebastian Meyer, and Michaela Paul
-  
-  Maintainer: Michael H\enc{ö}{oe}hle
-  \email{Michael.Hoehle@stat.uni-muenchen.de}
+%% Dynamically extract contributors from the DESCRIPTION file
+%% and persons from inst/THANKS for acknowledgement:
+\section{Acknowledgements}{
+  Substantial contributions of code by:\cr
+  \Sexpr[stage=build]{contributors <- authors[grepl("ctb", authors$role) & !sapply(authors$family, is.null)]}
+  \Sexpr[stage=build]{contributors <- contributors[order(unlist(contributors$family))]}
+  \Sexpr[stage=build]{formatPerson(contributors, short=TRUE)}.
+
+  Furthermore, the authors would like to thank the following people
+  for ideas, discussions, testing and feedback:\cr
+  \Sexpr[stage=build]{formatPerson(as.person(scan(system.file("THANKS", package="surveillance"), what="character", sep="\n", skip=2L, quiet=TRUE, fileEncoding="latin1")))}.
 }
 
 \references{
