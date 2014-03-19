@@ -94,7 +94,7 @@
 %% Author information is dynamically extracted from the DESCRIPTION file
 \author{
   \Sexpr[stage=build]{authors <- unname(eval(parse(text=meta$"Authors@R")))}
-  \Sexpr[stage=build]{formatPerson <- function(person, sort=FALSE) paste0(format(if (sort) person[order(unlist(person$family))] else person, include=c("given", "family")), collapse=", ")}
+  \Sexpr[stage=build]{formatPerson <- function(person, sort=FALSE) paste0(format(if (sort && length(person) > 1) person[order(unlist(person$family))] else person, include=c("given", "family")), collapse=", ")}
   \Sexpr[stage=build]{formatPerson(authors[grep("aut", authors$role)])}
 
   \Sexpr[stage=build]{maintainer <- authors[grep("cre", authors$role)]}
@@ -110,7 +110,7 @@
 
   Furthermore, the authors would like to thank the following people
   for ideas, discussions, testing and feedback:\cr
-  \Sexpr[stage=build]{formatPerson(as.person(grep("^(#|[[:blank:]]*$)", readLines(system.file("THANKS", package="surveillance"), encoding="latin1"), invert=TRUE, value=TRUE)), sort=TRUE)}.
+  \Sexpr[stage=build]{formatPerson(as.person(grep("^(#|[[:blank:]]*$)", readLines(system.file("THANKS", package="surveillance", mustWork=TRUE), encoding="latin1"), invert=TRUE, value=TRUE)), sort=TRUE)}.
 }
 
 \references{
