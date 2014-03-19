@@ -94,7 +94,7 @@
 %% Author information is dynamically extracted from the DESCRIPTION file
 \author{
   \Sexpr[stage=build]{authors <- unname(eval(parse(text=meta$"Authors@R")))}
-  \Sexpr[stage=build]{formatPerson <- function(person, short=FALSE) paste0(format(if (short) {person$given <- paste0(substr(person$given, 1, 1), "."); person} else person, include=c("given", "family")), collapse=", ")}
+  \Sexpr[stage=build]{formatPerson <- function(person, sort=FALSE) paste0(format(if (sort) person[order(unlist(person$family))] else person, include=c("given", "family")), collapse=", ")}
   \Sexpr[stage=build]{formatPerson(authors[grep("aut", authors$role)])}
 
   \Sexpr[stage=build]{maintainer <- authors[grep("cre", authors$role)]}
@@ -106,12 +106,11 @@
 \section{Acknowledgements}{
   Substantial contributions of code by:\cr
   \Sexpr[stage=build]{contributors <- authors[grepl("ctb", authors$role) & !sapply(authors$family, is.null)]}
-  \Sexpr[stage=build]{contributors <- contributors[order(unlist(contributors$family))]}
-  \Sexpr[stage=build]{formatPerson(contributors, short=TRUE)}.
+  \Sexpr[stage=build]{formatPerson(contributors, sort=TRUE)}.
 
   Furthermore, the authors would like to thank the following people
   for ideas, discussions, testing and feedback:\cr
-  \Sexpr[stage=build]{formatPerson(as.person(scan(system.file("THANKS", package="surveillance"), what="character", sep="\n", skip=2L, quiet=TRUE, fileEncoding="latin1")))}.
+  \Sexpr[stage=build]{formatPerson(as.person(grep("^(#|[[:blank:]]*$)", readLines(system.file("THANKS", package="surveillance"), encoding="latin1"), invert=TRUE, value=TRUE)), sort=TRUE)}.
 }
 
 \references{
