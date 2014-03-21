@@ -10,8 +10,9 @@
 
 \description{
   \code{imdepi} contains data on the spatio-temporal location of 636
-  cases of invasive meningococcal disease caused by two specific
-  meningococcal finetypes in Germany.
+  cases of invasive meningococcal disease caused by the two most common
+  meningococcal finetypes in Germany, \samp{B:P1.7-2,4:F1-5} (of
+  serogroup B) and \samp{C:P1.5,2:F3-3} (of serogroup C).
   \code{imdepifit} contains a model fit to the \code{imdepi} data. 
 }
 
@@ -24,23 +25,28 @@ data(imdepifit)
   \code{imdepi} is an object of class
   \code{"\link{epidataCS}"} (a list with components \code{events},
   \code{stgrid}, \code{W} and \code{qmatrix}).
+  
   \code{imdepifit} is an object of class \code{"\link{twinstim}"},
   see \code{\link{summary.twinstim}} for some simple methods for fitted
   \code{"twinstim"} models.
 }
 
 \details{
-  The dataset contains a slightly modified version of the data analyzed in
-  Meyer et al. (2012) represented as an \code{"epidataCS"} object, which
-  is a list with components \code{events}, \code{stgrid}, \code{W}, and
+  The dataset contains a simplified version of the data analyzed in
+  Meyer et al. (2012), represented as an \code{"epidataCS"} object, i.e.,
+  a list with components \code{events}, \code{stgrid}, \code{W}, and
   \code{qmatrix}.
 
   The \code{events} entry is a \code{"\linkS4class{SpatialPointsDataFrame}"}
-  object (ETSR89 projection, i.e. EPSG code 3035, with unit \sQuote{km})
+  object (ETRS89 projection, i.e. EPSG code 3035, with unit \sQuote{km})
   containing 636 events, each with the following entries:
   \describe{
     \item{ID:}{Unique identifier of the case.}
-    \item{time:}{Time of the case occurrence measured in number of days since origin.}
+    \item{time:}{Time of the case occurrence measured in number of days
+      since origin. Note that a U(0,1)-distributed random number has
+      been subtracted from each of the original event times (days) to
+      break ties (using
+      \code{\link{untie}(imdepi_tied, amount=list(t=1))}).}
     \item{tile:}{Tile ID in the spatio-temporal grid (\code{stgrid}) of
       endemic covariates, where the event is contained in.
       This corresponds to one of the 413 districts of Germany.
@@ -50,17 +56,18 @@ data(imdepifit)
       Here set to 30 days.}
     \item{eps.s:}{Maximum spatial interaction range for the event.
       Here set to 200 km.}
-    \item{sex:}{Sex of the case, i.e. a factor with levels \code{"male"}
-      and \code{"female"}.} 
+    \item{sex:}{Sex of the case, i.e. a factor with levels \code{"female"}
+      and \code{"male"}. Note: for some cases this
+      information is not available (\code{NA}).} 
     \item{agegrp:}{Factor giving the age group of the case,
-      i.e. 0-2, 3-18 or >=19. Note: for a small number of cases this
+      i.e. 0-2, 3-18 or >=19. Note: for one case this
       information is not available (\code{NA}).}
     \item{BLOCK, start:}{Block ID and start time (in days since origin) of
       the cell in the spatio-temporal endemic covariate grid, which the
       event belongs to.} 
-    \item{popdensity:}{Population density at the location of the event
-      (corresponds to population density of the district where the event is
-      located).}
+    \item{popdensity:}{Population density (per square km) at the
+      location of the event (corresponds to population density of the
+      district where the event is located).}
   }
   There are further auxiliary columns attached to the events' data
   the names of which begin with a . (dot): These are created during
@@ -70,7 +77,7 @@ data(imdepifit)
   With \code{coordinates(imdepi$events)} one obtains the (x,y) locations
   of the events.
 
-  The identifier in \code{tile} is indexed according to
+  The district identifier in \code{tile} is indexed according to
   the German official municipality key (
   \dQuote{Amtlicher Gemeindeschl\enc{ü}{ue}ssel}). See
   \url{http://de.wikipedia.org/wiki/Amtlicher_Gemeindeschl\%C3\%BCssel}
@@ -122,12 +129,6 @@ data(imdepifit)
   A space-time conditional intensity model for invasive meningococcal
   disease occurrence. \emph{Biometrics}, \bold{68}, 607-616.\cr
   DOI-Link: \url{http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x}
-
-  Meyer, S. (2010):
-  Spatio-Temporal Infectious Disease Epidemiology based on Point Processes.
-  Master's Thesis, Ludwig-Maximilians-Universit\enc{ä}{ae}t
-  M\enc{ü}{ue}nchen.\cr
-  Available as \url{http://epub.ub.uni-muenchen.de/11703/}
 }
 
 \seealso{

@@ -33,7 +33,7 @@ determineSources <- function (i, eventTimes, removalTimes, distvec, eps.s,
         as.vector(typeInfective, mode = "logical")[eventTypes]
         #<- as.vector to remove names
     }
-    # return IDs of potential epidemic sources
+    # return indexes of potential epidemic sources
     which(infectivity & proximity & matchType)
 }
 

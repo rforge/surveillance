@@ -372,24 +372,22 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
                 }
             }
         } else {
-            stopifnot(is(tiles, "SpatialPolygons"))
             tilesIDs <- if (is.null(tiles.idcol)) {
-                sapply(tiles@polygons, slot, "ID")
-            } else tiles@data[[tiles.idcol]]
+                stopifnot(is(tiles, "SpatialPolygons"))
+                row.names(tiles) # = sapply(tiles@polygons, slot, "ID")
+            } else {
+                stopifnot(is(tiles, "SpatialPolygonsDataFrame"))
+                tiles@data[[tiles.idcol]]
+            }
             if (!all(levels(gridTiles) %in% tilesIDs)) {
                 stop("'tiles' is incomplete for 'x' (check 'tiles.idcol')")
             }
-            .tiles <- as(tiles, "SpatialPolygons") # for over-method (drop data)
+            tiles <- as(tiles, "SpatialPolygons") # drop data for over-method
             function (xy) {             # works with a whole coordinate matrix
                 points <- SpatialPoints(xy, proj4string=tiles@proj4string)
-                polygonidxOfPoints <- over(points, .tiles)
-                points.outside <- is.na(polygonidxOfPoints)
-                polygonidxOfPoints[points.outside] <- 1L   # tiny hack
-                tilesOfPoints <- if (is.null(tiles.idcol)) {
-                    sapply(tiles@polygons[polygonidxOfPoints], slot, "ID")
-                } else tiles@data[polygonidxOfPoints,tiles.idcol]
-                is.na(tilesOfPoints) <- points.outside     # resolve hack
-                hInt[tilesOfPoints]       # index by name
+                polygonidxOfPoints <- over(points, tiles)
+                tilesOfPoints <- tilesIDs[polygonidxOfPoints]
+                hInt[tilesOfPoints]     # index by name
             }
         }
     } else function (...) 0

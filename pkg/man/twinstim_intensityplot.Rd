@@ -68,8 +68,10 @@ intensity.twinstim(x,
     This is only needed for \code{aggregate = "space"}.
 }
   \item{tiles.idcol}{
-    either a column index for \code{tiles@data}, or \code{NULL}
-    (default), which refers to the \code{"ID"} slot of the polygons.
+    either a column index for \code{tiles@data} (if \code{tiles} is a
+    \code{\linkS4class{SpatialPolygonsDataFrame}}), or \code{NULL}
+    (default), which refers to the \code{"ID"} slot of the polygons,
+    i.e., \code{row.names(tiles)}.
     The resulting ID's must correspond to the ID's used in the
     \code{tile} column of the \code{stgrid} of the
     \code{"\link{epidataCS}"} on which \code{x} was fitted.
