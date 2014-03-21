@@ -144,17 +144,17 @@ twinstim <- function (
     # ok because actually, 'eventBlocks' are only used in the partial likelihood
     # and there only eventBlocks[includes] is used (i.e. no prehistory events)
     my.na.action <- function (object, ...) {
-        prehistevents <- object[object[["(time)"]] <= t0, "(ID)"]
+        prehistevents <- row.names(object)[object[["(time)"]] <= t0]
         if (length(prehistevents) == 0L) return(na.action(object, ...))
-        origprehistblocks <- object[match(prehistevents,object[["(ID)"]]), "(BLOCK)"]
-        object[object[["(ID)"]] %in% prehistevents, "(BLOCK)"] <- 0L
+        origprehistblocks <- object[prehistevents, "(BLOCK)"] # all NA
+        object[prehistevents, "(BLOCK)"] <- 0L # temporary set non-NA
         xx <- na.action(object, ...)
-        xx[match(prehistevents,xx[["(ID)"]],nomatch=0L), "(BLOCK)"] <-
-            origprehistblocks[prehistevents %in% xx[["(ID)"]]]
+        xx[match(prehistevents,row.names(xx),nomatch=0L), "(BLOCK)"] <-
+            origprehistblocks[prehistevents %in% row.names(xx)]
         xx
     }
 
-    ID <- tile <- type <- BLOCK <- .obsInfLength <- .bdist <-
+    tile <- type <- BLOCK <- .obsInfLength <- .bdist <-
         "just cheating on codetools::checkUsage"
     mfe <- model.frame(epidemic, data = eventsData,
                        subset = time + eps.t > t0 & time <= T,
@@ -163,20 +163,18 @@ twinstim <- function (
                        na.action = my.na.action,
 # since R 2.10.0 patched also works with epidemic = ~1 and na.action=na.fail (see PR#14066)
                        drop.unused.levels = FALSE,
-                       ID = ID, time = time, tile = tile, type = type,
+                       time = time, tile = tile, type = type,
                        eps.t = eps.t, eps.s = eps.s, BLOCK = BLOCK,
                        obsInfLength = .obsInfLength, bdist = .bdist)
-    rm(ID, tile, type, BLOCK, .obsInfLength, .bdist)
+    rm(tile, type, BLOCK, .obsInfLength, .bdist)
 
     
     ### Extract essential information from model frame
 
-    # inmfe=rowindex(data$events@data) is necessary for subsetting
-    # influenceRegion (list object not compatible with model.frame) and
-    # coordinates
-    # CAVE: ID is not necessarily identical to the rowindex of data$events,
-    #       e.g., if working with subsetted epidataCS
-    inmfe <- which(data$events@data$ID %in% mfe[["(ID)"]])
+    # 'inmfe' indexes rows of data$events@data and is necessary for subsetting
+    # influenceRegion (list incompatible with model.frame) and coordinates.
+    # Note: model.frame() takes row.names from data
+    inmfe <- which(row.names(data$events@data) %in% row.names(mfe))
     N <- length(inmfe)   # mfe also contains events of the prehistory
     eventTimes <- mfe[["(time)"]] # I don't use model.extract since it returns named vectors
     # Indicate events after t0, which are actually part of the process
@@ -273,14 +271,12 @@ twinstim <- function (
 
     ### Generate endemic model frame and model matrix on event data
 
-    ID <- "just cheating on codetools::checkUsage"
-    mfhEvents <- model.frame(endemic, data = eventsData,
-                             subset = time>t0 & time<=T & ID %in% mfe[["(ID)"]],
+    mfhEvents <- model.frame(endemic, data = eventsData[row.names(mfe),],
+                             subset = time>t0 & time<=T,
                              na.action = na.fail,
                              # since R 2.10.0 patched also works with
                              # endemic = ~1 (see PR#14066)
                              drop.unused.levels = FALSE)
-    rm(ID)
     mmhEvents <- model.matrix(endemic, mfhEvents)
     # exclude intercept from endemic model matrix below, will be treated separately
     if (nbeta0 > 0) mmhEvents <- mmhEvents[,-1,drop=FALSE]
@@ -306,7 +302,7 @@ twinstim <- function (
         rm(BLOCK, tile, area)
         gridBlocks <- mfhGrid[["(BLOCK)"]]
         histIntervals <- unique(data$stgrid[c("BLOCK", "start", "stop")]) # sorted
-        rownames(histIntervals) <- NULL
+        row.names(histIntervals) <- NULL
         histIntervals <- histIntervals[histIntervals$start >= t0 &
                                        histIntervals$stop <= T,]
         gridTiles <- mfhGrid[["(tile)"]] # only needed for intensityplot
@@ -1330,7 +1326,7 @@ twinstim <- function (
     # calculate observed R0's: mu_j = spatio-temporal integral of e_j(t,s) over
     # the observation domain (t0;T] x W (not whole R+ x R^2)
     fit$R0 <- if (hase) qSum * gammapred * siafInt * tiafInt else rep.int(0, N)
-    names(fit$R0) <- rownames(mfe)
+    names(fit$R0) <- row.names(mfe)
 
     
     ### Append model information
