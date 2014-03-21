@@ -22,8 +22,7 @@
 #   eps.t: maximal temporal influence radius (e.g. length of infectious period, time to culling, etc.), may be Inf
 #   eps.s: maximal spatial influence radius (e.g. 100 [km]), may be Inf
 #   The remaining columns are further marks of the event, e.g. sex, age of infected person (-> epidemic covariates)
-#   The column names "ID", ".obsInfLength", ".bdist", ".influenceRegion", and ".sources" are reserved.
-#   "ID": unique chronological ID for the events
+#   The column names ".obsInfLength", ".bdist", ".influenceRegion", and ".sources" are reserved.
 #   ".obsInfLength": observed length of the infectious period (being part [0,T])
 #   ".bdist": minimal distance of the event locations to the boundary
 #   ".influenceRegion": object of class "owin", the intersection of W with b(s,eps.s), with origin at s
@@ -44,7 +43,7 @@
 
 obligColsNames_events <- c("time", "tile", "type", "eps.t", "eps.s")
 obligColsNames_stgrid <- c("start", "stop", "tile", "area")
-reservedColsNames_events <- c("ID", ".obsInfLength", ".sources", ".bdist",
+reservedColsNames_events <- c(".obsInfLength", ".sources", ".bdist",
                               ".influenceRegion", "BLOCK", "start")
 reservedColsNames_stgrid <- c("BLOCK")
 
@@ -262,14 +261,10 @@ checkEvents <- function (events, dropTypes = TRUE)
     cat("\tSorting events...\n")
     events <- events[order(events$time),]
     
-    # Attribute unique IDs to events (running chronologically from 1 to nEvents)
-    events$ID <- seq_along(events)
-
-    # Make ID column the first column, then obligatory columns then remainders (epidemic covariates)
-    IDcolIdx <- match("ID", names(events))
+    # First obligatory columns then remainders (epidemic covariates)
     obligColsIdx <- match(obligColsNames_events, names(events))
-    covarColsIdx <- setdiff(seq_along(events@data), c(IDcolIdx, obligColsIdx))
-    events <- events[c(IDcolIdx, obligColsIdx, covarColsIdx)]
+    covarColsIdx <- setdiff(seq_along(events@data), obligColsIdx)
+    events <- events[c(obligColsIdx, covarColsIdx)]
 
     # Done.
     return(events)

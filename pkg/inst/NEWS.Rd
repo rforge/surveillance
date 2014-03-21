@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-03-11)}{
+\section{Changes in surveillance version 1.8-0 (2014-03-21)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -159,6 +159,8 @@
     the outdated \CRANpkg{RUnit}.
     \item The \code{multiplicity}-generic and its default method have
     been integrated in \CRANpkg{spatstat} and are imported from there.
+    \item The events in a \code{"epidataCS"} object no longer have
+    a reserved \code{"ID"} column.
   }
 }
 

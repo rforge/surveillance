@@ -900,7 +900,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     stgridIgnoreCols <- match(c("BLOCK",
                                 setdiff(obligColsNames_stgrid, "start")),
                               names(stgrid))
-    eventData <- cbind(ID=seqAlongEvents, eventData, stgrid[stgrididx, -stgridIgnoreCols])
+    eventData <- cbind(eventData, stgrid[stgrididx, -stgridIgnoreCols])
     rownames(eventData) <- seqAlongEvents
 
     # add hidden columns
@@ -1058,10 +1058,13 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     # we don't need any reference to the original twinstim evaluation environment
     environment(endemic) <- environment(epidemic) <- globalenv()
     if (is.null(rmarks)) {
-        observedMarks <- subset(marks(data), subset = time > t0 & time <= T)
-        observedMarks <- observedMarks[match("eps.t", names(observedMarks)):(ncol(observedMarks)-2L)]
+        observedMarks <- subset(marks.epidataCS(data, coords=FALSE),
+                                subset = time > t0 & time <= T)
+        observedMarks <- observedMarks[match("eps.t", names(observedMarks)):ncol(observedMarks)]
         rmarks <- function (t, s) {
-            as.data.frame(lapply(observedMarks, function (x) sample(na.omit(x), size=1L)), optional=TRUE)
+            as.data.frame(lapply(observedMarks, function (x)
+                                 sample(na.omit(x), size=1L)),
+                          optional=TRUE)
         }
     }
     theta <- coef(object)

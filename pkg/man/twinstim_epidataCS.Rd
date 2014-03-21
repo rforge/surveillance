@@ -79,7 +79,7 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
     the events, e.g. sex, age of infected individuals, which may
     be used as epidemic covariates influencing infectiousness.
     Note that some auxiliary columns will be added at conversion
-    whose names are reserved: \code{"ID"}, \code{".obsInfLength"},
+    whose names are reserved: \code{".obsInfLength"},
     \code{".bdist"}, \code{".influenceRegion"}, and \code{".sources"},
     as well as \code{"start"}, \code{"BLOCK"}, and all endemic
     covariates' names from \code{stgrid}.
@@ -209,9 +209,9 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   following components: 
   \item{events}{a \code{"\linkS4class{SpatialPointsDataFrame}"} (see the
     description of the argument). 
-    The input \code{events} are checked for requirements, sorted
-    chronologically and attributed an ID. The columns are in the following
-    order: ID, obligatory event columns, event marks, the columns \code{BLOCK},
+    The input \code{events} are checked for requirements and sorted
+    chronologically. The columns are in the following
+    order: obligatory event columns, event marks, the columns \code{BLOCK},
     \code{start} and endemic covariates copied from \code{stgrid},
     and finally, hidden auxiliary columns. 
     The added auxiliary columns are:
@@ -220,7 +220,7 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 	(being part [0,T]), i.e. \code{pmin(T-time, eps.t)}.}
       \item{\code{.sources}}{a list of numeric vectors of potential sources of
         infection (wrt the interaction ranges eps.s and eps.t) for each
-        event. Currently row numbers are used as index, not the ID's.}
+        event. Row numbers are used as index.}
       \item{\code{.bdist}}{minimal distance of the event locations to the
         polygonal boundary \code{W}.}
       \item{\code{.influenceRegion}}{a list of influence regions represented by
@@ -352,7 +352,7 @@ W <- imdepi$W
 summary(W)
 
 ## events
-events <- marks(imdepi)[,-1]
+events <- marks(imdepi)
 coordinates(events) <- c("x", "y")    # promote to a SpatialPointsDataFrame
 proj4string(events) <- proj4string(W) # ETRS89 projection (+units=km)
 summary(events)

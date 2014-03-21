@@ -72,9 +72,9 @@ intensity.twinstim(x,
     \code{\linkS4class{SpatialPolygonsDataFrame}}), or \code{NULL}
     (default), which refers to the \code{"ID"} slot of the polygons,
     i.e., \code{row.names(tiles)}.
-    The resulting ID's must correspond to the ID's used in the
-    \code{tile} column of the \code{stgrid} of the
-    \code{"\link{epidataCS}"} on which \code{x} was fitted.
+    The ID's must correspond to the factor levels of
+    \code{stgrid$tile} of the \code{"\link{epidataCS}"} on which
+    \code{x} was fitted.
 }
   \item{plot}{
     logical indicating if a plot is desired, which defaults to \code{TRUE}.

@@ -5,7 +5,7 @@
 ###
 ### Spatial and temporal tie-breaking of events
 ###
-### Copyright (C) 2012-2013 Sebastian Meyer
+### Copyright (C) 2012-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -28,7 +28,7 @@ untie.epidataCS <- function (x,
     }
 
     ## Generate new events data frame
-    events <- marks(x, coords=FALSE)[,-1L] # drop ID column
+    events <- marks.epidataCS(x, coords=FALSE)
     newcoords <- if (do.spatial) {      # untie spatial coordinates
         untie.matrix(coordinates(x$events), amount$s, minsep$s, constraint=x$W, ...)
     } else coordinates(x$events)

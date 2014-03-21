@@ -173,11 +173,12 @@ tail.epidataCS <- function (x, n = 6L, ...)
 
 ### extract marks of the events (actually also including time and tile)
 
-marks.epidataCS <- function (x, coords = TRUE, ...) {
-    noEventMarks <- setdiff(reservedColsNames_events, "ID")
-    endemicCovars <- setdiff(names(x$stgrid),
-        c(reservedColsNames_stgrid, obligColsNames_stgrid))
-    idxnonmarks <- match(c(noEventMarks, endemicCovars), names(x$events))
+marks.epidataCS <- function (x, coords = TRUE, ...)
+{
+    endemicCovars <- setdiff(names(x$stgrid), c(
+        reservedColsNames_stgrid, obligColsNames_stgrid))
+    idxnonmarks <- match(c(reservedColsNames_events, endemicCovars),
+                         names(x$events))
     if (coords) {          # use as.data.frame method for SpatialPointsDataFrame
         as.data.frame(x$events[-idxnonmarks])
     } else {                            # return marks without coordinates
@@ -240,7 +241,7 @@ summary.epidataCS <- function (object, ...)
     typeTable <- c(table(types))
     nSources <- sapply(object$events$.sources, length)
     eps <- object$events@data[c("eps.t", "eps.s")]
-    eventMarks <- marks(object)
+    eventMarks <- marks.epidataCS(object)
 
     removalTimes <- times + object$events$eps.t
     tps <- sort(unique(c(times, removalTimes[is.finite(removalTimes)])))
@@ -459,7 +460,7 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
 {
     timeRange <- with(x$stgrid, c(start[1L], stop[length(stop)]))
     eventTimes <- if (missing(subset)) x$events$time else {
-        do.call(base::subset, list(x = quote(marks(x)),
+        do.call(base::subset, list(x = quote(marks.epidataCS(x)),
                                    subset = substitute(subset),
                                    select = "time", drop = TRUE))
     }

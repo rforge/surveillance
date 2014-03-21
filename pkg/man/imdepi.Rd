@@ -41,7 +41,6 @@ data(imdepifit)
   object (ETRS89 projection, i.e. EPSG code 3035, with unit \sQuote{km})
   containing 636 events, each with the following entries:
   \describe{
-    \item{ID:}{Unique identifier of the case.}
     \item{time:}{Time of the case occurrence measured in number of days
       since origin. Note that a U(0,1)-distributed random number has
       been subtracted from each of the original event times (days) to
