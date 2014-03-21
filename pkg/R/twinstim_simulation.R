@@ -7,7 +7,7 @@
 ### class "twinstim". The function basically uses Ogata's modified thinning
 ### algorithm (cf. Daley & Vere-Jones, 2003, Algorithm 7.5.V.).
 ###
-### Copyright (C) 2010-2013 Sebastian Meyer
+### Copyright (C) 2010-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -169,7 +169,6 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     # empty prehistory
     eventCoords <- matrix(0, nrow=0L, ncol=2L)
     eventData <- data.frame(
-        ID   = integer(0L),
         time = numeric(0L),
         tile = factor(character(0L), levels=tileLevels),
         type = factor(character(0L), levels=typeNames),
@@ -179,10 +178,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     Nout <- 0L
     # do we have a prehistory in 'events'
     if (!missing(events) && !is.null(events)) {
-        .reservedColsNames <- c("ID", ".obsInfLength", ".bdist",
-                                ".influenceRegion", ".sources",
-                                "BLOCK", "start") # from stgrid
-        events <- events[!names(events) %in% .reservedColsNames]
+        events <- events[!names(events) %in% reservedColsNames_events]
         if (!.skipChecks) {
             cat("Checking 'events':\n")
             events <- checkEvents(events, dropTypes = FALSE)
@@ -197,13 +193,11 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
             # check event types
             events@data$type <- factor(events@data$type, levels=typeNames)
             if (any(.typeIsNA <- is.na(events@data$type))) {
-                warning("removed unknown event types in 'events'")
+                warning("ignored 'events' of unknown type")
                 events <- events[!.typeIsNA,]
             }
             eventCoords <- coordinates(events)
             eventData <- events@data
-            # update ID counter
-            eventData$ID <- 1:Nout
             # check presence of unpredictable marks
             if (length(.idx <- which(!unpredMarks %in% names(eventData)))) {
                 stop("missing unpredictable marks in 'events': ",
@@ -221,7 +215,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                 eventData <- cbind(eventData, sampleMarks[.add2events])
                 is.na(eventData[.add2events]) <- TRUE
             }
-            eventData <- eventData[c("ID", "time", "tile", "type", markNames)]
+            eventData <- eventData[c("time", "tile", "type", markNames)]
         } else {
             .eventstxt <- if (.skipChecks) "data$events" else "events"   # account for simulate.twinstim
             cat("(no events from '", .eventstxt, "' were considered as prehistory)\n", sep="")
@@ -313,7 +307,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         # attaching covariates from 'stgrid' to events
         eventData <- attachstgridvars(eventData, stgridCopyCols)
         # construct model matrix
-        mfhEvents <- model.frame(endemic, data = eventData, na.action = na.fail, drop.unused.levels = FALSE)
+        mfhEvents <- model.frame(endemic, data = eventData, na.action = na.fail,
+                                 drop.unused.levels = FALSE)
         mmhEvents <- model.matrix(endemic, mfhEvents)
         # exclude intercept from endemic model matrix below, will be treated separately
         if (nbeta0 > 0) mmhEvents <- mmhEvents[,-1,drop=FALSE]
@@ -412,12 +407,12 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
     coefs <- c(
         if (nbeta0 > 1L) {
-            structure(beta0, names=paste0("h.type",typeNames))
-        } else if (nbeta0 == 1L) structure(beta0, names="h.(Intercept)"),
-        if (p > 0L) structure(beta, names=paste("h",colnames(mmh),sep=".")),
-        if (hase) structure(gamma, names=paste("e",colnames(mme),sep=".")),
-        if (hassiafpars) structure(siafpars, names=paste("e.siaf",1:nsiafpars,sep=".")),
-        if (hastiafpars) structure(tiafpars, names=paste("e.tiaf",1:ntiafpars,sep="."))
+            setNames(beta0, paste0("h.type",typeNames))
+        } else if (nbeta0 == 1L) setNames(beta0, "h.(Intercept)"),
+        if (p > 0L) setNames(beta, paste("h",colnames(mmh),sep=".")),
+        if (hase) setNames(gamma, paste("e",colnames(mme),sep=".")),
+        if (hassiafpars) setNames(siafpars, paste("e.siaf",1:nsiafpars,sep=".")),
+        if (hastiafpars) setNames(tiafpars, paste("e.tiaf",1:ntiafpars,sep="."))
     )
     cat("\n\t-", length(coefs), "coefficients:\n\n")
     print(coefs)
@@ -440,7 +435,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         })
         fact <- if (nbeta0 > 1L) sum(exp(beta0)) else if (nbeta0 == 1L) nTypes*exp(unname(beta0)) else nTypes
         fact * c(tapply(dsexpeta, gridBlocks, sum))
-    } else structure(numeric(nrow(blockstarts)), names=blockstarts[,1]) # zeroes
+    } else setNames(numeric(nrow(blockstarts)), blockstarts[,1]) # zeroes
     #<- is a named vector with names referencing BLOCK in stgrid
 
 
@@ -507,7 +502,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                     tiaf$g(t-times, tiafpars, types)
                 }
             # ejIntWt only for infectives, others have 0
-            structure(apply(cbind(eTerms,gTerm), 1, prod), names = infectives)
+            setNames(apply(cbind(eTerms,gTerm), 1, prod), infectives)
         }
 
         c("0"=hIntWKt, ejIntWt)   # endemic component has index "0" !
@@ -575,7 +570,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
     # change points of lambdag
     stgridbreaks <- blockstarts[-1,2]
-    Rtimes <- structure(eventMatrix[,"time"]+eventMatrix[,"eps.t"], names=eventMatrix[,"ID"])
+    Rtimes <- setNames(eventMatrix[,"time"]+eventMatrix[,"eps.t"],
+                       infectives) # name indexes row of eventMatrix
 
     # index of next event (row in eventMatrix)
     j <- Nout + 1L
@@ -783,7 +779,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
             .eventMarks <- rmarks(ct, .eventLocation)
 
             # gather event information
-            .eventData <- data.frame(ID=j, time=ct, tile=.eventTile, type=.eventType,
+            .eventData <- data.frame(time=ct, tile=.eventTile, type=.eventType,
                 .eventMarks, check.rows = FALSE, check.names = FALSE)
 
             # determine potential sources of infection (for epidataCS and lambda)
@@ -810,7 +806,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
             tmp <- eTermsCalc(.eventData, .eventLocation)
 
             # Update objects
-            eventMatrix[j,] <- c(j, ct, as.numeric(.eventTile), as.numeric(.eventType),
+            eventMatrix[j,] <- c(ct, as.numeric(.eventTile), as.numeric(.eventType),
                                  sapply(.eventMarks, as.numeric), .eventSource,
                                  .lambdah, .lambdae, Lambdag, tBLOCK)
             eventCoords[j,] <- .eventLocation
@@ -821,7 +817,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
             # Update set of infectives and recovery times
             infectives <- c(infectives, j)
-            Rtimes <- c(Rtimes, structure(ct + .eventMarks[["eps.t"]], names = j))
+            Rtimes <- c(Rtimes, setNames(ct + .eventMarks[["eps.t"]], j))
 
             # Increment next event iterator
             j <- j + 1L
@@ -890,7 +886,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     }
 
     # transform integer columns to integer
-    eventData[c("ID","source","BLOCK")] <- lapply(eventData[c("ID","source","BLOCK")], as.integer)
+    eventData[c("source","BLOCK")] <- lapply(eventData[c("source","BLOCK")], as.integer)
 
 
     ### Append additional columns for an epidataCS object
@@ -904,8 +900,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     stgridIgnoreCols <- match(c("BLOCK",
                                 setdiff(obligColsNames_stgrid, "start")),
                               names(stgrid))
-    eventData <- cbind(eventData, stgrid[stgrididx, -stgridIgnoreCols])
-    rownames(eventData) <- eventData$ID
+    eventData <- cbind(ID=seqAlongEvents, eventData, stgrid[stgrididx, -stgridIgnoreCols])
+    rownames(eventData) <- seqAlongEvents
 
     # add hidden columns
     eventData$.obsInfLength <- with(eventData, pmin(T-time, eps.t))
