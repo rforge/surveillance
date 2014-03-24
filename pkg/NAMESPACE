@@ -23,7 +23,7 @@ import(sp)
 ### required generics for own methods (that's why we "Depend" on these packages)
 
 ## importFrom(stats, coef, vcov, logLik, nobs, residuals, confint, AIC, extractAIC,
-##                   profile, simulate, update, terms, add1, drop1, predict)
+##                   profile, simulate, update, terms, add1, drop1, predict, as.stepfun)
 importFrom(utils, head, tail, toLatex)
 importFrom(xtable, xtable) # if we wouldn't "Depend" on xtable, our
                            # xtable-methods would not be useable except if the
@@ -282,6 +282,7 @@ S3method(print, epidataCS)
 S3method(subset, epidataCS)
 S3method(summary, epidataCS)
 S3method(print, summary.epidataCS)
+S3method(as.stepfun, epidataCS)
 S3method(animate, epidataCS)
 export(animate.epidataCS)               # for convenience
 export(marks)                           # as imported from spatstat

@@ -243,17 +243,13 @@ summary.epidataCS <- function (object, ...)
     eps <- object$events@data[c("eps.t", "eps.s")]
     eventMarks <- marks.epidataCS(object)
 
-    removalTimes <- times + object$events$eps.t
-    tps <- sort(unique(c(times, removalTimes[is.finite(removalTimes)])))
-    nInfectious <- sapply(tps, function(t) sum(times <= t & removalTimes > t))
-    counter <- stepfun(tps, c(0,nInfectious), right = TRUE)
-
     res <- list(timeRange = timeRange, bbox = bbox, nBlocks = nBlocks,
                 nEvents = nEvents, nTypes = nTypes,
                 eventTimes = times, eventCoords = coords, eventTypes = types,
                 eventRanges = eps, eventMarks = eventMarks, 
                 tileTable = tileTable, typeTable = typeTable,
-                counter = counter, nSources = nSources)
+                counter = as.stepfun.epidataCS(object),
+                nSources = nSources)
     class(res) <- "summary.epidataCS"
     res
 }
@@ -287,8 +283,6 @@ print.summary.epidataCS <- function (x, ...)
     cat("Number of potential sources of transmission:\n")
     if (any(is.finite(unlist(x$eventRanges)))) {
         print(summary(x$nSources))
-        cat("\nStep function of the number of infectives over time:\n")
-        print(x["counter"])
     } else {
         cat("   monotonically increasing like the number of infectives\n",
             "   because of infinite ranges of interaction ('eps.t' and 'eps.s')\n", sep="")
@@ -298,6 +292,14 @@ print.summary.epidataCS <- function (x, ...)
     invisible(x)
 }
 
+as.stepfun.epidataCS <- function (x, ...)
+{
+    eventTimes <- x$events$time
+    removalTimes <- eventTimes + x$events$eps.t
+    tps <- sort(unique(c(eventTimes, removalTimes[is.finite(removalTimes)])))
+    nInfectious <- sapply(tps, function(t) sum(eventTimes <= t & removalTimes > t))
+    stepfun(tps, c(0,nInfectious), right = TRUE) # no ties, 'tps' is unique
+}
 
 
 ### animate

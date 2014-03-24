@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-03-21)}{
+\section{Changes in surveillance version 1.8-0 (2014-03-24)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -89,6 +89,8 @@
     \code{twinstim()}.
 
     \item New \code{toLatex}-method for \code{"sts"} objects.
+
+    \item New \code{as.stepfun()}-method for \code{"epidataCS"} objects.
 
     \item Added methods of \code{vcov()} and \code{nobs()}
     for the \code{"hhh4"} class. For \code{AIC()} and \code{BIC()}, the

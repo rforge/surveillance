@@ -13,9 +13,10 @@
 \alias{marks.epidataCS}
 \alias{summary.epidataCS}
 \alias{print.summary.epidataCS}
+\alias{as.stepfun.epidataCS}
 
 \title{
-  Class for Representing Continuous Space-Time Point Process Data
+  Continuous Space-Time Marked Point Patterns with Grid-Based Covariates
 }
 
 \description{
@@ -47,6 +48,8 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 
 \method{summary}{epidataCS}(object, ...)
 \method{print}{summary.epidataCS}(x, ...)
+
+\method{as.stepfun}{epidataCS}(x, ...)
 }
 
 \arguments{
@@ -258,8 +261,9 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   The \code{summary} method (which has again a \code{print} method)
   returns a list of metadata, event data, the tables of tiles and types,
   a step function of the number of infectious individuals over time
-  (\code{counter}), and the number of
-  potential sources of transmission for each event (\code{nSources})
+  (\code{$counter}), i.e., the result of the
+  \code{\link{as.stepfun}}-method for \code{"epidataCS"}, and the number
+  of potential sources of transmission for each event (\code{$nSources})
   which is based on the given maximum interaction ranges \code{eps.t}
   and \code{eps.s}.
 }
@@ -325,7 +329,7 @@ s <- summary(imdepi)
 s
 plot(s$counter, xlab = "Time [days]",
      ylab="Number of infectious individuals",
-     main=paste("Time series of the number of infectious individuals",
+     main=paste("Time course of the number of infectious individuals",
                 "assuming an infectious period of 30 days", sep="\n"))
 plot(table(s$nSources), xlab="Number of \"close\" infective individuals",
      ylab="Number of events",
