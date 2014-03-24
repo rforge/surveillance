@@ -192,32 +192,44 @@ marks.epidataCS <- function (x, coords = TRUE, ...)
 
 print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
 {
-    timeRange <- c(x$stgrid$start[1], x$stgrid$stop[nrow(x$stgrid)])
-    bboxtxt <- paste(apply(bbox(x$W), 1,
-        function (int) paste0("[", paste(format(int, trim=TRUE, digits=digits), collapse=", "), "]")
-        ), collapse = " x ")
-    nBlocks <- length(unique(x$stgrid$BLOCK))
-    nTiles <- nlevels(x$stgrid$tile)
-    typeNames <- levels(x$events$type)
-    nEvents <- nobs(x)
     cat("\nHistory of an epidemic\n")
-    cat("Observation period:", paste(format(timeRange, trim=TRUE, digits=digits), collapse = " -- "), "\n")
-    cat("Observation window (bounding box):", bboxtxt, "\n")
-    cat("Spatio-temporal grid (not shown):", nBlocks,
-        ngettext(nBlocks, "time block,", "time blocks,"),
-        nTiles, ngettext(nTiles, "tile", "tiles"), "\n")
-    cat("Types of events:", paste0("'",typeNames,"'"), "\n")
-    cat("Overall number of events:", nEvents, "\n\n")
-    # 'print.SpatialPointsDataFrame' does not pass its "digits" argument on to
-    # 'print.data.frame', hence the use of options()
-    odigits <- options(digits=digits); on.exit(options(odigits))
+    print.epidataCS_header(
+        timeRange = c(x$stgrid$start[1L], x$stgrid$stop[nrow(x$stgrid)]),
+        bbox = bbox(x$W),
+        nBlocks = length(unique(x$stgrid$BLOCK)),
+        nTiles = nlevels(x$stgrid$tile),
+        digits = digits
+        )
+    cat("Types of events:", paste0("'",levels(x$events$type),"'"), "\n")
+    cat("Overall number of events:", nEvents <- nobs(x), "\n\n")
+    
+    # 2014-03-24: since sp 1.0-15, print.SpatialPointsDataFrame()
+    # appropriately passes its "digits" argument to print.data.frame()
     visibleCols <- grep("^\\..+", names(x$events@data), invert = TRUE)
-    print(head.matrix(x$events[visibleCols], n = n), ...)
+    print(head.matrix(x$events[visibleCols], n = n), digits = digits, ...)
     if (n < nEvents) cat("[....]\n")
     cat("\n")
     invisible(x)
 }
 
+print.epidataCS_header <- function (timeRange, bbox, nBlocks, nTiles,
+                                    digits = getOption("digits"))
+{
+    bboxtxt <- paste(
+        apply(bbox, 1, function (int) paste0(
+            "[", paste(format(int, trim=TRUE, digits=digits), collapse=", "), "]"
+            )),
+        collapse = " x ")
+    cat("Observation period:",
+        paste(format(timeRange, trim=TRUE, digits=digits),
+              collapse = " - "), "\n")
+    cat("Observation window (bounding box):", bboxtxt, "\n")
+    cat("Spatio-temporal grid (not shown):",
+        nBlocks, ngettext(nBlocks, "time block,", "time blocks"),
+        "x",
+        nTiles, ngettext(nTiles, "tile", "tiles"),
+        "\n")
+}
 
 
 ### SUMMARY
@@ -256,27 +268,13 @@ summary.epidataCS <- function (object, ...)
 
 print.summary.epidataCS <- function (x, ...)
 {
-    bboxtxt <- paste(apply(x$bbox, 1,
-        function (int) paste0("[", paste(format(int, trim=TRUE), collapse=", "), "]")
-        ), collapse = " x ")
     cat("\n")
-    cat("Observation period:", paste(format(x$timeRange, trim=TRUE), collapse = " -- "), "\n")
-    cat("Observation window (bounding box):", bboxtxt, "\n")
-    cat("Spatio-temporal grid (not shown):", x$nBlocks,
-        ngettext(x$nBlocks, "time block,", "time blocks,"),
-        length(x$tileTable), ngettext(length(x$tileTable), "tile", "tiles"), "\n")
+    print.epidataCS_header(timeRange = x$timeRange, bbox = x$bbox,
+                           nBlocks = x$nBlocks, nTiles = length(x$tileTable))
     cat("Overall number of events:", x$nEvents,
         if (x$nTypes==1) "(single type)" else paste0("(",x$nTypes," types)"),
         "\n")
     
-    ## if (x$nTypes > 1) {
-    ##     cat(x$nTypes, "types of events:\n")
-    ##     print(as.table(x$typeTable))
-    ## }
-    ## cat("\nTime points of events:\n")
-    ## print(summary(x$eventTimes))
-    ## cat("\nTiles of events:\n")
-    ## print(as.table(x$tileTable))
     cat("\nSummary of the event marks:\n")
     print(summary(x$eventMarks))
 
@@ -284,8 +282,8 @@ print.summary.epidataCS <- function (x, ...)
     if (any(is.finite(unlist(x$eventRanges)))) {
         print(summary(x$nSources))
     } else {
-        cat("   monotonically increasing like the number of infectives\n",
-            "   because of infinite ranges of interaction ('eps.t' and 'eps.s')\n", sep="")
+        cat("   monotonically increasing since interaction ranges",
+            "(eps.t, eps.s) are infinite\n")
     }
     cat("\n")
     
