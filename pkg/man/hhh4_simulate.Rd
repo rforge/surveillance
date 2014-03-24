@@ -116,7 +116,7 @@ plot(fit)
 simData <- simulate(fit, seed=1234)
 
 # plot simulated data
-plot(simData, main = "simulated data", legend.opts = NULL, xaxis.years = FALSE)
+plot(simData, main = "simulated data", legend.opts = NULL, xaxis.labelFormat=NULL)
 
 # consider a Poisson instead of a NegBin model
 coefs <- coef(fit)
@@ -124,7 +124,7 @@ coefs["overdisp"] <- 0
 
 simData2 <- simulate(fit, seed=123, coefs = coefs)
 plot(simData2, main = "simulated data: Poisson model", 
-     legend.opts = NULL, xaxis.years = FALSE)
+     legend.opts = NULL, xaxis.labelFormat = NULL)
 
 # consider a model with higher autoregressive parameter
 coefs <- coef(fit)
@@ -132,7 +132,7 @@ coefs[1] <- log(0.5)
 
 simData3 <- simulate(fit, seed=321, coefs = coefs)
 plot(simData3, main = "simulated data: lambda = 0.5", 
-     legend.opts = NULL, xaxis.years = FALSE)
+     legend.opts = NULL, xaxis.labelFormat = NULL)
 }
 
 \keyword{datagen}

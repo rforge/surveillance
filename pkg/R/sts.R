@@ -389,7 +389,6 @@ at2ndChange <- function(x,xm1) {
     idxAtChange[seq(idxAtChange) %% 2 == 1]
 }
 
-
 #Helper function to format the x-axis of the time series
 addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelFormat, xaxis.tickFreq,xaxis.labelFreq,...) {
   

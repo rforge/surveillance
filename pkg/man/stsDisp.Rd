@@ -1,3 +1,4 @@
+\encoding{latin1}
 \name{display-methods}
 \alias{plot,sts,missing-method}
 %\alias{print}
@@ -76,8 +77,8 @@
   
   \preformatted{plot.sts.time.one <- function(x, k=1,
     domany=FALSE,ylim=NULL, axes=TRUE,
-    xaxis.tickFreq=list("%Q"=atChange),xaxis.labelFreq=xaxis.tickFreq,
-    xaxis.labelFormat="%G\n\n%OQ", epochsAsDate=x@epochAsDate,
+    xaxis.tickFreq=list("\%Q"=atChange),xaxis.labelFreq=xaxis.tickFreq,
+    xaxis.labelFormat="\%G\n\n\%OQ", epochsAsDate=x@epochAsDate,
     xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),
     col=c(NA,1,4),lwd=c(1,1,1),
     outbreak.symbol = list(pch=3, col=3, cex=1,lwd=1),
@@ -117,7 +118,7 @@
   
   Finally, \code{xaxis.labelFormat} is a \code{\link{strftime}}
   compatible formatting string., e.g. the default value is
-  \code{\"\%G\\n\\n\%OQ\"}, which means ISO year and quarter (in roman
+  \code{"\%G\\n\\n\%OQ"}, which means ISO year and quarter (in roman
   letters) stacked on top of each other.
   
   
@@ -130,8 +131,8 @@
   Alarmplot
   \preformatted{plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)),
     ylim=NULL, xaxis.units=TRUE,
-    xaxis.tickFreq=list("%Q"=atChange),xaxis.labelFreq=xaxis.tickFreq,
-    xaxis.labelFormat="%G\n\n%OQ",epochsAsDate=x@epochAsDate,
+    xaxis.tickFreq=list("\%Q"=atChange),xaxis.labelFreq=xaxis.tickFreq,
+    xaxis.labelFormat="\%G\n\n\%OQ",epochsAsDate=x@epochAsDate,
     xlab="time", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4),
     outbreak.symbol = list(pch=3, col=3, cex=1, lwd=1),
     alarm.symbol=list(pch=24, col=2,cex=1,lwd=1),

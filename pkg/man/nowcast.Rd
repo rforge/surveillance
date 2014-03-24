@@ -153,7 +153,11 @@ if (!inherits(D, "try-error")) {
                   method="bayes.nb",aggregate.by="1 day",control=list(dRange=dRange))
 
     #Show result
-    plot(nc,xaxis.years=FALSE,dx.upperbound=0,legend=NULL,lty=c(1,1,1),
+    at7thChange <- function(x,xm1) { which(diff(c(xm1,x) \%/\% 7) != 0)}
+    plot(nc,xaxis.tickFreq=list("\%d"=atChange,"\%m"=atChange),
+            xaxis.labelFreq=list("\%j"=at7thChange),
+            xaxis.labelFormat="\%d\n\%b",
+            dx.upperbound=0,legend=NULL,lty=c(1,1,1),
             lwd=c(1,1,2),ylab="Cases",xlab="Time (days)",main="",
             ylim=c(0,max(nc@ci,na.rm=TRUE)))
     idx <- max(which(!is.na(upperbound(nc))))
