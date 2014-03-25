@@ -1,4 +1,4 @@
-\name{twinstim_intensityplot}
+\name{twinstim_intensity}
 \alias{intensityplot.twinstim}
 \alias{intensity.twinstim}
 \alias{intensityplot.simEpidataCS}
