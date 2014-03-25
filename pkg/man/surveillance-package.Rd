@@ -7,7 +7,7 @@
 \docType{package}
 
 \title{
-  \Sexpr[stage=build]{(meta <- packageDescription("surveillance", encoding=NA))$Title}
+  \Sexpr[stage=build]{(meta <- packageDescription("surveillance", encoding="latin1"))$Title}
 }
 
 \description{
@@ -110,7 +110,7 @@
 
   Furthermore, the authors would like to thank the following people
   for ideas, discussions, testing and feedback:\cr
-  \Sexpr[stage=build]{formatPerson(as.person(grep("^(#|[[:blank:]]*$)", readLines(system.file("THANKS", package="surveillance", mustWork=TRUE), encoding="latin1"), invert=TRUE, value=TRUE)), sort=TRUE)}.
+  \Sexpr[stage=build]{iconv(formatPerson(as.person(grep("^(#|[[:blank:]]*$)", readLines(system.file("THANKS", package="surveillance", mustWork=TRUE), encoding="latin1"), invert=TRUE, value=TRUE)), sort=TRUE),"latin1","latin1")}.
 }
 
 \references{
