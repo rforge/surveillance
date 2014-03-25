@@ -13,7 +13,7 @@
 \usage{
 \method{simulate}{hhh4}(object, nsim = 1, seed = NULL, y.start = NULL,
          subset = 1:nrow(object$stsObj), coefs = coef(object),
-         components=c("ar","ne","end"), simplify=nsim>1, ...)
+         components = c("ar","ne","end"), simplify = nsim>1, ...)
 }
 
 \arguments{
@@ -56,9 +56,9 @@
   }
   \item{simplify}{
     logical indicating if only the simulated counts (\code{TRUE}) or the
-    full sts object (\code{FALSE}) should be returned for every
-    replicate. Defaults to counts only if \code{nsim>1}, such that the
-    result will be an array of dimension \code{c(nTime, nUnits, nsim)}.
+    full \code{"\linkS4class{sts}"} object (\code{FALSE}) should be
+    returned for every replicate.
+    By default a full \code{"sts"} object is returned iff \code{nsim=1}.
   }
   \item{\dots}{unused (argument of the generic).}
 }
@@ -84,8 +84,13 @@
 }
 
 \value{
-An object of class \code{"sts"} in case \code{nsim = 1}, and
-a list of such objects otherwise.
+  If \code{simplify=FALSE}: an object of class
+  \code{"\linkS4class{sts}"} (\code{nsim = 1}) or a list of those
+  (\code{nsim > 1}).
+
+  If \code{simplify=TRUE}: an array of dimension
+  \code{c(length(subset), ncol(object$stsObj), nsim)}, where the third
+  dimension is dropped if \code{nsim=1} (yielding a matrix).
 }
 
 \references{

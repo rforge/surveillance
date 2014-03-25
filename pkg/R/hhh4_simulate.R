@@ -96,7 +96,7 @@ simulate.hhh4 <- function (object, # result from a call to hhh4
     res <- if (nsim==1) eval(simcall) else
            replicate(nsim, eval(simcall),
                      simplify=if (simplify) "array" else FALSE)
-    if (simplify) dimnames(res) <- list(subset, colnames(model$response), NULL)
+    if (simplify) dimnames(res)[1:2] <- list(subset, colnames(model$response))
     
     ## Done
     attr(res, "call") <- cl
