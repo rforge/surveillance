@@ -576,7 +576,7 @@ formals(intensityplot.twinstim)[names(formals(intensity.twinstim))] <-
 ### Plot fitted tiaf or siaf(cbind(0, r)), r=distance
 
 iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
-    scaled = FALSE, log = "",
+    scaled = TRUE, truncated = FALSE, log = "",
     conf.type = if (length(pars) > 1) "MC" else "parbounds",
     conf.level = 0.95, conf.B = 999,
     xgrid = 101, col.estimate = rainbow(length(types)), col.conf = col.estimate,
@@ -595,23 +595,53 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
     ## interaction function
     which <- match.arg(which)
     IAFobj <- object$formula[[which]]
+    if (is.null(IAFobj))
+        stop("the model has no epidemic component")
     IAF <- IAFobj[[if (which=="siaf") "f" else "g"]]
     isStepFun <- !is.null(knots <- attr(IAFobj, "knots")) &&
         !is.null(maxRange <- attr(IAFobj, "maxRange"))
 
-    ## scaling by epidemic intercept
-    FUN <- if (scaled) { # add intercept-factor to IAF if scaled=TRUE
-        function (x, pars, types) {
-            gamma0 <- pars[1L]
-            iafpars <- pars[-1L]
-            exp(gamma0) * IAF(x, iafpars, types)
-        }
-    } else IAF
+    ## interaction range
+    if (isScalar(truncated)) {
+        eps <- truncated
+        truncated <- TRUE
+    } else {
+        eps <- attr(IAFobj, "eps")
+    }
+    if (is.null(eps)) { # cannot take eps into account (pre 1.8-0 behaviour)
+        eps <- NA_real_
+    } else if (length(eps) > 1L && truncated) {
+        message("no truncation due to heterogeneous interaction ranges, see \"rug\"")
+    }
+    epsIsFixed <- length(eps) == 1L && is.finite(eps)
+
+    ## interaction as a function of distance and intercept for scaling
+    FUN <- function (x, iafpars, types, gamma0 = NULL) {
+        scale <- if (length(gamma0)) exp(gamma0) else 1
+        vals <- scale * IAF(x, iafpars, types)
+    }
+    if (which == "siaf") {
+        body(FUN)[[length(body(FUN))]] <- do.call("substitute", list(
+            body(FUN)[[length(body(FUN))]],
+            list(x = quote(cbind(x,0)))
+            ))
+    }
+    
+    ## truncate at eps
+    if (truncated && epsIsFixed) {
+        body(FUN) <- as.call(c(as.list(body(FUN)), expression(
+            vals[x > eps] <- 0,
+            vals
+            )))
+    }
+    
     ## if (loglog) {
     ##     body(FUN)[[length(body(FUN))]] <-
     ##         call("log", body(FUN)[[length(body(FUN))]])
     ## }
-    if (scaled) { # epidemic intercept
+
+    ## epidemic intercept
+    if (scaled) {
         idxgamma0 <- match("e.(Intercept)", names(coefs), nomatch=0L)
         if (idxgamma0 == 0L) {
             message("no scaling due to missing epidemic intercept")
@@ -619,7 +649,6 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
         }
     } else idxgamma0 <- 0L              # if no scaling, gamma0 is 0-length
     gamma0 <- coefs[idxgamma0]
-
     ## parameters of the interaction function
     idxiafpars <- grep(paste0("^e\\.",which), names(coefs))
     iafpars <- coefs[idxiafpars]
@@ -645,18 +674,13 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
             xmax <- par("usr")[2] / (if (par("xaxs")=="r") 1.04 else 1)
             if (par("xlog")) 10^xmax else xmax
         } else {
-            modelenv <- environment(object)
-            if (which == "siaf") {
-                if (!is.null(unique.eps.s <- unique(modelenv$eps.s)) &&
-                    length(unique.eps.s) == 1 && is.finite(unique.eps.s)) {
-                    unique.eps.s
-                } else if (isStepFun && maxRange < Inf) maxRange else
+            if (epsIsFixed) {
+                eps
+            } else if (isStepFun && maxRange < Inf) {
+                maxRange
+            } else if (which == "siaf") {
                 sqrt(sum((object$bbox[,"max"] - object$bbox[,"min"])^2))
             } else {
-                if (!is.null(unique.eps.t <- unique(modelenv$eps.t)) &&
-                    length(unique.eps.t) == 1 && is.finite(unique.eps.t)) {
-                    unique.eps.t
-                } else if (isStepFun && maxRange < Inf) maxRange else
                 diff(object$timeRange)
             }
         }
@@ -683,8 +707,7 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
             types <- 1L
         } else { # we compare the values for different types
             .fByType <- sapply(seq_len(nTypes), function (type)
-                               IAF(if (which=="siaf") cbind(0,xgrid) else xgrid,
-                                   iafpars, type))
+                               FUN(xgrid, iafpars, type, gamma0))
             types <- if (all(apply(.fByType[,-1L,drop=FALSE], 2L,
                                    function (fvals)
                                    identical(.fByType[,1L], fvals))))
@@ -696,8 +719,8 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
     if (!add) {
         if (is.null(ylim))
             ylim <- if (grepl("y", log)) {
-                sort(FUN(if (which=="siaf") cbind(xlim,0) else xlim, pars, 1L))
-            } else c(0, FUN(if (which=="siaf") cbind(0,0) else 0, pars, 1L))
+                sort(FUN(xlim, iafpars, 1L, gamma0))
+            } else c(0, FUN(0, iafpars, 1L, gamma0))
         if (is.null(xlab)) xlab <- if (which == "siaf") {
             expression("Distance " * x * " from host")
         } else {
@@ -717,6 +740,7 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
             }
         }
         plot(xlim, ylim, type="n", xlab = xlab, ylab = ylab, log = log, ...)
+        if (length(eps) > 1L && truncated) rug(eps)
     }
 
     ## store evaluated interaction function in a matrix (will be returned)
@@ -740,9 +764,9 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
         
         ## add confidence limits
         if (!is.null(parSample)) {
-            fvalsSample <- apply(parSample, 1, function (pars)
-                                 FUN(if(which=="siaf") cbind(xgrid,0) else xgrid,
-                                     pars, types[i]))
+            fvalsSample <- apply(parSample, 1, if (scaled) {
+                function (pars) FUN(xgrid, pars[-1L], types[i], pars[1L])
+            } else function (pars) FUN(xgrid, pars, types[i]))
             lowerupper <- if (conf.type == "parbounds") {
                 t(apply(fvalsSample, 1, range))
             } else { # Monte-Carlo sample of parameter values
@@ -775,8 +799,7 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
         }
         
         ## add point estimate
-        res[,1L+i] <- FUN(if(which=="siaf") cbind(xgrid,0) else xgrid,
-                          pars, types[i])
+        res[,1L+i] <- FUN(xgrid, iafpars, types[i], gamma0)
         if (isStepFun) {
             segments(xgrid, res[,1L+i],
                      c(xgrid[-1L], min(maxRange, xlim[2L])), res[,1L+i],

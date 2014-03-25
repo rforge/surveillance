@@ -13,7 +13,7 @@
 
 \usage{
 iafplot(object, which = c("siaf", "tiaf"), types = NULL,
-        scaled = FALSE, log="",
+        scaled = TRUE, truncated = FALSE, log="",
         conf.type = if (length(pars) > 1) "MC" else "parbounds",
         conf.level = 0.95, conf.B = 999, xgrid = 101,
         col.estimate = rainbow(length(types)), col.conf = col.estimate,
@@ -41,9 +41,19 @@ iafplot(object, which = c("siaf", "tiaf"), types = NULL,
   }
   \item{scaled}{
     logical indicating if the interaction function should be multiplied
-    by the epidemic intercept \eqn{exp(\gamma_0)}. This is required
-    for the comparison of estimated interaction functions from
-    different models.
+    by the epidemic intercept \eqn{exp(\gamma_0)}. This is the default
+    and required for the comparison of estimated interaction functions
+    from different models.
+  }
+  \item{truncated}{
+    logical indicating if the plotted interaction function should
+    take the maximum range of interaction (\code{eps.t}/\code{eps.s})
+    into account, i.e., drop to zero at that point (if it is finite
+    after all). If there is no common range of interaction, a
+    \code{\link{rug}} indicating the various ranges will 
+    be added to the plot if \code{truncated=TRUE}.
+    If \code{truncated} is a scalar, this value is used as the point
+    \code{eps} where the function drops to 0.
   }
   \item{log}{a character string passed to \code{\link{plot.default}}
     indicating which axes should be logarithmic.
@@ -123,8 +133,7 @@ iafplot(object, which = c("siaf", "tiaf"), types = NULL,
     \itemize{
       \item If \code{xgrid} is a vector of evaluation points, \code{xlim[2]} is
       set to \code{max(xgrid)}.
-      \item If the model environment is stored in \code{object}, it is set to
-      the unique finite value of \code{eps.t}/\code{eps.s} if that exists.
+      \item \code{eps.t}/\code{eps.s} if it is unique and finite.
       \item If the interaction function is a step function with
       \code{maxRange<Inf}, i.e. it drops to 0 at \code{maxRange},
       \code{xlim[2]} is set to \code{maxRange}.
@@ -180,14 +189,14 @@ iafplot(object, which = c("siaf", "tiaf"), types = NULL,
 
 \examples{
 data("imdepifit")
-iafplot(imdepifit, "tiaf", types=1)   # tiaf.constant(), not very exciting
-iafplot(imdepifit, "siaf", types=1,   # same for types=2
-        xlim=c(0,200), col.estimate=1, lwd=c(2,1))
 
-# scaled version and Monte-Carlo-CI (to be used if 'siaf' has more than
-# one parameter or 'scaled = TRUE')
-iafplot(imdepifit, "siaf", types=1, scaled=TRUE, xlim=c(0,200),
-        conf.type="MC", col.estimate=2)
+iafplot(imdepifit, "tiaf", scaled=FALSE)   # tiaf.constant(), not very exciting
+iafplot(imdepifit, "siaf", scaled=FALSE)
+
+# scaled version uses a Monte-Carlo-CI
+set.seed(1)  # result depends on .Random.seed
+iafplot(imdepifit, "siaf", scaled=TRUE, conf.type="MC", conf.B=199,
+        col.conf=gray(0.4), conf.level=NA)  # show MC samples
 }
 
 \keyword{hplot}

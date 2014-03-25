@@ -124,6 +124,9 @@
       \code{verticals} and \code{do.points}).
       \item supports logarithmic axes (via new \code{log} argument
       passed on to \code{plot.default}).
+      \item optionally respects \code{eps.s} and \code{eps.t},
+      respectively (by the new argument \code{truncated}).
+      \item now uses \code{scaled=TRUE} by default.
     }
     \item Take \code{verbose=FALSE} in \code{hhh4()} more seriously.
     \item \code{hhh4()} issues a \code{warning()} if non-convergent.
