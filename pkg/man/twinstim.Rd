@@ -63,8 +63,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
       \item a list as returned by \code{\link{tiaf}} or by a
       predefined interaction function such as
       \code{\link{tiaf.exponential}}
-      %% \item a numeric vector corresponding to the knots of a step
-      %% function, i.e. the same as \code{\link{tiaf.step}(knots)}
+      \item a numeric vector corresponding to the knots of a step
+      function, i.e. the same as \code{\link{tiaf.step}(knots)}
     }
   }
   \item{qmatrix}{

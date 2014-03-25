@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-03-24)}{
+\section{Changes in surveillance version 1.8-0 (2014-03-25)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -67,12 +67,12 @@
     \item (Deviance) \code{residuals()}-method for fitted \code{hhh4()}
     models.
 
-    \item New predefined spatial interaction functions for \code{twinstim()}:
-    \code{siaf.student()} implements a \eqn{t}-kernel, and
-    \code{siaf.step()} a step function.
-
-    \item New predefined temporal interaction function for \code{twinstim()}:
-    \code{tiaf.step()} implements a step function.
+    \item New predefined interaction functions for \code{twinstim()}:
+    \code{siaf.student()} implements a \eqn{t}-kernel for the distance
+    decay, and \code{siaf.step()} and \code{tiaf.step()} provide step
+    function kernels (which may also be invoked by specifying the
+    vector of knots as the \code{siaf} or \code{tiaf} argument in
+    \code{twinstim}).
 
     \item Numerical integration over polygonal domains in the \code{F}
     and \code{Deriv} components of \code{siaf.powerlaw()} and

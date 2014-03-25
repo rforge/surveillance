@@ -369,11 +369,11 @@ twinstim <- function (
     if (hase) {
 
         ## Check interaction functions
-        siaf <- do.call(".parseiaf", args = alist(siaf, "siaf", verbose))
+        siaf <- do.call(".parseiaf", args = alist(siaf, "siaf", eps.s, verbose))
         constantsiaf <- attr(siaf, "constant")
         nsiafpars <- siaf$npars
 
-        tiaf <- do.call(".parseiaf", args = alist(tiaf, "tiaf", verbose))
+        tiaf <- do.call(".parseiaf", args = alist(tiaf, "tiaf", eps.t, verbose))
         constanttiaf <- attr(tiaf, "constant")
         ntiafpars <- tiaf$npars
 

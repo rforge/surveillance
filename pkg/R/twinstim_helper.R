@@ -269,10 +269,10 @@ control2nlminb <- function (control, defaults)
 ### Internal wrapper used in twinstim() and simEpidataCS() to evaluate the siaf
 ### and tiaf arguments. If succesful, returns checked interaction function.
 
-.parseiaf <- function (iaf, type = c("siaf", "tiaf"), verbose = TRUE)
+.parseiaf <- function (iaf, type, eps = NULL, verbose = TRUE)
 {
-    type <- match.arg(type)
-    if (missing(iaf) || is.null(iaf)) {
+    type <- match.arg(type, choices=c("siaf", "tiaf"), several.ok=FALSE)
+    res <- if (missing(iaf) || is.null(iaf)) {
         if (verbose) {
             message("assuming constant ",
                     switch(type, siaf="spatial", tiaf="temporal"),
@@ -289,14 +289,16 @@ control2nlminb <- function (control, defaults)
         attr(ret, "constant") <- isTRUE(attr(iaf, "constant"))
         ret
     } else if (is.vector(iaf, mode = "numeric")) {
-        if (type == "tiaf") {
-            stop("'knots' are not implemented for '",type,"'")
-        } else do.call(paste(type,"step",sep="."), args = list(knots = iaf))
+        do.call(paste(type,"step",sep="."), args = list(knots = iaf))
     } else {
         stop("'", as.character(substitute(iaf)),
              "' must be NULL (or missing), a list (-> continuous ",
              "function), or numeric (-> knots of step function)")
     }
+    if (!is.null(eps)) {         # in simEpidataCS() eps is not known beforehand
+        attr(res, "eps") <- sort(unique(eps))
+    }
+    return(res)
 }
 
 
