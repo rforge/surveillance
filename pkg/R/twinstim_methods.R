@@ -734,15 +734,15 @@ update.twinstim <- function (object, endemic, epidemic,
         call$start <- coef(object)
         call$optim.args$fixed <- TRUE
         call$cumCIF <- FALSE
-        cat("Setting up the model environment ...\n")
-        capture.output(suppressMessages(
-                       objectWithModel <- eval(call, parent.frame())
-                       ))
-        cat("Done.\n")
+        call$verbose <- FALSE
+        ## evaluate in the environment calling update.twinstim()
+        message("Setting up the model environment ...")
+        objectWithModel <- eval(call, parent.frame(2L))
+        ## add the extra "model" components
         object <- append(object, objectWithModel["functions"],
                          after=match("optim.args", names(object)))
-        class(object) <- class(objectWithModel) # dropped by append()
         environment(object) <- environment(objectWithModel)
+        class(object) <- class(objectWithModel) # dropped by append()
     } else { # remove model environment
         object$functions <- NULL
         environment(object) <- NULL
