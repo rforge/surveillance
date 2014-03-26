@@ -1,4 +1,5 @@
-% Unfortunately, setting \RdOpts{stage=build} globally does not work as expected
+% Note @ R 3.0.2: Unfortunately, setting \RdOpts{stage=build} globally
+% does not work as expected, so we have to specify it in each \Sexpr
 
 \encoding{latin1}
 \name{surveillance-package}
@@ -8,6 +9,8 @@
 
 \title{
   \Sexpr[stage=build]{(meta <- packageDescription("surveillance", encoding="latin1"))$Title}
+  % If !is.na(encoding), do iconv() from "latin1" (DESCRIPTION: Encoding) to 'encoding'
+  % Do we really need re-encoding, i.e., encoding="latin1", to make the \Sexpr's work on Windows?
 }
 
 \description{
@@ -110,7 +113,9 @@
 
   Furthermore, the authors would like to thank the following people
   for ideas, discussions, testing and feedback:\cr
-  \Sexpr[stage=build]{iconv(formatPerson(as.person(grep("^(#|[[:blank:]]*$)", readLines(system.file("THANKS", package="surveillance", mustWork=TRUE), encoding="latin1"), invert=TRUE, value=TRUE)), sort=TRUE),"latin1","latin1")}.
+  \Sexpr[stage=build]{THANKSfile <- file(system.file("THANKS", package="surveillance", mustWork=TRUE), encoding="latin1")} % this re-encodes from "latin1" to the current native encoding
+  \Sexpr[stage=build]{formatPerson(as.person(grep("^(#|[[:blank:]]*$)", readLines(THANKSfile), invert=TRUE, value=TRUE)), sort=TRUE)}.
+  \Sexpr[stage=build]{close(THANKSfile)}
 }
 
 \references{
@@ -123,6 +128,7 @@
 #Code from an early survey article about the package: Hoehle (2007)
 #available from http://surveillance.r-forge.r-project.org/
 \dontrun{demo(cost)}
+
 #Code from a more recent book chapter about using the package for the
 #monitoring of Danish mortality data (Hoehle and Mazick, 2010).
 \dontrun{demo(biosurvbook)}
