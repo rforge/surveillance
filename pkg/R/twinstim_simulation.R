@@ -35,8 +35,10 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
     cat("\nChecking the supplied arguments ...\n")
 
-    ### Some simple checks
+    ### Some simple input checks
 
+    if (missing(endemic)) endemic <- ~ 0 else stopifnot(inherits(endemic, "formula"))
+    if (missing(epidemic)) epidemic <- ~ 0 else stopifnot(inherits(epidemic, "formula"))
     if (length(trace) != 1L) stop("'trace' must be a single integer or logical value")
     trace <- as.integer(trace)
     if (!isScalar(nCircle2Poly)) stop("'nCircle2Poly' must be scalar")
@@ -46,13 +48,55 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     .skipChecks <- as.logical(.skipChecks)
     .onlyEvents <- as.logical(.onlyEvents)
 
+    
+    ### Check qmatrix
 
-    ### Check formulae
+    if (missing(qmatrix)) qmatrix <- diag(1)
+    nTypes <- nrow(qmatrix)
+    if (is.null(typeNames <- rownames(qmatrix))) {
+        if (nTypes > length(LETTERS)) stop("'qmatrix' needs dimnames")
+        typeNames <- LETTERS[seq_len(nTypes)]
+    }
+    qmatrix <- checkQ(qmatrix, typeNames)
+    qSumTypes <- rowSums(qmatrix)  # how many types can be triggered by each type
 
-    if (missing(endemic)) endemic <- ~ 0 else stopifnot(inherits(endemic, "formula"))
-    if (missing(epidemic)) epidemic <- ~ 0 else stopifnot(inherits(epidemic, "formula"))
 
+    ### Check other "epidataCS" components (events, stgrid, tiles, and W)
+    
+    if (!missing(events) && !is.null(events)) {
+        events <- events[!names(events) %in% reservedColsNames_events]
+        if (!.skipChecks) {
+            cat("Checking 'events':\n")
+            events <- check_events(events, dropTypes = FALSE)
+            # epscols are obligatory in 'check_events', which is also appropriate here
+        }
+        ## check event types
+        events@data$type <- factor(events@data$type, levels=typeNames)
+        if (any(.typeIsNA <- is.na(events@data$type))) {
+            warning("ignored some 'events' of unknown type")
+            events <- events[!.typeIsNA,]
+        }
+    }
 
+    if (!.skipChecks) {
+        cat("Checking 'stgrid':\n")
+        stgrid <- check_stgrid(stgrid[grep("^BLOCK$", names(stgrid), invert=TRUE)])
+    }
+    
+    tileLevels <- levels(stgrid$tile)
+    tiles <- check_tiles(tiles, tileLevels,
+                         areas.stgrid = stgrid[["area"]][seq_len(nlevels(stgrid$tile))],
+                         W = W, keep.data = FALSE)
+    W <- if (is.null(W)) {
+        cat("Building 'W' as the union of 'tiles' ...\n")
+    	unionSpatialPolygons(tiles)
+    } else check_W(W)
+    
+    # Transform W to class "owin"
+    Wowin <- as(W, "owin")
+    maxExtentOfW <- diameter.owin(Wowin)
+
+    
     ### Check parameters
 
     beta0 <- if (missing(beta0)) numeric(0L) else as.vector(beta0, mode="numeric")
@@ -61,6 +105,9 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     siafpars <- if (missing(siafpars)) numeric(0L) else as.vector(siafpars, mode="numeric")
     tiafpars <- if (missing(tiafpars)) numeric(0L) else as.vector(tiafpars, mode="numeric")
     nbeta0 <- length(beta0)
+    if (nbeta0 > 1L && nbeta0 != nTypes) {
+        stop("'beta0' must have length 0, 1, or 'nrow(qmatrix)'")
+    }
     p <- length(beta)
     q <- length(gamma)
     nsiafpars <- length(siafpars)
@@ -71,27 +118,6 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     hastiafpars <- ntiafpars > 0L
     if (!hase && (hassiafpars | hastiafpars)) {
         stop("'siafpars' and 'tiafpars' require 'gamma'")
-    }
-
-
-    ### Check qmatrix
-
-    if (missing(qmatrix)) qmatrix <- diag(1)
-    typeNames <- rownames(qmatrix)
-    if (is.null(typeNames)) typeNames <- "1"    # single event type
-    qmatrix <- checkQ(qmatrix, typeNames)
-    nTypes <- length(typeNames)
-    if (nbeta0 > 1L && nbeta0 != nTypes) {
-        stop("'beta0' must have length 0, 1, or 'nrow(qmatrix)'")
-    }
-    qSumTypes <- rowSums(qmatrix)  # how many types can be triggered by each type
-
-
-    ### Check stgrid
-
-    if (!.skipChecks) {
-        cat("Checking 'stgrid':\n")
-        stgrid <- checkstgrid(stgrid[grep("^BLOCK$", names(stgrid), invert=TRUE)])
     }
 
 
@@ -114,7 +140,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     block_t0 <- stgrid$BLOCK[match(TRUE, stgrid$start > t0) - 1L]
     # BLOCK in stgrid such that stop time is equal to or just after T
     block_T <- stgrid$BLOCK[match(TRUE, stgrid$stop >= T)]
-    stgrid <- stgrid[stgrid$BLOCK >= block_t0 & stgrid$BLOCK <= block_T,]
+    stgrid <- stgrid[stgrid$BLOCK>=block_t0 & stgrid$BLOCK<=block_T,,drop=FALSE]
     stgrid$start[stgrid$BLOCK == block_t0] <- t0
     stgrid$stop[stgrid$BLOCK == block_T] <- T
     # matrix of BLOCKS and start times (used later)
@@ -123,24 +149,6 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     )
 
 
-    ### Check class, proj4string and names of tiles and W
-
-    stopifnot(inherits(tiles, "SpatialPolygons"),
-              (tileLevels <- levels(stgrid$tile)) %in% row.names(tiles))
-    tiles <- as(tiles, "SpatialPolygons") # drop possible data attribute
-                                          # (-> correct over-method)
-    if (is.null(W)) {
-        cat("Building 'W' as the union of 'tiles' ...\n")
-    	W <- unionSpatialPolygons(tiles)
-    } else {
-        stopifnot(inherits(W, "SpatialPolygons"), identicalCRS(tiles, W))
-    }
-
-    # Transform W to class "owin"
-    Wowin <- as(W, "owin")
-    maxExtentOfW <- diameter.owin(Wowin)
-
-    
     ### Check mark-generating function
 
     # eps.t and eps.s are also unpredictable marks (generated by rmarks)
@@ -164,64 +172,55 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                 " \"factor\" ('epidemic') variables only")
 
 
-    ### Check events (prehistory of the process)
+    ### Check prehistory of the process
 
-    # empty prehistory
-    eventCoords <- matrix(0, nrow=0L, ncol=2L)
-    eventData <- data.frame(
-        time = numeric(0L),
-        tile = factor(character(0L), levels=tileLevels),
-        type = factor(character(0L), levels=typeNames),
-        check.rows = FALSE, check.names = FALSE
-    )
-    eventData <- cbind(eventData, sampleMarks[0L,])
     Nout <- 0L
-    # do we have a prehistory in 'events'
     if (!missing(events) && !is.null(events)) {
-        events <- events[!names(events) %in% reservedColsNames_events]
-        if (!.skipChecks) {
-            cat("Checking 'events':\n")
-            events <- checkEvents(events, dropTypes = FALSE)
-            # epscols are obligatory in 'checkEvents', which is also appropriate here
-        }
-        # select prehistory of events which are still infective
         .stillInfective <- with(events@data, time <= t0 & time + eps.t > t0)
-        Nout <- sum(.stillInfective)    # = number of events in the prehistory
-        if (Nout > 0L) {
-            stopifnot(identicalCRS(events, W))
-            events <- events[.stillInfective,]
-            # check event types
-            events@data$type <- factor(events@data$type, levels=typeNames)
-            if (any(.typeIsNA <- is.na(events@data$type))) {
-                warning("ignored 'events' of unknown type")
-                events <- events[!.typeIsNA,]
-            }
-            eventCoords <- coordinates(events)
-            eventData <- events@data
-            # check presence of unpredictable marks
-            if (length(.idx <- which(!unpredMarks %in% names(eventData)))) {
-                stop("missing unpredictable marks in 'events': ",
-                     paste0("\"", unpredMarks[.idx], "\"", collapse=", "))
-            }
-            # check type of unpredictable marks
-            for (um in unpredMarks) {
-                if (!identical(class(sampleMarks[[um]]), class(eventData[[um]])))
-                    stop("the class of the unpredictable mark '", um,
-                         "' in the 'events' prehistory ",
-                         "is not identical to the class returned by 'rmarks'")
-            }
-            # add marks which are not in the prehistory but simulated by 'rmarks'
-            if (length(.add2events <- setdiff(markNames, names(eventData)))) {
-                eventData <- cbind(eventData, sampleMarks[.add2events])
-                is.na(eventData[.add2events]) <- TRUE
-            }
-            eventData <- eventData[c("time", "tile", "type", markNames)]
+        Nout <- sum(.stillInfective)
+        events <- if (Nout > 0L) {
+            events[.stillInfective,]
         } else {
-            .eventstxt <- if (.skipChecks) "data$events" else "events"   # account for simulate.twinstim
-            cat("(no events from '", .eventstxt, "' were considered as prehistory)\n", sep="")
+            .eventstxt <- if (.skipChecks) "data$events" else "events"  # for simulate.twinstim
+            cat("(no events from '", .eventstxt,
+                "' were considered as prehistory)\n", sep="")
+            NULL
         }
     }
-
+    
+    ## separate coordinates and data
+    if (Nout > 0L) {
+        check_tiles_events(tiles, events)
+        eventCoords <- coordinates(events)
+        eventData <- events@data
+        ## check presence of unpredictable marks
+        if (length(.idx <- which(!unpredMarks %in% names(eventData)))) {
+            stop("missing unpredictable marks in 'events': ",
+                 paste0("\"", unpredMarks[.idx], "\"", collapse=", "))
+        }
+        ## check type of unpredictable marks
+        for (um in unpredMarks) {
+            if (!identical(class(sampleMarks[[um]]), class(eventData[[um]])))
+                stop("the class of the unpredictable mark '", um,
+                     "' in the 'events' prehistory ",
+                     "is not identical to the class returned by 'rmarks'")
+        }
+        ## add marks which are not in the prehistory but simulated by 'rmarks'
+        if (length(.add2events <- setdiff(markNames, names(eventData)))) {
+            eventData <- cbind(eventData, sampleMarks[.add2events])
+            is.na(eventData[.add2events]) <- TRUE
+        }
+        eventData <- eventData[c("time", "tile", "type", markNames)]
+    } else { ## empty prehistory
+        eventCoords <- matrix(0, nrow=0L, ncol=2L)
+        eventData <- data.frame(
+            time = numeric(0L),
+            tile = factor(character(0L), levels=tileLevels),
+            type = factor(character(0L), levels=typeNames),
+            check.rows = FALSE, check.names = FALSE
+            )
+        eventData <- cbind(eventData, sampleMarks[0L,])
+    }
 
     ## helper function to attach covariates from 'stgrid' to events
     attachstgridvars <- function (eventData, stgridvars)

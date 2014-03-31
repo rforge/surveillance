@@ -89,7 +89,7 @@ gridcellOfEvent <- function (t, tilename, stgrid)
     ## ~5x faster alternative assuming a full BLOCK x tile grid, which is
     ## sorted by BLOCK and tile (tile varying first), specifically there must be
     ## all levels(stgrid$tile) in every BLOCK in that order;
-    ## this structure is guaranteed by checkstgrid()
+    ## this structure is guaranteed by check_stgrid()
     blockstart <- match(TRUE, stgrid$stop >= t)
     idx <- blockstart + match(tilename, levels(stgrid$tile)) - 1L
     

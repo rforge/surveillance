@@ -6,7 +6,7 @@
 ### Data structure for CONTINUOUS SPATIO-temporal infectious disease case data
 ### and a spatio-temporal grid of endemic covariates
 ###
-### Copyright (C) 2009-2013 Sebastian Meyer
+### Copyright (C) 2009-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -54,27 +54,20 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     clipper <- match.arg(clipper)
     # Check and SORT events and stgrid
     cat("\nChecking 'events':\n")
-    events <- checkEvents(events)
+    events <- check_events(events)
     cat("Checking 'stgrid':\n")
-    stgrid <- checkstgrid(stgrid, T)
-
-    # Check class and proj4string of W and consistency of area
+    stgrid <- check_stgrid(stgrid, T)
+    # Check class of W and consistency of area
     cat("Checking 'W'...\n")
-    W <- as(W, "SpatialPolygons")
+    W <- check_W(W, area.other =
+                 sum(stgrid[["area"]][seq_len(nlevels(stgrid$tile))]),
+                 other = "stgrid")
     stopifnot(identicalCRS(W, events))
-    W.area <- sum(sapply(W@polygons, slot, "area"))
-    tiles.totalarea <- sum(stgrid$area[stgrid$BLOCK == 1])
-    if (abs(W.area - tiles.totalarea) / max(W.area, tiles.totalarea) > 0.005) {
-        cat("\tArea of 'W' =", W.area, "\n")
-        cat("\tTotal area of the tiles in 'stgrid' =", tiles.totalarea, "\n")
-        warning("area of 'W' should be consistent with the ",
-                "total area of the tiles in 'stgrid'")
-    }
     
     # Check qmatrix
     cat("Checking 'qmatrix'...\n")
     typeNames <- levels(events$type)
-    nTypes <- length(typeNames)
+    nTypes <- length(typeNames)     # default value of qmatrix depends on nTypes
     qmatrix <- checkQ(qmatrix, typeNames)
 
     # Check nCircle2Poly
@@ -201,7 +194,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
 
 ### CHECK FUNCTION FOR events ARGUMENT IN as.epidataCS
 
-checkEvents <- function (events, dropTypes = TRUE)
+check_events <- function (events, dropTypes = TRUE)
 {
     # Check class and spatial dimensions
     stopifnot(inherits(events, "SpatialPointsDataFrame"))
@@ -274,7 +267,7 @@ checkEvents <- function (events, dropTypes = TRUE)
 
 ### CHECK FUNCTION FOR stgrid ARGUMENT IN as.epidataCS
 
-checkstgrid <- function (stgrid, T)
+check_stgrid <- function (stgrid, T)
 {
     # Check class
     stopifnot(inherits(stgrid, "data.frame"))
@@ -374,6 +367,110 @@ checkstgrid <- function (stgrid, T)
     return(stgrid)
 }
 
+
+
+### CHECK FUNCTION FOR W ARGUMENT IN as.epidataCS
+
+check_W <- function (W, area.other = NULL, other, tolerance = 0.001)
+{
+    W <- as(W, "SpatialPolygons") # i.e. drop data if a SpatialPolygonsDataFrame
+    
+    if (!is.null(area.other) && area.other > 0) {
+        check_W_area(W, area.other, other, tolerance)
+    }
+    
+    return(W)
+}
+
+check_W_area <- function (W, area.other, other, tolerance = 0.001)
+{
+    area.W <- sum(sapply(W@polygons, slot, "area"))
+    if (!isTRUE(all.equal(area.other, area.W, tolerance = tolerance))) {
+        cat("\tArea of 'W' =", area.W, "\n")
+        cat("\tTotal area from '", other, "' = ", area.other, "\n", sep="")
+        warning("area of 'W' (", area.W, ") differs from ",
+                "total tile area in '", other, "' (", area.other, ")")
+    }
+}
+
+
+
+### CHECK FUNCTION FOR tiles ARGUMENT IN as.epidataCS
+
+check_tiles <- function (tiles, levels,
+                         events = NULL, areas.stgrid = NULL, W = NULL,
+                         keep.data = FALSE, tolerance = 0.05)
+{
+    stopifnot(inherits(tiles, "SpatialPolygons"),
+              is.vector(levels, mode="character"))
+    tileIDs <- row.names(tiles)
+
+    ## check completeness of tiles
+    if (any(missingtiles <- !levels %in% tileIDs))
+        stop(sum(missingtiles), " regions are missing in 'tiles', ",
+             "check 'row.names(tiles)'")
+
+    ## re-order: first 'levels', then any extra tiles
+    tiles <- tiles[c(levels, setdiff(tileIDs, levels)),]
+
+    ## drop data (also for suitable over-method in check_tiles_events)
+    .tiles <- as(tiles, "SpatialPolygons")
+    
+    ## check tile specification of events and identical projection
+    if (!is.null(events)) {
+        check_tiles_events(.tiles, events)
+    }
+
+    ## check areas
+    areas.tiles <- sapply(tiles[levels,]@polygons, slot, "area")
+    if (!is.null(areas.stgrid)) {
+        check_tiles_areas(areas.tiles, areas.stgrid, tolerance=tolerance)
+    }
+    if (!is.null(W)) {
+        stopifnot(identicalCRS(tiles, W))
+        check_W_area(W, area.other=sum(areas.tiles), other="tiles",
+                     tolerance=tolerance)
+    }
+
+    ## done
+    if (keep.data) tiles else .tiles
+}
+
+check_tiles_events <- function (tiles, events)
+{
+    tiles <- as(tiles, "SpatialPolygons") # remove potential data for over()
+    stopifnot(inherits(events, "SpatialPointsDataFrame"),
+              identicalCRS(tiles, events))
+    tileIDs <- row.names(tiles)
+    eventIDs <- row.names(events)
+    
+    ## get polygon ID's of events (via overlay)
+    eventtiles <- tileIDs[over(events, tiles)]
+    
+    if (length(which_not_in_tiles <- which(is.na(eventtiles))))
+        warning("some of 'events' are not within 'tiles': ",
+                paste0("\"", eventIDs[which_not_in_tiles], "\"", collapse=", "))
+
+    if (!is.null(events@data[["tile"]])) {
+        which_disagree <- setdiff(
+            which(eventtiles != as.character(events$tile)),
+            which_not_in_tiles)
+        if (length(which_disagree))
+            message("'over(events, tiles)' disagrees with 'events$tile': ",
+                    paste0("\"", eventIDs[which_disagree], "\"", collapse=", "))
+    }
+    invisible()
+}
+
+check_tiles_areas <- function (areas.tiles, areas.stgrid, tolerance = 0.05)
+{
+    stopifnot(length(areas.tiles) == length(areas.stgrid))
+    areas_all_equal <- all.equal(areas.stgrid, areas.tiles,
+                                 tolerance = tolerance)
+    if (!isTRUE(areas_all_equal))
+        warning("tile areas in 'stgrid' differ from areas of 'tiles': ",
+                areas_all_equal)
+}
 
 
 ### CONSTRUCT SPATIAL INFLUENCE REGIONS AROUND EVENTS

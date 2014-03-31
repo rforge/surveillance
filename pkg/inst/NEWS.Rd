@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-03-25)}{
+\section{Changes in surveillance version 1.8-0 (2014-03-31)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -166,6 +166,15 @@
     been integrated in \CRANpkg{spatstat} and are imported from there.
     \item The events in a \code{"epidataCS"} object no longer have
     a reserved \code{"ID"} column.
+    \item The polygon representation of Germany's districts (
+    \code{system.file("shapes", "districtsD.RData", package="surveillance")}
+    ) has been simplified further. The union of \code{districtsD} is
+    used as observation window \code{W} in \code{data("imdepi")}. The
+    exemplary \code{twinstim()} fit \code{data("imdepifit")} has been
+    updated as well. Furthermore, \code{row.names(imdepi$events)} have
+    been reset (chronological index).
+    \item More rigorous checking of \code{tiles} in
+    \code{simulate.twinstim()} and \code{intensityplot.twinstim}.
   }
 }
 

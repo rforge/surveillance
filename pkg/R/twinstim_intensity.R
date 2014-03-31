@@ -45,6 +45,7 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
     removalTimes <- modelenv$removalTimes
     gridTiles <- modelenv$gridTiles
     gridBlocks <- modelenv$gridBlocks
+    ds <- modelenv$ds
     tiaf <- modelenv$tiaf
     tiafpars <- modelenv$tiafpars
     eps.s <- modelenv$eps.s
@@ -87,17 +88,15 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
                 }
             }
         } else {
-            tilesIDs <- if (is.null(tiles.idcol)) {
-                stopifnot(is(tiles, "SpatialPolygons"))
-                row.names(tiles) # = sapply(tiles@polygons, slot, "ID")
-            } else {
+            if (!is.null(tiles.idcol)) {
                 stopifnot(is(tiles, "SpatialPolygonsDataFrame"))
-                tiles@data[[tiles.idcol]]
+                row.names(tiles) <- tiles@data[[tiles.idcol]]
             }
-            if (!all(levels(gridTiles) %in% tilesIDs)) {
-                stop("'tiles' is incomplete for 'x' (check 'tiles.idcol')")
-            }
-            tiles <- as(tiles, "SpatialPolygons") # drop data for over-method
+            tileLevels <- levels(gridTiles)
+            tiles <- check_tiles(tiles, tileLevels,
+                                 areas.stgrid = ds[seq_along(tileLevels)],
+                                 keep.data = FALSE) # drop data for over-method
+            tilesIDs <- row.names(tiles) # = sapply(tiles@polygons, slot, "ID")
             function (xy) {             # works with a whole coordinate matrix
                 points <- SpatialPoints(xy, proj4string=tiles@proj4string)
                 polygonidxOfPoints <- over(points, tiles)
