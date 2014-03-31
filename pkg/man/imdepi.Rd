@@ -10,8 +10,8 @@
 
 \description{
   \code{imdepi} contains data on the spatio-temporal location of 636
-  cases of invasive meningococcal disease caused by the two most common
-  meningococcal finetypes in Germany, \samp{B:P1.7-2,4:F1-5} (of
+  cases of invasive meningococcal disease (IMD) caused by the two most
+  common meningococcal finetypes in Germany, \samp{B:P1.7-2,4:F1-5} (of
   serogroup B) and \samp{C:P1.5,2:F3-3} (of serogroup C).
   \code{imdepifit} contains a model fit to the \code{imdepi} data. 
 }
@@ -98,29 +98,34 @@ data(imdepifit)
   time trends and seasonality (in this discretized time).
   
   The entry \code{W} contains the observation window as a
-  \code{\link{SpatialPolygons}} object. In this case the boundaries of
-  Germany (simplified polygon to enhance speed).
-  %% The original shape file was downloaded from
-  %% \url{http://www.geodatenzentrum.de/geodaten/gdz_rahmen.gdz_div?gdz_spr=eng&gdz_akt_zeile=5&gdz_anz_zeile=5&gdz_user_id=0}
-  %% as of 2009-01-01, which has copyright by Bundesamt für Kartographie
-  %% und Geodäsie, Frankfurt am Main:
-  %% "Copy, distribution and making available to the public - also in
-  %% parts - is allowed with reference."
-  %% This shapefile was then simplified using \code{simplify.owin()} from
-  %% package \pkg{spatstat} with parameter \code{dmin = 10}.
+  \code{\link{SpatialPolygons}} object, in this case the boundaries of
+  Germany. It was obtained as
+  \code{stateD <- rgeos::gUnaryUnion(districtsD)},
+  where \code{districtsD} represents Germany's districts as at
+  2009-01-01 (originally obtained from \url{www.geodatenzentrum.de}),
+  simplified by the \dQuote{modified Visvalingam} algorithm (level
+  6.6\%) available at \url{www.MapShaper.org} (v. 0.1.17).
+  The objects \code{districtsD} and \code{stateD} are contained in
+  \code{system.file("shapes", "districtsD.RData", package="surveillance")}.
   
   The entry \code{qmatrix} is a \eqn{2\times 2}{2 x 2} identity matrix
   indicating that no transmission between the two finetypes can occur.
 }
 
 \source{
-  German Reference Centre for Meningococci (NRZM) -- hosted by the
-  Department of Hygiene and Microbiology,
-  Julius-Maximilians-Universit\enc{ä}{ae}t W\enc{ü}{ue}rzburg, Germany.\cr
-  Thanks to Dr. Johannes Elias and Prof. Dr. Ulrich Vogel from the NRZM
-  for providing the IMD event data. See \url{http://www.meningococcus.de/}
-  and \url{http://episcangis.hygiene.uni-wuerzburg.de/} for further
-  details about the IMD event data.
+  IMD case reports: German Reference Centre for Meningococci (NRZM) --
+  hosted by the Department of Hygiene and Microbiology,
+  Julius-Maximilians-Universit\enc{ä}{ae}t W\enc{ü}{ue}rzburg, Germany.
+  Thanks to Dr. Johannes Elias and Prof. Dr. Ulrich Vogel for providing
+  the data. See \url{http://www.meningococcus.de/} and
+  \url{http://episcangis.hygiene.uni-wuerzburg.de/} for further
+  details.
+
+  Shapefile of Germany's districts as at 2009-01-01:
+  Bundesamt f\enc{ü}{ue}r Kartographie und Geod\enc{ä}{ae}sie, Frankfurt
+  am Main, Germany, \url{www.geodatenzentrum.de}.
+  %% "Copy, distribution and making available to the public - also in
+  %% parts - is allowed with reference."
 }
 
 \references{

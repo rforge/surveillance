@@ -183,7 +183,7 @@ intensityplot(imdepifit, which="total intensity",
 plot(imdepi, breaks=100)
 par(opar)
 
-## path of the proportion of the epidemic component by event
+## time course of the epidemic proportion by event
 intensityplot(imdepifit, which="epidemic proportion",
               aggregate="time", tgrid=500, types=1)
 intensityplot(imdepifit, which="epidemic proportion",
@@ -191,13 +191,10 @@ intensityplot(imdepifit, which="epidemic proportion",
 legend("topright", legend=levels(imdepi$events$type), lty=1, col=1:2,
        title = "event type")
 
+## spatial shape of the intensity (aggregated over time)
 if (surveillance.options("allExamples") && requireNamespace("maptools"))
 {
-  ## spatial shape of the intensity (aggregated over time)
-  # load borders of Germany's districts (obtained from the
-  # Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, Germany,
-  # www.geodatenzentrum.de), simplified by the "special" Visvalingam
-  # algorithm (level=60\%) using www.MapShaper.org:
+  ## load borders of Germany's districts
   load(system.file("shapes", "districtsD.RData", package="surveillance"))
 
   # total intensity (using a rather sparse 'sgrid' for speed)

@@ -107,12 +107,12 @@
 %% Dynamically extract contributors from the DESCRIPTION file
 %% and persons from inst/THANKS for acknowledgement:
 \section{Acknowledgements}{
-  Substantial contributions of code by:\cr
+  Substantial contributions of code by:
   \Sexpr[stage=build]{contributors <- authors[grepl("ctb", authors$role) & !sapply(authors$family, is.null)]}
   \Sexpr[stage=build]{formatPerson(contributors, sort=TRUE)}.
 
   Furthermore, the authors would like to thank the following people
-  for ideas, discussions, testing and feedback:\cr
+  for ideas, discussions, testing and feedback:
   \Sexpr[stage=build]{THANKSfile <- file(system.file("THANKS", package="surveillance", mustWork=TRUE), encoding="latin1")} % this re-encodes from "latin1" to the current native encoding
   \Sexpr[stage=build]{formatPerson(as.person(grep("^(#|[[:blank:]]*$)", readLines(THANKSfile), invert=TRUE, value=TRUE)), sort=TRUE)}.
   \Sexpr[stage=build]{close(THANKSfile)}

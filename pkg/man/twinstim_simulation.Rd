@@ -299,16 +299,14 @@ spatio-temporal conditional intensity models to epidemic data.
 data("imdepi")
 data("imdepifit")
 
-## load borders of Germany's districts (obtained from the
+## load borders of Germany's districts (originally obtained from the
 ## Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, Germany,
-## www.geodatenzentrum.de), simplified by the "special" Visvalingam
-## algorithm (level=60\%) using www.MapShaper.org:
+## www.geodatenzentrum.de), simplified by the "modified Visvalingam"
+## algorithm (level=6.6\%) using www.MapShaper.org (v. 0.1.17):
 load(system.file("shapes", "districtsD.RData", package="surveillance"))
-
-## map of Germany's districts
 plot(districtsD)
 plot(stateD, add=TRUE, border=2, lwd=2)
-# 'stateD' is the union of the polygons in 'districtsD'
+# 'stateD' was obtained as 'rgeos::gUnaryUnion(districtsD)'
 
 ## simulate 2 realizations (during a VERY short period -- for speed)
 ## considering events from data(imdepi) before t=31 as pre-history
