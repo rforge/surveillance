@@ -180,7 +180,7 @@ imdepifit <- update(imdepifit, model=TRUE)
 opar <- par(mfrow=c(2,1))
 intensityplot(imdepifit, which="total intensity",
               aggregate="time", tgrid=500)
-plot(imdepi, breaks=100)
+plot(imdepi, "time", breaks=100)
 par(opar)
 
 ## time course of the epidemic proportion by event

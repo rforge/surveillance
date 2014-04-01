@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-03-31)}{
+\section{Changes in surveillance version 1.8-0 (2014-04-01)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -96,6 +96,14 @@
     for the \code{"hhh4"} class. For \code{AIC()} and \code{BIC()}, the
     default methods work smoothly now (due to changes to
     \code{logLik.hhh4()} documented below).
+
+    \item \code{plot.epidataCS()}:
+    \itemize{
+      \item The spatial plot has new arguments to automatically add
+      legends to the plot: \code{legend.types} and \code{legend.counts}.
+      It also gained an \code{add} argument.
+    }
+
   }
 }
 
@@ -110,7 +118,9 @@
     conversion codes -- indenpently if data are daily, weekly, monthly,
     etc. As a consequence, the old argument \code{xaxis.years} is
     removed. See \code{plot.sts.time.one} for more information.
-
+    \item The argument \code{colTypes} of
+    \code{plot.epidataCS(,aggregate="space")} is deprecated (use
+    \code{points.args$col} instead).
     \item \code{iafplot()} ...
     \itemize{
       \item invisibly returns a matrix containing the plotted

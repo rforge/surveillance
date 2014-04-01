@@ -74,12 +74,22 @@ number of events along the time axis (aggregated over space) using
 	Defaults to the \code{sqrt()} function, which for the default
 	circular \code{pch=1} means that the area of each point is
 	proportional to the number of events at its location.}
-      \item{points.args}{a list of further arguments passed to
-        \code{\link{points}}. An argument \code{cex} (default: 0.5) in
-	this list multiplies the sizes obtained from \code{cex.fun}.}
-      \item{colTypes}{colour vector for the different event types.
-	Defaults to colours from the \code{\link{rainbow}} palette. They are
-	only used if \code{col} is missing in \code{points.args}.}
+      \item{points.args}{a list of (type-specific) graphical parameters
+	for \code{\link{points}}, specifically \code{pch}, \code{lwd},
+	and \code{col}, which are all recycled to give the length
+	\code{nlevels(x$events$type)}. In contrast, a possible
+	\code{cex} element should be scalar (default: 0.5) and 
+	multiplies the sizes obtained from \code{cex.fun}.}
+      \item{add}{logical indicating if the event points should be added
+	to an existing plot.}
+      \item{legend.types}{if a list (of arguments for
+	\code{\link{legend}}), a legend for the event types is added to
+	the plot.}
+      \item{legend.args}{if a list (of arguments for
+	\code{\link{legend}}), a legend illustrating the effect of 
+	\code{cex.fun} is added to the plot. This list may contain a
+	special element \code{counts}, which is an integer vector
+	specifying the counts to illustrate.}
       \item{\dots}{further arguments passed to the \code{plot}-method
 	for \code{"\linkS4class{SpatialPolygons}"}, which draws the
 	observation region \code{x$W}.}
@@ -104,11 +114,11 @@ Sebastian Meyer
 data("imdepi")
 
 ## show the occurrence of events along the time axis (-> histogram)
-plot(imdepi, aggregate = "time", subset = type == "B",
+plot(imdepi, "time", subset = type == "B",
      main = "Time series of events of the serogroup B finetype")
 
 ## show the distribution in space
-plot(imdepi, aggregate = "space", colTypes = 1:2)
+plot(imdepi, "space", points.args=list(col=c(2,4)), lwd=2)
 }
 
 \keyword{hplot}

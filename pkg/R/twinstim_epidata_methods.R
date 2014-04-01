@@ -6,7 +6,7 @@
 ### S3-methods for "epidataCS" data objects, which represent
 ### CONTINUOUS SPATIO-temporal infectious disease case data
 ###
-### Copyright (C) 2009-2013 Sebastian Meyer
+### Copyright (C) 2009-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -354,14 +354,11 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
         TRUE
     } else FALSE
 
-    ## determines multiplicities in a matrix (or data frame)
-    ## and returns unique rows with appended column of counts
-    countunique <- function(x) unique(cbind(x, count=multiplicity(x)))
     # wrapper for 'points' with specific 'cex' for multiplicity
     multpoints <- function (tableCoordsTypes, col) {
         tableMult <- countunique(tableCoordsTypes)
         points(tableMult[,1:2,drop=FALSE], pch = pch[tableMult[,"type"]],
-               col = col, cex = sqrt(1.5*tableMult[,"count"]/pi) * par("cex"))
+               col = col, cex = sqrt(1.5*tableMult[,"COUNT"]/pi) * par("cex"))
     }
     # functions returning if events are in status I or R at time t
     I <- function (t) s$eventTimes <= t & removalTimes >= t
@@ -504,26 +501,76 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
 ### plot.epidataCS(x, aggregate = "space") -> spatial point pattern
 
 plot.epidataCS_space <- function (x, subset,
-    cex.fun = sqrt, points.args = list(cex=0.5),
-    colTypes = rainbow(nlevels(x$events$type)), ...)
+    cex.fun = sqrt, points.args = list(), add = FALSE,
+    legend.types = list(), legend.counts = list(), ...)
 {
-    stopifnot(is.list(points.args))
     events <- if (missing(subset)) x$events else {
         eval(substitute(base::subset(x$events, subset=.subset),
                         list(.subset=substitute(subset))))
-        ## do.call(base::subset,
-        ##         args = list(x=quote(x$events), subset=substitute(subset)))
     }
-    events@data[["_MULTIPLICITY_"]] <- multiplicity.Spatial(events)
-    events <- events[!duplicated(coordinates(events)),]
-    pointcex <- cex.fun(events$"_MULTIPLICITY_")
-    pointcex <- pointcex * points.args$cex
-    points.args$cex <- NULL
-    if (is.null(points.args[["col"]])) {
-        points.args$col <- colTypes[events$type]
+    eventCoordsTypesCounts <- countunique(
+        cbind(coordinates(events), type = as.integer(events$type))
+        )
+    pointCounts <- eventCoordsTypesCounts[,"COUNT"]
+    typeNames <- levels(events$type)
+    nTypes <- length(typeNames)
+    typesEffective <- sort(unique(eventCoordsTypesCounts[,"type"]))
+
+    ## point style
+    colTypes <- list(...)[["colTypes"]]  # backwards compatibility for < 1.8
+    if (is.null(colTypes)) {
+        colTypes <- rainbow(nTypes)
+    } else warning("argument 'colTypes' is deprecated; ",
+                   "use 'points.args$col' instead")
+    points.args <- modifyList(list(pch=1, col=colTypes, lwd=1, cex=0.5),
+                              points.args)
+    styleArgs <- c("pch", "col", "lwd")
+    points.args[styleArgs] <- lapply(points.args[styleArgs],
+                                     rep_len, length.out=nTypes)
+
+    ## select style parameters according to the events' types
+    points.args_pointwise <- points.args
+    points.args_pointwise[styleArgs] <- lapply(
+        points.args_pointwise[styleArgs], "[",
+        eventCoordsTypesCounts[,"type"])
+    points.args_pointwise$cex <- points.args_pointwise$cex * cex.fun(pointCounts)
+    
+    ## plot
+    if (!add) plot(x$W, ...)
+    do.call("points", c(alist(x=eventCoordsTypesCounts[,1:2]),
+                        points.args_pointwise))
+
+    ## optionally add legends
+    if (is.list(legend.types) && length(typesEffective) > 1) {
+        legend.types <- modifyList(
+            list(x="topright", legend=typeNames[typesEffective],
+                 title="Type",
+                 #pt.cex=points.args$cex, # better use par("cex")
+                 pch=points.args$pch[typesEffective],
+                 col=points.args$col[typesEffective],
+                 pt.lwd=points.args$lwd[typesEffective]),
+            legend.types)
+        do.call("legend", legend.types)
     }
-    plot(x$W, ...)
-    do.call("points", c(alist(x=events, cex=pointcex), points.args))
+    if (is.list(legend.counts) && any(pointCounts > 1)) {
+        if (is.null(legend.counts[["counts"]])) {
+            counts <- unique(round(10^(do.call("seq", c(
+                as.list(log10(range(pointCounts))), list(length.out=5)
+                )))))
+        } else {
+            counts <- as.vector(legend.counts[["counts"]], mode="integer")
+            legend.counts[["counts"]] <- NULL
+        }
+        legend.counts <- modifyList(
+            list(x="bottomright", bty="n", legend=counts,
+                 pt.cex=points.args$cex * cex.fun(counts),
+                 pch=points.args$pch[1L],
+                 col=if(length(unique(points.args$col)) == 1L)
+                 points.args$col[1L] else 1,
+                 pt.lwd=points.args$lwd[1L]),
+            legend.counts)
+        do.call("legend", legend.counts)
+    }
     invisible()
 }
 

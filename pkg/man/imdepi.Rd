@@ -190,22 +190,21 @@ par(opar)
 # a histogram of the number of events along time (using the
 # plot-method for the epidataCS-class, see ?plot.epidataCS)
 opar <- par(mfrow = c(2,1))
-plot(imdepi, aggregate = "time", subset = type == "B", main = "Finetype B")
-plot(imdepi, aggregate = "time", subset = type == "C", main = "Finetype C")
+plot(imdepi, "time", subset = type == "B", main = "Finetype B")
+plot(imdepi, "time", subset = type == "C", main = "Finetype C")
 par(opar)
 
 # Plot the spatial distribution of the events in W
-plot(imdepi$W)
-colTypes <- c("darkblue","indianred2")
-pch <- c(3,4)
-with(imdepi, {
-  plot(events,pch=pch[events$type],col=colTypes[events$type],add=TRUE)
-  legend(x="topleft",levels(events$type),col=colTypes, pch=pch,title="Finetype")
-})
-
-# somehow easier: use the plot-method for the epidataCS class
-plot(imdepi, aggregate="space", axes=TRUE, colTypes=colTypes)
+plot(imdepi, "space", points.args = list(col=c("darkblue","indianred2")),
+     axes=TRUE, lwd=2)
 title(xlab = "x [km]", ylab = "y [km]")
+
+\dontrun{
+# or manually (no legends, no account for tied locations):
+plot(imdepi$W, lwd=2)
+plot(imdepi$events, pch=c(3,4)[imdepi$events$type], cex=0.8,
+     col=c("darkblue","indianred2")[imdepi$events$type], add=TRUE)
+}
 
 \dontrun{
   # Show a dynamic illustration of the spatio-temporal dynamics of the 

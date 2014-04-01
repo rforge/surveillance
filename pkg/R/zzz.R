@@ -78,6 +78,12 @@ formatPval <- function (pv, eps = 1e-4)
 }
 
 
+### determines multiplicities in a matrix (or data frame)
+### and returns unique rows with appended column of counts
+
+countunique <- function (x) unique(cbind(x, COUNT = multiplicity(x)))
+
+
 
 ###############################################################
 ### backwards-compatibility for old class name "ah4" (<= 1.7-0)
