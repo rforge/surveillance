@@ -80,7 +80,7 @@
     we use \code{polyCub.iso()} instead of \code{polyCub.SV()}.
 
     \item Inference for neighbourhood weights in \code{hhh4()} models:
-    \code{W.powerlaw()} and \code{W.np()} both implement weights
+    \code{W_powerlaw()} and \code{W_np()} both implement weights
     depending on the order of neighbourhood between regions, a power-law
     decay and nonparametric weights, i.e., unconstrained estimation of
     individual weights for each neighbourhood order.

@@ -48,7 +48,7 @@ zetaweights <- function (nbmat, d = 1, maxlag = max(nbmat), normalize = FALSE)
 ## the raw powerlaw weights are defined as w_ji = o_ji^-d,
 ## and with (row-)normalization we have    w_ji = o_ji^-d / sum_k o_jk^-d
 
-W.powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
+W_powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
                         initial = if (log) 0 else 1)
 {
     if (missing(maxlag)) {

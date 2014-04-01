@@ -1,6 +1,6 @@
 \name{hhh4_W}
-\alias{W.powerlaw}
-\alias{W.np}
+\alias{W_powerlaw}
+\alias{W_np}
 \title{
   Power-Law and Nonparametric Neighbourhood Weights for \code{hhh4}-Models
 }
@@ -15,22 +15,22 @@
 }
 
 \usage{
-W.powerlaw(maxlag, normalize = TRUE,
+W_powerlaw(maxlag, normalize = TRUE,
            log = FALSE, initial = if (log) 0 else 1)
 
-W.np(maxlag, to0 = FALSE, normalize = TRUE,
+W_np(maxlag, to0 = FALSE, normalize = TRUE,
      initial = log(zetaweights(2:maxlag)))
 }
 
 \arguments{
   \item{maxlag,to0}{a single integer specifying a limiting order of
     neighbourhood.\cr
-    For \code{W.powerlaw}, weights are positive
+    For \code{W_powerlaw}, weights are positive
     up to \code{maxlag} and set to 0 for higher orders. If spatial
     dependence is not to be truncated at some high order, \code{maxlag}
     should be set to the maximum neighbourhood order in the network of
     regions.\cr
-    For \code{W.np}, individual weights are estimated up to order
+    For \code{W_np}, individual weights are estimated up to order
     \code{maxlag}. Higher orders are either assumed to have 0 weight
     (\code{to0=TRUE}), or the weight at \code{maxlag} is carried forward
     (\code{to0=FALSE}, default).
@@ -82,7 +82,7 @@ if (requireNamespace("spdep")) {
 
   ## a simple hhh4 model with power-law decay of spatial interaction
   m <- list(ar = list(f = ~ 1),
-            ne = list(f = ~ 1, weights = W.powerlaw(maxlag=4, log=FALSE)),
+            ne = list(f = ~ 1, weights = W_powerlaw(maxlag=4, log=FALSE)),
             end = list(f = addSeason2formula(~-1 + ri(), S=1, period=52),
                        offset = population(measles)),
             family = "NegBin1", verbose=TRUE)
