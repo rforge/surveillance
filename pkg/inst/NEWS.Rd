@@ -102,6 +102,9 @@
       \item The spatial plot has new arguments to automatically add
       legends to the plot: \code{legend.types} and \code{legend.counts}.
       It also gained an \code{add} argument.
+      \item The temporal plot now supports type-specific sub-histograms,
+      additional lines for the cumulative number of events, and an
+      automatic legend.
     }
 
   }

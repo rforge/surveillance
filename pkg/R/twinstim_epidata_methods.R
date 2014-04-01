@@ -451,24 +451,37 @@ plot.epidataCS <- function (x, aggregate = c("time", "space"), subset, ...)
 ## in case t0.Date is specified, hist.Date() is used and breaks must set in ... (e.g. "months")
 
 plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
-    col = "white", add = FALSE,
+    col = rainbow(nTypes), cumulative = list(), add = FALSE, mar = NULL,
     xlim = NULL, ylim = NULL, xlab = "Time", ylab = NULL, main = NULL,
-    panel.first = abline(h=axTicks(2), lty=2, col="grey"), ...)
+    panel.first = abline(h=axTicks(2), lty=2, col="grey"),
+    legend.types = list(), ...)
 {
     timeRange <- with(x$stgrid, c(start[1L], stop[length(stop)]))
-    eventTimes <- if (missing(subset)) x$events$time else {
+    eventTimesTypes <- if (missing(subset)) {
+        x$events@data[c("time", "type")]
+    } else {
         do.call(base::subset, list(x = quote(marks.epidataCS(x)),
                                    subset = substitute(subset),
-                                   select = "time", drop = TRUE))
+                                   select = c("time", "type")))
     }
-    if (length(eventTimes) == 0) stop("no events left after 'subset'")
+    if (nrow(eventTimesTypes) == 0L) stop("no events left after 'subset'")
+    if (is.list(cumulative)) {
+        csums <- tapply(eventTimesTypes$time, eventTimesTypes["type"],
+                        function (t) cumsum(table(t)), simplify=FALSE)
+        if (is.null(cumulative[["axis"]])) cumulative[["axis"]] <- TRUE
+    }
+    typeNames <- levels(eventTimesTypes$type)
+    nTypes <- length(typeNames)
+    eventTimesTypes$type <- as.integer(eventTimesTypes$type)
+    col <- rep_len(col, nTypes)
+    
     if (!is.null(t0.Date)) {
-        stopifnot(inherits(t0.Date, "Date") || is.vector(t0.Date), length(t0.Date) == 1L)
+        stopifnot(length(t0.Date) == 1L)
         t0.Date <- as.Date(t0.Date)
         t0 <- timeRange[1L]
         if (is.null(xlim)) xlim <- t0.Date + (timeRange - t0)
         if (missing(xlab)) xlab <- paste0("Time (", list(...)[["breaks"]], ")")
-        eventTimes <- t0.Date + as.integer(eventTimes - t0)
+        eventTimesTypes$time <- t0.Date + as.integer(eventTimesTypes$time - t0)
         ## we need integer dates here because otherwise, if the last event
         ## occurs on the last day of a month, year, etc. (depending on
         ## 'breaks') with a fractional date (e.g. as.Date("2009-12-31") + 0.5),
@@ -476,11 +489,16 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
         ## the data (in the example, it will only reach until
         ## as.Date("2009-12-31")).
     }
-    histdata <- if (is.null(t0.Date)) {
-        hist(eventTimes, plot=FALSE, warn.unused=FALSE, ...)
-    } else {
-        hist(eventTimes, plot=FALSE, ...) # warn.unused=FALSE is hard-coded in hist.Date
+    gethistdata <- function (types = seq_len(nTypes)) {
+        times <- eventTimesTypes$time[eventTimesTypes$type %in% types]
+        if (is.null(t0.Date)) {
+            hist(times, plot=FALSE, warn.unused=FALSE, ...)
+        } else {
+            hist(times, plot=FALSE, ...)
+            ## warn.unused=FALSE is hard-coded in hist.Date
+        }
     }
+    histdata <- gethistdata()
     if (!add) {
         if (is.null(xlim)) xlim <- timeRange
         if (is.null(ylim)) {
@@ -489,11 +507,59 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
         if (is.null(ylab)) {
             ylab <- if (freq) "Number of cases" else "Density of cases"
         }
+        
+        if (is.null(mar)) {
+            mar <- par("mar")
+            if (is.list(cumulative) && cumulative$axis) mar[4L] <- mar[2L]
+        }
+        opar <- par(mar = mar); on.exit(par(opar))
         plot(x=xlim, y=ylim, xlab=xlab, ylab=ylab, main=main, type="n", bty="n")
         force(panel.first)
     }
-    plot(histdata, freq = freq, add = TRUE, col = col, ...)
+
+    ## plot histogram (over all types)
+    plot(histdata, freq = freq, add = TRUE, col = col[1L], ...)
     box()          # because white filling of bars might overdraw the inital box
+
+    ## add type-specific sub-histograms
+    typesEffective <- sort(unique(eventTimesTypes$type))
+    for (typeIdx in seq_along(typesEffective)[-1L]) {
+        plot(gethistdata(typesEffective[typeIdx:length(typesEffective)]),
+             freq = freq, add = TRUE, col = col[typesEffective[typeIdx]], ...)
+    }
+
+    ## optionally add cumulative number of cases
+    if (is.list(cumulative)) {
+        aT2 <- axTicks(2)
+        div <- length(aT2) - 1L
+        cumulative <- modifyList(
+            list(maxat = ceiling(max(unlist(csums))/div)*div,
+                 col = apply(col2rgb(col)/255*0.5, 2, function (x)
+                             rgb(x[1L], x[2L], x[3L])),
+                 lwd = 3, axis = TRUE, lab = "Cumulative number of cases"),
+            cumulative)
+        csum2y <- function (x) x / cumulative$maxat * aT2[length(aT2)]
+        for (typeIdx in typesEffective) {
+            .times <- as.numeric(names(csums[[typeIdx]]))
+            lines(if (is.null(t0.Date)) .times else t0.Date + .times - t0,
+                  csum2y(csums[[typeIdx]]), lwd=cumulative$lwd,
+                  col=cumulative$col[typeIdx])
+        }
+        if (cumulative$axis) {
+            axis(4, at=aT2, labels=aT2/aT2[length(aT2)]*cumulative$maxat)
+            mtext(cumulative$lab, side=4, line=3, las=0)
+        }
+    }
+
+    ## optionally add legend
+    if (is.list(legend.types) && length(typesEffective) > 1) {
+        legend.types <- modifyList(
+            list(x="topleft", legend=typeNames[typesEffective],
+                 title="Type", fill=col[typesEffective]),
+            legend.types)
+        do.call("legend", legend.types)
+    }
+    
     invisible(histdata)
 }
 

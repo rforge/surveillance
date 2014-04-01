@@ -52,15 +52,26 @@ number of events along the time axis (aggregated over space) using
 	works).}
       \item{freq}{see \code{\link{hist}}, defaults to \code{TRUE}.}
       \item{col}{fill colour for the bars of the histogram, defaults to
-	\code{"white"}.}
+	the vector of \code{\link{rainbow}} colours.}
+      \item{cumulative}{if a list (of style options),
+	lines for the cumulative number of events (per type) will be
+	added to the plot. Possible options are \code{axis} (logical),
+	\code{lab} (axis label), \code{maxat} (single integer affecting
+	the axis range), \code{lwd}, and \code{col}.}
       \item{add}{logical (\code{FALSE}) indicating if the histogram
 	should be added to an existing plot window.}
+      \item{mar}{see \code{\link{par}}. The default (\code{NULL}) is
+	\code{mar <- par("mar")}, with \code{mar[4] <- mar[2]} if an
+	axis is requested for the \code{cumulative} numbers.}
       \item{xlim,ylim}{\code{NULL} provides automatic axis limits.}
       \item{xlab,ylab}{axis labels (with sensible defaults).}
       \item{main}{main title of the plot, defaults to \code{NULL}.}
       \item{panel.first}{expression that should be evaluated after the
 	plotting window has been set up but before the histogram is plotted.
 	Defaults to adding horizontal grid lines.}
+      \item{legend.types}{if a list (of arguments for
+	\code{\link{legend}}), a legend for the event types is added to
+	the plot.}
       \item{\dots}{further arguments passed to \code{\link{hist}} or
 	\code{\link{hist.Date}}, respectively.}
     }
@@ -114,11 +125,10 @@ Sebastian Meyer
 data("imdepi")
 
 ## show the occurrence of events along the time axis (-> histogram)
-plot(imdepi, "time", subset = type == "B",
-     main = "Time series of events of the serogroup B finetype")
+plot(imdepi, "time", main = "Histogram of event time points")
 
 ## show the distribution in space
-plot(imdepi, "space", points.args=list(col=c(2,4)), lwd=2)
+plot(imdepi, "space", lwd=2)
 }
 
 \keyword{hplot}
