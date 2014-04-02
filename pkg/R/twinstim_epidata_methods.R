@@ -240,28 +240,22 @@ print.epidataCS_header <- function (timeRange, bbox, nBlocks, nTiles,
 
 summary.epidataCS <- function (object, ...)
 {
-    coords <- coordinates(object$events)
-    times <- object$events$time
-    nEvents <- length(times)
-    timeRange <- with(object$stgrid, c(start[1], stop[length(stop)]))
-    nBlocks <- length(unique(object$stgrid$BLOCK))
-    tiles <- object$events$tile
-    bbox <- bbox(object$W)
-    tileTable <- c(table(tiles))
-    types <- object$events$type
-    nTypes <- nlevels(types)
-    typeTable <- c(table(types))
-    nSources <- sapply(object$events$.sources, length)
-    eps <- object$events@data[c("eps.t", "eps.s")]
-    eventMarks <- marks.epidataCS(object)
-
-    res <- list(timeRange = timeRange, bbox = bbox, nBlocks = nBlocks,
-                nEvents = nEvents, nTypes = nTypes,
-                eventTimes = times, eventCoords = coords, eventTypes = types,
-                eventRanges = eps, eventMarks = eventMarks, 
-                tileTable = tileTable, typeTable = typeTable,
-                counter = as.stepfun.epidataCS(object),
-                nSources = nSources)
+    res <- list(
+        timeRange = with(object$stgrid, c(start[1], stop[length(stop)])),
+        bbox = bbox(object$W),
+        nBlocks = length(unique(object$stgrid$BLOCK)),
+        nEvents = nobs(object),
+        nTypes = nlevels(object$events$type),
+        eventTimes = object$events$time,
+        eventCoords = coordinates(object$events),
+        eventTypes = object$events$type,
+        eventRanges = object$events@data[c("eps.t", "eps.s")],
+        eventMarks = marks.epidataCS(object), 
+        tileTable = c(table(object$events$tile)),
+        typeTable = c(table(object$events$type)),
+        counter = as.stepfun.epidataCS(object),
+        nSources = sapply(object$events$.sources, length)
+        )
     class(res) <- "summary.epidataCS"
     res
 }
