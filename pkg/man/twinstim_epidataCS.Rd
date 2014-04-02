@@ -34,7 +34,7 @@
 \usage{
 as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
              nCircle2Poly = 32L, T = NULL,
-             clipper = c("polyclip", "rgeos"))
+             clipper = c("polyclip", "rgeos"), verbose = interactive())
 
 \method{print}{epidataCS}(x, n = 6L, digits = getOption("digits"), ...)
 
@@ -153,6 +153,10 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
     \code{\link{intersect.owin}} from package \pkg{spatstat}).
     In \pkg{surveillance} <= 1.6-0, package \pkg{gpclib} was used, which
     has a restrictive license. This is no longer supported.}
+
+  \item{verbose}{logical indicating if status messages should be printed
+  during input checking and \code{"epidataCS"} generation. The default
+  is to do so in interactive \R sessions.}
 
   \item{x}{an object of class \code{"epidataCS"} or
     \code{"summary.epidataCS"}, respectively.}
@@ -275,7 +279,7 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
   it take to fit a \code{\link{twinstim}}. It is often advisable to
   sacrifice some shape detail for speed by reducing polygon complexity
   using, e.g., the Douglas and Peucker (1973) reduction method available
-  at \url{http://MapShaper.org} (Harrower and Bloch, 2006) or as function
+  at \url{MapShaper.org} (Harrower and Bloch, 2006) or as function
   \code{\link[maptools]{thinnedSpatialPoly}} in package \pkg{maptools},
   or by passing via \pkg{spatstat}'s
   \code{\link[spatstat]{simplify.owin}} procedure.
@@ -353,36 +357,31 @@ subset(imdepi, type=="B")   # only consider event type B
 
 ### now reconstruct the object from its components
 
-## (Simplified) observation region (as SpatialPolygons)
-W <- imdepi$W
-summary(W)
-
 ## events
 events <- marks(imdepi)
-coordinates(events) <- c("x", "y")    # promote to a SpatialPointsDataFrame
-proj4string(events) <- proj4string(W) # ETRS89 projection (+units=km)
+coordinates(events) <- c("x", "y")  # promote to a "SpatialPointsDataFrame"
+proj4string(events) <- proj4string(imdepi$events)       # ETRS89 projection
 summary(events)
 
-## plot W with events
-plot(W, axes=TRUE)
-title(xlab="x [km]", ylab="y [km]")
+## endemic covariates
+head(stgrid <- imdepi$stgrid[,-1])
+
+## (Simplified) observation region (as SpatialPolygons)
+load(system.file("shapes", "districtsD.RData", package="surveillance"),
+     verbose = TRUE)
+
+## plot observation region with events
+plot(stateD, axes=TRUE); title(xlab="x [km]", ylab="y [km]")
 points(events, pch=unclass(events$type), cex=0.5, col=unclass(events$type))
-legend("topright", legend=levels(events$type), title="Type",
-       pch=1:2, col=1:2)
+legend("topright", legend=levels(events$type), title="Type", pch=1:2, col=1:2)
 \dontrun{
     # similar to using the convenient plot-method for "epidataCS"
     plot(imdepi, "space")
 }
 
-## endemic covariates
-stgrid <- imdepi$stgrid[,-1]
-
-## indicator matrix for possible transmission between event types
-qmatrix <- imdepi$qmatrix
-qmatrix
-
 ## construct an object of class "epidataCS" from these components
-myimdepi <- as.epidataCS(events, stgrid, W, qmatrix, nCircle2Poly=16)
+myimdepi <- as.epidataCS(events = events, stgrid = stgrid,
+                         W = stateD, qmatrix = diag(2), nCircle2Poly = 16)
 
 \dontshow{
 ## should be equal as long as the internal structures of "epidataCS" and
@@ -394,7 +393,7 @@ if (!isTRUE(all.equal(imdepi, myimdepi, tolerance=5e-6)))
 ## in '.influenceRegions' (since 'Wowin' is different)
 }
 
-## take a look into the internal structure of an epidataCS-object
+## internal structure of an "epidataCS"-object
 str(imdepi, max.level=4)
 }
 

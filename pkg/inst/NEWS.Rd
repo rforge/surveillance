@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-04-01)}{
+\section{Changes in surveillance version 1.8-0 (2014-04-02)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -106,6 +106,8 @@
       additional lines for the cumulative number of events, and an
       automatic legend.
     }
+
+    \item \code{as.epidataCS()} gained a \code{verbose} argument.
 
   }
 }

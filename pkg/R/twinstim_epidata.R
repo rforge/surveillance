@@ -49,23 +49,24 @@ reservedColsNames_stgrid <- c("BLOCK")
 
 as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
                           nCircle2Poly = 32, T = NULL,
-                          clipper = c("polyclip", "rgeos"))
+                          clipper = c("polyclip", "rgeos"),
+                          verbose = interactive())
 {
     clipper <- match.arg(clipper)
     # Check and SORT events and stgrid
-    cat("\nChecking 'events':\n")
-    events <- check_events(events)
-    cat("Checking 'stgrid':\n")
-    stgrid <- check_stgrid(stgrid, T)
+    if (verbose) cat("\nChecking 'events':\n")
+    events <- check_events(events, verbose = verbose)
+    if (verbose) cat("Checking 'stgrid':\n")
+    stgrid <- check_stgrid(stgrid, T, verbose = verbose)
     # Check class of W and consistency of area
-    cat("Checking 'W'...\n")
+    if (verbose) cat("Checking 'W' ...\n")
     W <- check_W(W, area.other =
                  sum(stgrid[["area"]][seq_len(nlevels(stgrid$tile))]),
                  other = "stgrid")
     stopifnot(identicalCRS(W, events))
     
     # Check qmatrix
-    cat("Checking 'qmatrix'...\n")
+    if (verbose) cat("Checking 'qmatrix' ...\n")
     typeNames <- levels(events$type)
     nTypes <- length(typeNames)     # default value of qmatrix depends on nTypes
     qmatrix <- checkQ(qmatrix, typeNames)
@@ -84,7 +85,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     }
 
     # Check that all events are part of W
-    cat("Checking if all events are part of 'W'...\n")
+    if (verbose) cat("Checking if all events are part of 'W' ...\n")
     WIdxOfEvents <- over(events, W)
     if (eventNotInWidx <- match(NA, WIdxOfEvents, nomatch = 0L)) {
         stop("the event at (", eventidx2string(eventNotInWidx), ") is not ",
@@ -97,7 +98,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     timeRange <- with(stgrid, c(start[1], stop[length(stop)]))
 
     # Are event times covered by stgrid?
-    cat("Checking if all events are covered by 'stgrid'...\n")
+    if (verbose) cat("Checking if all events are covered by 'stgrid' ...\n")
     ## FIXME: what about pre-history events? don't need stgrid-data for them
     if (events$time[1] <= timeRange[1] || events$time[nEvents] > timeRange[2]) {
         stop("event times are not covered by 'stgrid': must be in (",
@@ -116,15 +117,15 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     removalTimes <- events$time + events$eps.t
 
     # Calculate distance matrix of events
-    cat("Calculating euclidean distance matrix of events...\n")
+    if (verbose) cat("Calculating euclidean distance matrix of events ...\n")
     eventDists <- as.matrix(dist(eventCoords, method = "euclidean"))
     #diag(eventDists) <- Inf   # infinite distance to oneself (no self-infection), not needed
 
     # Map events to corresponding grid cells
     # Also precalculate possible origins of events (other infected individuals)
-    cat("Mapping events to 'stgrid' cells and",
-        "determining potential event sources...\n")
-    withPB <- interactive()
+    if (verbose) cat("Mapping events to 'stgrid' cells and",
+                     "determining potential event sources ...\n")
+    withPB <- verbose && interactive()
     gridcellsOfEvents <- integer(nEvents)
     eventSources <- vector(nEvents, mode = "list")
     if (withPB) pb <- txtProgressBar(min=0, max=nEvents, initial=0, style=3)
@@ -143,7 +144,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     if (withPB) close(pb)
 
     # Attach endemic covariates from stgrid to events
-    cat("Attaching endemic covariates from 'stgrid' to 'events'...\n")
+    if (verbose) cat("Attaching endemic covariates from 'stgrid' to 'events' ...\n")
     stgridIgnoreCols <- match(setdiff(obligColsNames_stgrid, "start"), names(stgrid))
     copyCols <- setdiff(seq_along(stgrid), stgridIgnoreCols)
     reservedColsIdx <- na.omit(match(names(stgrid)[copyCols], names(events@data),
@@ -164,12 +165,12 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     events$.sources <- eventSources
 
     # Calculate minimal distance of event locations from the polygonal boundary
-    cat("Calculating (minimal) distances of the events to the boundary...\n")
+    if (verbose) cat("Calculating the events' distances to the boundary ...\n")
     Wowin <- as(W, "owin")              # imported from polyCub
     events$.bdist <- bdist(eventCoords, Wowin)
 
     # Construct spatial influence regions around events
-    cat("Constructing spatial influence regions around events...\n")
+    if (verbose) cat("Constructing spatial influence regions around events ...\n")
     events$.influenceRegion <- if (clipper == "polyclip") {
         .influenceRegions(events, Wowin, nCircle2Poly, clipper=clipper)
     } else .influenceRegions(events, W, nCircle2Poly, clipper=clipper)
@@ -177,7 +178,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     # Return components in a list of class "epidataCS"
     res <- list(events = events, stgrid = stgrid, W = W, qmatrix = qmatrix)
     class(res) <- "epidataCS"
-    cat("Done.\n\n")
+    if (verbose) cat("Done.\n\n")
     return(res)
 }
 
@@ -193,7 +194,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
 
 ### CHECK FUNCTION FOR events ARGUMENT IN as.epidataCS
 
-check_events <- function (events, dropTypes = TRUE)
+check_events <- function (events, dropTypes = TRUE, verbose = TRUE)
 {
     # Check class and spatial dimensions
     stopifnot(inherits(events, "SpatialPointsDataFrame"))
@@ -202,14 +203,14 @@ check_events <- function (events, dropTypes = TRUE)
     }
 
     # Check existence of type column
-    cat("\tChecking 'type' column... ")
+    if (verbose) cat("\tChecking 'type' column ... ")
     events$type <- if ("type" %in% names(events)) {
                        if (dropTypes) factor(events$type) else as.factor(events$type)
                    } else {
-                       cat("Setting 'type' to 1 for all events.")
+                       if (verbose) cat("Setting 'type' to 1 for all events.")
                        factor(rep.int(1L,nrow(events@coords)))
                      }
-    cat("\n")
+    if (verbose) cat("\n")
 
     # Check obligatory columns
     obligColsIdx <- match(obligColsNames_events, names(events), nomatch = NA_integer_)
@@ -229,17 +230,17 @@ check_events <- function (events, dropTypes = TRUE)
     }    
 
     # Check that influence radii are numeric and positive (also not NA)
-    cat("\tChecking 'eps.t' and 'eps.s' columns...\n")
+    if (verbose) cat("\tChecking 'eps.t' and 'eps.s' columns ...\n")
     with(events@data, stopifnot(is.numeric(eps.t), eps.t > 0,
                                 is.numeric(eps.s), eps.s > 0))
 
     # Transform time into a numeric variable
-    cat("\tConverting event time into a numeric variable...\n")
+    if (verbose) cat("\tConverting event time into a numeric variable ...\n")
     events$time <- as.numeric(events$time)
     stopifnot(!is.na(events$time))
 
     # Check event times for ties
-    cat("\tChecking event times for ties...\n")
+    if (verbose) cat("\tChecking event times for ties ...\n")
     timeIsDuplicated <- duplicated(events$time)
     if (any(timeIsDuplicated)) {
         duplicatedTimes <- unique(events$time[timeIsDuplicated])
@@ -250,7 +251,7 @@ check_events <- function (events, dropTypes = TRUE)
     }
 
     # Sort events chronologically
-    cat("\tSorting events...\n")
+    if (verbose) cat("\tSorting events ...\n")
     events <- events[order(events$time),]
     
     # First obligatory columns then remainders (epidemic covariates)
@@ -266,7 +267,7 @@ check_events <- function (events, dropTypes = TRUE)
 
 ### CHECK FUNCTION FOR stgrid ARGUMENT IN as.epidataCS
 
-check_stgrid <- function (stgrid, T)
+check_stgrid <- function (stgrid, T, verbose = TRUE)
 {
     # Check class
     stopifnot(inherits(stgrid, "data.frame"))
@@ -298,7 +299,7 @@ check_stgrid <- function (stgrid, T)
 
     # Transform tile into a factor variable
     # (also removing unused levels if it was a factor)
-    cat("\tConverting 'tile' into a factor variable...\n")
+    if (verbose) cat("\tConverting 'tile' into a factor variable ...\n")
     stgrid$tile <- factor(stgrid$tile)
 
     # Transform start times and area into numeric variables
@@ -308,7 +309,7 @@ check_stgrid <- function (stgrid, T)
     # Check stop times
     stgrid$stop <- if (autostop) {
         # auto-generate stop times from start times and T
-        cat("\tAuto-generating 'stop' column...\n")
+        if (verbose) cat("\tAuto-generating 'stop' column ...\n")
         starts <- sort(unique(stgrid$start))
         if (T <= starts[length(starts)]) {
             stop("'T' must be larger than the last 'start' time in 'stgrid'")
@@ -326,7 +327,7 @@ check_stgrid <- function (stgrid, T)
 
     if (!autostop) {
         # Check start/stop consistency
-        cat("\tChecking start/stop consisteny...\n")
+        if (verbose) cat("\tChecking start/stop consisteny ...\n")
         if (any(histIntervals[,2L] <= histIntervals[,1L])) {
             stop("stop times must be greater than start times")
         }
@@ -341,7 +342,7 @@ check_stgrid <- function (stgrid, T)
     stgrid$BLOCK <- match(stgrid$start, histIntervals[,1L])
 
     # Check that we have a full BLOCK x tile grid
-    cat("\tChecking if the grid is rectangular (all time-space combinations)...\n")
+    if (verbose) cat("\tChecking if the grid is complete ...\n")
     blocksizes <- table(stgrid$BLOCK)
     tiletable <- table(stgrid$tile)
     if (length(unique(blocksizes)) > 1L || length(unique(tiletable)) > 1L) {
@@ -349,7 +350,7 @@ check_stgrid <- function (stgrid, T)
     }
 
     # First column BLOCK, then obligCols, then remainders (endemic covariates)
-    cat("\tSorting the grid by time and tile...\n")
+    if (verbose) cat("\tSorting the grid by time and tile ...\n")
     BLOCKcolIdx <- match("BLOCK", names(stgrid))
     obligColsIdx <- match(obligColsNames_stgrid, names(stgrid))
     covarColsIdx <- setdiff(seq_along(stgrid), c(BLOCKcolIdx, obligColsIdx))
@@ -384,12 +385,9 @@ check_W <- function (W, area.other = NULL, other, tolerance = 0.001)
 check_W_area <- function (W, area.other, other, tolerance = 0.001)
 {
     area.W <- sum(sapply(W@polygons, slot, "area"))
-    if (!isTRUE(all.equal(area.other, area.W, tolerance = tolerance))) {
-        cat("\tArea of 'W' =", area.W, "\n")
-        cat("\tTotal area from '", other, "' = ", area.other, "\n", sep="")
+    if (!isTRUE(all.equal(area.other, area.W, tolerance = tolerance)))
         warning("area of 'W' (", area.W, ") differs from ",
                 "total tile area in '", other, "' (", area.other, ")")
-    }
 }
 
 
