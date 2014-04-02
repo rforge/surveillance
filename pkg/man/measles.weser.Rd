@@ -73,12 +73,12 @@ data("measlesWeserEms")
   Robert Koch institute: \url{http://www3.rki.de/SurvStat}.
 
   A shapefile of Germany's districts as of 01/01/2009 was obtained from
-  the Service Center (\url{http://www.geodatenzentrum.de}) of the German
-  Federal Agency for Cartography and Geodesy (\url{http://www.bkg.bund.de}).
+  the Service Center (\url{www.geodatenzentrum.de}) of the German
+  Federal Agency for Cartography and Geodesy (\url{www.bkg.bund.de}).
   The map of the 17 districts of the \dQuote{Weser-Ems} region
   (\code{measlesWeserEms@map}) is a simplified subset of this
   shapefile using a 30\% reduction via the Douglas-Peucker reduction method
-  as implemented at \url{http://MapShaper.org}.
+  as implemented at \url{MapShaper.org}.
 
   Population numbers are obtained from the Federal Statistical Office of
   Lower Saxony (\acronym{NLS}):

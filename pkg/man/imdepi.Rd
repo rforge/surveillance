@@ -104,7 +104,7 @@ data(imdepifit)
   where \code{districtsD} represents Germany's districts as at
   2009-01-01 (originally obtained from \url{www.geodatenzentrum.de}),
   simplified by the \dQuote{modified Visvalingam} algorithm (level
-  6.6\%) available at \url{www.MapShaper.org} (v. 0.1.17).
+  6.6\%) available at \url{MapShaper.org} (v. 0.1.17).
   The objects \code{districtsD} and \code{stateD} are contained in
   \code{system.file("shapes", "districtsD.RData", package="surveillance")}.
   

@@ -252,7 +252,7 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   the algorithm. Often it can be advantageous to sacrifice some shape
   detail for speed by reducing polygon complexity using, e.g., the
   Douglas and Peucker (1973) reduction method available at
-  \url{http://MapShaper.org} (Harrower and Bloch, 2006) or as function
+  \url{MapShaper.org} (Harrower and Bloch, 2006) or as function
   \code{\link[maptools]{thinnedSpatialPoly}} in package \pkg{maptools},
   or by passing via \pkg{spatstat}'s
   \code{\link[spatstat]{simplify.owin}} procedure.
@@ -302,7 +302,7 @@ data("imdepifit")
 ## load borders of Germany's districts (originally obtained from the
 ## Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, Germany,
 ## www.geodatenzentrum.de), simplified by the "modified Visvalingam"
-## algorithm (level=6.6\%) using www.MapShaper.org (v. 0.1.17):
+## algorithm (level=6.6\%) using MapShaper.org (v. 0.1.17):
 load(system.file("shapes", "districtsD.RData", package="surveillance"))
 plot(districtsD)
 plot(stateD, add=TRUE, border=2, lwd=2)
