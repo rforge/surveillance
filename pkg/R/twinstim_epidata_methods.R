@@ -192,7 +192,6 @@ marks.epidataCS <- function (x, coords = TRUE, ...)
 
 print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
 {
-    cat("\nHistory of an epidemic\n")
     print.epidataCS_header(
         timeRange = c(x$stgrid$start[1L], x$stgrid$stop[nrow(x$stgrid)]),
         bbox = bbox(x$W),
@@ -208,7 +207,6 @@ print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
     visibleCols <- grep("^\\..+", names(x$events@data), invert = TRUE)
     print(head.matrix(x$events[visibleCols], n = n), digits = digits, ...)
     if (n < nEvents) cat("[....]\n")
-    cat("\n")
     invisible(x)
 }
 
@@ -262,25 +260,15 @@ summary.epidataCS <- function (object, ...)
 
 print.summary.epidataCS <- function (x, ...)
 {
-    cat("\n")
     print.epidataCS_header(timeRange = x$timeRange, bbox = x$bbox,
                            nBlocks = x$nBlocks, nTiles = length(x$tileTable))
     cat("Overall number of events:", x$nEvents,
         if (x$nTypes==1) "(single type)" else paste0("(",x$nTypes," types)"),
         "\n")
     
-    cat("\nSummary of the event marks:\n")
-    print(summary(x$eventMarks), ...)
+    cat("\nSummary of event marks and number of potential sources:\n")
+    print(summary(cbind(x$eventMarks, "|.sources|"=x$nSources)), ...)
 
-    cat("Number of potential sources of transmission:\n")
-    if (any(is.finite(unlist(x$eventRanges)))) {
-        print(summary(x$nSources), ...)
-    } else {
-        cat("   monotonically increasing since interaction ranges",
-            "(eps.t, eps.s) are infinite\n")
-    }
-    cat("\n")
-    
     invisible(x)
 }
 
