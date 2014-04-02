@@ -270,11 +270,11 @@ print.summary.epidataCS <- function (x, ...)
         "\n")
     
     cat("\nSummary of the event marks:\n")
-    print(summary(x$eventMarks))
+    print(summary(x$eventMarks), ...)
 
     cat("Number of potential sources of transmission:\n")
     if (any(is.finite(unlist(x$eventRanges)))) {
-        print(summary(x$nSources))
+        print(summary(x$nSources), ...)
     } else {
         cat("   monotonically increasing since interaction ranges",
             "(eps.t, eps.s) are infinite\n")

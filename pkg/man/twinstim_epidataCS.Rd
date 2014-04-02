@@ -175,8 +175,10 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
     \ldots) are retained.}
 
   \item{drop, \dots}{unused (arguments of the generics).
-    However, the \code{print} method for class \code{"epidataCS"} passes
-    \dots to the \code{\link{print.data.frame}} method.}
+    However, the \code{print} method for \code{"epidataCS"} passes
+    \dots to the \code{\link{print.data.frame}} method, and the
+    \code{print} method for \code{"summary.epidataCS"} passes additional
+    arguments to \code{\link{print.table}}.}
 
   \item{subset, select}{arguments used to subset the \code{events} from
     an \code{"epidataCS"} object like in \code{\link{subset.data.frame}}.}
