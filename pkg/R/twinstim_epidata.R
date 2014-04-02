@@ -174,10 +174,9 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
         .influenceRegions(events, Wowin, nCircle2Poly, clipper=clipper)
     } else .influenceRegions(events, W, nCircle2Poly, clipper=clipper)
 
-    # Attach some useful attributes
+    # Return components in a list of class "epidataCS"
     res <- list(events = events, stgrid = stgrid, W = W, qmatrix = qmatrix)
-    class(res) <- c("epidataCS", "list")
-
+    class(res) <- "epidataCS"
     cat("Done.\n\n")
     return(res)
 }

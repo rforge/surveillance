@@ -951,7 +951,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     epi$control.siaf <- control.siaf    # for R0.simEpidataCS
     epi$call <- cl
     epi$runtime <- proc.time()[[3]] - ptm
-    class(epi) <- c("simEpidataCS", "epidataCS", "list")
+    class(epi) <- c("simEpidataCS", "epidataCS")
     return(epi)
 }
 
@@ -1137,8 +1137,8 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     attr(res, "simplified") <- simplify
     attr(res, "runtime") <- proc.time()[[3]] - ptm
     class(res) <- if (nsim == 1L) {
-            c("simEpidataCS", "epidataCS", "list")
-        } else c("simEpidataCSlist", "list")
+            c("simEpidataCS", "epidataCS")
+        } else c("simEpidataCSlist")
     res
 }
 
@@ -1167,7 +1167,7 @@ print.simEpidataCSlist <- function (x, ...)
         x <- append(x, list(timeRange = attr(x$events, "timeRange")), after=4L)
         x$runtime <- attr(x$events, "runtime")
         attr(x$events, "timeRange") <- attr(x$events, "runtime") <- NULL
-        class(x) <- c("simEpidataCS", "epidataCS", "list")
+        class(x) <- c("simEpidataCS", "epidataCS")
         x
     } else NextMethod("[[")
 }
