@@ -1054,8 +1054,8 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
 
     endemic  <- formula(object)$endemic
     epidemic <- formula(object)$epidemic
-    # we don't need any reference to the original twinstim evaluation environment
-    environment(endemic) <- environment(epidemic) <- globalenv()
+    # we don't need any reference to the original formula environment
+    environment(endemic) <- environment(epidemic) <- .GlobalEnv
     if (is.null(rmarks)) {
         observedMarks <- subset(marks.epidataCS(data, coords=FALSE),
                                 subset = time > t0 & time <= T)

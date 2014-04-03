@@ -124,7 +124,7 @@ twinstim <- function (
     ### Parse epidemic formula
 
     if (missing(epidemic)) {
-        origenv.epidemic <- .GlobalEnv
+        origenv.epidemic <- parent.frame()
         epidemic <- ~ 0
     } else {
         origenv.epidemic <- environment(epidemic)
@@ -232,6 +232,9 @@ twinstim <- function (
     
     epidemic <- formula(epidemic)
     environment(epidemic) <- origenv.epidemic
+    ## we keep the original formula environment since it will be used to
+    ## evaluate the modified twinstim-call in drop1/add1 (with default
+    ## enclos=baseenv()), and cl$data should be visible from there.
 
 
 
@@ -244,7 +247,7 @@ twinstim <- function (
     ### Parse endemic formula
 
     if (missing(endemic)) {
-        origenv.endemic <- .GlobalEnv
+        origenv.endemic <- parent.frame()
         endemic <- ~ 0
     } else {
         origenv.endemic <- environment(endemic)
@@ -349,6 +352,9 @@ twinstim <- function (
         update.formula(formula(endemic), ~ (1|type) + .)
     } else formula(endemic)
     environment(endemic) <- origenv.endemic
+    ## we keep the original formula environment since it will be used to
+    ## evaluate the modified twinstim-call in drop1/add1 (with default
+    ## enclos=baseenv()), and cl$data should be visible from there.
 
 
     ### Check that there is at least one parameter
