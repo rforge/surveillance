@@ -232,9 +232,10 @@ twinstim <- function (
     
     epidemic <- formula(epidemic)
     environment(epidemic) <- origenv.epidemic
-    ## we keep the original formula environment since it will be used to
+    ## We keep the original formula environment since it will be used to
     ## evaluate the modified twinstim-call in drop1/add1 (with default
     ## enclos=baseenv()), and cl$data should be visible from there.
+    ## Alternatively, we could set it to parent.frame().
 
 
 
@@ -352,9 +353,10 @@ twinstim <- function (
         update.formula(formula(endemic), ~ (1|type) + .)
     } else formula(endemic)
     environment(endemic) <- origenv.endemic
-    ## we keep the original formula environment since it will be used to
+    ## We keep the original formula environment since it will be used to
     ## evaluate the modified twinstim-call in drop1/add1 (with default
     ## enclos=baseenv()), and cl$data should be visible from there.
+    ## Alternatively, we could set it to parent.frame().
 
 
     ### Check that there is at least one parameter
@@ -925,9 +927,10 @@ twinstim <- function (
 
     if (is.null(optim.args[["par"]])) { # set naive defaults
         h.Intercept <- if (nbeta0 > 0) rep.int(crudebeta0(
-                nEvents = Nin, offset.mean = weighted.mean(offsetGrid, ds),
-                W.area = sum(ds[gridBlocks==histIntervals[1,"BLOCK"]]),
-                period = T-t0, nTypes = nTypes
+            nEvents = Nin,
+            offset.mean = if (is.null(offsetGrid)) 0 else weighted.mean(offsetGrid, ds),
+            W.area = sum(ds[gridBlocks==histIntervals[1,"BLOCK"]]),
+            period = T-t0, nTypes = nTypes
             ), nbeta0) else numeric(0L)
         optim.args$par <- c(h.Intercept, rep.int(0, npars - nbeta0))
     } else { # check validity of par-specification
