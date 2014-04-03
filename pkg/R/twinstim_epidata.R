@@ -53,11 +53,26 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
                           verbose = interactive())
 {
     clipper <- match.arg(clipper)
-    # Check and SORT events and stgrid
+    
+    # Check and SORT events
     if (verbose) cat("\nChecking 'events':\n")
     events <- check_events(events, verbose = verbose)
+
+    # Check and SORT stgrid
     if (verbose) cat("Checking 'stgrid':\n")
-    stgrid <- check_stgrid(stgrid, T, verbose = verbose)
+    tiles <- NULL                       # FIXME: add argument to as.epidataCS
+    stgrid <- if (missing(stgrid) && inherits(tiles, "SpatialPolygons")) {
+        if (verbose) cat("\t(missing, using time-constant 'tiles' grid)\n")
+        stgrid_template <- data.frame(start = min(events$time),
+                                      stop = max(events$time),
+                                      tile = row.names(tiles),
+                                      area = sapply(tiles@polygons, slot, "area"),
+                                      check.rows = FALSE, check.names = FALSE)
+        check_stgrid(stgrid_template, verbose = FALSE)
+    } else {
+        check_stgrid(stgrid, T, verbose = verbose)
+    }
+    
     # Check class of W and consistency of area
     if (verbose) cat("Checking 'W' ...\n")
     W <- check_W(W, area.other =

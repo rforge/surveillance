@@ -188,7 +188,7 @@ intensityplot.twinstim <- function (x,
     if (!plot) return(FUN)
 
     ## plot the FUN
-    modelenv <- environment(components$eFUN)$modelenv
+    modelenv <- environment(x)
     dotargs <- list(...)
     nms <- names(dotargs)
     if (aggregate == "time") {
@@ -219,25 +219,25 @@ intensityplot.twinstim <- function (x,
         }
         invisible(FUN)
     } else {
-        .tiles <- as(tiles, "SpatialPolygons") # we don't need the data here
+        tiles <- as(tiles, "SpatialPolygons") # remove potential data for over()
         
         ## set up grid of coordinates where 'which' will be evaluated
         if (isScalar(sgrid)) {
-            sgrid <- maptools::Sobj_SpatialGrid(.tiles, n = sgrid)$SG
-            ## ensure that sgrid has exactly the same proj4string as .tiles
-            ## since CRS(proj4string(.tiles)) might have modified the string
-            sgrid@proj4string <- .tiles@proj4string
+            sgrid <- maptools::Sobj_SpatialGrid(tiles, n = sgrid)$SG
+            ## ensure that sgrid has exactly the same proj4string as tiles
+            ## since CRS(proj4string(tiles)) might have modified the string
+            sgrid@proj4string <- tiles@proj4string
         }
         sgrid <- as(sgrid, "SpatialPixels")
         
         ## only select grid points inside W (tiles)
-        in.tiles <- !is.na(over(sgrid, .tiles))
-        sgrid <- sgrid[in.tiles,]
+        sgridTileIdx <- over(sgrid, tiles)
+        sgrid <- sgrid[!is.na(sgridTileIdx),]
         
         ## calculate 'which' on sgrid
         yvals <- FUN(coordinates(sgrid))
         sgridy <- SpatialPixelsDataFrame(sgrid, data=data.frame(yvals=yvals),
-                                         proj4string=.tiles@proj4string)
+                                         proj4string=tiles@proj4string)
 
         ## define sp.layout
         lobjs <- list()
@@ -245,15 +245,15 @@ intensityplot.twinstim <- function (x,
             nms.polygons <- names(polygons.args)
             if(! "col" %in% nms.polygons) polygons.args$col <- "darkgrey"
             lobjs <- c(lobjs,
-                       list(c(list("sp.polygons", .tiles, first=FALSE),
+                       list(c(list("sp.polygons", tiles, first=FALSE),
                               polygons.args)))
         }
         if (is.list(points.args)) {
             eventCoords.types <- modelenv$eventCoords[modelenv$eventTypes %in% types,,drop=FALSE]
             ## eventCoords as Spatial object with duplicates counted and removed
             eventCoords.types <- SpatialPoints(eventCoords.types,
-                                               proj4string=.tiles@proj4string,
-                                               bbox = .tiles@bbox)
+                                               proj4string = tiles@proj4string,
+                                               bbox = tiles@bbox)
             eventCoords.types <- SpatialPointsDataFrame(eventCoords.types,
                 data.frame(mult = multiplicity.Spatial(eventCoords.types)))
             eventCoords.types <- eventCoords.types[!duplicated(coordinates(eventCoords.types)),]
@@ -275,8 +275,8 @@ intensityplot.twinstim <- function (x,
 
         ## plotit
         if (add) message("'add'ing is not possible with 'aggregate=\"space\"'")
-        if (! "xlim" %in% nms) dotargs$xlim <- bbox(.tiles)[1,]
-        if (! "ylim" %in% nms) dotargs$ylim <- bbox(.tiles)[2,]
+        if (! "xlim" %in% nms) dotargs$xlim <- bbox(tiles)[1,]
+        if (! "ylim" %in% nms) dotargs$ylim <- bbox(tiles)[2,]
         if (! "scales" %in% nms) dotargs$scales <- list(draw = TRUE)
         do.call("spplot", args=c(alist(sgridy, zcol="yvals", sp.layout=lobjs,
                           checkEmptyRC=FALSE), dotargs))

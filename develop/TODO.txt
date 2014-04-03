@@ -123,8 +123,7 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 - allow for type-specific endemic effects, i.e. interaction with type. ideas:
 use "special", or extra argument typeSpecificEffects=c("(Intercept)",
 "influenza0"), ... maybe we can just use the classical formula interface (":")?
-- plot.epidataCS: "time" with optionally added cumulative number of events,
-  "space" with optional tiles and optional aggregation (-> snapshot)
+- plot.epidataCS (spatial): optional tiles and optional aggregation (-> snapshot)
 - animate.epidataCS: allow more customization of points, not only col (e.g.,
   smaller cex of removed points), and support decreasing infectious point cex?
   To get a time slider (!), we could set up a Shiny app via animate(, shiny=TRUE)
