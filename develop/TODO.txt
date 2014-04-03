@@ -115,8 +115,6 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
   would include the window "W") or of class STIDF, then transform appropriately
   (but don't change "epidataCS" class definition).
   "stgrid" could be of class STFDF.
-- why don't we set environment(endemic)<-environment(epidemic)<-.GlobalEnv ???
-  was that necessary for stepComponent to work?
 - allow for spatial "prehistory", i.e. events outside of W as possible sources
   in the epidemic component only, but otherwise not part of the likelihood
 - update.epidataCS(): add or remove stgrid variables
