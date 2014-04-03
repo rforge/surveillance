@@ -52,7 +52,8 @@ twinstim <- function (
         mfe, mfhEvents, mfhGrid, model, my.na.action, na.action, namesOptimUser,
         namesOptimArgs, nlminbControl, nlminbRes, nlmObjective, nlmControl,
         nlmRes, nmRes, optim.args, optimArgs, control.siaf,
-        optimMethod, optimRes, optimRes1, optimValid, partial,
+        optimMethod, optimRes, optimRes1, optimValid,
+        origenv.endemic, origenv.epidemic, partial,
         partialloglik, ptm, qmatrix, res, negsc, score, start, subset, tmpexpr,
         typeSpecificEndemicIntercept, useScore, verbose, whichfixed, 
         inherits = FALSE)))
@@ -123,11 +124,12 @@ twinstim <- function (
     ### Parse epidemic formula
 
     if (missing(epidemic)) {
+        origenv.epidemic <- .GlobalEnv
         epidemic <- ~ 0
     } else {
+        origenv.epidemic <- environment(epidemic)
         environment(epidemic) <- environment()
         ## such that t0 and T are found in the subset expression below
-        ## will be set to .GlobalEnv afterwards
     }
     epidemic <- terms(epidemic, data = eventsData, keep.order = TRUE)
     if (!is.null(attr(epidemic, "offset"))) {
@@ -226,10 +228,10 @@ twinstim <- function (
     } else if (verbose) message("no epidemic component in model")
 
 
-    ### Drop terms and environment from epidemic formula
+    ### Drop "terms" and restore original formula environment
     
     epidemic <- formula(epidemic)
-    environment(epidemic) <- .GlobalEnv
+    environment(epidemic) <- origenv.epidemic
 
 
 
@@ -242,11 +244,12 @@ twinstim <- function (
     ### Parse endemic formula
 
     if (missing(endemic)) {
+        origenv.endemic <- .GlobalEnv
         endemic <- ~ 0
     } else {
+        origenv.endemic <- environment(endemic)
         environment(endemic) <- environment()
         ## such that t0 and T are found in the subset expressions below
-        ## will be set to .GlobalEnv afterwards
     }
     endemic <- terms(endemic, data = data$stgrid, keep.order = TRUE)
 
@@ -339,13 +342,13 @@ twinstim <- function (
     } else if (verbose) message("no endemic component in model")
 
     
-    ### Drop terms and environment from endemic formula
+    ### Drop "terms" and restore original formula environment
     
     endemic <- if (typeSpecificEndemicIntercept) {
         ## re-add it to the endemic formula
         update.formula(formula(endemic), ~ (1|type) + .)
     } else formula(endemic)
-    environment(endemic) <- .GlobalEnv
+    environment(endemic) <- origenv.endemic
 
 
     ### Check that there is at least one parameter
