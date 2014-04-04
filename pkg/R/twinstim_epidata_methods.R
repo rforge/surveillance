@@ -96,10 +96,10 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
     
     ## assure valid epidataCS after subsetting
     if (!missing(j)) {                # only epidemic covariates may be selected
-        BLOCKstartEndemicVars <- setdiff(names(x$stgrid),
-            setdiff(obligColsNames_stgrid,"start"))
-        if (!all(obligColsNames_events %in% names(x$events)) ||
-            !all(BLOCKstartEndemicVars %in% names(x$events))) {
+        endemicVars <- setdiff(names(x$stgrid), c(
+            reservedColsNames_stgrid, obligColsNames_stgrid))
+        if (!all(c(reservedColsNames_events, obligColsNames_events, 
+                   endemicVars) %in% names(x$events))) {
             stop("only epidemic covariates may be removed from 'events'")
         }
     }
