@@ -93,9 +93,6 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
     cl[[1]] <- as.name("[")
     cl[[2]] <- substitute(x$events)
     x$events <- eval(cl, envir=parent.frame())
-
-    ## restore nCircle2Poly attribute
-    attr(x$events$.influenceRegion, "nCircle2Poly") <- nCircle2Poly
     
     ## assure valid epidataCS after subsetting
     if (!missing(j)) {                # only epidemic covariates may be selected
@@ -116,10 +113,12 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
             message("Note: dropped type(s) ",
                     paste0("\"", setdiff(rownames(x$qmatrix), typeNames), "\"",
                            collapse = ", "))
-            typesIdx <- match(typeNames, rownames(x$qmatrix))
-            x$qmatrix <- x$qmatrix[typesIdx, typesIdx, drop = FALSE]
+            x$qmatrix <- checkQ(x$qmatrix, typeNames)
         }
     }
+    
+    ## restore nCircle2Poly attribute
+    attr(x$events$.influenceRegion, "nCircle2Poly") <- nCircle2Poly
 
     ## Done
     return(x)
@@ -291,7 +290,7 @@ as.stepfun.epidataCS <- function (x, ...)
 animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
     nmax = NULL, sleep = NULL, legend.opts = list(), timer.opts = list(),
     pch = 15:18, col.current = "red", col.I = "#C16E41", col.R = "#B3B3B3",
-    col.influence = "#FEE0D2", main = NULL, verbose = TRUE, ...)
+    col.influence = NULL, main = NULL, verbose = interactive(), ...)
 {
     stopifnot(is.numeric(interval), length(interval) == 2L)
     with.animation <- suppressWarnings(require("animation"))
@@ -412,7 +411,7 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
         if (nrow(iTableNew) > 0L) multpoints(iTableNew, col = col.current)
         told <- t
         if (verbose) setTxtProgressBar(pb, it)
-        Sys.sleep(sleep)
+        if (dev.interactive()) Sys.sleep(sleep)
     }
     if (verbose) close(pb)
     invisible(NULL)
@@ -752,8 +751,9 @@ epidataCS2sts <- function (object, freq, start,
         if (is.null(tiles))
             stop("'tiles' is required for auto-generation of 'neighbourhood'")
         neighbourhood <- poly2adjmat(tiles, zero.policy=TRUE)
-        if (any(rowSums(neighbourhood) == 0))
-            warning("generated neighbourhood matrix contains islands")
+        if (nIslands <- sum(rowSums(neighbourhood) == 0))
+            message("Note: auto-generated neighbourhood matrix contains ",
+                    nIslands, ngettext(nIslands, " island", " islands"))
     }
     populationFrac <- if (is.null(popcol.stgrid)) NULL else {
         stopifnot(is.vector(popcol.stgrid), length(popcol.stgrid) == 1)

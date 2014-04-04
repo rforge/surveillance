@@ -111,6 +111,10 @@ load(system.file("shapes", "districtsD.RData", package="surveillance"))
 imdepi_sts <- epidataCS2sts(imdepi, freq=12, start=c(2002,1),
                             neighbourhood=NULL, # not needed here
                             tiles=districtsD)
+\dontshow{
+stopifnot(isTRUE(all.equal(colSums(imdepi_sts@observed),
+                           c(table(imdepi$events$tile)))))
+}
 
 ## compare plots of monthly number of cases
 opar <- par(mfrow=c(2,1))

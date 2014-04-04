@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-04-03)}{
+\section{Changes in surveillance version 1.8-0 (2014-04-04)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -126,6 +126,10 @@
     \item The argument \code{colTypes} of
     \code{plot.epidataCS(,aggregate="space")} is deprecated (use
     \code{points.args$col} instead).
+    \item \code{animate.epidataCS()} now by default does not draw
+    influence regions (\code{col.influence=NULL}), is \code{verbose} if
+    \code{interactive()}, and ignores \code{sleep} on non-interactive
+    devices. 
     \item \code{iafplot()} ...
     \itemize{
       \item invisibly returns a matrix containing the plotted

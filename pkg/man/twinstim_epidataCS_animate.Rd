@@ -22,8 +22,8 @@ Spatio-Temporal Animation of a Continuous-Time Continuous-Space Epidemic
 \method{animate}{epidataCS}(object, interval = c(0,Inf), time.spacing = NULL,
         nmax = NULL, sleep = NULL, legend.opts = list(), timer.opts = list(),
         pch = 15:18, col.current = "red", col.I = "#C16E41",
-        col.R = "#B3B3B3", col.influence = "#FEE0D2",
-        main = NULL, verbose = TRUE, ...)
+        col.R = "#B3B3B3", col.influence = NULL,
+        main = NULL, verbose = interactive(), ...)
 }
 
 \arguments{
@@ -33,11 +33,12 @@ Spatio-Temporal Animation of a Continuous-Time Continuous-Space Epidemic
   \item{interval}{time range of the animation.}
   \item{time.spacing}{
     time interval for the animation steps.\cr
-    If \code{NULL} (the default), the events are plotted one by one.
+    If \code{NULL} (the default), the events are plotted sequentially by
+    producing a snapshot at every time point where an event occured.
     Thus, it is just the \emph{ordering} of the events, which is shown.\cr
     To plot the appearance of events proportionally to the exact time line,
     \code{time.spacing} can be set to a numeric value indicating the period of
-    time between consecutive plots.  Then, for each time point in
+    time between consecutive snapshots.  Then, for each time point in
     \code{seq(0, end, by = time.spacing)} the current state of the epidemic can
     be seen and an additional timer indicates the current time
     (see \code{timer.opts} below).\cr
@@ -53,13 +54,13 @@ Spatio-Temporal Animation of a Continuous-Time Continuous-Space Epidemic
   }
   \item{sleep}{
     numeric scalar specyfing the artificial pause in seconds between two
-    time points, or \code{NULL} (default), when this is taken from
-    \code{ani.options("interval")} if the \pkg{animation} package is
-    available, or set to 0.1 otherwise. 
-    Thus, if generating an animation inside \pkg{animation}'s
-    \code{\link[animation]{saveHTML}} or similar, then this should be
-    set to 0.
-  }  
+    time points (using \code{\link{Sys.sleep}}), or \code{NULL}
+    (default), when this is taken from \code{ani.options("interval")} if
+    the \pkg{animation} package is available, and set to 0.1 otherwise.
+    Note that \code{sleep} is ignored on non-interactive devices
+    (see \code{\link{dev.interactive}}), e.g., if generating an
+    animation inside \pkg{animation}'s \code{\link[animation]{saveHTML}}.
+  }
   \item{pch, col}{
     vectors of length equal to the number of event types specifying the
     point symbols and colors for events to plot (in this order).
@@ -86,12 +87,12 @@ Spatio-Temporal Animation of a Continuous-Time Continuous-Space Epidemic
     Note that the argument \code{legend}, which is the current time of the
     animation, can not be modified.
   }
-  \item{col.current}{color of events when occuring.}
+  \item{col.current}{color of events when occuring (new).}
   \item{col.I}{color once infectious.}
   \item{col.R}{color event has once \dQuote{recovered}. If \code{NA},
     then recovered events will not be shown.}
   \item{col.influence}{color with which the influence region is drawn. Use
-    \code{NA} if no influence regions should be drawn.}
+    \code{NULL} (default) if no influence regions should be drawn.}
   \item{main}{optional main title placed above the map.}
   \item{verbose}{logical specifying if a (textual) progress bar should
     be shown during snapshot generation. This is especially useful if
@@ -120,30 +121,27 @@ The contributed \R package \pkg{animation}.
 }
 
 \examples{
+data("imdepi")
+imdepiB <- subset(imdepi, type == "B")
+
 \dontrun{
-  data("imdepi")
-  imdepiB <- subset(imdepi, type == "B")
-  if (require("animation")) ani.options(interval = 0.1, nmax = 60)
-
   # Animate the first year of type B with a step size of 7 days
-  animate(imdepiB, interval=c(0,365), time.spacing=7)
+  animate(imdepiB, interval=c(0,365), time.spacing=7, nmax=Inf, sleep=0.1)
 
-  # Animate the whole time range but with nmax=60 snapshots only and
-  # omitting the painting of (quiet artificial) influence regions
-  animate(imdepiB, time.spacing=NA, col.influence=NA, nmax=60)
+  # Sequential animation of type B events during the first year
+  animate(imdepiB, interval=c(0,365), time.spacing=NULL, sleep=0.1)
 
-  # Sequential animation of events
-  animate(imdepiB, time.spacing=NULL, nmax=60)
+  # Animate the whole time range but with nmax=60 snapshots only
+  animate(imdepiB, time.spacing=NA, nmax=60, sleep=0.1)
+}
 
-  # Such an animation can be saved in various ways using the tools of
-  # the animation package, e.g., saveHTML()
-  if (require("animation")) {
-    ani.options(outdir = tempdir())
-    saveHTML(animate(imdepiB, interval=c(0,365), time.spacing=7),
-             img.name = "imdepi_year1", htmlfile = "imdepi_animation.html",
-             autobrowse = TRUE, title = "Animation of the first year",
-             description = c("Take a look into the first-year dynamics."))
-  }
+# Such an animation can be saved in various ways using the tools of
+# the animation package, e.g., saveHTML()
+if (require("animation")) {
+   saveHTML(animate(imdepiB, interval=c(0,365), time.spacing=7),
+            outdir = tempdir(), htmlfile = "imdepi_animation.html",
+            nmax = Inf, interval = 0.2, loop = FALSE,
+            title = "Animation of the first year of type B events")
 }
 }
 
