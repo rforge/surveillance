@@ -577,7 +577,7 @@ plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL, axes=TRUE, xaxis.t
     axis( side=2 ,...)#cex=cex, cex.axis=cex.axis)
   }
 
-  if(!is.null(legend.opts)) {
+  if(is.list(legend.opts)) {
     #Fill empty (mandatory) slots in legend.opts list
     if (is.null(legend.opts$x)) legend.opts$x <- "topleft"
     if (is.null(legend.opts$lty)) legend.opts$lty <- c(lty[1],lty[3],NA,NA)
@@ -857,7 +857,7 @@ plot.sts.spacetime <- function(x,type,legend=NULL,opts.col=NULL,labels=TRUE,wait
     if (!aggregate) { title(paste(t,"/",maxt,sep="")) }
 
     #In case a legend is requested
-    if (!is.null(legend) && !(legend$once & t>1)  | (t==1)) {
+    if (is.list(legend) && !(legend$once & t>1)  | (t==1)) {
       add.legend(legend,  maplim ,gyr)
     }
 
