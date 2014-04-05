@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-04-04)}{
+\section{Changes in surveillance version 1.8-0 (2014-04-05)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -19,6 +19,10 @@
 
     \item Package \pkg{surveillance} now depends on
     \CRANpkg{spatstat} >= 1.36-0.
+
+    \item The documentation of plot variants for \code{"sts"} objects
+    has been cleaned up. The functions implementing the various plot
+    types (\code{stsplot_*}) are now exported and documented separately.
   }
 }
 
@@ -107,6 +111,11 @@
       automatic legend.
     }
 
+    \item Function \code{stsplot_space()} provides an improved map plot
+    of disease incidence for \code{"sts"} objects aggregated over time.
+    It corresponds to the new \code{type = observed ~ unit} of the
+    \code{plot}-method of the \code{"sts"}-class.
+
     \item \code{as.epidataCS()} gained a \code{verbose} argument.
 
   }
@@ -122,7 +131,7 @@
     tick-marks and labelling based on \code{strftime} compatible
     conversion codes -- indenpently if data are daily, weekly, monthly,
     etc. As a consequence, the old argument \code{xaxis.years} is
-    removed. See \code{plot.sts.time.one} for more information.
+    removed. See \code{stsplot_time()} for more information.
     \item The argument \code{colTypes} of
     \code{plot.epidataCS(,aggregate="space")} is deprecated (use
     \code{points.args$col} instead).
@@ -199,7 +208,7 @@
 
 \subsection{BUG FIXES}{
   \itemize{
-    \item Fixed a bug during alarm plots (\code{plot.sts.alarm}),
+    \item Fixed a bug during alarm plots (\code{stsplot_alarm()}),
     where the use of \code{alarm.symbol} was ignored.
     \item Fixed a bug in \code{algo.glrnb} where the overdispersion
     parameter \code{alpha} from the automatically fitted \code{glm.nb}

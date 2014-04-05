@@ -142,6 +142,7 @@ export(stcd)
 ### sts(BP)-specific
 
 exportClasses(sts, stsBP)
+export(linelist2sts)
 
 # generics for sts class defined in sts.R
 exportMethods("[", plot)
@@ -154,9 +155,13 @@ exportMethods(as.data.frame)
 exportMethods(epoch,observed,alarms,upperbound,population,control,multinomialTS,neighbourhood)
 exportMethods("epoch<-","observed<-","alarms<-","upperbound<-","population<-","control<-","multinomialTS<-","neighbourhood<-")
 
-export(atChange,at2ndChange,atMedian) #for x-axis formatting
-export(linelist2sts)
+# plot variants
+export(stsplot_space)
+export(stsplot_time, stsplot_time1, stsplot_alarm)
+export(atChange, at2ndChange, atMedian) #for time axis formatting
+export(stsplot_spacetime) # old implementation of (animated) map
 
+# outbreak detection algorithms (sts-interfaces)
 export(wrap.algo, farrington, bayes, rki, cusum, glrpois, glrnb, outbreakP, boda) # FIXME: rogerson, hmm ??
 export(earsC)
 export(farringtonFlexible)

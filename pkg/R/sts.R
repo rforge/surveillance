@@ -307,641 +307,60 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   return(x)
 })
 
+
 #########################################################################
-# Plot method ... the type argument specifies what type of plot
-# to make.
-#
-# plot as multivariate time series:  type = observed ~ time | unit 
-# plot as map object aggregated over time: type = observed ~ 1 | unit
+## Plot method ... the type argument specifies what type of plot to make
+##
+## plot as multivariate time series:  type = observed ~ time | unit 
+## plot as map object aggregated over time: type = observed ~ 1 | unit
+## new map implementation via: type = observed ~ unit
+## the specific plot functions are in separate files (stsplot_*.R)
 ########################################################################
-setMethod("plot", signature(x="sts", y="missing"), function(x, y, type,...) {
-  if (missing(type)) type = observed ~ time | unit
+
+setMethod("plot", signature(x="sts", y="missing"),
+          function (x, type = observed ~ time | unit, ...) {
   
-  #Parse the formula, i.e. extract components
-  obsOk <- (type[[2]] == "observed")
-  alarmOk <- (type[[2]] == "alarm")
-  map   <- (length(type[[3]])==3) && (type[[3]][[1]] == "|") && (type[[3]][[2]] == "1")
-  time  <- pmatch("time",type[[3]]) > 0
+  # catch new implementation of time-aggregate map plot
+  if (isTRUE(all.equal(observed ~ unit, type)))
+      return(stsplot_space(x, ...))
 
   #Valid formula?
-  valid <- lapply(as.list(type[[3]]),function(i) is.na(pmatch(i,c("1","unit","|","time","*","+"))))
+  valid <- lapply(as.list(type[[3]]), function(i)
+                  is.na(pmatch(i,c("1","unit","|","time","*","+"))))
   valid <- all(!unlist(valid))
+  obsOk <- (type[[2]] == "observed")
+  alarmOk <- (type[[2]] == "alarm")
+  if (!valid || !(obsOk | alarmOk))
+      stop("Not a valid plot type")
 
-  #No unit dimenstion?
+  #Parse the formula, i.e. extract components
+  map   <- (length(type[[3]])==3) && (type[[3]][[1]] == "|") && (type[[3]][[2]] == "1")
+  time  <- pmatch("time",type[[3]]) > 0
+  #All-in-one if type=time+unit -> no, use argument "as.one" for stsplot_time
+  #as.one <- all(!is.na(pmatch(c("time","unit"),type[[3]] ))) && is.na(pmatch("|",type[[3]]))
+
+  #No unit dimension?
   justTime <- type[[3]] == "time"
-  
-  if (!(obsOk | alarmOk) | !valid) {
-    stop("Not a valid plot type.")
-  }
-
 
   #space-time plots
   if (map) {
-    plot.sts.spacetime(x,type,...)
+    stsplot_spacetime(x, type, ...)
     return(invisible())
   }
   #time plots
   if (time) {
     if (obsOk) {
       #In case observed ~ time, the units are aggregated
-      plot.sts.time( if(justTime) aggregate(x,by="unit") else x,type,...)
+      stsplot_time(if(justTime) aggregate(x,by="unit") else x, ...)
       return(invisible())
     }
     if (alarmOk) {
-      plot.sts.alarm(x,...)
+      stsplot_alarm(x, ...)
       return(invisible())
     }
   }
 })
 
-######################################################################
-# Helper function to merge two lists taken from the RCurl package
-######################################################################
-
-merge.list <- function (x, y, ...) 
-{
-    if (length(x) == 0) 
-        return(y)
-    if (length(y) == 0) 
-        return(x)
-    i = match(names(y), names(x))
-    i = is.na(i)
-    if (any(i)) 
-        x[names(y)[which(i)]] = y[which(i)]
-    return(x)
-}
-
-##########################################################################
-# Plot functions
-##########################################################################
-
-#Every unit change
-atChange <- function(x,xm1) {
-    which(diff(c(xm1,x)) != 0)
-}
-#Median index of factor
-atMedian <- function(x,xm1) {
-    as.integer(tapply(seq_len(length(x)), INDEX=x, quantile, prob=0.5,type=3))
-}
-#Only every second unit change
-at2ndChange <- function(x,xm1) {
-    idxAtChange <- atChange(x,xm1)
-    idxAtChange[seq(idxAtChange) %% 2 == 1]
-}
-
-#Helper function to format the x-axis of the time series
-addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelFormat, xaxis.tickFreq,xaxis.labelFreq,...) {
-  
-  #Old style if there are no Date objects
-  if (!epochsAsDate) {
-    #Declare commonly used variables.
-    startyear <-  x@start[1]
-    
-    if (x@freq ==52) {  #Weekly epochs are the most supported 
-      # At which indices to put the "at" tick label. This will
-      # be exactly those week numbers where the new quarter begins: 1, 14, 27 and 40 + i*52.
-      # Note that week number and index is not the same due to the "firstweek" argument
-      weeks <- 1:length(observed) + (firstweek-1)
-      noYears <- ceiling(max(weeks)/52)
-      quarterStarts <- rep( (0:(noYears))*52, each=4) + rep( c(1,14,27,40), noYears+1)
-      weeks <- subset(weeks, !is.na(match(weeks,quarterStarts)))
-      weekIdx <- weeks - (firstweek-1)
-      
-      # get the right year for each week
-      year <- weeks %/% 52 + startyear
-      # function to define the quarter order
-      quarterFunc <- function(i) { switch(i+1,"I","II","III","IV") } #nicer:as.roman, but changes class.
-      # get the right number and order of quarter labels
-      quarter <- sapply( (weeks-1) %/% 13 %% 4, quarterFunc)
-      #Computed axis labels -- add quarters (this is the old style)
-      labels.week <- paste(year,"\n\n",quarter,sep="")
-      #Make the line. Use lwd.ticks to get full line but no marks.
-      axis( side=1,labels=FALSE,at=c(1,length(observed)),lwd.ticks=0,line=1,...) 
-      axis( at=weekIdx[which(quarter != "I")] , labels=labels.week[which(quarter != "I")] , side=1, line = 1 ,...)       
-      #Bigger tick marks at the first quarter (i.e. change of the year)
-      at <- weekIdx[which(quarter == "I")]
-      axis( at=at, labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
-      
-    } else { ##other frequency (not really supported)
-      #A label at each unit
-      myat.unit <- seq(firstweek,length.out=length(observed) )
-      
-      # get the right year order
-      month <- (myat.unit-1) %% x@freq + 1
-      year <- (myat.unit - 1) %/% x@freq + startyear
-      #construct the computed axis labels -- add quarters if xaxis.units is requested
-      mylabels.unit <- paste(year,"\n\n", (myat.unit-1) %% x@freq + 1,sep="")
-      
-      #Add axis
-      axis( at=(1:length(observed)), labels=NA, side=1, line = 1, ...) 
-      axis( at=(1:length(observed))[month==1], labels=mylabels.unit[month==1] , side=1, line = 1 ,...)
-      #Bigger tick marks at the first unit
-      at <- (1:length(observed))[(myat.unit - 1) %% x@freq == 0]
-      axis( at=at, labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
-    } 
-  } else {   
-    ################################################################
-    #epochAsDate -- experimental functionality to handle ISO 8601
-    ################################################################
-    
-    dates <- epoch(x)
-    #make one which has one extra element at beginning with same spacing
-    datesOneBefore <- c(dates[1]-(dates[2]-dates[1]),dates)
-    
-    #Make the line. Use lwd.ticks to get full line but no marks.
-    axis( side=1,labels=FALSE,at=c(1,length(observed)),lwd.ticks=0,...) 
-    
-    ###Make the ticks (depending on the selected level).###
-    tcl <- par()$tcl
-    tickFactors <- surveillance.options("stsTickFactors")
-    
-    #Loop over all pairs in the xaxis.tickFreq list
-     for (i in seq(xaxis.tickFreq)) {
-      format <- names(xaxis.tickFreq)[i]
-      xm1x <- as.numeric(formatDate(datesOneBefore,format))                         
-      idx <- xaxis.tickFreq[[i]](x=xm1x[-1],xm1=xm1x[1])
-      
-      #Find tick size by table lookup
-      tclFactor <- tickFactors[pmatch(format, names(tickFactors))]
-      if (is.na(tclFactor)) { 
-        warning("No tcl factor found for",format,". Setting it at 1") 
-        tclFactor <- 1
-      }
-      axis(1,at=idx, labels=NA,tcl=tclFactor*tcl,...)
-    }  
-    
-    ###Make the labels (depending on the selected level)###
-    if (!is.null(xaxis.labelFormat)) {
-      labelIdx <- NULL
-      for (i in seq(xaxis.labelFreq)) {
-        format <- names(xaxis.labelFreq)[i]
-        xm1x <- as.numeric(formatDate(datesOneBefore,format))                         
-        labelIdx <- c(labelIdx,xaxis.labelFreq[[i]](x=xm1x[-1],xm1=xm1x[1]))
-      }
-      
-      #Format labels (if any) for the requested subset
-      if (length(labelIdx)>0) {
-          labels <- rep(NA,nrow(x))
-          labels[labelIdx] <- formatDate(epoch(x)[labelIdx],xaxis.labelFormat)
-          axis(1,at=1:nrow(x), labels=labels,tick=FALSE,...)
-      }
-    }
-  }#end epochAsDate
-  #Done
-  invisible()
-}
-
-plot.sts.time.one <- function(x, k=1, domany=FALSE,ylim=NULL, axes=TRUE, xaxis.tickFreq=list("%Q"=atChange),xaxis.labelFreq=xaxis.tickFreq,xaxis.labelFormat="%G\n\n%OQ", epochsAsDate=x@epochAsDate, xlab="time", ylab="No. infected", main=NULL, type="s",lty=c(1,1,2),col=c(NA,1,4),lwd=c(1,1,1), outbreak.symbol = list(pch=3, col=3, cex=1,lwd=1),alarm.symbol=list(pch=24, col=2, cex=1,lwd=1),legend.opts=list(x="top", legend=NULL,lty=NULL,pch=NULL,col=NULL),dx.upperbound=0L,hookFunc=function() {}, ...) {
-
-  #Extract slots -- depending on the algorithms: x@control$range
-  observed   <- x@observed[,k]
-  state      <- x@state[,k]
-  alarm      <- x@alarm[,k]
-  upperbound <- x@upperbound[,k]
-  hasAlarm   <- all(!is.na(alarm))
-  startyear <-  x@start[1]
-  firstweek <-  x@start[2]
-  method <-     x@control$name
-  disease <-    x@control$data
-  population <- x@populationFrac[,k]
-  binaryTS <- x@multinomialTS
-
-  #Control what axis style is used
-  xaxis.dates <- !is.null(xaxis.labelFormat) 
-
-  if (binaryTS) {
-    observed <- ifelse(population!=0,observed/population,0)
-    upperbound <- ifelse(population!=0,upperbound/population,0)
-    if (ylab == "No. infected") { ylab <- "Proportion infected" }
-  }
-  
-   ##### Handle the NULL arguments ######################################
-  if (is.null(main)) {
-    #If no surveillance algorithm has been run
-    if (length(x@control) != 0) {
-      main = paste("Surveillance using ", as.character(method),sep="") 
-    }
-  }
-  #No titles are drawn when more than one is plotted.
-  if (domany) main = ""
-
-  # control where the highest value is
-  max <- max(c(observed,upperbound),na.rm=TRUE)
-  
-  #if ylim is not specified, give it a default value
-  if(is.null(ylim) ){
-    ylim <- c(-1/20*max, max)
-  }
-  
-  # left/right help for constructing the columns
-  dx.observed <- 0.5
-  upperboundx <- (1:length(upperbound)) - (dx.observed - dx.upperbound)
-  
-  #Generate the matrices to plot (values,last value)
-  xstuff <- cbind(c(upperboundx,length(observed) + min(1-(dx.observed - dx.upperbound),0.5)))
-  ystuff <-cbind(c(upperbound,upperbound[length(observed) ]))
-
-  #Plot the results 
-  matplot(x=xstuff,y=ystuff,xlab=xlab,ylab=ylab,main=main,ylim=ylim,axes = !(xaxis.dates),type=type,lty=lty[-c(1:2)],col=col[-c(1:2)],lwd=lwd[-c(1:2)],...)
-
-  #This draws the polygons containing the number of counts (sep. by NA)
-  i <- rep(1:length(observed),each=5)
-  dx <- rep(dx.observed * c(-1,-1,1,1,NA), times=length(observed))
-  x.points <- i + dx
-  y.points <- as.vector(t(cbind(0, observed, observed, 0, NA)))
-  polygon(x.points,y.points,col=col[1],border=col[2],lwd=lwd[1])
-
-  #Draw upper bound once more in case the polygons are filled
-  if (!is.na(col[1])) {
-    lines(x=xstuff,y=ystuff,type=type,lty=lty[-c(1:2)],col=col[-c(1:2)],lwd=lwd[-c(1:2)],...)
-  }
-  
-  #Draw outbreak symbols
-  alarmIdx <- which(!is.na(alarm) & (alarm == 1))
-  if (length(alarmIdx)>0) {
-    matpoints( alarmIdx, rep(-1/40*ylim[2],length(alarmIdx)), pch=alarm.symbol$pch, col=alarm.symbol$col, cex= alarm.symbol$cex, lwd=alarm.symbol$lwd)
-  }
-  
-  #Draw alarm symbols
-  stateIdx <- which(state == 1)
-  if (length(stateIdx)>0) {
-    matpoints( stateIdx, rep(-1/20*ylim[2],length(stateIdx)), pch=outbreak.symbol$pch, col=outbreak.symbol$col,cex = outbreak.symbol$cex,lwd=outbreak.symbol$lwd)
-  }
-
-  #Label x-axis 
-  if(xaxis.dates & axes) {
-    addFormattedXAxis(x, epochsAsDate, observed, firstweek,xaxis.labelFormat,xaxis.tickFreq,xaxis.labelFreq,...)
-  }
-  #Label y-axis
-  if (axes) {
-    axis( side=2 ,...)#cex=cex, cex.axis=cex.axis)
-  }
-
-  if(is.list(legend.opts)) {
-    #Fill empty (mandatory) slots in legend.opts list
-    if (is.null(legend.opts$x)) legend.opts$x <- "topleft"
-    if (is.null(legend.opts$lty)) legend.opts$lty <- c(lty[1],lty[3],NA,NA)
-    if (is.null(legend.opts$col)) legend.opts$col <- c(col[2],col[3],outbreak.symbol$col,alarm.symbol$col)
-    if (is.null(legend.opts$pch)) legend.opts$pch <- c(NA,NA,outbreak.symbol$pch,alarm.symbol$pch)
-    if (is.null(legend.opts$legend)) {
-      legend.opts$legend <- c("Infected", "Threshold","Outbreak","Alarm" )
-    }
-    #Make the legend
-    do.call("legend",legend.opts)
-  }
-
-  #Call hook function for user customized action
-  environment(hookFunc) <- environment()
-  hookFunc()
-
-  invisible()
-}
-
-
-plot.sts.alarm <- function(x, lvl=rep(1,nrow(x)), ylim=NULL, xaxis.units=TRUE, xaxis.tickFreq=list("%Q"=atChange),xaxis.labelFreq=xaxis.tickFreq,xaxis.labelFormat="%G\n\n%OQ",epochsAsDate=x@epochAsDate, xlab="time", main=NULL, type="hhs",lty=c(1,1,2),col=c(1,1,4), outbreak.symbol = list(pch=3, col=3, cex=1, lwd=1),alarm.symbol=list(pch=24, col=2, cex=1,lwd=1),cex=1,cex.yaxis=1,...) {
-
-  k <- 1
-  #Extract slots -- depending on the algorithms: x@control$range
-  observed   <- x@observed[,k]
-  state      <- x@state[,k]
-  alarm      <- x@alarm[,k]
-  upperbound <- x@upperbound[,k]
-  hasAlarm   <- all(!is.na(alarm))
-  startyear <-  x@start[1]
-  firstweek <-  x@start[2]
-  method <-     x@control$name
-  disease <-    x@control$data
-  ylim <- c(0.5, ncol(x))
-  
-  ##### Handle the NULL arguments ######################################
-  if (is.null(main)) {
-    #If no surveillance algorithm has been run
-    if (length(x@control) != 0) {
-     # main = paste("Analysis of ", as.character(disease), " using ",
-      main = paste("Surveillance using ", as.character(method),sep="") 
-    }
-  }
- 
-  #Control what axis style is used
-  xaxis.dates <- !is.null(xaxis.labelFormat) 
-
-  # left/right help for constructing the columns
-  dx.observed <- 0.5
-  observedxl <- (1:length(observed))-dx.observed
-  observedxr <- (1:length(observed))+dx.observed
-  upperboundx <- (1:length(upperbound)) #-0.5
-  
-  # control where the highest value is
-  max <- max(c(observed,upperbound),na.rm=TRUE)
-        
-  #if ylim is not specified
-  if(is.null(ylim)){
-    ylim <- c(-1/20*max, max)
-  }
-
-
-  #Generate the matrices to plot
-  xstuff <- cbind(observedxl, observedxr, upperboundx)
-  ystuff <-cbind(observed, observed, upperbound)
-        
-
-  #Plot the results using one Large plot call (we do this by modifying
-  #the call). Move this into a special function!
-  matplot(x=xstuff,y=ystuff,xlab=xlab,ylab="",main=main,ylim=ylim,axes = FALSE,type="n",lty=lty,col=col,...)
-
-  #Label of x-axis 
-  if(xaxis.dates){
-    addFormattedXAxis(x, epochsAsDate, observed, firstweek, xaxis.labelFormat,xaxis.tickFreq,xaxis.labelFreq,...)
-  }
-  axis( side=2, at=1:ncol(x),cex.axis=cex.yaxis, labels=colnames(x),las=2)
-
-
-  #Draw all alarms
-  for (i in 1:nrow(x)) {
-    idx <- (1:ncol(x))[x@alarm[i,] > 0]
-    for (j in idx) {
-      points(i,j,pch=alarm.symbol$pch,col=alarm.symbol$col[lvl[j]],cex=alarm.symbol$cex,lwd=alarm.symbol$lwd)
-    }
-  }
-
-  #Draw lines seperating the levels
-  m <- c(-0.5,cumsum(as.numeric(table(lvl))))
-  sapply(m, function(i) lines(c(0.5,nrow(x@alarm)+0.5),c(i+0.5,i+0.5),lwd=2))
-  
-  invisible()
-}
-
-######################################################################
-# This function sets the scene and distributes individual calls
-# to plot.sts.time.one
-######################################################################
-
-plot.sts.time <- function(x, type, method=x@control$name,
-                          disease=x@control$data,
-                          same.scale=TRUE, par.list=list(), ...)
-{
-  #Plot as one if type = time + unit 
-  as.one=all(!is.na(pmatch(c("time","unit"),type[[3]] ))) & is.na(pmatch("|",type[[3]]))
-  
-  #Extract
-  observed <- x@observed
-  state <- x@state
-  alarm <- x@alarm
-  population <- x@populationFrac
-  binaryTS <- x@multinomialTS
-  
-  #univariate timeseries ?
-  if(is.vector(observed))
-    observed <- matrix(observed,ncol=1)
-  if(is.vector(state))
-    state <- matrix(state,ncol=1)
-  if(is.vector(alarm)) 
-    alarm <- matrix(alarm,ncol=1)
-  nAreas <- ncol(observed)
-
-  #If no "mar" or "mfrow" argument in par.list add default values.
-  if (is.null(par.list[["mar",exact=TRUE]])) { par.list$mar <- c(5,4,1,1)}
-  if (is.null(par.list[["mfrow",exact=TRUE]])) { par.list$mfrow=magic.dim(nAreas)}
-  
-  #multivariate time series
-  if(nAreas > 1){
-    if(as.one) { # all areas in one plot
-      stop("this type of plot is currently not implemented")
-    } else {
-      #set window size
-      oldpar <- par(par.list)
-
-      #All plots on same scale? If yes, then check if a scale
-      #is already specified using the ylim argument
-      args <- list(...)
-      if(same.scale) {
-        if (is.null(args$ylim)) {
-            max <- if (binaryTS) {
-                max(ifelse(population == 0, 0,
-                           pmax(observed,x@upperbound,na.rm=TRUE)/population))
-            } else max(observed,x@upperbound,na.rm=TRUE)
-            args$ylim <- c(-1/20*max, max)
-        }
-      } else {
-        args$ylim <- NULL
-      }
-      
-      #plot areas
-      for (k in 1:nAreas) {
-        #Changed call of plot.sts.time.one to invocation using "call"
-        argsK <- merge.list(args,list("x"=x,"k"=k,"domany"=TRUE,"legend"=NULL))
-        do.call("plot.sts.time.one",args=argsK)
-        title(main=colnames(observed)[k], line=-1)
-      }
-      
-      #reset graphical params
-      par(oldpar)
-    }
-  } else {  #univariate time series
-    par.list$mfrow <- NULL #no mf formatting..
-    oldpar <- par(par.list)
-    plot.sts.time.one(x=x, domany=FALSE,...)
-    par(oldpar)
-  }
-  invisible()
-}
-
-##############################################################
-# Animation
-#
-# opts.col - how to get colors??
-# wait - waiting time (max count in a for loop) better way?
-##############################################################
-
-plot.sts.spacetime <- function(x,type,legend=NULL,opts.col=NULL,labels=TRUE,wait.ms=250,cex.lab=0.7,verbose=FALSE,dev.printer=NULL,...) {
-  #Extract the mappoly
-  if (length(x@map) == 0)
-    stop("The sts object has an empty map.")
-  map <- x@map
-  maplim <- list(x=bbox(map)[1,],y=bbox(map)[2,])
-
-  #Check colnames, otherwise no need to continue
-  if (is.null(colnames(x@observed)))
-    stop("The sts observed slot does not have any colnames to match with the shapefile.")
-
-  #Check for color options
-  if (is.null(opts.col)) {
-    opts.col <- list(ncolors=100,use.color=TRUE)
-  }
-  #Check for legend options
-  if (is.null(legend)) {
-    legend <- list(dx=0.4,dy=0.04,x=maplim$x[1],y=maplim$y[1],once=TRUE)
-  }
-
-  #Process dev.printer options
-  if (!is.null(dev.printer)) {
-    #Device
-    if (is.null(dev.printer$device)) dev.printer$device <- png
-    #File extension
-    if (is.null(dev.printer$extension)) dev.printer$extension <- ".png"
-    #Width and height
-    if (is.null(dev.printer$width)) dev.printer$width <- 640
-    if (is.null(dev.printer$height)) dev.printer$height <- 480
-  }
-      
-
-  #Extract the data
-  o <- x@observed
-  alarm <- x@alarm
-  
-  #Formula is of type "observed ~ 1|unit" (i.e. no time)
-  aggregate <- type[[3]][[3]] == "unit"
-  if (aggregate) {
-    o <- t(as.matrix(apply(o,MARGIN=2,sum)))
-    alarm <- t(as.matrix(apply(alarm,MARGIN=2,sum)))>0
-  }
-  
-  #Number of time points
-  maxt <- dim(o)[1]
-
-  
-  #Make colors using the hcl.colors function
-  gyr <- hcl.colors(o,ncolors=length(o),use.color=TRUE)
-  theCut <- cut(o,length(gyr$col))
-  #Assign min/max values resulting from the cut to color scheme
-  gyr$min <- min(o)
-  gyr$max <- max(o)
-
-  #Cut into specified number of colors
-  o.cut <- matrix(as.numeric(theCut),nrow=nrow(o),ncol=ncol(o))
-  o.col <- matrix(gyr$col[o.cut],ncol=ncol(o.cut))
-  o.col[is.na(o.col)] <- gray(1)
-  dimnames(o.col) <- dimnames(o)
-
-  #Sort the o according to the names in the map
-  region.id <- row.names(map)
-  o.col.id <- dimnames(o.col)[[2]]
-
-  #Make the columns of o as in the map object
-  o.col <- o.col[,pmatch(region.id,o.col.id),drop=FALSE]
-  alarm.col <- alarm[,pmatch(region.id,o.col.id),drop=FALSE]
-
-  #Screen processing
-  screen.matrix <- matrix(c(0,1,0,1,0,1,0.8,1),2,4,byrow=TRUE)
-  split.screen(screen.matrix)
-
-  #Loop over all time slices
-  for (t in 1:maxt) {
-    #Status information
-    if (verbose) {
-      cat(paste("Processing slice",t,"of",maxt,"\n"))
-    }
-    
-    #Clean screen (title area)
-    screen(n=2)
-    par(bg=gray(1))
-    erase.screen()
-    par(bg="transparent")
-
-    #Plot the map on screen 1
-    screen(n=1)
-    plot(map,col=o.col[t,],xlab="",ylab="",...)
-    #Indicate alarms as shaded overlays
-    if (!all(is.na(alarm.col))) {
-      #Plotting using density "NA" does not appear to work
-      #anymore in the new sp versions
-      alarm.col[is.na(alarm.col)] <- 0
-      plot(map,dens=alarm.col*15,add=TRUE)
-    }
-    
-
-    if (labels)
-      #getSpPPolygonsLabptSlots is deprecated. Use coordinates method insteas
-      text(coordinates(map), labels=as.character(region.id), cex.lab=cex.lab)
-  
-    if (!aggregate) { title(paste(t,"/",maxt,sep="")) }
-
-    #In case a legend is requested
-    if (is.list(legend) && !(legend$once & t>1)  | (t==1)) {
-      add.legend(legend,  maplim ,gyr)
-    }
-
-    #Is writing to files requested?
-    if (!is.null(dev.printer)) {
-      #Create filename
-      fileName <- paste(dev.printer$name,"-",insert.zeroes(t,length=ceiling(log10(maxt))),
-                        dev.printer$extension,sep="")
-      cat("Creating ",fileName,"\n")
-      #Save the current device using dev.print
-     dev.print(dev.printer$device, file=fileName, width=dev.printer$width, height=dev.printer$height)
-    }
-    
-    wait(wait.ms) 
-  }
-  close.screen(all.screens = TRUE)
-}
-
-###################################################################
-#Helper function for waiting a specific amount of milliseconds
-#implemented using proc.time. The waiting time is probably not 100%
-#exact as R is an interpretated language.
-#
-# Params:
-#  wait.ms - number of milliseconds to wait
-###################################################################
-
-wait <- function(wait.ms) {
-  #Initialize
-  start.time <- proc.time()[3]*1000
-  ellapsed <- proc.time()[3]*1000 - start.time
-
-  #Loop as long as required.
-  while (ellapsed < wait.ms) {
-    ellapsed <- proc.time()[3]*1000 - start.time
-  }
-}
-
-#Helper function -- use colors from the vcd package
-hcl.colors <- function(x, ncolors=100, use.color=TRUE)
-{
-    GYR <- if (requireNamespace("colorspace")) { # the Zeil-ice colors 
-        colorspace::heat_hcl(ncolors, h=c(0,120),
-                             c=if (use.color) c(90,30) else c(0,0),
-                             l=c(50,90), power=c(0.75, 1.2))
-    } else {
-        if (use.color) heat.colors(ncolors) else grey.colors(ncolors)
-    }
-    list(col=rev(GYR), trans=identity)
-}
-
-#Helper function for plot.sts.spacetime
-add.legend <- function(legend,maplim,theColors) {
-  #Preproc
-  dy <- diff(maplim$y) * legend$dy
-  dx <- diff(maplim$x) * legend$dx
-    
-  #Add legend -- i.e. a slider
-  xlu <- xlo <- legend$x
-  xru <- xro <- xlu + dx 
-  yru <- ylu <- legend$y
-  yro <- ylo <- yru + dy 
-
-  
-  step <- (xru - xlu)/length(theColors$col)
-  for (i in 0:(length(theColors$col) - 1)) {
-    polygon(c(xlo + step * i, xlo + step * (i + 1), 
-              xlu + step * (i + 1), xlu + step * i), c(ylo, 
-                                                       yro, yru, ylu), col = theColors$col[i + 1], 
-            border = theColors$col[i + 1])
-  }
-  
-  
-  #Write info about min and max on the slider.
-  black <- grey(0)
-  lines(c(xlo, xro, xru, xlu, xlo), c(ylo, yro, yru, ylu, ylo), col =   black)
-
-  #Transformation function for data values, either
-  #exp or identical
-  trans <- theColors$trans
-
-  text(xlu, ylu - 0.5*dy, formatC(trans(theColors$min)), cex = 1, col = black,adj=c(0,1))
-  text(xru, yru - 0.5*dy, formatC(trans(theColors$max)), cex = 1, col = black,adj=c(1,1))
-}
 
 ###Validity checking
 setValidity("sts", function ( object ) {
@@ -985,24 +404,6 @@ setValidity("sts", function ( object ) {
 })
 
 
-
-######################################################################
-# Insert leading zeros so integers obtain a fixed length. Good when
-# making filenames so they are all of same length ideal for sorting.
-#
-# Parameters
-#  x - An integer
-######################################################################
-
-insert.zeroes<- function(x,length=3) {
-  for (i in 1:(length-1)) {
-    if (x<10^i) return(paste(paste(rep(0,length-i),collapse=""),x,sep=""))
-  }
-  #If x has more digits than length then just return x
-  return(paste(x))
-}
-
-
 ##Show/Print method
 # show
 setMethod( "show", "sts", function( object ){
@@ -1040,6 +441,7 @@ setMethod( "show", "sts", function( object ){
   cat("\nhead of neighbourhood:\n")
   print( head(object@neighbourhood,n))
 } )
+
 
 ######################################################################
 #Method to convert sts object to a data frame suitable for regression

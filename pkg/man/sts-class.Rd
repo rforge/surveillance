@@ -137,12 +137,12 @@
       \code{alarm} slots of \code{x} into a data frame with column names
       matching the colnames of the respective slots. Useful when one wants
       to fit a model based on the object}
-    \item{plot}{\code{signature(x="sts",y="missing",function(x, y, type,...)...)}: this function is
+    \item{plot}{\code{signature(x="sts",y="missing")}: this function is
       the successor of the \code{\link{plot.disProg}} and 
       \code{\link{plot.survRes}} functions. It takes (more or less) the
       same arguments as \code{plot.survRes}. The most important
       difference is the type of plot, which is specified using
-      \code{type}. See \code{\link{show,sts-method}} for details.
+      \code{type}. See \code{\link{plot,sts,missing-method}} for details.
     }
   }
 }
@@ -163,4 +163,5 @@ if (requireNamespace("maptools")) {
 ha.sts
 plot(ha.sts, type=observed ~ 1 | unit)
 }
+
 \keyword{classes}
