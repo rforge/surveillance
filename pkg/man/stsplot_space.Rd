@@ -18,7 +18,7 @@ sequences of such snapshots.
 
 \usage{
 stsplot_space(x, tps = NULL, map = x@map, population = NULL,
-              main = NULL, at = 10, col.regions = NULL,
+              main = NULL, labels = FALSE, at = 10, col.regions = NULL,
               colorkey = list(space = "bottom", labels = list(at=at)),
               total.args = NULL, sp.layout = NULL, ...)
 }
@@ -53,6 +53,16 @@ stsplot_space(x, tps = NULL, map = x@map, population = NULL,
     a main title for the plot. If \code{NULL} and \code{x} is of
     class \code{"sts"}, the time range of \code{tps} is put as
     the main title.
+  }
+  \item{labels}{
+    determines if and how regions are labeled. A \code{FALSE} (default)
+    or \code{NULL} value omits region labels. \code{labels=TRUE} uses
+    \code{row.names(map)}. Alternatively, \code{labels} can also be a
+    character or numeric index for a column of \code{map@data} which
+    contains suitable labels, or a vector of length \code{length(map)}
+    with labels. Furthermore, \code{labels} can also be a list of
+    arguments for \code{\link[lattice]{panel.text}}, where the
+    optional \code{labels} component follows the same rules as above.
   }
   \item{at}{
     either a number of levels (default: 10) for the categorization
@@ -121,9 +131,13 @@ data("measlesWeserEms")
 # default plot: total region-specific counts over all weeks
 plot(measlesWeserEms, type=observed~unit)
 
-# plot incidence
+# compare with old implementation
+plot(measlesWeserEms, type=observed~1|unit)
+
+# plot incidence with region labels
 plot(measlesWeserEms, type=observed~unit,
-     population=measlesWeserEms@map$POPULATION / 100000)
+     population=measlesWeserEms@map$POPULATION / 100000,
+     labels=list(labels="GEN", cex=0.7, font=3))
 
 # counts in the first week of the second year only (+ display overall)
 plot(measlesWeserEms, type=observed~unit, tps=53, total.args=list())

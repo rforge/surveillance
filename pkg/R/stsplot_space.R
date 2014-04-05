@@ -23,7 +23,8 @@
 
 stsplot_space <- function (x, tps = NULL, map = x@map,
                            population = NULL, # nUnits-vector of population counts
-                           main = NULL, at = 10, col.regions = NULL,
+                           main = NULL, labels = FALSE,
+                           at = 10, col.regions = NULL,
                            colorkey = list(space="bottom", labels=list(at=at)),
                            total.args = NULL, sp.layout = NULL, ...)
 {
@@ -41,17 +42,37 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
         ncases <- ncases / population
         total <- total / sum(population)
     }
-    
-    ## check/determine break points 'at'
-    at <- checkat(at, ncases)
 
     ## add ncases to map@data
     if (inherits(map, "SpatialPolygonsDataFrame")) {
         map$ncases <- ncases
     } else {
-        map <- SpatialPolygonsDataFrame(map, as.data.frame(ncases))
+        map <- SpatialPolygonsDataFrame(map, as.data.frame(ncases),
+                                        match.ID=FALSE)
     }
+
+    ## default main title
+    if (is.null(main) && inherits(x, "sts"))
+        main <- stsTimeRange2text(x, tps)
+
+    ## get region labels
+    getLabels <- function (labels) {
+        if (isTRUE(labels)) {
+            row.names(map)
+        } else if (length(labels) == 1L &&
+                   (is.numeric(labels) | is.character(labels))) {
+            map@data[[labels]]
+        } else labels
+    }
+    labels.args <- if (is.list(labels)) {
+        labels
+    } else if (!is.null(labels) && !identical(labels, FALSE)) {
+        list(labels = getLabels(labels))
+    } # else NULL
     
+    ## check/determine color break points 'at'
+    at <- checkat(at, ncases)
+    ## default color palette
     if (is.null(col.regions)) {
         separate0 <- at[1] == 0 & at[2] <= 1
         col.regions <- c(
@@ -59,13 +80,21 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
             hcl.colors(ncolors=length(at)-1-separate0,
                        use.color=TRUE))
     }
+    ## colorkey settings
     if (!missing(colorkey) && is.list(colorkey))
         colorkey <- modifyList(eval(formals()$colorkey), colorkey)
-    if (is.null(main) && inherits(x, "sts"))
-        main <- stsTimeRange2text(x, tps)
 
-    if (is.list(total.args) && require("grid")) {
-        total.args <- modifyList(list(label="Overall: ", x=1, y=0), total.args)
+    ## automatic additions to sp.layout (region labels and total)
+    if (is.list(labels.args)) {
+        labels.args <- modifyList(list(x=coordinates(map), labels=TRUE),
+                                  labels.args)
+        labels.args$labels <- getLabels(labels.args$labels)
+        layout.labels <- c("panel.text", labels.args)
+        sp.layout <- c(sp.layout, list(layout.labels))
+    }
+    if (is.list(total.args)) {
+        total.args <- modifyList(list(label="Overall: ", x=1, y=0),
+                                 total.args)
         if (is.null(total.args$just))
             total.args$just <- with (total.args, if (all(c(x,y) %in% 0:1)) {
                 c(c("left", "right")[1+x], c("bottom","top")[1+y])
@@ -74,6 +103,8 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
         layout.total <- c("grid.text", total.args)
         sp.layout <- c(sp.layout, list(layout.total))
     }
+
+    ## generate the spplot()
     args <- list(quote(map), "ncases", main=main,
                  col.regions=col.regions, at=at, colorkey=colorkey,
                  sp.layout=sp.layout, quote(...))
@@ -86,6 +117,8 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
 ### Auxiliary functions for the "sts" snapshot function
 #######################################################
 
+## sum of counts by unit over time points "tps"
+## the resulting vector has no names
 getCumCounts <- function (counts, tps=NULL, nUnits=ncol(counts))
 {
     if (!is.null(tps)) counts <- counts[tps,,drop=FALSE]

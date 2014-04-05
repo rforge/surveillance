@@ -22,7 +22,8 @@
 
     \item The documentation of plot variants for \code{"sts"} objects
     has been cleaned up. The functions implementing the various plot
-    types (\code{stsplot_*}) are now exported and documented separately.
+    types (\code{stsplot_*}, previously named \code{plot.sts.*})
+    are now exported and documented separately.
   }
 }
 
@@ -111,10 +112,11 @@
       automatic legend.
     }
 
-    \item Function \code{stsplot_space()} provides an improved map plot
-    of disease incidence for \code{"sts"} objects aggregated over time.
-    It corresponds to the new \code{type = observed ~ unit} of the
-    \code{plot}-method of the \code{"sts"}-class.
+    \item The new function \code{stsplot_space()} provides an improved
+    map plot of disease incidence for \code{"sts"} objects aggregated
+    over time. It corresponds to the new \code{type = observed ~ unit}
+    of the \code{stsplot}-method, and supersedes
+    \code{type = observed ~ 1|unit} (except for alarm shading).
 
     \item \code{as.epidataCS()} gained a \code{verbose} argument.
 

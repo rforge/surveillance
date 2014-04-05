@@ -57,7 +57,7 @@
       details and examples.
     }
     \item{\code{observed ~ 1 | unit}}{old version of the map plot, which
-      supports labelling regions and shading regions with an alarm.
+      supports shading regions with an alarm.
       The plotting is done by the function \code{\link{stsplot_spacetime}}.
       Use \code{type=observed~unit} for the new implementation as function
       \code{\link{stsplot_space}} (without alarm support, though).
