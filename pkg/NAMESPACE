@@ -294,6 +294,7 @@ export(marks)                           # as imported from spatstat
 S3method(marks, epidataCS)
 export(marks.epidataCS)            # for convenience since its a foreign generic
 S3method(plot, epidataCS)
+export(epidataCSplot_time, epidataCSplot_space)
 S3method(as.epidata, epidataCS)
 export(as.epidata.epidataCS)            # for convenience
 

@@ -1,4 +1,4 @@
-\name{twinstim_epidataCS_aggregate}
+\name{epidataCS_aggregate}
 \alias{epidataCS2sts}
 \alias{as.epidata.epidataCS}
 

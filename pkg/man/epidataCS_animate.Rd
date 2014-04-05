@@ -1,5 +1,5 @@
 \encoding{latin1}
-\name{twinstim_epidataCS_animate}
+\name{epidataCS_animate}
 \alias{animate.epidataCS}
 
 \title{

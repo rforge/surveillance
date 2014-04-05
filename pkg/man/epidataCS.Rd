@@ -1,5 +1,5 @@
 \encoding{latin1}
-\name{twinstim_epidataCS}
+\name{epidataCS}
 \alias{epidataCS}
 \alias{as.epidataCS}
 \alias{print.epidataCS}

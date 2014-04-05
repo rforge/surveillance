@@ -14,7 +14,7 @@
 plot.epidataCS <- function (x, aggregate = c("time", "space"), subset, ...)
 {
     aggregate <- match.arg(aggregate)
-    FUN <- paste("plot.epidataCS", aggregate, sep="_")
+    FUN <- paste("epidataCSplot", aggregate, sep="_")
     do.call(FUN, args=list(x=quote(x), subset=substitute(subset), ...))
 }
 
@@ -22,7 +22,7 @@ plot.epidataCS <- function (x, aggregate = c("time", "space"), subset, ...)
 ### plot.epidataCS(x, aggregate = "time") -> number of cases over time
 ## in case t0.Date is specified, hist.Date() is used and breaks must set in ... (e.g. "months")
 
-plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
+epidataCSplot_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
     col = rainbow(nTypes), cumulative = list(), add = FALSE, mar = NULL,
     xlim = NULL, ylim = NULL, xlab = "Time", ylab = NULL, main = NULL,
     panel.first = abline(h=axTicks(2), lty=2, col="grey"),
@@ -138,7 +138,7 @@ plot.epidataCS_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
 
 ### plot.epidataCS(x, aggregate = "space") -> spatial point pattern
 
-plot.epidataCS_space <- function (x, subset,
+epidataCSplot_space <- function (x, subset,
     cex.fun = sqrt, points.args = list(), add = FALSE,
     legend.types = list(), legend.counts = list(), ...)
 {

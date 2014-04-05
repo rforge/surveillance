@@ -1,4 +1,4 @@
-\name{twinstim_epidataCS_update}
+\name{epidataCS_update}
 \alias{update.epidataCS}
 \title{
   Update method for \code{"epidataCS"}
