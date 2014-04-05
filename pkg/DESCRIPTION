@@ -40,7 +40,7 @@ Depends: R (>= 2.15.2), methods, grDevices, graphics, stats, utils,
         Rcpp, sp (>= 1.0-6), xtable, polyCub (>= 0.4-2)
 Imports: MASS, Matrix, spatstat (>= 1.36-0)
 LinkingTo: Rcpp
-Suggests: parallel, msm, spc, colorspace, animation, scales,
+Suggests: parallel, grid, msm, spc, colorspace, animation, scales,
         quadprog,
         memoise, polyclip, rgeos, gpclib, maptools, intervals,
         spdep, numDeriv, maxLik,

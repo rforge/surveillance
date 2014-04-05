@@ -90,6 +90,7 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
                                   labels.args)
         labels.args$labels <- getLabels(labels.args$labels)
         layout.labels <- c("panel.text", labels.args)
+        ## "panel.text" works since package "sp" imports all of "lattice"
         sp.layout <- c(sp.layout, list(layout.labels))
     }
     if (is.list(total.args)) {
@@ -100,7 +101,8 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
                 c(c("left", "right")[1+x], c("bottom","top")[1+y])
             } else "center")
         total.args$label <- paste0(total.args$label, round(total,1))
-        layout.total <- c("grid.text", total.args)
+        layout.total <- c(grid::grid.text, total.args)
+        ## "grid.text" wouldn't work since package "sp" doesn't import it
         sp.layout <- c(sp.layout, list(layout.total))
     }
 
