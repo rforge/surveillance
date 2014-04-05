@@ -137,12 +137,12 @@
       \code{alarm} slots of \code{x} into a data frame with column names
       matching the colnames of the respective slots. Useful when one wants
       to fit a model based on the object}
-    \item{plot}{\code{signature(x="sts",y="missing")}: this function is
+    \item{plot}{\code{signature(x="sts",y="missing")}: this method is
+      the entry point to a collection of plot variants. It is also
       the successor of the \code{\link{plot.disProg}} and 
-      \code{\link{plot.survRes}} functions. It takes (more or less) the
-      same arguments as \code{plot.survRes}. The most important
-      difference is the type of plot, which is specified using
-      \code{type}. See \code{\link{plot,sts,missing-method}} for details.
+      \code{\link{plot.survRes}} functions. The type of plot is
+      specified using a formula \code{type}.
+      See \code{\link{stsplot}} for details.
     }
   }
 }

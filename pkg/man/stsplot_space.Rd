@@ -110,11 +110,9 @@ stsplot_space(x, tps = NULL, map = x@map, population = NULL,
 }
 
 \seealso{
-  the central \code{"sts"}
-  \code{\link[=plot,sts,missing-method]{plot}}-method for
-  an overview of plot types.
-  There is also an \code{\link[=animate.sts]{animate}}-method for class
-  \code{"sts"}.
+  the central \code{\link{stsplot}}-documentation for an overview of
+  plot types, and \code{\link{animate.sts}} for animations of
+  \code{"sts"} objects.
 }
 
 \examples{

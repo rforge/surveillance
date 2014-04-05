@@ -122,9 +122,8 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
 }
 
 \seealso{
-  the central \code{"sts"}
-  \code{\link[=plot,sts,missing-method]{plot}}-method for
-  an overview of plot types.
+  the central \code{\link{stsplot}}-documentation for an overview of
+  plot types.
 }
 
 \examples{
