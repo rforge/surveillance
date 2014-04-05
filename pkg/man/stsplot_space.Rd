@@ -116,17 +116,17 @@ stsplot_space(x, tps = NULL, map = x@map, population = NULL,
 }
 
 \examples{
-data("fluBYBW")
+data("measlesWeserEms")
 
 # default plot: total region-specific counts over all weeks
-plot(fluBYBW, type=observed~unit)
+plot(measlesWeserEms, type=observed~unit)
 
 # plot incidence
-plot(fluBYBW, type=observed~unit,
-     population=fluBYBW@map$X31_12_01 / 100000)
+plot(measlesWeserEms, type=observed~unit,
+     population=measlesWeserEms@map$POPULATION / 100000)
 
-# counts in the last week only
-plot(fluBYBW, type=observed~unit, tps=nrow(fluBYBW), total.args=list())
+# counts in the first week of the second year only (+ display overall)
+plot(measlesWeserEms, type=observed~unit, tps=53, total.args=list())
 }
 
 \keyword{hplot}
