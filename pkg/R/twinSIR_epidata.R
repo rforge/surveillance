@@ -290,7 +290,7 @@ as.epidata.default <- function(data, id.col, start.col, stop.col, atRiskY.col,
 # INSERT BLOCKS FOR EXTRA STOP TIMES IN 'EPIDATA' OBJECTS
 ################################################################################
 
-intersperse <- function (epidata, stoptimes)
+intersperse <- function (epidata, stoptimes, verbose = FALSE)
 {
     # Check arguments
     if (!inherits(epidata, "epidata")) {
@@ -328,7 +328,10 @@ intersperse <- function (epidata, stoptimes)
     oldclass <- class(epidata)
     class(epidata) <- "data.frame" # Avoid use of [.epidata (not necessary here)
     sortedEpiStop <- sort(epiStop)
-    for(extraStop in extraStoptimes) {
+    nInsert <- length(extraStoptimes)
+    if (verbose) pb <- txtProgressBar(min=0, max=nInsert, initial=0, style=3)
+    for(i in seq_len(nInsert)) {
+      extraStop <- extraStoptimes[i]
       nextStoptime <- sortedEpiStop[match(TRUE, sortedEpiStop > extraStop)]
       # Find the block (row indexes) into which the extraStop falls
       rowsMatchedBlock <- which(epidata$stop == nextStoptime)
@@ -342,7 +345,9 @@ intersperse <- function (epidata, stoptimes)
       epidata[rowsMatchedBlock, "Revent"] <- 0
       # append the new block to epidata (reorder rows later)
       epidata <- rbind(epidata, newBlock)
+      if (verbose) setTxtProgressBar(pb, i)
     }
+    if (verbose) close(pb)
     
     # Adjust BLOCK column
     sortedEpiStop <- sort(c(sortedEpiStop, extraStoptimes))

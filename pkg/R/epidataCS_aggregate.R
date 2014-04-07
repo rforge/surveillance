@@ -75,10 +75,11 @@ as.epidata.epidataCS <- function (data, tileCentroids, eps = 0.001, ...)
 
     ### add additional stop times to stgrid for tile infections and recoveries
     requiredStopTimes <- sort(c(tileItimes, tileRtimes))
-    class(stgrid) <- c("epidataCS", "data.frame")
+    class(stgrid) <- c("epidata", "data.frame")
     attr(stgrid, "timeRange") <- c(stgrid$start[1], tail(stgrid$stop,1))
     cat("Inserting extra stop times in 'stgrid' (this might take a while)... ")
-    evHist <- intersperse(stgrid, requiredStopTimes) # this resets the BLOCK index
+    evHist <- intersperse(stgrid, requiredStopTimes, verbose=interactive())
+                                        # CAVE: this resets the BLOCK index
     class(evHist) <- "data.frame"
     ### <- THIS IS THE MOST TIME-CONSUMING PART OF THIS FUNCTION !!!
     cat("Done.\n")
