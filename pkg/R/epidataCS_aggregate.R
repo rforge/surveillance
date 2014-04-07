@@ -43,6 +43,7 @@ as.epidata.epidataCS <- function (data, tileCentroids, eps = 0.001, ...)
         # relies on ordering of stgrid by first BLOCK, then tile
     )
     names(stgrid)[names(stgrid)=="tile"] <- "id"
+    timeRange <- with(stgrid, c(start[1], stop[length(stop)]))
 
     ### now determine "events" with respect to the tiles
     # individual data
@@ -74,10 +75,10 @@ as.epidata.epidataCS <- function (data, tileCentroids, eps = 0.001, ...)
     }
 
     ### add additional stop times to stgrid for tile infections and recoveries
-    requiredStopTimes <- sort(c(tileItimes, tileRtimes))
+    requiredStopTimes <- sort(c(tileItimes,tileRtimes[tileRtimes<timeRange[2]]))
     class(stgrid) <- c("epidata", "data.frame")
-    attr(stgrid, "timeRange") <- c(stgrid$start[1], tail(stgrid$stop,1))
-    cat("Inserting extra stop times in 'stgrid' (this might take a while)... ")
+    attr(stgrid, "timeRange") <- timeRange
+    cat("Inserting extra stop times in 'stgrid' (this might take a while) ... ")
     evHist <- intersperse(stgrid, requiredStopTimes, verbose=interactive())
                                         # CAVE: this resets the BLOCK index
     class(evHist) <- "data.frame"
@@ -109,7 +110,7 @@ as.epidata.epidataCS <- function (data, tileCentroids, eps = 0.001, ...)
     evHist$atRiskY <- .atRiskY
 
     ### Return final epidata object of twinSIR-type
-    cat("Generating final \"epidata\" object for use with twinSIR... ")
+    cat("Generating final \"epidata\" object for use with twinSIR ... ")
     epi <- as.epidata(evHist[-grep("BLOCK", names(evHist))],
         id.col="id", start.col="start", stop.col="stop", atRiskY.col="atRiskY",
         event.col="event", Revent.col="Revent", coords.cols=c("xCent","yCent")
