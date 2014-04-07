@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-04-05)}{
+\section{Changes in surveillance version 1.8-0 (2014-04-07)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -117,6 +117,11 @@
     over time. It corresponds to the new \code{type = observed ~ unit}
     of the \code{stsplot}-method, and supersedes
     \code{type = observed ~ 1|unit} (except for alarm shading).
+
+    \item An \code{animate()}-method for the \code{"sts"} class provides
+    a new implementation for animated maps (superseding the \code{plot}
+    \code{type=observed ~ 1 | unit * time}) with an optional evolving
+    time series plot below the map.
 
     \item \code{as.epidataCS()} gained a \code{verbose} argument.
 

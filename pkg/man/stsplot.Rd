@@ -62,13 +62,15 @@
       Use \code{type=observed~unit} for the new implementation as function
       \code{\link{stsplot_space}} (without alarm support, though).
     }
-    
-    \item{\code{observed ~ 1 | unit * time}}{an animation consisting
-      of \code{nrow(x)} frames is generated. Each frame contains the
+
+    \item{\code{observed ~ 1 | unit * time}}{old version for animated
+      maps via the \code{\link{stsplot_spacetime}} function.
+      Each of the \code{nrow(x)} frames contains the
       number of counts per region for the current row in the
       \code{observed} matrix. It is possible to redirect the output
       into files, e.g. to generate an animated GIF.
-      See the documentation of \code{\link{stsplot_spacetime}}.
+      NOTE: the new \code{\link{animate.sts}} method supersedes this
+      plot \code{type}!
     }
   }
 }
@@ -79,7 +81,11 @@
 }
 
 \seealso{
-  \code{\link{plot.survRes}} (old implementation).
+  the documentation of the individual plot types
+  \code{\link{stsplot_time}}, \code{\link{stsplot_space}},
+  \code{\link{stsplot_spacetime}} (obsolete), as well as the
+  \code{animate}-method \code{\link{animate.sts}}.
+  \code{\link{plot.survRes}} is the old implementation.
 }
 
 \examples{

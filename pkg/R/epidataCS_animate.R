@@ -23,6 +23,9 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
     pch = 15:18, col.current = "red", col.I = "#C16E41", col.R = "#B3B3B3",
     col.influence = NULL, main = NULL, verbose = interactive(), ...)
 {
+    if (dev.interactive())
+        message("Advice: use facilities of the \"animation\" package, e.g.,\n",
+                "        saveHTML() to view the animation in a web browser.")
     stopifnot(is.numeric(interval), length(interval) == 2L)
     with.animation <- suppressWarnings(require("animation"))
     if (is.null(sleep)) {
