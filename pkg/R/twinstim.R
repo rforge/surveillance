@@ -18,8 +18,8 @@ twinstim <- function (
     na.action = na.fail, start = NULL, partial = FALSE,
     control.siaf = list(F=list(), Deriv=list()),
     optim.args = list(), finetune = FALSE,
-    model = FALSE, cumCIF = TRUE,
-    cumCIF.pb = interactive(), cores = 1, verbose = TRUE
+    model = FALSE, cumCIF = FALSE, cumCIF.pb = interactive(),
+    cores = 1, verbose = TRUE
     )
 {
 
@@ -1097,7 +1097,8 @@ twinstim <- function (
         optimArgs[namesOptimUser[optimValid]] <- optim.args[optimValid]
         if (any(!optimValid)) {
             warning("unknown names in optim.args: ",
-                    paste(namesOptimUser[!optimValid], collapse = ", "))
+                    paste(namesOptimUser[!optimValid], collapse = ", "),
+                    immediate. = TRUE)
         }
         doHessian <- eval(optimArgs$hessian)
         optimMethod <- eval(optimArgs$method)
@@ -1263,17 +1264,18 @@ twinstim <- function (
     ### Add Fisher information matrices
 
     # estimation of the expected Fisher information matrix
-    if (useScore)
-        fit$fisherinfo <- structure(
+    fit["fisherinfo"] <- list(
+        if (useScore) structure(
             fisherinfo(fit$coefficients),
             dimnames = list(names(initpars), names(initpars))
             )
-
+        )
+    
     # If requested, add observed fisher info (= negative hessian at maximum)
-    if (any(!fixed) && !is.null(optimRes$hessian)) {
-        fit$fisherinfo.observed <- optimRes$hessian
+    fit["fisherinfo.observed"] <- list(
+        if (any(!fixed) && !is.null(optimRes$hessian)) optimRes$hessian
         ## no "-" here because we optimized the negative log-likelihood
-    }
+        )
 
 
     ### Add fitted intensity values and integrated intensities at events
@@ -1326,11 +1328,12 @@ twinstim <- function (
         if (cumCIF.pb) close(pb)
         setNames(.colSums(heIntEvents, 2L, Nin), rownames(mmhEvents))
     }
-    if (cumCIF) {
-        if (verbose)
-            cat("\nCalculating fitted cumulative intensities at events...\n")
-        fit$tau <- LambdagEvents(cores, cumCIF.pb)
-    }
+    fit["tau"] <- list(
+        if (cumCIF) {
+            if (verbose)
+                cat("\nCalculating fitted cumulative intensities at events...\n")
+            LambdagEvents(cores, cumCIF.pb)
+        })
 
     # calculate observed R0's: mu_j = spatio-temporal integral of e_j(t,s) over
     # the observation domain (t0;T] x W (not whole R+ x R^2)
@@ -1355,10 +1358,11 @@ twinstim <- function (
     optim.args$par <- initpars        # reset to also include fixed coefficients
     if (any(fixed)) optim.args$fixed <- names(initpars)[fixed] # restore
     fit$optim.args <- optim.args
-    if (model) {
-        fit$functions <- functions
-        environment(fit) <- environment()
-    }
+    fit["functions"] <- list(
+        if (model) {
+            environment(fit) <- environment()
+            functions
+        })
 
 
     ### Return object of class "twinstim"

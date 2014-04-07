@@ -210,6 +210,13 @@
     been reset (chronological index).
     \item More rigorous checking of \code{tiles} in
     \code{simulate.twinstim()} and \code{intensityplot.twinstim}.
+    \item The optional \code{"twinstim"} result components
+    \code{fisherinfo}, \code{tau}, and \code{functions} are always
+    included. They are set to \code{NULL} if they are not applicable
+    instead of missing completely (as before), such that all
+    \code{"twinstim"} objects have the same list structure.
+    \item The \code{twinstim()} argument \code{cumCIF} now defaults to
+    \code{FALSE}.
   }
 }
 

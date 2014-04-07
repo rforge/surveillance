@@ -498,7 +498,8 @@ residuals.twinstim <- function (object, ...)
               objname <- deparse(substitute(object))
               object$tau <- res
               assign(objname, object, envir = parent.frame())
-              cat("Note: added the 'tau' component to '", objname, "' for future use.\n", sep="")
+              message("Note: added the 'tau' component to object '", objname,
+                      "' for future use.")
           }, silent = TRUE)
       }
   }

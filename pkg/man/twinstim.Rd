@@ -18,8 +18,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
          na.action = na.fail, start = NULL, partial = FALSE,
          control.siaf = list(F = list(), Deriv = list()),
          optim.args = list(), finetune = FALSE,
-         model = FALSE, cumCIF = TRUE,
-         cumCIF.pb = interactive(), cores = 1, verbose = TRUE)
+         model = FALSE, cumCIF = FALSE, cumCIF.pb = interactive(),
+         cores = 1, verbose = TRUE)
 }
 
 \arguments{
@@ -165,7 +165,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     
     Note that \code{optim} receives the negative log-likelihood for 
     minimization (thus, if used, \code{optim.args$control$fnscale} should be
-    positive). The \code{hessian} argument defaults to \code{TRUE} and
+    positive). The \code{hessian} argument defaults to \code{TRUE}, and
     in the \code{control} list, \code{trace}ing is enabled with
     \code{REPORT=1} by default. By setting
     \code{optim.args$control$trace = 0}, all output from the
@@ -200,10 +200,10 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     \code{maxit} (-> \code{iter.max}), \code{REPORT} (-> \code{trace},
     default: 1), \code{abstol} (-> \code{abs.tol}), and
     \code{reltol} (-> \code{rel.tol}, default: \code{1e-6}).
-    For \code{nlminb}, a logical \code{hessian} argument indicates if
-    the negative \emph{expected} Fisher information matrix should be
-    used as the Hessian during optimization (otherwise a numerical
-    approximation is used).
+    For \code{nlminb}, a logical \code{hessian} argument (default:
+    \code{TRUE}) indicates if the negative \emph{expected} Fisher
+    information matrix should be used as the Hessian during optimization
+    (otherwise a numerical approximation is used).
 
     Similary, \code{method="nlm"} should also work but is not
     recommended here.    
@@ -230,7 +230,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     \code{twinstim} result.
   }
   \item{cumCIF}{
-    logical (default: \code{TRUE}) indicating whether to
+    logical (default: \code{FALSE}) indicating whether to
     calculate the fitted cumulative ground intensity at event times.
     This is the residual process, see \code{\link{residuals.twinstim}}.
   }
@@ -279,17 +279,15 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     likelihood was used.}
   \item{counts}{number of log-likelihood and score evaluations during
     optimization.}
-  \item{control.siaf}{see the \dQuote{Arguments} section above.}
-  \item{optim.args}{input optimizer arguments used to determine the MLE.}
   \item{converged}{either \code{TRUE} (if the optimizer converged) or a
     character string containing a failure message).}
   \item{fisherinfo}{\emph{expected} Fisher information evaluated at the
-    MLE. Only part of the output for full likelihood inference
+    MLE. Only non-\code{NULL} for full likelihood inference
     (\code{partial = FALSE}) and if spatial and temporal interaction
     functions are provided with their derivatives.}
   \item{fisherinfo.observed}{observed Fisher information matrix
     evaluated at the value of the MLE. Obtained as the negative Hessian.
-    This is only part of the result if \code{optim.args$method} is not
+    Only non-\code{NULL} if \code{optim.args$method} is not
     \code{"nlminb"} and if it was requested by setting
     \code{hessian=TRUE} in \code{optim.args}.}
   \item{fitted}{fitted values of the conditional intensity function at the events.}
@@ -298,7 +296,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     components, respectively.\cr
     (Note that \code{rowSums(fittedComponents) == fitted}.)}
   \item{tau}{fitted cumulative ground intensities at the event times.
-    Only calculated and returned if \code{cumCIF = TRUE}.
+    Only non-\code{NULL} if \code{cumCIF = TRUE}.
     This is the \dQuote{residual process} of the model, see
     \code{\link{residuals.twinstim}}.}
   \item{R0}{estimated basic reproduction number for each event. This
@@ -316,13 +314,15 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   \item{formula}{a list containing the four main parts of the model
     specification: \code{endemic}, \code{epidemic}, \code{siaf}, and
     \code{tiaf}.}
+  \item{control.siaf}{see the \dQuote{Arguments} section above.}
+  \item{optim.args}{input optimizer arguments used to determine the MLE.}
   \item{functions}{if \code{model=TRUE} this is a \code{list} with
     components \code{ll}, \code{sc} and \code{fi}, which are functions
     evaluating the log-likelihood, the score function and the expected
     Fisher information for a parameter vector \eqn{\theta}. The
     \code{environment} of these function is the model environment, which
-    is thus retained in the workspace if \code{model=TRUE}.
-  }
+    is thus retained in the workspace if \code{model=TRUE}. Otherwise,
+    the \code{functions} component is \code{NULL}.}
   \item{call}{the matched call.}
   \item{runtime}{the \code{\link{proc.time}}-queried time taken
     to fit the model, i.e., a named numeric vector of length 5 of class
@@ -416,8 +416,7 @@ m_noepi <- twinstim(
     endemic = addSeason2formula(~ offset(log(popdensity)) + I(start/365-3.5),
                                 S=1, period=365, timevar="start"),
     data = imdepi, subset = !is.na(agegrp),
-    optim.args = list(par=c(h.intercept,rep(0,3))), # the default anyway
-    model = FALSE, cumCIF = FALSE   # for reasons of speed
+    optim.args = list(par=c(h.intercept,rep(0,3))) # the default anyway
 )
 
 ## look at the model summary
@@ -495,7 +494,7 @@ if (surveillance.options("allExamples"))
 {
   ## estimate an exponential temporal decay of infectivity
   m1_tiaf <- update(m0, tiaf=tiaf.exponential())
-  plot(m1_tiaf, "tiaf", xlim=c(0,30), legend=FALSE)
+  plot(m1_tiaf, "tiaf", scaled=FALSE)
 
   ### try with a spatially decreasing interaction kernel
   ## Likelihood evaluation takes much longer than for constant spatial spread
@@ -513,7 +512,7 @@ if (surveillance.options("allExamples"))
 
   AIC(m_noepi, m0, m1)   # further improvement
   summary(m1, test.iaf=FALSE)   # nonsense to test H0: log(sigma) = 0
-  plot(m1, "siaf", xlim=c(0,200), types=1)   # the same for types=2
+  plot(m1, "siaf", scaled=FALSE)
 
 
   ### add epidemic covariates
