@@ -125,6 +125,10 @@
 
     \item \code{as.epidataCS()} gained a \code{verbose} argument.
 
+    \item The new function \code{glm_epidataCS()} can be used to fit
+    an endemic-only \code{twinstim()} via \code{glm()}.
+    This is mainly provided for testing purposes since the estimation
+    via \code{glm} usually takes much longer. 
   }
 }
 

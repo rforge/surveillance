@@ -1,6 +1,6 @@
 ################################################################################
 ## Author: Sebastian Meyer [sebastian *.* meyer *a*t* ifspm *.* uzh *.* ch]
-## Time-stamp: <[glmfit.R] by SM Son 08/09/2013 13:54 (CEST)>
+## Time-stamp: <[glmfit.R] by SM Mon 07/04/2014 23:17 (CEST)>
 ## Project: Reproduce endemic-only twinstim fit by an equivalent Poisson-GLM fit
 ################################################################################
 
@@ -41,11 +41,12 @@ summary(myglm)
 ## but the intercept is not correct
 
 
-### need an additional offset: log(ds*dt)
+### need an additional offset: log(nTypes*ds*dt)
 
+nTypes <- nlevels(imdepi$events$type)
 myglmoffset <- glm(update(formula(m_noepi)$endemic, nEvents ~ .),
                    data=mystgrid, family=poisson,
-                   offset=log((stop-start) * area))
+                   offset=log(nTypes * (stop-start) * area))
 summary(myglmoffset)
 # estimates and standard errors reproduced (apart from numerical differences)
 
@@ -56,7 +57,6 @@ summary(myglmoffset)
 m_noepi_types <- update(m_noepi, endemic=~(1|type) + ., optim.args=list(par=c(0,coef(m_noepi))))
 summary(m_noepi_types)
 
-nTypes <- nlevels(imdepi$events$type)
 mystkappagrid <- rbind(cbind(imdepi$stgrid,type="B"), cbind(imdepi$stgrid,type="C"))
 eventsbycell <- c(table(with(imdepi$events@data,
     interaction(tile, BLOCK, type, drop=FALSE, sep=".", lex.order=FALSE))))

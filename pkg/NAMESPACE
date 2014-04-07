@@ -267,6 +267,7 @@ export(intensityplot.simEpidata)        # for convenience
 ### twinstim-specific
 
 export(as.epidataCS)
+export(glm_epidataCS)
 export(twinstim)
 export(simEpidataCS)
 export(siaf,
