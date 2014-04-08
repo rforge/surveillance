@@ -111,6 +111,7 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 ##########
 
 # Feature requests
+- Permutation test to evaluate importance of epidemic component
 - as.epidataCS: "events" could be provided as an object of class ppx (which
   would include the window "W") or of class STIDF, then transform appropriately
   (but don't change "epidataCS" class definition).
@@ -119,7 +120,7 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
   in the epidemic component only, but otherwise not part of the likelihood
 - update.epidataCS(): add or remove stgrid variables
 - marks<-.epidataCS(,add=TRUE): to add marks
-- validate (test) twinstim by twinSIR and glm if only endemic component
+- validate (test) twinstim by twinSIR if only endemic component
 - allow for type-specific endemic effects, i.e. interaction with type. ideas:
 use "special", or extra argument typeSpecificEffects=c("(Intercept)",
 "influenza0"), ... maybe we can just use the classical formula interface (":")?
@@ -128,7 +129,7 @@ use "special", or extra argument typeSpecificEffects=c("(Intercept)",
   smaller cex of removed points), and support decreasing infectious point cex?
   To get a time slider (!), we could set up a Shiny app via animate(, shiny=TRUE)
     shiny::runApp(list(ui=pageWithSidebar(...), server=function(input,output)))
-  with default input$epidataCS the 'object'.
+  with default input$epidataCS the 'object' (but this is probably overkill)
 
 # Done
 06/08/2010 (sebastian): Lambda(t) function, i.e. cumulative intensity function

@@ -709,7 +709,7 @@ update.twinstim <- function (object, endemic, epidemic,
         if (use.estimates) coef(object) else object$optim.args$par
     } else NULL
     if ("start" %in% names(extras)) {
-        newstart <- eval.parent(extras$start)
+        newstart <- check_twinstim_start(eval.parent(extras$start))
         call$start[names(newstart)] <- newstart
         extras$start <- NULL
     }

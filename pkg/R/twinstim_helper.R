@@ -329,3 +329,24 @@ mapplyFUN <- function (args, before = list(), after = list(), parallel = TRUE)
     }
     FUN
 }
+
+
+### parse the list or vector of start values
+
+check_twinstim_start <- function (start)
+{
+    if (is.null(start)) {
+        return(start)
+    } else if (is.list(start)) { # convert allowed list specification to vector
+        stopifnot(names(start) %in% c("endemic", "epidemic", "h", "e",
+                                      "siaf", "tiaf", "e.siaf", "e.tiaf"))
+        names(start)[names(start) == "endemic"] <- "h"
+        names(start)[names(start) == "epidemic"] <- "e"
+        names(start)[names(start) == "siaf"] <- "e.siaf"
+        names(start)[names(start) == "tiaf"] <- "e.tiaf"
+        start <- unlist(start, use.names=TRUE)
+    }
+    if (!is.vector(start, mode="numeric") || is.null(names(start)))
+        stop("parameter 'start' values must be named and numeric")
+    return(start)
+}

@@ -956,16 +956,8 @@ twinstim <- function (
     )
 
     ## values in "start" overwrite initial values given by optim.args$par
-    if (is.list(start)) { # convert allowed list specification to vector
-        stopifnot(names(start) %in% c("endemic", "epidemic", "h", "e",
-                                      "siaf", "tiaf", "e.siaf", "e.tiaf"))
-        names(start)[names(start) == "endemic"] <- "h"
-        names(start)[names(start) == "epidemic"] <- "e"
-        names(start)[names(start) == "siaf"] <- "e.siaf"
-        names(start)[names(start) == "tiaf"] <- "e.tiaf"
-        start <- unlist(start, use.names=TRUE)
-    }
-    if (is.vector(start, mode="numeric")) {
+    if (!is.null(start)) {
+        start <- check_twinstim_start(start)
         start <- start[names(start) %in% names(optim.args$par)]
         optim.args$par[names(start)] <- start
     }
