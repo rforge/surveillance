@@ -204,12 +204,15 @@ print.summary.twinstim <- function (x,
 
 toLatex.summary.twinstim <- function (object,
                                       digits = max(3, getOption("digits") - 3),
-                                      eps.Pvalue = 1e-4,
-                                      align = "lrrrr", withAIC = FALSE, ...)
+                                      eps.Pvalue = 1e-4, 
+                                      align = "lrrrr", booktabs = FALSE,
+                                      withAIC = FALSE, ...)
 {
 ret <- capture.output({
-    cat("\\begin{tabular}{", align, "}\n\\hline\n", sep="")
-    cat(" & Estimate & Std. Error & $z$ value & $P(|Z|>|z|)$ \\\\\n\\hline\n\\hline\n")
+    cat("\\begin{tabular}{", align, "}\n",
+        if (booktabs) "\\toprule" else "\\hline", "\n", sep="")
+    cat(" & Estimate & Std. Error & $z$ value & $P(|Z|>|z|)$ \\\\\n",
+        if (!booktabs) "\\hline\n", sep="")
     tabh <- object$coefficients.beta
     tabe <- rbind(object$coefficients.gamma, object$coefficients.iaf)
     for (tabname in c("tabh", "tabe")) {
@@ -232,17 +235,17 @@ ret <- capture.output({
             tab2[] <- lapply(tab2, function(x) {
                 ifelse(is.na(x), "", paste0("$",x,"$")) # (test.iaf=FALSE)
             })
+            cat(if (booktabs) "\\midrule" else "\\hline", "\n")
             print(xtable(tab2), only.contents=TRUE, hline.after=NULL,
                   include.colnames=FALSE, sanitize.text.function=identity)
-            cat("\\hline\n")
         }
     }
     if (withAIC) {
-        cat("\\hline\n")
+        cat(if (booktabs) "\\midrule" else "\\hline", "\n")
         cat("AIC:& $", format(object$aic, digits=max(4, digits+1)), "$ &&&\\\\\n")
         cat("Log-likelihood:& $", format(object$loglik, digits=digits), "$ &&&\\\\\n")
     }
-    cat("\\hline\n")
+    cat(if (booktabs) "\\bottomrule" else "\\hline", "\n")
     cat("\\end{tabular}\n")
 })
 class(ret) <- "Latex"

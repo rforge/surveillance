@@ -40,7 +40,7 @@ Print, Summary and Extraction Methods for \code{"twinstim"} Objects
 
 \method{toLatex}{summary.twinstim}(object,
         digits = max(3, getOption("digits") - 3), eps.Pvalue = 1e-4,
-        align = "lrrrr", withAIC = FALSE, ...)
+        align = "lrrrr", booktabs = FALSE, withAIC = FALSE, ...)
 \method{xtable}{summary.twinstim}(x, caption = NULL, label = NULL,
       align = c("l", "r", "r", "r"), digits = 3,
       display = c("s", "f", "s", "s"),
@@ -72,6 +72,9 @@ Print, Summary and Extraction Methods for \code{"twinstim"} Objects
   \item{signif.stars}{logical. If \code{TRUE}, \dQuote{significance
       stars} are printed for each coefficient.}
   \item{eps.Pvalue}{passed to \code{\link{format.pval}}.}
+  \item{booktabs}{logical indicating if the \code{toprule},
+  \code{midrule} and \code{bottomrule} commands from the LaTeX package
+  \pkg{booktabs} should be used for horizontal lines rather than \code{hline}.}
   \item{withAIC}{logical indicating if the AIC and the log-likelihood of
     the model should be included below the table of coefficients in the
     LaTeX tabular.}
