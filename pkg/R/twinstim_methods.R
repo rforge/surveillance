@@ -250,14 +250,14 @@ ret
 }
 
 
-## Alternative implementation including exp-transformation of parameters
-## CAVE: no iaf parameters here
+## Alternative implementation with exp() of parameters, i.e., rate ratios (RR)
+## NOTE: intercepts and iaf parameters are ignored here
 
 xtable.summary.twinstim <- function (x, caption = NULL, label = NULL,
                              align = c("l", "r", "r", "r"), digits = 3,
                              display = c("s", "f", "s", "s"),
                              ci.level = 0.95, ci.fmt = "%4.2f", ci.to = "--",
-                             eps.pvalue = 1e-4, ...)
+                             eps.Pvalue = 1e-4, ...)
 {
     cis <- confint(x, level=ci.level)
     tabh <- x$coefficients.beta
@@ -269,7 +269,7 @@ xtable.summary.twinstim <- function (x, caption = NULL, label = NULL,
     cifmt <- paste0(ci.fmt, ci.to, ci.fmt)
     rrtab <- data.frame(RR = exp(tab[,1]),
                         CI = sprintf(cifmt, expcis[,1], expcis[,2]),
-                        "p-value" = formatPval(tab[,4], eps=eps.pvalue),
+                        "p-value" = formatPval(tab[,4], eps=eps.Pvalue),
                         check.names = FALSE, stringsAsFactors=FALSE)
     names(rrtab)[2] <- paste0(100*ci.level, "% CI")
 
