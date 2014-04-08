@@ -202,11 +202,10 @@ print.summary.twinstim <- function (x,
 
 ### 'cat's the summary in LaTeX code
 
-toLatex.summary.twinstim <- function (object,
-                                      digits = max(3, getOption("digits") - 3),
-                                      eps.Pvalue = 1e-4, 
-                                      align = "lrrrr", booktabs = FALSE,
-                                      withAIC = FALSE, ...)
+toLatex.summary.twinstim <- function (
+    object, digits = max(3, getOption("digits") - 3), eps.Pvalue = 1e-4,
+    align = "lrrrr", booktabs = getOption("xtable.booktabs", FALSE),
+    withAIC = FALSE, ...)
 {
 ret <- capture.output({
     cat("\\begin{tabular}{", align, "}\n",
@@ -223,8 +222,10 @@ ret <- capture.output({
                         printCoefmat(tab, digits=digits, signif.stars=FALSE,
                                      eps.Pvalue = eps.Pvalue, na.print="NA")
                         )[-1]
-            #tab_char <- sub("< (0\\..+)$", "<\\1", tab_char)
-            tab_char <- sub("([<]?)[ ]?([0-9]+)e([+-][0-9]+)$",
+            ## remove extra space (since used as column sep in read.table)
+            tab_char <- sub("< ", "<", tab_char, fixed=TRUE) # small p-values
+            ## replace scientific notation by corresponding LaTeX code
+            tab_char <- sub("(<?)([0-9]+)e([+-][0-9]+)$",
                             "\\1\\2\\\\cdot{}10^{\\3}",
                             tab_char)
             con <- textConnection(tab_char)

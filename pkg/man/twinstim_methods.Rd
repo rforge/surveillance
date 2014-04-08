@@ -40,7 +40,8 @@ Print, Summary and Extraction Methods for \code{"twinstim"} Objects
 
 \method{toLatex}{summary.twinstim}(object,
         digits = max(3, getOption("digits") - 3), eps.Pvalue = 1e-4,
-        align = "lrrrr", booktabs = FALSE, withAIC = FALSE, ...)
+        align = "lrrrr", booktabs = getOption("xtable.booktabs", FALSE),
+        withAIC = FALSE, ...)
 \method{xtable}{summary.twinstim}(x, caption = NULL, label = NULL,
       align = c("l", "r", "r", "r"), digits = 3,
       display = c("s", "f", "s", "s"),
