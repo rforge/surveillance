@@ -1,7 +1,7 @@
 ################################################################################
 ### Author: Sebastian Meyer [sebastian *.* meyer *a*t* ifspm *.* uzh *.* ch]
-### Time-stamp: <[imdepifit.R] by SM Mon 31/03/2014 17:36 (CEST)>
-### Project: reproduce data(imdepifit)
+### Time-stamp: <[imdepifit.R] by SM Die 08/04/2014 18:23 (CEST)>
+### Project: reproduce data(imdepifit), should be as in the JSS paper
 ################################################################################
 
 
@@ -9,6 +9,17 @@
 
 library("surveillance")
 data("imdepi")
+
+imdepifit_endemic <- twinstim(
+    endemic = addSeason2formula(~ offset(log(popdensity)) + I(start/365-3.5),
+                                S=1, period=365, timevar="start"),
+    data = imdepi, subset = !is.na(agegrp))
+
+imdepifit <- update(imdepifit_endemic,
+    epidemic = ~ type + agegrp, siaf = siaf.gaussian(),
+    control.siaf = list(F=list(adapt=0.25), Deriv=list(nGQ=13)),
+    start = list(epidemic=c("(Intercept)"=-12.5, "typeC"=-1, "siaf.1"=2.8)))
+
 
 myimdepifit <- twinstim(
     endemic = addSeason2formula(~ offset(log(popdensity)) + I(start/365-3.5),
