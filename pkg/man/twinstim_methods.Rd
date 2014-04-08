@@ -131,7 +131,11 @@ Print, Summary and Extraction Methods for \code{"twinstim"} Objects
   \code{"Latex"}, each element containing one line of LaTeX code (see
   \code{\link{print.Latex}}).
   The \code{xtable} method returns an object of class
-  \code{"\link{xtable}"}.
+  \code{"\link{xtable}"}. Note that the column name of the confidence
+  interval, e.g. \dQuote{95\% CI}, contains the percent symbol that may
+  need to be escaped when printing the \code{"xtable"} in the output
+  format (see \code{sanitize.text.function} in
+  \code{\link{print.xtable}}). This may also hold for row names.
 }
 
 \author{
