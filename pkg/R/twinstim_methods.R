@@ -710,7 +710,6 @@ update.twinstim <- function (object, endemic, epidemic,
         ## old optim.args$par probably doesn't match updated model,
         ## thus we set it as "start"-argument
         call$optim.args$par <- NULL
-        if (length(call$optim.args) == 0L) call$optim.args <- NULL
         if (use.estimates) coef(object) else object$optim.args$par
     } else NULL
     if ("start" %in% names(extras)) {

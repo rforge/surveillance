@@ -379,18 +379,14 @@ legend("topright", legend=levels(events$type), title="Type", pch=1:2, col=1:2)
     plot(imdepi, "space")
 }
 
-## construct an object of class "epidataCS" from these components
+## reconstruct the "imdepi" object from its components
 myimdepi <- as.epidataCS(events = events, stgrid = stgrid,
                          W = stateD, qmatrix = diag(2), nCircle2Poly = 16)
-
 \dontshow{
 ## should be equal as long as the internal structures of "epidataCS" and
 ## of the embedded classes ("owin", "SpatialPolygons", ...) do not change
-if (!isTRUE(all.equal(imdepi, myimdepi, tolerance=5e-6)))
+if (!identical(imdepi, myimdepi))
     warning("@Sebastian: update data(imdepi)")
-## Note: in spatstat 1.36.0, option "fixpolygons" was introduced and
-## defaults to TRUE, which produces small numerical differences (<5e-6)
-## in '.influenceRegions' (since 'Wowin' is different)
 }
 
 ## internal structure of an "epidataCS"-object

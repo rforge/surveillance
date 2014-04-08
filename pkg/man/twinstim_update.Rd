@@ -25,7 +25,9 @@ especially useful if one wants to add the \code{model} environment
   \item{optim.args}{see \code{\link{twinstim}}. If a list, it will
     modify the original \code{optim.args} using \code{\link{modifyList}}.}
   \item{model}{see \code{\link{twinstim}}. If this is the only argument
-    to update, re-fitting is cleverly circumvented.}
+    to update, re-fitting is cleverly circumvented.
+    Enriching the fit by the model environment is, e.g., required for
+    \code{\link{intensityplot.twinstim}}.}
   \item{\dots}{Additional arguments to the call, or arguments with changed
     values.\cr
     If \code{start} values are specified, they need to be in the same
@@ -60,16 +62,10 @@ data("imdepifit")
 
 ## add another epidemic covariate (but fix siaf-parameter for speed)
 imdepifit2 <- update(imdepifit, epidemic = ~. + log(popdensity),
-                     optim.args = list(fixed="e.siaf.1"), cumCIF=FALSE)
+                     optim.args = list(fixed="e.siaf.1"))
   
 ## compare by AIC
 AIC(imdepifit, imdepifit2)
-
-if (surveillance.options("allExamples")) {
-  ## enrich the fit by the model environment
-  imdepifit <- update(imdepifit, model=TRUE)
-  ## this enables, e.g., intensityplot()s and untrimmed R0 estimates
-}
 }
 
 \keyword{models}

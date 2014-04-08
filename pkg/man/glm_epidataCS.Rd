@@ -46,7 +46,7 @@ glm_epidataCS(formula, data, ...)
 data("imdepi")
 data("imdepifit")
 ## Compare an endemic-only twinstim() with an equivalent model using glm()
-fit_twinstim <- update(imdepifit, epidemic = ~0, siaf = NULL, cumCIF=FALSE)
+fit_twinstim <- update(imdepifit, epidemic = ~0, siaf = NULL)
 fit_glm <- glm_epidataCS(formula(fit_twinstim)$endemic, imdepi)
 coef(fit_glm)
 \dontshow{
