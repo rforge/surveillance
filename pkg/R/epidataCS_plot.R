@@ -106,7 +106,7 @@ epidataCSplot_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
         div <- length(aT2) - 1L
         cumulative <- modifyList(
             list(maxat = ceiling(max(unlist(csums))/div)*div,
-                 col = apply(col2rgb(col)/255*0.5, 2, function (x)
+                 col = apply(col2rgb(col)/255*0.6, 2, function (x)
                              rgb(x[1L], x[2L], x[3L])),
                  lwd = 3, axis = TRUE, lab = "Cumulative number of cases"),
             cumulative)
