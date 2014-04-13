@@ -29,6 +29,13 @@
 
 \subsection{NEW FEATURES}{
   \itemize{
+    \item The \code{nowcast} procedure has been completely re-written to
+    handle the inherit right-truncation of reporting data (best
+    visualized as a reporting triangle). The new code implements the
+    generalized-Dirichlet and the hierarchical Bayesian approach described in
+    \enc{Höhle}{Hoehle} and an der Heiden (2014). No backwards
+    compatibility to the old nowcasting procedure is given. 
+    
     \item The package contains a new monitoring function
     \code{boda}. This is a first experimental surveillance
     implementation of the Bayesian Outbreak Detection Algorithm (BODA)

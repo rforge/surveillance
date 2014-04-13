@@ -122,3 +122,24 @@ setReplaceMethod("neighbourhood", "sts", function(x, value) {
  x
 })
 
+######################################################################
+# For stsNC class
+######################################################################
+
+### access function for repotringTriangle slot 
+setGeneric("reportingTriangle", function(x) standardGeneric("reportingTriangle"))
+setMethod("reportingTriangle", "stsNC", function(x) {
+  return(x@reportingTriangle)
+})
+
+### access function for delayCDF slot 
+setGeneric("delayCDF", function(x) standardGeneric("delayCDF"))
+setMethod("delayCDF", "stsNC", function(x) {
+  return(x@delayCDF)
+})
+
+### access function for SR slot 
+setGeneric("score", function(x) standardGeneric("score"))
+setMethod("score", "stsNC", function(x) {
+  return(x@SR)
+})

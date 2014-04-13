@@ -154,6 +154,8 @@ exportMethods(as.data.frame)
 # methods for accessing/replacing slots of an sts object (cf. AllGeneric.R)
 exportMethods(epoch,observed,alarms,upperbound,population,control,multinomialTS,neighbourhood)
 exportMethods("epoch<-","observed<-","alarms<-","upperbound<-","population<-","control<-","multinomialTS<-","neighbourhood<-")
+# methods for accessing/replacing slots of an stsNC object
+exportMethods(reportingTriangle,delayCDF,score)
 
 # plot variants
 export(stsplot_space)
