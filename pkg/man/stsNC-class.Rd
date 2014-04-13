@@ -46,7 +46,16 @@
     \item{\code{signature(from = "sts", to = "stsNC")}}{
       Convert an object of class \code{sts} to class \code{stsNC}.
     }
-  }
+    \item{reportingTriangle}{\code{signature(x = "stsNC")}: extract the
+      \code{reportingTriangle} slot of an \code{stsNC} object.
+    }
+    \item{delayCDF}{\code{signature(x = "stsNC")}: extract the
+      \code{delayCDF} slot of an \code{stsNC} object.
+    }
+    \item{score}{\code{signature(x = "stsNC")}: extract the
+      scoring rules result slot of an \code{stsNC} object.
+    }
+}
 } %end section methods.
 
 

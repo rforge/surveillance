@@ -304,7 +304,6 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
 
   #Store results of the reporting triangle in the control slot together with additional
   #attributes for fast access of, e.g., summaries or defining variables.
-  #reportingTriangle <- list(n=n,n.x=n.x,N.x=N.x,N.tT=N.tT,N.tInf=N.tInf,T=T,m=m,D=D,t02s=t02s)
   reportingTriangle <- n
   attr(reportingTriangle, "n.x") <- n.x
   attr(reportingTriangle, "N.x") <- N.x
@@ -312,11 +311,11 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
   attr(reportingTriangle, "N.tInf") <- N.tInf
   attr(reportingTriangle, "T") <- T
   attr(reportingTriangle, "D") <- D
-  attr(reportingTriangle, "t02s=t02s") <- t02s
+  attr(reportingTriangle, "t02s") <- t02s
   sts@reportingTriangle <- reportingTriangle
   
   #======================================================================
-  # Calculations jointly for all t values. 
+  # Calculations are jointly for all t values. 
   #======================================================================
 
   #List of casts each containing a table 0..N.tInf.max with the PMF
@@ -1061,9 +1060,13 @@ dbnb <- function(k,n,alpha,beta) {
 
 
 ######################################################################
-#Convert discrete time hazards to PMF
-#Parameters:
+# Convert discrete time hazard function on 0,...,Dmax to a probability
+# mass function.
+#
+# Parameters:
 #  haz - vector with entries for (0,...,Dmax)
+# Returns:
+#  vector with PMF on 0,...,Dmax.
 ######################################################################
 
 haz2pmf <- function(haz) {
