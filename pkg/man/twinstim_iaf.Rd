@@ -127,8 +127,8 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
       \eqn{f(s) = 1}
     }
     \item{\code{siaf.step}:}{
-      \eqn{f(s) = \sum_{k=0}^K \alpha_k I_k(||s||)},\cr
-      where \eqn{\alpha_0 = 1}, and \eqn{\alpha_1, \dots, \alpha_K} are
+      \eqn{f(s) = \sum_{k=0}^K \exp(\alpha_k) I_k(||s||)},\cr
+      where \eqn{\alpha_0 = 0}, and \eqn{\alpha_1, \dots, \alpha_K} are
       the parameters (heights) to estimate. \eqn{I_k(||s||)} indicates
       if distance \eqn{||s||} belongs to the \eqn{k}th interval
       according to \code{c(0,knots,maxRange)}, where \eqn{k=0} indicates
@@ -198,8 +198,8 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
       \eqn{g(t) = 1}
     }
     \item{\code{tiaf.step}:}{
-      \eqn{g(t) = \sum_{k=0}^K \alpha_k I_k(t)},\cr
-      where \eqn{\alpha_0 = 1}, and \eqn{\alpha_1, \dots, \alpha_K} are
+      \eqn{g(t) = \sum_{k=0}^K \exp(\alpha_k) I_k(t)},\cr
+      where \eqn{\alpha_0 = 0}, and \eqn{\alpha_1, \dots, \alpha_K} are
       the parameters (heights) to estimate. \eqn{I_k(t)} indicates
       if \eqn{t} belongs to the \eqn{k}th interval
       according to \code{c(0,knots,maxRange)}, where \eqn{k=0} indicates
