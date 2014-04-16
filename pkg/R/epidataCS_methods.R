@@ -286,14 +286,19 @@ as.stepfun.epidataCS <- function (x, ...)
 ### Distances from potential (eps.s, eps.t) sources
 ###################################################
 
-getSourceDists <- function (object)
+getSourceDists <- function (object, dimension = c("space", "time"))
 {
+    dimension <- match.arg(dimension)
+    
     ## extract required info from "epidataCS"-object
-    eventCoords <- coordinates(object$events)
+    distmat <- as.matrix(dist(
+        if (dimension == "space") {
+            coordinates(object$events)
+        } else object$events$time
+        ))
     .sources <- object$events$.sources
 
-    ## distance matrix and number of sources
-    distmat <- as.matrix(dist(eventCoords))
+    ## number of sources
     nsources <- sapply(.sources, length)
     hasSources <- nsources > 0
     cnsources <- c(0, cumsum(nsources))
