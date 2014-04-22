@@ -233,6 +233,9 @@
 
 \subsection{BUG FIXES}{
   \itemize{
+    \item Fixed a bug in \code{LRCUSUM.runlength} where computations
+    were erroneously always done under  the in-control parameter
+    \code{mu0} instead of \code{mu}.
     \item Fixed a bug during alarm plots (\code{stsplot_alarm()}),
     where the use of \code{alarm.symbol} was ignored.
     \item Fixed a bug in \code{algo.glrnb} where the overdispersion
