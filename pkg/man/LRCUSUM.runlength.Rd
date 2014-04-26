@@ -130,6 +130,25 @@ if (surveillance.options("allExamples"))
 # and multinomial CUSUMs. Hopefully, these will be added
 # in the future.
 ########################################################
+
+#dfun function for the multinomial distribution (Note: Only k-1
+categories are specified).
+dmult <- function(y, size,mu, log = FALSE) {
+    return(dmultinom(c(y,size-sum(y)), size = size, prob=c(mu,1-sum(mu)), log = log))
+}
+
+#Example for the time-constant multinomial distribution
+#with size 100 and in-control and out-of-control parameters as below.
+n <- 100
+pi0 <- as.matrix(c(0.5,0.3,0.2))
+pi1 <- as.matrix(c(0.38,0.46,0.16))
+
+#ARL0
+LRCUSUM.runlength(mu=pi0[1:2,,drop=FALSE],mu0=pi0[1:2,,drop=FALSE],mu1=pi1[1:2,,drop=FALSE],h=5,dfun=dmult, n=n, g=15)$arl
+#ARL1
+LRCUSUM.runlength(mu=pi1[1:2,,drop=FALSE],mu0=pi0[1:2,,drop=FALSE],mu1=pi1[1:2,,drop=FALSE],h=5,dfun=dmult, n=n, g=15)$arl
+
+
 }
 
 \author{M. \enc{Höhle}{Hoehle}}
