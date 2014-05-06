@@ -342,6 +342,7 @@ Zurich, Switzerland</li>
 Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
       <li>Swiss National Science Foundation (SNSF, 2007-2010, projects <a href="http://p3.snf.ch/Project-116776">#116776</a> and <a href="http://p3.snf.ch/Project-124429">#124429</a>)</li>
       <li>Swiss National Science Foundation (SNSF, 2012-2015, project <a href="http://p3.snf.ch/Project-137919">#137919</a>)</li>
+      <li>Robert Koch Institute, Berlin, Germany (2012-2015, Ph.D. project 'Modern surveillance algorithms for public health surveillance')</li>
     </ul>
 </blockquote>
 
