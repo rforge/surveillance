@@ -365,7 +365,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
 
   Meyer, S. and Held, L. (2014):
   Power-law models for infectious disease spread.
-  Revised for \emph{Annals of Applied Statistics}.
+  \emph{Annals of Applied Statistics}. In press.
   \emph{arXiv:1308.5115}\cr
   arXiv-Link: \url{http://arxiv.org/abs/1308.5115}
 

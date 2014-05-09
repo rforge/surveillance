@@ -109,7 +109,7 @@ stsplot_space(x, tps = NULL, map = x@map, population = NULL,
 \references{
   Meyer, S. and Held, L. (2014):
   Power-law models for infectious disease spread.
-  Revised for the \emph{Annals of Applied Statistics}.
+  \emph{Annals of Applied Statistics}. In press.
   \href{http://arxiv.org/abs/1308.5115}{arXiv:1308.5115}.\cr
   Supplements are available from
   \url{http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html}.

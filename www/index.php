@@ -395,7 +395,7 @@ Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
 <dt></dt>
 <dd><a href="http://arxiv.org/abs/1308.5115">Meyer, S. and Held, L. (<b>2014</b>)</a></dd>
 <dd><i>Power-law models for infectious disease spread</i></dd>
-<dd>Revised for the Annals of Applied Statistics, available as arXiv:1308.5115</dd>
+<dd>Annals of Applied Statistics, in press, available as arXiv:1308.5115</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1002/sim.4177">Paul, M. and Held, L. (<b>2011</b>)</a></dd>
