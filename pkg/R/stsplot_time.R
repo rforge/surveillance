@@ -63,7 +63,8 @@ stsplot_time <- function(x, method=x@control$name, disease=x@control$data,
       
       #plot areas
       for (k in 1:nAreas) {
-        argsK <- modifyList(args, list(x=x, k=k, main="", legend.opts=NULL))
+        argsK <- modifyList(args, list(x=x, k=k, main="", legend.opts=NULL),
+                            keep.null = TRUE)
         do.call("stsplot_time1",args=argsK)
         title(main=colnames(observed)[k], line=-1)
       }
