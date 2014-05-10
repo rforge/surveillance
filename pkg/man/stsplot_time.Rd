@@ -37,7 +37,6 @@ stsplot_time1(x, k=1, ylim=NULL,
               dx.upperbound=0L, hookFunc=function(){}, ...)
 
 stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
-              xaxis.units=TRUE,
               xaxis.tickFreq=list("\%Q"=atChange),
               xaxis.labelFreq=xaxis.tickFreq, xaxis.labelFormat="\%G\n\n\%OQ",
               epochsAsDate=x@epochAsDate, xlab="time", main=NULL,
@@ -68,13 +67,61 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
   \item{axes}{a logical value indicating whether both axes should be drawn
     on the plot.}
   \item{xaxis.tickFreq,xaxis.labelFreq,xaxis.labelFormat}{see Details.}
-  
-  %% TODO @ Michael: document remaining plot arguments (maybe can take
-  %% most of them from plot.survRes.Rd)
-
+  \item{epochsAsDate}{Boolean indicating whether to treat the epochs as
+    Date objects. Default: Value of the corresponding slot in \code{x}.}
+  \item{xlab}{a title for the x axis. See \code{plot.default}.}
+  \item{ylab}{a title for the y axis. See \code{plot.default}.}
+  \item{main}{an overall title for the plot: see 'title'.}
+  \item{type}{type of plot to do.}
+  \item{lty}{vector of length 3 specifying the line type for the three
+    lines in the plot -- see \code{col} argument.}
+  \item{col}{Vector of length 3 specifying the color to use in the
+    plot. The first color is the fill color of the polygons for the
+    counts bars (\code{NA} for unfilled), the 2nd element denotes their
+    border color, the 3rd element is the color of the \code{upperbound}
+    plotting.} 
+  \item{lwd}{Vector of length 3 specifying the line width of the three
+    elements to plot. See also the \code{col} argment.}
+  \item{alarm.symbol}{a list with entries \code{pch}, \code{col},
+    \code{cex} and \code{lwd} specifying the appearance of the outbreak
+    symbol in the plot.}
+  \item{outbreak.symbol}{a list with entries \code{pch}, \code{col},
+    \code{cex} and \code{lwd} specifying the appearance of the outbreak
+    symbol in the plot.}
+  \item{legend.opts}{a list containing the entries to be sent to the
+  \code{\link{legend}} function. If no legend is requested use
+  \code{legend.opts=NULL}. Otherwise, the following arguments are
+  default 
+    \describe{
+      \item{\code{x}}{\code{top}}
+      \item{\code{legend}}{The names infected and outbreak.}
+      \item{\code{lty}}{If \code{NULL} the \code{lty} argument will be used}
+      \item{\code{pch}}{If \code{NULL} the \code{pch} argument is used}
+      \item{\code{col}}{If \code{NULL} the \code{col} argument is
+        used}  
+    }
+    
+    Any further arguments to the \code{legend} function are
+    just provided as additional elements of this list,
+    e.g. \code{horiz=TRUE}.
+  }
+  \item{dx.upperbound}{horizontal change in the plotting of the
+    upperbound line. Sometimes it can be convenient to offset this line
+    a little for better visiability.}
+  \item{lvl}{A vector of length \code{ncol(x)}, which is used to
+    specify the hierarchy level for each time series in the sts object
+    for alarm plots.} 
+  \item{cex}{A numerical value giving the amount by which plotting text
+    and symbols should be magnified relative to the default. See
+    \code{?par} for details.}
+  \item{cex.yaxis}{The magnification to be used for y-axis annotation
+    relative to the current setting of 'cex'.}
   \item{hookFunc}{a function that is called after all the basic plotting
     has be done, i.e., it is not possible to control formatting with
     this function. See Examples.}
+  \item{...}{further arguments for the function \code{matplot}. If
+    e.g. \code{xlab} or \code{main} are provided they overwrite the
+    default values.} 
 }
 
 \details{

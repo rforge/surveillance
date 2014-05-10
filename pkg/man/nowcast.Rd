@@ -9,16 +9,18 @@
 \alias{RPS}
 
 \title{
-  Adjust a time series of counts for observed but-not-yet-reported events
+  Adjust a univariate time series of counts for observed
+  but-not-yet-reported events 
 }
 
 \description{
   Nowcasting can help to obtain up-to-date information on trends during
-  a situation where cases only arrive with delay. For example in
-  outbreak situation, when reports about important 
-  indicators (such as hospitalizations of cases) only arrive with delay.
-  Delays are subject to a delay distribution, which may or may not vary
-  over time.
+  a situation where reports about events arrive with delay. For example
+  in any type of public health reporting, reports about important
+  indicators (such as occurrence of cases) are prone to be delayed due to
+  for example manual quality checking and reporting system
+  hierarchies. Altogether, delays are subject to a delay distribution,
+  which may or may not vary over time.
 }
 
 \usage{
@@ -144,7 +146,8 @@ nowcast(now,when,data,dEventCol="dHospital",dReportCol="dReport",
 \value{
   \code{nowcast} returns an object of \code{"\linkS4class{stsNC}"}. The
   \code{upperbound} slot contains the median of the method specified at
-  position one of the argument \code{method}. The slot \code{pi}
+  the first position the argument \code{method}. The slot \code{pi} (for
+  prediction interval)
   contains the equal tailed (1-\eqn{\alpha}{alpha})*100\% prediction
   intervals, which are calculated based on the predictive distributions
   in slot \code{predPMF}.
@@ -156,11 +159,12 @@ nowcast(now,when,data,dEventCol="dHospital",dReportCol="dReport",
 
 \references{
   \enc{Höhle}{Hoehle} M and an der Heiden M (2014), Bayesian Nowcasting
-  during the STEC O104:H4 Outbreak in Germany, 2011, In revision for
-  Biometrics.
+  during the STEC O104:H4 Outbreak in Germany, 2011, Accepted for
+  publication in Biometrics.
 
-  Lawless, JF (1994), Adjustments for Reporting Delays and the Prediction of Occurred but Not Reported Events,
-  The Canadian Journal of Statistics, 22(1):15--31.
+  Lawless, JF (1994), Adjustments for Reporting Delays and the
+  Prediction of Occurred but Not Reported Events, The Canadian Journal
+  of Statistics, 22(1):15--31.
 }
 
 \author{
@@ -185,7 +189,7 @@ data("husO104Hosp")
 #Extract the reporting triangle at a specific day
 t.repTriangle <- as.Date("2011-07-04")
 
-#Use void nowcasting procedure (we just want the reporting triangle)
+#Use 'void' nowcasting procedure (we just want the reporting triangle)
 nc <- nowcast(now=t.repTriangle,when=t.repTriangle,
               dEventCol="dHosp",dReportCol="dReport",data=husO104Hosp,
               D=15,method="unif")
@@ -193,7 +197,7 @@ nc <- nowcast(now=t.repTriangle,when=t.repTriangle,
 #Show reporting triangle 
 reportingTriangle(nc)
 
-#Nowcasting assuming the delay distribution is stable over time
+#Perform Bayesian nowcasting assuming the delay distribution is stable over time
 nc.control <- list(N.tInf.prior=structure("poisgamma",mean.lambda=50,var.lambda=3000))
 t.repTriangle <- as.Date("2011-06-10")
 when <- seq(t.repTriangle-3,length.out=10,by="-1 day")

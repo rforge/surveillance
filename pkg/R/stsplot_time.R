@@ -204,7 +204,6 @@ stsplot_time1 <- function(
 
 stsplot_alarm <- function(
     x, lvl=rep(1,nrow(x)), ylim=NULL,
-    xaxis.units=TRUE,
     xaxis.tickFreq=list("%Q"=atChange),
     xaxis.labelFreq=xaxis.tickFreq, xaxis.labelFormat="%G\n\n%OQ",
     epochsAsDate=x@epochAsDate, xlab="time", main=NULL,

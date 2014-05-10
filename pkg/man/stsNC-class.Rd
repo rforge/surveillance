@@ -3,10 +3,12 @@
 \docType{class}
 \alias{stsNC-class}
 %New stsNC specific methods
+\alias{reportingTriangle}
 \alias{reportingTriangle,stsNC-method}
+\alias{delayCDF}
 \alias{delayCDF,stsNC-method}
-\alias{score,stsNC-method}
-
+\alias{score} 
+\alias{score,stsNC-method} 
 %Coerce method to convert to sts object
 \alias{coerce,sts,stsNC-method}
 
