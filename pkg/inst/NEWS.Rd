@@ -24,6 +24,10 @@
     has been cleaned up. The functions implementing the various plot
     types (\code{stsplot_*}, previously named \code{plot.sts.*})
     are now exported and documented separately.
+
+    \item More tests have been implemented to ensure package integrity.
+    We now use \CRANpkg{testthat} instead of the outdated package
+    \CRANpkg{RUnit}.
   }
 }
 
@@ -206,8 +210,6 @@
     the supplied new list elements (\code{"F"}, \code{"Deriv"})
     completely replace the respective elements from the original
     \code{control.siaf} specification.
-    \item Now using \CRANpkg{testthat} for package testing instead of
-    the outdated \CRANpkg{RUnit}.
     \item The \code{multiplicity}-generic and its default method have
     been integrated in \CRANpkg{spatstat} and are imported from there.
     \item The events in a \code{"epidataCS"} object no longer have

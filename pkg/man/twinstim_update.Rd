@@ -20,8 +20,10 @@ especially useful if one wants to add the \code{model} environment
   \item{object}{a previous \code{"twinstim"} fit.}
   \item{endemic, epidemic}{changes to the formulae -- see
     \code{\link{update.formula}} and \code{\link{twinstim}}.}
-  \item{control.siaf}{a list, see \code{\link{twinstim}}. It will replace
-    the given elements in the original \code{control.siaf} list.}
+  \item{control.siaf}{a list (see \code{\link{twinstim}}) to replace
+    the given elements in the original \code{control.siaf} list.
+    If \code{NULL}, the original list of control arguments is removed
+    from the call, i.e., the defaults are used in \code{twinstim}.}
   \item{optim.args}{see \code{\link{twinstim}}. If a list, it will
     modify the original \code{optim.args} using \code{\link{modifyList}}.}
   \item{model}{see \code{\link{twinstim}}. If this is the only argument

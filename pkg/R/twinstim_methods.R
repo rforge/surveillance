@@ -692,8 +692,12 @@ update.twinstim <- function (object, endemic, epidemic,
     ##       the end and a missing intercept will be denoted by a final -1.
     
     if (!missing(control.siaf)) {
-        call$control.siaf <- object$control.siaf # =NULL if constantsiaf
-        call$control.siaf[names(control.siaf)] <- control.siaf
+        if (is.null(control.siaf)) {
+            call$control.siaf <- NULL  # remove from call, i.e., use defaults
+        } else {
+            call$control.siaf <- object$control.siaf # =NULL if constantsiaf
+            call$control.siaf[names(control.siaf)] <- control.siaf
+        }
     }
     
     call["optim.args"] <- if (missing(optim.args)) object["optim.args"] else {
