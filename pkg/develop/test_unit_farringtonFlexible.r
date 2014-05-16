@@ -445,7 +445,7 @@ algoControl <- list(noPeriods=10,alpha = 0.01,verbose = F,
                     range = (length(timeSeries) - 1):length(timeSeries))
 seriesSTSObject <- new('sts', observed = timeSeries,
                        epoch = as.numeric(seq(as.Date('2001-01-01'),length.out=length(timeSeries), by='1 week')),
-                       epochAsDate = TRUE)
+                       epochAsDate = TRUE, glmWarnings = FALSE)
 algoResult <- farringtonFlexible(seriesSTSObject, control = algoControl)
 
 
