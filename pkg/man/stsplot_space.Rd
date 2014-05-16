@@ -13,7 +13,8 @@ where regions are color-coded according to disease incidence
 (either absolute counts or relative to population) during a given
 time period.
 See, e.g., Meyer and Held (2014, Supplement A) for animated
-sequences of such snapshots.
+sequences of such snapshots (produced by the \code{\link{animate.sts}}
+method). 
 }
 
 \usage{

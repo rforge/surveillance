@@ -88,34 +88,6 @@
   \code{\link{plot.survRes}} is the old implementation.
 }
 
-\examples{
-data("ha.sts")
-print(ha.sts)
-
-## map of total counts by district
-plot(ha.sts, type=observed ~ 1 | unit)
-## only show a sub-period total for two selected districts
-plot(ha.sts[1:20,1:2], type=observed ~ 1 | unit)
-
-
-\dontrun{
-# space-time animation
-plot(aggregate(ha.sts,nfreq=13), type= observed ~ 1 | unit * time)
-
-#Configure a png device printer to save the frames
-dev.printer <- list(device=png, extension=".png", width=640, height=480,
-                    name=file.path(tempdir(),"berlin"))
-
-#Do the animation (without extra sleeping time between frames)
-plot(aggregate(ha.sts,nfreq=13), type = observed ~ 1 | unit * time,
-     wait.ms=0, dev.printer=dev.printer)
-
-#Use ImageMagick (you might have to adjust the path to 'convert')
-system(paste("convert -delay 50 ",dev.printer$name,
-           "*.png ", dev.printer$name, "-animated.gif",sep=""))
-}
-}
-
 \keyword{ts}
 \keyword{spatial}
 \keyword{hplot}
