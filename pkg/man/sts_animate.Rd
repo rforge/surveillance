@@ -20,8 +20,8 @@
 }
 
 \usage{
-animate.sts(object, tps = NULL, cumulative = FALSE, at = 10, ...,
-            timeplot = list(height = 0.3), sleep = 0.5, verbose = interactive())
+\method{animate}{sts}(object, tps = NULL, cumulative = FALSE, at = 10, ...,
+        timeplot = list(height = 0.3), sleep = 0.5, verbose = interactive())
 }
 
 \arguments{
