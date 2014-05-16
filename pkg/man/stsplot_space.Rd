@@ -12,9 +12,6 @@ documented below. It produces an \code{\link{spplot}}
 where regions are color-coded according to disease incidence
 (either absolute counts or relative to population) during a given
 time period.
-See, e.g., Meyer and Held (2014, Supplement A) for animated
-sequences of such snapshots (produced by the \code{\link{animate.sts}}
-method). 
 }
 
 \usage{
@@ -105,15 +102,6 @@ stsplot_space(x, tps = NULL, map = x@map, population = NULL,
   a lattice plot of class
   \code{"\link[lattice:trellis.object]{trellis}"}, but see
   \code{\link{spplot}}.
-}
-
-\references{
-  Meyer, S. and Held, L. (2014):
-  Power-law models for infectious disease spread.
-  \emph{Annals of Applied Statistics}. In press.
-  \href{http://arxiv.org/abs/1308.5115}{arXiv:1308.5115}.\cr
-  Supplements are available from
-  \url{http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html}.
 }
 
 \author{

@@ -93,10 +93,3 @@ stsplot_timeSimple <- function (x, tps = NULL, highlight = integer(0),
                               list(...))
     do.call(lattice::xyplot, xyplot.args)
 }
-
-
-## data("measlesWeserEms")
-## animation::saveHTML(animate(measlesWeserEms, tps=1:10),
-##                     outdir = tempdir(), htmlfile = "measles.html",
-##                     title = "Evolution of the measles epidemic in the Weser-Ems region",
-##                     ani.width=500, ani.height=600)
