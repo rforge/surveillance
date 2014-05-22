@@ -10,6 +10,10 @@ Profile Likelihood Computation and Confidence Intervals for
 \description{
   Function to compute estimated and profile likelihood based confidence
   intervals for \code{twinstim} objects. Computations might be cumbersome!
+  
+  WARNING: the implementation is not well tested, simply uses
+  \code{optim} (ignoring optimizer settings from the original fit),
+  and does not return the complete set of coefficients at each grid point.
 }
 
 \usage{
