@@ -45,7 +45,7 @@ Profile Likelihood Computation and Confidence Intervals for
   \item{alpha}{
     \eqn{(1-\alpha)\%}{(1-alpha)\%} profile likelihood based confidence
     intervals are computed.  If alpha <= 0, then no confidence intervals are
-    computed.
+    computed. This is currently not implemented.
   }
   \item{control}{
     control object to use in \code{\link{optim}} for the profile log-likelihood
@@ -76,6 +76,8 @@ Michael \enc{Höhle}{Hoehle}
 \dontrun{
 #Load the twinstim model fitted to the IMD data
 data("imdepifit")
+# for profiling we need the model environment
+imdepifit <- update(imdepifit, model=TRUE)
 
 #Generate profiling object for a list of parameters for the new model
 names <- c("h.(Intercept)","e.typeC")

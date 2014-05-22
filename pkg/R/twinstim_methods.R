@@ -536,6 +536,11 @@ residuals.twinstim <- function (object, ...)
 profile.twinstim <- function (fitted, profile, alpha = 0.05,
     control = list(fnscale = -1, factr = 1e1, maxit = 100), do.ltildeprofile=FALSE,...)
 {
+  warning("the profile likelihood implementation is experimental")
+  ## the implementation below is not well tested, simply uses optim (ignoring
+  ## optimizer settings from the original fit), and does not store the complete
+  ## set of coefficients
+  
   ## Check that input is ok
   profile <- as.list(profile)
   if (length(profile) == 0L) {
@@ -549,10 +554,6 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
   if (is.null(fitted[["functions"]])) {
     stop("'fitted' must contain the component 'functions' -- fit using the option model=TRUE")
   }
-
-  ################################################################
-  warning("Sorry, the profile likelihood is not implemented yet.")
-  ###############################################################
 
   ## Control of the optim procedure
   if (is.null(control[["fnscale",exact=TRUE]])) { control$fnscale <- -1 }
@@ -633,7 +634,7 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
         cat("\tj= ",j,"/",length(thetai.grid),"\n")
         resProfile[[i]][j,] <- c(thetai.grid[j],
            #Do we need to compute ltildeprofile (can be quite time consuming)
-           ifelse(do.ltildeprofile, ltildeprofile(thetai.grid[j],idx), NA),
+           if (do.ltildeprofile) ltildeprofile(thetai.grid[j],idx) else NA_real_,
            ltildeestim(thetai.grid[j],idx),
            - 1/2*(1/se[idx]^2)*(thetai.grid[j] - theta.ml[idx])^2)
       }
