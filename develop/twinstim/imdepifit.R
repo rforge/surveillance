@@ -1,7 +1,7 @@
 ################################################################################
 ### Author: Sebastian Meyer [sebastian *.* meyer *a*t* ifspm *.* uzh *.* ch]
-### Time-stamp: <[imdepifit.R] by SM Die 08/04/2014 23:22 (CEST)>
-### Project: reproduce data(imdepifit) as in the JSS paper (two-stage procedure)
+### Time-stamp: <[imdepifit.R] by SM Don 22/05/2014 14:37 (CEST)>
+### Project: reproduce data(imdepifit)
 ################################################################################
 
 
@@ -10,24 +10,25 @@
 library("surveillance")
 data("imdepi")
 
-imdepifit_endemic <- twinstim(
+myimdepifit <- twinstim(
     endemic = addSeason2formula(~ offset(log(popdensity)) + I(start/365-3.5),
                                 S=1, period=365, timevar="start"),
-    data = imdepi, subset = !is.na(agegrp))
-
-imdepifit <- update(imdepifit_endemic,
     epidemic = ~ type + agegrp, siaf = siaf.gaussian(),
-    control.siaf = list(F=list(adapt=0.25), Deriv=list(nGQ=13)),
-    start = list(epidemic=c("(Intercept)"=-12.5, "typeC"=-1, "siaf.1"=2.7)))
+    data = imdepi, subset = !is.na(agegrp),
+    control.siaf = list(F=list(adapt=0.25), Deriv=list(nGQ=13)), 
+    optim.args = list(par = c(-20, 0, 0.2, 0.3, -12, -1, 0, 0, 3)),
+    model = FALSE, cumCIF = FALSE
+)
 
 ## compare with the one stored in the package
-imdepifit_installed <- local({data("imdepifit", envir=environment()); imdepifit})
-all.equal(imdepifit_installed, imdepifit)
+data("imdepifit")
+all.equal(imdepifit, myimdepifit)
 ## only the "runtime" component should be different!
-rbind(imdepifit_installed$runtime, imdepifit$runtime)
+rbind(imdepifit$runtime, myimdepifit$runtime)
 
 if (FALSE) # store updated fit in data-folder
 {
+    imdepifit <- myimdepifit
     save(imdepifit, file="~/Projekte/surveillance/pkg/data/imdepifit.RData")
     tools::resaveRdaFiles("~/Projekte/surveillance/pkg/data/imdepifit.RData")
 }
