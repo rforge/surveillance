@@ -381,8 +381,6 @@ export(addSeason2formula)
 export(zetaweights, W_powerlaw)
 export(W_np)
 export(oneStepAhead, scores)
-
-## FIXME: functions not yet documented, but used in example(hhh4)
 export(permutationTest)
 export(pit)
 

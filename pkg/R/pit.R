@@ -22,7 +22,7 @@
 ## ... - arguments for pdistr. Ignored if pdistr is a list.
 ## plot - NULL (no plot) or a list of arguments for plot.histogram
 
-pit <- function (x, pdistr, J=10, relative=TRUE, ..., plot = NULL)
+pit <- function (x, pdistr, J=10, relative=TRUE, ..., plot = list())
 {
     PxPxm1 <- pitPxPxm1(x, pdistr, ...)
     breaks <- (0:J)/J

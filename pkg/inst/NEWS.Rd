@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-04-07)}{
+\section{Changes in surveillance version 1.8-0 (2014-05-22)}{
 
 \subsection{SYNOPSIS}{
   \itemize{
@@ -230,6 +230,7 @@
     \code{"twinstim"} objects have the same list structure.
     \item The \code{twinstim()} argument \code{cumCIF} now defaults to
     \code{FALSE}.
+    \item The new default for \code{pit()} is to produce the plot.
   }
 }
 
