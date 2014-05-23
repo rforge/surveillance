@@ -57,11 +57,13 @@ cbind(twinstim=coef(fit_twinstim), glm=coef(fit_glm))
 stopifnot(isTRUE(all.equal(coef(fit_glm), coef(fit_twinstim),
                            tolerance = 0.0005, check.attributes = FALSE)))
 \dontshow{
-## also check type-specific model:
-stopifnot(isTRUE(all.equal(
-    coef(glm_epidataCS(~0+type, imdepi)),
-    coef(update(fit_twinstim, endemic=~(1|type))),
+if (surveillance.options("allExamples")) {
+    ## also check type-specific model:
+    stopifnot(isTRUE(all.equal(
+        coef(glm_epidataCS(~0+type, imdepi)),
+        coef(update(fit_twinstim, endemic=~(1|type))),
     tolerance = 0.0005, check.attributes = FALSE)))
+}
 }
 
 ### also compare to an equivalent endemic-only hhh4() fit
