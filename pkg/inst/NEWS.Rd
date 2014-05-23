@@ -251,7 +251,9 @@
     used as observation window \code{W} in \code{data("imdepi")}. The
     exemplary \code{twinstim()} fit \code{data("imdepifit")} has been
     updated as well. Furthermore, \code{row.names(imdepi$events)} have
-    been reset (chronological index).
+    been reset (chronological index), and numerical differences
+    in \code{imdepi$events$.influenceRegion} are due to changes in
+    \CRANpkg{polyclip} 1.3-0.
 
     \item The Campylobacteriosis data set \code{campyDE}, where absolute
     humidity is used as concurrent covariate to adjust the outbreak
