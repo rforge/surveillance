@@ -120,7 +120,6 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
   in the epidemic component only, but otherwise not part of the likelihood
 - update.epidataCS(): add or remove stgrid variables
 - marks<-.epidataCS(,add=TRUE): to add marks
-- validate (test) twinstim by twinSIR if only endemic component
 - allow for type-specific endemic effects, i.e. interaction with type. ideas:
 use "special", or extra argument typeSpecificEffects=c("(Intercept)",
 "influenza0"), ... maybe we can just use the classical formula interface (":")?

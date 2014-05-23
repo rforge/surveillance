@@ -1,6 +1,6 @@
 ################################################################################
 ## Author: Sebastian Meyer [sebastian *.* meyer *a*t* ifspm *.* uzh *.* ch]
-## Time-stamp: <[glmfit.R] by SM Mon 07/04/2014 23:17 (CEST)>
+## Time-stamp: <[glmfit.R] by SM Fre 23/05/2014 11:30 (CEST)>
 ## Project: Reproduce endemic-only twinstim fit by an equivalent Poisson-GLM fit
 ################################################################################
 
@@ -69,3 +69,30 @@ myglmtypes <- glm(update(formula(m_noepi)$endemic, nEvents ~ type + . - 1),
                   offset=log((stop-start) * area))
 summary(myglmtypes)
 # in accordance with the results from the corresponding twinstim-fit ! :)
+
+
+
+### try to fit equivalent model with twinSIR
+
+data("imdepi")
+imdepi_short <- subset(imdepi, time < 200)
+imdepi_short$stgrid <- subset(imdepi_short$stgrid, start < 200)
+
+## endemic-only twinstim()
+data("imdepifit")
+form <- ~ log(popdensity) + I(start/365)
+fit_twinstim <- update(imdepifit, endemic = form, epidemic = ~0, siaf = NULL,
+                       data = imdepi_short, model=TRUE,
+                       optim.args = list(control=list(trace=0)), verbose=FALSE)
+fit_twinstim
+
+## convert imdepi_short to "epidata" by districts
+load(system.file("shapes", "districtsD.RData", package="surveillance"))
+imdepi_short_epidata <- as.epidata(imdepi_short,
+                                   tileCentroids=coordinates(districtsD))
+fit_twinSIR <- twinSIR(~cox(log(popdensity)) + cox(I(start/365)),
+                       data=imdepi_short_epidata)
+fit_twinSIR
+## this is something different since we look at infectivity of districts as a
+## whole disregarding the number of infective individuals within the tiles.
+## we also have a different grid in time (due to extra stop times at recovery).
