@@ -154,7 +154,7 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 #======================================================================
 #======================================================================
 
-#Open
+#Done
 - add documentation for oneStepAhead predictions/scores
 - improve and document plot/predict methods
 - remove redundant elements in control/stsObj/terms to reduce the

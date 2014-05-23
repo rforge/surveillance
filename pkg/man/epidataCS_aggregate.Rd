@@ -128,7 +128,8 @@ plot(imdepi_sts, type=observed~1|unit, labels=FALSE)
 ## also test conversion to multivariate point process ("epidata")
 imdepi_short <- subset(imdepi, time < 50)
 imdepi_short$stgrid <- subset(imdepi_short$stgrid, start < 50)
-imdepi_epidata <- as.epidata(imdepi_short, coordinates(districtsD))
+imdepi_epidata <- as.epidata(imdepi_short,
+                             tileCentroids=coordinates(districtsD))
 summary(imdepi_epidata)
 }
 
