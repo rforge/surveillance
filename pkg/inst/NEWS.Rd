@@ -6,10 +6,24 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-05-22)}{
+\section{Changes in surveillance version 1.8-0 (2014-05-23)}{
 
-\subsection{SYNOPSIS}{
+\subsection{PACKAGE INFRASTRUCTURE}{
   \itemize{
+    \item Package \pkg{surveillance} now depends on newer versions of
+    packages \CRANpkg{sp} (>= 1.0-15), \CRANpkg{polyCub} (>= 0.4-2),
+    and \CRANpkg{spatstat} (>= 1.36-0).
+    The \R packages \pkg{INLA} and \CRANpkg{runjags} are now suggested
+    to support a new outbreak detection algorithm (\code{boda()}) and
+    the new \code{nowcast()}ing procedure, respectively.
+    The \R packages for \CRANpkg{lattice}, \CRANpkg{grid},
+    \CRANpkg{gridExtra}, and \CRANpkg{scales} are suggested for
+    added visualization facilities.
+
+    \item More tests have been implemented to ensure package integrity.
+    We now use \CRANpkg{testthat} instead of the outdated package
+    \CRANpkg{RUnit}.
+
     \item \code{hhh4()} fits now have class \code{"hhh4"} instead of
     \code{"ah4"}, for consistency with \code{twinstim()},
     \code{twinSIR()}, and to follow the common convention (cp. \code{lm()}).
@@ -17,17 +31,10 @@
     available for backwards compatibility but may be removed in the
     future.
 
-    \item Package \pkg{surveillance} now depends on
-    \CRANpkg{spatstat} >= 1.36-0.
-
-    \item The documentation of plot variants for \code{"sts"} objects
-    has been cleaned up. The functions implementing the various plot
-    types (\code{stsplot_*}, previously named \code{plot.sts.*})
+    \item Plot variants for \code{"sts"} objects have been cleaned up:
+    The functions implementing the various plot types
+    (\code{stsplot_*}, previously named \code{plot.sts.*})
     are now exported and documented separately.
-
-    \item More tests have been implemented to ensure package integrity.
-    We now use \CRANpkg{testthat} instead of the outdated package
-    \CRANpkg{RUnit}.
   }
 }
 
@@ -45,15 +52,42 @@
     implementation of the Bayesian Outbreak Detection Algorithm (BODA)
     proposed in Manitz and \enc{Höhle}{Hoehle} (2012). The function
     relies on the non-CRAN package \pkg{INLA}, which has to be installed first
-    in order to use this function. Expect initial problems. The
-    Campylobacteriosis data set \code{campyDE}, where absolute humidity
-    is used as concurrent covariate to adjust the outbreak detection is
-    also added to the package.
+    in order to use this function. Expect initial problems.
+
     
+    \item New \code{toLatex}-method for \code{"sts"} objects.
+
+    \item The new function \code{stsplot_space()} provides an improved
+    map plot of disease incidence for \code{"sts"} objects aggregated
+    over time. It corresponds to the new \code{type = observed ~ unit}
+    of the \code{stsplot}-method, and supersedes
+    \code{type = observed ~ 1|unit} (except for alarm shading).
+
+    \item An \code{animate()}-method for the \code{"sts"} class provides
+    a new implementation for animated maps (superseding the \code{plot}
+    \code{type=observed ~ 1 | unit * time}) with an optional evolving
+    time series plot below the map.
+
+    \item The \code{plot()} method for \code{"sts"} objects with epochs as
+    dates is now made more flexible by introducing the arguments
+    \code{xaxis.tickFreq}, \code{xaxis.labelFreq} and
+    \code{xaxis.labelFormat}. These allow the specification of
+    tick-marks and labelling based on \code{strftime} compatible
+    conversion codes -- independently if data are daily, weekly, monthly,
+    etc. As a consequence, the old argument \code{xaxis.years} is
+    removed. See \code{stsplot_time()} for more information.
+
+    
+    \item Inference for neighbourhood weights in \code{hhh4()} models:
+    \code{W_powerlaw()} and \code{W_np()} both implement weights
+    depending on the order of neighbourhood between regions, a power-law
+    decay and nonparametric weights, i.e., unconstrained estimation of
+    individual weights for each neighbourhood order.
+
     \item \code{hhh4()} now allows the inclusion of multiplicative
     offsets also in the epidemic components \code{"ar"} and \code{"ne"}.
 
-    \item \code{hhh4()} now has support for \code{lag!=1} in the
+    \item \code{hhh4()} now has support for \code{lag != 1} in the
     autoregressive and neighbor-driven components. The applied lags are
     stored as component \code{"lags"} of the return value (previously
     there was an unused component \code{"lag"} which was always 1 and
@@ -70,9 +104,6 @@
       \code{txtProgressBar()}. 
     }
 
-    \item New \code{data("measlesWeserEms")}, a corrected version of
-    \code{data("measles.weser")}.
-
     \item The \code{plot()}-method for fitted \code{hhh4()} objects now
     offers three additional types of plots: component seasonality,
     seasonal or time course of the dominant eigenvalue, and maps
@@ -83,6 +114,12 @@
     \item (Deviance) \code{residuals()}-method for fitted \code{hhh4()}
     models.
 
+    \item Added methods of \code{vcov()} and \code{nobs()}
+    for the \code{"hhh4"} class. For \code{AIC()} and \code{BIC()}, the
+    default methods work smoothly now (due to changes to
+    \code{logLik.hhh4()} documented below).
+
+    
     \item New predefined interaction functions for \code{twinstim()}:
     \code{siaf.student()} implements a \eqn{t}-kernel for the distance
     decay, and \code{siaf.step()} and \code{tiaf.step()} provide step
@@ -93,25 +130,10 @@
     \item Numerical integration over polygonal domains in the \code{F}
     and \code{Deriv} components of \code{siaf.powerlaw()} and
     \code{siaf.powerlawL()} is much faster and more accurate now since
-    we use \code{polyCub.iso()} instead of \code{polyCub.SV()}.
-
-    \item Inference for neighbourhood weights in \code{hhh4()} models:
-    \code{W_powerlaw()} and \code{W_np()} both implement weights
-    depending on the order of neighbourhood between regions, a power-law
-    decay and nonparametric weights, i.e., unconstrained estimation of
-    individual weights for each neighbourhood order.
-
-    \item \code{hhh4()} now stores the runtime just like
-    \code{twinstim()}.
-
-    \item New \code{toLatex}-method for \code{"sts"} objects.
+    we use the new \code{polyCub.iso()} instead of \code{polyCub.SV()}
+    from package \CRANpkg{polyCub}.
 
     \item New \code{as.stepfun()}-method for \code{"epidataCS"} objects.
-
-    \item Added methods of \code{vcov()} and \code{nobs()}
-    for the \code{"hhh4"} class. For \code{AIC()} and \code{BIC()}, the
-    default methods work smoothly now (due to changes to
-    \code{logLik.hhh4()} documented below).
 
     \item \code{plot.epidataCS()}:
     \itemize{
@@ -123,44 +145,40 @@
       automatic legend.
     }
 
-    \item The new function \code{stsplot_space()} provides an improved
-    map plot of disease incidence for \code{"sts"} objects aggregated
-    over time. It corresponds to the new \code{type = observed ~ unit}
-    of the \code{stsplot}-method, and supersedes
-    \code{type = observed ~ 1|unit} (except for alarm shading).
-
-    \item An \code{animate()}-method for the \code{"sts"} class provides
-    a new implementation for animated maps (superseding the \code{plot}
-    \code{type=observed ~ 1 | unit * time}) with an optional evolving
-    time series plot below the map.
-
-    \item \code{as.epidataCS()} gained a \code{verbose} argument.
-
     \item The new function \code{glm_epidataCS()} can be used to fit
     an endemic-only \code{twinstim()} via \code{glm()}.
-    This is mainly provided for testing purposes since the estimation
-    via \code{glm} usually takes much longer. 
+    This is mainly provided for testing purposes since wrapping into
+    \code{glm} usually takes longer. 
   }
 }
 
-\subsection{MINOR CHANGES}{
+\subsection{MAJOR CHANGES}{
   \itemize{
-    
-    \item The \code{plot()} method for \code{sts} objects with epochs as
-    dates is now made more flexible by introducing the arguments
-    \code{xaxis.tickFreq}, \code{xaxis.labelFreq} and
-    \code{xaxis.labelFormat}. These allow the specification of
-    tick-marks and labelling based on \code{strftime} compatible
-    conversion codes -- indenpently if data are daily, weekly, monthly,
-    etc. As a consequence, the old argument \code{xaxis.years} is
-    removed. See \code{stsplot_time()} for more information.
-    \item The argument \code{colTypes} of
-    \code{plot.epidataCS(,aggregate="space")} is deprecated (use
-    \code{points.args$col} instead).
-    \item \code{animate.epidataCS()} now by default does not draw
-    influence regions (\code{col.influence=NULL}), is \code{verbose} if
-    \code{interactive()}, and ignores \code{sleep} on non-interactive
-    devices. 
+    \item Fitted \code{hhh4()} objects no longer contain the associated
+    \code{"sts"} data twice: it is now only stored as \code{$stsObj}
+    component, the hidden duplicate in \code{$control$data$.sts} was
+    dropped, which makes fitted objects substantially smaller.
+
+    \item \code{logLik.hhh4()} always returns an object of class
+    \code{"logLik"} now; for random effects models, its \code{"df"}
+    attribute is \code{NA_real_}. Furthermore, for non-convergent fits,
+    \code{logLik.hhh4()} gives a warning and returns \code{NA_real_};
+    previously, an error was thrown in this case.
+
+    \item \code{oneStepAhead()}:
+    \itemize{
+      \item Default of \code{tp[2]} is now the penultimate time point of
+      the fitted subset (not of the whole \code{stsObj}).
+      \item \code{+1} on rownames of \code{$pred} (now the same as for
+      \code{$observed}). 
+    }
+
+    \item The optional \code{"twinstim"} result components
+    \code{fisherinfo}, \code{tau}, and \code{functions} are always
+    included. They are set to \code{NULL} if they are not applicable
+    instead of missing completely (as before), such that all
+    \code{"twinstim"} objects have the same list structure.
+
     \item \code{iafplot()} ...
     \itemize{
       \item invisibly returns a matrix containing the plotted
@@ -178,26 +196,32 @@
       respectively (by the new argument \code{truncated}).
       \item now uses \code{scaled=TRUE} by default.
     }
+    
+    \item The argument \code{colTypes} of
+    \code{plot.epidataCS(,aggregate="space")} is deprecated (use
+    \code{points.args$col} instead).
+
+    \item The events in an \code{"epidataCS"} object no longer have
+    a reserved \code{"ID"} column.
+  }
+}
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item \code{hhh4()} now stores the runtime just like \code{twinstim()}.
     \item Take \code{verbose=FALSE} in \code{hhh4()} more seriously.
     \item \code{hhh4()} issues a \code{warning()} if non-convergent.
-    \item \code{oneStepAhead()}:
-    \itemize{
-      \item Default of \code{tp[2]} is now the penultimate time point of
-      the fitted subset (not of the whole \code{stsObj}).
-      \item \code{+1} on rownames of \code{$pred} (now the same as for
-      \code{$observed}). 
-    }
-    \item Fitted \code{hhh4()} objects no longer contain the associated
-    \code{"sts"} data twice: it is now only stored as \code{$stsObj}
-    component, the hidden duplicate in \code{$control$data$.sts} was
-    dropped, which makes fitted objects substantially smaller.
     \item The following components of a \code{hhh4()} fit now have names:
     \code{"se"}, \code{"cov"}, \code{"Sigma"}.
-    \item \code{logLik.hhh4()} always returns an object of class
-    \code{"logLik"} now; for random effects models, its \code{"df"}
-    attribute is \code{NA_real_}. Furthermore, for non-convergent fits,
-    \code{logLik.hhh4()} gives a warning and returns \code{NA_real_};
-    previously, an error was thrown in this case. 
+    \item The new default for \code{pit()} is to produce the plot.
+
+    \item The \code{twinstim()} argument \code{cumCIF} now defaults to
+    \code{FALSE}.
+    \item \code{update.twinstim()} no longer uses recursive
+    \code{modifyList()} for the \code{control.siaf} argument. Instead,
+    the supplied new list elements (\code{"F"}, \code{"Deriv"})
+    completely replace the respective elements from the original
+    \code{control.siaf} specification.
     \item \code{siaf.lomax()} is now defunct (it has been deprecated
     since version 1.5-2); use \code{siaf.powerlaw()} instead.
     \item Allow the default \code{adapt}ive bandwidth to be specified via the
@@ -205,15 +229,22 @@
     \item Unsupported options (\code{logpars=FALSE},
     \code{effRangeProb}) have been dropped from \code{siaf.powerlaw()}
     and \code{siaf.powerlawL()}.
-    \item \code{update.twinstim()} no longer uses recursive
-    \code{modifyList()} for the \code{control.siaf} argument. Instead,
-    the supplied new list elements (\code{"F"}, \code{"Deriv"})
-    completely replace the respective elements from the original
-    \code{control.siaf} specification.
+    \item More rigorous checking of \code{tiles} in
+    \code{simulate.twinstim()} and \code{intensityplot.twinstim}.
+
+    \item \code{as.epidataCS()} gained a \code{verbose} argument.
+    \item \code{animate.epidataCS()} now by default does not draw
+    influence regions (\code{col.influence=NULL}), is \code{verbose} if
+    \code{interactive()}, and ignores \code{sleep} on non-interactive
+    devices.
+    
     \item The \code{multiplicity}-generic and its default method have
-    been integrated in \CRANpkg{spatstat} and are imported from there.
-    \item The events in a \code{"epidataCS"} object no longer have
-    a reserved \code{"ID"} column.
+    been integrated into \CRANpkg{spatstat} and are imported from there.
+  }
+}
+
+\subsection{DATA}{
+  \itemize{
     \item The polygon representation of Germany's districts (
     \code{system.file("shapes", "districtsD.RData", package="surveillance")}
     ) has been simplified further. The union of \code{districtsD} is
@@ -221,16 +252,14 @@
     exemplary \code{twinstim()} fit \code{data("imdepifit")} has been
     updated as well. Furthermore, \code{row.names(imdepi$events)} have
     been reset (chronological index).
-    \item More rigorous checking of \code{tiles} in
-    \code{simulate.twinstim()} and \code{intensityplot.twinstim}.
-    \item The optional \code{"twinstim"} result components
-    \code{fisherinfo}, \code{tau}, and \code{functions} are always
-    included. They are set to \code{NULL} if they are not applicable
-    instead of missing completely (as before), such that all
-    \code{"twinstim"} objects have the same list structure.
-    \item The \code{twinstim()} argument \code{cumCIF} now defaults to
-    \code{FALSE}.
-    \item The new default for \code{pit()} is to produce the plot.
+
+    \item The Campylobacteriosis data set \code{campyDE}, where absolute
+    humidity is used as concurrent covariate to adjust the outbreak
+    detection is added to the package to exemplify \code{boda()}.
+
+    \item New \code{data("measlesWeserEms")} (of class \code{"sts"}),
+    a corrected version of \code{data("measles.weser")} (of the old
+    \code{"disProg"} class).
   }
 }
 
@@ -239,8 +268,10 @@
     \item Fixed a bug in \code{LRCUSUM.runlength} where computations
     were erroneously always done under  the in-control parameter
     \code{mu0} instead of \code{mu}.
+    
     \item Fixed a bug during alarm plots (\code{stsplot_alarm()}),
     where the use of \code{alarm.symbol} was ignored.
+    
     \item Fixed a bug in \code{algo.glrnb} where the overdispersion
     parameter \code{alpha} from the automatically fitted \code{glm.nb}
     model (fitted by \code{estimateGLRNbHook}) was incorrectly taken as
@@ -248,9 +279,11 @@
     due to a different parametrization of the negative binomial
     distribution compared to the parametrization in \enc{Höhle}{Hoehle}
     and Paul (2008).
+    
     \item The score function of \code{hhh4()} was wrong when fitting
     endemic-only models to a \code{subset} including the first time
     point. This led to \dQuote{false convergence}.
+    
     \item \code{twinstim()} did not work without an endemic offset if
     \code{is.null(optim.args$par)}.
   }
