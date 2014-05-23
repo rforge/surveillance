@@ -118,15 +118,22 @@ Print, Summary and Extraction Methods for \code{"twinstim"} Objects
 
 \value{
   The \code{print} methods return their first argument, invisibly, as
-  they always should. The \code{vcov}, \code{logLik}, and \code{nobs}
-  methods return the estimated variance-covariance
-  matrix of the parameters (here, the inverse of the estimate of the
-  expected Fisher information matrix), the maximum log-likelihood
-  value of the model, and the number of events (excluding events of the
-  pre-history), respectively.
+  they always should.
+  The \code{vcov} method returns the estimated variance-covariance
+  matrix of the parameters, which is the inverse of
+  \code{object$fisherinfo} (estimate of the \emph{expected} Fisher
+  information matrix). This \code{"fisherinfo"} is not always available
+  (see \code{\link{twinstim}}), in which case
+  \code{object$fisherinfo.observed} is used if available or an error is
+  returned otherwise. 
+  The \code{logLik} and \code{nobs} methods return the maximum
+  log-likelihood value of the model, and the number of events (excluding
+  events of the pre-history), respectively.
+  
   The \code{summary} method returns a list containing some summary
   statistics of the model, which is nicely printed by the corresponding
   \code{print} method.
+  
   The \code{toLatex} method returns a character vector of class
   \code{"Latex"}, each element containing one line of LaTeX code (see
   \code{\link{print.Latex}}).
