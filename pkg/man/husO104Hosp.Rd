@@ -62,6 +62,6 @@
 }
 
 \examples{
-data("hus104Hosp")
+data("husO104Hosp")
 }
 \keyword{datasets}
