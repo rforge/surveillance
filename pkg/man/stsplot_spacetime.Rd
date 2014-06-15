@@ -27,22 +27,42 @@ stsplot_spacetime(x, type, legend = NULL, opts.col = NULL, labels = TRUE,
     time (no animation), use \code{observed ~ 1 | unit}, otherwise
     \code{observed ~ 1 | unit * time}.
   }
-%%   \item{legend}{
-%% }
-%%   \item{opts.col}{
-%% }
-%%   \item{labels}{
-%% }
-%%   \item{wait.ms}{
-%% }
-%%   \item{cex.lab}{
-%% }
-%%   \item{verbose}{
-%% }
-%%   \item{dev.printer}{
-%% }
-%%   \item{\dots}{
-%% }
+  \item{legend}{
+    An object of type \code{list} containing the following items used
+    for coloring
+    \itemize{
+      \item{dx}{position increments in x direction}
+      \item{dy}{position increments in y direction}
+      \item{x}{position in x}
+      \item{y}{position in y}
+      \item{once}{\code{Boolean} - if \code{TRUE} then only shown once}
+    }
+    If \code{NULL} then a default legend is used.
+  }
+  \item{opts.col}{
+    A list containing the two elements
+    \itemize{
+      \item{ncolors}{Number of colors to use for plotting}
+      \item{use.color}{\code{Boolean} if \code{TRUE} then colors
+	will be used in the palette, otherwise grayscale}
+    }
+  }
+  \item{labels}{\code{Boolean} whether to add labels
+  }
+  \item{wait.ms}{Number of milliseconds to wait between each plot
+  }
+  \item{cex.lab}{\code{cex} of the labels
+  }
+  \item{verbose}{\code{Boolean} whether to write out extra information
+  }
+  \item{dev.printer}{Either \code{NULL}, which means that plotting is
+    only to the screen otherwise a list with elements \code{device},
+    \code{extension}, \code{width} and \code{height}. This options is more
+    or less obsolete - nowadays it's better
+    to us the \code{animation} package to generate output to files.
+  }
+  \item{\dots}{Extra arguments sent to the plot function.
+  }
 }
 
 \author{

@@ -28,8 +28,14 @@ setGeneric("toLatex")
 setGeneric("nrow")
 setGeneric("ncol")
 setGeneric("colnames")
-setGeneric("as.data.frame")
 
+
+######################################################################
+# Conversion to and from sts objects
+######################################################################
+
+#setGeneric("as.sts") 
+setGeneric("as.data.frame")
 
 
 ######################################################################

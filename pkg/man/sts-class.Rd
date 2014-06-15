@@ -33,6 +33,7 @@
 \alias{initialize,sts-method}
 \alias{as.data.frame,sts-method}
 \alias{coerce,sts,ts-method}
+\alias{coerce,ts,sts-method}
 
 \encoding{latin1}
 
@@ -162,6 +163,12 @@ if (requireNamespace("maptools")) {
 
 ha.sts
 plot(ha.sts, type=observed ~ 1 | unit)
+
+#Convert ts/mts object to sts
+z <- ts(matrix(rpois(300,10), 100, 3), start = c(1961, 1), frequency = 12)
+sts.z <- as(z,"sts")
+plot(sts.z)
+
 }
 
 \keyword{classes}

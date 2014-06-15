@@ -181,7 +181,7 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
   #Which observations are available at time s
   data.sub <- data[ na2FALSE(data[,dReportCol] <= now),]
   if (nrow(data.sub)==0) {
-    stop(paste("No data available at s=",s,"\n"))
+    stop(paste("No data available at now=",now,"\n"))
   }
   
   #Create an sts object containing the observed number of counts until s
