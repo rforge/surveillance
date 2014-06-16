@@ -159,12 +159,8 @@ nowcast(now,when,data,dEventCol="dHospital",dReportCol="dReport",
 
 \references{
   \enc{Höhle}{Hoehle} M and an der Heiden M (2014), Bayesian Nowcasting
-  during the STEC O104:H4 Outbreak in Germany, 2011, Accepted for
-  publication in Biometrics.
-
-  Lawless, JF (1994), Adjustments for Reporting Delays and the
-  Prediction of Occurred but Not Reported Events, The Canadian Journal
-  of Statistics, 22(1):15--31.
+  during the STEC O104:H4 Outbreak in Germany, 2011, Biometrics, 
+  \url{http://dx.doi.org/10.1111/biom.12194}.
 }
 
 \author{
@@ -198,7 +194,8 @@ nc <- nowcast(now=t.repTriangle,when=t.repTriangle,
 reportingTriangle(nc)
 
 #Perform Bayesian nowcasting assuming the delay distribution is stable over time
-nc.control <- list(N.tInf.prior=structure("poisgamma",mean.lambda=50,var.lambda=3000))
+nc.control <- list(N.tInf.prior=structure("poisgamma",
+                                 mean.lambda=50,var.lambda=3000))
 t.repTriangle <- as.Date("2011-06-10")
 when <- seq(t.repTriangle-3,length.out=10,by="-1 day")
 nc <- nowcast(now=t.repTriangle,when=when,

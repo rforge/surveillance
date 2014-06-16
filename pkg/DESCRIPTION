@@ -3,7 +3,7 @@ Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomen
 Version: 1.8-0
 Date: 2014-05-23
 Authors@R: c(MH = person("Michael", "Höhle",
-                  email = "Michael.Hoehle@stat.uni-muenchen.de",
+                  email = "hoehle@math.su.se",
                   role = c("aut", "cre", "ths")),
              SM = person("Sebastian", "Meyer",
                   email = "Sebastian.Meyer@ifspm.uzh.ch",
@@ -35,7 +35,7 @@ Author: Michael Höhle [aut, cre, ths], Sebastian Meyer [aut],
         Maëlle Salmon [ctb], Dirk Schumacher [ctb], Stefan Steiner [ctb],
         Mikko Virtanen [ctb], Valentin Wimmer [ctb], R Core Team [ctb]
         (A few code segments are modified versions of code from base R)
-Maintainer: Michael Höhle <Michael.Hoehle@stat.uni-muenchen.de>
+Maintainer: Michael Höhle <hoehle@math.su.se>
 Depends: R (>= 2.15.2), methods, grDevices, graphics, stats, utils, 
         Rcpp, sp (>= 1.0-15), xtable, polyCub (>= 0.4-2)
 Imports: MASS, Matrix, spatstat (>= 1.36-0)

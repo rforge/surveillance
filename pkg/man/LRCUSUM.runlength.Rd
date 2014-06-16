@@ -68,13 +68,13 @@ such that it works for a very large class of distributions.
   Book chapter in T. Kneib and G. Tutz (Eds.), Statistical
   Modelling and Regression Structures - Festschrift in Honour of Ludwig
   Fahrmeir, Springer, pp. 377-397. Preprint available as
-  http://www.stat.uni-muenchen.de/~hoehle/pubs/hoehle2010-preprint.pdf
+  http://www.math.su.se/~hoehle/pubs/hoehle2010-preprint.pdf
 
   Höhle, M. and Mazick, A. (2009), Aberration detection in R illustrated
   by Danish mortality monitoring, Book chapter to appear in T. Kass-Hout
   and X. Zhang (Eds.) Biosurveillance: A Health Protection Priority,
   CRCPress. Preprint available as
-  http://www.stat.uni-muenchen.de/~hoehle/pubs/hoehle_mazick2009-preprint.pdf
+  http://www.math.su.se/~hoehle/pubs/hoehle_mazick2009-preprint.pdf
   
   Brook, D. and Evans, D. A. (1972),  An approach to the probability
   distribution of Cusum run length, Biometrika,

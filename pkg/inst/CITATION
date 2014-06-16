@@ -152,6 +152,22 @@ bibentry(
     doi = "10.1007/s00180-007-0074-8"
 )
 
+##############
+### nowcast ###
+##############
+
+bibentry(
+    bibtype = "Article",
+    header = "For the nowcasting functionality the appropriate citation is:",
+    title = "Bayesian Nowcasting during the STEC O104:H4 Outbreak in Germany, 2011", 
+    author = c(authors["MH"],person("Matthias", "an der Heiden")),
+    journal = "Biometrics",
+    year = "2014",
+    volume = "??",
+    number = "?",
+    pages = "???--???",
+    doi = "10.1111/biom.12194"
+)
 
 ################################
 ### basic software reference ###
