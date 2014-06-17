@@ -198,7 +198,9 @@ print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
         nTiles = nlevels(x$stgrid$tile),
         digits = digits
         )
-    cat("Types of events:", paste0("'",levels(x$events$type),"'"), "\n")
+    cat("Types of events: ")
+    str(levels(x$events$type), give.attr = FALSE, give.head = FALSE,
+        width = getOption("width") - 17L)
     cat("Overall number of events:", nEvents <- nobs(x), "\n\n")
     
     # 2014-03-24: since sp 1.0-15, print.SpatialPointsDataFrame()
