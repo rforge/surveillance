@@ -47,7 +47,6 @@ Suggests: parallel, lattice, grid, gridExtra, colorspace, scales, animation,
         spdep, numDeriv, maxLik,
         testthat, coda, splancs, gamlss,
         INLA, runjags
-Additional_repositories: http://www.r-inla.org/download
 Description: A package implementing statistical methods for the modeling and
         change-point detection in time series of counts, proportions and
         categorical data, as well as for the modeling of continuous-time
@@ -74,6 +73,10 @@ Description: A package implementing statistical methods for the modeling and
         The package contains several real-world data sets, the ability
         to simulate outbreak data, visualize the results of the
         monitoring in temporal, spatial or spatio-temporal fashion.
+	Note: The suggested package INLA is unfortunately not available from 
+        any mainstream repository - in case one wants to use the 'boda' 
+	algorithm one needs to manually install the INLA package 
+        as specified at http://www.r-inla.org/download. 
 License: GPL-2
 URL: http://surveillance.r-forge.r-project.org/
 BugReports: https://r-forge.r-project.org/tracker/?func=browse&group_id=45&atid=237
