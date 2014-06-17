@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-0 (2014-05-23)}{
+\section{Changes in surveillance version 1.8-0 (2014-06-16)}{
 
 \subsection{PACKAGE INFRASTRUCTURE}{
   \itemize{

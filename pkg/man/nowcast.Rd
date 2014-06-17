@@ -195,7 +195,9 @@ reportingTriangle(nc)
 
 #Perform Bayesian nowcasting assuming the delay distribution is stable over time
 nc.control <- list(N.tInf.prior=structure("poisgamma",
-                                 mean.lambda=50,var.lambda=3000))
+                                mean.lambda=50,var.lambda=3000),
+                                nSamples=1e2)
+
 t.repTriangle <- as.Date("2011-06-10")
 when <- seq(t.repTriangle-3,length.out=10,by="-1 day")
 nc <- nowcast(now=t.repTriangle,when=when,
