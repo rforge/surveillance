@@ -769,8 +769,18 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                 whichTile <- over(SpatialPoints(.eventLocation,
                                                 proj4string=tiles@proj4string),
                                   tiles)
+                if (is.na(whichTile)) {
+                    warning("event generated at (",
+                            paste(.eventLocation, collapse=","),
+                            ") not in 'tiles'")
+                    stop("'tiles' must cover all of 'W'")
+                }
                 .eventTile <- row.names(tiles)[whichTile]
                 .eventTile <- factor(.eventTile, levels=tileLevels)
+                if (is.na(.eventTile))
+                    stop("tile \"", row.names(tiles)[whichTile],
+                         "\" of simulated event is no level of stgrid$tile",
+                         "\n-> verify row.names(tiles)")
             }
             .eventType <- factor(.eventType, levels=typeNames)
 
