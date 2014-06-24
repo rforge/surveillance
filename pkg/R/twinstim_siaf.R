@@ -284,6 +284,7 @@ checksiaf.deriv <- function (deriv, f, pargrid, type=1, rmax=100)
     apply(pargrid, 1, function (pars) {
         maxLik::compareDerivatives(f, deriv, t0=pars, s=sgrid,
                                    print=FALSE)$maxRelDiffGrad
+        ## Note: numDeriv::grad() would only allow one location s at a time
     })
 }
 
