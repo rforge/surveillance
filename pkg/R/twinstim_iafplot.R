@@ -203,6 +203,8 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
             fvalsSample <- apply(parSample, 1, if (scaled) {
                 function (pars) FUN(xgrid, pars[-1L], types[i], pars[1L])
             } else function (pars) FUN(xgrid, pars, types[i]))
+            if (length(xgrid) == 1L)  # e.g., single-step function
+                fvalsSample <- t(fvalsSample)  # convert to matrix form
             lowerupper <- if (conf.type == "parbounds") {
                 t(apply(fvalsSample, 1, range))
             } else { # Monte-Carlo sample of parameter values
