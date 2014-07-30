@@ -1,9 +1,3 @@
-setwd("P:\\Daten\\Surveillance\\pkg\\R")
-library('surveillance')
-source("../R/farringtonFlexible.r")
-
-library(testthat)
-
 data("salmonella.agona")
 # sts object
 lala <- paste(salmonella.agona$start[1],salmonella.agona$start[2],"1",sep=" ")
