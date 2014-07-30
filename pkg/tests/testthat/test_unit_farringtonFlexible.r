@@ -341,7 +341,7 @@ population <- rnorm(1301)+10
 verbose <- FALSE
 pastWeeksNotIncluded <- w
 k <- 1200
-source("../R/farringtonFlexible.r")
+
 lala <- algo.farrington.data.glm(dayToConsider, b, freq, 
                                      epochAsDate,epochStr,
 									 vectorOfDates,w,noPeriods,
