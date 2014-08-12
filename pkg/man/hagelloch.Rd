@@ -66,7 +66,7 @@ data("hagelloch")
       "Recovered". This unknown
       time is calculated as
       \deqn{R_i = \min{D_i,Q_i+d_0},}{R[i] = min(D[i],Q[i]+d[0]),}
-      where as in Section 3.1 of Neal and Roberts (2004) we use
+      where -- as in Section 3.1 of Neal and Roberts (2004) -- we use
       \eqn{d_0=3}{d0=3}.} 
   }
 
@@ -78,7 +78,19 @@ data("hagelloch")
   interval censoring, a \eqn{U(0,1)} distributed random variable has
   been subtracted from \code{tS}, \code{tD} and \code{tQ} in order to
   break ties.
+
+  The \code{twinSIR} data set \code{hagelloch} contains a number of
+  extra entries created by giving an f argument to the \code{as.epidata}
+  conversion. This generates indicator variables based on the distance
+  \eqn{u}{u} between events. We use 62.5 meter as local distance, see
+  p.255 of Neal & Roberts (2004) for details.
   
+  \describe{
+    \item{household}{output of \code{function(u) is.finite(u) & (u==0)}}
+    \item{local}{output of \code{function(u) is.finite(u) & (u<0.0625)}}
+    \item{global}{output of \code{global1 = function(u) (u>=0.0625) & is.finite(u)}}
+    \item{nothousehold}{output of \code{function(u) is.finite(u) & (u>0)}}
+    }
 }
 
 \source{
@@ -134,3 +146,5 @@ data("hagelloch")
 \seealso{\code{\link{twinSIR}}, \code{\link{epidata}}}
 \keyword{datasets}
 
+%Technical Note: The data were created through the dataio-hagelloch.R
+%script available in the Infer2011/R/ folder.

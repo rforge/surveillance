@@ -34,15 +34,16 @@ stsplot_time <- function(x, method=x@control$name, disease=x@control$data,
     alarm <- matrix(alarm,ncol=1)
   nAreas <- ncol(observed)
 
-  #If no "mar" or "mfrow" argument in par.list add default values.
-  if (is.null(par.list[["mar",exact=TRUE]])) { par.list$mar <- c(5,4,1,1)}
-  if (is.null(par.list[["mfrow",exact=TRUE]])) { par.list$mfrow=magic.dim(nAreas)}
-  
+
   #multivariate time series
   if(nAreas > 1){
     if(as.one) { # all areas in one plot
       stop("this type of plot is currently not implemented")
     } else {
+      #If no "mar" or "mfrow" argument in par.list add default values.        
+      if (is.null(par.list[["mar",exact=TRUE]])) { par.list$mar <- c(5,4,1,1)}
+      if (is.null(par.list[["mfrow",exact=TRUE]])) { par.list$mfrow=magic.dim(nAreas)}
+
       #set window size
       oldpar <- par(par.list)
 

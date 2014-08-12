@@ -5,9 +5,30 @@
 \title{News for Package 'surveillance'}
 \encoding{latin1}
 
+\section{Changes in surveillance version 1.8-1 (2014-08-12)}{
+  
+\subsection{NEW FEATURES}{
+}
+
+\subsection{MAJOR CHANGES}{
+}
+
+\subsection{MINOR CHANGES}{
+}
+
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item Fixed a bug in the \code{hagelloch} data set which contained
+    both a \code{local}/\code{global} and \code{local1}/\code{global1}
+    covariates of which the former erroneously consisted of only
+    zeroes. Fixed the problem and removed the \code{local1}/\code{global1} columns.
+  }
+}
+}
 
 \section{Changes in surveillance version 1.8-0 (2014-06-16)}{
-
+  
 \subsection{PACKAGE INFRASTRUCTURE}{
   \itemize{
     \item Package \pkg{surveillance} now depends on newer versions of
