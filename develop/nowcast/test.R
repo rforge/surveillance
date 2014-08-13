@@ -1,3 +1,5 @@
+library("surveillance")
+
 data("husO104Hosp")
 
 #Extract the reporting triangle at a specific day
@@ -49,10 +51,13 @@ myHook <- function() {
         lines( rep(i,each=2), x@pi[i,,],lty=2,col=color[3])
     }
 
-    #Add now symbol
-    points(curDate-range[1]+1,0,pch=10,col=control$col[6],cex=1.5)
+    #Extract now date
+    nowDate <- x@control$now
+    
+    #Add "now" symbol on x-axis
+    points(nowDate-range[1]+1,0,pch=10,col=control$col[6],cex=1.5)
     #Add nowcast symbol
-    points(curDate-range[1]+1-control$safeguard,0,pch=9,col=control$col[3],cex=1.5)
+    points(nowDate-range[1]+1-control$safeguard,0,pch=9,col=control$col[3],cex=1.5)
     #Add this to the legend
     legend(x="right",c("Now","Nowcast horizon"),pch=c(10,9),col=control$col[c(6,3)],pt.cex=1.5)
     
@@ -64,6 +69,92 @@ myHook <- function() {
 plot(nc,xaxis.tickFreq=list("%d"=atChange,"%m"=atChange),
      xaxis.labelFreq=list("%d"=at2ndChange),xaxis.labelFormat="%d-%b",
      legend.opts=NULL, xlab="Time (days)",lty=c(1,1,1,1),hookFunc=myHook)
+
+
+#Does not have a direct plotting routine, but inherits one
+#(see the now so short introduction to S4 classes)
+existsMethod("plot","stsNC")
+hasMethod("plot","stsNC")
+
+#Create own plotting routine for the stsNC class, which starts by
+#using the inherited method.
+setMethod(f="plot", signature=signature(x="stsNC", y="missing"),
+          function (x, type = observed ~ time | unit, ...) {
+              cat("In new method with arguments:\n")
+              print(list(...))
+
+              #Hook function specifically for nowcasting objects.
+              nowcastPlotHook <- function() {
+                  ## #Call global hook (dirty programming, but I have not been able to find out how to transport the correct environment, coz the environment of the hook function is set to environment() in the plot function!!)
+                  ## if (exists("topHook", mode = "function")) {
+                  ##     .topHook()
+                  ## }
+                  
+                  #Define some colors for the plotting. Could be put somewhere else.
+                  color <- c("violetred3","#2171B5","orange","blue","black","springgreen4")
+    
+                  #Prolong line of last observation (this should go into the plot function
+                  idx <- nrow(x) - which.max(!is.na(rev(upperbound(x)))) + 1
+                  #Continue line from plot - use same style as stsplot_time1
+                  lines( idx+c(-0.5,0.5), rep(upperbound(x)[idx,],2),col=col[3],lwd=lwd[3],lty=lty[3])
+
+                  #Add the prediction intervals as bars (where not NA). Conf level
+                  #is found in x@control$alpha
+                  idxt <- which(apply(x@pi[1:nrow(x),1,],1,function(x) all(!is.na(x))))
+                  for (i in idxt) {
+                      lines( i+c(-0.3,0.3), rep(x@pi[i,,1],2),lty=1,col=color[3])
+                      lines( i+c(-0.3,0.3), rep(x@pi[i,,2],2),lty=1,col=color[3])
+                      lines( rep(i,each=2), x@pi[i,,],lty=2,col=color[3])
+                  }
+
+                  #Extract now date and date range of the plotting
+                  startDate <- epoch(x)[1]
+
+                  #Add "now" symbol on x-axis
+                  points(x@control$now-startDate+1,0,pch=10,col=color[6],cex=1.5)
+                  #Add start of nowcast symbol
+                  points(max(x@control$when)-startDate+1,0,pch=9,col=color[3],cex=1.5)
+                  #Add this to the legend
+                  legend(x="right",c("Now","Nowcast horizon"),pch=c(10,9),col=color[c(6,3)],pt.cex=1.5)
+                  
+                  return(invisible())
+              }
+
+              invisible(callNextMethod(x=x,y=y,.hookFuncSpecial=nowcastPlotHook,...))
+
+  ##             browser()
+              
+##               #Add nowcasting stuff at the end of the hook function (if it exists)
+##               threeDots <<- list(...)
+                  
+##               #Make a topHook function in the surveillance enviroment
+##               if (!is.null(threeDots[["hookFun",exact=TRUE]])) {
+## #                  .topHook <<- threeDots$hookFun
+##                   attr(nowcastPlotHook,".topHook") <- threeDots$hookFun
+## #                  surveillance.options(topHook=threeDots$hookFun)
+##               } else {
+## #                  .topHook <<- function() {}
+##                   attr(nowcastPlotHook,".topHook") <- function() {}
+## #                  surveillance.options(topHook=function() {})
+##               }
+##               threeDots$hookFun <- nowcastPlotHook
+##               invisible(do.call("callNextMethod", args=modifyList(threeDots,list(x=x))))
+  
+          })
+
+#foo
+existsMethod("plot",signature=signature(x="stsNC", y="missing"))
+hasMethod("plot","stsNC")
+hasMethod("plot",signature=signature(x="stsNC", y="missing"))
+
+plot(nc,xaxis.tickFreq=list("%d"=atChange,"%m"=atChange),
+     xaxis.labelFreq=list("%d"=at2ndChange),xaxis.labelFormat="%d-%b",
+     legend.opts=NULL, xlab="Time (days)",lty=c(1,1,1,1))
+
+#with hookFun
+plot(nc,xaxis.tickFreq=list("%d"=atChange,"%m"=atChange),
+     xaxis.labelFreq=list("%d"=at2ndChange),xaxis.labelFormat="%d-%b",
+     legend.opts=NULL, xlab="Time (days)",lty=c(1,1,1,1),hookFun=function() print("Foobar!"))
 
 ######### empty
 
