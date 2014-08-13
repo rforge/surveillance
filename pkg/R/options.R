@@ -41,7 +41,14 @@
   check=function(x) is.numeric(x),
   valid="vector of pairs"
 )
-  
+
+#Colors for the prediction intervals in nowcast plots
+.Options$colors <- list(
+    default=c(nowSymbol="springgreen4",piBars="orange"),
+    check=function(x) is.character(x),
+    valid="vector of pairs"
+)
+    
 ## Function to activate the defaults
 reset.surveillance.options <- function ()
 {

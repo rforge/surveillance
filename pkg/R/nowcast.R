@@ -918,7 +918,7 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
   #Other arguments to save in control object
   ######################################################################
   sts@control$N.tInf.support <- N.tInf.support
-  sts@control$method <- method
+  sts@control$method <- sts@control$name <- method
   #Store the maxDelay
   sts@control$D <- D
   sts@control$m <- m

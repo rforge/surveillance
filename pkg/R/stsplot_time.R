@@ -93,7 +93,7 @@ stsplot_time1 <- function(
     outbreak.symbol=list(pch=3, col=3, cex=1, lwd=1),
     alarm.symbol=list(pch=24, col=2, cex=1, lwd=1),
     legend.opts=list(x="top", legend=NULL, lty=NULL, pch=NULL, col=NULL),
-    dx.upperbound=0L, hookFunc=function(){}, ...)
+    dx.upperbound=0L, hookFunc=function(){}, .hookFuncInheritance=function() {}, ...)
 {
 
   #Extract slots -- depending on the algorithms: x@control$range
@@ -122,7 +122,9 @@ stsplot_time1 <- function(
   if (is.null(main)) {
     #If no surveillance algorithm has been run
     if (length(x@control) != 0) {
-      main = paste("Surveillance using ", as.character(method),sep="") 
+#      main = paste("Surveillance using ", as.character(method),sep="")
+        action = switch(class(x), "sts"="surveillance","stsNC"="nowcasting","stsBP"="backprojection")
+        main = paste(action," using ", as.character(method),sep="") 
     }
   }
 
@@ -191,9 +193,13 @@ stsplot_time1 <- function(
     do.call("legend",legend.opts)
   }
 
-  #Call hook function for user customized action
+  #Call hook function for user customized action using the current environment
   environment(hookFunc) <- environment()
   hookFunc()
+
+  #Extra hook functions for inheritance plotting (see e.g. plot function of stsNC objects)
+  environment(.hookFuncInheritance) <- environment()
+  .hookFuncInheritance()
 
   invisible()
 }

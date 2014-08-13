@@ -8,12 +8,23 @@
 \section{Changes in surveillance version 1.8-1 (2014-08-12)}{
   
 \subsection{NEW FEATURES}{
+    \itemize{
+      \item to be added...
+    }
 }
 
 \subsection{MAJOR CHANGES}{
+  \itemize{
+    \item to be added...
+  }
 }
 
 \subsection{MINOR CHANGES}{
+  \itemize{
+    \item Better plotting of \code{stsNC} objects by writing an own plot
+    method for them. Prediction intervals are now shown jointly with the
+    point estimate.
+  }
 }
 
 
