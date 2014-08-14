@@ -21,6 +21,9 @@
 
 \subsection{MINOR CHANGES}{
   \itemize{
+    \item In farringtonFlexible alarms are now for observed>upperbound and not for observed>=upperbound which was not correct.
+  }
+  \itemize{
     \item Better plotting of \code{stsNC} objects by writing an own plot
     method for them. Prediction intervals are now shown jointly with the
     point estimate.
