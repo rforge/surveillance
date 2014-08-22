@@ -5,12 +5,13 @@
 \title{News for Package 'surveillance'}
 \encoding{latin1}
 
-\section{Changes in surveillance version 1.8-1 (2014-08-12)}{
+
+\section{Changes in surveillance version 1.8-1 (2014-08-22)}{
   
 \subsection{NEW FEATURES}{
-    \itemize{
-      \item to be added...
-    }
+  \itemize{
+    \item to be added...
+  }
 }
 
 \subsection{MAJOR CHANGES}{
@@ -20,9 +21,6 @@
 }
 
 \subsection{MINOR CHANGES}{
-  \itemize{
-    \item In farringtonFlexible alarms are now for observed>upperbound and not for observed>=upperbound which was not correct.
-  }
   \itemize{
     \item Better plotting of \code{stsNC} objects by writing an own plot
     method for them. Prediction intervals are now shown jointly with the
@@ -37,9 +35,16 @@
     both a \code{local}/\code{global} and \code{local1}/\code{global1}
     covariates of which the former erroneously consisted of only
     zeroes. Fixed the problem and removed the \code{local1}/\code{global1} columns.
+    
+    \item In \code{farringtonFlexible} alarms are now for
+    \code{observed>upperbound} and not for \code{observed>=upperbound}
+    which was not correct.
   }
 }
+
 }
+
+
 
 \section{Changes in surveillance version 1.8-0 (2014-06-16)}{
   

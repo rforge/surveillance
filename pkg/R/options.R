@@ -16,39 +16,40 @@
 .Options <- new.env()
 
 ## Specify options
-.Options$gpclib       <- list(
-                         default=FALSE, # no gpclib due to license restrictions
-                         check=function(x) {
-                             if (!is.logical(x) || length(x) != 1L) return(FALSE)
-                             if (x && !requireNamespace("gpclib")) {
-                                 warning("cannot set gpclib=TRUE")
-                                 return(FALSE)
-                             }
-                             TRUE
-                         },
-                         valid="a single logical value"
-                         )
-                         
-.Options$allExamples  <- list(
-                         default=TRUE,  # maybe disabled by .onAttach()
-                         check=function(x) is.logical(x) && length(x) == 1L,
-                         valid="a single logical value"
-                         )
+.Options$gpclib <- list(
+    default = FALSE, # no gpclib due to license restrictions
+    check = function(x) {
+        if (!is.logical(x) || length(x) != 1L) return(FALSE)
+        if (x && !requireNamespace("gpclib")) {
+            warning("cannot set gpclib=TRUE")
+            return(FALSE)
+        }
+        TRUE
+    },
+    valid = "a single logical value"
+    )
+
+.Options$allExamples <- list(
+    default = TRUE,  # maybe disabled by .onAttach()
+    check = function(x) is.logical(x) && length(x) == 1L,
+    valid = "a single logical value"
+    )
 
 #Tick sizes of sts xaxis relative to par()$tcl
 .Options$stsTickFactors <- list(
-  default=c("%d"=0.33,"%W"=0.33,"%V"=0.33,"%m"=1,"%Q"=1.25,"%Y"=1.5,"%G"=1.5),
-  check=function(x) is.numeric(x),
-  valid="vector of pairs"
+    default = c("%d"=0.33,"%W"=0.33,"%V"=0.33,"%m"=1,"%Q"=1.25,"%Y"=1.5,"%G"=1.5),
+    check = function(x) is.vector(x, mode="numeric") && !is.null(names(x)),
+    valid = "a named vector of relative tick sizes"
 )
 
 #Colors for the prediction intervals in nowcast plots
 .Options$colors <- list(
-    default=c(nowSymbol="springgreen4",piBars="orange"),
-    check=function(x) is.character(x),
-    valid="vector of pairs"
+    default = c(nowSymbol="springgreen4",piBars="orange"),
+    check = function(x) is.character(x),
+    valid = "a vector of color names"
 )
-    
+
+
 ## Function to activate the defaults
 reset.surveillance.options <- function ()
 {

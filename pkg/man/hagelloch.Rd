@@ -88,7 +88,7 @@ data("hagelloch")
   \describe{
     \item{household}{output of \code{function(u) is.finite(u) & (u==0)}}
     \item{local}{output of \code{function(u) is.finite(u) & (u<0.0625)}}
-    \item{global}{output of \code{global1 = function(u) (u>=0.0625) & is.finite(u)}}
+    \item{global}{output of \code{function(u) (u>=0.0625) & is.finite(u)}}
     \item{nothousehold}{output of \code{function(u) is.finite(u) & (u>0)}}
     }
 }
