@@ -212,12 +212,14 @@ checksiaf <- function (siaf, pargrid, type = 1, tolerance = 1e-5,
     ## Check 'deriv'
     if (!is.null(siaf$deriv)) {
         cat("'deriv' vs. numerical derivative ... ")
-        maxRelDiffs.deriv <- checksiaf.deriv(siaf$deriv, siaf$f, pargrid,
-                                             type=type)
-        cat(attr(maxRelDiffs.deriv, "all.equal") <-
-            if (any(maxRelDiffs.deriv > tolerance))
-            paste("maxRelDiff =", max(maxRelDiffs.deriv)) else TRUE,
-            "\n")
+        if (requireNamespace("maxLik", quietly=TRUE)) {
+            maxRelDiffs.deriv <- checksiaf.deriv(siaf$deriv, siaf$f, pargrid,
+                                                 type=type)
+            cat(attr(maxRelDiffs.deriv, "all.equal") <-
+                if (any(maxRelDiffs.deriv > tolerance))
+                paste("maxRelDiff =", max(maxRelDiffs.deriv)) else TRUE,
+                "\n")
+        } else cat("Failed: need package", sQuote("maxLik"), "\n")
     }
 
     ## Check 'Deriv'
