@@ -323,9 +323,9 @@ plot.twinstim <- function (x, which, ...)
 ### Calculates the basic reproduction number R0 for individuals
 ### with marks given in 'newevents'
 
-R0.twinstim <- function (object, newevents, trimmed = TRUE, ...)
+R0.twinstim <- function (object, newevents, trimmed = TRUE, newcoef = NULL, ...)
 {
-    ## extract model information
+    ## check for epidemic component
     npars <- object$npars
     if (npars["q"] == 0L) {
         message("no epidemic component in model, returning 0-vector")
@@ -334,6 +334,12 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, ...)
                              names = rownames(newevents)))
         }
     }
+    ## update object for use of new parameters
+    if (!is.null(newcoef)) {
+        object <- update(object, optim.args = list(par=newcoef, fixed=TRUE),
+                         cumCIF = FALSE, cores = 1L, verbose = FALSE)
+    }
+    ## extract model information
     t0 <- object$timeRange[1L]
     T <- object$timeRange[2L]
     typeNames <- rownames(object$qmatrix)

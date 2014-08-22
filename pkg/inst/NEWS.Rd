@@ -10,7 +10,9 @@
   
 \subsection{NEW FEATURES}{
   \itemize{
-    \item to be added...
+    \item The \code{R0}-method for \code{"twinstim"} gained an argument
+    \code{newcoef} to simplify computation of reproduction numbers with
+    a different parameter vector (also used for Monte Carlo CI's).
   }
 }
 
