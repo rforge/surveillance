@@ -758,13 +758,11 @@ update.twinstim <- function (object, endemic, epidemic,
         ## evaluate in the environment calling update.twinstim()
         message("Setting up the model environment ...")
         objectWithModel <- eval(call, parent.frame(2L))
-        ## add the extra "model" components
-        object <- append(object, objectWithModel["functions"],
-                         after=match("optim.args", names(object)))
+        ## add the model "functions" and environment
+        object$functions <- objectWithModel$functions
         environment(object) <- environment(objectWithModel)
-        class(object) <- class(objectWithModel) # dropped by append()
     } else { # remove model environment
-        object$functions <- NULL
+        object["functions"] <- list(NULL)
         environment(object) <- NULL
     }
     object$call$model <- model

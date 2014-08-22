@@ -1342,7 +1342,7 @@ twinstim <- function (
     fit$timeRange <- c(t0, T)           # for simulate.twinstim's defaults
     fit$formula <- list(endemic = endemic, epidemic = epidemic,
                         siaf = siaf, tiaf = tiaf)
-    fit$control.siaf <- control.siaf    # might be NULL
+    fit["control.siaf"] <- list(control.siaf)    # might be NULL
 
     
     ### Append optimizer configuration
