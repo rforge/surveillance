@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-08-22)}{
+\section{Changes in surveillance version 1.8-1 (2014-08-25)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -41,6 +41,11 @@
     \item In \code{farringtonFlexible} alarms are now for
     \code{observed>upperbound} and not for \code{observed>=upperbound}
     which was not correct.
+
+    \item Fixed duplicate \code{"functions"} element resulting from
+    \code{update.twinstim(*,model=TRUE)} and ensured that
+    \code{"twinstim"} objects always have the same components (some may
+    be \code{NULL}).
   }
 }
 
