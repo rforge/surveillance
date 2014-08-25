@@ -27,6 +27,11 @@
     \item Better plotting of \code{stsNC} objects by writing an own plot
     method for them. Prediction intervals are now shown jointly with the
     point estimate.
+
+    \item Reduced package size by applying \code{tools::resaveRdaFiles}
+    to some large datasets and by building the package with
+    \code{--compact-vignettes=both}, i.e., using additional GhostScript
+    compression with ebook quality, see \code{?tools::compactPDF}.
   }
 }
 
