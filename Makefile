@@ -19,6 +19,7 @@
 ##                     now includes date and revision in its built packages
 ##   10 Dec 2012 (SM): add message about warnings in examples in "check"
 ##    6 Feb 2014 (SM): set _R_CHECK_FORCE_SUGGESTS_ to FALSE (for INLA package)
+##   25 Aug 2014 (SM): use compact-vignettes=both, i.e., including ghostscript
 ################################################################################
 
 ## Define variable for R and sed script which enables the use of alternatives,
@@ -59,7 +60,7 @@ clean:
 	rm -f pkg/*/.Rhistory
 
 build: clean ${SYSDATA} #${DESCRIPTION}
-	$R CMD build --no-resave-data --compact-vignettes pkg
+	$R CMD build --no-resave-data --compact-vignettes=both pkg
 
 ## update date in DESCRIPTION file
 # ${DESCRIPTION}:
