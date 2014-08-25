@@ -315,12 +315,13 @@ epi <- simEpidata(cbind(start,stop) ~ cox(gender),
 plot(epi)
 
 
+## load data of an artificial epidemic
+data("fooepidata")
+summary(fooepidata)
+plot(fooepidata)
+
 if (surveillance.options("allExamples"))
 {
-  ## load data of an artificial epidemic
-  data("fooepidata")
-  summary(fooepidata)
-
   ## simulate a new evolution of the epidemic
   set.seed(1)
   simepi <- simEpidata(cbind(start, stop) ~ cox(z1) + cox(z1):cox(z2),
@@ -333,21 +334,17 @@ if (surveillance.options("allExamples"))
   intensityplot(simepi)
 }
 
-
-## load a fitted model object, which must contain the original data 
-## (use 'keep.data = TRUE' in the call of 'twinSIR')
+## load a model fitted to the 'fooepidata' epidemic
 data("foofit")
 foofit
-# plot original epidemic
-plot(foofit$data)
 
 ## simulate a new epidemic using the model and parameter estimates of 'foofit'
 ## and set simulation period = observation period
 # a) with observed infPeriods (i.e. fixed length 3 days):
-simfitepi1 <- simulate(foofit)
+simfitepi1 <- simulate(foofit, data=fooepidata)
 plot(simfitepi1)
 # b) with new infPeriods (simuluated from the Exp(0.3) distribution):
-simfitepi2 <- simulate(foofit,
+simfitepi2 <- simulate(foofit, data=fooepidata,
                        infPeriod=function(ids) rexp(length(ids), rate=0.3))
 plot(simfitepi2)
 intensityplot(simfitepi2, which="total", aggregate=FALSE,
