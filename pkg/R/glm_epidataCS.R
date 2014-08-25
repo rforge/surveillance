@@ -12,6 +12,8 @@
 ################################################################################
 
 
+utils::globalVariables("area")  # in glm(), the 'offset' is evaluated in 'data'
+
 glm_epidataCS <- function (formula, data, ...)
 {
     if (missing(formula)) {

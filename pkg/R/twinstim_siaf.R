@@ -83,22 +83,20 @@ siaf <- function (f, F, Fcircle, effRange, deriv, Deriv, simulate, npars,
 
 siaf.constant <- function ()
 {
-    r <- s <- n <- ub <- "just cheating on codetools::checkUsage"
-    ## to avoid notes in R CMD check ("no visible binding for global variable")
-    ## one could also use utils::globalVariables() in R >= 2.15.1 as follows:
-    ## if (getRversion() >= "2.15.1") utils::globalVariables("r")
     res <- list(
-        f = as.function(alist(s=, pars=NULL, types=NULL,
-                              rep.int(1, length(s)/2)),
+        ## use explicit quote()ing to prevent notes from codetools::checkUsage
+        f = as.function(c(alist(s=, pars=NULL, types=NULL),
+                          quote(rep.int(1, length(s)/2))),
         ##<- nrow() would take extra time in standardGeneric()
                         envir = .GlobalEnv),
         ## integration over polydomains is handled specially in twinstim
-        Fcircle = as.function(alist(r=, pars=NULL, type=NULL, pi*r^2),
+        Fcircle = as.function(c(alist(r=, pars=NULL, type=NULL),
+                                quote(pi*r^2)),
                               envir = .GlobalEnv),
         ## simulation will be handled specially in simEpidataCS, this is only
         ## included here for completeness
-        simulate = as.function(alist(n=, pars=NULL, type=NULL, ub=,
-                                     runifdisc(n, ub)),
+        simulate = as.function(c(alist(n=, pars=NULL, type=NULL, ub=),
+                                 quote(runifdisc(n, ub))),
                                envir = getNamespace("surveillance")),
         npars = 0L
     )

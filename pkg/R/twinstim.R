@@ -12,6 +12,10 @@
 ################################################################################
 
 
+## model.frame() evaluates 'subset' and '...' with 'data'
+utils::globalVariables(c("tile", "type", "BLOCK", ".obsInfLength", ".bdist",
+                         "area"))
+
 twinstim <- function (
     endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     data, subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
@@ -154,8 +158,6 @@ twinstim <- function (
         xx
     }
 
-    tile <- type <- BLOCK <- .obsInfLength <- .bdist <-
-        "just cheating on codetools::checkUsage"
     mfe <- model.frame(epidemic, data = eventsData,
                        subset = time + eps.t > t0 & time <= T,
 # here we can have some additional rows (individuals) compared to mfhEvents, which is established below!
@@ -166,7 +168,6 @@ twinstim <- function (
                        time = time, tile = tile, type = type,
                        eps.t = eps.t, eps.s = eps.s, BLOCK = BLOCK,
                        obsInfLength = .obsInfLength, bdist = .bdist)
-    rm(tile, type, BLOCK, .obsInfLength, .bdist)
 
     
     ### Extract essential information from model frame
@@ -293,7 +294,6 @@ twinstim <- function (
 
     if (hash) {
         offsetEvents <- model.offset(mfhEvents)
-        BLOCK <- tile <- area <- "just cheating on codetools::checkUsage"
         mfhGrid <- model.frame(endemic, data = data$stgrid,
                                subset = start >= t0 & stop <= T,
                                na.action = na.fail,
@@ -303,7 +303,6 @@ twinstim <- function (
                                BLOCK=BLOCK, tile=tile, dt=stop-start, ds=area)
                                # 'tile' is redundant here for fitting but useful
                                # for debugging & necessary for intensityplots
-        rm(BLOCK, tile, area)
         gridBlocks <- mfhGrid[["(BLOCK)"]]
         histIntervals <- unique(data$stgrid[c("BLOCK", "start", "stop")]) # sorted
         row.names(histIntervals) <- NULL

@@ -17,6 +17,9 @@
 ### - if epidemic-only process (!hash), we actually don't need stgrid, but we
 ###   want to have valid epidataCS at the end, which requires stgrid
 
+## model.frame() evaluates '...' with 'data'
+utils::globalVariables(c("BLOCK", "tile", "area"))
+
 simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     events, stgrid, tiles, beta0, beta, gamma, siafpars, tiafpars,
     t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5,
@@ -324,12 +327,9 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
     ### Build endemic model matrix on stgrid
 
-    BLOCK <- tile <- area <- "just cheating on codetools::checkUsage"
-    ## model.frame() will evaluate these variables in the context of 'stgrid'
     mfhGrid <- model.frame(endemic, data = stgrid, na.action = na.fail,
                            drop.unused.levels = FALSE,
                            BLOCK = BLOCK, tile = tile, ds = area)
-    rm(BLOCK, tile, area)
     # we don't actually need 'tile' in mfhGrid; this is only for easier identification when debugging
     mmhGrid <- model.matrix(endemic, mfhGrid)
     # exclude intercept from endemic model matrix below, will be treated separately
