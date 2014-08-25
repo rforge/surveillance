@@ -218,17 +218,16 @@ myEpidata <- as.epidata(foodata, id.col = 1, start.col = "start",
 )
 # note the is.finite restriction in B2 to ensure that f[[i]](Inf) = 0, for all i
 
-str(myEpidata)
-subset(myEpidata, BLOCK == 1)
-
-summary(myEpidata)          # see 'summary.epidata'
-plot(myEpidata)             # see 'plot.epidata' and also 'animate.epidata'
-stateplot(myEpidata, "15")  # see 'stateplot'
-
-\dontrun{ # works in interactive mode, but not in R CMD check
+# this is how data("fooepidata") has been generated
 data("fooepidata")
-stopifnot(identical(myEpidata, fooepidata))
-}
+stopifnot(isTRUE(all.equal(myEpidata, fooepidata)))
+
+str(fooepidata)
+subset(fooepidata, BLOCK == 1)
+
+summary(fooepidata)          # see 'summary.epidata'
+plot(fooepidata)             # see 'plot.epidata' and also 'animate.epidata'
+stateplot(fooepidata, "15")  # see 'stateplot'
 }
 
 \keyword{spatial}
