@@ -802,7 +802,7 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
       
       runjagsMethod <-  'rjparallel' #'rjags'
       monitor <- c('gamma','eta','logLambda','NtInf')
-      samples.rj <- run.jags(bugsFile,#bugsModel,
+      samples.rj <- runjags::run.jags(bugsFile,#bugsModel,
                              monitor = monitor, data=jagsData, n.chains=3,
                              inits = init,
                              burnin =  control$ddcp$mcmc["burnin"],  
@@ -812,11 +812,11 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
                            summarise=FALSE,method=runjagsMethod)
 
       #Extract posterior median of discrete survival time delay distribution model parameters
-      dt.surv.samples <- as.mcmc.list(samples.rj, vars = c('gamma','^eta'))
+      dt.surv.samples <- coda::as.mcmc.list(samples.rj, vars = c('gamma','^eta'))
       post.median <- dt.surv.pm <- apply( as.matrix(dt.surv.samples), 2, median)
 
       #Posterior median of the lambda's
-      lambda.post <- exp(apply( as.matrix(as.mcmc.list(samples.rj, vars = c('^logLambda'))), 2,
+      lambda.post <- exp(apply( as.matrix(coda::as.mcmc.list(samples.rj, vars = c('^logLambda'))), 2,
                                quantile, prob=c(0.025,0.5,0.975)))
 
       #Extract posterior median of model parameters
@@ -842,7 +842,7 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
       attr(delayCDF[["bayes.trunc.ddcp"]],"model") <- list(post.median=dt.surv.pm,W=W,lambda.post=lambda.post,tps=tps)
       
       #Convert to coda compatible output.
-      samples <- as.mcmc.list(samples.rj)
+      samples <- coda::as.mcmc.list(samples.rj)
 
       
       #Extract PMFs 
