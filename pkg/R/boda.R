@@ -33,8 +33,7 @@ boda <- function(sts, control=list(range=NULL, X=NULL, trend=FALSE, season=FALSE
   #Possibly speed up the computations by using multiple cores.
   if (is.null(control[["multicore",exact=TRUE]])) { control$multicore <- TRUE }
   if (control$multicore) {
-      noCores <- if (require("parallel")) detectCores(logical = TRUE) else 1
-      inla.setOption("num.threads", noCores)
+      inla.setOption("num.threads", parallel::detectCores(logical = TRUE))
   }
   
   #Stop if the sts object is multivariate
