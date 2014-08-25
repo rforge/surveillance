@@ -64,11 +64,10 @@ Michael \enc{Höhle}{Hoehle}
 }
 
 \examples{
-data("foofit")
-# the following call takes a while
-\dontrun{
-prof <- profile(foofit, list(c(1,0,0.05,5), c(3,NA,NA,0), c(4, NA, NA, 10)))
-prof
+if (surveillance.options("allExamples")) {
+  data("foofit")
+  prof <- profile(foofit, list(c(1,0,0.05,5), c(3,NA,NA,0), c(4, NA, NA, 10)))
+  prof
 }
 }
 
