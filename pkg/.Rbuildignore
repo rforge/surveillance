@@ -1,10 +1,7 @@
 ^develop
-^newsim
 ^sysdata
 
 Makefile
-^inst/unitTests/report.*
-^inst/unitTests/reportSummary.*
 ^surveillance_[0-9\.-]+\.tar\.gz
 ^surveillance-Ex\.R
 twins.log
