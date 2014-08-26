@@ -756,7 +756,7 @@ animate.summary.epidata <- function (object,
     sleep <- eval(sleep)
     if (is.null(time.spacing)) { # plot events sequentially
         for(i in seq_len(.nTimes)) {
-            Sys.sleep(sleep)
+            if (dev.interactive()) Sys.sleep(sleep)
             tmp <- eventTable[i,]  # c(time, type, id)
             points(coords[as.character(tmp[["id"]]),,drop=FALSE],
                    pch = pch[tmp[["type"]]], col = col[tmp[["type"]]])
@@ -800,7 +800,7 @@ animate.summary.epidata <- function (object,
         }
         for(i in 1L+seq_along(timeGrid)) {
             tp <- timeGrid[i-1L]
-            Sys.sleep(sleep)
+            if (dev.interactive()) Sys.sleep(sleep)
             timeIndex <- which(eventTable[["time"]] > oldtp & eventTable[["time"]] <= tp)
             if (length(timeIndex) > 0L) {
                 tmp <- eventTable[timeIndex,]  # c(time, type, id)
