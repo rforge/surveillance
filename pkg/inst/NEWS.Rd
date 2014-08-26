@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-08-25)}{
+\section{Changes in surveillance version 1.8-1 (2014-08-26)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -51,6 +51,10 @@
     \code{update.twinstim(*,model=TRUE)} and ensured that
     \code{"twinstim"} objects always have the same components (some may
     be \code{NULL}).
+
+    \item \code{animate.epidata} works again with the
+    \CRANpkg{animation} package (\code{ani.options("outdir")} was
+    removed in version 2.3)
   }
 }
 

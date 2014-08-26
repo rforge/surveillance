@@ -786,8 +786,7 @@ animate.summary.epidata <- function (object,
             img.name <- generate.snapshots
             ani.dev <- animation::ani.options("ani.dev")
             if (is.character(ani.dev)) ani.dev <- get(ani.dev)
-            imgdir <- file.path(animation::ani.options("outdir"),
-                                animation::ani.options("imgdir"))
+            imgdir <- animation::ani.options("imgdir")
             imgtype <- animation::ani.options("ani.type")
             generate.snapshots <- list(
                 device = ani.dev,

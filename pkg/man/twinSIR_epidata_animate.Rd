@@ -163,10 +163,13 @@ animate(s, sleep=0.01)   # or: animate(fooepidata)
 animate(s, time.spacing=0.1, end=10, sleep=0.01)
 
 # using features of the animation package:
-if (require("animation")) saveHTML(
-    animate(s, time.spacing = 1, sleep = 0, generate.snapshots = "epiani"),
-    img.name = "epiani", use.dev = FALSE, ani.type = "png", width = 600
-)
+if (require("animation")) {
+  oldwd <- setwd(tempdir())
+  saveHTML(animate(s, time.spacing = 1, sleep = 0,
+                   generate.snapshots = "epiani"),
+           img.name = "epiani", use.dev = FALSE, width = 600)
+  setwd(oldwd)
+}
 }
 }
 
