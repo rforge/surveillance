@@ -275,16 +275,15 @@ confint.hhh4 <- function (object, parm, level = 0.95,
 {
     cf <- coef.hhh4(object, se=TRUE, reparamPsi=reparamPsi, idx2Exp=idx2Exp,
                     amplitudeShift=amplitudeShift, ...)
-    pnames <- rownames(cf)
-    if (missing(parm)) 
-        parm <- pnames
-    else if (is.numeric(parm)) 
-        parm <- pnames[parm]
+    ## CAVE: random intercepts have no names (all "")
+    if (missing(parm))
+        parm <- seq_len(nrow(cf))
+    pnames <- if (is.numeric(parm)) rownames(cf)[parm] else parm
     a <- (1 - level)/2
     a <- c(a, 1 - a)
     pct <- paste(format(100*a, trim=TRUE, scientific=FALSE, digits=3), "%")
     fac <- qnorm(a)
-    ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(parm, pct))
+    ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(pnames, pct))
     ses <- cf[parm,2]
     ci[] <- cf[parm,1] + ses %o% fac
     ci

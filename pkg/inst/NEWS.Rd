@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-08-26)}{
+\section{Changes in surveillance version 1.8-1 (2014-08-27)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -55,6 +55,9 @@
     \item \code{animate.epidata} works again with the
     \CRANpkg{animation} package (\code{ani.options("outdir")} was
     removed in version 2.3)
+
+    \item For \code{hhh4} models with random effects, \code{confint()}
+    only worked if argument \code{parm} was specified.
   }
 }
 
