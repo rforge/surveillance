@@ -113,7 +113,7 @@ Michaela Paul and Sebastian Meyer
 }
 
 \seealso{
-\code{vignette{"hhh4"}} and \code{\link{hhh4}}.
+\code{vignette("hhh4")} and \code{\link{hhh4}}.
 }
 
 \examples{

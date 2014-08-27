@@ -73,25 +73,33 @@ W_np(maxlag, to0 = FALSE, normalize = TRUE,
 }
 
 \examples{
-if (requireNamespace("spdep")) {
-  data("measles.weser")
-  measles <- disProg2sts(measles.weser)
+data("measlesWeserEms")
 
-  ## parametric powerlaw weights require neighbourhood orders in the data
-  neighbourhood(measles) <- nbOrder(neighbourhood(measles), maxlag=Inf)
+## data contains neighbourhood orders as required for parametric weights
+neighbourhood(measlesWeserEms)[1:6,1:6]
+max(neighbourhood(measlesWeserEms))  # max order is 5
 
-  ## a simple hhh4 model with power-law decay of spatial interaction
-  m <- list(ar = list(f = ~ 1),
-            ne = list(f = ~ 1, weights = W_powerlaw(maxlag=4, log=FALSE)),
-            end = list(f = addSeason2formula(~-1 + ri(), S=1, period=52),
-                       offset = population(measles)),
-            family = "NegBin1", verbose=TRUE)
+## fit a power-law decay of spatial interaction
+## in a hhh4 model with seasonality and random intercepts in the endemic part
+measlesModel <- list(
+    ar = list(f = ~ 1),
+    ne = list(f = ~ 1, weights = W_powerlaw(maxlag=5, log=FALSE)),
+    end = list(f = addSeason2formula(~-1 + ri(), S=1, period=52),
+               offset = population(measlesWeserEms)),
+    family = "NegBin1")
 
-  ## fit the model
-  set.seed(1)  # random intercepts are initialized randomly
-  fit <- hhh4(measles, m)
-  summary(fit)  # "neweights.d" is the decay parameter
-}
+## fit the model
+set.seed(1)  # random intercepts are initialized randomly
+measlesFit <- hhh4(measlesWeserEms, measlesModel)
+summary(measlesFit)  # "neweights.d" is the decay parameter
+
+## plot the spatio-temporal weight o^-d as a function of neighbourhood order
+plot(1:5, (1:5)^-coef(measlesFit)["neweights.d"],
+     xlab="Neighbourhood order", ylab="Weight", type="b")
+## also with regard to the SE, there is no evidence for a power law of
+## spatial interaction in this small observation region with only 17 districts;
+## a possible simpler model is first-order dependence, i.e., using
+## 'weights = neighbourhood(measlesWeserEms)==1' in the 'ne' component
 }
 
 \keyword{spatial}
