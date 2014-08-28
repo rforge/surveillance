@@ -35,7 +35,6 @@ twinstim <- function (
     cl <- match.call()
     partial <- as.logical(partial)
     finetune <- if (partial) FALSE else as.logical(finetune)
-    useParallel <- cores > 1L && requireNamespace("parallel")
 
     ## # Collect polyCub.midpoint warnings (and apply unique on them at the end)
     ## .POLYCUB.WARNINGS <- NULL
@@ -388,6 +387,16 @@ twinstim <- function (
         if (constantsiaf) control.siaf <- NULL else {
             stopifnot(is.null(control.siaf) || is.list(control.siaf))
             if (is.list(control.siaf)) stopifnot(sapply(control.siaf, is.list))
+        }
+
+        ## should we compute siafInt in parallel?
+        useParallel <- cores > 1L && requireNamespace("parallel")
+        ## but do not parallelize for a memoised siaf.step (becomes slower)
+        if (useParallel &&
+            !is.null(attr(siaf, "knots")) && !is.null(attr(siaf, "maxRange")) &&
+            isTRUE(attr(environment(siaf$f)$ringAreas, "memoised"))) {
+            cores <- 1L
+            useParallel <- FALSE
         }
         
         ## Define function that integrates the 'tiaf' function

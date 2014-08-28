@@ -141,10 +141,7 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
       only calculated once for every \code{polydomain} (in the first
       iteration of the \code{twinstim} optimization). They are used in
       the integration components \code{F} and \code{Deriv}.
-      See Meyer and Held (2014) for a use case and further details.\cr
-      CAVE: If package \pkg{memoise} is available, do use the default
-      \code{cores=1} in \code{twinstim} for maximum speed
-      (parallelization would slow down model fitting significantly)!
+      See Meyer and Held (2014) for a use case and further details.
     }
     \item{\code{siaf.gaussian}:}{
       \eqn{f(s|\kappa) = \exp(-||s||/2/\sigma_\kappa^2)}\cr

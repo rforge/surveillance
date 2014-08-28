@@ -244,11 +244,10 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     \code{twinstim} runs in single-CPU mode. Currently, only the
     \pkg{multicore}-type of parallel computing via forking is
     supported, which is not available on Windows, see
-    \code{\link[parallel]{mclapply}} in package \pkg{parallel}.\cr
-    CAVE: When using \code{\link{siaf.step}} as the spatial interaction
-    function and package \pkg{memoise} is available, do stick to
-    \code{cores=1} since parallelization would slow down model fitting
-    significantly!
+    \code{\link[parallel]{mclapply}} in package \pkg{parallel}.
+    Note that for a \pkg{memoise}d \code{\link{siaf.step}} kernel,
+    \code{cores=1} is fixed internally since parallelization would slow
+    down model fitting significantly.
   }
   \item{verbose}{
     logical indicating if information should be printed during
