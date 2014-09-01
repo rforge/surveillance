@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-08-27)}{
+\section{Changes in surveillance version 1.8-1 (2014-09-01)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -58,6 +58,11 @@
 
     \item For \code{hhh4} models with random effects, \code{confint()}
     only worked if argument \code{parm} was specified.
+
+    \item Computing one-sided AIC weights by simulation for \code{twinSIR}
+    models with more than 2 epidemic covariates now is more robust (by
+    rescaling the objective function for the quadratic programming
+    solver) and twice as fast (due to code optimization).
   }
 }
 

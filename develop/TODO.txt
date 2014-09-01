@@ -12,17 +12,6 @@
 #======================================================================
 
 #Open
-26/07/2012 Fix pictex figure in surveillance.Rnw vignette
-12/09/2012 more package tests
-           (see http://www.bioconductor.org/developers/unitTesting-guidelines/)
-
-
-###########
-# Wishlist
-###########
-
-#Open
-02/11/2011 plot for sts objects which contains daily data as Date obj
 
 #Done
 21/04/2011 incorporate a NAMESPACE :) (as of R 2.14.0 this is obligatory)
@@ -30,6 +19,7 @@
            (as of R 2.14.0 the preferred location for vignette sources is
             directory "vignettes" and not "inst/doc")
 18/04/2013 Author@R field in the "DESCRIPTION" file.
+10/05/2014 plot for sts objects which contains daily data as Date obj
 
 
 
@@ -44,19 +34,19 @@
 ########
 
 #Open
-04/04/2011 osAIC computation by simulation does not work in some
-           cases where estimated coefficient is small (global in Hagelloch):
-           m <- twinSIR(~ household + local1 + global1, data=hagelloch)
-           AIC(m, nsim=10)   # sometimes this works, sometimes not (-> NA)
-           Problems occur in the quadratic programming:
-           Error in quadprog::solve.QP(Dmat = Winv, dvec = d, Amat = t(R), bvec = rep(0,  : 
-             constraints are inconsistent, no solution!
 
 #Fixed
 25/03/2011 intensityPlot in twinSIR does not work if there are initially
            infectious individuals (as in the hagelloch data)
 07/08/2012 simulation does not work on the fitted Hagelloch data. More
            specifically, it does not work when there are no endemic covariates.
+01/09/2014 osAIC computation by simulation does not work in some
+           cases where estimated coefficient is small (global in Hagelloch):
+           m <- twinSIR(~ household + local + global, data=hagelloch)
+           AIC(m, nsim=10)   # sometimes this works, sometimes not (-> NA)
+           Problems occur in the quadratic programming:
+           Error in quadprog::solve.QP(Dmat = Winv, dvec = d, Amat = t(R), bvec = rep(0,  : 
+             constraints are inconsistent, no solution!
 
 
 ###########
@@ -66,7 +56,7 @@
 #Open
 05/04/2011 R0 calculations as for twinstim:
            how can we derive R0 in a twinSIR model? (-> Michael)
-07/08/2012 analysis of hagelloch data in twinSIR examples (-> Michael)
+07/08/2012 replace foodata analysis by hagelloch data in examples (-> Michael)
 
 #Done
 07/08/2012 animate using animation package for objects of type "epidata"

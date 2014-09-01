@@ -1,15 +1,19 @@
 ################################################################################
-# Authors: Sebastian Meyer, Michael Hoehle
-# Date: 4 Jun 2009
-#
-# This file contains methods for generic functions for objects of class
-# "twinSIR", specifically:
-# - coef and vcov: enabling the use of function confint to calculate Wald
-#                  confidence intervals for the parameter estimates.
-# - logLik: enables the use of function AIC
-# - AIC, extractAIC: compute AIC or OSAIC depending on argument 'one.sided'
-# - print, summary, print.summary, plot (intensityPlot), ...
-# - profile: Calculates the profile log-likelihood (-> likelihood.ci)
+### Part of the surveillance package, http://surveillance.r-forge.r-project.org
+### Free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
+###
+### Methods for "twinSIR" fits, specifically:
+### - vcov: enabling the use of function confint to calculate Wald
+###         confidence intervals for the parameter estimates.
+### - logLik: enables the use of function AIC
+### - AIC, extractAIC: compute AIC or OSAIC depending on argument 'one.sided'
+### - print, summary, print.summary, plot (intensityPlot), ...
+### - profile: Calculates the profile log-likelihood (-> likelihood.ci)
+###
+### Copyright (C) 2009-2014 Sebastian Meyer, contributions by Michael Hoehle
+### $Revision$
+### $Date$
 ################################################################################
 
 ### don't need a specific coef-method (identical to stats:::coef.default)
@@ -55,17 +59,13 @@ logLik.twinSIR <- function (object, ...)
         w <- c(as, 0.5, 0.5-as)
         k * sum(w * (pz + 0:2))   # = k * sum(w * (npar - px + 0:2))
     } else { # px > 2
-        cat("Computing OSAIC weights for px =",px,"epidemic covariates",
-            "based on", nsim, "simulations...\n")
+        message("Computing OSAIC weights for ", px,
+                " epidemic covariates based on ", nsim, " simulations ...")
         W <- vcov(twinSIRobject)[1:px,1:px]
-        #The simulation approach has unresolved problems for some situations (initial constraints
-        #can fail). Catch this operation until exact cause has been investigated
-        tryCatch( { 
-          w.sim <- w.chibarsq.sim(p=px, W=W, N=nsim)
+        w.sim <- w.chibarsq.sim(p=px, W=W, N=nsim)
           #c.f. (12) in Hughes & King (2003), r_i=px, m=0:px, ki=npar
           #as npar=pz+px, we have that npar-px = pz, hence the sum is
-          k * sum(w.sim * (pz + 0:px))
-        }, error=function(e) NA)
+        k * sum(w.sim * (pz + 0:px))
     }
     
     attr(penalty, "exact") <- px <= 2
