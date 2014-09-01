@@ -78,9 +78,10 @@ calculation of the so-called one-sided AIC (OSAIC).
     respectively), where \code{"L-BFGS"} means constrained optimization.
   }
   \item{nsim}{
-    number of simulations to use for determining the weights in the OSAIC
-    formula when there are more than two epidemic covariates in the fit.
-    Defaults to 1000 samples.
+    when there are more than two epidemic covariates in the fit, the
+    weights in the OSAIC formula have to be deterimed by simulation. 
+    Default is to use 1000 samples. Note that package \pkg{quadprog} is
+    additionally required in this case.
   }
   \item{scale}{unused (argument of the generic).}
   \item{signif.stars}{logical. If \code{TRUE}, \dQuote{significance
