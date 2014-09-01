@@ -146,7 +146,7 @@ checkResidualProcess <- function (object, plot = 1:2, mfrow = n2mfrow(length(plo
                  ## Investigate serial correlation between U_t and U_{t+1} which
                  ## corresponds to Figure 11 in Ogata (1988)
                  plot(tail(U,n=-1), head(U,n=-1),
-                      xlab=expression(u[(i)]), ylab=expression(u[i+1]))
+                      xlab=expression(u[i]), ylab=expression(u[i+1]))
                  )
     
     ## eval selected plot calls
