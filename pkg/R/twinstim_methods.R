@@ -507,7 +507,6 @@ residuals.twinstim <- function (object, ...)
           message("'", substitute(object), "' was fit with disabled 'cumCIF'",
                   " -> calculate it now ...")
           res <- with(modelenv, LambdagEvents(cumCIF.pb = interactive()))
-          cat("Done.\n")
           try({
               objname <- deparse(substitute(object))
               object$tau <- res
