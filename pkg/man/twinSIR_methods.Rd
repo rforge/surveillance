@@ -165,9 +165,6 @@ AIC(foofit, one.sided = FALSE)
 extractAIC(foofit)
 extractAIC(foofit, one.sided = FALSE)
 
-# with BIC-like penalty weight
-AIC(foofit, k = log(nlevels(foofit$model$survs$id)))
-
 # just as a stupid example for the use of AIC with multiple fits
 foofit2 <- foofit
 AIC(foofit, foofit2)   # 2nd column should actually be named "OSAIC" here
