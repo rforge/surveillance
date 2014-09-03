@@ -11,7 +11,8 @@
   The function \code{simEpidataCS} simulates events of a self-exiciting
   spatio-temporal point process of the \code{"\link{twinstim}"} class.
   Simulation works via Ogata's modified thinning of the conditional
-  intensity as described in Meyer et al. (2012).
+  intensity as described in Meyer et al. (2012). Note that simulation is
+  limited to the spatial and temporal range of \code{stgrid}.
 
   The \code{\link{simulate}} method for objects of class
   \code{"\link{twinstim}"} simulates new epidemic data using the model and
