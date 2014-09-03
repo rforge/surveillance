@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-09-01)}{
+\section{Changes in surveillance version 1.8-1 (2014-09-03)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -63,6 +63,10 @@
     models with more than 2 epidemic covariates now is more robust (by
     rescaling the objective function for the quadratic programming
     solver) and twice as fast (due to code optimization).
+
+    \item \code{simulate.twinstim(..., rmarks=NULL)} can now handle the
+    case where \code{data} has no events within the simulation period
+    (by sampling marks from all of \code{data$events}).
   }
 }
 

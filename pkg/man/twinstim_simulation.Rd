@@ -80,7 +80,11 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
     For the \code{simulate.twinstim} method, the default (\code{NULL})
     means sampling from the empirical distribution function of the
-    (non-missing) marks in \code{data} in (\code{t0};\code{T}].
+    (non-missing) marks in \code{data} restricted to events in the
+    simulation period (\code{t0};\code{T}]. If there are no events in
+    this period, e.g., if simulating beyond the original observation
+    period, \code{rmarks} will sample marks from all of
+    \code{data$events}.
   }
   \item{events}{
     \code{NULL} or missing (default) in case of an empty prehistory,

@@ -1069,6 +1069,11 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     if (is.null(rmarks)) {
         observedMarks <- subset(marks.epidataCS(data, coords=FALSE),
                                 subset = time > t0 & time <= T)
+        if (nrow(observedMarks) == 0) {
+            message("Note: 'data' does not contain events in the simulation window ('t0';'T'],\n",
+                    "      'rmarks' thus samples marks from all of 'data$events'")
+            observedMarks <- marks.epidataCS(data, coords=FALSE)
+        }
         observedMarks <- observedMarks[match("eps.t", names(observedMarks)):ncol(observedMarks)]
         rmarks <- function (t, s) {
             as.data.frame(lapply(observedMarks, function (x)
