@@ -983,15 +983,12 @@ R0.simEpidataCS <- function (object, trimmed = TRUE, ...)
 
 as.twinstim.simEpidataCS <- function (x)
 {
-    capture.output(
-    m <- do.call("twinstim",
-                 c(formula(x),
-                   alist(data=x),
-                   list(control.siaf = x$control.siaf,
-                        optim.args=list(par=coef(x), fixed=seq_along(coef(x))),
-                        model=TRUE, cumCIF=FALSE)
-                   ))
-    )
+    m <- do.call("twinstim", c(
+        formula(x),
+        list(data = quote(x), control.siaf = x$control.siaf,
+             optim.args = list(par=coef(x), fixed=TRUE),
+             model = TRUE, cumCIF = FALSE, verbose = FALSE)
+        ))
     components2copy <- setdiff(names(m), names(x))
     for (comp in components2copy) x[[comp]] <- m[[comp]]
     environment(x) <- environment(m)
@@ -1003,17 +1000,25 @@ intensityplot.simEpidataCS <- function (x, ...)
 {
     if (is.null(environment(x))) {
         objname <- deparse(substitute(x))
-        cat("Setting up model environment ...\n")
+        message("Setting up the model environment ...")
         x <- as.twinstim.simEpidataCS(x)
         try({
             assign(objname, x, envir=parent.frame())
-            cat("Note: added model environment to '", objname,
-                "' for future use.\n", sep="")
+            message("Note: added model environment to '", objname,
+                    "' for future use.")
         }, silent=TRUE)
     }
     intensityplot.twinstim(x, ...)
 }
 
+
+### the residual process Lambda_g(t) is stored with the simulated events
+
+residuals.simEpidataCS <- function (object, ...)
+{
+    setNames(object$events$Lambdag,
+             row.names(object$events))[!is.na(object$events$Lambdag)]
+}
 
 
 

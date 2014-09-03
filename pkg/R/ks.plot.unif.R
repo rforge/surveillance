@@ -117,7 +117,7 @@ ks.plot.unif <- function (U, conf.level = 0.95, exact = NULL,
 
 checkResidualProcess <- function (object, plot = 1:2, mfrow = n2mfrow(length(plot)), ...)
 {
-    stopifnot(inherits(object, c("twinSIR", "twinstim")))
+    stopifnot(inherits(object, c("twinSIR", "twinstim", "simEpidataCS")))
     
     ## check plot argument
     if (is.logical(plot)) plot <- which(rep(plot, length.out = 2)) else {
