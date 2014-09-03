@@ -37,13 +37,21 @@ epidataCSplot_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
                                    select = c("time", "type")))
     }
     if (nrow(eventTimesTypes) == 0L) stop("no events left after 'subset'")
+    typeNames <- levels(eventTimesTypes$type)
+    nTypes <- length(typeNames)
+
     if (is.list(cumulative)) {
         csums <- tapply(eventTimesTypes$time, eventTimesTypes["type"],
                         function (t) cumsum(table(t)), simplify=FALSE)
+        if (!is.null(cumulative[["offset"]])) {
+            stopifnot(is.vector(cumulative$offset, mode="numeric"),
+                      length(cumulative$offset) == nTypes)
+            csums <- mapply(FUN="+", csums, cumulative$offset,
+                            SIMPLIFY=FALSE, USE.NAMES=TRUE)
+        }
         if (is.null(cumulative[["axis"]])) cumulative[["axis"]] <- TRUE
     }
-    typeNames <- levels(eventTimesTypes$type)
-    nTypes <- length(typeNames)
+    
     eventTimesTypes$type <- as.integer(eventTimesTypes$type)
     col <- rep_len(col, nTypes)
     
@@ -91,7 +99,8 @@ epidataCSplot_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
 
     ## plot histogram (over all types)
     plot(histdata, freq = freq, add = TRUE, col = col[1L], ...)
-    box()          # because white filling of bars might overdraw the inital box
+    if (!add)  # doesn't work as expected when adding to plot with cumulative axis
+        box()  # because white filling of bars might overdraw the inital box
 
     ## add type-specific sub-histograms
     typesEffective <- sort(unique(eventTimesTypes$type))
