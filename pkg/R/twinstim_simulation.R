@@ -801,8 +801,13 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
             # calculate actual intensity at this time, location and type
             .mmhEvent <- buildmmh(.eventData)
             .etaEvent <- .mmhEvent %*% beta
-            .offsetEvent <- attr(.mmhEvent, "offset")
-            if (!is.null(.offsetEvent)) .etaEvent <- .offsetEvent + .etaEvent
+            if (!is.null(.offsetEvent <- attr(.mmhEvent, "offset")))
+                .etaEvent <- .etaEvent + .offsetEvent
+            if (nbeta0 == 1L) {
+                .etaEvent <- .etaEvent + beta0
+            } else if (nbeta0 > 1L) {
+                .etaEvent <- .etaEvent + beta0[.eventType]
+            }
             .lambdah <- exp(.etaEvent)
             .lambdae <- if (hase && length(.sources) > 0L) {
                 .sdiffs <- .eventLocation[rep.int(1L,length(.sources)),,drop=FALSE] - eventCoords[.sources,,drop=FALSE]

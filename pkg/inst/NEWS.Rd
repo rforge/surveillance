@@ -67,6 +67,10 @@
     \item \code{simulate.twinstim(..., rmarks=NULL)} can now handle the
     case where \code{data} has no events within the simulation period
     (by sampling marks from all of \code{data$events}).
+
+    \item The \code{lambda.h} values of simulated events in
+    \code{"simEpidataCS"} objects were wrong if the model contained an
+    endemic intercept (which is usually the case).
   }
 }
 
