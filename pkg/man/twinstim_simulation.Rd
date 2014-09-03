@@ -326,6 +326,32 @@ plot(mysim1, aggregate="space")
 
 ## plot both epidemics using the plot-method for simEpidataCSlist's
 plot(mysims, aggregate="time", subset=type=="B")
+
+
+\dontrun{
+### compare the observed cumulative number of cases during the
+### first 90 days to 20 simulations from the fitted model
+
+sims <- simulate(imdepifit, nsim=20, seed=1, data=imdepi, t0=0, T=90,
+                 tiles=districtsD, W=stateD, simplify=TRUE)
+getcsums <- function (events) {
+    tapply(events$time, events@data["type"],
+           function (t) cumsum(table(t)), simplify=FALSE)
+}
+csums_observed <- getcsums(imdepi$events)
+csums_simulated <- lapply(sims$eventsList, getcsums)
+plotcsums <- function (csums, ...) {
+    mapply(function (csum, ...) lines(as.numeric(names(csum)), csum, ...),
+           csums, ...)
+    invisible()
+}
+plot(c(0,90), c(0,35), type="n", xlab="Time [days]",
+     ylab="Cumulative number of cases")
+plotcsums(csums_observed, col=c(2,4), lwd=3)
+legend("topleft", legend=levels(imdepi$events$type), col=c(2,4), lwd=1)
+invisible(lapply(csums_simulated, plotcsums,
+                 col=scales::alpha(c(2,4), alpha=0.5)))
+}
 }
 
 \keyword{datagen}
