@@ -161,12 +161,12 @@ siaf.simulatePC <- function (intrfr)    # e.g., intrfr.powerlaw
         QF <- function (p) uniroot(function(q) CDF(q)-p, lower=0, upper=ub)$root
 
         ## Now sample r as QF(U), where U ~ U(0,1)
-        r <- sapply(runif(n), QF)
+        r <- vapply(X=runif(n), FUN=QF, FUN.VALUE=0, USE.NAMES=FALSE)
         ## Check simulation of r via kernel estimate:
         ## plot(density(r, from=0, to=ub)); curve(p(x)/normconst,add=TRUE,col=2)
         
         ## now rotate each point by a random angle to cover all directions
-        theta <- stats::runif(n, 0, 2*pi)
+        theta <- runif(n, 0, 2*pi)
         r * cbind(cos(theta), sin(theta))
     })), envir=parent.frame())
 }
@@ -323,7 +323,7 @@ checksiaf.simulate <- function (simulate, f, pars, type=1, B=3000, ub=10,
         ##x11(); image(kdens, add=TRUE)
 
         ## Graphical check of distance distribution
-        MASS::truehist(sqrt(rowSums(simpoints^2)), xlab="Distance")
+        truehist(sqrt(rowSums(simpoints^2)), xlab="Distance")
         rfr <- function (r) r*f(cbind(r,0), pars, type)
         rfrnorm <- integrate(rfr, 0, ub)$value
         do.call("curve", list(quote(rfr(x)/rfrnorm), add=TRUE, col=2, lwd=2))

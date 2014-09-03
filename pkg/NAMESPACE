@@ -82,7 +82,7 @@ importFrom(spatstat, area.owin, as.im.function, coords.ppp, diameter,
 importFrom(polyCub, polyCub, .polyCub.iso, polyCub.SV, polyCub.midpoint, xylist)
 importMethodsFrom(polyCub, coerce)
 
-importFrom(MASS, kde2d)
+importFrom(MASS, kde2d, truehist)
 
 
 
