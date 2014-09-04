@@ -74,6 +74,8 @@
 ############
 
 #Open
+04/09/2014 verify that isTRUE(all.equal(residuals(mysim1),
+           surveillance:::residuals.twinstim(surveillance:::as.twinstim.simEpidataCS(mysim1))))
 
 #Fixed
 29/07/2010>> Summary/print fuer twinstim Objekte, die mit do.call
