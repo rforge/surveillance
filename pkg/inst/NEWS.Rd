@@ -32,6 +32,9 @@
     to some large datasets and by building the package with
     \code{--compact-vignettes=both}, i.e., using additional GhostScript
     compression with ebook quality, see \code{?tools::compactPDF}.
+
+    \item Added \code{units} argument to \code{stsplot_time} to select
+    only a subset of the multivariate time series for plotting.
   }
 }
 

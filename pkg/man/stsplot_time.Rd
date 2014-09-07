@@ -22,7 +22,7 @@
 }
 
 \usage{
-stsplot_time(x, method=x@control$name, disease=x@control$data,
+stsplot_time(x, units, method=x@control$name, disease=x@control$data,
              as.one=FALSE, same.scale=TRUE, par.list=list(), ...)
 
 stsplot_time1(x, k=1, ylim=NULL,
@@ -49,8 +49,12 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
 
 \arguments{
   \item{x}{an object of class \code{"\linkS4class{sts}"}.}
-  \item{method}{surveillance method to be used in the main title.}
-  \item{disease}{name of the disease to be used for annotation.
+  \item{units}{optional integer vector to select the units (=columns of
+    \code{observed(x)}) to plot. \code{stsplot_time1} is called for
+    \code{k in units}. The default is to plot all time series.}
+  \item{method}{name of the surveillance method to be used in the main
+    title. Currently ignored.}
+  \item{disease}{name of the disease to be used in the main title.
     Currently ignored.}
   \item{as.one}{logical indicating if all time series should be plotted
     within the same frame. This is currently not implemented

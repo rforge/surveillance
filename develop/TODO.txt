@@ -13,7 +13,6 @@
 
 #Open
 06/09/2014 implement "as.one=TRUE" for stsplot_time (see plot.disProg)
-06/09/2014 add a "units" argument to stsplot_time with default 1:nAreas
 
 #Done
 21/04/2011 incorporate a NAMESPACE :) (as of R 2.14.0 this is obligatory)
@@ -22,6 +21,7 @@
             directory "vignettes" and not "inst/doc")
 18/04/2013 Author@R field in the "DESCRIPTION" file.
 10/05/2014 plot for sts objects which contains daily data as Date obj
+07/09/2014 add a "units" argument to stsplot_time with default 1:nAreas
 
 
 

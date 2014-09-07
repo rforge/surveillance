@@ -15,34 +15,26 @@
 # stsplot_time sets the scene and calls stsplot_time1 for each unit
 ######################################################################
 
-stsplot_time <- function(x, method=x@control$name, disease=x@control$data,
+stsplot_time <- function(x, units,
+                         method=x@control$name, disease=x@control$data,
                          as.one=FALSE, same.scale=TRUE, par.list=list(), ...)
 {
   #Extract
   observed <- x@observed
-  state <- x@state
-  alarm <- x@alarm
   population <- x@populationFrac
   binaryTS <- x@multinomialTS
-  
-  #univariate timeseries ?
-  if(is.vector(observed))
-    observed <- matrix(observed,ncol=1)
-  if(is.vector(state))
-    state <- matrix(state,ncol=1)
-  if(is.vector(alarm)) 
-    alarm <- matrix(alarm,ncol=1)
-  nAreas <- ncol(observed)
-
+  nUnits <- ncol(observed)
 
   #multivariate time series
-  if(nAreas > 1){
+  if(nUnits > 1){
+    if (missing(units))
+      units <- seq_len(nUnits)
     if(as.one) { # all areas in one plot
       stop("this type of plot is currently not implemented")
     } else {
-      #If no "mar" or "mfrow" argument in par.list add default values.        
-      if (is.null(par.list[["mar",exact=TRUE]])) { par.list$mar <- c(5,4,1,1)}
-      if (is.null(par.list[["mfrow",exact=TRUE]])) { par.list$mfrow=magic.dim(nAreas)}
+      par.list <- modifyList(
+        list(mar = c(5,4,1,1), mfrow = magic.dim(nUnits)),
+        par.list)
 
       #set window size
       oldpar <- par(par.list)
@@ -63,7 +55,7 @@ stsplot_time <- function(x, method=x@control$name, disease=x@control$data,
       }
       
       #plot areas
-      for (k in 1:nAreas) {
+      for (k in units) {
         argsK <- modifyList(args, list(x=x, k=k, main="", legend.opts=NULL),
                             keep.null = TRUE)
         do.call("stsplot_time1",args=argsK)
