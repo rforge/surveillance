@@ -17,23 +17,16 @@
 ### [see Section "Methods for S3 Generic Functions" in help("Methods")]
 
 animate.sts <- function (object, tps = NULL, cumulative = FALSE,
-                         at = 10, ...,
+                         population = NULL, at = 10, ...,
                          timeplot = list(height = 0.3),
                          sleep = 0.5, verbose = interactive())
 {
     if (dev.interactive())
         message("Advice: use facilities of the \"animation\" package, e.g.,\n",
                 "        saveHTML() to view the animation in a web browser.")
-    observed <- if (inherits(object, "sts")) observed(object) else object
-    if (is.null(tps)) {
-        tps <- seq_len(nrow(observed))
-    } else {
-        observed <- observed[tps,,drop=FALSE]
-    }
 
-    ## determine color breaks 'at' (checkat() is defined in stsplot_space.R)
-    at <- checkat(at,
-                  data=if (cumulative) colSums(observed) else range(observed))
+    ## determine color breaks (checkat() is defined in stsplot_space.R)
+    at <- checkat(at, data=.rangeOfDataToPlot(object, tps, cumulative, population))
 
     ## style of the additional temporal plot
     if (is.list(timeplot)) {
@@ -43,11 +36,14 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
         stopifnot(timeplot_height > 0, timeplot_height < 1)
     }
 
+    if (is.null(tps))
+        tps <- seq_len(nrow(object))
     if (verbose)
         pb <- txtProgressBar(min=0, max=length(tps), initial=0, style=3)
     for(i in seq_along(tps)) {
         cti <- if (cumulative) seq_len(i) else i
-        ls <- stsplot_space(object, tps=tps[cti], at=at, ...)
+        ls <- stsplot_space(object, tps=tps[cti], population=population,
+                            at=at, ...)
         if (is.list(timeplot) && require("gridExtra")) {
             lt <- do.call("stsplot_timeSimple", c(
                 list(x=object, tps=tps, highlight=cti),
@@ -92,4 +88,22 @@ stsplot_timeSimple <- function (x, tps = NULL, highlight = integer(0),
                                 styleargs),
                               list(...))
     do.call(lattice::xyplot, xyplot.args)
+}
+
+
+### determine data range for automatic color breaks 'at'
+
+.rangeOfDataToPlot <- function (object, tps = NULL, cumulative = FALSE,
+                                population = NULL)
+{
+    observed <- if (inherits(object, "sts")) observed(object) else object
+    if (!is.null(tps)) {
+        observed <- observed[tps,,drop=FALSE]
+    }
+    if (!is.null(population)) { # compute prevalence
+        stopifnot(is.vector(population, mode="numeric"),
+                  length(population) == ncol(object))
+        observed <- observed / rep(population, each=nrow(observed))
+    }
+    range(if (cumulative) c(observed[1L,], colSums(observed)) else observed)
 }

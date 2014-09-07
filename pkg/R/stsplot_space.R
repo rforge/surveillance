@@ -36,9 +36,7 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
     total <- sum(ncases)
     if (!is.null(population)) { # plot prevalence
         stopifnot(is.vector(population, mode="numeric"),
-                  length(population) == ncol(counts))
-        if (!is.null(colnames(counts)) && !is.null(names(population)))
-            stopifnot(colnames(counts) == names(population))
+                  length(population) == length(ncases))
         ncases <- ncases / population
         total <- total / sum(population)
     }

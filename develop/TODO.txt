@@ -12,6 +12,8 @@
 #======================================================================
 
 #Open
+06/09/2014 implement "as.one=TRUE" for stsplot_time (see plot.disProg)
+06/09/2014 add a "units" argument to stsplot_time with default 1:nAreas
 
 #Done
 21/04/2011 incorporate a NAMESPACE :) (as of R 2.14.0 this is obligatory)

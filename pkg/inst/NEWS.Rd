@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-09-03)}{
+\section{Changes in surveillance version 1.8-1 (2014-09-07)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -71,6 +71,10 @@
     \item The \code{lambda.h} values of simulated events in
     \code{"simEpidataCS"} objects were wrong if the model contained an
     endemic intercept (which is usually the case).
+
+    \item Automatic choice of color breaks in the \code{animate}-method
+    for class \code{"sts"} now also works for incidence maps (i.e., with
+    a \code{population} argument).
   }
 }
 
