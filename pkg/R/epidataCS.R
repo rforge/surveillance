@@ -529,5 +529,6 @@ check_tiles_areas <- function (areas.tiles, areas.stgrid, tolerance = 0.05)
         SIMPLIFY = FALSE, USE.NAMES = FALSE)
     
     attr(res, "nCircle2Poly") <- npoly
+    attr(res, "clipper") <- clipper
     res
 }
