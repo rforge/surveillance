@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-09-07)}{
+\section{Changes in surveillance version 1.8-1 (2014-09-10)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -35,6 +35,12 @@
 
     \item Added \code{units} argument to \code{stsplot_time} to select
     only a subset of the multivariate time series for plotting.
+
+    \item The \code{untie}-method for class \code{"epidataCS"} gained an
+    argument \code{verbose} which is now \code{FALSE} by default.
+
+    \item \code{"epidataCS"} objects store the \code{clipper} used
+    during generation as attribute of \code{$events$.influenceRegion}.
   }
 }
 
