@@ -802,7 +802,7 @@ meanHHH <- function(theta, model, subset=model$subset, total.only=FALSE)
         return(list(exppred = zeroes, mean = zeroes))
     }
     
-    for(i in (1:nGroups)[comp==component]){
+    for(i in seq_len(nGroups)[comp==component]){
       fe <- fixed[idxFE==i]
       if(term["unitSpecific",i][[1]]){
         fe <- nullMatrix
@@ -967,7 +967,7 @@ penScore <- function(theta, sd.corr, model)
     grad.fe <- numeric(0L)
     grad.re <- numeric(0L)
        
-    for(i in 1:nGroups){
+    for(i in seq_len(nGroups)){
       comp <- term["offsetComp",i][[1]]
       Xit<- term["terms",i][[1]] # eiter 1 or a matrix with values
       if(is.matrix(Xit)){
@@ -1199,18 +1199,18 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
           hessian.RE.RE[which(idxRE==i),idxRE==j] <<- diag(colSums( didj %m% Z))
         } else if(length(Z.j)==1 & length(Z.i)>1){         #*
           Z.j <- diag(nrow=model$nUnits)
-          for(k in 1:ncol(Z.j)){
+          for(k in seq_len(ncol(Z.j))){
             Z <- Z.i*Z.j[,k]
             hessian.RE.RE[idxRE==i,which(idxRE==j)[k]] <<- colSums( didj %m% Z)
           }  
         } else if(length(Z.j)>1 & length(Z.i)==1){         #* 
           Z.i <- diag(nrow=model$nUnits)
-          for(k in 1:ncol(Z.i)){
+          for(k in seq_len(ncol(Z.i))){
             Z <- Z.i[,k]*Z.j
             hessian.RE.RE[which(idxRE==i)[k],idxRE==j] <<- colSums( didj %mj% Z)
           }  
         } else {         
-          for(k in 1:ncol(Z.j)){
+          for(k in seq_len(ncol(Z.j))){
             Z <- Z.i*Z.j[,k]
             hessian.RE.RE[which(idxRE==i)[k],idxRE==j] <<- colSums( didj %m% Z)
           }  
@@ -1228,7 +1228,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
     }
   ##----------------------------------------------           
 
-    for(i in 1:nGroups){ #go through rows of hessian
+    for(i in seq_len(nGroups)){ #go through rows of hessian
       # parameter group belongs to which components
       comp.i <- term["offsetComp",i][[1]]      
       # get covariate value
@@ -1548,7 +1548,7 @@ marScore <- function(sd.corr, theta, model, fisher.unpen=NULL, verbose=FALSE){
   d1logDet <- c(-dimBlocks,dimBlocks[1]*corr/(corr^2+1))
   
   # go through all variance parameters
-  for(i in 1:dimSigma){
+  for(i in seq_len(dimSigma)){
     dSi <- -Sigmai.inv %*% d1Sigma[,,i] %*% Sigmai.inv # CAVE: sign
     dS.i <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,Sigmai=dSi)
     #dlpen.i <- -0.5* t(randomEffects) %*% dS.i %*% randomEffects
@@ -1634,7 +1634,7 @@ marFisher <- function(sd.corr, theta, model, fisher.unpen=NULL, verbose=FALSE){
   }
   
   # go through all variance parameters
-  for(i in 1:dimSigma){
+  for(i in seq_len(dimSigma)){
     # compute first derivative of the penalized Fisher info (-> of Sigma^-1) 
     # with respect to the i-th element of Sigma (= kronecker prod. of Sigmai and identity matrix)
     # Harville Ch15, Eq. 8.15: (d/d i)S^-1 = - S^-1 * (d/d i) S * S^-1
@@ -2105,13 +2105,13 @@ addSeason2formula <- function(f=~1,       # formula to start with
   f <- paste(deparse(f), collapse="")
   # create formula
   if(length(S)==1 && S>0){
-    for(i in 1:S){
+    for(i in seq_len(S)){
       f <- paste0(f,
                   " + sin(",2*i,"*pi*",timevar,"/",period,")",
                   " + cos(",2*i,"*pi*",timevar,"/",period,")")
     }
   } else {
-    for(i in 1:max(S)){
+    for(i in seq_len(max(S))){
       which <- paste(i <= S,collapse=",")
       f <- paste0(f,
                   " + fe( sin(",2*i,"*pi*",timevar,"/",period,"), which=c(",which,"))",
