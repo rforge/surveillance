@@ -64,6 +64,7 @@ plotHHH4_fitted <- function (x, units = 1, names = NULL,
 
     ## plot fitted values region by region
     meanHHHunits <- vector(mode="list", length=length(units))
+    names(meanHHHunits) <- if (is.character(units)) units else colnames(x$stsObj)[units]
     for(i in seq_along(units)) {
         meanHHHunits[[i]] <- plotHHH4_fitted1(x, units[i], main=names[i],
                                               col=col, pch=pch, pt.cex=pt.cex,
