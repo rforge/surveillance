@@ -29,7 +29,7 @@ plotHHH4_fitted <- function (x, units = 1, names = NULL,
                              pch = 19, pt.cex = 0.6,
                              par.settings = list(),
                              legend = TRUE, legend.args = list(),
-                             legend.observed = TRUE, ...)
+                             legend.observed = FALSE, ...)
 {
     if (!is.null(names)) stopifnot(length(units) == length(names))
     if (length(col) == 3) col <- c(col, "black") else if (length(col) != 4)

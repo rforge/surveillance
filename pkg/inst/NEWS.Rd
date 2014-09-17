@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-09-10)}{
+\section{Changes in surveillance version 1.8-1 (2014-09-17)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -41,6 +41,9 @@
 
     \item \code{"epidataCS"} objects store the \code{clipper} used
     during generation as attribute of \code{$events$.influenceRegion}.
+
+    \item In \code{plotHHH4_fitted()}, the argument \code{legend.observed}
+    now defaults to \code{FALSE}.
   }
 }
 

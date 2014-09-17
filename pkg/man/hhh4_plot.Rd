@@ -34,7 +34,7 @@ plotHHH4_fitted(x, units = 1, names = NULL,
                 pch = 19, pt.cex = 0.6,
                 par.settings = list(),
                 legend = TRUE, legend.args = list(),
-                legend.observed = TRUE, ...)
+                legend.observed = FALSE, ...)
 
 plotHHH4_fitted1(x, unit = 1, main = NULL,
                  col = c("grey30", "grey60", "grey85", "grey0"),
