@@ -557,15 +557,15 @@ toLatex.sts <- function(object, caption = "",label=" ", columnLabels = NULL,
     observedValues <- object@observed[,k]
     alarms <- object@alarm[,k]
     ubCol <- c()
-    for(l in 1:length(upperbounds)) {
-      if (is.na(upperbounds[l]))
-        ubCol <- c(ubCol, NA)
-      else {
-        if (!is.na(alarms[l]) && alarms[l])
-          ubCol <- c(ubCol, paste0(alarmPrefix, upperbounds[l], alarmSuffix))
-        else
-          ubCol <- c(ubCol, upperbounds[l])
-      }
+    for (l in 1:length(upperbounds)) {
+        if (is.na(upperbounds[l])) {
+            ubCol <- c(ubCol, NA)
+        } else {
+            ubCol <- c(ubCol, upperbounds[l])
+            if (!is.na(alarms[l]) && alarms[l]) {
+                observedValues[l] <- paste0(alarmPrefix, observedValues[l], alarmSuffix)
+            }
+        }
     }
     dataTable[,(j)] <- observedValues
     dataTable[,(j + 1)] <- ubCol
