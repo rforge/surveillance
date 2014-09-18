@@ -39,6 +39,8 @@ epidataCSplot_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
     if (nrow(eventTimesTypes) == 0L) stop("no events left after 'subset'")
     typeNames <- levels(eventTimesTypes$type)
     nTypes <- length(typeNames)
+    if (!freq && nTypes > 1L)
+        warning("a stacked barplot of multiple event types only makes sense for 'freq=TRUE'")
 
     if (is.list(cumulative)) {
         csums <- tapply(eventTimesTypes$time, eventTimesTypes["type"],
