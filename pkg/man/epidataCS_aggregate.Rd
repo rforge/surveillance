@@ -118,7 +118,7 @@ stopifnot(isTRUE(all.equal(colSums(imdepi_sts@observed),
 
 ## compare plots of monthly number of cases
 opar <- par(mfrow=c(2,1))
-plot(imdepi, "time", t0.Date=as.Date("2002-01-01"), breaks="months")
+suppressWarnings(plot(imdepi, "time", breaks=c(0,unique(imdepi$stgrid$stop))))
 plot(imdepi_sts, type=observed~time, legend.opts=NULL)
 par(opar)
 
