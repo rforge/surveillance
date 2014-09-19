@@ -11,7 +11,9 @@
 ################################################################################
 
 
-plot.hhh4 <- function (x, type=c("fitted", "season", "maxEV", "ri"), ...)
+plot.hhh4 <- function (x,
+                       type = c("fitted", "season", "maxEV", "ri", "neweights"),
+                       ...)
 {
     cl <- sys.call()
     cl$type <- NULL
@@ -525,7 +527,38 @@ getSeasonStart <- function (object)
 
 
 
+###
+### plot neighbourhood weight as a function of distance (neighbourhood order)
+###
+
+plotHHH4_neweights <- function (x,
+                                xlab = "Distance", ylab = "Weight", ...,
+                                exclude = 0, maxlag = Inf)
+{
+    ## orders of neighbourhood (o_ji)
+    nbmat <- neighbourhood(x$stsObj)
+    if (all(nbmat %in% 0:1)) {
+        message("'neighbourhood(x$stsObj)' is binary; ",
+                "computing neighbourhood orders ...")
+        nbmat <- nbOrder(nbmat, maxlag=maxlag)
+    }
+
+    ## extract (estimated) weight matrix (w_ji)
+    W <- getNEweights(x)
+    if (is.null(W)) {  # if no spatio-temporal component in the model
+        W <- nbmat
+        W[] <- 0
+    }
+
+    ## draw the boxplot
+    boxplot(c(W) ~ factor(nbmat, exclude=exclude), xlab=xlab, ylab=ylab, ...)
+}
+
+
+
+###
 ### auxiliary functions
+###
 
 yearepoch2point <- function (yearepoch, frequency, toleft=FALSE)
     yearepoch[1L] + (yearepoch[2L] - toleft) / frequency

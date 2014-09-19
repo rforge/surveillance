@@ -7,11 +7,12 @@
 \alias{plotHHH4_maxEV}
 \alias{getMaxEV}
 \alias{plotHHH4_ri}
+\alias{plotHHH4_neweights}
 
 \title{Plots for Fitted \code{hhh4}-models}
 
 \description{
-  There are four \code{type}s of plots for fitted \code{\link{hhh4}} models:
+  There are five \code{type}s of plots for fitted \code{\link{hhh4}} models:
   \itemize{
     \item Plot the \code{"fitted"} component means (of selected units)
     along time along with the observed counts.
@@ -23,11 +24,14 @@
     \code{"\linkS4class{sts}"} object represent different regions, a map
     of estimated region-specific intercepts (\code{"ri"}) of a selected
     model component can be produced.
+    \item Plot the (estimated) neighbourhood weights
+    (\code{"neweights"}) as a function of neighbourhood order
+    (shortest-path distance between regions), i.e., \code{w_ji ~ o_ji}.
   }
 }
 
 \usage{
-\method{plot}{hhh4}(x, type=c("fitted", "season", "maxEV", "ri"), ...)
+\method{plot}{hhh4}(x, type=c("fitted", "season", "maxEV", "ri", "neweights"), ...)
 
 plotHHH4_fitted(x, units = 1, names = NULL,
                 col = c("orange", "blue", "grey85", "black"),
@@ -60,6 +64,9 @@ getMaxEV(x)
 plotHHH4_ri(x, component, sp.layout = NULL,
             gpar.missing = list(col = "darkgrey", lty = 2, lwd = 2),
             ...)
+
+plotHHH4_neweights(x, xlab = "Distance", ylab = "Weight", ...,
+                   exclude = 0, maxlag = Inf)
 }
 
 \arguments{
@@ -80,7 +87,9 @@ plotHHH4_ri(x, component, sp.layout = NULL,
     \code{type} function.\cr
     \code{plotHHH4_fitted} passes them to \code{plotHHH4_fitted1}, which is called
     sequentially for every unit in \code{units}.\cr
-    \code{plotHHH4_ri} passes additional arguments to \code{\link{spplot}}.}
+    \code{plotHHH4_ri} passes additional arguments to
+    \code{\link{spplot}}, and \code{plotHHH4_neweights} to
+    \code{\link{boxplot}}.}
   \item{units,unit}{integer or character vector specifying a single
     \code{unit} or possibly multiple \code{units} to plot.
     It indexes \code{colnames(x$stsObj)}. In the seasonality functions,
@@ -149,6 +158,14 @@ plotHHH4_ri(x, component, sp.layout = NULL,
     with missing random intercepts (i.e., not included in the model).
     Supplementary regions won't be plotted at all if
     \code{!is.list(gpar.missing)}.}
+  \item{exclude}{vector of neighbourhood orders to be excluded from
+    plotting (passed to \code{\link{factor}}).
+    By default, the neighbourhood weight for order 0 is not
+    shown, which is usually zero anyway.}
+  \item{maxlag}{maximum order of neighbourhood to be assumed when
+    computing the \code{\link{nbOrder}} matrix. This additional step is
+    necessary iff \code{neighbourhood(x$stsObj)} only specifies a binary
+    adjacency matrix.}
 }
 
 \value{
@@ -166,9 +183,12 @@ plotHHH4_ri(x, component, sp.layout = NULL,
   its dominant eigenvalue if time effects are ignored).\cr
   \code{plotHHH4_maxEV} (invisibly) and \code{getMaxEV} return the
   dominant eigenvalue of the \eqn{\Lambda_t} matrix for all time points
-  \eqn{t} of \code{x$stsObj}.
+  \eqn{t} of \code{x$stsObj}.\cr
   \code{plotHHH4_ri} returns the generated \code{\link{spplot}}, which
-  is a \pkg{lattice} plot of class \code{"\link[=trellis.object]{trellis}"}.
+  is a \pkg{lattice} plot of class
+  \code{"\link[=trellis.object]{trellis}"}.\cr
+  \code{plotHHH4_neweights} eventually calls \code{\link{boxplot}} and
+  thus returns the summaries on which the boxplots are based.
 }
 
 \author{
@@ -210,6 +230,9 @@ plot(measlesFit, type="maxEV")  # not very exciting here since constant
 
 ## random intercepts of the endemic component
 plot(measlesFit, type="ri", component="end")
+
+## neighbourhood weights as a function of neighbourhood order
+plot(measlesFit, type="neweights")  # boring, model has no "ne" component
 
 ## fitted values for the 6 regions with most cases and some customization
 bigunits <- tail(names(sort(colSums(observed(measlesWeserEms)))), 6)

@@ -6,13 +6,15 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-09-17)}{
+\section{Changes in surveillance version 1.8-1 (2014-09-19)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
     \item The \code{R0}-method for \code{"twinstim"} gained an argument
     \code{newcoef} to simplify computation of reproduction numbers with
     a different parameter vector (also used for Monte Carlo CI's).
+
+    \item New plot \code{type="neweights"} for \code{"hhh4"} fits.
   }
 }
 
