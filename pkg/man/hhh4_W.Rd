@@ -30,7 +30,7 @@ W_np(maxlag, to0 = FALSE, normalize = TRUE,
     dependence is not to be truncated at some high order, \code{maxlag}
     should be set to the maximum neighbourhood order in the network of
     regions.\cr
-    For \code{W_np}, individual weights are estimated up to order
+    For \code{W_np}, order-specific log-weights are estimated up to order
     \code{maxlag}. Higher orders are either assumed to have 0 weight
     (\code{to0=TRUE}), or the weight at \code{maxlag} is carried forward
     (\code{to0=FALSE}, default).

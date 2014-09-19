@@ -77,7 +77,7 @@ check: build
 	@echo "timings <- read.table(file.path('surveillance.Rcheck','surveillance-Ex.timings'), header=TRUE, row.names='name'); \
 	timings <- timings[order(timings$$elapsed, decreasing=TRUE),'elapsed',drop=FALSE]; \
 	cat(capture.output(subset(timings, elapsed > 1)), sep='\n')" | $R --slave --vanilla
-	@cd surveillance.Rcheck; nwarn=`grep -c "Warning" surveillance-Ex.Rout`; \
+	@cd surveillance.Rcheck; nwarn=`grep -c "^Warning" surveillance-Ex.Rout`; \
 	if [ $$nwarn -gt 0 ]; then echo "\n\tWARNING: $$nwarn" \
         "warning(s) thrown when running examples,\n" \
 	"\t         see file surveillance.Rcheck/surveillance-Ex.Rout\n"; fi
