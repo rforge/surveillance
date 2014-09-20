@@ -270,7 +270,7 @@ createLambda <- function (object)
         function (t) {
             stopifnot(isScalar(t) && t > 0 && t <= nTime)
             Lambda <- meanHHH$ne.exppred[t,] * Wt(t)
-            diag(Lambda) <- meanHHH$ar.exppred[t,]
+            diag(Lambda) <- diag(Lambda) + meanHHH$ar.exppred[t,]
             Lambda
         }
     }
@@ -480,10 +480,10 @@ getMaxEV_season <- function (x, unit = 1)
         Lambda <- if ("ne" %in% components) {
             exp(s2.phi$intercept + ri.phi + if(t==0) 0 else s2.phi$season[t]) * W
         } else matrix(0, nUnits, nUnits)
-        diag(Lambda) <- if ("ar" %in% components) {
-            exp(s2.lambda$intercept + ri.lambda +
+        if ("ar" %in% components) {
+            diag(Lambda) <- diag(Lambda) + exp(s2.lambda$intercept + ri.lambda +
                 if(t==0) 0 else s2.lambda$season[t])
-        } else 0
+        }
         Lambda
     }
 
