@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-09-19)}{
+\section{Changes in surveillance version 1.8-1 (2014-09-20)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -15,12 +15,6 @@
     a different parameter vector (also used for Monte Carlo CI's).
 
     \item New plot \code{type="neweights"} for \code{"hhh4"} fits.
-  }
-}
-
-\subsection{MAJOR CHANGES}{
-  \itemize{
-    \item to be added...
   }
 }
 
@@ -46,9 +40,16 @@
 
     \item In \code{plotHHH4_fitted()}, the argument \code{legend.observed}
     now defaults to \code{FALSE}.
+
+    \item The default weights for the spatio-temporal component in
+    \code{hhh4} models now are \code{neighbourhood(stsObj) == 1}.
+    The previous default \code{neighbourhood(stsObj)} does not make
+    sense for the newly supported \code{nbOrder} neighbourhood matrices
+    (shortest-path distances). The new default makes no difference for
+    (old) models with binary adjacency matrices in the neighbourhood
+    slot of the \code{stsObj}.
   }
 }
-
 
 \subsection{BUG FIXES}{
   \itemize{

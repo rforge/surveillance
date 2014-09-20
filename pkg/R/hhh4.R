@@ -34,7 +34,7 @@ CONTROL.hhh4 <- alist(
     ne = list(f = ~ -1,        # a formula "exp(x'phi) * sum_j w_ji * y_j,t-lag"
               offset = 1,      # multiplicative offset
               lag = 1,         # regression on y_j,t-lag
-              weights = neighbourhood(stsObj),  # weights w_ji
+              weights = neighbourhood(stsObj) == 1,  # weights w_ji
               initial = NULL   # initial parameter values if pred = ~1 (not really used ATM)
     ),
     end = list(f = ~ 1,        # a formula " exp(x'nu) * n_it "

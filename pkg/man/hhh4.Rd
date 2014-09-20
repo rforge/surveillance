@@ -44,7 +44,7 @@ hhh4(stsObj,
                ne = list(f = ~ -1,
                          offset = 1,
                          lag = 1,
-                         weights = neighbourhood(stsObj),
+                         weights = neighbourhood(stsObj) == 1,
                          initial = NULL
                          ),
                end = list(f = ~ 1,
@@ -93,9 +93,14 @@ hhh4(stsObj,
 	    a matrix of the same dimension as \code{observed(stsObj)}}
 	  \item{lag = 1}{a non-negative integer meaning dependency on
 	    \eqn{y_{j,t-lag}}}
-	  \item{weights = neighbourhood(stsObj)}{
-	    neighbourhood weights \eqn{w_{ji}}{w_ji}. By default, 
-	    the neighbourhood slot of \code{stsObj} is used.
+	  \item{weights = neighbourhood(stsObj) == 1}{
+	    neighbourhood weights \eqn{w_{ji}}{w_ji}. The default
+	    corresponds to the original formulation by Held et al
+	    (2005), i.e., the spatio-temporal component incorporates an
+	    unweighted sum over the lagged cases of the first-order
+	    neighbours. See Paul et al (2008) and Meyer and Held (2014)
+	    for alternative specifications, e.g.,
+	    \code{\link{W_powerlaw}}.
 	    Time-varying weights are possible by specifying an
 	    array of \code{dim()} \code{c(nUnits, nUnits, nTime)}, where
 	    \code{nUnits=ncol(stsObj)} and \code{nTime=nrow(stsObj)}.}
