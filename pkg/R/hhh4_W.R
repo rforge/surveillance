@@ -66,8 +66,8 @@ checkWeightsArray <- function (W, nUnits, nTime, name)
         stop("missing values in '", name, "' are not allowed")
     diags <- if (is.matrix(W)) diag(W) else apply(W, 3, diag)
     if (any(diags != 0))
-        stop("'", name, "' must only contain zeroes on the diagonal",
-             if (!is.matrix(W)) "s")
+        warning("'", name, "' has nonzeros on the diagonal",
+                if (!is.matrix(W)) "s")
 }
 
 
