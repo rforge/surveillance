@@ -101,8 +101,8 @@ data(imdepifit)
   time trends and seasonality (in this discretized time).
   
   The entry \code{W} contains the observation window as a
-  \code{\link{SpatialPolygons}} object, in this case the boundaries of
-  Germany. It was obtained as
+  \code{"\linkS4class{SpatialPolygons}"} object, in this case the
+  boundaries of Germany. It was obtained as
   \code{stateD <- rgeos::gUnaryUnion(districtsD)},
   where \code{districtsD} represents Germany's districts as at
   2009-01-01 (originally obtained from \url{www.geodatenzentrum.de}),
