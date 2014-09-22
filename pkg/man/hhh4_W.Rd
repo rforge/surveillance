@@ -11,33 +11,31 @@
   Without normalization, power-law weights are
   \eqn{w_{ji} = o_{ji}^{-d}}{w_ji = o_ji^-d}, where \eqn{o_{ji}}{o_ji}
   is the order of neighbourhood between regions \eqn{i} and \eqn{j},
-  see \code{\link{nbOrder}}.
+  see \code{\link{nbOrder}}, and \eqn{d} is to be estimated.
+  In the nonparametric formulation, \code{maxlag-1} order-specific
+  log-weights are to be estimated (the first-order weight is always
+  fixed to 1 for identifiability).
+
 }
 
 \usage{
 W_powerlaw(maxlag, normalize = TRUE,
            log = FALSE, initial = if (log) 0 else 1)
 
-W_np(maxlag, to0 = FALSE, normalize = TRUE,
+W_np(maxlag, to0 = TRUE, normalize = TRUE,
      initial = log(zetaweights(2:maxlag)))
 }
 
 \arguments{
-  \item{maxlag,to0}{a single integer specifying a limiting order of
-    neighbourhood.\cr
-    For \code{W_powerlaw}, weights are positive
-    up to \code{maxlag} and set to 0 for higher orders. If spatial
-    dependence is not to be truncated at some high order, \code{maxlag}
-    should be set to the maximum neighbourhood order in the network of
-    regions.\cr
-    For \code{W_np}, order-specific log-weights are estimated up to order
-    \code{maxlag}. Higher orders are either assumed to have 0 weight
-    (\code{to0=TRUE}), or the weight at \code{maxlag} is carried forward
-    (\code{to0=FALSE}, default).
-    Since the first-order weight is fixed to 1 for identifiability,
-    \code{maxlag-1} parameters are to be estimated in this nonparametric
-    specification.
-  }
+  \item{maxlag}{a single integer specifying a limiting order of
+    neighbourhood. If spatial dependence is not to be truncated at some
+    high order, \code{maxlag} should be set to the maximum neighbourhood
+    order in the network of regions.}
+  \item{to0}{\code{W_np} represents order-specific log-weights up to
+    order \code{maxlag}. Higher orders are by default (\code{to0=TRUE})
+    assumed to have 0 weight as for \code{W_powerlaw}. Alternatively,
+    \code{to0=FALSE} requests that the weight at order \code{maxlag}
+    should be carried forward to higher orders.}
   \item{normalize}{logical indicating if the weights should be normalized
     such that the rows of the weight matrix sum to 1 (default).}
   \item{log}{logical indicating if the decay parameter \eqn{d} should be

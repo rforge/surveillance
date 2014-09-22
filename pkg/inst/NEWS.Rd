@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-09-20)}{
+\section{Changes in surveillance version 1.8-1 (2014-09-22)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -48,6 +48,11 @@
     (shortest-path distances). The new default makes no difference for
     (old) models with binary adjacency matrices in the neighbourhood
     slot of the \code{stsObj}.
+
+    \item The default for nonparametric weights \code{W_np} in
+    \code{hhh4} is now to assume zero weight for neighbourhood orders
+    above \code{maxlag}, i.e., \code{W_np}'s argument \code{to0} now
+    defaults to \code{TRUE}.
   }
 }
 
