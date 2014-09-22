@@ -49,9 +49,9 @@
     (old) models with binary adjacency matrices in the neighbourhood
     slot of the \code{stsObj}.
 
-    \item The default for nonparametric weights \code{W_np} in
-    \code{hhh4} is now to assume zero weight for neighbourhood orders
-    above \code{maxlag}, i.e., \code{W_np}'s argument \code{to0} now
+    \item The default for nonparametric weights \code{W_np()} in
+    \code{hhh4()} is now to assume zero weight for neighbourhood orders
+    above \code{maxlag}, i.e., \code{W_np()}'s argument \code{to0} now
     defaults to \code{TRUE}.
   }
 }
@@ -95,6 +95,9 @@
     \item Automatic choice of color breaks in the \code{animate}-method
     for class \code{"sts"} now also works for incidence maps (i.e., with
     a \code{population} argument).
+
+    \item \code{hhh4()} did not allow the use of nonparametric
+    neighbourhood weights \code{W_np()} with \code{maxlag=2}.
   }
 }
 

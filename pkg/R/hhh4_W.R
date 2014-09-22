@@ -119,7 +119,7 @@ checkWeights <- function (weights, nUnits, nTime,
         dim.d <- length(weights$initial)
         dw <- weights$dw(weights$initial, nbmat, data)
         d2w <- weights$d2w(weights$initial, nbmat, data)
-        if (dim.d == 1L) {
+        if (dim.d == 1L && !is.list(dw) && !is.list(d2w)) {
             checkWeightsArray(dw, nUnits, nTime, name=paste0(name, "$dw"))
             checkWeightsArray(d2w, nUnits, nTime, name=paste0(name, "$d2w"))
         } else {
