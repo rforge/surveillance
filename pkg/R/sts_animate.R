@@ -45,6 +45,9 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
         ls <- stsplot_space(object, tps=tps[cti], population=population,
                             at=at, ...)
         if (is.list(timeplot) && require("gridExtra")) {
+            ## NOTE: unfortunately (R-exts, Section 1.1.3.1), only loading the
+            ## namespace of package "gridExtra" would not be sufficient here;
+            ## nothing would be plotted by grid.arrange() in that case ...
             lt <- do.call("stsplot_timeSimple", c(
                 list(x=object, tps=tps, highlight=cti),
                 timeplot))
