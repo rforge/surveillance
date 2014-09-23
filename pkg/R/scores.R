@@ -8,7 +8,7 @@
 ### Czado, C., Gneiting, T. & Held, L. (2009)
 ### Biometrics 65:1254-1261
 ###
-### Copyright (C) 2010-2012 Michaela Paul
+### Copyright (C) 2010-2012 Michaela Paul, 2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -89,54 +89,60 @@ rps <- function(x,mu,size=NULL,k=40){
 }
 
 
-## returns logs, rps,ses and dss in reversed!! order
-## i.e. the scores for time points n, n-1, n-2,...
-scores <- function(object, unit=NULL,sign=FALSE, individual=FALSE)
+## returns logs, rps, ses, dss, nses in reversed (!) order
+## i.e. the scores for time points n, n-1, n-2, ...
+scores <- function (object, units=NULL, sign=FALSE, individual=FALSE)
 {
-    mu <- object$pred
-    x <- object$observed
-    size <- object$psi
-
-    if (!is.null(size)) { # NegBin
+    mu <- object$pred     # predicted counts
+    x <- object$observed  # observed counts
+    size <- object$psi    # estimated -log(overdispersion), 1 or ncol(x) columns
+    ntps <- nrow(x)       # the number of predicted time points
+    
+    if (!is.null(size)) { # => NegBin
         size <- exp(size) # transform to parameterization suitable for dnbinom()
         if (ncol(size) != ncol(x)) { # => ncol(size)=1, unit-independent psi
-            ## replicate to obtain nrow(size) x nUnits matrix
-            size <- matrix(size, nrow=nrow(size), ncol=ncol(x), byrow=FALSE)
+            ## replicate to obtain a ntps x ncol(x) matrix
+            size <- matrix(size, nrow=ntps, ncol=ncol(x), byrow=FALSE)
         }
+        colnames(size) <- colnames(x)  # such that we can select by unit name
     }
-    
-    if(!is.null(unit)){
-        x <- as.matrix(x[,unit])
-        mu <- as.matrix(mu[,unit])
-        size <- size[,unit]
+    ## At this point, mu, x and size all are ntps x ncol(x) matrices
+
+    ## select units
+    if (!is.null(units)) {
+        x <- x[,units,drop=FALSE]
+        mu <- mu[,units,drop=FALSE]
+        size <- size[,units,drop=FALSE]
     }
-    
+    nUnits <- ncol(x)
+    if (nUnits == 1L)
+        individual <- TRUE  # no need to apply rowMeans() below
+
+    ## compute sign of x-mu
     signXmMu <- if(sign) sign(x-mu) else NULL
-
-    #compute average scores for unit
-    log.score <- apply(as.matrix(logScore(x=x,mu=mu,size=size)),MARGIN=2,rev)
-    rp.score <- apply(as.matrix(rps(x=x,mu=mu,size=size)),MARGIN=2,rev)
-    se.score <- apply(as.matrix(ses(x=x,mu=mu)), MARGIN=2, rev)
-    nse.score <- apply(as.matrix(nses(x=x,mu=mu,size=size)),MARGIN=2,rev)
-    ds.score <- apply(as.matrix(dss(x=x, mu=mu, size=size)), MARGIN=2,rev)
     
-    if(is.null(unit)){
-        if(individual){
-            log.score <- c(log.score)
-            rp.score <- c(rp.score)
-            se.score <- c(se.score)
-            nse.score <- c(nse.score)
-            ds.score <- c(ds.score)
-        } else {
-            log.score <- rowMeans(log.score)
-            rp.score <- rowMeans(rp.score)
-            se.score <- rowMeans(se.score)
-            nse.score <- rowMeans(nse.score)
-            ds.score <- rowMeans(ds.score)
-        }    
+    ## compute individual scores
+    log.score <- logScore(x=x, mu=mu, size=size)
+    rp.score <- rps(x=x, mu=mu, size=size)
+    se.score <- ses(x=x, mu=mu)
+    ds.score <- dss(x=x, mu=mu, size=size)
+    nse.score <- nses(x=x, mu=mu, size=size)
+    
+    ## gather individual scores in an array
+    result <- array(c(log.score, rp.score, se.score, ds.score, nse.score, signXmMu),
+                    dim = c(ntps, nUnits, 5L + sign),
+                    dimnames = c(dimnames(x),
+                                 list(c("logs","rps","ses", "dss", "nses",
+                                        if (sign) "sign"))))
+
+    ## reverse order of the time points (historically)
+    result <- result[ntps:1L,,,drop=FALSE]
+
+    ## average over units if requested
+    if (individual) {
+        drop(result)
+    } else {
+        apply(X=result, MARGIN=3L, FUN=rowMeans)
+        ## this gives a ntps x (5L+sign) matrix (or a vector in case ntps=1)
     }
-    
-    result <- cbind(logs=log.score,rps=rp.score,ses=se.score,dss=ds.score,nses=nse.score,signXmMu=signXmMu)
-    return(result)
 }
-

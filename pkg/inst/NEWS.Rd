@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-09-22)}{
+\section{Changes in surveillance version 1.8-1 (2014-09-23)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -15,6 +15,17 @@
     a different parameter vector (also used for Monte Carlo CI's).
 
     \item New plot \code{type="neweights"} for \code{"hhh4"} fits.
+
+    \item The \code{scores()} function allows the selection of multiple
+    units (by index or name) for which to compute (averaged) proper scores.
+  }
+}
+
+\subsection{MAJOR CHANGES}{
+  \itemize{
+    \item For multivariate \code{oneStepAhead()} predictions,
+    \code{scores(..., individual=TRUE)} now returns a 3d array instead
+    of a collapsed matrix.
   }
 }
 
@@ -98,6 +109,12 @@
 
     \item \code{hhh4()} did not allow the use of nonparametric
     neighbourhood weights \code{W_np()} with \code{maxlag=2}.
+
+    \item \code{scores()} did not work for multivariate \code{oneStepAhead()}
+    predictions if both \code{individual=TRUE} and \code{sign=TRUE}, and
+    it could not handle a \code{oneStepAhead()} prediction of only one
+    time point. Furthermore, the \code{"sign"} column of
+    \code{scores(..., sign=TRUE)} was wrong (reversed).
   }
 }
 
