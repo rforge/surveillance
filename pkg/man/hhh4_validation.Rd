@@ -238,7 +238,7 @@ compareWithBest <- function(best, whichModels, whichScores=1:3, nPermut=9999, se
     for(model in whichModels){
       if(model==best) p <- c(p,NA)
       else p <- c(p,permutationTest(scores_i[[model]][,,score],scores_i[[best]][,,score],
-     plot=TRUE,nPermutation=nPermut)$pVal.permut)
+     plot=TRUE,nPermutation=nPermut, verbose=TRUE)$pVal.permut)
     }  
     pVals <- cbind(pVals,p)
   }

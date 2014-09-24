@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-09-23)}{
+\section{Changes in surveillance version 1.8-1 (2014-09-24)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -64,6 +64,10 @@
     \code{hhh4()} is now to assume zero weight for neighbourhood orders
     above \code{maxlag}, i.e., \code{W_np()}'s argument \code{to0} now
     defaults to \code{TRUE}.
+
+    \item Added a \code{verbose} argument to \code{permutationTest()},
+    which defaults to \code{FALSE}. The previous behaviour corresponds
+    to \code{verbose=TRUE}.
   }
 }
 

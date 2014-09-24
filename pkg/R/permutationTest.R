@@ -10,7 +10,8 @@
 ### $Date$
 ################################################################################
 
-permutationTest <- function(score1, score2, nPermutation=9999, plot=FALSE)
+permutationTest <- function(score1, score2, nPermutation = 9999,
+                            plot = FALSE, verbose = FALSE)
 {
     stopifnot((nTime <- length(score1)) == length(score2),
               !is.na(score1), !is.na(score2))
@@ -35,9 +36,10 @@ permutationTest <- function(score1, score2, nPermutation=9999, plot=FALSE)
 
     pTtest <- t.test(score1, score2, paired=TRUE)$p.value
     
-    cat("mean difference=", diffObserved,
-        "\tp(permutation) =", pVal,
-        "\tp(paired t-test) =", pTtest, "\n")
+    if (verbose)
+        cat("mean difference =", diffObserved,
+            "\tp(permutation) =", pVal,
+            "\tp(paired t-test) =", pTtest, "\n")
     
     list(diffObs=diffObserved, pVal.permut=pVal, pVal.t=pTtest)
 }
