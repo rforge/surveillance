@@ -273,6 +273,7 @@ check_events <- function (events, dropTypes = TRUE, verbose = TRUE)
     obligColsIdx <- match(obligColsNames_events, names(events@data))
     covarColsIdx <- setdiff(seq_along(events@data), obligColsIdx)
     events@data <- events@data[c(obligColsIdx, covarColsIdx)]
+    events@coords.nrs <- numeric(0L)  # forget index of coordinate columns
 
     # Done.
     return(events)
