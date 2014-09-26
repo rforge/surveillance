@@ -82,13 +82,13 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
 ### but retain stgrid and W. If any event types disappear due to subsetting,
 ### these types will be dropped from the factor levels and from qmatrix
 
-"[.epidataCS" <- function (x, i, j, drop = FALSE)
+"[.epidataCS" <- function (x, i, j, ..., drop = TRUE)
 {
     ## Store nCircle2Poly attribute of x$events$.influenceRegion since this will
     ## be dropped when subsetting
     nCircle2Poly <- attr(x$events$.influenceRegion, "nCircle2Poly")
 
-    ## apply [,SpatialPointsDataFrame-method
+    ## apply [,SpatialPointsDataFrame-method (where "drop" is ignored)
     cl <- sys.call()
     cl[[1]] <- as.name("[")
     cl[[2]] <- substitute(x$events)
@@ -106,14 +106,16 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
     if (!missing(i)) {
         ## update .sources
         x$events$.sources <- determineSources.epidataCS(x)
-        ## update types and qmatrix (a type could have disappeared)
-        x$events$type <- x$events$type[drop=TRUE]
-        typeNames <- levels(x$events$type)
-        if (!identical(rownames(x$qmatrix), typeNames)) {
-            message("Note: dropped type(s) ",
-                    paste0("\"", setdiff(rownames(x$qmatrix), typeNames), "\"",
-                           collapse = ", "))
-            x$qmatrix <- checkQ(x$qmatrix, typeNames)
+        if (drop) {
+            ## update type levels and qmatrix (a type could have disappeared)
+            x$events$type <- x$events$type[drop=TRUE]
+            typeNames <- levels(x$events$type)
+            if (!identical(rownames(x$qmatrix), typeNames)) {
+                message("Note: dropped type(s) ",
+                        paste0("\"", setdiff(rownames(x$qmatrix), typeNames), "\"",
+                               collapse = ", "))
+                x$qmatrix <- checkQ(x$qmatrix, typeNames)
+            }
         }
     }
     
@@ -131,7 +133,7 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
 ## The R Core Team) with slight modifications only
 ## (we just replace 'x' by 'x$events@data' for evaluation of subset and select)
 
-subset.epidataCS <- function (x, subset, select, drop = FALSE, ...)
+subset.epidataCS <- function (x, subset, select, drop = TRUE, ...)
 {
     if (missing(subset)) 
         r <- TRUE
