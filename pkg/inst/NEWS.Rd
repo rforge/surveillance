@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-09-24)}{
+\section{Changes in surveillance version 1.8-1 (2014-09-26)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -68,6 +68,9 @@
     \item Added a \code{verbose} argument to \code{permutationTest()},
     which defaults to \code{FALSE}. The previous behaviour corresponds
     to \code{verbose=TRUE}.
+
+    \item \code{simulate.twinstim()} now by default uses the original
+    \code{data$W} as observation region.
   }
 }
 

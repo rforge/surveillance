@@ -1037,7 +1037,7 @@ residuals.simEpidataCS <- function (object, ...)
 simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5,
     control.siaf = object$control.siaf,
-    W = NULL, trace = FALSE, nCircle2Poly = NULL, gmax = NULL,
+    W = data$W, trace = FALSE, nCircle2Poly = NULL, gmax = NULL,
     .allocate = 500, simplify = TRUE, ...)
 {
     ptm <- proc.time()[[3]]
