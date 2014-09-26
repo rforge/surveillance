@@ -122,6 +122,9 @@
     it could not handle a \code{oneStepAhead()} prediction of only one
     time point. Furthermore, the \code{"sign"} column of
     \code{scores(..., sign=TRUE)} was wrong (reversed).
+
+    \item For \code{"epidataCS"} with only one event,
+    \code{epidataCSplot_space()} did not draw the point.
   }
 }
 

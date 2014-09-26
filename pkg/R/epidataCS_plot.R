@@ -186,7 +186,7 @@ epidataCSplot_space <- function (x, subset,
     
     ## plot
     if (!add) plot(x$W, ...)
-    do.call("points", c(alist(x=eventCoordsTypesCounts[,1:2]),
+    do.call("points", c(alist(x=eventCoordsTypesCounts[,1:2,drop=FALSE]),
                         points.args_pointwise))
 
     ## optionally add legends
