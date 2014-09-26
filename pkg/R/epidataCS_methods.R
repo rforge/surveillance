@@ -179,9 +179,9 @@ marks.epidataCS <- function (x, coords = TRUE, ...)
     endemicCovars <- setdiff(names(x$stgrid), c(
         reservedColsNames_stgrid, obligColsNames_stgrid))
     idxnonmarks <- match(c(reservedColsNames_events, endemicCovars),
-                         names(x$events))
-    if (coords) {          # use as.data.frame method for SpatialPointsDataFrame
-        as.data.frame(x$events[-idxnonmarks])
+                         names(x$events@data))
+    if (coords) { # append coords (cp. as.data.frame.SpatialPointsDataFrame)
+        data.frame(x$events@data[-idxnonmarks], x$events@coords)
     } else {                            # return marks without coordinates
         x$events@data[-idxnonmarks]
     }
@@ -205,11 +205,17 @@ print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
         width = getOption("width") - 17L)
     cat("Overall number of events:", nEvents <- nobs(x), "\n\n")
     
-    # 2014-03-24: since sp 1.0-15, print.SpatialPointsDataFrame()
-    # appropriately passes its "digits" argument to print.data.frame()
     visibleCols <- grep("^\\..+", names(x$events@data), invert = TRUE)
-    print(head.matrix(x$events[visibleCols], n = n), digits = digits, ...)
-    if (n < nEvents) cat("[....]\n")
+    if (nEvents == 0L) { # not handled by [,SpatialPointsDataFrame-method
+                         # and thus actually not supported by "epidataCS"
+        ## display header only
+        print(data.frame(coordinates = character(0L), x$events@data[visibleCols]))
+    } else {
+        ## 2014-03-24: since sp 1.0-15, print.SpatialPointsDataFrame()
+        ## appropriately passes its "digits" argument to print.data.frame()
+        print(head.matrix(x$events[visibleCols], n = n), digits = digits, ...)
+        if (n < nEvents) cat("[....]\n")
+    }
     invisible(x)
 }
 

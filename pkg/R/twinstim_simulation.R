@@ -876,6 +876,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
 
     ### throw an error if no events have been simulated
+    ## because SpatialPoints[DataFrame]() does not allow the empty set, try:
+    ## SpatialPoints(coords = matrix(numeric(0), 0, 2), bbox=bbox(W))
     
     if (j-1L == Nout) {
         stop("no events have been simulated")
