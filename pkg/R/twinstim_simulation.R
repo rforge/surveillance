@@ -85,17 +85,18 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         cat("Checking 'stgrid':\n")
         stgrid <- check_stgrid(stgrid[grep("^BLOCK$", names(stgrid), invert=TRUE)])
     }
-    
-    tileLevels <- levels(stgrid$tile)
-    tiles <- check_tiles(tiles, tileLevels,
-                         areas.stgrid = stgrid[["area"]][seq_len(nlevels(stgrid$tile))],
-                         W = W, keep.data = FALSE)
+
     W <- if (is.null(W)) {
         cat("Building 'W' as the union of 'tiles' ...\n")
     	unionSpatialPolygons(tiles)
-    } else check_W(W)
+    } else check_W(W)  # does as(W, "SpatialPolygons")
+
+    tileLevels <- levels(stgrid$tile)
+    tiles <- check_tiles(tiles, tileLevels,
+                         areas.stgrid = stgrid[["area"]][seq_along(tileLevels)],
+                         W = W, keep.data = FALSE)
     
-    # Transform W to class "owin"
+    ## Transform W to class "owin"
     Wowin <- as(W, "owin")
     maxExtentOfW <- diameter.owin(Wowin)
 
