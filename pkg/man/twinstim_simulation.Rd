@@ -333,17 +333,21 @@ plot(mysims, aggregate="time", subset=type=="B")
 
 
 \dontrun{
-### compare the observed cumulative number of cases during the
+### compare the observed _cumulative_ number of cases during the
 ### first 90 days to 20 simulations from the fitted model
 
 sims <- simulate(imdepifit, nsim=20, seed=1, data=imdepi, t0=0, T=90,
                  tiles=districtsD, simplify=TRUE)
+
+## extract cusums
 getcsums <- function (events) {
     tapply(events$time, events@data["type"],
            function (t) cumsum(table(t)), simplify=FALSE)
 }
 csums_observed <- getcsums(imdepi$events)
 csums_simulated <- lapply(sims$eventsList, getcsums)
+
+## plot it
 plotcsums <- function (csums, ...) {
     mapply(function (csum, ...) lines(as.numeric(names(csum)), csum, ...),
            csums, ...)
@@ -355,6 +359,52 @@ plotcsums(csums_observed, col=c(2,4), lwd=3)
 legend("topleft", legend=levels(imdepi$events$type), col=c(2,4), lwd=1)
 invisible(lapply(csums_simulated, plotcsums,
                  col=scales::alpha(c(2,4), alpha=0.5)))
+}
+
+\dontrun{
+nm2add <- 24
+nsim <- 5
+### simulate 'nm2add' months beyond the observed period;
+### the events still infective by the end of imdepi$stgrid will be used
+### as the prehistory for the continued process
+
+origT <- tail(imdepi$stgrid$stop, 1)
+## create a time-extended version of imdepi
+imdepiext <- local({
+    ## first we have to expand stgrid (assuming constant "popdensity")
+    g <- imdepi$stgrid
+    g$stop <- g$BLOCK <- NULL
+    gadd <- data.frame(start=rep(seq(origT, by=30, length.out=nm2add),
+                                 each=nlevels(g$tile)),
+                       g[rep(seq_len(nlevels(g$tile)), nm2add), -1])
+    ## now create an "epidataCS" using this time-extended stgrid
+    as.epidataCS(events=imdepi$events,  # the replacement warnings are ok
+                 W=imdepi$W, qmatrix=imdepi$qmatrix,
+                 stgrid=rbind(g, gadd), T=max(gadd$start) + 30)
+})
+newT <- tail(imdepiext$stgrid$stop, 1)
+
+## simulate beyond the original period
+simsext <- simulate(imdepifit, nsim=nsim, seed=1, t0=origT, T=newT,
+                    data=imdepiext, tiles=districtsD, simplify=TRUE)
+
+## Aside to understand the note from checking events and tiles:
+# marks(imdepi)["636",]  # tile 09662 is attributed to this event, but:
+# plot(districtsD[c("09678","09662"),], border=1:2, lwd=2, axes=TRUE)
+# points(imdepi$events["636",])
+## this mismatch is due to polygon simplification
+
+## plot the observed and simulated event numbers over time
+## and ignore the warnings of plot.histogram on wrong area-representation
+plot(imdepiext, breaks=c(unique(imdepi$stgrid$start),origT),
+     cumulative=list(maxat=330), col=c(2,4))
+for (i in seq_along(simsext$eventsList))
+    plot(simsext[[i]], add=TRUE, legend.types=FALSE,
+         breaks=c(unique(sim1$stgrid$start),newT),
+         subset=!is.na(source),  # have to exclude the events of the prehistory
+         cumulative=list(offset=c(table(imdepi$events$type)), maxat=330, axis=FALSE),
+         col=scales::alpha(c(2,4), alpha=0.5))
+abline(v=origT, lty=2, lwd=2)
 }
 }
 
