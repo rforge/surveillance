@@ -368,11 +368,9 @@ plotHHH4_season <- function (...,
         s2 <- lapply(objects, getSeason, component = comp, unit = unit)
         seasons[[comp]] <- exp(sapply(s2, function(intseas) do.call("+", intseas)))
         do.call("matplot",              # x defaults to 1:freq
-                c(list(seasons[[comp]], xlim=xlim,
-                       ylim=if (is.null(ylim[[comp]]))
-                       c(0,max(1,seasons[[comp]])) else ylim[[comp]],
-                       xlab=xlab, ylab=ylab[[comp]],
-                       main=main[[comp]]), matplot.args))
+                c(list(seasons[[comp]], xlim=xlim, ylim=ylim[[comp]],
+                       xlab=xlab, ylab=ylab[[comp]], main=main[[comp]]),
+                  matplot.args))
         if (match(comp, components) %in% legend)
             do.call("legend", legend.args)
     }
