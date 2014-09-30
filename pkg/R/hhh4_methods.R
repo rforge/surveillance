@@ -164,7 +164,7 @@ coef.hhh4 <- function(object, se=FALSE,
     if (se) {
         cov <- vcov.hhh4(object, reparamPsi=reparamPsi, idx2Exp=idx2Exp,
                          amplitudeShift=amplitudeShift)
-        cbind("Estimates"=coefs, "Std. Error"=sqrt(diag(cov)))
+        cbind("Estimate"=coefs, "Std. Error"=sqrt(diag(cov)))
     } else coefs
 }
 
