@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-09-26)}{
+\section{Changes in surveillance version 1.8-1 (2014-09-30)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -71,6 +71,10 @@
 
     \item \code{simulate.twinstim()} now by default uses the original
     \code{data$W} as observation region.
+
+    \item The \code{data("measlesWeserEms")} contain two additional
+    variables in the \code{@map@data} slot: \code{"vaccdoc.2004"} and
+    \code{"vacc1.2004"}.
   }
 }
 
