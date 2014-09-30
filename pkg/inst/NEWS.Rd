@@ -17,7 +17,12 @@
     \item New plot \code{type="neweights"} for \code{"hhh4"} fits.
 
     \item The \code{scores()} function allows the selection of multiple
-    units (by index or name) for which to compute (averaged) proper scores.
+    units (by index or name) for which to compute (averaged) proper
+    scores.
+
+    \item Added a \code{formula}-method for \code{"hhh4"} fits to
+    extract the \code{f} specifications of the three components from the
+    control list.
   }
 }
 

@@ -3,6 +3,7 @@
 \alias{print.hhh4}
 \alias{summary.hhh4}
 \alias{nobs.hhh4}
+\alias{formula.hhh4}
 \alias{logLik.hhh4}
 \alias{coef.hhh4}
 \alias{vcov.hhh4}
@@ -36,6 +37,7 @@ from a call to \code{\link{hhh4}}.
 \method{fixef}{hhh4}(object, ...)
 \method{ranef}{hhh4}(object, tomatrix = FALSE, ...)
 
+\method{formula}{hhh4}(x, ...)
 \method{nobs}{hhh4}(object, ...)
 \method{logLik}{hhh4}(object, ...)
 
@@ -93,6 +95,9 @@ from a call to \code{\link{hhh4}}.
   If the model includes random effects, those can be extracted with
   \code{ranef}, whereas \code{fixef} returns the fixed parameters.
 
+  The \code{\link{formula}}-method returns the formulae used for the
+  three log-linear predictors in a list with elements \code{"ar"},
+  \code{"ne"}, and \code{"end"}.
   The \code{\link{nobs}}-method returns the number of observations used
   for model fitting.
   The \code{\link{logLik}}-method returns an object of class

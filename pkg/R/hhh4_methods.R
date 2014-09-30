@@ -5,7 +5,7 @@
 ###
 ### Standard methods for hhh4-fits
 ###
-### Copyright (C) 2010-2014 Michaela Paul and Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -370,3 +370,10 @@ residuals.hhh4 <- function (object, type = c("deviance", "response"), ...)
     di2 <- dev.resids(y=obs, mu=fit, wt=1)
     sign(obs-fit) * sqrt(pmax.int(di2, 0))
 }
+
+## extract the formulae of the three log-linear predictors
+formula.hhh4 <- function (x, ...)
+{
+    lapply(x$control[c("ar", "ne", "end")], "[[", "f")
+}
+
