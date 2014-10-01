@@ -312,19 +312,55 @@ predict.hhh4 <- function(object, newSubset = object$control$subset,
 
 ### refit hhh4-model
 ## ...: arguments modifying the original control list
+## S: a named list to adjust the number of harmonics of the three components
 ## subset.upper: refit on a subset of the data up to that time point
 ## use.estimates: use fitted parameters as new start values
 ##                (only applicable if same model)
 
-update.hhh4 <- function (object, ..., subset.upper=NULL, use.estimates=FALSE)
+update.hhh4 <- function (object, ..., S = NULL, subset.upper = NULL,
+                         use.estimates = FALSE, evaluate = TRUE)
 {
     control <- object$control
+
+    ## first modify the control list according to the components in ...
     control <- modifyList(control, list(...))
+
+    ## adjust seasonality
+    if (!is.null(S)) {
+        stopifnot(is.list(S), !is.null(names(S)),
+                  names(S) %in% c("ar", "ne", "end"))
+        control[names(S)] <- mapply(function (comp, S) {
+            comp$f <- addSeason2formula(removeSeasonFromFormula(comp$f),
+                                        period = object$stsObj@freq, S = S)
+            comp
+        }, control[names(S)], S, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+    }
+
+    ## restrict fit to those epochs of control$subset which are <=subset.upper
     if (isScalar(subset.upper))
         control$subset <- control$subset[control$subset <= subset.upper]
+
+    ## use previous estimates as new start values
     if (use.estimates)
         control$start <- hhh4coef2start(object)
-    hhh4(object$stsObj, control)
+
+    ## fit the updated model or just return the modified control list
+    if (evaluate) { 
+        hhh4(stsObj = object$stsObj, control = control)
+    } else {
+        control
+    }
+}
+
+## remove sine-cosine terms from a formula
+## f: usually a model "formula", but can generally be of any class for which
+##    terms() and formula() apply
+removeSeasonFromFormula <- function (f)
+{
+    fterms <- terms(f, keep.order = TRUE)
+    ## search sine-cosine terms of the forms "sin(..." and "fe(sin(..."
+    idxSinCos <- grep("^(fe\\()?(sin|cos)\\(", attr(fterms, "term.labels"))
+    formula(if (length(idxSinCos)) fterms[-idxSinCos] else f)
 }
 
 

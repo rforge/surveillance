@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-09-30)}{
+\section{Changes in surveillance version 1.8-1 (2014-10-01)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -23,6 +23,10 @@
     \item Added a \code{formula}-method for \code{"hhh4"} fits to
     extract the \code{f} specifications of the three components from the
     control list.
+
+    \item The \code{update()}-method for fitted \code{"hhh4"} models
+    gained an argument \code{S} for convenient modification of component
+    seasonality using \code{addSeason2formula()}.
   }
 }
 

@@ -14,7 +14,6 @@
 \alias{confint.hhh4}
 % FIXME: functions without documentation atm
 %% \alias{print.summary.hhh4}
-%% \alias{update.hhh4}
 %% \alias{terms.hhh4}
 %% \alias{residuals.hhh4}
 
@@ -118,7 +117,9 @@ from a call to \code{\link{hhh4}}.
 }
 
 \seealso{
-  the \code{\link[=plot.hhh4]{plot}}-method for fitted \code{hhh4} models.
+  the \code{\link[=plot.hhh4]{plot}}
+  and \code{\link[=update.hhh4]{update}} methods
+  for fitted \code{"hhh4"} models.
 }
 
 \author{
