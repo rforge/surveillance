@@ -50,7 +50,7 @@ plotHHH4_fitted1(x, unit = 1, main = NULL,
 plotHHH4_season(...,
                 components=c("ar", "ne", "end", "maxEV"),
                 xlim=NULL, ylim=NULL,
-                xlab=NULL, ylab=NULL, main=NULL,
+                xlab=NULL, ylab="", main=NULL,
                 par.settings = list(), matplot.args = list(),
                 legend = NULL, legend.args = list(),
                 refline.args = list(), unit = 1)
@@ -135,8 +135,11 @@ plotHHH4_neweights(x, xlab = "Distance", ylab = "Weight", ...,
     one \code{ylim} is specified, it will be recycled for all
     \code{components} plots.}
   \item{xlab,ylab}{axis labels. For \code{plotHHH4_season}, \code{ylab}
-    specifies the y-axis labels for all \code{components} plots in a
-    list (similar to \code{ylim}).}
+    specifies the y-axis labels for all \code{components} in a
+    list (similar to \code{ylim}). If \code{NULL} or incomplete, 
+    default mathematical expressions are used.
+    If a single name is supplied such as the default \code{ylab=""} (to
+    omit y-axis labels), it is used for all \code{components}.}
   \item{hide0s}{logical indicating if dots for zero observed counts
     should be omitted. Especially useful if there are too many.}
   \item{meanHHH}{(internal) use different component means than those

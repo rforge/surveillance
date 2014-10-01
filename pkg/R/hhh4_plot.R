@@ -286,7 +286,7 @@ createLambda <- function (object)
 plotHHH4_season <- function (...,
                              components = c("ar", "ne", "end", "maxEV"),
                              xlim = NULL, ylim = NULL,
-                             xlab = NULL, ylab = NULL, main = NULL,
+                             xlab = NULL, ylab = "", main = NULL,
                              par.settings = list(), matplot.args = list(),
                              legend = NULL, legend.args = list(),
                              refline.args = list(), unit = 1)
