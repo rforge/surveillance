@@ -65,7 +65,7 @@ plotHHH4_ri(x, component, sp.layout = NULL,
             gpar.missing = list(col = "darkgrey", lty = 2, lwd = 2),
             ...)
 
-plotHHH4_neweights(x, xlab = "Distance", ylab = "Weight", ...,
+plotHHH4_neweights(x, plotter = boxplot, ...,
                    exclude = 0, maxlag = Inf)
 }
 
@@ -88,8 +88,8 @@ plotHHH4_neweights(x, xlab = "Distance", ylab = "Weight", ...,
     \code{plotHHH4_fitted} passes them to \code{plotHHH4_fitted1}, which is called
     sequentially for every unit in \code{units}.\cr
     \code{plotHHH4_ri} passes additional arguments to
-    \code{\link{spplot}}, and \code{plotHHH4_neweights} to
-    \code{\link{boxplot}}.}
+    \code{\link{spplot}}, and \code{plotHHH4_neweights} to the
+    \code{plotter}.}
   \item{units,unit}{integer or character vector specifying a single
     \code{unit} or possibly multiple \code{units} to plot.
     It indexes \code{colnames(x$stsObj)}. In the seasonality functions,
@@ -161,6 +161,12 @@ plotHHH4_neweights(x, xlab = "Distance", ylab = "Weight", ...,
     with missing random intercepts (i.e., not included in the model).
     Supplementary regions won't be plotted at all if
     \code{!is.list(gpar.missing)}.}
+  \item{plotter}{the (name of a) function used to produce the plot of
+    weights (a numeric vector) as a function of neighbourhood order (a
+    factor variable). It is called as
+    \code{plotter(Weight ~ Distance, ...)} and defaults to
+    \code{\link{boxplot}}. A useful alternative is, e.g.,
+    \code{\link{stripplot}} from package \pkg{lattice}.}
   \item{exclude}{vector of neighbourhood orders to be excluded from
     plotting (passed to \code{\link{factor}}).
     By default, the neighbourhood weight for order 0 is not
@@ -190,8 +196,8 @@ plotHHH4_neweights(x, xlab = "Distance", ylab = "Weight", ...,
   \code{plotHHH4_ri} returns the generated \code{\link{spplot}}, which
   is a \pkg{lattice} plot of class
   \code{"\link[=trellis.object]{trellis}"}.\cr
-  \code{plotHHH4_neweights} eventually calls \code{\link{boxplot}} and
-  thus returns the summaries on which the boxplots are based.
+  \code{plotHHH4_neweights} eventually calls \code{plotter} and
+  thus returns whatever is returned by that function.
 }
 
 \author{

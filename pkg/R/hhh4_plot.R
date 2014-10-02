@@ -5,7 +5,7 @@
 ###
 ### Plot-method(s) for fitted hhh4() models
 ###
-### Copyright (C) 2010-2014 Michaela Paul and Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -529,10 +529,11 @@ getSeasonStart <- function (object)
 ### plot neighbourhood weight as a function of distance (neighbourhood order)
 ###
 
-plotHHH4_neweights <- function (x,
-                                xlab = "Distance", ylab = "Weight", ...,
+plotHHH4_neweights <- function (x, plotter = boxplot, ...,
                                 exclude = 0, maxlag = Inf)
 {
+    plotter <- match.fun(plotter)
+    
     ## orders of neighbourhood (o_ji)
     nbmat <- neighbourhood(x$stsObj)
     if (all(nbmat %in% 0:1)) {
@@ -549,7 +550,11 @@ plotHHH4_neweights <- function (x,
     }
 
     ## draw the boxplot
-    boxplot(c(W) ~ factor(nbmat, exclude=exclude), xlab=xlab, ylab=ylab, ...)
+    Distance <- factor(nbmat, exclude = exclude)
+    notexcluded <- which(!is.na(Distance))
+    Distance <- Distance[notexcluded]
+    Weight <- W[notexcluded]
+    plotter(Weight ~ Distance, ...)
 }
 
 

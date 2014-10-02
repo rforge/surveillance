@@ -11,9 +11,6 @@
 #======================================================================
 #======================================================================
 
-#Open
-06/09/2014 implement "as.one=TRUE" for stsplot_time (see plot.disProg)
-
 #Done
 21/04/2011 incorporate a NAMESPACE :) (as of R 2.14.0 this is obligatory)
 19/06/2012 move vignettes into a vignettes directory or create .Rinstignore
@@ -23,6 +20,17 @@
 10/05/2014 plot for sts objects which contains daily data as Date obj
 07/09/2014 add a "units" argument to stsplot_time with default 1:nAreas
 
+
+#======================================================================
+#======================================================================
+# sts
+#======================================================================
+#======================================================================
+
+#Open
+06/09/2014 implement "as.one=TRUE" for stsplot_time (see plot.disProg)
+02/10/2014 set sensible default arguments for sts initialization, e.g.,
+           epoch = 1:nrow(observed)
 
 
 #======================================================================
@@ -146,6 +154,11 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 # hhh4
 #======================================================================
 #======================================================================
+
+#Open
+01/10/2014 make update.hhh4(..., use.estimates=TRUE) generally useable
+01/10/2014 plotHHH4_season() should take offsets and covariates into account
+           (then becomes unit-specific)
 
 #Done
 - add documentation for oneStepAhead predictions/scores
