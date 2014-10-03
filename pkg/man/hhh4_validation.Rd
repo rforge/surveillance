@@ -19,7 +19,8 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
              which.start = c("current", "final"),
              keep.estimates = FALSE, verbose = TRUE, cores = 1)
 
-scores(object, units = NULL, sign = FALSE, individual = FALSE)
+scores(object, which = c("logs", "rps", "dss", "ses"), units = NULL,
+       sign = FALSE, individual = FALSE)
 }
 
 \arguments{
@@ -71,6 +72,7 @@ scores(object, units = NULL, sign = FALSE, individual = FALSE)
     \code{which.start="final"} for this to work).}
   
   \item{object}{result of \code{oneStepAhead}.}
+  \item{which}{character vector determining which scores to compute.}
   \item{units}{integer or character vector indexing the units for which
     the scores should be computed. By default (\code{NULL}) all units
     are considered.}
@@ -108,10 +110,11 @@ If \code{keep.estimates=TRUE}, there are the following additional elements:
   \code{"margll"} with their obvious meanings.}
 
 
-The function \code{scores} computes the following five proper scoring rules:
-logarithmic score (\code{"logs"}), ranked probability score (\code{"rps"}),
-squared error (\code{"ses"}), Dawid-Sebastiani score (\code{"dss"}), and
-normalized squared error score (\code{"nses"}).
+The function \code{scores} by default computes the following proper
+scoring rules: logarithmic score (\code{"logs"}), ranked probability
+score (\code{"rps"}), Dawid-Sebastiani score (\code{"dss"}), and squared
+error score (\code{"ses"}). It can also compute the normalized SES
+(\code{"nses"}) but that is improper.
 If multiple \code{units} are selected and \code{individual=TRUE}, the
 result is an array of dimensions
 \code{c(nrow(pred),length(units),5+sign)} (up to \pkg{surveillance}
@@ -211,16 +214,13 @@ val_D <- oneStepAhead(res_D,tp=tp)
 
 #scores
 vals <- ls(pattern="val_")
-
 nam <- substring(vals,first=5,last=6)
 
-uni <- NULL
-indiv <- TRUE
-
+whichScores <- c("logs", "rps", "ses")
 scores_i <- list()
 meanScores <- NULL
 for(i in seq(along.with=vals)){
-  sc <- scores(get(vals[i]),unit=uni, individual=indiv)
+  sc <- scores(get(vals[i]), which=whichScores, individual=TRUE)
   scores_i[[i]] <- sc
   meanScores <- rbind(meanScores,colMeans(sc, dims=2))
 }
@@ -230,10 +230,10 @@ rownames(meanScores) <- nam
 
 ##comparison with best model B2 
 
-compareWithBest <- function(best, whichModels, whichScores=1:3, nPermut=9999, seed=1234){
+compareWithBest <- function(best, whichModels, nPermut=9999, seed=1234){
   set.seed(seed)
   pVals <- NULL
-  for(score in whichScores){
+  for(score in seq_along(whichScores)){
     p <- c()
     for(model in whichModels){
       if(model==best) p <- c(p,NA)

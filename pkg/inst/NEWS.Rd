@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-10-01)}{
+\section{Changes in surveillance version 1.8-1 (2014-10-03)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -17,8 +17,8 @@
     \item New plot \code{type="neweights"} for \code{"hhh4"} fits.
 
     \item The \code{scores()} function allows the selection of multiple
-    units (by index or name) for which to compute (averaged) proper
-    scores.
+    \code{units} (by index or name) for which to compute (averaged) proper
+    scores. Furthermore, one can now select \code{which} scores to compute.
 
     \item Added a \code{formula}-method for \code{"hhh4"} fits to
     extract the \code{f} specifications of the three components from the
@@ -34,7 +34,9 @@
   \itemize{
     \item For multivariate \code{oneStepAhead()} predictions,
     \code{scores(..., individual=TRUE)} now returns a 3d array instead
-    of a collapsed matrix.
+    of a collapsed matrix. Furthermore, the scores computed by default
+    are \code{c("logs","rps","dss","ses")}, excluding the normalized
+    squared error score \code{"nses"} which is improper.
   }
 }
 

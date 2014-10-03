@@ -15,83 +15,91 @@
 
 
 ## logarithmic score
-# logs(P,x) = - log(P(X=x))
-logScore <- function(x,mu, size=NULL){
-	if(is.null(size))
-		- dpois(x,lambda=mu,log=TRUE)
-	else - dnbinom(x, mu=mu,size=size,log=TRUE)
+## logs(P,x) = -log(P(X=x))
+
+logs <- function (x, mu, size=NULL) {
+    if (is.null(size)) {
+        - dpois(x, lambda=mu, log=TRUE)
+    } else {
+        - dnbinom(x, mu=mu, size=size, log=TRUE)
+    }
 }
+
 
 ## squared error score
-# ses(P,x) =(x-mu_p)^2
-ses <- function(x, mu){
-  (x-mu)^2
+## ses(P,x) = (x-mu_p)^2
+
+ses <- function (x, mu, size=NULL) {
+    (x-mu)^2
 }
 
-## normalized squared error score
-# nses(P,x) =((x-mu_p)/sigma_p)^2
-nses <- function(x, mu,size=NULL){
-  if(!is.null(size)){
-    sigma2 <- mu*(1+mu/size)
-  } else sigma2 <- mu
-  
-  ((x-mu)^2)/sigma2
+
+## normalized squared error score (IMPROPER)
+## nses(P,x) = ((x-mu_p)/sigma_p)^2
+
+nses <- function (x, mu, size=NULL) {
+    sigma2 <- if (is.null(size)) mu else mu * (1 + mu/size)
+    ((x-mu)^2) / sigma2
 }
+
 
 ## Dawid-Sebastiani score
-# dss(P,x) = ((x-mu_p)/sigma_p)^2 + 2*log(sigma_p)
-dss <- function(x,mu,size=NULL){
-  if(!is.null(size)){
-    sigma2 <- mu*(1+mu/size)
-  } else sigma2 <- mu
-  
-  ((x-mu)^2)/sigma2 +log(sigma2)
+## dss(P,x) = ((x-mu_p)/sigma_p)^2 + 2*log(sigma_p)
+
+dss <- function (x, mu, size=NULL) {
+    sigma2 <- if (is.null(size)) mu else mu * (1 + mu/size)
+    ((x-mu)^2)/sigma2 + log(sigma2)
 }
+
 
 ## ranked probability score
-# rps(P,x) =sum_0^Kmax { P(X<=k) - 1(x <=k)}^2
-rps.one <- function(x, mu,size=NULL,k=40,eps=1e-10){
-	# determine variance of distribution
-	if(is.null(size)){
-	  se <- sqrt(mu)
-	} else se <- sqrt(mu*(1+mu/size))
+## rps(P,x) = sum_0^Kmax {P(X<=k) - 1(x<=k)}^2
+
+rps.one <- function (x, mu, size=NULL, k=40, tolerance=sqrt(.Machine$double.eps)) {
+    ## return NA for non-convergent fits (where mu=NA)
+    if (is.na(mu)) return(NA_real_)
+
+    ## determine variance of distribution
+    sigma2 <- if (is.null(size)) mu else mu * (1 + mu/size)
+    
+    ## determine the maximum number of summands as Kmax=mean+k*sd
+    kmax <- ceiling(mu + k*sqrt(sigma2))
+    
+    ## compute 1(x<=k)
+    ind <- 1*(x < seq_len(kmax+1))
 	
-	# determine the maximum number of summands as Kmax= mean+k*se
-	kmax <- ceiling(mu + k*se)
+    ## compute P(X<=k)
+    Px <- if (is.null(size)) {
+        ppois(0:kmax, lambda=mu)
+    } else {
+        pnbinom(0:kmax, mu=mu, size=size)
+    }
 	
-	# compute 1(x <=k)
-	ind <- 1*(x < (1:(kmax+1)))
+    ## check precision
+    if ((1-tail(Px,1))^2 > tolerance)
+        warning("precision of finite sum not smaller than tolerance=", tolerance)
 	
-	# compute P(X<=k)
-	# Poisson case
-	if(is.null(size)){
-		Px <- ppois(0:kmax,lambda=mu)
-	} else  Px <- pnbinom(0:kmax,mu=mu,size=size)
-	
-	#determine precision
-	if((1-tail(Px,1))^2 > eps)
-	 cat("precision of finite sum not smaller than ", eps,"\n")
-	
-	
-	# compute rps
-	sum((Px-ind)^2)
+    ## compute rps
+    sum((Px-ind)^2)
 }
 
-rps <- function(x,mu,size=NULL,k=40){
-	n <- length(x)
-	if(length(mu)==1)
-		mu <- rep(mu,n)
-	if(!is.null(size) & length(size)==1)
-		size <- rep(size,n)
-	
-	res <- sapply(1:n, function(i) rps.one(x=x[i],mu=mu[i],size=size[i],k=k) )
-	matrix(res,ncol=ncol(as.matrix(x)),byrow=FALSE)
+rps <- function (x, mu, size=NULL, k=40, tolerance=sqrt(.Machine$double.eps)) {
+    res <- if (is.null(size)) {
+        mapply(rps.one, x=x, mu=mu,
+               MoreArgs=list(k=k, tolerance=tolerance), SIMPLIFY=TRUE, USE.NAMES=FALSE)
+    } else {
+        mapply(rps.one, x=x, mu=mu, size=size,
+               MoreArgs=list(k=k, tolerance=tolerance), SIMPLIFY=TRUE, USE.NAMES=FALSE)
+    }
+    attributes(res) <- attributes(x)  # set dim and dimnames
+    res
 }
 
 
-## returns logs, rps, ses, dss, nses in reversed (!) order
-## i.e. the scores for time points n, n-1, n-2, ...
-scores <- function (object, units=NULL, sign=FALSE, individual=FALSE)
+## returns scores in reversed (!) order, i.e. for time points n, n-1, n-2, ...
+
+scores <- function (object, which = c("logs","rps","dss","ses"), units = NULL,
+                    sign = FALSE, individual = FALSE)
 {
     mu <- object$pred     # predicted counts
     x <- object$observed  # observed counts
@@ -121,19 +129,16 @@ scores <- function (object, units=NULL, sign=FALSE, individual=FALSE)
     ## compute sign of x-mu
     signXmMu <- if(sign) sign(x-mu) else NULL
     
-    ## compute individual scores
-    log.score <- logScore(x=x, mu=mu, size=size)
-    rp.score <- rps(x=x, mu=mu, size=size)
-    se.score <- ses(x=x, mu=mu)
-    ds.score <- dss(x=x, mu=mu, size=size)
-    nse.score <- nses(x=x, mu=mu, size=size)
+    ## compute individual scores (these are ntps x nUnits matrices)
+    scorelist <- lapply(which, do.call, args = alist(x=x, mu=mu, size=size),
+                        envir = environment())
     
     ## gather individual scores in an array
-    result <- array(c(log.score, rp.score, se.score, ds.score, nse.score, signXmMu),
-                    dim = c(ntps, nUnits, 5L + sign),
+    result <- array(c(unlist(scorelist, recursive=FALSE, use.names=FALSE),
+                      signXmMu),
+                    dim = c(ntps, nUnits, length(which) + sign),
                     dimnames = c(dimnames(x),
-                                 list(c("logs","rps","ses", "dss", "nses",
-                                        if (sign) "sign"))))
+                                 list(c(which, if (sign) "sign"))))
 
     ## reverse order of the time points (historically)
     result <- result[ntps:1L,,,drop=FALSE]
