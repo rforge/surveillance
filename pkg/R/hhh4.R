@@ -593,15 +593,6 @@ interpretControl <- function (control, stsObj)
   ne <- control$ne
   end <- control$end
 
-  ## FIXME: really weird... if the array below is evaluated, code will be faster
-  ## A complex example model takes 132s (without this nonsense array evaluation)
-  ## or 116s (with) for the whole fit
-  if (ne$inModel && is.array(ne$weights)) {
-    dev.null <- array(ne$weights, c(nUnits,nUnits,nTime))
-    ## for instance, str(ne$weights), as.vector(ne$weights), or
-    ## array(ne$weights, dim(ne$weights)) do not have this effect...
-  }
-
   ## for backwards compatibility with surveillance < 1.8-0, where the ar and ne
   ## components of the control object did not have an offset
   if (is.null(ar$offset)) ar$offset <- 1
@@ -1024,8 +1015,8 @@ penScore <- function(theta, sd.corr, model)
   
   ## add penalty to random effects gradient
   s.pen <- if(dimRE > 0) c(Sigma.inv %*% randomEffects) else numeric(0L)
-  if(length(gradients$re) != length(s.pen)) # FIXME: could this ever happen?
-      stop("length of s(b) != Sigma.inv %*% b")
+  if(length(gradients$re) != length(s.pen))
+      stop("oops... lengths of s(b) and Sigma.inv %*% b do not match")
   grRandom <- c(gradients$re - s.pen)
 
   ## Done
@@ -1177,9 +1168,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         dIJ <- colSums(didj %mj% Z.j)   # didj must not contain NA's (all NA's set to 0)
         hessian.FE.RE[idxFE==i,idxRE==j] <<- diag(dIJ)[ which.i, ]
         dIJ <- dIJ[ which.i ]           # added which.i subsetting in r432
-                                        # FIXME @Michaela: please confirm this correction
       } else if(unitSpecific.j){
-        ## which.ij <- (which.i & which.j) # FIXME: this is actually unused...?
         dIJ <- diag(colSums(didj))[ which.i, which.j ] 
       } else {
         dIJ <- colSums(didj)[ which.i ]
