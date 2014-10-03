@@ -5,7 +5,7 @@
 ###
 ### Compute one-step-ahead predictions (means) at a series of time points
 ###
-### Copyright (C) 2011-2014 Michaela Paul and Sebastian Meyer
+### Copyright (C) 2011-2012 Michaela Paul, 2012-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -52,7 +52,7 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
     verbose <- as.integer(verbose)
     result$control$verbose <- max(0, verbose - (ntps>1))
     if (type != "rolling" && verbose > 1L) verbose <- 1L
-    do_pb <- verbose == 1L
+    do_pb <- verbose == 1L && interactive()
     
     ## initial fit
     fit <- if (type == "first") {

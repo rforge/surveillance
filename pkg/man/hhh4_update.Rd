@@ -39,6 +39,7 @@
   \item{subset.upper}{
     if a scalar value, restrict the new fit to those epochs of
     \code{object$control$subset} which are \code{<= subset.upper}.
+    This argument is used by \code{\link{oneStepAhead}}.
   }
   \item{use.estimates}{
     logical specifying if the \code{coef(object)} should be used as
