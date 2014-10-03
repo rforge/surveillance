@@ -430,6 +430,8 @@ getSeason <- function(x, component = c("ar", "ne", "end"), unit = 1)
             stop("cannot handle partially unit-specific seasonality")
         coefSinCos <- coefSinCos[grep(paste0(").",colnames(x$stsObj)[unit]),
                                       names(coefSinCos), fixed=TRUE)]
+        ## drop .unitname-suffix since non-syntactic (cannot reformulate())
+        names(coefSinCos) <- sub("\\)\\..+$", ")", names(coefSinCos))
     }
     if (length(coefSinCos)==0)
         return(list(intercept=intercept, season=rep.int(0,freq)))
