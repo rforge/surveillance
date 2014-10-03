@@ -72,7 +72,19 @@ scores(object, which = c("logs", "rps", "dss", "ses"), units = NULL,
     \code{which.start="final"} for this to work).}
   
   \item{object}{result of \code{oneStepAhead}.}
-  \item{which}{character vector determining which scores to compute.}
+  \item{which}{character vector determining which scores to compute.
+    The package \pkg{surveillance} implements the following proper
+    scoring rules: logarithmic score (\code{"logs"}), ranked probability
+    score (\code{"rps"}), Dawid-Sebastiani score (\code{"dss"}), and
+    squared error score (\code{"ses"}). The normalized SES
+    (\code{"nses"}) is also available but it is improper and not
+    computed by default.\cr
+    It is possible to name own scoring rules in \code{which}. These
+    must be functions of \code{(x, mu, size)}, where all arguments are
+    time x unit matrices, except that \code{size} is \code{NULL}
+    in case of a Poisson model.
+    See the package-internal scoring rules for guidance, e.g.,
+    \code{surveillance:::logs} or \code{surveillance:::dss}.}
   \item{units}{integer or character vector indexing the units for which
     the scores should be computed. By default (\code{NULL}) all units
     are considered.}
@@ -110,11 +122,8 @@ If \code{keep.estimates=TRUE}, there are the following additional elements:
   \code{"margll"} with their obvious meanings.}
 
 
-The function \code{scores} by default computes the following proper
-scoring rules: logarithmic score (\code{"logs"}), ranked probability
-score (\code{"rps"}), Dawid-Sebastiani score (\code{"dss"}), and squared
-error score (\code{"ses"}). It can also compute the normalized SES
-(\code{"nses"}) but that is improper.
+The function \code{scores} computes the scoring rules specified in the
+argument \code{which}.
 If multiple \code{units} are selected and \code{individual=TRUE}, the
 result is an array of dimensions
 \code{c(nrow(pred),length(units),5+sign)} (up to \pkg{surveillance}
