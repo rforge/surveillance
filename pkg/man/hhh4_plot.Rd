@@ -58,7 +58,7 @@ plotHHH4_maxEV(...,
                legend.args = list())
 getMaxEV(x)
 
-plotHHH4_ri(x, component, sp.layout = NULL,
+plotHHH4_ri(x, component, labels = FALSE, sp.layout = NULL,
             gpar.missing = list(col = "darkgrey", lty = 2, lwd = 2),
             ...)
 
@@ -163,7 +163,10 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
   \item{component}{component for which to plot the estimated
     region-specific random intercepts. Must partially match one of
     \code{colnames(ranef(x, tomatrix=TRUE))}.}
-  \item{sp.layout}{see \code{\link{spplot}}.}
+  \item{labels}{determines if and how regions are labeled, see
+    \code{\link{layout.labels}}.}
+  \item{sp.layout}{optional list of additional layout items, see
+    \code{\link{spplot}}.}
   \item{gpar.missing}{list of graphical parameters applied to regions
     with missing random intercepts (i.e., not included in the model).
     Supplementary regions won't be plotted at all if
@@ -245,7 +248,7 @@ getMaxEV(measlesFit)  # here simply constant and equal to exp(ar.1)
 plot(measlesFit, type="maxEV")  # not very exciting
 
 ## random intercepts of the endemic component
-plot(measlesFit, type="ri", component="end")
+plot(measlesFit, type="ri", component="end", labels=list(font=3, labels="GEN"))
 
 ## neighbourhood weights as a function of neighbourhood order
 plot(measlesFit, type="neweights")  # boring, model has no "ne" component

@@ -160,3 +160,40 @@ polyAtBorder <- function (SpP,
     names(atBorder) <- row.names(SpP)
     atBorder
 }
+
+
+### sp.layout item for spplot() to draw labels for Spatial* objects
+
+layout.labels <- function (obj, labels = TRUE)
+{
+    stopifnot(inherits(obj, "Spatial"))
+
+    ## get region labels
+    getLabels <- function (labels) {
+        if (isTRUE(labels)) {
+            row.names(obj)
+        } else if (length(labels) == 1L &&
+                   (is.numeric(labels) | is.character(labels))) {
+            if (!"data" %in% slotNames(obj))
+                stop("no data slot to select labels from")
+            obj@data[[labels]]
+        } else labels
+    }
+    
+    ## convert labels argument to a list
+    labels.args <- if (is.list(labels)) {
+        labels
+    } else if (!is.null(labels) && !identical(labels, FALSE)) {
+        list(labels = getLabels(labels))
+    } else { # labels = FALSE or labels = NULL
+        return(NULL)
+    }
+
+    ## set default coordinates for panel.text() and parse labels
+    labels.args <- modifyList(list(x = coordinates(obj), labels = TRUE),
+                              labels.args)
+    labels.args$labels <- getLabels(labels.args$labels)
+
+    ## return layout item
+    c("panel.text", labels.args)
+}

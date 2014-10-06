@@ -122,6 +122,7 @@ S3method(diameter, gpc.poly)
 export(nbOrder)
 export(poly2adjmat)
 export(polyAtBorder)
+export(layout.labels)
 
 # randomly break tied event times or coordinates
 export(untie)                           # new S3-generic

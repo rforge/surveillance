@@ -53,21 +53,6 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
     if (is.null(main) && inherits(x, "sts"))
         main <- stsTimeRange2text(x, tps)
 
-    ## get region labels
-    getLabels <- function (labels) {
-        if (isTRUE(labels)) {
-            row.names(map)
-        } else if (length(labels) == 1L &&
-                   (is.numeric(labels) | is.character(labels))) {
-            map@data[[labels]]
-        } else labels
-    }
-    labels.args <- if (is.list(labels)) {
-        labels
-    } else if (!is.null(labels) && !identical(labels, FALSE)) {
-        list(labels = getLabels(labels))
-    } # else NULL
-    
     ## check/determine color break points 'at'
     at <- checkat(at, ncases)
     ## default color palette
@@ -83,12 +68,7 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
         colorkey <- modifyList(eval(formals()$colorkey), colorkey)
 
     ## automatic additions to sp.layout (region labels and total)
-    if (is.list(labels.args)) {
-        labels.args <- modifyList(list(x=coordinates(map), labels=TRUE),
-                                  labels.args)
-        labels.args$labels <- getLabels(labels.args$labels)
-        layout.labels <- c("panel.text", labels.args)
-        ## "panel.text" works since package "sp" imports all of "lattice"
+    if (!is.null(layout.labels <- layout.labels(map, labels))) {
         sp.layout <- c(sp.layout, list(layout.labels))
     }
     if (is.list(total.args)) {

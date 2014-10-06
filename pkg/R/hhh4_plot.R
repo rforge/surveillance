@@ -143,7 +143,7 @@ plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
 ### Map of estimated random intercepts of a specific component
 ###
 
-plotHHH4_ri <- function (x, component, sp.layout = NULL,
+plotHHH4_ri <- function (x, component, labels = FALSE, sp.layout = NULL,
                          gpar.missing = list(col="darkgrey", lty=2, lwd=2),
                          ...)
 {
@@ -158,10 +158,15 @@ plotHHH4_ri <- function (x, component, sp.layout = NULL,
     if (is.null(map)) stop("'x$stsObj' has no map")
     map$ranef <- ranefmatrix[,comp][row.names(map)]
     
-    if (is.list(gpar.missing) && any(is.na(map$ranef)))
+    if (is.list(gpar.missing) && any(is.na(map$ranef))) {
         sp.layout <- c(sp.layout, 
                        c(list("sp.polygons", map[is.na(map$ranef),]),
                          gpar.missing))
+    }
+    if (!is.null(layout.labels <- layout.labels(map, labels))) {
+        sp.layout <- c(sp.layout, list(layout.labels))
+    }
+    
     spplot(map[!is.na(map$ranef),], zcol = "ranef",
            sp.layout = sp.layout, ...)
 }

@@ -27,6 +27,9 @@
     \item The \code{update()}-method for fitted \code{"hhh4"} models
     gained an argument \code{S} for convenient modification of component
     seasonality using \code{addSeason2formula()}.
+
+    \item The new auxiliary function \code{layout.labels()} generates an
+    \code{sp.layout} item for \code{spplot()} in order to draw labels.
   }
 }
 
