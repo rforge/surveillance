@@ -281,10 +281,13 @@ createLambda <- function (object)
 
 ###
 ### Plot estimated seasonality (sine-cosine terms) of one or several hhh4-fits
+### either as multiplicative effect on the 'components' (intercept=FALSE)
+### or with intercept=TRUE, which only makes sense if there are no further
+### non-centered covariates and offsets.
 ###
 
 plotHHH4_season <- function (...,
-                             components = c("ar", "ne", "end", "maxEV"),
+                             components = c("ar", "ne", "end"), intercept = FALSE,
                              xlim = NULL, ylim = NULL,
                              xlab = NULL, ylab = "", main = NULL,
                              par.settings = list(), matplot.args = list(),
@@ -294,7 +297,8 @@ plotHHH4_season <- function (...,
     objnams <- unlist(lapply(match.call(expand.dots=FALSE)$..., deparse))
     objects <- getHHH4list(..., .names = objnams)
     freq <- attr(objects, "freq")
-    components <- match.arg(components, several.ok=TRUE)
+    components <- match.arg(components, choices = c("ar", "ne", "end", "maxEV"),
+                            several.ok = TRUE)
 
     ## x-axis
     if (is.null(xlim))
@@ -366,7 +370,11 @@ plotHHH4_season <- function (...,
     seasons <- list()
     for(comp in setdiff(components, "maxEV")){
         s2 <- lapply(objects, getSeason, component = comp, unit = unit)
-        seasons[[comp]] <- exp(sapply(s2, function(intseas) do.call("+", intseas)))
+        seasons[[comp]] <- exp(vapply(s2, FUN = if (intercept) {
+            function (intseas) do.call("+", intseas)
+        } else {
+            function (intseas) intseas$season  # disregard intercept
+        }, FUN.VALUE = numeric(freq), USE.NAMES = TRUE))
         do.call("matplot",              # x defaults to 1:freq
                 c(list(seasons[[comp]], xlim=xlim, ylim=ylim[[comp]],
                        xlab=xlab, ylab=ylab[[comp]], main=main[[comp]]),
@@ -378,7 +386,7 @@ plotHHH4_season <- function (...,
     ## plot seasonality of dominant eigenvalue
     if ("maxEV" %in% components) {
         seasons[["maxEV"]] <- sapply(objects, function(obj)
-                                     getMaxEV_season(obj, unit=unit)$maxEV.season)
+                                     getMaxEV_season(obj)$maxEV.season)
         do.call("matplot",
                 c(list(seasons[["maxEV"]], xlim=xlim,
                        ylim=if (is.null(ylim[["maxEV"]]))
@@ -396,9 +404,10 @@ plotHHH4_season <- function (...,
 }
 
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# get estimated seasonal pattern in the different components
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# get estimated intercept and seasonal pattern in the different components
+# CAVE: other covariates and offsets are ignored
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 getSeason <- function(x, component = c("ar", "ne", "end"), unit = 1)
 {
     stopifnot(inherits(x, c("hhh4","ah4")))
@@ -413,7 +422,7 @@ getSeason <- function(x, component = c("ar", "ne", "end"), unit = 1)
 
     ## get the intercept
     est <- fixef(x, reparamPsi=FALSE)
-    intercept <- est[grep(paste0("^", component, "\\.(1|ri)"), names(est))]
+    intercept <- est[[grep(paste0("^", component, "\\.(1|ri)"), names(est))]]
     if (length(intercept) == 0) {
         intercept <- 0 # no intercept (not standard)
     } else if (length(intercept) > 1) { # unit-specific intercepts
@@ -442,23 +451,40 @@ getSeason <- function(x, component = c("ar", "ne", "end"), unit = 1)
                              data=data.frame(t=startseason-1 + seq_len(freq)))
 
     ## Done
-    list(intercept=intercept, season=mmSinCos %*% coefSinCos)
+    list(intercept=intercept, season=as.vector(mmSinCos %*% coefSinCos))
 }
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # compute dominant eigenvalue of Lambda_t
+# CAVE: no support for Lambda_it
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-getMaxEV_season <- function (x, unit = 1)
+getMaxEV_season <- function (x)
 {
     stopifnot(inherits(x, c("hhh4","ah4")))
     nUnits <- x$nUnit
     freq <- x$stsObj@freq
     components <- componentsHHH4(x)
+
+    ## CAVE: this function ignores epidemic covariates/offsets
+    ##       and unit-specific seasonality
+    if (nUnits > 1L && any(c("ar", "ne") %in% components)) {
+        compOK <- vapply(x$control[c("ar","ne")], FUN = function (comp) {
+            terms <- terms(x)$terms
+            epiterms <- terms[,terms["offsetComp",] %in% seq_len(2L),drop=FALSE]
+            identical(as.numeric(comp$offset), 1) &&
+                length(all.vars(removeTimeFromFormula(comp$f))) == 0L &&
+                    all(!unlist(epiterms["unitSpecific",]))
+        }, FUN.VALUE = TRUE, USE.NAMES = FALSE)
+        if (any(!compOK))
+            warning("epidemic components contain (unit-specific)",
+                    "covariates/offsets not accounted for;\n",
+                    "  use getMaxEV() or plotHHH4_maxEV()")
+    }
     
     ## global intercepts and seasonality
-    s2.lambda <- getSeason(x, "ar", unit = unit)
-    s2.phi <- getSeason(x, "ne", unit = unit)
+    s2.lambda <- getSeason(x, "ar")
+    s2.phi <- getSeason(x, "ne")
     
     ## unit-specific intercepts
     ris <- ranef(x, tomatrix=TRUE)
@@ -519,9 +545,9 @@ getMaxEV_season <- function (x, unit = 1)
 getSeasonStart <- function (object)
 {
     if ((startsample <- object$stsObj@start[2]) == 1) {
-        object$control$data$t[1]
+        object$control$data$t[1L]
     } else {
-        object$control$data$t[1] + object$stsObj@freq-startsample + 1
+        object$control$data$t[1L] + object$stsObj@freq-startsample + 1
     }
 }
 

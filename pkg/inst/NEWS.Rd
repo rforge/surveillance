@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-10-03)}{
+\section{Changes in surveillance version 1.8-1 (2014-10-06)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -37,6 +37,11 @@
     of a collapsed matrix. Furthermore, the scores computed by default
     are \code{c("logs","rps","dss","ses")}, excluding the normalized
     squared error score \code{"nses"} which is improper.
+
+    \item The plot-\code{type="season"} for \code{"hhh4"} fits now by
+    default plots the multiplicative effect of seasonality on the
+    respective component (new argument \code{intercept=FALSE}).
+    The default set of components to plot has also changed.
   }
 }
 

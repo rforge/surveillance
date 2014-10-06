@@ -363,6 +363,15 @@ removeSeasonFromFormula <- function (f)
     formula(if (length(idxSinCos)) fterms[-idxSinCos] else f)
 }
 
+## remove all temporal terms from a formula
+removeTimeFromFormula <- function (f, timevar = "t") {
+    fterms <- terms(f, keep.order = TRUE)
+    containsTime <- vapply(attr(fterms, "variables")[-1L],
+                           FUN = function (x) timevar %in% all.vars(x),
+                           FUN.VALUE = TRUE, USE.NAMES = FALSE)
+    formula(if (any(containsTime)) fterms[!containsTime] else f)
+}
+
 
 ## convert fitted parameters to a list suitable for control$start
 hhh4coef2start <- function (fit)
