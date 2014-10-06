@@ -1,6 +1,4 @@
 \name{multiplicity.Spatial}
-\alias{multiplicity}   % the generic is imported from spatstat and
-                       % then exported (unchanged) -> documentation required
 \alias{multiplicity.Spatial}
 
 \title{
