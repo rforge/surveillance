@@ -74,11 +74,12 @@ importMethodsFrom(Matrix, coerce, diag, forceSymmetric, solve)
 
 importFrom(spatstat, area.owin, as.im.function, coords.ppp, diameter,
                      diameter.owin, disc, distppl, inside.owin, intersect.owin,
-                     is.polygonal, multiplicity, runifpoint, shift.owin,
+                     is.polygonal, runifpoint, shift.owin,
                      spatstat.options, vertices)
-
 importFrom(spatstat, marks)
 export(marks)                           # we define an epidataCS-method
+importFrom(spatstat, multiplicity)
+export(multiplicity)                    # we define a Spatial-method
 
 ## Note: we depend on instead of import package polyCub to avoid "::" references
 ##       in some of the siaf.* generators which create functions in .GlobalEnv
@@ -138,7 +139,6 @@ S3method(intersectPolyCircle, SpatialPolygons)
 S3method(intersectPolyCircle, gpc.poly)
 
 # little helper: multiplicity of points
-export(multiplicity)                    # as imported from spatstat
 S3method(multiplicity, Spatial)
 
 # Spatio-temporal cluster detection
