@@ -74,8 +74,11 @@ importMethodsFrom(Matrix, coerce, diag, forceSymmetric, solve)
 
 importFrom(spatstat, area.owin, as.im.function, coords.ppp, diameter,
                      diameter.owin, disc, distppl, inside.owin, intersect.owin,
-                     is.polygonal, marks, multiplicity, runifpoint, shift.owin,
+                     is.polygonal, multiplicity, runifpoint, shift.owin,
                      spatstat.options, vertices)
+
+importFrom(spatstat, marks)
+export(marks)                           # we define an epidataCS-method
 
 ## Note: we depend on instead of import package polyCub to avoid "::" references
 ##       in some of the siaf.* generators which create functions in .GlobalEnv
@@ -296,7 +299,6 @@ S3method(print, summary.epidataCS)
 S3method(as.stepfun, epidataCS)
 S3method(animate, epidataCS)
 export(animate.epidataCS)               # for convenience
-export(marks)                           # as imported from spatstat
 S3method(marks, epidataCS)
 export(marks.epidataCS)            # for convenience since its a foreign generic
 S3method(plot, epidataCS)

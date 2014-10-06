@@ -8,8 +8,6 @@
 \alias{tail.epidataCS}
 \alias{[.epidataCS}
 \alias{subset.epidataCS}
-\alias{marks}	       % the generic 'marks()' is imported from spatstat and
-                       % then exported (unchanged) -> documentation required
 \alias{marks.epidataCS}
 \alias{summary.epidataCS}
 \alias{print.summary.epidataCS}
@@ -189,7 +187,7 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
     an \code{"epidataCS"} object like in \code{\link{subset.data.frame}}.}
 
   \item{coords}{logical indicating if the data frame of event marks
-    returned by \code{marks.epidataCS} should have the event
+    returned by \code{marks(x)} should have the event
     coordinates appended as last columns. This defaults to \code{TRUE}.}
 
   \item{object}{an object of class \code{"epidataCS"}.}
