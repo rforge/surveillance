@@ -287,7 +287,7 @@ createLambda <- function (object)
 ###
 
 plotHHH4_season <- function (...,
-                             components = c("ar", "ne", "end"), intercept = FALSE,
+                             components = NULL, intercept = FALSE,
                              xlim = NULL, ylim = NULL,
                              xlab = NULL, ylab = "", main = NULL,
                              par.settings = list(), matplot.args = list(),
@@ -297,8 +297,13 @@ plotHHH4_season <- function (...,
     objnams <- unlist(lapply(match.call(expand.dots=FALSE)$..., deparse))
     objects <- getHHH4list(..., .names = objnams)
     freq <- attr(objects, "freq")
-    components <- match.arg(components, choices = c("ar", "ne", "end", "maxEV"),
-                            several.ok = TRUE)
+    components <- if (is.null(components)) {
+        intersect(c("ar", "ne", "end"), unique(unlist(
+            lapply(objects, componentsHHH4), use.names = FALSE)))
+    } else {
+        match.arg(components, choices = c("ar", "ne", "end", "maxEV"),
+                  several.ok = TRUE)
+    }
 
     ## x-axis
     if (is.null(xlim))
@@ -385,8 +390,9 @@ plotHHH4_season <- function (...,
 
     ## plot seasonality of dominant eigenvalue
     if ("maxEV" %in% components) {
-        seasons[["maxEV"]] <- sapply(objects, function(obj)
-                                     getMaxEV_season(obj)$maxEV.season)
+        seasons[["maxEV"]] <- vapply(objects, FUN = function (obj) {
+            getMaxEV_season(obj)$maxEV.season
+        }, FUN.VALUE = numeric(freq), USE.NAMES = TRUE)
         do.call("matplot",
                 c(list(seasons[["maxEV"]], xlim=xlim,
                        ylim=if (is.null(ylim[["maxEV"]]))
@@ -526,8 +532,11 @@ getMaxEV_season <- function (x)
 
     ## do this for t in 0:freq
     maxEV.const <- maxEV(0)
-    maxEV.season <- if (all(c(s2.phi$season, s2.lambda$season) %in% c(-Inf, 0)))
-        rep.int(maxEV.const, freq) else sapply(seq_len(freq), maxEV)
+    maxEV.season <- if (all(c(s2.phi$season, s2.lambda$season) %in% c(-Inf, 0))) {
+        rep.int(maxEV.const, freq)
+    } else {
+        vapply(seq_len(freq), FUN = maxEV, FUN.VALUE = 0, USE.NAMES = FALSE)
+    }
 
     ## Done
     list(maxEV.season = maxEV.season,

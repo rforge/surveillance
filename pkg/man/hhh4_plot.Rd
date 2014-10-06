@@ -45,8 +45,7 @@ plotHHH4_fitted1(x, unit = 1, main = NULL,
                  xlim = NULL, ylim = NULL, xlab = "", ylab = "No. infected",
                  hide0s = FALSE, meanHHH = NULL)
 
-plotHHH4_season(...,
-                components = c("ar", "ne", "end"), intercept = FALSE,
+plotHHH4_season(..., components = NULL, intercept = FALSE,
                 xlim = NULL, ylim = NULL,
                 xlab = NULL, ylab = "", main = NULL,
                 par.settings = list(), matplot.args = list(),
@@ -143,11 +142,13 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
     should be omitted. Especially useful if there are too many.}
   \item{meanHHH}{(internal) use different component means than those
     estimated and available from \code{x}.}
-  \item{components}{vector of components for which to plot estimated
-    seasonality. Additionally, a seasonality plot of the dominant
-    eigenvalue of the epidemic components is available
-    (\code{"maxEV"}), which only supports models without
-    covariates/offsets in the epidemic components.}
+  \item{components}{character vector of component names, i.e., a subset
+    of \code{c("ar", "ne", "end")}, for which to plot the estimated
+    seasonality. If \code{NULL} (the default), only components which
+    appear in any of the models in \code{\dots} are plotted.\cr
+    A seasonality plot of the epidemic dominant eigenvalue
+    is also available by including \code{"maxEV"} in \code{components},
+    but it only supports models without epidemic covariates/offsets.}
   \item{intercept}{logical indicating whether to plot seasonality as a
     multiplicative effect on the respective component (the default
     \code{intercept=FALSE}), or additionally multiplied by the
