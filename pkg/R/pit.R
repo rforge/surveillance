@@ -14,7 +14,7 @@
 ################################################################################
 
 
-## x - observed data
+## x - observed count data
 ## pdistr - predictive CDF, i.e. a vectorized function (x, ...)
 ##          or a list of such predictive CDF's, one for each data point x
 ##          If evaluated at x=-1 it should return 0
@@ -26,9 +26,10 @@ pit <- function (x, pdistr, J=10, relative=TRUE, ..., plot = list())
 {
     PxPxm1 <- pitPxPxm1(x, pdistr, ...)
     breaks <- (0:J)/J
-    Fbar_seq <- sapply(breaks, pit1, Px=PxPxm1[1,], Pxm1=PxPxm1[2,])
+    Fbar_seq <- vapply(X = breaks, FUN = pit1, FUN.VALUE = 0,
+                       Px = PxPxm1[1,], Pxm1 = PxPxm1[2,], USE.NAMES = FALSE)
     scale <- if (relative) J else 1
-    f_j <- scale * diff(Fbar_seq)
+    f_j <- scale * diff.default(Fbar_seq)
     
     res <- structure(list(breaks=breaks, counts=f_j, density=f_j,
                           mids=breaks[-(J+1)] + 1/J/2,
@@ -42,16 +43,18 @@ pitPxPxm1 <- function (x, pdistr, ...)
 {
     if (is.list(pdistr)) {
         stopifnot(length(pdistr) == length(x))
-        sapply(seq_along(x), function (i) {
-            stopifnot(isTRUE(all.equal(0, pdistr[[i]](-1))))
-            res <- pdistr[[i]](c(x[i], x[i]-1))
-            if (length(res) == 2 && is.vector(res, mode="numeric")) res else
-                stop("pdistr[[", i, "]](c(", x[i], ", ", x[i]-1,
-                     ")) is no numeric vector of length 2")
-        }) # 2 x length(x)
+        vapply(X = seq_along(x), FUN = function (i) {
+            stopifnot(isTRUE(
+                all.equal.numeric(0, pdistr[[i]](-1), check.attributes = FALSE)
+            ))
+            pdistr[[i]](c(x[i], x[i]-1))
+        }, FUN.VALUE = c(0,0), USE.NAMES = FALSE) # 2 x length(x)
     } else { # same pdistr for every data point
-        stopifnot(pdistr(-1, ...) == 0)
-        rbind(pdistr(x, ...), pdistr(x-1, ...))
+        stopifnot(isTRUE(
+            all.equal.numeric(0, pdistr(-1, ...), check.attributes = FALSE)
+        ))
+        rbind(pdistr(x, ...),
+              pdistr(x-1, ...))
     }
 }
 
