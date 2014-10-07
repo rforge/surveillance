@@ -77,7 +77,7 @@ pitplot <- function (pit, args)
 {
     relative <- !isTRUE(all.equal(1, sum(pit$density)))
     defaultArgs <- list(x = pit, main = "",
-                        ylab = if(relative) "Relative frequency" else "Density")
+                        ylab = if(relative) "Relative Frequency" else "Density")
     args <- if (is.list(args)) {
         args[["x"]] <- NULL             # manual x is ignored
         args <- modifyList(defaultArgs, args)
