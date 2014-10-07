@@ -188,6 +188,9 @@ stopifnot(identical(
 ## compute mean scores
 colMeans(sc)
 
+## plot a (non-randomized) PIT histogram for the predictions
+with(pred, pit(x = observed, pdistr = "pnbinom", mu = pred, size = exp(psi)))
+
 
 \dontrun{
 ######################################################################

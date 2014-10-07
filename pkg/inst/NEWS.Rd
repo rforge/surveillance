@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-10-06)}{
+\section{Changes in surveillance version 1.8-1 (2014-10-07)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -30,6 +30,12 @@
 
     \item The new auxiliary function \code{layout.labels()} generates an
     \code{sp.layout} item for \code{spplot()} in order to draw labels.
+
+    \item When generating the \code{pit()} histogram with a single
+    predictive CDF \code{pdistr}, the \code{\dots} arguments can now be
+    \code{x}-specific and are recycled if necessary using \code{mapply()}.
+    If \code{pdistr} is a list of CDFs, \code{pit()} no longer requires
+    the functions to be vectorized.
   }
 }
 

@@ -15,11 +15,11 @@
 
 
 ## x - observed count data
-## pdistr - predictive CDF, i.e. a vectorized function (x, ...)
-##          or a list of such predictive CDF's, one for each data point x
-##          If evaluated at x=-1 it should return 0
+## pdistr - predictive CDF or a list of such predictive CDF's,
+##          one for each data point x. If evaluated at x=-1 it must return 0
 ## J - number of bins 
-## ... - arguments for pdistr. Ignored if pdistr is a list.
+## ... - additional arguments for pdistr(), recycled to the length of x.
+##       Ignored if pdistr is a list.
 ## plot - NULL (no plot) or a list of arguments for plot.histogram
 
 pit <- function (x, pdistr, J=10, relative=TRUE, ..., plot = list())
@@ -27,7 +27,7 @@ pit <- function (x, pdistr, J=10, relative=TRUE, ..., plot = list())
     PxPxm1 <- pitPxPxm1(x, pdistr, ...)
     breaks <- (0:J)/J
     Fbar_seq <- vapply(X = breaks, FUN = pit1, FUN.VALUE = 0,
-                       Px = PxPxm1[1,], Pxm1 = PxPxm1[2,], USE.NAMES = FALSE)
+                       Px = PxPxm1[1L,], Pxm1 = PxPxm1[2L,], USE.NAMES = FALSE)
     scale <- if (relative) J else 1
     f_j <- scale * diff.default(Fbar_seq)
     
@@ -41,20 +41,31 @@ pit <- function (x, pdistr, J=10, relative=TRUE, ..., plot = list())
 
 pitPxPxm1 <- function (x, pdistr, ...)
 {
-    if (is.list(pdistr)) {
+    if (is.list(pdistr)) { # list of functions, not necessarily vectorized
         stopifnot(length(pdistr) == length(x))
         vapply(X = seq_along(x), FUN = function (i) {
             stopifnot(isTRUE(
                 all.equal.numeric(0, pdistr[[i]](-1), check.attributes = FALSE)
             ))
-            pdistr[[i]](c(x[i], x[i]-1))
+            c(pdistr[[i]](x[i]), pdistr[[i]](x[i]-1))
         }, FUN.VALUE = c(0,0), USE.NAMES = FALSE) # 2 x length(x)
-    } else { # same pdistr for every data point
-        stopifnot(isTRUE(
-            all.equal.numeric(0, pdistr(-1, ...), check.attributes = FALSE)
-        ))
-        rbind(pdistr(x, ...),
-              pdistr(x-1, ...))
+    } else { # pdistr is (the name of) a function
+        pdistr <- match.fun(pdistr)
+        if (nargs() == 2L) { # no dots, same pdistr for every data point
+                             # and assumed to be vectorized
+            stopifnot(isTRUE(all.equal.numeric(0, pdistr(-1))))
+            rbind(pdistr(x),
+                  pdistr(x-1),
+                  deparse.level = 0)
+        } else { # ... arguments for pdistr, recycled to the length of x
+                 # pdistr is called by mapply, so no need to be vectorized
+            stopifnot(isTRUE(all.equal.numeric(
+                0, do.call("pdistr", c(list(-1), lapply(list(...), "[", 1L))),
+                check.attributes = FALSE)))
+            rbind(mapply(pdistr, x, ..., SIMPLIFY = TRUE, USE.NAMES = FALSE),
+                  mapply(pdistr, x-1, ..., SIMPLIFY = TRUE, USE.NAMES = FALSE),
+                  deparse.level = 0)
+        }
     }
 }
 
