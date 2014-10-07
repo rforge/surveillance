@@ -303,7 +303,7 @@ plotHHH4_season <- function (...,
     objects <- getHHH4list(..., .names = objnams)
     freq <- attr(objects, "freq")
     components <- if (is.null(components)) {
-        intersect(c("ar", "ne", "end"), unique(unlist(
+        intersect(c("end", "ar", "ne"), unique(unlist(
             lapply(objects, componentsHHH4), use.names = FALSE)))
     } else {
         match.arg(components, choices = c("ar", "ne", "end", "maxEV"),
@@ -419,7 +419,7 @@ plotHHH4_season <- function (...,
 # get estimated intercept and seasonal pattern in the different components
 # CAVE: other covariates and offsets are ignored
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-getSeason <- function(x, component = c("ar", "ne", "end"), unit = 1)
+getSeason <- function(x, component = c("end", "ar", "ne"), unit = 1)
 {
     stopifnot(inherits(x, c("hhh4","ah4")))
     component <- match.arg(component)
