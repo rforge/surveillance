@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-10-07)}{
+\section{Changes in surveillance version 1.8-1 (2014-10-09)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -154,6 +154,9 @@
 
     \item For \code{"epidataCS"} with only one event,
     \code{epidataCSplot_space()} did not draw the point.
+
+    \item The trivial (identity) call
+    \code{aggregate(stsObj, nfreq=stsObj@freq)} did not work.
   }
 }
 

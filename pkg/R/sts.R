@@ -175,11 +175,12 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
   if (by == "time") {
     if (nfreq == "all") {
       howmany <- dim(x@observed)[1]
-    } else {
-      if (nfreq != x@freq) {
-        howmany <- x@freq / nfreq
-        if (howmany - ceiling(howmany) != 0) { stop("Error: nfreq has to be a multiple of x@freq.")}
-      }
+    } else if (nfreq == x@freq) { # nothing to do
+      return(x)
+    } else { # nfreq != x@freq
+      howmany <- x@freq / nfreq
+      if (howmany - ceiling(howmany) != 0)
+          stop("nfreq has to be a multiple of x@freq.")
     }
     
     n <- dim(x@observed)[1]
