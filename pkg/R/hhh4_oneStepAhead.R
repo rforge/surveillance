@@ -26,7 +26,8 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
     type <- match.arg(type)
     which.start <- if (type == "rolling") match.arg(which.start) else "final"
     if (cores > 1 && which.start == "current")
-        stop("no parallelization for \"rolling\" if 'which.start=\"current\"'")
+        stop("no parallelization for 'type=\"rolling\"' ",
+             "if 'which.start=\"current\"'")
     startfinal <- hhh4coef2start(result)
 
     ## get model terms
