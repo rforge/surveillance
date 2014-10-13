@@ -33,6 +33,7 @@
 #  * yt.support to N.tInf support  in nowcast??
 #  * bayes.notrunc and bayes.notrunc.bnb could become one code segment
 #  * Enable user to provide reporting triangle directly.
+#  * Function should work for weekly and monthly data as well
 ######################################################################
 
 nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
@@ -70,6 +71,46 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
   method <- match.arg(method,c("bayes.notrunc","bayes.notrunc.bnb","lawless","bayes.trunc","unif","bayes.trunc.ddcp"),several.ok=TRUE)
 
   ######################################################################
+  # Time aggregation. Make sure it's a valid aggregational level and
+  # move all dates to the "first" of this level.
+  # @hoehle: Should work for day, weeks and month. Quarter and year not atm.
+  ######################################################################
+  aggregate.by <- match.arg(aggregate.by,c("1 day","1 week", "1 month"),several.ok=FALSE)
+  epochInPeriodStr <- switch(aggregate.by, "1 day"="%1","1 week"="%u", "1 month"="%d")
+  
+  if (aggregate.by != "1 day") {
+      warning("Moving dates to first of each epoch.")
+      
+      
+      #Move dates back to first of each epoch unit
+      for (colName in c(dEventCol, dReportCol)) {
+          data[,colName] <- data[,colName] - as.numeric(format(data[,colName],epochInPeriodStr)) + 1
+      }
+      #Check now and when
+      if (!all( format( c(now,when),epochInPeriodStr) == 1)) {
+          stop("The variables 'now' and 'when' needs to be at the first of each epoch")
+      }
+  }
+  
+  #Choose the corect difference function
+  if (aggregate.by == "1 day") {
+      timeDelay <- function(d1,d2) {as.numeric(d2-d1)}
+  }
+  if (aggregate.by == "1 week") { 
+      timeDelay <- function(d1,d2) { floor(as.numeric(difftime(d2,d1,units="weeks")))  } #Count the number of full weeks
+  }
+  if (aggregate.by == "1 month") {
+      timeDelay <- function(d1,d2) {
+           #Helper function from http://stackoverflow.com/questions/1995933/number-of-months-between-two-dates
+          monnb <- function(d) {
+              lt <- as.POSIXlt(as.Date(d, origin="1900-01-01"))
+              lt$year*12 + lt$mon
+          }
+          monnb(d2) - monnb(d1) #count the number of full months
+      } 
+  }
+      
+  ######################################################################
   #If there is a specification of dateRange set dMin and dMax accordingly
   #Otherwise use as limits the range of the data
   ######################################################################
@@ -80,8 +121,12 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
     dMin <- control$dRange[1]
     dMax <- control$dRange[length(control$dRange)]
   }
+  #@hoehle - check that dRange is proper
+  if (!all( format( c(dMin,dMax), epochInPeriodStr) == 1)) {
+      stop("The variables in dRange needs to be at the first of each epoch.")
+  }
   dateRange <- seq(dMin,dMax,by=aggregate.by)
-
+  
   ######################################################################
   # Additional manipulation of the control arguments
   ######################################################################
@@ -169,17 +214,19 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
 
   #Create a column containing the reporting delay using the timeDelay
   #function
-  timeDelay <- function(d1,d2) {as.numeric(d2-d1)}
   data$delay <- timeDelay(data[,dEventCol],data[,dReportCol])
 
-  #Handle delays longer than D
-  notThereButDThere <- (data[,dReportCol] > now) & ((data[,dEventCol]) + D <= now)
+  #Handle delays longer than D.
+  #@hoehle - handle that the unit might not just be days
+  #notThereButDThere <- (data[,dReportCol] > now) & ((data[,dEventCol]) + D <= now)
+  notThereButDThere <- (timeDelay(data[,dReportCol],now) < 0) & (timeDelay(data[,dEventCol],now) >= D)
   if (sum(notThereButDThere,na.rm=TRUE)) {
     warning(paste(sum(notThereButDThere,na.rm=TRUE), " observations > \"now\" due to a delay >D. If delay cut to D they would be there."),sep="")
   }
   
   #Which observations are available at time s
-  data.sub <- data[ na2FALSE(data[,dReportCol] <= now),]
+  #@hoehle: data.sub <- data[ na2FALSE(data[,dReportCol] <= now),]
+  data.sub <- data[ na2FALSE(timeDelay(data[,dReportCol],now) >= 0),]
   if (nrow(data.sub)==0) {
     stop(paste("No data available at now=",now,"\n"))
   }
@@ -238,7 +285,8 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
   #Time origin t_0
   t0 <- min(dateRange)
   #Sequence from time origin until now (per day??)
-  t02s <- seq(t0,now,by="1 day") 
+  #@hoehle
+  t02s <- seq(t0,now,by=aggregate.by) 
   #Maximum time index
   T <- length(t02s)-1  
 
@@ -258,7 +306,8 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
   #Loop over time points. (more efficient that delay and then t)
   for (t in 0:T) {
     #Extract all reports happening at time (index) t. 
-    data.att <- data.sub[na2FALSE(data.sub[,dEventCol] == t02s[t+1]), ]
+    #@hoehle: data.att <- data.sub[na2FALSE(data.sub[,dEventCol] == t02s[t+1]), ]
+    data.att <- data.sub[na2FALSE(timeDelay(data.sub[,dEventCol], t02s[t+1])) == 0, ]
     #Loop over all delays 
     for (x in 0:(T-t)) {
       #Count number with specific delay
@@ -268,7 +317,8 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
 
   cat("No. cases: ",sum(n,na.rm=TRUE),"\n")
 
-  #Handle delays longer than D 
+  #Handle delays longer than D
+  #@hoehle: Not done!                 
   nLongDelay <- apply(n[,(D+1)+seq_len(T-D)],1,sum,na.rm=TRUE)
   if (any(nLongDelay>0)) {
     warning(paste(sum(nLongDelay)," cases with a delay longer than D=",D," days forced to have a delay of D days.\n",sep=""))
@@ -382,7 +432,7 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
     
     #Discretize result: all mass below actual observation is put to observation
     PMFs <- matrix(NA, nrow=control$N.tInf.max+1,ncol=T+1)
-    #Left truncated normal
+    #CDF of a left truncated normal, truncated at "at"
     ltruncpnorm <- function(x, mean, sd, at) {
       ifelse( x < at, 0, pnorm(x, mean, sd) / (1-pnorm(at, mean,sd)))
     }
@@ -395,7 +445,8 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
         CDF <- c(0,ltruncpnorm(N.tInf.support, mean=Nhat.tT1[i], sd=sqrt(Vhat.Zt[i]),at=N.tT[i]))
         PMFs[,i] <- diff(CDF)
       } else {
-        PMFs[,i] <- c(1,rep(0,control$N.tInf.max)) ##all mass concentrated in zero.
+        #@hoehle: previous bug: c(1,rep(0,control$N.tInf.max)) ##all mass concentrated in zero, but it should be: Nhat.tT1
+        PMFs[,i] <- (N.tInf.support == Nhat.tT1[i])*1
       }
     }
     
@@ -919,11 +970,12 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
   ######################################################################
   sts@control$N.tInf.support <- N.tInf.support
   sts@control$method <- sts@control$name <- method
-  #Store the maxDelay
+  #Store variables relevant for the nowcast
   sts@control$D <- D
   sts@control$m <- m
   sts@control$now <- now
   sts@control$when <- when
+  sts@control$timeDelay <- timeDelay
   
   #Store delayCDF object 
   sts@delayCDF <- delayCDF 

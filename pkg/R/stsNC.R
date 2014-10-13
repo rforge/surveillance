@@ -106,8 +106,9 @@ setMethod(f="plot", signature=signature(x="stsNC", y="missing"),
                   #Extract now date and date range of the plotting
                   startDate <- epoch(x)[1]
 
-                  #Add "now" symbol on x-axis
-                  points(x@control$now-startDate+1,0,pch=pchList["nowSymbol"],col=color["nowSymbol"],cex=1.5)
+                  #Add "now" symbol on x-axis. Plotting now takes possible temporal aggregation into account.
+                  #points(x@control$now-startDate+1,0,pch=pchList["nowSymbol"],col=color["nowSymbol"],cex=1.5)
+                  points(x@control$timeDelay(startDate,x@control$now)+1,0,pch=pchList["nowSymbol"],col=color["nowSymbol"],cex=1.5)
                   #Add this to the legend
                   if (!is.null(legend.opts)) {
                       legend(x="topright",c("Now"),pch=pchList["nowSymbol"],col=color["nowSymbol"],bg="white")
