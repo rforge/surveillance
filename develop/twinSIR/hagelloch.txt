@@ -34,7 +34,7 @@
 # NI    number of initial cases
 # GE    generation number of the case
 # TD    day of max. fever (days after rush)
-# TM    max. fever (grad celsius)
+# TM    max. fever (degree celsius)
 # HNX   x coordinate of house (in 2.5m units)
 # HNY   y coordinate of house (in 2.5m units)
 ######################################################################
