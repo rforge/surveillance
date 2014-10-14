@@ -31,6 +31,9 @@
 06/09/2014 implement "as.one=TRUE" for stsplot_time (see plot.disProg)
 02/10/2014 set sensible default arguments for sts initialization, e.g.,
            epoch = 1:nrow(observed)
+14/10/2014 the need to set legend.opts=NULL for sts objects without
+           alarm/upperbound info is not nice -> maybe change default in
+           stsplot_time to do legend if sts object contains upperbounds
 
 
 #======================================================================
@@ -157,8 +160,9 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 
 #Open
 01/10/2014 make update.hhh4(..., use.estimates=TRUE) generally useable
-01/10/2014 plotHHH4_season() should take offsets and covariates into account
-           (then becomes unit-specific)
+14/10/2014 incorporate showsim.* function from power-law paper
+           as plot-methods for arrays of simulated counts returned by
+           simulate.hhh4(..., simplify=TRUE)
 
 #Done
 - add documentation for oneStepAhead predictions/scores

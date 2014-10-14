@@ -45,7 +45,7 @@ loadHagelloch <- function() {
   #time of rash
   hagelloch$tQ <-   hagelloch$ERU <- moday2Date(hagelloch$ERU)
   #time of death
-  hagelloch$tD <- moday2Date(hagelloch$DEAD) 
+  hagelloch$tD <-  hagelloch$DEAD <- moday2Date(hagelloch$DEAD) 
 
 
   #Convert factors
