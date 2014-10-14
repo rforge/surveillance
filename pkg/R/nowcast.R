@@ -76,7 +76,7 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
   # @hoehle: Should work for day, weeks and month. Quarter and year not atm.
   ######################################################################
   aggregate.by <- match.arg(aggregate.by,c("1 day","1 week", "1 month"),several.ok=FALSE)
-  epochInPeriodStr <- switch(aggregate.by, "1 day"="%1","1 week"="%u", "1 month"="%d")
+  epochInPeriodStr <- switch(aggregate.by, "1 day"="1","1 week"="%u", "1 month"="%d")
   
   if (aggregate.by != "1 day") {
       warning("Moving dates to first of each epoch.")
