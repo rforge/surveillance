@@ -7,7 +7,7 @@
 ### of the numbers of susceptible, infectious and recovered individuals.
 ### The extra function "stateplot" shows the event history of one individual.
 ###
-### Copyright (C) 2008-2014 Sebastian Meyer
+### Copyright (C) 2008-2009, 2013 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################

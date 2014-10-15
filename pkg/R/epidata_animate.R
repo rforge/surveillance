@@ -7,7 +7,7 @@
 ### - sequential plots regardless of time between events (i.e. only ordering)
 ### - chronological animation with timer
 ###
-### Copyright (C) 2008-2014 Sebastian Meyer
+### Copyright (C) 2008-2009, 2012, 2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
