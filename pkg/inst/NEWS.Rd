@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-10-09)}{
+\section{Changes in surveillance version 1.8-1 (2014-10-16)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -36,6 +36,10 @@
     \code{x}-specific and are recycled if necessary using \code{mapply()}.
     If \code{pdistr} is a list of CDFs, \code{pit()} no longer requires
     the functions to be vectorized.
+
+    \item New method \code{as.epidata.data.frame()}, which constructs the
+    start/stop SIR event history format from a simple individual-based
+    data frame (e.g., \code{hagelloch.df}).
   }
 }
 

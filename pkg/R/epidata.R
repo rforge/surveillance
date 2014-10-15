@@ -4,29 +4,141 @@
 ### a copy of which is available at http://www.r-project.org/Licenses/.
 ###
 ### Data structure "epidata" representing the SIR event history of a fixed
-### geo-referenced population (e.g., farms, households)
+### geo-referenced population (e.g., farms, households) for twinSIR() analysis
 ###
-### Copyright (C) 2008-2014 Sebastian Meyer
+### Copyright (C) 2008-2010, 2012, 2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
 
+## CAVE:
+## - we assume fixed coordinates (this is important since time-varying
+##   coordinates would result in more sophisticated and time consuming
+##   calculations of distance matrices) !
+## - in the first block (start = t0) all id's must be present (for coordinates)
+## - those id's with atRiskY(t0) = 0 are taken as initially infectious
+## - SIS epidemics are possible, but must be given as SIRS with pseudo R-events,
+##   i.e. individuals will be removed and become susceptible directly afterwards
+
 
 ################################################################################
-# CONVERTER FUNCTION
-# the main purpose is to prepare the data of an epidemic for the inference
-# function 'twinSIR', i.e. perform consistency checks, transform data to common
-# format and calculate epidemic covariates with distance function f.
-# - we assume fixed coordinates (this is important as time-varying coordinates
-# would result in more sophisticated and time consuming calculations of
-# distance matrices) !
-# - in the first block (start = t0) all id's must be present (for coordinates)
-# - those id's with atRiskY(t0) = 0 are taken as initially infectious
-# - SIS epidemics are possible, but must be given as SIRS with pseudo R-events,
-# i.e. individuals will be removed and become susceptible directly afterwards
+## Convert a simple data.frame with one row per individual and with columns for
+## the times of becoming exposed/infectious/removed
+## to the long "epidata" event history start/stop format.
+## tE.col and tR.col can be missing corresponding to SIR, SEI, or SI data.
+## NA's in time variables mean that the respective event has not yet occurred.
+## Time-varying covariates are not supported by this converter.
 ################################################################################
 
-# default method (original data in a data.frame)
+as.epidata.data.frame <- function (data, t0, tE.col, tI.col, tR.col,
+                                   id.col, coords.cols, f = list(), #-> .default
+                                   keep.cols = TRUE, ...)
+{
+    if (missing(t0)) {
+        return(NextMethod("as.epidata"))  # as.epidata.default
+    }
+
+    ## drop individuals that have already been removed prior to t0
+    ## since they would otherwise be considered as initially infective
+    ## (atRiskY = 0 in first time block) and never be removed
+    if (!missing(tR.col)) {
+        alreadyRemoved <- !is.na(data[[tR.col]]) & data[[tR.col]] <= t0
+        if (any(alreadyRemoved)) {
+            data <- data[!alreadyRemoved,]
+            message("Note: dropped rows with tR <= t0 (",
+                    paste0(which(alreadyRemoved), collapse = ", "), ")")
+        }
+    }
+
+    ## parse id column
+    id <- factor(data[[id.col]]) # removes unused levels
+    stopifnot(!anyDuplicated(id), !is.na(id))
+    N <- nlevels(id) # = nrow(data)
+
+    ## make time relative to t0
+    subtract_t0 <- function (x) as.numeric(x - t0)
+    tI <- subtract_t0(data[[tI.col]])
+    tE <- if (missing(tE.col)) tI else subtract_t0(data[[tE.col]])
+    tR <- if (missing(tR.col)) rep.int(NA_real_, N) else subtract_t0(data[[tR.col]])
+
+    ## check E-I-R order
+    if (any((is.na(tE) & !(is.na(tI) & is.na(tR))) | (is.na(tI) & !is.na(tR)))) {
+        stop("events cannot be skipped (NA in E/I => NA in I/R)")
+    }
+    if (any(.wrongsequence <- (tE > tI | tI >= tR) %in% TRUE)) {  # TRUE | NA = TRUE
+        stop("E-I-R events are in wrong order for the following id's: ",
+             paste0(id[.wrongsequence], collapse = ", "))
+    }
+
+    ## vector of stop times
+    stopTimes <- c(tE, tI, tR)
+    stopTimes <- stopTimes[!is.na(stopTimes) & stopTimes > 0]
+    stopTimes <- sort.int(unique.default(stopTimes), decreasing = FALSE)
+    nBlocks <- length(stopTimes)
+    if (nBlocks == 0L) {
+        stop("nothing happens after 't0'")
+    }
+    
+    ## initialize event history
+    evHist <- data.frame(
+        id = rep.int(id, nBlocks),
+        start = rep.int(c(0,stopTimes[-nBlocks]), rep.int(N, nBlocks)),
+        stop = rep.int(stopTimes, rep.int(N, nBlocks)),
+        atRiskY = NA, event = 0, Revent = 0, # adjusted in the loop below
+        row.names = NULL, check.rows = FALSE, check.names = FALSE)
+    
+    ## indexes of the last rows of the time blocks
+    blockbase <- c(0, seq_len(nBlocks) * N)
+
+    ## which individuals are at risk in the first (next) block
+    Y <- is.na(tE) | tE > 0
+    
+    ## Loop over the blocks/stop times to adjust atRiskY, event and Revent
+    for (i in seq_len(nBlocks)) {
+        ct <- stopTimes[i]
+
+        ## set individual at-risk indicators for the current time block
+        evHist$atRiskY[blockbase[i] + seq_len(N)] <- Y
+        ## individuals who become exposed at the current stop time
+        ## will no longer be at risk in the next block
+        Y[which(tE == ct)] <- FALSE
+        
+        ## process events at this stop time
+        evHist$event[blockbase[i] + which(tI == ct)] <- 1
+        evHist$Revent[blockbase[i] + which(tR == ct)] <- 1
+    }
+
+    ## add additional time-constant covariates
+    extraVarNames <- coords.cols  # may be NULL
+    if (isTRUE(keep.cols)) {
+        extraVarNames <- c(extraVarNames, setdiff(names(data), id.col))
+    } else if (length(keep.cols) > 0L && !identical(FALSE, keep.cols)) {
+        extraVarNames <- c(extraVarNames, names(data[keep.cols]))
+    }
+    extraVarNames <- unique.default(extraVarNames)
+    if (length(extraVarNames) > 0L) {
+        evHist <- data.frame(
+            evHist,
+            data[rep.int(seq_len(N), nBlocks), extraVarNames, drop=FALSE],
+            row.names = NULL, check.names = TRUE, stringsAsFactors = TRUE)
+    }
+
+    ## Now we can pass the generated event history to the default method
+    ## for the usual consistency checks and the pre-calculation of f covariates
+    as.epidata.default(
+        data = evHist,
+        id.col = "id", start.col = "start", stop.col = "stop",
+        atRiskY.col = "atRiskY", event.col = "event", Revent.col = "Revent",
+        coords.cols = coords.cols, f = f)
+}
+
+
+################################################################################
+# DEFAULT CONVERTER, which requires a start/stop event history data.frame
+# It performs consistency checks, and pre-calculates the distance-based
+# epidemic covariates from f.
+################################################################################
+
 as.epidata.default <- function(data, id.col, start.col, stop.col, atRiskY.col,
     event.col, Revent.col, coords.cols, f = list(), ...)
 {
