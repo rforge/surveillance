@@ -1,11 +1,12 @@
 ######################################################################
 # Prepare Hagelloch data for conversion to epidata object.  This file
 # contains procedures for converting the data.frame sent by Pete Neal
-# to an epidata object using the description given in Neal & Robert
-# (2004).
+# to an epidata object using the description given in Neal & Roberts
+# (2004). Latent periods (of usually 1 week) are not considered.
 #
-# Author: Michael Höhle
-# Date:   25 Mar 2011 
+# 25 Mar 2011 (MH): initial version
+# 15 Oct 2014 (SM):
+# - format DEAD as Date and set NAs in SEX, IFTO, TD and TM
 ######################################################################
 
 #Load the 'cool' packages
@@ -13,8 +14,7 @@ library("surveillance")
 library("animation")
 
 ######################################################################
-# Convert notation MM.DD to R date format. Note 00.00 corresponds
-# to NA
+# Convert notation MM.DD to R Date format. Note 0.00 corresponds to NA
 #
 # Parameters:
 #  moday - a vector of two digit numerics in the format MM.DD.
@@ -22,41 +22,55 @@ library("animation")
 #  a vector of class Date
 ######################################################################
 
-moday2Date <- function(moday) {
-  moday.str <- sprintf("%.2f",moday)
-  moday <- matrix(as.numeric(unlist(strsplit(moday.str,split=".",fixed=TRUE))),ncol=2,byrow=TRUE)
-  #Set 00.00 to NA's
-  isNA <- moday[,1] == 0 & moday[,2] == 0
-  #Convert only non NA's
-  date <- as.Date(ifelse(!isNA, paste(ifelse(moday[,1]<10,1862,1861),moday[,1],moday[,2],sep="-"), NA))
-  return(date)
+moday2Date <- function (moday)
+{
+  moday.str <- sprintf("%.2f", moday)
+  moday.mat <- matrix(as.numeric(unlist(
+      strsplit(moday.str, split=".", fixed=TRUE)
+  )), ncol=2, byrow=TRUE, dimnames = list(NULL, c("month", "day")))
+  is.na(moday.mat) <- moday.mat == 0
+  ymd <- cbind(year = ifelse(moday.mat[,"month"] < 10, 1862, 1861), moday.mat)
+  as.Date(ifelse(complete.cases(ymd),
+                 paste(ymd[,"year"], ymd[,"month"], ymd[,"day"], sep="-"),
+                 NA))
 }
 
 ######################################################################
-# This is the conversion function
+# Import the text file and format columns -> hagelloch.df
 ######################################################################
 
-loadHagelloch <- function() {
-  #Read data
-  hagelloch <- read.table("hagelloch.txt",skip=43,header=TRUE)
+importHagelloch <- function ()
+{
+  ## Import text file
+  hagelloch <- read.table("hagelloch.txt", header=TRUE, quote="", dec=".",
+                          blank.lines.skip=TRUE, comment.char="#",
+                          stringsAsFactor=TRUE)
 
-  #time of prodomes (in Neal & Roberts its called time of symptoms)
-  hagelloch$tS <-   hagelloch$PRO <- moday2Date(hagelloch$PRO)
-  #time of rash
-  hagelloch$tQ <-   hagelloch$ERU <- moday2Date(hagelloch$ERU)
-  #time of death
-  hagelloch$tD <-  hagelloch$DEAD <- moday2Date(hagelloch$DEAD) 
+  ## Format
+  hagelloch <- within(hagelloch, {
+      ## factors
+      SEX <- factor(SEX, levels=1:2, labels=c("male","female")) # 0=unknown=NA
+      CL <- factor(CL, levels=0:2, labels=c("preschool","1st class","2nd class"))
+      C <- factor(C, levels=0:5, labels=c("no complicatons","bronchopneumonia","severe bronchitis","lobar pneumonia","pseudocroup","cerebral edema"))
 
+      ## convert "month.day" columns to the Date class
+      PRO <- moday2Date(PRO)   # date of prodromes (first symptoms)
+      ERU <- moday2Date(ERU)   # date of eruption (rash)
+      DEAD <- moday2Date(DEAD) # date of death (with missings)
+      
+      ## coordinates to meter units
+      HNX <- HNX * 2.5
+      HNY <- HNY * 2.5
 
-  #Convert factors
-  hagelloch$SEX <- factor(sapply(hagelloch$SEX+1, function(sex) switch(sex,"unknown","male","female")),levels=c("unknown","male","female"))
-  hagelloch$CL <- factor(sapply(hagelloch$CL+1, function(cl) switch(cl,"preschool","1st class","2nd class")),levels=c("preschool","1st class","2nd class"))
-  hagelloch$C <- factor(sapply(hagelloch$C+1, function(complication) switch(complication,"no complicatons","bronchopneumonia","severe bronchitis","lobar pneumonia","pseudocroup","cerebral edema")),levels=c("no complicatons","bronchopneumonia","severe bronchitis","lobar pneumonia","pseudocroup","cerebral edema"))
+      ## missings
+      is.na(IFTO) <- IFTO == 0
+      is.na(TD) <- TD == 0
+      is.na(TM) <- TM == 0
+  })
 
-  #Convert location to meters
-  hagelloch$HNX <-   hagelloch$HNX * 2.5
-  hagelloch$HNY <-   hagelloch$HNY * 2.5
-  
+  return(hagelloch)
+}
+
   ######################################################################
   #Problem: the dates have ties, because they are interval censored
   #         (how often did Pfeilsticker visit the village??)
@@ -64,6 +78,12 @@ loadHagelloch <- function() {
   #         the day before (daily visits)
   ######################################################################
 
+untieHagelloch <- function (hagelloch)
+{
+  hagelloch$tS <- hagelloch$PRO
+  hagelloch$tQ <- hagelloch$ERU
+  hagelloch$tD <- hagelloch$DEAD
+  
   #Break ties by subtracting random time
   set.seed(123)
   hagelloch$tS <- hagelloch$tS - runif(nrow(hagelloch))
@@ -139,11 +159,12 @@ df2history <- function(pop.df, xycoords.names=c("x","y"),extraVarNames=NULL) {
   nEvents <- length(eventTimes)
   
   #Distance matrix, ensure distance to itself is maximal
-  Dkm <- as.matrix(dist(pop.df[,xycoords.names])/1000,diag=TRUE)
-  diag(Dkm) <- Inf
+#  Dkm <- as.matrix(dist(pop.df[,xycoords.names])/1000,diag=TRUE)
+#  diag(Dkm) <- Inf
   #These are distance based kernels. Can be replaced by f argument in as.epidata
 #  Dkm.local <- (Dkm < (62.5/1000)) * is.finite(Dkm) #use 62.5 meter as local distance, see p.255 of Neal & Roberts (2004)
-#  Dkm.global <- (Dkm >= (62.5/1000)) * is.finite(Dkm) 
+#  Dkm.global <- (Dkm >= (62.5/1000)) * is.finite(Dkm)
+  
   Class1 <-  with(pop.df, (CL == "1st class") %o% (CL == "1st class"))
   Class2 <-  with(pop.df, (CL == "2nd class") %o% (CL == "2nd class"))
 
@@ -215,8 +236,8 @@ df2history <- function(pop.df, xycoords.names=c("x","y"),extraVarNames=NULL) {
 ######################################################################
 
 hagelloch2epidata <- function(saveInSurveillance=FALSE) {
-  #Load data and produce R friendly data.frame
-  hagelloch.df <- loadHagelloch()
+  #Import data and produce R friendly data.frame
+  hagelloch.df <- untieHagelloch(importHagelloch())
 
   #Extra covariable names
   extraVarNames <- c("PN","NAME","FN","HN","AGE","SEX","PRO","ERU","CL","DEAD","IFTO","SI","C","PR","CA","NI","GE","TD","TM")
