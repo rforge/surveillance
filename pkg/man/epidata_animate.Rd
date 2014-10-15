@@ -1,4 +1,4 @@
-\name{twinSIR_epidata_animate}
+\name{epidata_animate}
 \alias{animate.epidata}
 \alias{animate.summary.epidata}
 

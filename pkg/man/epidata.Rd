@@ -1,4 +1,4 @@
-\name{twinSIR_epidata}
+\name{epidata}
 \alias{as.epidata}
 \alias{as.epidata.default}
 \alias{print.epidata}

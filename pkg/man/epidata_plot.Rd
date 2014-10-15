@@ -1,4 +1,4 @@
-\name{twinSIR_epidata_plot}
+\name{epidata_plot}
 \alias{plot.epidata}
 \alias{plot.summary.epidata}
 \alias{stateplot}
