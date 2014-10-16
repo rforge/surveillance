@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-10-16)}{
+\section{Changes in surveillance version 1.8-1 (2014-10-17)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -40,6 +40,10 @@
     \item New method \code{as.epidata.data.frame()}, which constructs the
     start/stop SIR event history format from a simple individual-based
     data frame (e.g., \code{hagelloch.df}).
+
+    \item New argument \code{w} in \code{as.epidata.default()} to
+    generate covariate-based weights for the force of infection in
+    \code{twinSIR}. The \code{f} argument is for distance-based weights.
   }
 }
 

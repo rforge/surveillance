@@ -246,6 +246,7 @@ export(twinSIR)
 export(stateplot)
 export(simEpidata)
 
+S3method(update, epidata)
 S3method("[", epidata)
 S3method(print, epidata)
 S3method(summary, epidata)

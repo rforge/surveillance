@@ -283,10 +283,11 @@ hagelloch2epidata <- function (hagelloch.df, extraVarNames = NULL)
           global = function(u) is.finite(u) & (u>=62.5),
           nothousehold = function(u) is.finite(u) & (u>0)
       ),
+      w = list(
+          c1 = function (CL.i, CL.j) CL.i == "1st class" & CL.j == CL.i,
+          c2 = function (CL.i, CL.j) CL.i == "2nd class" & CL.j == CL.i
+      ),
       keep.cols = extraVarNames)
-
-  #TODO: School class indicators
-
 
   return(hagelloch)
 }
@@ -304,10 +305,10 @@ doIt <- function()
   extraVarNames <- c("SEX", "AGE", "CL")
 
   #Make the data
-  hagelloch <- hagelloch2epidata(hagelloch.df, extraVarName=extraVarNames)
+  hagelloch <- hagelloch2epidata(hagelloch.df, extraVarNames)
 
   if (FALSE) { # use old implementation for comparison
-      hagelloch_old <- hagelloch2epidata_old(hagelloch.df, extraVarNames = extraVarNames)
+      hagelloch_old <- hagelloch2epidata_old(hagelloch.df, extraVarNames)
       nam <- intersect(names(hagelloch), names(hagelloch_old))
       all.equal(as.data.frame(hagelloch_old)[nam], as.data.frame(hagelloch)[nam])
   }

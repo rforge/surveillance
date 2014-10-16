@@ -49,11 +49,11 @@ data("hagelloch")
     \item{GE:}{generation number of the case}
     \item{TD:}{day of max. fever (days after rush)}
     \item{TM:}{max. fever (degree celsius)}
-    \item{HNX:}{x coordinate of house (in meters). Scaling in metres
+    \item{x.loc:}{x coordinate of house (in meters). Scaling in metres
       is obtained by multiplying the original coordinates by 2.5 (see details
       in Neal and Roberts (2004))}
-    \item{HNY:}{y coordinate of house (in meters). See also the above
-      description of \code{HNX}.}
+    \item{y.loc:}{y coordinate of house (in meters). See also the above
+      description of \code{x.loc}.}
   }
 
   The \code{hagelloch} \code{"epidata"} object additionally contains the

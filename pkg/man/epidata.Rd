@@ -4,6 +4,7 @@
 \alias{as.epidata.default}
 \alias{print.epidata}
 \alias{[.epidata}
+\alias{update.epidata}
 \alias{epidata}
 
 \title{
@@ -27,12 +28,13 @@ Continuous-Time SIR Event History of a Fixed Population
 as.epidata(data, ...)
 
 \method{as.epidata}{data.frame}(data, t0, tE.col, tI.col, tR.col,
-           id.col, coords.cols, f = list(), keep.cols = TRUE, ...)
+           id.col, coords.cols, f = list(), w = list(), keep.cols = TRUE, ...)
 \method{as.epidata}{default}(data, id.col, start.col, stop.col, atRiskY.col,
-           event.col, Revent.col, coords.cols, f = list(), ...)
+           event.col, Revent.col, coords.cols, f = list(), w = list(), ...)
 
 \method{print}{epidata}(x, ...)
 \method{[}{epidata}(x, i, j, drop)
+\method{update}{epidata}(object, f = list(), w = list(), ...)
 }
 
 \arguments{
@@ -157,6 +159,21 @@ as.epidata(data, ...)
     \eqn{\sum_{j \in I(t)} f_m(||s_i - s_j||)}{%
          \sum_{j in I(t)} f[[m]](||s_i - s_j||)}
   }
+  \item{w}{
+    a \emph{named} list of \emph{vectorized} functions to compute extra 
+    covariate-based weights \eqn{w_{ij}}{w_ij} in the epidemic component.
+    Each function operates on a single time-constant covariate in
+    \code{data}, which is determined by the name of the first argument:
+    The two function arguments should be named \code{varname.i} and
+    \code{varname.j}, where \code{varname} is one of \code{names(data)}.
+    Similar to the components in \code{f}, \code{length(w)} epidemic
+    covariates will be generated in the resulting \code{"epidata"} named
+    according to \code{names(w)}. For individual \eqn{i} at time
+    \eqn{t}, the \eqn{m}'th such covariate has the value
+    \eqn{\sum_{j \in I(t)} w_m(z^{(m)}_i, z^{(m)}_j)},
+    where \eqn{z^{(m)}} denotes the variable in \code{data} associated
+    with \code{w[[m]]}.
+  }
   \item{keep.cols}{
     logical indicating if all columns in \code{data}
     should be retained (and not only the obligatory \code{"epidata"}
@@ -165,7 +182,7 @@ as.epidata(data, ...)
     Alternatively, \code{keep.cols} can be a numeric or character vector
     indexing columns of \code{data} to keep.
   }
-  \item{x}{
+  \item{x,object}{
     an object of class \code{"epidata"}.
   }
   \item{\dots}{
@@ -186,6 +203,9 @@ as.epidata(data, ...)
   \code{\link[=[.data.frame]{data.frame}}s, but there is an own method, which
   assures consistency of the resulting \code{"epidata"} or drops this class, if
   necessary.
+  The \code{update}-method can be used to add or replace distance-based
+  (\code{f}) or covariate-based (\code{w}) epidemic variables in an
+  existing \code{"epidata"} object.
   
   SIS epidemics are implemented as SIRS epidemics where the length of the
   removal period equals 0.  This means that an individual, which has an R-event
@@ -225,6 +245,9 @@ as.epidata(data, ...)
   \item{"f"}{
     this equals the argument \code{f}.
   }
+  \item{"w"}{
+    this equals the argument \code{w}.
+  }
 }
 
 \author{
@@ -250,17 +273,22 @@ str(foodata)
 
 # convert the data to an object of class "epidata",
 # also generating some epidemic covariates
-myEpidata <- as.epidata(foodata, id.col = 1, start.col = "start",
-    stop.col = "stop", atRiskY.col = "atrisk", event.col = "infected",
-    Revent.col = "removed", coords.cols = c("x","y"),
-    f = list(B1 = function(u) u<=1,
-             B2 = function(u) u>1 & is.finite(u))
-)
+myEpidata <- as.epidata(foodata,
+  id.col = 1, start.col = "start", stop.col = "stop",
+  atRiskY.col = "atrisk", event.col = "infected", Revent.col = "removed",
+  coords.cols = c("x","y"),
+  f = list(B1 = function(u) u<=1,
+           B2 = function(u) u>1 & is.finite(u)))
 # note the is.finite restriction in B2 to ensure that f[[i]](Inf) = 0, for all i
 
 # this is how data("fooepidata") has been generated
 data("fooepidata")
 stopifnot(isTRUE(all.equal(myEpidata, fooepidata)))
+
+# add covariate-based weight for the force of infection, e.g.,
+# to model an increased force if i and j have the same value in z1
+myEpidata2 <- update(fooepidata,
+                     w = list(samez1 = function(z1.i, z1.j) z1.i == z1.j))
 
 str(fooepidata)
 subset(fooepidata, BLOCK == 1)

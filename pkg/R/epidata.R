@@ -31,7 +31,7 @@
 ################################################################################
 
 as.epidata.data.frame <- function (data, t0, tE.col, tI.col, tR.col,
-                                   id.col, coords.cols, f = list(), #-> .default
+                                   id.col, coords.cols, f = list(), w = list(),
                                    keep.cols = TRUE, ...)
 {
     if (missing(t0)) {
@@ -129,7 +129,7 @@ as.epidata.data.frame <- function (data, t0, tE.col, tI.col, tR.col,
         data = evHist,
         id.col = "id", start.col = "start", stop.col = "stop",
         atRiskY.col = "atRiskY", event.col = "event", Revent.col = "Revent",
-        coords.cols = coords.cols, f = f)
+        coords.cols = coords.cols, f = f, w = w)
 }
 
 
@@ -140,29 +140,14 @@ as.epidata.data.frame <- function (data, t0, tE.col, tI.col, tR.col,
 ################################################################################
 
 as.epidata.default <- function(data, id.col, start.col, stop.col, atRiskY.col,
-    event.col, Revent.col, coords.cols, f = list(), ...)
+    event.col, Revent.col, coords.cols, f = list(), w = list(), ...)
 {
     cl <- match.call()
     
     # If necessary, convert 'data' into a data.frame (also converting
     # column names to syntactically correct names for use in formulae)
     data <- as.data.frame(data, stringsAsFactors = FALSE)
-    
-    # Check f
-    if (length(f) > 0L) {
-        if (is.null(coords.cols)) {
-            stop("need coordinates to calculate epidemic covariates")
-        }
-        if (!is.list(f) || is.null(names(f)) || any(!sapply(f, is.function))) {
-            stop("'f' must be a named list of functions or 'list()'")
-        }
-        if (any(fInfNot0 <- sapply(f, function(B) B(Inf)) != 0)) {
-            stop("all functions in 'f' must return 0 at infinite distance: ",
-                 "f[[i]](Inf) == 0 fails for i = ",
-                 paste(which(fInfNot0), collapse=", "))
-        }
-    }
-    
+        
     # Use column numbers as indices and check them
     colargs <- c("id.col", "start.col", "stop.col", "atRiskY.col",
                  "event.col", "Revent.col", "coords.cols")
@@ -270,36 +255,134 @@ as.epidata.default <- function(data, id.col, start.col, stop.col, atRiskY.col,
     {
         .checkFunction(eventTable[k,"BLOCK"], eventTable[k,"id"])
     }
-    
-    # Compute epidemic variables x
-    if ((nf <- length(f)) > 0L)
-    {
-        # check names(f) and initialize x-columns
-        if (any(names(f) %in% names(data))) {
-            warning("some 'names(f)' already existed in 'names(data)' ",
-                    "and have been replaced")
+
+    # Set attributes
+    attr(data, "eventTimes") <- sort(eventTimes)
+    attr(data, "timeRange") <- c(histIntervals[1L,1L],histIntervals[nBlocks,2L])
+    attr(data, "coords.cols") <- coords.cols
+    # <- must include this info because externally of this function
+    #    we don't know how many coords.cols (dimensions) we have
+    class(data) <- c("epidata", "data.frame")
+
+    # Compute epidemic variables
+    update.epidata(data, f = f, w = w)
+}
+
+
+update.epidata <- function (object, f = list(), w = list(), ...)
+{
+    oldclass <- class(object)
+    class(object) <- "data.frame" # avoid use of [.epidata
+
+    ## block indexes and first block
+    beginBlock <- which(!duplicated(object[["BLOCK"]],
+                                    nmax = object[["BLOCK"]][nrow(object)]))
+    endBlock <- c(beginBlock[-1L]-1L, nrow(object))
+    firstDataBlock <- object[seq_len(endBlock[1L]), ]
+
+    ## check f and calculate distance matrix
+    if (length(f) > 0L) {
+        if (is.null(coords.cols <- attr(object, "coords.cols"))) {
+            stop("need coordinates for distance-dependent force of infection")
         }
-        data[names(f)] <- 0
+        if (!is.list(f) || is.null(names(f)) || any(!sapply(f, is.function))) {
+            stop("'f' must be a named list of functions")
+        }
+        if (any(fInfNot0 <- sapply(f, function(B) B(Inf)) != 0)) {
+            stop("all functions in 'f' must return 0 at infinite distance: ",
+                 "f[[i]](Inf) == 0 fails for i = ",
+                 paste0(which(fInfNot0), collapse=", "))
+        }
+        if (any(names(f) %in% names(object))) {
+            warning("'f' components replace existing columns of the same name")
+        }
+        lapply(X = f, FUN = function (B) {
+            if (!isTRUE(all.equal(c(5L,2L), dim(B(matrix(0, 5, 2))))))
+                stop("'f'unctions must retain the dimensions of their input")
+        })
+
+        ## reset / initialize columns for distance-based epidemic weights
+        object[names(f)] <- 0
+        ## keep functions as attribute
+        attr(object, "f")[names(f)] <- f
         
-        # Compute distance matrix
-        firstDataBlock <- data[beginBlock[1L]:endBlock[1L],]
-        coords <- firstDataBlock[coords.cols]
-        rownames(coords) <- firstDataBlock[["id"]]
+        ## compute distance matrix
+        coords <- as.matrix(firstDataBlock[coords.cols], rownames.force = FALSE)
+        rownames(coords) <- as.character(firstDataBlock[["id"]])
         distmat <- as.matrix(dist(coords, method = "euclidean"))
         diag(distmat) <- Inf   # no influence on yourself
-        
-        # Compute sum of distances over infectious individuals
+    }
+
+    ## check covariate-based epidemic weights
+    if (length(w) > 0L) {
+        if (!is.list(w) || is.null(names(w)) || any(!sapply(w, is.function))) {
+            stop("'w' must be a named list of functions")
+        }
+        if (any(names(w) %in% names(object))) {
+            warning("'w' components replace existing columns of the same name")
+        }
+
+        ## for each function in 'w', determine the variable on which it acts;
+        ## this is derived from the name of the first formal argument
+        ## (must be of the form varname.i)
+        wvars <- vapply(X = w, FUN = function (wFUN) {
+            varname.i <- names(formals(wFUN))[[1L]]
+            substr(varname.i, 1, nchar(varname.i)-2L)
+        }, FUN.VALUE = "", USE.NAMES = TRUE)
+        if (any(wvarNotFound <- !wvars %in% names(object))) {
+            stop("'w' function refers to unknown variables: ",
+                 paste0(names(w)[wvarNotFound], collapse=", "))
+        }
+            
+        ## reset / initialize columns for covariate-based epidemic weights
+        object[names(w)] <- 0
+        ## keep functions as attribute
+        attr(object, "w")[names(w)] <- w
+
+        ## compute weights from firstDataBlock
+        wijlist <- mapply(
+            FUN = function (wFUN, wVAR, ids) {
+                wij <- outer(X = wVAR, Y = wVAR, FUN = wFUN)
+                dimnames(wij) <- list(ids, ids)
+                wij
+            },
+            wFUN = w, wVAR = firstDataBlock[wvars],
+            MoreArgs = list(ids = as.character(firstDataBlock[["id"]])),
+            SIMPLIFY = FALSE, USE.NAMES = TRUE)
+    }
+
+    if (length(f) + length(w) > 0L) {
+        ## Compute sum of epidemic weights over infectious individuals
         infectiousIDs <- firstDataBlock[firstDataBlock[["atRiskY"]] == 0, "id"]
+        ##<- this is a factor variable
         for(i in seq_along(beginBlock)) {
             blockidx <- beginBlock[i]:endBlock[i]
-            blockdata <- data[blockidx,]
+            blockdata <- object[blockidx,]
             blockIDs <- blockdata[["id"]]
             if (length(infectiousIDs) > 0L) {
-                u <- distmat[as.character(blockIDs),as.character(infectiousIDs),
-                             drop = FALSE]
-                # numerical indices would be better, but be careful with factors
-                data[blockidx,names(f)] <- sapply(f, function(B) rowSums(B(u)))
+                if (length(f) > 0L) {
+                    u <- distmat[as.character(blockIDs),
+                                 as.character(infectiousIDs),
+                                 drop = FALSE] # index by factor levels
+                    object[blockidx,names(f)] <- vapply(
+                        X = f, FUN = function (B) rowSums(B(u)),
+                        FUN.VALUE = numeric(length(blockIDs)),
+                        USE.NAMES = FALSE)
+                }
+                if (length(w) > 0L) {
+                    object[blockidx,names(w)] <- vapply(
+                        X = wijlist, FUN = function (wij) {
+                            ## actually don't have to care about the diagonal:
+                            ## i at risk => sum does not include it
+                            ## i infectious => atRiskY = 0 (ignored in twinSIR)
+                            rowSums(wij[as.character(blockIDs),
+                                        as.character(infectiousIDs),
+                                        drop = FALSE]) # index by factor levels
+                        }, FUN.VALUE = numeric(length(blockIDs)),
+                        USE.NAMES = FALSE)
+                }
             }
+            ## update the set of infectious individuals for the next block
             recoveredID <- blockIDs[blockdata[["Revent"]] == 1]
             infectedID <- blockIDs[blockdata[["event"]] == 1]
             if (length(recoveredID) > 0L) {
@@ -309,16 +392,12 @@ as.epidata.default <- function(data, id.col, start.col, stop.col, atRiskY.col,
             }
         }
     }
-
-    attr(data, "eventTimes") <- sort(eventTimes)
-    attr(data, "timeRange") <- c(histIntervals[1L,1L],histIntervals[nBlocks,2L])
-    attr(data, "coords.cols") <- coords.cols
-    # must include this info because externally of this function
-    # we don't know how many coords.cols (dimensions) we have
-    attr(data, "f") <- f
-    class(data) <- c("epidata", "data.frame")
-    return(data)
+    
+    ## restore "epidata" class
+    class(object) <- oldclass
+    return(object)
 }
+
 
 
 ################################################################################
