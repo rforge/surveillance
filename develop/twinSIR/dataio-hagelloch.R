@@ -18,7 +18,6 @@
 
 #Load the 'cool' packages
 library("surveillance")
-library("animation")
 
 ######################################################################
 # Convert notation MM.DD to R Date format. Note 0.00 corresponds to NA
@@ -92,10 +91,13 @@ importHagelloch <- function ()
 untieHagelloch <- function (hagelloch)
 {
   t0 <- as.Date("1861-10-30")
+
+  ## initialize time columns in order
+  hagelloch[c("tPRO", "tERU", "tDEAD")] <- NA_real_
   
   ## Break ties by subtracting random time and make relative to t0
   set.seed(123)
-  for (state in c("PRO", "DEAD", "ERU")) {
+  for (state in c("PRO", "DEAD", "ERU")) {  # maintain original runif-sequence
     hagelloch[[paste0("t",state)]] <-
         as.numeric(hagelloch[[state]] - t0) + 1 - runif(nrow(hagelloch))
   }
@@ -316,6 +318,7 @@ doIt <- function()
   #Save result as part of the surveillance package
   if (FALSE) {
     save(hagelloch, hagelloch.df, file = "../../pkg/data/hagelloch.RData")
+    tools::resaveRdaFiles("../../pkg/data/hagelloch.RData")
   }
 
   if (FALSE) {
