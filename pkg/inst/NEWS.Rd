@@ -59,6 +59,8 @@
     default plots the multiplicative effect of seasonality on the
     respective component (new argument \code{intercept=FALSE}).
     The default set of components to plot has also changed.
+
+    \item Several modifications and corrections in \code{data("hagelloch")}.
   }
 }
 
@@ -113,11 +115,6 @@
 
 \subsection{BUG FIXES}{
   \itemize{
-    \item Fixed a bug in the \code{hagelloch} data set which contained
-    both a \code{local}/\code{global} and \code{local1}/\code{global1}
-    covariates of which the former erroneously consisted of only
-    zeroes. Fixed the problem and removed the \code{local1}/\code{global1} columns.
-    
     \item In \code{farringtonFlexible} alarms are now for
     \code{observed>upperbound} and not for \code{observed>=upperbound}
     which was not correct.

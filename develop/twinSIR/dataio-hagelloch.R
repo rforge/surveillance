@@ -5,6 +5,7 @@
 # (2004). Latent periods (of usually 1 week) are not considered.
 #
 # 25 Mar 2011 (MH): initial version
+# 12 Aug 2014 (MH): fixed the local and global columns
 # 16 Oct 2014 (SM): corrections
 # - format DEAD as Date and set NAs in SEX, IFTO, TD and TM
 # - use new converter function as.epidata.data.frame():
