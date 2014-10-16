@@ -5,8 +5,15 @@
 # (2004). Latent periods (of usually 1 week) are not considered.
 #
 # 25 Mar 2011 (MH): initial version
-# 15 Oct 2014 (SM):
+# 16 Oct 2014 (SM): corrections
 # - format DEAD as Date and set NAs in SEX, IFTO, TD and TM
+# - use new converter function as.epidata.data.frame():
+#   + in Michael's converter df2epidata(), Infec(), c1, c2 are wrong
+#   + do not create redundant stop times at tS = tPRO
+# - new t0 = 1861-10-30 00:00:00 (!), previously t0 was at min(tPRO)
+# - new names for tS, tD, tQ in hagelloch.df: tPRO, tDEAD, tERU
+# - coordinate names in hagelloch.df as in hagelloch (x.loc and y.loc)
+# - do not include all variables in epidata to save space
 ######################################################################
 
 #Load the 'cool' packages
@@ -68,6 +75,10 @@ importHagelloch <- function ()
       is.na(TM) <- TM == 0
   })
 
+  ## rename coordinate columns
+  names(hagelloch)[names(hagelloch) == "HNX"] <- "x.loc"
+  names(hagelloch)[names(hagelloch) == "HNY"] <- "y.loc"
+
   return(hagelloch)
 }
 
@@ -80,40 +91,37 @@ importHagelloch <- function ()
 
 untieHagelloch <- function (hagelloch)
 {
-  hagelloch$tS <- hagelloch$PRO
-  hagelloch$tQ <- hagelloch$ERU
-  hagelloch$tD <- hagelloch$DEAD
+  t0 <- as.Date("1861-10-30")
   
-  #Break ties by subtracting random time
+  ## Break ties by subtracting random time and make relative to t0
   set.seed(123)
-  hagelloch$tS <- hagelloch$tS - runif(nrow(hagelloch))
-  t0 <- min(hagelloch$tS)
-  hagelloch$tS <- hagelloch$tS - t0
-
-  for (state in c("tD","tQ")) {
-    hagelloch[,state] <- hagelloch[,state] - runif(nrow(hagelloch)) - t0
+  for (state in c("PRO", "DEAD", "ERU")) {
+    hagelloch[[paste0("t",state)]] <-
+        as.numeric(hagelloch[[state]] - t0) + 1 - runif(nrow(hagelloch))
   }
-
-  ######################################################################
-  # Generate other variables
-  ######################################################################
-
-  #Set tR using fixed d0 parameter
+  ## e.g., tPRO = 0.5 means first symptoms on 1861-10-30 at noon
+  
+  ## Assume infectiousness until three days after appearance of rash (d0),
+  ## and infection one day before the first symptoms (d1)
+  ## as in Neal and Roberts (2004, Section 3.1).
+  ## No latent periods, i.e., day of infection is start of infectiousness.
   d0 <- 3
   d1 <- 1
 
-  #Generate unknown times as described on p.251 of the paper
-  hagelloch$tR <- with(hagelloch, pmin(tD, tQ + d0,na.rm=TRUE))
-  hagelloch$tI <- with(hagelloch, tS - d1)
+  ## Generate unknown times as described on p. 251 of the paper
+  hagelloch$tR <- with(hagelloch, pmin(tDEAD, tERU + d0, na.rm=TRUE))
+  hagelloch$tI <- hagelloch$tPRO - d1
 
-  #Check that no more than 1 event per time
-  if (sum(table(hagelloch$tS) > 1)) { stop("Ties in event times!") }
-
-  #Done, return the data frame
+  ## Done
   return(hagelloch)
 }
 
+
 ######################################################################
+# !!! OLD CONVERTER BY Michael, WE NOW USE as.epidata.data.frame() !!!
+# CAVE: tS (=tPRO) is NOT the E->I change => Infec(), c1, c2 are WRONG
+#       tI (=tS-1) is the E->I change.
+#
 # Convert to epidata using loop over events.
 #
 # Parameters:
@@ -223,7 +231,7 @@ df2history <- function(pop.df, xycoords.names=c("x","y"),extraVarNames=NULL) {
     evHist <- rbind(evHist, nextEvent)
   }
   #Add additional columns
-  evHist$weights <- 1
+  #evHist$weights <- 1
   #Possibly retransform - not necessary here
 
   cat("\nFinished conversion!\n")
@@ -231,22 +239,26 @@ df2history <- function(pop.df, xycoords.names=c("x","y"),extraVarNames=NULL) {
 }
 
 ######################################################################
-# Function to read hagelloch data and convert them to become
-# an epidata object for use with the surveillance package
+# OBSOLETE function to convert the basic hagelloch data frame
+# to "epidata" using WRONG df2epidata()
 ######################################################################
 
-hagelloch2epidata <- function(saveInSurveillance=FALSE) {
-  #Import data and produce R friendly data.frame
-  hagelloch.df <- untieHagelloch(importHagelloch())
-
-  #Extra covariable names
-  extraVarNames <- c("PN","NAME","FN","HN","AGE","SEX","PRO","ERU","CL","DEAD","IFTO","SI","C","PR","CA","NI","GE","TD","TM")
+hagelloch2epidata_old <- function(hagelloch.df, extraVarNames = NULL)
+{
+  # define tS (=tPRO) as expected by old df2history()
+  hagelloch.df$tS <- hagelloch.df$tPRO
   
-  #Convert data frame to a data.frame containing the history of the
-  #inectious process. 
-  hagelloch.evHist <- df2history(hagelloch.df, extraVarNames=extraVarNames,xycoords.names=c("HNX","HNY"))
+  # revert to old t0
+  ## hagelloch.df$tS <- hagelloch.df$tS - min(hagelloch.df$tPRO)
+  ## hagelloch.df$tI <- hagelloch.df$tI - min(hagelloch.df$tPRO)
+  ## hagelloch.df$tR <- hagelloch.df$tR - min(hagelloch.df$tPRO)
 
-  #Create epidata object. 
+  #Convert data frame to a data.frame containing the history of the
+  #infectious process. CAVE: df2history creates redundant stop times at "tS".
+  hagelloch.evHist <- df2history(hagelloch.df, extraVarNames=extraVarNames,
+                                 xycoords.names=c("x.loc","y.loc"))
+
+  # Create epidata object
   hagelloch <- as.epidata(hagelloch.evHist,
                           id.col = "id", start.col = "start",
                           stop.col = "stop", atRiskY.col = "atRiskY",
@@ -256,39 +268,76 @@ hagelloch2epidata <- function(saveInSurveillance=FALSE) {
                             local = function(u) is.finite(u) & (u<0.0625),
                             global = function(u) is.finite(u) & (u>=0.0625),
                             nothousehold = function(u) is.finite(u) & (u>0)))
-
-
-  #Save result as part of the surveillance package
-  if (saveInSurveillance) {
-    save(file="~/Surveillance/surveillance/pkg/data/hagelloch.RData",list=c("hagelloch","hagelloch.df"))
-  }
-
-  cat("Processes and saved hagelloch.RData\n")
   
-  invisible(hagelloch)
+  return(hagelloch)
 }
 
-doIt <- function() {
-  source("dataio-hagelloch.R")
-  #Make and write the data
-  if (FALSE) {
-      hagelloch <- hagelloch2epidata(saveInSurveillance=TRUE) #saved in pkg/data
-  } else {
-      hagelloch <- hagelloch2epidata(saveInSurveillance=FALSE)
-  }
-  
-  #Load
-  load(file="~/Surveillance/surveillance/pkg/data/hagelloch.RData")
 
-  descriptive()
+######################################################################
+# use NEW converter as.epidata.data.frame()
+######################################################################
+
+hagelloch2epidata <- function (hagelloch.df, extraVarNames = NULL)
+{
+  # use new data.frame converter and meter-based coordinates,
+  # we no longer have redundant stop times at "tS"
+  hagelloch <- as.epidata(
+      hagelloch.df, t0 = 0, tI.col = "tI", tR.col = "tR",
+      id.col = "PN", coords.cols = c("x.loc", "y.loc"),
+      f = list(
+          household = function(u) is.finite(u) & (u==0),
+          local = function(u) is.finite(u) & (u<62.5),
+          global = function(u) is.finite(u) & (u>=62.5),
+          nothousehold = function(u) is.finite(u) & (u>0)
+      ),
+      keep.cols = extraVarNames)
+
+  #TODO: School class indicators
+
+
+  return(hagelloch)
+}
+
+
+
+doIt <- function()
+{
+  source("dataio-hagelloch.R")
+
+  ## Import data and produce R friendly data.frame without ties
+  hagelloch.df <- untieHagelloch(importHagelloch())
+
+  # variables to keep in the "epidata"
+  extraVarNames <- c("SEX", "AGE", "CL")
+
+  #Make the data
+  hagelloch <- hagelloch2epidata(hagelloch.df, extraVarName=extraVarNames)
+
+  if (FALSE) { # use old implementation for comparison
+      hagelloch_old <- hagelloch2epidata_old(hagelloch.df, extraVarNames = extraVarNames)
+      ## drop redundant blocks with stop at tPRO
+      hagelloch_old <- subset(hagelloch_old, stop %in% stop[event|Revent])
+      nam <- intersect(names(hagelloch), names(hagelloch_old))
+      all.equal(hagelloch_old[nam], as.data.frame(hagelloch)[nam])
+  }
+
+  #Save result as part of the surveillance package
+  if (FALSE) {
+    save(hagelloch, hagelloch.df, file = "../../pkg/data/hagelloch.RData")
+  }
+
+  if (FALSE) {
+    descriptive()
+  }
 }
 
 
 descriptive <- function() {
-  library("surveillance")
+  ## library("surveillance")
+  ## data("hagelloch")
 
   #Show case locations as in Neal & Roberts (different scaling)
-  plot(hagelloch.df$HNX,hagelloch.df$HNY,xlab="x [m]",ylab="x [m]",pch=15)
+  plot(hagelloch.df$x.loc,hagelloch.df$y.loc,xlab="x [m]",ylab="x [m]",pch=15)
   
   ######################################################################
   # Draw epicurve
@@ -336,17 +385,18 @@ descriptive <- function() {
 
   #hist(hagelloch$AGE)
 
-  #Start of the outbreak (first symptoms)
-  as.numeric(min(hagelloch$tS))
+  #Start day of the outbreak (first symptoms)
+  min(hagelloch.df$PRO)
+  min(hagelloch.df$tPRO)
   #First S->I transmission
-  as.numeric(min(hagelloch$tI))
+  min(hagelloch.df$tI)
 
 
   #Summary
-  summary(hagelloch.epidata)
+  summary(hagelloch)
 
-  stateplot(hagelloch.epidata, "187")  # see 'stateplot'
+  stateplot(hagelloch, "187")  # see 'stateplot'
 
-  plot(hagelloch.epidata)
-  animate(hagelloch.epidata)
+  plot(hagelloch)
+  animate(hagelloch)
 }
