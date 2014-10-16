@@ -119,21 +119,19 @@ untieHagelloch <- function (hagelloch)
 
 ######################################################################
 # !!! OLD CONVERTER BY Michael, WE NOW USE as.epidata.data.frame() !!!
-# CAVE: tS (=tPRO) is NOT the E->I change => Infec(), c1, c2 are WRONG
-#       tI (=tS-1) is the E->I change.
+# CAVE: the E->I change is at tI (=tS-1), NOT at tS (=tPRO)
 #
 # Convert to epidata using loop over events.
 #
 # Parameters:
 #  pop.df - data.frame containing the event times of each individual
-#           in the population. Needs to contain columns tS, tI, tR
-#           and location as column names "x" and "y"
+#           in the population. Needs to contain columns tI, tR
+#  xycoords.names - names of coordinate columns
 #  extraVarNames - vector of string containing additional columns of
 #                  pop.df to include
-#  startTime - time before first event where the analysis starts
 #  
 #  Returns:
-#  epidata compatible framework
+#  epidata compatible data frame
 ######################################################################
 
 "%without%" <- function(x,y) x[!x %in% y] #--  x without y
@@ -141,28 +139,27 @@ untieHagelloch <- function (hagelloch)
 df2history <- function(pop.df, xycoords.names=c("x","y"),extraVarNames=NULL) {
   ######################################################################
   #Helper function to determine who is infectious at a specific time point
-  #I.e. determine set I(t) (i.e. all i, where t > t_i^{E->I} & t < t_i^{I->R})
+  #I.e. determine set I(t) (i.e. all i, where t > t_i^{S->I} & t < t_i^{I->R})
   ######################################################################
   Infec <- function(t){
-    (t > pop.df$tS) & (t <= pop.df$tR)
+    (t > pop.df$tI) & (t <= pop.df$tR)
   }
   #Number of individuals in the population
   n <- nrow(pop.df)
   #Number of infections in the population
-  nInfections <- sum(!is.na(pop.df$tS))
+  nInfections <- sum(!is.na(pop.df$tI))
   #Ids of individuals
   id <- 1:nrow(pop.df)
   #Who are the first cases (here: only one)
   indexCase <- which.min(pop.df[!is.na(pop.df$tI),"tI"])
 
-  #Time of S->E change. Condition on the first one already being infectious
+  #Time of S->I change. Condition on the first one already being infectious
   infectionTimes <- pop.df[!is.na(pop.df$tI),"tI"]
-  #Time of E->I change. Again, conditioned on index cases
-  infectiousTimes <- pop.df[!is.na(pop.df$tS),"tS"]
   #Time of removal
   removalTimes <- pop.df[!is.na(pop.df$tR),"tR"]
   #List of all times where something happened. Now sorted
-  eventTimes <- sort(unique(c(infectionTimes[1:n %without% indexCase], infectiousTimes[1:n %without% indexCase], removalTimes)))
+  eventTimes <- sort(unique(c(infectionTimes[1:n %without% indexCase],
+                              removalTimes)))
   #How many events in total (3*number of infected)
   nEvents <- length(eventTimes)
   
@@ -245,16 +242,12 @@ df2history <- function(pop.df, xycoords.names=c("x","y"),extraVarNames=NULL) {
 
 hagelloch2epidata_old <- function(hagelloch.df, extraVarNames = NULL)
 {
-  # define tS (=tPRO) as expected by old df2history()
-  hagelloch.df$tS <- hagelloch.df$tPRO
-  
   # revert to old t0
-  ## hagelloch.df$tS <- hagelloch.df$tS - min(hagelloch.df$tPRO)
   ## hagelloch.df$tI <- hagelloch.df$tI - min(hagelloch.df$tPRO)
   ## hagelloch.df$tR <- hagelloch.df$tR - min(hagelloch.df$tPRO)
 
   #Convert data frame to a data.frame containing the history of the
-  #infectious process. CAVE: df2history creates redundant stop times at "tS".
+  #infectious process.
   hagelloch.evHist <- df2history(hagelloch.df, extraVarNames=extraVarNames,
                                  xycoords.names=c("x.loc","y.loc"))
 
@@ -315,10 +308,8 @@ doIt <- function()
 
   if (FALSE) { # use old implementation for comparison
       hagelloch_old <- hagelloch2epidata_old(hagelloch.df, extraVarNames = extraVarNames)
-      ## drop redundant blocks with stop at tPRO
-      hagelloch_old <- subset(hagelloch_old, stop %in% stop[event|Revent])
       nam <- intersect(names(hagelloch), names(hagelloch_old))
-      all.equal(hagelloch_old[nam], as.data.frame(hagelloch)[nam])
+      all.equal(as.data.frame(hagelloch_old)[nam], as.data.frame(hagelloch)[nam])
   }
 
   #Save result as part of the surveillance package
@@ -343,7 +334,7 @@ descriptive <- function() {
   # Draw epicurve
   ######################################################################
   #Manual
-  hist(as.numeric(hagelloch.df$tS),xlab="Time (days)",ylab="Cases",main="")
+  hist(as.numeric(hagelloch.df$tI),xlab="Time (days)",ylab="Cases",main="")
 
   
   #Epicurve package - does not work (?)
@@ -376,7 +367,7 @@ descriptive <- function() {
 #  ec2 <- epicurve.weeks(hagelloch.df$PRO)#,before=0,after=0)
   
 #  t0 <- min(hagelloch.df$PRO)
-#  epicurve.dates(as.Date(hagelloch.df$tS + t0))
+#  epicurve.dates(as.Date(hagelloch.df$tI + t0))
 
   #Draw extra lines on first of month
        
