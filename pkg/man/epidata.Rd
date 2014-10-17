@@ -142,25 +142,25 @@ as.epidata(data, ...)
     between the individuals, see \code{f}.
   }
   \item{f}{
-    a \emph{named} list of distance functions or \code{list()} (the default),
-    if calculation of epidemic covariates is not requested.  The functions must
-    interact elementwise on a (distance) matrix so that - for a matrix D -
-    f[[m]](D) results in a matrix.  A simple example is
+    a \emph{named} list of \emph{vectorized} functions for a
+    distance-based force of infection.
+    The functions must interact elementwise on a (distance) matrix so that
+    - for a matrix D - f[[m]](D) results in a matrix.  A simple example is
     \code{function(u) {u <= 1}}, which indicates if the Euclidian distance
-    between the individuals is smaller than or equal to 1.  To ensure that an
-    individual does not influence itself, the distance to itself is defined as
-    \code{Inf}.  Consequently, all of the distance functions must have the
-    property f[[m]](Inf) = 0.  The names of the functions will be the names of
-    the epidemic variables in the resulting data frame.  The value of such a
-    variable is computed as follows: \eqn{I(t)} denotes the set of infectious
+    between the individuals is smaller than or equal to 1.
+    The names of the functions will be the names of the epidemic variables
+    in the resulting data frame.  So, the names should not coincide with
+    names of other covariates.
+    The distance-based weights are computed as follows:
+    \eqn{I(t)} denotes the set of infectious
     individuals just before time \eqn{t} and \eqn{s_i} the coordinate vector of
-    individual \eqn{i}.  For individual \eqn{i} at time \eqn{t} the epidemic
-    component \eqn{m} has the value
+    individual \eqn{i}.  For individual \eqn{i} at time \eqn{t} the
+    \eqn{m}'th covariate has the value
     \eqn{\sum_{j \in I(t)} f_m(||s_i - s_j||)}{%
          \sum_{j in I(t)} f[[m]](||s_i - s_j||)}
   }
   \item{w}{
-    a \emph{named} list of \emph{vectorized} functions to compute extra 
+    a \emph{named} list of \emph{vectorized} functions for extra 
     covariate-based weights \eqn{w_{ij}}{w_ij} in the epidemic component.
     Each function operates on a single time-constant covariate in
     \code{data}, which is determined by the name of the first argument:
@@ -168,7 +168,8 @@ as.epidata(data, ...)
     \code{varname.j}, where \code{varname} is one of \code{names(data)}.
     Similar to the components in \code{f}, \code{length(w)} epidemic
     covariates will be generated in the resulting \code{"epidata"} named
-    according to \code{names(w)}. For individual \eqn{i} at time
+    according to \code{names(w)}.  So, the names should not coincide with
+    names of other covariates.  For individual \eqn{i} at time
     \eqn{t}, the \eqn{m}'th such covariate has the value
     \eqn{\sum_{j \in I(t)} w_m(z^{(m)}_i, z^{(m)}_j)},
     where \eqn{z^{(m)}} denotes the variable in \code{data} associated
@@ -284,13 +285,11 @@ myEpidata <- as.epidata(foodata,
   id.col = 1, start.col = "start", stop.col = "stop",
   atRiskY.col = "atrisk", event.col = "infected", Revent.col = "removed",
   coords.cols = c("x","y"),
-  f = list(B1 = function(u) u<=1,
-           B2 = function(u) u>1 & is.finite(u)))
-# note the is.finite restriction in B2 to ensure that f[[i]](Inf) = 0, for all i
+  f = list(B1 = function(u) u <= 1, B2 = function(u) u > 1))
 
 # this is how data("fooepidata") has been generated
 data("fooepidata")
-stopifnot(isTRUE(all.equal(myEpidata, fooepidata)))
+stopifnot(all.equal(myEpidata, fooepidata))
 
 # add covariate-based weight for the force of infection, e.g.,
 # to model an increased force if i and j have the same value in z1

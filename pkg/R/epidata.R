@@ -288,18 +288,13 @@ update.epidata <- function (object, f = list(), w = list(), ...)
         if (!is.list(f) || is.null(names(f)) || any(!sapply(f, is.function))) {
             stop("'f' must be a named list of functions")
         }
-        if (any(fInfNot0 <- sapply(f, function(B) B(Inf)) != 0)) {
-            stop("all functions in 'f' must return 0 at infinite distance: ",
-                 "f[[i]](Inf) == 0 fails for i = ",
-                 paste0(which(fInfNot0), collapse=", "))
-        }
-        if (any(names(f) %in% names(object))) {
-            warning("'f' components replace existing columns of the same name")
-        }
         lapply(X = f, FUN = function (B) {
             if (!isTRUE(all.equal(c(5L,2L), dim(B(matrix(0, 5, 2))))))
                 stop("'f'unctions must retain the dimensions of their input")
         })
+        if (any(names(f) %in% names(object))) {
+            warning("'f' components replace existing columns of the same name")
+        }
 
         ## reset / initialize columns for distance-based epidemic weights
         object[names(f)] <- 0
@@ -310,7 +305,8 @@ update.epidata <- function (object, f = list(), w = list(), ...)
         coords <- as.matrix(firstDataBlock[coords.cols], rownames.force = FALSE)
         rownames(coords) <- as.character(firstDataBlock[["id"]])
         distmat <- as.matrix(dist(coords, method = "euclidean"))
-        diag(distmat) <- Inf   # no influence on yourself
+    } else {
+        attr(object, "f") <- list()
     }
 
     ## check covariate-based epidemic weights
@@ -321,38 +317,20 @@ update.epidata <- function (object, f = list(), w = list(), ...)
         if (any(names(w) %in% names(object))) {
             warning("'w' components replace existing columns of the same name")
         }
-
-        ## for each function in 'w', determine the variable on which it acts;
-        ## this is derived from the name of the first formal argument
-        ## (must be of the form varname.i)
-        wvars <- vapply(X = w, FUN = function (wFUN) {
-            varname.i <- names(formals(wFUN))[[1L]]
-            substr(varname.i, 1, nchar(varname.i)-2L)
-        }, FUN.VALUE = "", USE.NAMES = TRUE)
-        if (any(wvarNotFound <- !wvars %in% names(object))) {
-            stop("'w' function refers to unknown variables: ",
-                 paste0(names(w)[wvarNotFound], collapse=", "))
-        }
-            
+        
         ## reset / initialize columns for covariate-based epidemic weights
         object[names(w)] <- 0
         ## keep functions as attribute
         attr(object, "w")[names(w)] <- w
 
-        ## compute weights from firstDataBlock
-        wijlist <- mapply(
-            FUN = function (wFUN, wVAR, ids) {
-                wij <- outer(X = wVAR, Y = wVAR, FUN = wFUN)
-                dimnames(wij) <- list(ids, ids)
-                wij
-            },
-            wFUN = w, wVAR = firstDataBlock[wvars],
-            MoreArgs = list(ids = as.character(firstDataBlock[["id"]])),
-            SIMPLIFY = FALSE, USE.NAMES = TRUE)
+        ## compute wij matrix for each of w
+        wijlist <- compute_wijlist(w = w, data = firstDataBlock)
+    } else {
+        attr(object, "w") <- list()
     }
 
+    ## Compute sum of epidemic covariates over infectious individuals
     if (length(f) + length(w) > 0L) {
-        ## Compute sum of epidemic weights over infectious individuals
         infectiousIDs <- firstDataBlock[firstDataBlock[["atRiskY"]] == 0, "id"]
         ##<- this is a factor variable
         for(i in seq_along(beginBlock)) {
@@ -398,6 +376,33 @@ update.epidata <- function (object, f = list(), w = list(), ...)
     return(object)
 }
 
+compute_wijlist <- function (w, data)
+{
+    ## for each function in 'w', determine the variable on which it acts;
+    ## this is derived from the name of the first formal argument, which
+    ## must be of the form "varname.i"
+    wvars <- vapply(X = w, FUN = function (wFUN) {
+        varname.i <- names(formals(wFUN))[[1L]]
+        substr(varname.i, 1, nchar(varname.i)-2L)
+    }, FUN.VALUE = "", USE.NAMES = TRUE)
+    
+    if (any(wvarNotFound <- !wvars %in% names(data))) {
+        stop("'w' function refers to unknown variables: ",
+             paste0(names(w)[wvarNotFound], collapse=", "))
+    }
+   
+    ## compute weight matrices w_ij for each of w
+    mapply(
+        FUN = function (wFUN, wVAR, ids) {
+            wij <- outer(X = wVAR, Y = wVAR, FUN = wFUN)
+            dimnames(wij) <- list(ids, ids)
+            wij
+        },
+        wFUN = w, wVAR = data[wvars],
+        MoreArgs = list(ids = as.character(data[["id"]])),
+        SIMPLIFY = FALSE, USE.NAMES = TRUE
+    )
+}
 
 
 ################################################################################

@@ -47,6 +47,10 @@
 ########
 
 #Open
+17/10/2014 should epidata[i,] drop individuals that have already experienced an
+           Revent and are no longer atRiskY in the new first block?
+           Individuals with atRiskY=0 in the first block are considered
+	   initially infective...
 
 #Fixed
 25/03/2011 intensityPlot in twinSIR does not work if there are initially
@@ -69,7 +73,7 @@
 #Open
 05/04/2011 R0 calculations as for twinstim:
            how can we derive R0 in a twinSIR model? (-> Michael)
-07/08/2012 replace foodata analysis by hagelloch data in examples (-> Michael)
+07/08/2012 replace foodata analysis by hagelloch data in examples
 
 #Done
 07/08/2012 animate using animation package for objects of type "epidata"

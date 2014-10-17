@@ -260,10 +260,12 @@ hagelloch2epidata_old <- function(hagelloch.df, extraVarNames = NULL)
                           stop.col = "stop", atRiskY.col = "atRiskY",
                           event.col = "event", Revent.col = "Revent",
                           coords.cols = c("x.loc","y.loc"),
-                          f = list(household = function(u) is.finite(u) & (u==0),
-                            local = function(u) is.finite(u) & (u<0.0625),
-                            global = function(u) is.finite(u) & (u>=0.0625),
-                            nothousehold = function(u) is.finite(u) & (u>0)))
+                          f = list(
+                              household    = function(u) u == 0,
+                              local        = function(u) u < 0.0625,
+                              global       = function(u) u >= 0.0625,
+                              nothousehold = function(u) u > 0
+                          ))
   
   return(hagelloch)
 }
@@ -281,10 +283,10 @@ hagelloch2epidata <- function (hagelloch.df, extraVarNames = NULL)
       hagelloch.df, t0 = 0, tI.col = "tI", tR.col = "tR",
       id.col = "PN", coords.cols = c("x.loc", "y.loc"),
       f = list(
-          household = function(u) is.finite(u) & (u==0),
-          local = function(u) is.finite(u) & (u<62.5),
-          global = function(u) is.finite(u) & (u>=62.5),
-          nothousehold = function(u) is.finite(u) & (u>0)
+          household    = function(u) u == 0,
+          local        = function(u) u < 62.5,
+          global       = function(u) u >= 62.5,
+          nothousehold = function(u) u > 0
       ),
       w = list(
           c1 = function (CL.i, CL.j) CL.i == "1st class" & CL.j == CL.i,

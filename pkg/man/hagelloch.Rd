@@ -84,10 +84,10 @@ data("hagelloch")
   p.255 of Neal & Roberts, 2004), and class room effects:
 
   \describe{
-    \item{household:}{output of \code{function(u) is.finite(u) & (u==0)}}
-    \item{local:}{output of \code{function(u) is.finite(u) & (u<62.5)}}
-    \item{global:}{output of \code{function(u) (u>=62.5) & is.finite(u)}}
-    \item{nothousehold:}{output of \code{function(u) is.finite(u) & (u>0)}}
+    \item{household:}{output of \code{function(u) u==0}}
+    \item{local:}{output of \code{function(u) u<62.5}}
+    \item{global:}{output of \code{function(u) u>=62.5}}
+    \item{nothousehold:}{output of \code{function(u) u>0}}
     \item{c1,c2:}{the number of children infectious during the respective
       time block and being members of class 1 and 2, respectively; but
       the value is 0 if the individual of the row is not herself a
@@ -117,10 +117,10 @@ stopifnot(all.equal(hagelloch,
     hagelloch.df, t0 = 0, tI.col = "tI", tR.col = "tR",
     id.col = "PN", coords.cols = c("x.loc", "y.loc"),
     f = list(
-        household = function(u) is.finite(u) & (u==0),
-        local = function(u) is.finite(u) & (u<62.5),
-        global = function(u) is.finite(u) & (u>=62.5),
-        nothousehold = function(u) is.finite(u) & (u>0)
+        household    = function(u) u == 0,
+        local        = function(u) u < 62.5,
+        global       = function(u) u >= 62.5,
+        nothousehold = function(u) u > 0
     ),
     w = list(
         c1 = function (CL.i, CL.j) CL.i == "1st class" & CL.j == CL.i,

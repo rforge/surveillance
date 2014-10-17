@@ -59,6 +59,15 @@
     default plots the multiplicative effect of seasonality on the
     respective component (new argument \code{intercept=FALSE}).
     The default set of components to plot has also changed.
+    
+    \item When \code{as.epidata()} and \code{simEpidata()} calculate
+    distance-based epidemic weights from the \code{f} functions, they no
+    longer set the distance of an infectious individual to itself
+    artificially to \code{Inf}.
+    This changes the corresponding columns in the \code{"epidata"} in
+    rows of currently infectious individuals, but the \code{twinSIR}
+    model itself is invariant, since only rows with \code{atRiskY=1}
+    contribute to the likelihood.
 
     \item Several modifications and corrections in \code{data("hagelloch")}.
   }
