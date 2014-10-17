@@ -110,6 +110,9 @@
     \item The \code{data("measlesWeserEms")} contain two additional
     variables in the \code{@map@data} slot: \code{"vaccdoc.2004"} and
     \code{"vacc1.2004"}.
+
+    \item The plot-method for \code{"epidata"} objects now uses colored
+    lines by default.
   }
 }
 

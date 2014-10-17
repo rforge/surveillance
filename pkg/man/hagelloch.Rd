@@ -112,7 +112,7 @@ head(as.data.frame(hagelloch))   # derived "epidata" object
 
 ### How the "epidata" 'hagelloch' was created from 'hagelloch.df'
 
-stopifnot(isTRUE(all.equal(hagelloch,
+stopifnot(all.equal(hagelloch,
   as.epidata(
     hagelloch.df, t0 = 0, tI.col = "tI", tR.col = "tR",
     id.col = "PN", coords.cols = c("x.loc", "y.loc"),
@@ -127,7 +127,7 @@ stopifnot(isTRUE(all.equal(hagelloch,
         c2 = function (CL.i, CL.j) CL.i == "2nd class" & CL.j == CL.i
     ),
     keep.cols = c("SEX", "AGE", "CL"))
-)))
+))
 
 
 ### Basic plots produced from hagelloch.df

@@ -7,7 +7,7 @@
 ### of the numbers of susceptible, infectious and recovered individuals.
 ### The extra function "stateplot" shows the event history of one individual.
 ###
-### Copyright (C) 2008-2009, 2013 Sebastian Meyer
+### Copyright (C) 2008-2009, 2013-2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -19,7 +19,8 @@ plot.epidata <- function(x, ...)
 }
 
 plot.summary.epidata <- function (x,
-    lty = c(2,1,3), lwd = 2, col = 1, col.hor = col, col.vert = col,
+    lty = c(2,1,3), lwd = 2,
+    col = c("#1B9E77", "#D95F02", "#7570B3"), col.hor = col, col.vert = col,
     xlab = "Time", ylab = "Number of individuals", xlim = NULL, ylim = NULL,
     legend.opts = list(), do.axis4 = NULL, panel.first = grid(),
     rug.opts = list(), which.rug = c("infections", "removals",

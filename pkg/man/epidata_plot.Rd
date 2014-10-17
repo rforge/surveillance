@@ -17,7 +17,8 @@ Plotting the Evolution of an Epidemic
 
 \usage{
 \method{plot}{summary.epidata}(x,
-     lty = c(2, 1, 3), lwd = 2, col = 1, col.hor = col, col.vert = col,
+     lty = c(2, 1, 3), lwd = 2,
+     col = c("#1B9E77", "#D95F02", "#7570B3"), col.hor = col, col.vert = col,
      xlab = "Time", ylab = "Number of individuals",
      xlim = NULL, ylim = NULL, legend.opts = list(), do.axis4 = NULL,
      panel.first = grid(), rug.opts = list(),
@@ -51,7 +52,9 @@ stateplot(x, id, ...)
     \code{col.hor} defines the color for the horizontal parts of the step
     function, whilst \code{col.vert} defines the color for its vertical parts.
     The argument \code{col} is just short for \code{col.hor = col} and
-    \code{col.vert = col}.  By default, all lines are completely drawn in black.
+    \code{col.vert = col}.  The default \code{col} vector corresponds to
+    \code{\link[RColorBrewer]{brewer.pal}("Dark2",n=3)} from the
+    \pkg{RColorBrewer} package.
     The vectors are recycled if necessary.  For information about the possible
     values of \code{col}, see the help pages of \code{\link{par}}.
   }
