@@ -77,8 +77,8 @@ data("hagelloch")
   The \code{hagelloch} \code{"epidata"} object only retains some of
   the above covariates to save space. Apart from the usual
   \code{"epidata"} event columns, \code{hagelloch} contains a number of
-  extra variables created by giving \code{f} and \code{w} arguments to
-  the \code{\link{as.epidata}} at conversion.
+  extra variables created by specifying \code{f} and \code{w} arguments
+  in \code{\link{as.epidata}} at conversion.
   This creates distance- and covariate-based weights for the force of
   infection. We use 62.5 meter as local distance (see
   p.255 of Neal & Roberts, 2004), and class room effects:

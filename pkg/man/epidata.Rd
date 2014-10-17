@@ -255,6 +255,11 @@ Sebastian Meyer
 }
 
 \seealso{
+The \code{\link{hagelloch}} data for a \dQuote{real} \code{"epidata"} object.
+The code for the conversion from the simple data frame to the SIR event
+history using \code{as.epidata.data.frame} is given in
+\code{example(hagelloch)}.
+
 The \code{\link[=plot.epidata]{plot}} and the
 \code{\link[=summary.epidata]{summary}} method for class \code{"epidata"}.
 Furthermore, the function \code{\link{animate.epidata}} for the animation of
@@ -267,7 +272,9 @@ Function \code{\link{simEpidata}} for the simulation of epidemic data.
 }
 
 \examples{
-# an artificial example of an event history from the package
+# see example(hagelloch)
+
+# here is an artificial event history
 data("foodata")
 str(foodata)
 
