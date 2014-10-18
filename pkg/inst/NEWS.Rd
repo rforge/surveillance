@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-10-17)}{
+\section{Changes in surveillance version 1.8-1 (2014-10-19)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -122,6 +122,10 @@
 
     \item The plot-method for \code{"epidata"} objects now uses colored
     lines by default.
+
+    \item The \pkg{surveillance} package now depends on \R >= 3.0.2,
+    which, effectively, is the minimum version required since
+    \pkg{surveillance} 1.7-0 (see the corresponding NEWS below).
   }
 }
 
