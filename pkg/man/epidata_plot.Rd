@@ -67,15 +67,14 @@ stateplot(x, id, ...)
     to fit the time range of the epidemic and the number of individuals.
   }
   \item{legend.opts}{
-    either a list of arguments passed to the \code{\link{legend}} function or
-    \code{NULL} (or \code{NA}), in which case no legend will be plotted.  All
-    necessary arguments have sensible defaults and need not be specified, i.e.
+    if this is a list (of arguments for the \code{\link{legend}} function),
+    a legend will be plotted.  The defaults are as follows:
     \describe{
       \item{\code{x}:}{\code{"topright"}}
+      \item{\code{inset}:}{\code{c(0,0.02)}}
       \item{\code{legend}:}{\code{c("susceptible", "infectious", "removed")}}
-      \item{\code{lty}:}{same as argument \code{lty} of the main function}
-      \item{\code{lwd}:}{same as argument \code{lwd} of the main function}
-      \item{\code{col}:}{same as argument \code{col.hor} of the main function}
+      \item{\code{lty},\code{lwd},\code{col}:}{same as the arguments
+        \code{lty}, \code{lwd}, and \code{col.hor} of the main function}
       \item{\code{bty}:}{\code{"n"}}
     }
   }

@@ -113,16 +113,11 @@ plot.summary.epidata <- function (x,
         }
     }
     if (is.list(legend.opts)) {
-        if (is.null(legend.opts[["x",exact=TRUE]]))
-            legend.opts$x <- "topright"
-        if (is.null(legend.opts$legend))
-            legend.opts$legend <- c("susceptible", "infectious", "removed")
-        if (any(lty == 0) && length(legend.opts$legend) == 3)
-            legend.opts$legend <- legend.opts$legend[lty > 0]
-        if (is.null(legend.opts$lty)) legend.opts$lty <- lty[lty > 0]
-        if (is.null(legend.opts$lwd)) legend.opts$lwd <- lwd[lty > 0]
-        if (is.null(legend.opts$col)) legend.opts$col <- col.hor[lty > 0]
-        if (is.null(legend.opts$bty)) legend.opts$bty <- "n"
+        legend.opts <- modifyList(
+            list(x = "topright", bty = "n", inset = c(0,0.02),
+                 legend = c("susceptible", "infectious", "removed")[lty>0],
+                 lty = lty[lty>0], lwd = lwd[lty>0], col = col.hor[lty>0]),
+            legend.opts)
         do.call(legend, legend.opts)
     }
     invisible(as.matrix(
