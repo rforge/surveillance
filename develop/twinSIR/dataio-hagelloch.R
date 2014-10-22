@@ -15,9 +15,10 @@
 # - new names for tS, tD, tQ in hagelloch.df: tPRO, tDEAD, tERU
 # - coordinate names in hagelloch.df as in hagelloch (x.loc and y.loc)
 # - do not include all variables in epidata to save space
+# 22 Oct 2014 (SM): removed local and global variables
 ######################################################################
 
-#Load the 'cool' packages
+#Load the 'cool' package
 library("surveillance")
 
 ######################################################################
@@ -166,13 +167,6 @@ df2history <- function(pop.df, xycoords.names=c("x","y"),extraVarNames=NULL) {
   #How many events in total (3*number of infected)
   nEvents <- length(eventTimes)
   
-  #Distance matrix, ensure distance to itself is maximal
-#  Dkm <- as.matrix(dist(pop.df[,xycoords.names])/1000,diag=TRUE)
-#  diag(Dkm) <- Inf
-  #These are distance based kernels. Can be replaced by f argument in as.epidata
-#  Dkm.local <- (Dkm < (62.5/1000)) * is.finite(Dkm) #use 62.5 meter as local distance, see p.255 of Neal & Roberts (2004)
-#  Dkm.global <- (Dkm >= (62.5/1000)) * is.finite(Dkm)
-  
   Class1 <-  with(pop.df, (CL == "1st class") %o% (CL == "1st class"))
   Class2 <-  with(pop.df, (CL == "2nd class") %o% (CL == "2nd class"))
 
@@ -184,9 +178,6 @@ df2history <- function(pop.df, xycoords.names=c("x","y"),extraVarNames=NULL) {
                           atRiskY=Y,
 # Additional covariates for endemic or epidemic part. Note that extraVarNames
 # are appended at the end
-# hoehle @ 12 Aug 2014: local and global not needed anymore, because they
-# are now generated directly from the as.epidata f function argument.
-#                          local=rep(0,n),global=rep(0,n),
                           c1=rep(0,n), c2=rep(0,n),
 # Time book-keeping
                           start=rep(0,n), stop=rep(0,n), event=rep(0,n),Revent=rep(0,n))
@@ -262,8 +253,8 @@ hagelloch2epidata_old <- function(hagelloch.df, extraVarNames = NULL)
                           coords.cols = c("x.loc","y.loc"),
                           f = list(
                               household    = function(u) u == 0,
-                              local        = function(u) u < 0.0625,
-                              global       = function(u) u >= 0.0625,
+                              ## local        = function(u) u < 0.0625,
+                              ## global       = function(u) u >= 0.0625,
                               nothousehold = function(u) u > 0
                           ))
   
@@ -271,21 +262,30 @@ hagelloch2epidata_old <- function(hagelloch.df, extraVarNames = NULL)
 }
 
 
+
 ######################################################################
-# use NEW converter as.epidata.data.frame()
+## do everything and store the data in the package
 ######################################################################
 
-hagelloch2epidata <- function (hagelloch.df, extraVarNames = NULL)
+doIt <- function()
 {
-  # use new data.frame converter and meter-based coordinates,
-  # we no longer have redundant stop times at "tS"
+  source("dataio-hagelloch.R")
+
+  ## import data and produce R friendly data.frame without ties
+  hagelloch.df <- untieHagelloch(importHagelloch())
+
+  ## variables to keep in the "epidata"
+  extraVarNames <- c("SEX", "AGE", "CL")
+
+  ## use new as.epidata.data.frame converter and meter-based coordinates,
+  ## we no longer have redundant stop times at "tS"
   hagelloch <- as.epidata(
       hagelloch.df, t0 = 0, tI.col = "tI", tR.col = "tR",
       id.col = "PN", coords.cols = c("x.loc", "y.loc"),
       f = list(
           household    = function(u) u == 0,
-          local        = function(u) u < 62.5,
-          global       = function(u) u >= 62.5,
+          ## local        = function(u) u < 62.5,
+          ## global       = function(u) u >= 62.5,
           nothousehold = function(u) u > 0
       ),
       w = list(
@@ -294,31 +294,14 @@ hagelloch2epidata <- function (hagelloch.df, extraVarNames = NULL)
       ),
       keep.cols = extraVarNames)
 
-  return(hagelloch)
-}
-
-
-
-doIt <- function()
-{
-  source("dataio-hagelloch.R")
-
-  ## Import data and produce R friendly data.frame without ties
-  hagelloch.df <- untieHagelloch(importHagelloch())
-
-  # variables to keep in the "epidata"
-  extraVarNames <- c("SEX", "AGE", "CL")
-
-  #Make the data
-  hagelloch <- hagelloch2epidata(hagelloch.df, extraVarNames)
-
-  if (FALSE) { # use old implementation for comparison
+  ## use old implementation for comparison
+  if (FALSE) {
       hagelloch_old <- hagelloch2epidata_old(hagelloch.df, extraVarNames)
       nam <- intersect(names(hagelloch), names(hagelloch_old))
       all.equal(as.data.frame(hagelloch_old)[nam], as.data.frame(hagelloch)[nam])
   }
 
-  #Save result as part of the surveillance package
+  ## save result as part of the surveillance package
   if (FALSE) {
     save(hagelloch, hagelloch.df, file = "../../pkg/data/hagelloch.RData")
     tools::resaveRdaFiles("../../pkg/data/hagelloch.RData")

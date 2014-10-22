@@ -77,21 +77,22 @@ data("hagelloch")
   The \code{hagelloch} \code{"epidata"} object only retains some of
   the above covariates to save space. Apart from the usual
   \code{"epidata"} event columns, \code{hagelloch} contains a number of
-  extra variables created by specifying \code{f} and \code{w} arguments
-  in \code{\link{as.epidata}} at conversion.
-  This creates distance- and covariate-based weights for the force of
-  infection. We use 62.5 meter as local distance (see
-  p.255 of Neal & Roberts, 2004), and class room effects:
-
+  extra variables representing distance- and covariate-based weights for
+  the force of infection. These have been computed by specifying \code{f}
+  and \code{w} arguments in \code{\link{as.epidata}} at conversion (see
+  the Examples below):
   \describe{
-    \item{household:}{output of \code{function(u) u==0}}
-    \item{local:}{output of \code{function(u) u<62.5}}
-    \item{global:}{output of \code{function(u) u>=62.5}}
-    \item{nothousehold:}{output of \code{function(u) u>0}}
-    \item{c1,c2:}{the number of children infectious during the respective
+    \item{household:}{the number of currently infectious children in the same
+      household (including the child itself if it is currently
+      infectious), corresponding to \code{function(u) u == 0} in \code{f}.}
+    \item{nothousehold:}{the number of currently infectious children
+      outside the household, corresponding to \code{function(u) u > 0}
+      in \code{f}.}
+    \item{c1, c2:}{the number of children infectious during the respective
       time block and being members of class 1 and 2, respectively; but
       the value is 0 if the individual of the row is not herself a
-      member of the respective class.} 
+      member of the respective class. See the Examples below for
+      the corresponding function definitions in \code{w}.}
   }
 
 }
@@ -118,8 +119,6 @@ stopifnot(all.equal(hagelloch,
     id.col = "PN", coords.cols = c("x.loc", "y.loc"),
     f = list(
         household    = function(u) u == 0,
-        local        = function(u) u < 62.5,
-        global       = function(u) u >= 62.5,
         nothousehold = function(u) u > 0
     ),
     w = list(
