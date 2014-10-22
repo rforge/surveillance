@@ -332,9 +332,10 @@ plot(mysim1, aggregate="space")
 plot(mysims, aggregate="time", subset=type=="B")
 
 
-\dontrun{
+if (surveillance.options("allExamples")) {
 ### compare the observed _cumulative_ number of cases during the
 ### first 90 days to 20 simulations from the fitted model
+### (performing these simulations takes about 30 seconds)
 
 sims <- simulate(imdepifit, nsim=20, seed=1, data=imdepi, t0=0, T=90,
                  tiles=districtsD, simplify=TRUE)
@@ -361,12 +362,14 @@ invisible(lapply(csums_simulated, plotcsums,
                  col=scales::alpha(c(2,4), alpha=0.5)))
 }
 
-\dontrun{
+
+if (surveillance.options("allExamples")) {
+### 'nsim' simulations of 'nm2add' months beyond the observed period:
 nm2add <- 24
 nsim <- 5
-### simulate 'nm2add' months beyond the observed period;
-### the events still infective by the end of imdepi$stgrid will be used
-### as the prehistory for the continued process
+### With these settings, simulations will take about 30 seconds.
+### The events still infective by the end of imdepi$stgrid will be used
+### as the prehistory for the continued process.
 
 origT <- tail(imdepi$stgrid$stop, 1)
 ## create a time-extended version of imdepi
@@ -400,7 +403,7 @@ plot(imdepiext, breaks=c(unique(imdepi$stgrid$start),origT),
      cumulative=list(maxat=330), col=c(2,4))
 for (i in seq_along(simsext$eventsList))
     plot(simsext[[i]], add=TRUE, legend.types=FALSE,
-         breaks=c(unique(sim1$stgrid$start),newT),
+         breaks=c(unique(simsext$stgrid$start),newT),
          subset=!is.na(source),  # have to exclude the events of the prehistory
          cumulative=list(offset=c(table(imdepi$events$type)), maxat=330, axis=FALSE),
          col=scales::alpha(c(2,4), alpha=0.5))
