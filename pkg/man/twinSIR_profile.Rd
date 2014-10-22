@@ -41,8 +41,8 @@ Profile Likelihood Computation and Confidence Intervals
     }
   }
   \item{alpha}{
-    \eqn{(1-\alpha)\%}{(1-alpha)\%} profile likelihood based confidence
-    intervals are computed.  If alpha <= 0, then no confidence intervals are
+    \eqn{(1-\alpha) 100\%}{(1-alpha)*100\%} profile likelihood based confidence
+    intervals are computed.  If \code{alpha <= 0}, then no confidence intervals are
     computed.
   }
   \item{control}{
