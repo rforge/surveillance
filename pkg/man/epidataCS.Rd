@@ -382,10 +382,11 @@ legend("topright", legend=levels(events$type), title="Type", pch=1:2, col=1:2)
 myimdepi <- as.epidataCS(events = events, stgrid = stgrid,
                          W = stateD, qmatrix = diag(2), nCircle2Poly = 16)
 \dontshow{
-## should be equal as long as the internal structures of "epidataCS" and
-## of the embedded classes ("owin", "SpatialPolygons", ...) do not change
+## should be equal as long as the internal structures of "epidataCS",
+## of the embedded classes ("owin", "SpatialPolygons", ...), and the
+## calculation of the influence regions by "polyclip" do not change
 if (!identical(imdepi, myimdepi))
-    warning("@Sebastian: update data(imdepi)")
+    warning("@Sebastian: maybe update data(imdepi)")
 }
 
 ## internal structure of an "epidataCS"-object
