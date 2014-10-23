@@ -85,36 +85,6 @@ unionSpatialPolygons <- function (SpP,
 }
 
 
-### Compute distance from points to boundary
-### copied in part from function bdist.points() of the "spatstat" package
-### authored by A. Baddeley and R. Turner (DEPENDS ON spatstat::distppl)
-## xy is the coordinate _matrix_ of the points
-## poly is a polygonal domain of class "owin" or "gpc.poly"
-## Note that we do not check if points are actually inside the polygonal domain
-bdist <- function (xy, poly)
-{
-    result <- rep.int(Inf, length(xy)/2) # faster than nrow, xy must be a matrix
-    bdry <- if (is.polygonal(poly)) {
-        poly$bdry
-    } else if (inherits(poly, "gpc.poly")) {
-        poly@pts
-    } else stop("'poly' must be a polygonal \"owin\" or a \"gpc.poly\"")
-    for (i in seq_along(bdry)) {
-        polly <- bdry[[i]]
-        px <- polly$x
-        py <- polly$y
-        nsegs <- length(px)
-        for (j in seq_len(nsegs)) {
-            j1 <- if (j < nsegs) j + 1L else 1L
-            seg <- c(px[j], py[j], px[j1], py[j1])
-            ## calculate distances of points to segment j of polygon i
-            result <- pmin.int(result, distppl(xy, seg))
-        }
-    }
-    return(result)
-}
-
-
 ### sample n points uniformly on a disc with radius r
 
 runifdisc <- function (n, r = 1, buffer = 0)
