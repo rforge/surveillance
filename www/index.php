@@ -393,9 +393,12 @@ Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
 <dd>Biometrics, Vol. 68(2), pp. 607-616</dd>
 
 <dt></dt>
-<dd><a href="http://arxiv.org/abs/1308.5115">Meyer, S. and Held, L. (<b>2014</b>)</a></dd>
+<dd><a href="http://dx.doi.org/10.1214/14-AOAS743">Meyer, S. and Held, L. (<b>2014</b>)</a></dd>
 <dd><i>Power-law models for infectious disease spread</i></dd>
-<dd>Annals of Applied Statistics, in press, available as arXiv:1308.5115</dd>
+<dd>Annals of Applied Statistics, Vol. 8(3), pp. 1612-1639</dd>
+<dd>(The paper is also available from <a href="http://www.zora.uzh.ch/89321/">ZORA</a>
+or as <a href="http://arxiv.org/abs/1308.5115">arXiv:1308.5115</a>,
+and has <a href="http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html">supplementary animations</a>)</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1002/sim.4177">Paul, M. and Held, L. (<b>2011</b>)</a></dd>

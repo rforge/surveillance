@@ -8,7 +8,8 @@
   Weekly number of influenza A & B cases in the 140 districts
   of the two Southern German states Bavaria and Baden-Wuerttemberg,
   for the years 2001 to 2008. These surveillance data have been
-  analyzed originally by Paul and Held (2011).
+  analyzed originally by Paul and Held (2011) and more recently by
+  Meyer and Held (2014).
 }
 
 \usage{data(fluBYBW)}
@@ -62,13 +63,12 @@ if (require("animation")) {
 \references{
   Paul, M. and Held, L. (2011) Predictive assessment of a non-linear
     random  effects model for multivariate time series of infectious
-    disease counts. Statistics in Medicine, \bold{30}, 1118--1136.
+    disease counts. Statistics in Medicine, \bold{30}, 1118-1136.
 
   Meyer, S. and Held, L. (2014):
     Power-law models for infectious disease spread.
-    \emph{Annals of Applied Statistics}. In press.
-    \emph{arXiv:1308.5115}\cr
-    arXiv-Link: \url{http://arxiv.org/abs/1308.5115}    
+    \emph{The Annals of Applied Statistics}, \bold{8} (3), 1612-1639.\cr
+    DOI-Link: \url{http://dx.doi.org/10.1214/14-AOAS743}
 }
 
 \keyword{datasets}

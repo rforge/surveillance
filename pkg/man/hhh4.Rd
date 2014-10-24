@@ -413,9 +413,8 @@ res_D <- hhh4(fluBYBW,cntrl_D)
     
   Meyer, S. and Held, L. (2014):
     Power-law models for infectious disease spread.
-    \emph{Annals of Applied Statistics}. In press.
-    \emph{arXiv:1308.5115}\cr
-    arXiv-Link: \url{http://arxiv.org/abs/1308.5115}
+    \emph{The Annals of Applied Statistics}, \bold{8} (3), 1612-1639.\cr
+    DOI-Link: \url{http://dx.doi.org/10.1214/14-AOAS743}
 }
 
 \keyword{ts}
