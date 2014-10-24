@@ -145,7 +145,7 @@ profile.twinSIR <- function (fitted, profile, alpha = 0.05,
   resProfile <- list()
   
   ## Perform profile computations for all requested parameters
-  cat("Evaluating the profile logliks on a grid...\n")
+  cat("Evaluating the profile log-likelihood on a grid ...\n")
   for (i in 1:length(profile))
   {
     cat("i= ",i,"/",length(profile),"\n")
@@ -205,5 +205,59 @@ profile.twinSIR <- function (fitted, profile, alpha = 0.05,
     }
   }
   
-  return(list(lp=resProfile, ci.hl=ciProfile, profileObj=profile))
+  res <- list(lp=resProfile, ci.hl=ciProfile, profileObj=profile)
+  class(res) <- "profile.twinSIR"
+  return(res)
+}
+
+
+######################################################################
+## Plot the result of the profiler
+## Parameters:
+##  x - the result of calling profile() on a "twinSIR" object
+##  which - names of selected parameters, NULL meaning all available
+##  conf.level - level for the horizontal line for -qchisq(,df=1)/2
+##  legend - logical indicating whether to add a legend to the plot,
+##           or numeric vector of indexes of plots where to add the legend
+######################################################################
+
+plot.profile.twinSIR <- function(x, which = NULL, conf.level = 0.95,
+                                 xlab = which, ylab = "normalized log-likelihood",
+                                 legend = TRUE, par.settings = list(), ...)
+{
+    ## extract relevant components of 'x'
+    lp <- x$lp[!vapply(X=x$lp, FUN=is.null, FUN.VALUE=FALSE, USE.NAMES=FALSE)]
+    mle <- x$ci.hl[,"mle"]
+
+    ## check arguments
+    which <- if (is.null(which)) {
+        names(lp)
+    } else {
+        match.arg(which, names(lp), several.ok = TRUE)
+    }
+    xlab <- rep_len(xlab, length(which))
+    if (is.logical(legend))
+        legend <- which(legend)
+    if (is.list(par.settings)) {
+        par.defaults <- list(mfrow = sort(n2mfrow(length(which))),
+                             mar = c(5,5,2,1)+.1, las = 1)
+        par.settings <- modifyList(par.defaults, par.settings)
+        opar <- do.call("par", par.settings)
+        on.exit(par(opar))
+    }
+    
+    ## loop over parameters
+    for (i in seq_along(which)) {
+        coefname <- which[i]
+        matplot(lp[[coefname]][,1L], lp[[coefname]][,-1L], type = "l",
+                col = 1:3, lty = 1:3, xlab = xlab[i], ylab = ylab)
+        if (i %in% legend) {
+            legend(x = "bottomright", legend = c("profile","estimated","Wald"),
+                   col = 1:3, lty = 1:3)
+        }
+        ## some lines which help interpretation
+        segments(x0=mle[coefname], y0=par("usr")[3L], y1=0,
+                 lty=2, col="darkgray")
+        abline(h=-1/2*qchisq(conf.level, df=1), lty=2, col="darkgray")
+    }
 }

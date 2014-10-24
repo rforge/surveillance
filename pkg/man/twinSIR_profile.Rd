@@ -1,6 +1,7 @@
 \encoding{latin1}
 \name{twinSIR_profile}
 \alias{profile.twinSIR}
+\alias{plot.profile.twinSIR}
 
 \title{
 Profile Likelihood Computation and Confidence Intervals
@@ -60,14 +61,17 @@ and wald confidence intervals.  The argument \code{profile} is also returned.
 }
 
 \author{
-Michael \enc{Höhle}{Hoehle}
+Michael \enc{Höhle}{Hoehle} and Sebastian Meyer
 }
 
 \examples{
 if (surveillance.options("allExamples")) {
   data("foofit")
-  prof <- profile(foofit, list(c(1,0,0.05,5), c(3,NA,NA,0), c(4, NA, NA, 10)))
+  prof <- profile(foofit, list(c(1,NA,NA,5), c(3,NA,NA,0), c(4, 0.5, 1.1, 10)))
   prof
+
+  ## there is also a plot-method for "profile.twinSIR"
+  plot(prof)
 }
 }
 

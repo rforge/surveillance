@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-10-19)}{
+\section{Changes in surveillance version 1.8-1 (2014-10-24)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -44,6 +44,9 @@
     \item New argument \code{w} in \code{as.epidata.default()} to
     generate covariate-based weights for the force of infection in
     \code{twinSIR}. The \code{f} argument is for distance-based weights.
+
+    \item The result of \code{profile.twinSIR()} gained a class and an
+    associated \code{plot}-method.
   }
 }
 

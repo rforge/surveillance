@@ -263,6 +263,7 @@ S3method(plot, twinSIR)
 S3method(intensityplot, twinSIR)
 export(intensityplot.twinSIR)           # for convenience
 S3method(profile, twinSIR)
+S3method(plot, profile.twinSIR)
 S3method(vcov, twinSIR)
 S3method(logLik, twinSIR)
 S3method(AIC, twinSIR)
