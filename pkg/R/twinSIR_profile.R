@@ -240,7 +240,7 @@ plot.profile.twinSIR <- function(x, which = NULL, conf.level = 0.95,
         legend <- which(legend)
     if (is.list(par.settings)) {
         par.defaults <- list(mfrow = sort(n2mfrow(length(which))),
-                             mar = c(5,5,2,1)+.1, las = 1)
+                             mar = c(5,5,1,1)+.1, las = 1)
         par.settings <- modifyList(par.defaults, par.settings)
         opar <- do.call("par", par.settings)
         on.exit(par(opar))
