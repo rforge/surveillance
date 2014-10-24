@@ -6,7 +6,7 @@
 ### profile-method for class "twinSIR" to calculate the profile log-likelihood
 ### (normalized) as well as profile likelihood based confidence intervals
 ###
-### Copyright (C) 2009 Michael Hoehle
+### Copyright (C) 2009 Michael Hoehle, 2014 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -175,16 +175,19 @@ profile.twinSIR <- function (fitted, profile, alpha = 0.05,
    names(resProfile) <- names(theta.ml)[sapply(profile, function(x) x[1L])]
   
   ## Profile likelihood intervals
-  lower <- if (fitted$method == "L-BFGS-B") {
-             c(rep(0,px),rep(-Inf,pz))
-           } else {
-             -Inf
-           }
-  ciProfile <- matrix(NA, nrow = length(profile), ncol = 5L,
-    dimnames = list(NULL, c("idx","hl.low","hl.up","wald.low","wald.up")))
+  ciProfile <- matrix(NA, nrow = length(profile), ncol = 6L,
+    dimnames = list(NULL, c("idx","hl.low","hl.up","wald.low","wald.up","mle")))
+  ciProfile[,"idx"] <- sapply(profile, "[", 1L)
+  ciProfile[,"mle"] <- theta.ml[ciProfile[,"idx"]]
+  rownames(ciProfile) <- names(theta.ml)[ciProfile[,"idx"]]
   if (alpha > 0) {
-    cat("Computing likelihood ratio intervals...\n")
-    for (i in 1:length(profile))
+    cat("Computing profile likelihood-based confidence intervals ...\n")
+    lower <- if (fitted$method == "L-BFGS-B") {
+      c(rep(0,px),rep(-Inf,pz))
+    } else {
+      -Inf
+    }
+    for (i in seq_along(profile))
     {
       cat(i,"/", length(profile),"\n") 
       #Index of the parameter in the theta vector
@@ -198,9 +201,8 @@ profile.twinSIR <- function (fitted, profile, alpha = 0.05,
         error = function(e) rep(NA,2))
       #Wald intervals based on expected fisher information
       ci.wald <- theta.ml[idx] + c(-1,1) * qnorm(1-alpha/2) * se[idx]
-      ciProfile[i,] <- c(idx, ci.hl, ci.wald)
+      ciProfile[i,2:5] <- c(ci.hl, ci.wald)
     }
-    rownames(ciProfile) <- names(theta.ml)[ciProfile[,1]]
   }
   
   return(list(lp=resProfile, ci.hl=ciProfile, profileObj=profile))
