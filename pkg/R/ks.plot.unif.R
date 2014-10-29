@@ -115,7 +115,8 @@ ks.plot.unif <- function (U, conf.level = 0.95, exact = NULL,
 # 95% Kolmogorov-Smirnov error bounds.
 ######################################################################
 
-checkResidualProcess <- function (object, plot = 1:2, mfrow = n2mfrow(length(plot)), ...)
+checkResidualProcess <- function (object, plot = 1:2, mfrow = c(1,length(plot)),
+                                  ...)
 {
     stopifnot(inherits(object, c("twinSIR", "twinstim", "simEpidataCS")))
     

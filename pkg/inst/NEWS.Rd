@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-1 (2014-10-24)}{
+\section{Changes in surveillance version 1.8-1 (2014-10-29)}{
   
 \subsection{NEW FEATURES}{
   \itemize{
@@ -129,6 +129,10 @@
     \item The \pkg{surveillance} package now depends on \R >= 3.0.2,
     which, effectively, is the minimum version required since
     \pkg{surveillance} 1.7-0 (see the corresponding NEWS below).
+
+    \item The two diagnostic plots of \code{checkResidualProcess()} are
+    now by default plotted side by side (\code{mfrow=c(1,2)}) instead of
+    one below the other.
   }
 }
 
