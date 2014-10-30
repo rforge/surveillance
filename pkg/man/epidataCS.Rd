@@ -385,7 +385,7 @@ myimdepi <- as.epidataCS(events = events, stgrid = stgrid,
 ## should be equal as long as the internal structures of "epidataCS",
 ## of the embedded classes ("owin", "SpatialPolygons", ...), and the
 ## calculation of the influence regions by "polyclip" do not change
-if (!isTRUE(all.equal(imdepi, myimdepi)))
+if (!isTRUE(all.equal(imdepi, myimdepi, tolerance=1E-6)))
     warning("@Sebastian: maybe update data(imdepi)")
 }
 
