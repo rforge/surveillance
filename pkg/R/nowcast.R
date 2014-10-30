@@ -53,7 +53,7 @@ nowcast <- function(now,when,data,dEventCol="dHospital",dReportCol="dReport",
   
   #Check if the runjags package is available (required for bayes.trunc.ddcp to work!
   if ("bayes.trunc.ddcp" %in% method) {
-    if (!require("runjags")) {
+    if (!requireNamespace("runjags",quietly=TRUE)) {
       stop("The \"bayes.trunc.ddcp\" method requires the runjags package to be installed, which is available from CRAN.")
     }
   }
