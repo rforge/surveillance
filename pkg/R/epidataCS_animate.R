@@ -24,7 +24,7 @@ animate.epidataCS <- function (object, interval = c(0,Inf), time.spacing = NULL,
     col.influence = NULL, main = NULL, verbose = interactive(), ...)
 {
     stopifnot(is.numeric(interval), length(interval) == 2L)
-    with.animation <- suppressWarnings(require("animation"))
+    with.animation <- requireNamespace("animation", quietly = TRUE)
     if (is.null(sleep)) {
         sleep <- if (with.animation) animation::ani.options("interval") else 0.1
         ## we cannot set this as default function argument, because we don't

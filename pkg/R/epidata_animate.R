@@ -95,7 +95,7 @@ animate.summary.epidata <- function (object,
         oldtp <- tp <- attr(object, "timeRange")[1L]
         i <- 1L                   # to be used in the file argument in dev.print
         if (is.vector(generate.snapshots, mode="character") &&
-            length(generate.snapshots) == 1L && require("animation")) {
+            length(generate.snapshots) == 1L && requireNamespace("animation")) {
             img.name <- generate.snapshots
             ani.dev <- animation::ani.options("ani.dev")
             if (is.character(ani.dev)) ani.dev <- get(ani.dev)
