@@ -197,8 +197,12 @@ echo $contents; } ?>
       <li><code>backprojNP</code> - Non-parametric back-projection method of Becker et al. (1991) used in, e.g., Werber et al. (2013).</li>
     </ul>
   </li>
+  <li>Adjusting for occurred-but-not-yet-reported events
+    <ul>
+      <li><code>nowcast</code> - Nowcasting using frequentist approaches described in Lawless (1994) as well as more flexible hierarchical Bayes approaches developed in Höhle and an der Heiden (2014).</li>
+    </ul>
+  </li>
 </ul>
-
 
 <hr />
 <h3>Download</h3>
@@ -371,6 +375,11 @@ Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
 <dd><a href="http://dx.doi.org/10.1002/bimj.200900050">Höhle, M. (<b>2009</b>)</a></dd>
 <dd><i>Additive-multiplicative regression models for spatio-temporal epidemics</i></dd>
 <dd>Biometrical Journal, Vol. 51(6), pp. 961-978</dd>
+
+<dt></dt>
+<dd><a href="http://dx.doi.org/10.1111/biom.12194">Höhle, M. and An der Heiden, M. (<b>2014</b>)</a></dd>
+<dd><i>Bayesian Nowcasting during the STEC O104:H4 Outbreak in Germany, 2011</i></dd>
+<dd>Biometrics, E-pub ahead of print</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1016/j.csda.2008.02.015">Höhle, M. and Paul, M. (<b>2008</b>)</a></dd>
