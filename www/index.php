@@ -161,30 +161,40 @@ echo $contents; } ?>
 
 <ul>
 
-  <li>Multivariate time series models for count data:
+  <li>Meyer et al. (2014) provide a guide to the
+  spatio-temporal analysis of epidemic phenomena using the R package <code>surveillance</code>.
+  The paper describes three regression-oriented model frameworks capturing endemic and epidemic dynamics,
+  which are illustrated by applications to infectious disease surveillance data:
+  <ul>
+    <li><code>twinstim</code> for geo-referenced event data (i.e., a spatio-temporal point pattern)</li>
+    <li><code>twinSIR</code> for the SI[R][S] event history of a fixed population</li>
+    <li><code>hhh4</code> for multivariate time series of counts</li>
+  </ul>
+  </li>
+
+  <li>Methodological papers on multivariate time series models for count data:
     <ul>
       <li><code>algo.hhh</code> - Held et al. (2005) and Paul et al. (2008)</li>
-      <li><code>hhh4</code> - Paul and Held (2011)</li>
       <li><code>algo.twins</code> - Held et al. (2006)</li>
+      <li><code>hhh4</code> - Paul and Held (2011)</li>
     </ul>
   </li>
 
-  <li>Continuous-time point process modelling:
+  <li>Methodological papers on continuous-time point process modelling:
     <ul>
       <li><code>twinSIR</code> - continuous-time/discrete-space modelling as
 	described in H&ouml;hle (2009). The <code>"epidata"</code> class
-	provides the appropriate data structure for such data.</li>
+	provides the associated data structure.</li>
       <li><code>twinstim</code> - continuous-time/continuous-space modelling as described in
 	Meyer et al. (2012).
-	The <code>"epidataCS"</code> class describes the data, which mainly consist
-	of the observed events and exogenous covariates on a space-time lattice.</li>
+	The <code>"epidataCS"</code> class holds the data, which mainly consist
+	of the observed events and exogenous covariates on a space-time grid.</li>
     </ul>
   </li>
 
-  <li>See Meyer and Held (2014) for a joint description of the
-  <code>hhh4()</code> (count data) and <code>twinstim()</code> (individual-level
-  data) modelling frameworks -- with a view to account for power-law decay
-  of spatial interaction.</li>
+  <li>Meyer and Held (2014) describe both the spatio-temporal 
+  <code>hhh4()</code> (count data) and <code>twinstim()</code> (individual-level data) 
+  frameworks with a view to modelling power-law decay of spatial interaction.</li>
 
 </ul>
 
@@ -320,10 +330,9 @@ further preprints.<br>
 Höhle</a>, Department of Mathematics, Stockholm University, Sweden
 (Project Admin)</li>
       <li><a href="http://www.biostat.uzh.ch/aboutus/people/smeyer.html">Sebastian
-Meyer</a>, Institute of Social and Preventive Medicine, University of 
+Meyer</a>, Epidemiology, Biostatistics and Prevention Institute (<a href="http://www.ebpi.uzh.ch/">EBPI</a>), University of 
 Zurich, Switzerland</li> 
-      <li>Michaela Paul (previously at the Institute of Social and Preventive
-	Medicine, University of Zurich, Switzerland)</li>
+      <li>Michaela Paul (previously: University of Zurich, Switzerland)</li>
       <li><a href="http://www.normalesup.org/~masalmon/">Ma&eumllle Salmon</a>,
 	Department for Infectious Disease Epidemiology, Robert Koch Institute,
 	Germany</li>
@@ -408,6 +417,11 @@ Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
 <dd>(The paper is also available from <a href="http://www.zora.uzh.ch/89321/">ZORA</a>
 or as <a href="http://arxiv.org/abs/1308.5115">arXiv:1308.5115</a>,
 and has <a href="http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html">supplementary animations</a>)</dd>
+
+<dt></dt>
+<dd><a href="http://arxiv.org/abs/1411.0416">Meyer, S., Held, L. and Höhle, M. (<b>2014</b>)</a></dd>
+<dd><i>Spatio-Temporal Analysis of Epidemic Phenomena Using the <code>R</code> Package <code>surveillance</code></i></dd>
+<dd>Submitted to the Journal of Statistical Software</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1002/sim.4177">Paul, M. and Held, L. (<b>2011</b>)</a></dd>
