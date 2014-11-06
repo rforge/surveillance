@@ -88,10 +88,11 @@ echo $contents; } ?>
 <h3>Prospective Outbreak Detection</h3>
 
 <ul>
-
   <li><tt>surveillance</tt> provides the <tt>S4</tt> class data
     structure <tt>"sts"</tt> and a framework for methodological developments
     of change-point algorithms for time series of counts.</li>
+  <li>Salmon et al. (2014) provide an overall guide to the
+  monitoring capabilities of <code>surveillance</code>. </li>
 
   <li>Prospective outbreak detection procedures for count data time series:
     <ul>
@@ -263,6 +264,7 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
 <blockquote>
   <blockquote>
     <ul>
+       <li>Two recent manuscripts provide an overview as well as step-by-step instructions on what you can do with the package: <a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> covers prospective monitoring whereas <a href="http://arxiv.org/abs/1411.0416">Meyer et al. (2014)</a> covers spatio-temporal modelling.</li>
       <li>A good (but slightly outdated) introduction to the outbreak detection part of the package is
 provided in the paper <a
  href="http://dx.doi.org/10.1007/s00180-007-0074-8"><span
@@ -432,6 +434,11 @@ and has <a href="http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html">s
 <dd><a href="http://dx.doi.org/10.1002/sim.3440">Paul, M., Held, L. and Toschke, A. M. (<b>2008</b>)</a></dd>
 <dd><i>Multivariate modelling of infectious disease surveillance data</i></dd>
 <dd>Statistics in Medicine, Vol. 27(29), pp. 6250-6267</dd>
+
+<dt></dt>
+<dd><a href="http://arxiv.org/abs/1411.1292">Salmon, M., Schumacher, D. and Höhle, M. (<b>2014</b>)</a></dd>
+<dd><i>Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance</i></dd>
+<dd>Submitted to the Journal of Statistical Software</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1093/aje/kwt069">Werber, D., King, L.A., Müller, L., Follin, P., Buchholz, U., Bernard, H., Rosner, B.M., Ethelberg, S., de Valk, H., Höhle, M. (<b>2013</b>)</a></dd>
