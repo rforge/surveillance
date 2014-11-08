@@ -318,7 +318,7 @@ further preprints.<br>
 <!--  convert -density 100x100 mpbb-intensity.pdf mpbb-intensity.png -->
       <img src="mpbb-intensity.png" align="middle"><p>
       <code>twinstim</code>
-<!-- 100 dpi version of imdepifit_Gaussian_intensityplot_space1.pdf from JSS -->
+<!-- convert -density 100x100 imdepifit_Gaussian_intensityplot_space1.pdf imdepifit.png from JSS -->
       <img src="imdepifit.png" align="middle"><p>
     </ul>
   </blockquote>
