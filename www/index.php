@@ -317,7 +317,7 @@ further preprints.<br>
       <code>twinSIR</code><p>
 <!--  convert -density 100x100 mpbb-intensity.pdf mpbb-intensity.png -->
       <img src="mpbb-intensity.png" align="middle"><p>
-      <code>twinstim</code>
+      <code>twinstim</code><p>
 <!-- convert -density 100x100 imdepifit_Gaussian_intensityplot_space1.pdf imdepifit.png from JSS -->
       <img src="imdepifit.png" align="middle"><p>
     </ul>
