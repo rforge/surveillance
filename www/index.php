@@ -252,7 +252,7 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
     the <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/inst/NEWS.Rd?view=markup&root=surveillance">NEWS file</a> 
     of the current development version.
   </li>
-  <li>Two arxiv reports (submitted manuscripts) illustrate the newest package features: <a href="http://arxiv.org/abs/1411.0416">Meyer et al. (2014)</a> and <a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a>.</li>
+  <li>2014/11/08 Two arxiv reports (submitted manuscripts) illustrate the newest package features: <a href="http://arxiv.org/abs/1411.0416">Meyer et al. (2014)</a> (spatio-temporal modelling) and <a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> (monitoring).</li>
   <li>2013/04/23 <a href="StockholmR-Hoehle_4.pdf">Talk</a> at the  Stockholm R useR group (StockholmR) on <a href="http://www.meetup.com/StockholmR/events/105738342/">Making R packages (and) Shiny</a>.</li>
 </ul>
 
