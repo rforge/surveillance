@@ -439,8 +439,10 @@ setMethod( "show", "sts", function( object ){
           cat("Data slot   :", ncol(object@map), "variables\n")
   }
 
-  cat("\nhead of neighbourhood:\n")
-  print( head(object@neighbourhood,n))
+  if (ncol(object@observed) > 1) {
+      cat("\nhead of neighbourhood:\n")
+      print( head(object@neighbourhood,n))
+  }
 } )
 
 

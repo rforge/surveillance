@@ -6,6 +6,19 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.8-2 (2014-11-12)}{
+  
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item For univariate \code{"sts"} objects, the (meaningless)
+    \dQuote{head of neighbourhood} is no longer \code{show}n.
+  }
+}
+
+}
+
+
+
 \section{Changes in surveillance version 1.8-1 (2014-10-29)}{
   
 \subsection{NEW FEATURES}{
