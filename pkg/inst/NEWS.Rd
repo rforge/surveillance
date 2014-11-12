@@ -12,6 +12,11 @@
   \itemize{
     \item For univariate \code{"sts"} objects, the (meaningless)
     \dQuote{head of neighbourhood} is no longer \code{show}n.
+
+    \item The \code{"sts"} class now has a \code{dimnames}-method
+    instead of a \code{colnames}-method. Furthermore, the redundant
+    \code{nrow} and \code{ncol} methods have been removed
+    (the \code{dim}-method is sufficient).
   }
 }
 

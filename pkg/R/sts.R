@@ -223,12 +223,10 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
 # Miscellaneous access methods
 ####################################################################
 
-setMethod("nrow", "sts", function(x) return(nrow(x@observed)))
-setMethod("ncol", "sts", function(x) return(ncol(x@observed)))
-setMethod("dim", "sts", function(x) return(dim(x@observed)))
-setMethod("colnames", signature=c(x="sts",do.NULL="missing",prefix="missing"), function(x,do.NULL, prefix) return(colnames(x@observed)))
+setMethod("dim", "sts", function (x) dim(x@observed))
+setMethod("dimnames", "sts", function (x) dimnames(x@observed))
+
 #Extract which observation within year we have
-setGeneric("epochInYear", function(x, ...) standardGeneric("epochInYear"));
 setMethod("epochInYear", "sts", function(x,...) {
   #Strptime format strings available as:
   #http://www.opengroup.org/onlinepubs/009695399/functions/strptime.html
@@ -239,8 +237,8 @@ setMethod("epochInYear", "sts", function(x,...) {
     return( (x@epoch-1 + x@start[2]-1) %% x@freq + 1)
   }
 })
+
 #Extract the corresponding year for each observation using
-setGeneric("year", function(x, ...) standardGeneric("year"));
 setMethod("year", "sts", function(x,...) {
   if (x@epochAsDate) {
     return(as.numeric(formatDate(epoch(x),"%G")))
@@ -248,6 +246,7 @@ setMethod("year", "sts", function(x,...) {
     ((x@epoch-1 + x@start[2]-1) + (x@freq*x@start[1])) %/% x@freq 
   }
 })
+
 
 #####################################################################
 #[-method for accessing the observed, alarm, etc. objects
