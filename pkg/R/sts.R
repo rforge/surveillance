@@ -40,20 +40,21 @@ init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0
     nObs <- nrow(observed)
     if(ncol(observed) != ncol(state)){
       #if there is only one state-vector for more than one area, repeat it
-      if(ncol(state)==1)
+      if(ncol(state)==1) {
         state <- ts(matrix(rep(state,nAreas),ncol=nAreas,byrow=FALSE),frequency=frequency(observed))
       ## FIXME @ Michael: 1. why convert 'state' to a "ts" object in this special case but not in general
       ##                  2. frequency(observed) is 1 unless observed has the "tsp" attribute
-      else{ 
-        cat('wrong dimensions of observed and state \n')
-      return(NULL)
+      } else { 
+        stop('wrong dimensions of observed and state')
       }
     }
+
+    # check length of epoch
+    stopifnot(length(epoch) == nrow(observed))
     
-    #check neighbourhood matrix. 
-    if(!is.null(neighbourhood) & (any(dim(neighbourhood) != nAreas))) {
-      cat('wrong dimensions of neighbourhood matrix \n')
-      return(NULL)
+    #check neighbourhood matrix
+    if(!is.null(neighbourhood) && any(dim(neighbourhood) != nAreas)) {
+      stop('wrong dimensions of neighbourhood matrix')
     }
     
     #popFrac
@@ -83,7 +84,7 @@ init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0
       upperbound <- matrix(NA,nrow=nObs,ncol=nAreas)
 
     ##Assign everything else
-    .Object@epoch <- epoch  # FIXME: better check that length(epoch) == nObs
+    .Object@epoch <- epoch
     .Object@epochAsDate <- epochAsDate
     .Object@multinomialTS <- multinomialTS
     
