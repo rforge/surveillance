@@ -22,6 +22,8 @@ fix.dimnames <- function(x) {
 }
 
 #constructor function
+## FIXME @ Michael: why do 'start' and 'freq' have these specific defaults,
+##                  and 'epoch' not conveniently default to 1:nrow(observed)?
 init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0*observed, map=NULL, neighbourhood=NULL, populationFrac=NULL,alarm=NULL,upperbound=NULL, control=NULL,epochAsDate=FALSE,multinomialTS=FALSE) {
 
   #If used in constructor
@@ -40,6 +42,8 @@ init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0
       #if there is only one state-vector for more than one area, repeat it
       if(ncol(state)==1)
         state <- ts(matrix(rep(state,nAreas),ncol=nAreas,byrow=FALSE),frequency=frequency(observed))
+      ## FIXME @ Michael: 1. why convert 'state' to a "ts" object in this special case but not in general
+      ##                  2. frequency(observed) is 1 unless observed has the "tsp" attribute
       else{ 
         cat('wrong dimensions of observed and state \n')
       return(NULL)
@@ -71,18 +75,15 @@ init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0
     dimnames(observed) <- list(NULL,namesObs)
     dimnames(state) <- list(NULL,namesState)
 
-    #FIXME: If ncol(observed) is huge then the generated matrix
-    #might be beyond memory capacities -> use sparse matrices?
     if (is.null(neighbourhood))
-      neighbourhood <- matrix(NA,nrow=ncol(observed),ncol=ncol(observed))
-      #diag(neighbourhood) <- 0  #FIXME: shouldn't we always define the diag as 0?
+      neighbourhood <- matrix(NA,nrow=nAreas,ncol=nAreas)
     if (is.null(alarm)) 
-      alarm      <- matrix(NA,nrow=dim(observed)[1],ncol=dim(observed)[2])
+      alarm      <- matrix(NA,nrow=nObs,ncol=nAreas)
     if (is.null(upperbound))
-      upperbound <- matrix(NA,nrow=dim(observed)[1],ncol=dim(observed)[2])
+      upperbound <- matrix(NA,nrow=nObs,ncol=nAreas)
 
     ##Assign everything else
-    .Object@epoch <- epoch
+    .Object@epoch <- epoch  # FIXME: better check that length(epoch) == nObs
     .Object@epochAsDate <- epochAsDate
     .Object@multinomialTS <- multinomialTS
     
@@ -209,8 +210,7 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
     #There is no clever way to aggregate the upperbounds
     x@upperbound <- matrix(NA,ncol=ncol(x@alarm),nrow=nrow(x@alarm))
     x@populationFrac <- as.matrix(apply(x@populationFrac, MARGIN=1, sum))#>0
-    x@neighbourhood <- matrix(1,nrow=1,ncol=1)
-                     # FIXME: |-wouldn't 0 be more appropriate?
+    x@neighbourhood <- matrix(NA, 1, 1) # consistent with default for new("sts")
   }
 
   #validObject(x) #just a check
@@ -250,8 +250,6 @@ setMethod("year", "sts", function(x,...) {
 
 #####################################################################
 #[-method for accessing the observed, alarm, etc. objects
-# new param:
-#  normPopulationFrac - normalize population frac
 #####################################################################
 
 setMethod("[", "sts", function(x, i, j, ..., drop) {
@@ -292,16 +290,9 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   ## necessary), we have to update epoch, too!
   if (!x@epochAsDate) x@epoch <- x@epoch - i.min + 1  # FIXME: correct?
                                                      
-  #FIXME: In case there is a map: Also subset map according to region index j.
-  # -> This only makes sense if identical(row.names(map), colnames(observed))
-  #    is a property of the sts-class already verified in init.sts
-  ## if (length(x@map)>0) {
-  ##   ## x@map <- x@map[colnames(x@observed),]
-  ##   #take them in the order as in the map to ensure x and x[] are identical
-  ##   order <- pmatch(row.names(x@map), colnames(x)) #, row.names(x@map))
-  ##   order2 <- pmatch(row.names(x@map)[!is.na(order)], row.names(x@map))
-  ##   x@map <- x@map[order2,]
-  ## }
+  ## Note: We do not automatically subset the map according to j, since
+  ##       identical(row.names(map), colnames(observed))
+  ##       is not a property of the sts-class; Unmonitored regions are allowed.
   
   #Done
   return(x)
