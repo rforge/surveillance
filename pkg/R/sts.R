@@ -265,13 +265,18 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
 
   x@populationFrac <- x@populationFrac[i,j,drop=FALSE]
   #If not binary TS the populationFrac is normed
-  binaryTS <- sum( x@populationFrac > 1 ) > 1
+  binaryTS <- sum( x@populationFrac > 1 ) > 1 # FIXME @ Michael: x@multinomialTS
   if (!binaryTS) {
     x@populationFrac <- x@populationFrac / apply(x@populationFrac,MARGIN=1,sum)
    }  
   x@upperbound <- x@upperbound[i,j,drop=FALSE]
 
   #Neighbourhood matrix
+  if (ncol(x@observed) != ncol(x@neighbourhood) &&  # selected units
+      !all(x@neighbourhood %in% c(NA,0,1))) { # no adjacency matrix
+      message("Note: selection of units could invalidate the 'neighbourhood'")
+      ## e.g., if 'neighbourhood' specifies neighbourhood orders
+  }
   x@neighbourhood <- x@neighbourhood[j,j,drop=FALSE]
 
   #Fix the corresponding start entry. it can either be a vector of
@@ -287,9 +292,8 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   start.year <- start[1] + (new.sampleNo - 1) %/% x@freq 
   start.sampleNo <- (new.sampleNo - 1) %% x@freq + 1
   x@start <- c(start.year,start.sampleNo)
-  ## If !epochAsDate and updating "start" (which seems not really to be
-  ## necessary), we have to update epoch, too!
-  if (!x@epochAsDate) x@epoch <- x@epoch - i.min + 1  # FIXME: correct?
+  ## If !epochAsDate, we also have to update epoch since it is relative to start
+  if (!x@epochAsDate) x@epoch <- x@epoch - i.min + 1
                                                      
   ## Note: We do not automatically subset the map according to j, since
   ##       identical(row.names(map), colnames(observed))
