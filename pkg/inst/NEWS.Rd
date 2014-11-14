@@ -6,9 +6,9 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-2 (2014-11-12)}{
+\section{Changes in surveillance version 1.8-2 (2014-11-14)}{
   
-\subsection{MINOR CHANGES}{
+\subsection{MINOR CHANGES related to the \code{"sts"}-class)}{
   \itemize{
     \item For univariate \code{"sts"} objects, the (meaningless)
     \dQuote{head of neighbourhood} is no longer \code{show}n.
@@ -17,6 +17,10 @@
     instead of a \code{colnames}-method. Furthermore, the redundant
     \code{nrow} and \code{ncol} methods have been removed
     (the \code{dim}-method is sufficient).
+
+    \item If a \code{map} is provided when \code{initialize()}ing an
+    \code{"sts"} object, it is now verified that all \code{observed}
+    regions are part of the \code{map} (matched by \code{row.names}).
   }
 }
 

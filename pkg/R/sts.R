@@ -98,10 +98,12 @@ init.sts <- function(.Object, epoch, start=c(2000,1), freq=52, observed, state=0
     .Object@state <- state
     .Object@observed <- observed
     
-    #It is not possible to assign a null argument to the
-    #SpatialPolygonsDataFrame slot. 
-    if (!is.null(map)) {
-      .Object@map <- map
+    if (length(map) > 0L) {  # i.e., not the empty prototype nor NULL
+      .Object@map <- map  # checkAtAssignment() verifies the class of map
+      ## if a map is provided, it must cover all colnames(observed)
+      if (!all(colnames(observed) %in% row.names(map))) {
+        stop("map is incomplete; check colnames(observed) %in% row.names(map)")
+      }
     }
     
     .Object@neighbourhood <- neighbourhood
@@ -359,6 +361,8 @@ setMethod("plot", signature(x="sts", y="missing"),
 
 
 ###Validity checking
+## NOTE: this is effectively not used ATM, but we could include
+##       validObject(.Object) as the last step in init.sts()
 setValidity("sts", function ( object ) {
   retval <- NULL
 
@@ -387,16 +391,7 @@ setValidity("sts", function ( object ) {
   if (!all( colnames(object@observed) == colnames(object@neighbourhood)))
     retval <- c( retval , " colnames of observed and neighbourhood have to match")
 
-  ## if map is not empty, check that all colnames(object@observed)
-  ## are in row.names(object@map)
-  if (length(object@map)>0) {
-    if (!all(colnames(object@observed) %in% row.names(object@map))) {
-      retval <- c( retval , " colnames of observed have to be contained in the row.names of the map.")
-    }
-  }
-  
-  if(is.null( retval)) return ( TRUE )
-  else return ( retval )
+  if (is.null(retval)) TRUE else retval
 })
 
 
