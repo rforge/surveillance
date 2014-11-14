@@ -21,6 +21,10 @@
     \item If a \code{map} is provided when \code{initialize()}ing an
     \code{"sts"} object, it is now verified that all \code{observed}
     regions are part of the \code{map} (matched by \code{row.names}).
+
+    \item In \code{stsplot_space()}, extra (unobserved) regions of the
+    \code{map} are no longer dropped but shown with a dashed border by
+    default.
   }
 }
 

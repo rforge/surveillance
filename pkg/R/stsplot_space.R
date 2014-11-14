@@ -26,11 +26,14 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
                            main = NULL, labels = FALSE,
                            at = 10, col.regions = NULL,
                            colorkey = list(space="bottom", labels=list(at=at)),
-                           total.args = NULL, sp.layout = NULL, ...)
+                           total.args = NULL, 
+                           gpar.missing = list(col="darkgrey", lty=2, lwd=2),
+                           sp.layout = NULL,
+                           xlim = bbox(map)[1, ], ylim = bbox(map)[2, ], ...)
 {
     counts <- if (inherits(x, "sts")) observed(x) else x
-    map <- map[colnames(x),] # assure same order
-
+    if (length(map) == 0L) stop("no map")
+    
     ## compute data to plot
     ncases <- getCumCounts(counts, tps)
     total <- sum(ncases)
@@ -42,13 +45,10 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
     }
 
     ## add ncases to map@data
-    if (inherits(map, "SpatialPolygonsDataFrame")) {
-        map$ncases <- ncases
-    } else {
-        map <- SpatialPolygonsDataFrame(map, as.data.frame(ncases),
-                                        match.ID=FALSE)
-    }
-
+    map <- as(map, "SpatialPolygonsDataFrame")
+    map$ncases <- NA_real_
+    map$ncases[match(colnames(x),row.names(map))] <- ncases
+    
     ## default main title
     if (is.null(main) && inherits(x, "sts"))
         main <- stsTimeRange2text(x, tps)
@@ -68,6 +68,11 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
         colorkey <- modifyList(eval(formals()$colorkey), colorkey)
 
     ## automatic additions to sp.layout (region labels and total)
+    if (is.list(gpar.missing) && any(is.na(map$ncases))) {
+        layout.missing <- c(list("sp.polygons", obj=map[is.na(map$ncases),]),
+                            gpar.missing)
+        sp.layout <- c(sp.layout, list(layout.missing))
+    }
     if (!is.null(layout.labels <- layout.labels(map, labels))) {
         sp.layout <- c(sp.layout, list(layout.labels))
     }
@@ -85,9 +90,9 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
     }
 
     ## generate the spplot()
-    args <- list(quote(map), "ncases", main=main,
+    args <- list(quote(map[!is.na(map$ncases),]), "ncases", main=main,
                  col.regions=col.regions, at=at, colorkey=colorkey,
-                 sp.layout=sp.layout, quote(...))
+                 sp.layout=sp.layout, xlim=xlim, ylim=ylim, quote(...))
     do.call("spplot", args)
 }
 
