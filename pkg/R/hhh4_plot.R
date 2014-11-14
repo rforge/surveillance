@@ -154,8 +154,8 @@ plotHHH4_ri <- function (x, component, labels = FALSE, sp.layout = NULL,
         stop("'component' must (partially) match one of ",
              paste(dQuote(colnames(ranefmatrix)), collapse=", "))
     
-    map <- x$stsObj@map
-    if (is.null(map)) stop("'x$stsObj' has no map")
+    map <- as(x$stsObj@map, "SpatialPolygonsDataFrame")
+    if (length(map) == 0L) stop("'x$stsObj' has no map")
     map$ranef <- ranefmatrix[,comp][row.names(map)]
     
     if (is.list(gpar.missing) && any(is.na(map$ranef))) {
