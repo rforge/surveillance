@@ -171,6 +171,7 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
            simulate.hhh4(..., simplify=TRUE)
 31/10/2014 update examples on help pages according to JSS paper
 31/10/2014 update vignette("hhh4") according to JSS paper
+17/11/2014 add checkNeighbourhood(..., strict=TRUE) for integer check
 
 #Done
 - add documentation for oneStepAhead predictions/scores
