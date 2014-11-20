@@ -311,16 +311,11 @@ setControl <- function (control, stsObj)
 
 
 # check whether or not one of the three components is included in the model
-isInModel <- function(formula, name=deparse(substitute(formula))){
+isInModel <- function(formula, name=deparse(substitute(formula)))
+{
   term <- terms.formula(formula)
-  if(attr(term,"response") == 1) stop(name," cannot contain a response variable\n")
-  if(attr(term,"intercept") == 1) {
-    inModel <- TRUE
-  } else {
-    # first element is always a list
-    inModel <- ifelse(length(attr(term, "variables")) > 1, TRUE, FALSE)
-  }
-  return(inModel)
+  if(attr(term,"response") > 0) stop(name, " cannot contain a response")
+  attr(term, "intercept") + length(attr(term, "term.labels")) > 0
 }
 
 # used to incorporate covariates and unit-specific effects
