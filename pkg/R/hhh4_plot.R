@@ -488,7 +488,7 @@ getMaxEV_season <- function (x)
                     all(!unlist(epiterms["unitSpecific",]))
         }, FUN.VALUE = TRUE, USE.NAMES = FALSE)
         if (any(!compOK))
-            warning("epidemic components contain (unit-specific)",
+            warning("epidemic components have (unit-specific) ",
                     "covariates/offsets not accounted for;\n",
                     "  use getMaxEV() or plotHHH4_maxEV()")
     }
