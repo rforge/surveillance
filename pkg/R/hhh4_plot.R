@@ -434,7 +434,7 @@ getSeason <- function(x, component = c("end", "ar", "ne"), unit = 1)
 
     ## get the intercept
     est <- fixef(x, reparamPsi=FALSE)
-    intercept <- est[[grep(paste0("^", component, "\\.(1|ri)"), names(est))]]
+    intercept <- unname(est[grep(paste0("^", component, "\\.(1|ri)"), names(est))])
     if (length(intercept) == 0) {
         intercept <- 0 # no intercept (not standard)
     } else if (length(intercept) > 1) { # unit-specific intercepts
