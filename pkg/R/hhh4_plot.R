@@ -33,6 +33,7 @@ plotHHH4_fitted <- function (x, units = 1, names = NULL,
                              legend = TRUE, legend.args = list(),
                              legend.observed = FALSE, ...)
 {
+    if (is.null(units)) units <- seq_len(x$nUnit)
     if (!is.null(names)) stopifnot(length(units) == length(names))
     if (length(col) == 3) col <- c(col, "black") else if (length(col) != 4)
         stop("'col' must be of length 3 or 4") # for backwards compatibility

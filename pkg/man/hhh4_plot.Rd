@@ -90,7 +90,9 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
     \code{plotter}.}
   \item{units,unit}{integer or character vector specifying a single
     \code{unit} or possibly multiple \code{units} to plot.
-    It indexes \code{colnames(x$stsObj)}. In the seasonality plot,
+    It indexes \code{colnames(x$stsObj)}.\cr
+    In \code{plotHHH4_fitted}, \code{units=NULL} plots all units.\cr
+    In the seasonality plot,
     selection of a unit is only relevant if the model contains
     unit-specific intercepts or seasonality terms.}
   \item{names,main}{main title(s) for the selected
