@@ -22,17 +22,16 @@
 ##   25 Aug 2014 (SM): use compact-vignettes=both, i.e., including ghostscript
 ################################################################################
 
-## Define variable for R and sed script which enables the use of alternatives,
+## Define variable for R which enables the use of alternatives,
 ## e.g., 'make check R=R-devel'
-R = R
-sed = sed
+R := R
 
 ## sysdata file
 SYSDATA := pkg/R/sysdata.rda
 DESCRIPTION := pkg/DESCRIPTION
 
 ## package version
-VERSION := $(strip $(shell grep "^Version:" ${DESCRIPTION} | cut -f 2 -d ":"))
+VERSION := $(shell $R --vanilla --slave -e 'cat(read.dcf("${DESCRIPTION}", fields="Version"))')
 
 ## svn revision number
 #REVISION := $(strip $(shell svnversion pkg))
@@ -44,7 +43,7 @@ VERSION := $(strip $(shell grep "^Version:" ${DESCRIPTION} | cut -f 2 -d ":"))
 #DATE := $(shell date +%F)
 # DESCRIPTION (esp. the Rev property) would not be updated across multiple
 # revisions on the same day => use date _and_ time
-DATE := $(shell date --rfc-3339=seconds)
+#DATE := $(shell date --rfc-3339=seconds)
 # alternative: svn last changed date (date info would be lagged by one revision)
 #LASTCHANGEDDATE := $(shell svn info pkg | grep "^Last Changed Date:" | \
 #                     grep -E -o "[0-9]{4}-[0-9]{2}-[0-9]{2}")
@@ -64,7 +63,7 @@ build: clean ${SYSDATA} #${DESCRIPTION}
 
 ## update date in DESCRIPTION file
 # ${DESCRIPTION}:
-# 	$(sed) -i "s/^\(Date:\)[^\r]*/\1 ${DATE}/" $@
+# 	sed -i "s/^\(Date:\)[^\r]*/\1 ${DATE}/" $@
 
 ## Save internal datasets from pkg/sysdata/ into pkg/R/sysdata.rda
 ${SYSDATA}: pkg/sysdata/sysdata.R
