@@ -140,12 +140,13 @@ getCountIntervals <- function (nInt, data, trafo=scales::sqrt_trans(), ...) {
     at
 }
 
-stsTime2text <- function (stsObj, tps=TRUE)
-    paste(year(stsObj)[tps], epochInYear(stsObj)[tps], sep="/")
+stsTime2text <- function (stsObj, tps=TRUE, fmt="%i/%i") {
+    sprintf(fmt, year(stsObj)[tps], epochInYear(stsObj)[tps])
+}
 
-stsTimeRange2text <- function (stsObj, tps=NULL)
+stsTimeRange2text <- function (stsObj, tps=NULL, fmt="%i/%i", sep=" - ")
 {
     tpsRange <- if (is.null(tps)) c(1, nrow(stsObj)) else range(tps)
-    tpsRangeYW <- stsTime2text(stsObj, tpsRange)
-    paste(unique(tpsRangeYW), collapse=" - ")
+    tpsRangeYW <- stsTime2text(stsObj, tps=tpsRange, fmt=fmt)
+    paste0(unique(tpsRangeYW), collapse=sep)
 }
