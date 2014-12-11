@@ -70,20 +70,21 @@ if (surveillance.options("allExamples")) {
 
 ## first need to aggregate imdepi into an "sts" object
 load(system.file("shapes", "districtsD.RData", package="surveillance"))
-imdepi_sts <- epidataCS2sts(imdepi, freq=12, start=c(2002,1),
-    neighbourhood=NULL, tiles=districtsD, popcol.stgrid="popdensity")
+imdsts <- epidataCS2sts(imdepi, freq = 12, start = c(2002, 1),
+                        neighbourhood = NULL, tiles = districtsD,
+                        popcol.stgrid = "popdensity")
 
 ## determine the correct offset to get an equivalent model
 offset <- 2 * rep(with(subset(imdepi$stgrid, !duplicated(BLOCK)),
-                  stop-start), ncol(imdepi_sts)) *
-          sum(districtsD$POPULATION) * population(imdepi_sts)
+                  stop - start), ncol(imdsts)) *
+          sum(districtsD$POPULATION) * population(imdsts)
 
 ## fit the model using hhh4()
-fit_hhh4 <- hhh4(imdepi_sts, control = list(
+fit_hhh4 <- hhh4(imdsts, control = list(
     end = list(
         f = addSeason2formula(~I(start/365-3.5), period=365, timevar="start"),
         offset = offset
-    ), family = "Poisson", subset = 1:nrow(imdepi_sts),
+    ), family = "Poisson", subset = 1:nrow(imdsts),
     data = list(start=with(subset(imdepi$stgrid, !duplicated(BLOCK)), start))))
 
 summary(fit_hhh4)
