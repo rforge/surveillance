@@ -48,21 +48,21 @@ data("imdepi")
 data("imdepifit")
 
 ## Fit an endemic-only twinstim() and an equivalent model wrapped in glm()
-fit_twinstim <- update(imdepifit, epidemic = ~0, siaf = NULL,
+fit_twinstim <- update(imdepifit, epidemic = ~0, siaf = NULL, subset = NULL,
                        optim.args=list(control=list(trace=0)), verbose=FALSE)
-fit_glm <- glm_epidataCS(formula(fit_twinstim)$endemic, imdepi)
+fit_glm <- glm_epidataCS(formula(fit_twinstim)$endemic, data = imdepi)
 
 ## Compare the coefficients
-cbind(twinstim=coef(fit_twinstim), glm=coef(fit_glm))
-stopifnot(isTRUE(all.equal(coef(fit_glm), coef(fit_twinstim),
-                           tolerance = 0.0005, check.attributes = FALSE)))
+cbind(twinstim = coef(fit_twinstim), glm = coef(fit_glm))
 \dontshow{
+stopifnot(all.equal(coef(fit_glm), coef(fit_twinstim),
+                    tolerance = 1e-5, check.attributes = FALSE))
 if (surveillance.options("allExamples")) {
     ## also check type-specific model:
-    stopifnot(isTRUE(all.equal(
+    stopifnot(all.equal(
         coef(glm_epidataCS(~0+type, imdepi)),
         coef(update(fit_twinstim, endemic=~(1|type))),
-    tolerance = 0.0005, check.attributes = FALSE)))
+    tolerance = 1e-5, check.attributes = FALSE))
 }
 }
 
@@ -88,8 +88,7 @@ fit_hhh4 <- hhh4(imdsts, control = list(
     data = list(start=with(subset(imdepi$stgrid, !duplicated(BLOCK)), start))))
 
 summary(fit_hhh4)
-stopifnot(isTRUE(all.equal(coef(fit_hhh4), coef(fit_glm),
-                           check.attributes=FALSE)))
+stopifnot(all.equal(coef(fit_hhh4), coef(fit_glm), check.attributes=FALSE))
 }
 
 \keyword{models}
