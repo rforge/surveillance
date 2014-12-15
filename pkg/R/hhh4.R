@@ -24,19 +24,15 @@ hhh4 <- function (stsObj, control = list(
     ar = list(f = ~ -1,        # a formula "exp(x'lamba)*y_t-lag" (ToDo: matrix)
               offset = 1,      # multiplicative offset
               lag = 1,         # autoregression on y_i,t-lag
-              weights = NULL,  # for a contact matrix model (currently unused)
-              initial = NULL   # initial parameters values if pred is a matrix
-                               # or if pred = ~1 (not really used ATM)
+              weights = NULL   # for a contact matrix model (currently unused)
     ),
     ne = list(f = ~ -1,        # a formula "exp(x'phi) * sum_j w_ji * y_j,t-lag"
               offset = 1,      # multiplicative offset
               lag = 1,         # regression on y_j,t-lag
-              weights = neighbourhood(stsObj) == 1,  # weights w_ji
-              initial = NULL   # initial parameter values if pred = ~1 (not really used ATM)
+              weights = neighbourhood(stsObj) == 1  # weights w_ji
     ),
     end = list(f = ~ 1,        # a formula "exp(x'nu) * n_it"
-               offset = 1,     # optional multiplicative offset e_it
-               initial = NULL  # initial parameter values if pred = ~1 (not really used ATM)
+               offset = 1      # optional multiplicative offset e_it
     ),
     family = c("Poisson", "NegBin1", "NegBinM"),
     subset = 2:nrow(stsObj),   # epidemic components require Y_{t-lag}
@@ -45,7 +41,7 @@ hhh4 <- function (stsObj, control = list(
                      variance = list(method="nlminb")),
     verbose = FALSE,           # level of reporting during optimization
     start = list(fixed=NULL,random=NULL,sd.corr=NULL),  # list with initials,
-                               # overrides any initial values in formulas 
+                               # overrides any initial values from fe() and ri()
     data = list(t=epoch(stsObj)-1), # named list of covariates
     keep.terms = FALSE  # whether to keep interpretControl(control, stsObj)
     ), check.analyticals = FALSE)

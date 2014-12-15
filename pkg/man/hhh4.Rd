@@ -38,18 +38,15 @@ hhh4(stsObj,
                ar = list(f = ~ -1,
                          offset = 1,
                          lag = 1,
-                         weights = NULL,
-                         initial = NULL
+                         weights = NULL
                          ),
                ne = list(f = ~ -1,
                          offset = 1,
                          lag = 1,
-                         weights = neighbourhood(stsObj) == 1,
-                         initial = NULL
+                         weights = neighbourhood(stsObj) == 1
                          ),
                end = list(f = ~ 1,
-                          offset = 1,
-                          initial = NULL
+                          offset = 1
                           ),
                family = c("Poisson","NegBin1","NegBinM"),
                subset = 2:nrow(stsObj),
@@ -80,9 +77,6 @@ hhh4(stsObj,
 	    \eqn{y_{i,t-lag}}}
 	  \item{weights = NULL}{optional weights, only used if model is
 	    a contact matrix (currently not implemented)}
-	  \item{initial = NULL}{vector with initial values for
-	    parameters if \code{f = ~1} (not really
-	    used ATM)}
 	}
       }
       \item{\code{ne}}{Model for the neighbor-driven component given as
@@ -104,8 +98,6 @@ hhh4(stsObj,
 	    Time-varying weights are possible by specifying an
 	    array of \code{dim()} \code{c(nUnits, nUnits, nTime)}, where
 	    \code{nUnits=ncol(stsObj)} and \code{nTime=nrow(stsObj)}.}
-	  \item{initial = NULL}{vector with initial values for
-	    parameter if \code{f = ~1} (not really used ATM)}
 	}
       }
       \item{\code{end}}{Model for the endemic component given as list
@@ -114,8 +106,6 @@ hhh4(stsObj,
 	  \item{f = ~ 1}{a formula specifying \eqn{\log(\nu_{it})}{log(\nu_it)}}
 	  \item{offset = 1}{optional multiplicative offset \eqn{e_{it}}{e_it},
 	    either 1 or a matrix of the same dimension as \code{observed(stsObj)}}
-	  \item{initial = NULL}{vector with initial values for
-	    parameter if \code{f = ~1} (not really used ATM)}
 	}
       }
       \item{\code{family}}{Distributional family -- either \code{"Poisson"},
@@ -150,8 +140,7 @@ hhh4(stsObj,
 	\code{0:3}) specifying the amount of tracing information to be
 	output during optimization.}
       \item{\code{start}}{a list of initial parameter values; overrides
-	any initial values in formulas (this is currently the only way
-	to specify initial values).}
+	initial values set via \code{\link{fe}} and \code{\link{ri}}.}
       \item{\code{data}}{a named list of covariates that are to be
 	included as fixed effects (see \code{\link{fe}}) in any of the 3
 	component formulae.
