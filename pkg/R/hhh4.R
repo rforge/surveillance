@@ -38,7 +38,7 @@ hhh4 <- function (stsObj, control = list(
     subset = 2:nrow(stsObj),   # epidemic components require Y_{t-lag}
     optimizer = list(stop = list(tol=1e-5, niter=100),   # control arguments
                      regression = list(method="nlminb"), # for optimization 
-                     variance = list(method="nlminb")),
+                     variance = list(method="nlminb")),  # <- or "Nelder-Mead"
     verbose = FALSE,           # level of reporting during optimization
     start = list(fixed=NULL,random=NULL,sd.corr=NULL),  # list with initials,
                                # overrides any initial values from fe() and ri()
@@ -49,12 +49,14 @@ hhh4 <- function (stsObj, control = list(
   ptm <- proc.time()
   
   ## Convert old disProg class to new sts class
-  if(inherits(stsObj, "disProg")) stsObj <- disProg2sts(stsObj)
+  if (inherits(stsObj, "disProg")) {
+      stsObj <- disProg2sts(stsObj)
+  } else {
+      stopifnot(inherits(stsObj, "sts"))
+  }
   
   ## check control and set default values (for missing arguments)
   control <- setControl(control, stsObj)
-  #* if univariate, no neighbouring term
-  #* check nhood matrix
   
   ## get model terms
   model <- interpretControl(control, stsObj)
@@ -222,6 +224,8 @@ setControl <- function (control, stsObj)
   control$ne$inModel <- isInModel(control$ne$f)
   
   if (control$ne$inModel) {
+      if (nUnit == 1)
+          stop("\"ne\" component requires a multivariate 'stsObj'")
       ## if ar$f is a matrix it includes neighbouring units => no "ne" component
       if (control$ar$isMatrix)
           stop("there must not be an extra \"ne\" component ",

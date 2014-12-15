@@ -14,6 +14,7 @@
                    e_it \nu_it  }
   containing epidemic and endemic components to a multivariate time series
   of counts \eqn{Y_{it}}{Y_it} (unit \eqn{i}, period \eqn{t}).
+  Univariate count time series are supported as well.
   In the case of a negative binomial model, the conditional 
   variance is \eqn{\mu_{it}(1+\psi\mu_{it})}{\mu_it(1+\psi*\mu_it)} 
   with overdispersion parameter \eqn{\psi}. 
@@ -63,8 +64,8 @@ hhh4(stsObj,
 }
 
 \arguments{
-  \item{stsObj}{object of class \code{"\linkS4class{sts}"} containing the multivariate
-    count data time series}
+  \item{stsObj}{object of class \code{"\linkS4class{sts}"} containing the (multivariate)
+    count data time series.}
   \item{control}{a list containing the model specification and control arguments:
     \describe{
       \item{\code{ar}}{ Model for the autoregressive component given as
