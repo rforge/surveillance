@@ -6,8 +6,16 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-2 (2014-11-14)}{
-  
+\section{Changes in surveillance version 1.8-2 (2014-12-16)}{
+
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item Parameter \code{start} values in \code{hhh4()} are now
+    matched by name and need not be complete in that case (default
+    initial values are used for unspecified parameters).
+  }
+}
+
 \subsection{MINOR CHANGES related to the \code{"sts"}-class)}{
   \itemize{
     \item For univariate \code{"sts"} objects, the (meaningless)
