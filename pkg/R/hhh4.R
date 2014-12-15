@@ -18,13 +18,10 @@
 ADVICEONERROR <- "\n  Try different starting values, more iterations, or another optimizer.\n"
 
 
-### Default control argument for hhh4
-### This argument list is also set as the formal 'control' argument of hhh4()
-### below the definition of hhh4
+### Main function to be called by the user
 
-CONTROL.hhh4 <- alist(
-    ar = list(f = ~ -1,        # a formula " exp(x'lamba)*y_t-1 "
-                               # (ToDo: or a matrix " Lambda %*% y_t-1 ")
+hhh4 <- function (stsObj, control = list(
+    ar = list(f = ~ -1,        # a formula "exp(x'lamba)*y_t-lag" (ToDo: matrix)
               offset = 1,      # multiplicative offset
               lag = 1,         # autoregression on y_i,t-lag
               weights = NULL,  # for a contact matrix model (currently unused)
@@ -37,27 +34,21 @@ CONTROL.hhh4 <- alist(
               weights = neighbourhood(stsObj) == 1,  # weights w_ji
               initial = NULL   # initial parameter values if pred = ~1 (not really used ATM)
     ),
-    end = list(f = ~ 1,        # a formula " exp(x'nu) * n_it "
+    end = list(f = ~ 1,        # a formula "exp(x'nu) * n_it"
                offset = 1,     # optional multiplicative offset e_it
                initial = NULL  # initial parameter values if pred = ~1 (not really used ATM)
     ),
     family = c("Poisson", "NegBin1", "NegBinM"),
-    subset = 2:nrow(stsObj),   # typically 2:nTime if model contains lags
+    subset = 2:nrow(stsObj),   # epidemic components require Y_{t-lag}
     optimizer = list(stop = list(tol=1e-5, niter=100),   # control arguments
                      regression = list(method="nlminb"), # for optimization 
                      variance = list(method="nlminb")),
-    verbose = FALSE,           # level of reporting during hhh4() processing
+    verbose = FALSE,           # level of reporting during optimization
     start = list(fixed=NULL,random=NULL,sd.corr=NULL),  # list with initials,
                                # overrides any initial values in formulas 
-    data = list(t=epoch(stsObj)-1), # named list of covariates from any of the formulae
-    keep.terms = FALSE   # keep the result of interpretControl(control, stsObj)?
-)
-
-
-
-### Main function, which is to be called by the user
-
-hhh4 <- function (stsObj, control, check.analyticals = FALSE)
+    data = list(t=epoch(stsObj)-1), # named list of covariates
+    keep.terms = FALSE  # whether to keep interpretControl(control, stsObj)
+    ), check.analyticals = FALSE)
 {
   ptm <- proc.time()
   
@@ -174,9 +165,6 @@ hhh4 <- function (stsObj, control, check.analyticals = FALSE)
   result
 }
 
-## Store default control arguments in the formal argument list of hhh4
-formals(hhh4)[["control"]] <- as.pairlist(CONTROL.hhh4)
-
 
 ## set default values for model specifications in control
 setControl <- function (control, stsObj)
@@ -187,10 +175,9 @@ setControl <- function (control, stsObj)
   if(nTime <= 2) stop("too few observations")
   
   ## arguments in 'control' override any corresponding default arguments
-  defaultControl <- lapply(CONTROL.hhh4, eval, envir=environment())
+  defaultControl <- eval(formals(hhh4)$control)
   environment(defaultControl$ar$f) <- environment(defaultControl$ne$f) <-
       environment(defaultControl$end$f) <- .GlobalEnv
-  defaultControl$data <- as.list(defaultControl$data)
   control <- modifyList(defaultControl, control)
 
   ## check that component specifications are list objects
@@ -208,10 +195,8 @@ setControl <- function (control, stsObj)
 
   
   ### check AutoRegressive component
-  
-  control$ar$isMatrix <- is.matrix(control$ar$f)
 
-  if (is.matrix(control$ar$f)) {
+  if (control$ar$isMatrix <- is.matrix(control$ar$f)) {
       if (any(dim(control$ar$f) != nUnit))
           stop("'control$ar$f' must be a square matrix of size ", nUnit)
       # use identity matrix if weight matrix is missing
