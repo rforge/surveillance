@@ -349,11 +349,11 @@ fe <- function(x,          # covariate
   # get dimension of parameter
   dim.fe <- ifelse(unitSpecific, sum(which), 1)
   
-  #* check length of initial values + set default values?
-  if(!is.null(initial) & length(initial) !=dim.fe){
-    stop("Initial values for \'",deparse(substitute(x)),"\' must be of length ",dim.fe,"\n")
-  } else if(is.null(initial)){
+  # check length of initial values + set default values
+  if (is.null(initial)) {
     initial <- rep.int(0,dim.fe)
+  } else if (length(initial) != dim.fe) {
+    stop("initial values for '",deparse(substitute(x)),"' must be of length ",dim.fe)
   }
   
   summ <- ifelse(unitSpecific,"colSums","sum")
@@ -382,14 +382,15 @@ fe <- function(x,          # covariate
 }
 
 # random intercepts
-ri <- function(type=c("iid","car")[1], 
-               corr=c("none","all")[1],
-               initial.var=NULL,  # initial value for variance
+ri <- function(type=c("iid","car"), 
+               corr=c("none","all"),
+               initial.fe=0,
+               initial.var=-.5,
                initial.re=NULL)
 {
   stsObj <- get("stsObj", envir=parent.frame(1), inherits=TRUE) #checkFormula()
-  type <- match.arg(type, c("iid","car"))
-  corr <- match.arg(corr, c("none","all"))
+  type <- match.arg(type)
+  corr <- match.arg(corr)
   corr <- switch(corr, 
                   "none"=FALSE,
                   "all"=TRUE)
@@ -423,16 +424,12 @@ ri <- function(type=c("iid","car")[1],
     mult <- "%*%"
   } 
   
-  #* check length of initial values + set default values?
-  if(!is.null(initial.re) & length(initial.re) !=dim.re){
-    stop("Initial values for \'",type,"\' must be of length ",dim.re)
-  } else if(is.null(initial.re)){
+  # check length of initial values + set default values
+  stopifnot(length(initial.fe) == 1, length(initial.var) == 1)
+  if (is.null(initial.re)) {
     initial.re <- rnorm(dim.re,0,sd=sqrt(0.001))
-  }
-  if(!is.null(initial.var) & length(initial.var) !=1){
-    stop("Initial values for \'",type,"\' must be of length ",1)
-  } else if(is.null(initial.var)){
-    initial.var <- -.5
+  } else if (length(initial.re) != dim.re) {
+    stop("'initial.re' must be of length ", dim.re)
   }
 
   result <- list(terms=1,
@@ -440,7 +437,7 @@ ri <- function(type=c("iid","car")[1],
                 Z.intercept=Z,
                 which=NULL,
                 dim.fe=1,
-                initial.fe=0,
+                initial.fe=initial.fe,
                 dim.re=dim.re,
                 dim.var=1,
                 initial.var=initial.var,

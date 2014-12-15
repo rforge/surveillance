@@ -16,8 +16,8 @@ respectively, in formulae used in the function \code{\link{hhh4}}.
 \usage{
   fe(x, which = NULL, initial = NULL)
 
-  ri(type = c("iid","car")[1], corr = c("none", "all")[1],
-     initial.var = NULL, initial.re = NULL)
+  ri(type = c("iid","car"), corr = c("none", "all"),
+     initial.fe = 0, initial.var = -.5, initial.re = NULL)
 }
 
 \arguments{
@@ -41,17 +41,18 @@ respectively, in formulae used in the function \code{\link{hhh4}}.
     If \code{which=NULL}, the parameter is assumed to be the same
     for all units.}
   \item{initial}{initial values (on internal scale!) 
-    for the fixed effects used for optimization.
-    Not really used ATM.}
-  \item{type}{random intercepts either follow an IID or a CAR
-   model}
-  \item{corr}{logical switch indicating whether random effects
+    for the fixed effects used for optimization. The default
+    (\code{NULL}) means to use zeroes.}
+  \item{type}{random intercepts either follow an IID or a CAR model.}
+  \item{corr}{whether random effects
    in different components (such as \code{ar} and \code{end})
-   should be correlated or not. }
+   should be correlated or not.}
+  \item{initial.fe}{initial value for the random intercept mean.}
   \item{initial.var}{initial values (on internal scale!) 
-    for the variance components used for optimization. Not really used ATM.}
+    for the variance components used for optimization.}
   \item{initial.re}{initial values (on internal scale!) for the random effects 
-    used for optimization. Not really used ATM.}
+    used for optimization. The default \code{NULL} are random numbers
+    from a normal distribution with zero mean and variance 0.001.}
 }
 
 
