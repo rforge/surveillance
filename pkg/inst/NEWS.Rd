@@ -8,15 +8,20 @@
 
 \section{Changes in surveillance version 1.8-2 (2014-12-16)}{
 
-\subsection{NEW FEATURES}{
+\subsection{MINOR CHANGES related to \code{hhh4}}{
   \itemize{
     \item Parameter \code{start} values in \code{hhh4()} are now
-    matched by name and need not be complete in that case (default
+    matched by name but need not be complete in that case (default
     initial values are used for unspecified parameters).
+
+    \item The \code{update.hhh4()}-method now by default does
+    \code{use.estimates} from the previous fit.
+    Setting \code{use.estimates = FALSE} means to re-use the previous
+    start specification.
   }
 }
 
-\subsection{MINOR CHANGES related to the \code{"sts"}-class)}{
+\subsection{MINOR CHANGES related to the \code{"sts"}-class}{
   \itemize{
     \item For univariate \code{"sts"} objects, the (meaningless)
     \dQuote{head of neighbourhood} is no longer \code{show}n.

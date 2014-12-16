@@ -315,15 +315,44 @@ predict.hhh4 <- function(object, newSubset = object$control$subset,
 ## S: a named list to adjust the number of harmonics of the three components
 ## subset.upper: refit on a subset of the data up to that time point
 ## use.estimates: use fitted parameters as new start values
-##                (only applicable if same model)
 
 update.hhh4 <- function (object, ..., S = NULL, subset.upper = NULL,
-                         use.estimates = FALSE, evaluate = TRUE)
+                         use.estimates = TRUE, evaluate = TRUE)
 {
     control <- object$control
 
     ## first modify the control list according to the components in ...
-    control <- modifyList(control, list(...))
+    extras <- list(...)
+    control <- modifyList(control, extras)
+
+    ## adjust start values
+    control$start <- if (use.estimates) { # use parameter estimates
+        hhh4coef2start(object)
+    } else local({ # re-use previous 'start' specification
+        ## for pre-1.8-2 "hhh4" objects,
+        ## object$control$start is not necessarily a complete list:
+        template <- eval(formals(hhh4)$control$start)
+        template[] <- object$control$start[names(template)]
+        template
+    })
+    ## and update according to an extra 'start' argument
+    if (!is.null(extras[["start"]])) {
+        if (!is.list(extras$start) || is.null(names(extras$start))) {
+            stop("'start' must be a named list, see 'help(\"hhh4\")'")
+        }
+        control$start[] <- mapply(
+            FUN = function (now, extra) {
+                if (is.null(names(extra))) {
+                    extra
+                } else { # can retain non-extra values
+                    now[names(extra)] <- extra
+                    now
+                }
+            },
+            control$start, extras$start[names(control$start)],
+            SIMPLIFY = FALSE, USE.NAMES = FALSE
+        )
+    }
 
     ## adjust seasonality
     if (!is.null(S)) {
@@ -340,9 +369,6 @@ update.hhh4 <- function (object, ..., S = NULL, subset.upper = NULL,
     if (isScalar(subset.upper))
         control$subset <- control$subset[control$subset <= subset.upper]
 
-    ## use previous estimates as new start values
-    if (use.estimates)
-        control$start <- hhh4coef2start(object)
 
     ## fit the updated model or just return the modified control list
     if (evaluate) { 
