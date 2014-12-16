@@ -140,8 +140,15 @@ hhh4(stsObj,
       \item{\code{verbose}}{non-negative integer (usually in the range
 	\code{0:3}) specifying the amount of tracing information to be
 	output during optimization.}
-      \item{\code{start}}{a list of initial parameter values; overrides
-	initial values set via \code{\link{fe}} and \code{\link{ri}}.}
+      \item{\code{start}}{a list of initial parameter values replacing
+	initial values set via \code{\link{fe}} and \code{\link{ri}}.
+	Since \pkg{surveillance} 1.8-2, named vectors are matched
+	against the coefficient names in the model (where unmatched
+	start values are silently ignored), and need not be complete,
+	e.g., \code{start = list(fixed = c("-log(overdisp)" = 0.5))}
+	(default: 2) for a \code{family = "NegBin1"} model.
+	In contrast, an unnamed start vector must specify the full set
+	of parameters as used by the model.}
       \item{\code{data}}{a named list of covariates that are to be
 	included as fixed effects (see \code{\link{fe}}) in any of the 3
 	component formulae.
