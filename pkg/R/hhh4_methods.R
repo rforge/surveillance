@@ -401,9 +401,15 @@ removeTimeFromFormula <- function (f, timevar = "t") {
 
 ## convert fitted parameters to a list suitable for control$start
 hhh4coef2start <- function (fit)
-    list(fixed = fit$coefficients[seq_len(fit$dim[1L])],
-         random = fit$coefficients[fit$dim[1L]+seq_len(fit$dim[2L])],
-         sd.corr = fit$Sigma.orig)
+{
+    res <- list(fixed = fit$coefficients[seq_len(fit$dim[1L])],
+                random = fit$coefficients[fit$dim[1L]+seq_len(fit$dim[2L])],
+                sd.corr = fit$Sigma.orig)
+    if (any(!nzchar(names(res$random)))) { # no names pre 1.8-2
+        names(res$random) <- NULL
+    }
+    res
+}
 
 ## character vector of model components that are "inModel"
 componentsHHH4 <- function (object)

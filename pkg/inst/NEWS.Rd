@@ -15,7 +15,9 @@
     initial values are used for unspecified parameters).
 
     \item The \code{update.hhh4()}-method now by default does
-    \code{use.estimates} from the previous fit.
+    \code{use.estimates} from the previous fit. This reduces the
+    number of iterations during model fitting but may lead to slightly
+    different parameter estimates (within a tolerance of \code{1e-5}).
     Setting \code{use.estimates = FALSE} means to re-use the previous
     start specification.
   }
