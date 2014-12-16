@@ -51,8 +51,6 @@
            Revent and are no longer atRiskY in the new first block?
            Individuals with atRiskY=0 in the first block are considered
 	   initially infective...
-31/10/2014 use data("hagelloch") as an example on the help pages
-
 
 #Fixed
 25/03/2011 intensityPlot in twinSIR does not work if there are initially
@@ -165,7 +163,6 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 #======================================================================
 
 #Open
-01/10/2014 make update.hhh4(..., use.estimates=TRUE) generally useable
 14/10/2014 incorporate showsim.* function from power-law paper
            as plot-methods for arrays of simulated counts returned by
            simulate.hhh4(..., simplify=TRUE)
@@ -174,6 +171,7 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 17/11/2014 add checkNeighbourhood(..., strict=TRUE) for integer check
 
 #Done
+16/12/2014 make update.hhh4(..., use.estimates=TRUE) generally useable
 - add documentation for oneStepAhead predictions/scores
 - improve and document plot/predict methods
 - remove redundant elements in control/stsObj/terms to reduce the
