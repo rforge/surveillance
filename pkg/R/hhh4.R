@@ -425,7 +425,7 @@ ri <- function(type=c("iid","car"),
     # Z = L(L'L)^-1, which can't be simplified to Z=(L')^-1 as L is not square
     Z <- L %*% solve(t(L)%*%L)
     
-    dim.re <- dimK-1
+    dim.re <- dimK - 1L
     mult <- "%*%"
   } 
   
@@ -628,10 +628,18 @@ interpretControl <- function (control, stsObj)
   }
   
   n <- c("ar","ne","end")[unlist(all.term["offsetComp",])]
-  names.fe <- names.var <- NULL
-  for(i in 1:length(n)){
-    names.fe <- c(names.fe,paste(n[i],all.term["name",i][[1]], sep="."))
-    if(all.term["random",i][[1]]) names.var <- c(names.var,paste("sd",n[i],all.term["name",i][[1]], sep="."))
+  names.fe <- names.var <- names.re <- character(0L)
+  for(i in seq_along(n)){
+    .name <- all.term["name",i][[1]]
+    names.fe <- c(names.fe, paste(n[i], .name, sep="."))
+    if(all.term["random",i][[1]]) {
+        names.var <- c(names.var, paste("sd", n[i], .name, sep="."))
+        names.re <- c(names.re, paste(n[i], .name, if (.name == "ri(iid)") {
+            colnames(stsObj)
+        } else {
+            seq_len(all.term["dim.re",i][[1]])
+        }, sep = "."))
+    }
   }
   index.fe <- rep(1:ncol(all.term), times=unlist(all.term["dim.fe",]))
   index.re <- rep(1:ncol(all.term), times=unlist(all.term["dim.re",])) 
@@ -671,13 +679,13 @@ interpretControl <- function (control, stsObj)
       fixed = c(unlist(all.term["initial.fe",]),
                 initial.d,
                 rep.int(2, dim.overdisp)),
-      random = unlist(all.term["initial.re",]),
+      random = as.numeric(unlist(all.term["initial.re",])), # NULL -> numeric(0)
       sd.corr = c(unlist(all.term["initial.var",]),
                   rep.int(0, dim.corr))
   )
   # set names of parameter vectors
   names(initial$fixed) <- c(names.fe, names.d, names.overdisp)
-  ## FIXME: also set names(initial$random)
+  names(initial$random) <- names.re
   names(initial$sd.corr) <- c(names.var, head(paste("corr",1:3,sep="."), dim.corr))
 
   # modify initial values according to the supplied 'start' values

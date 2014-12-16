@@ -10,6 +10,9 @@
 
 \subsection{MINOR CHANGES related to \code{hhh4}}{
   \itemize{
+    \item In the coefficient vector resulting from a \code{hhh4} fit,
+    random intercepts are now named.
+    
     \item Parameter \code{start} values in \code{hhh4()} are now
     matched by name but need not be complete in that case (default
     initial values are used for unspecified parameters).
