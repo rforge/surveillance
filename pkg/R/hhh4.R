@@ -392,6 +392,8 @@ ri <- function(type=c("iid","car"),
                initial.re=NULL)
 {
   stsObj <- get("stsObj", envir=parent.frame(1), inherits=TRUE) #checkFormula()
+  if (ncol(stsObj) == 1)
+      stop("random intercepts require a multivariate 'stsObj'")
   type <- match.arg(type)
   corr <- match.arg(corr)
   corr <- switch(corr, 
