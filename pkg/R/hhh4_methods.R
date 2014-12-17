@@ -454,3 +454,57 @@ formula.hhh4 <- function (x, ...)
     lapply(x$control[c("ar", "ne", "end")], "[[", "f")
 }
 
+
+## decompose the fitted mean of a "hhh4" model returning an array
+## with dimensions (t, i, j), where the first j index is "endemic"
+decompose.hhh4 <- function (x, coefs = x$coefficients, ...)
+{
+    ## get three major components from meanHHH() function
+    meancomps <- meanHHH(coefs, terms.hhh4(x))
+
+    ## this contains c("endemic", "epi.own", "epi.neighbours")
+    ## but we really want the mean by neighbour
+    neArray <- c(meancomps$ne.exppred) * neOffsetArray(x, coefW(coefs))
+    ##<- ne.exppred is (t, i) and recycled for (t, i, j)
+    stopifnot(all.equal(rowSums(neArray, dims = 2), meancomps$epi.neighbours,
+                        check.attributes = FALSE))
+    
+    ## add autoregressive part to neArray
+    diagidx <- cbind(c(row(meancomps$epi.own)),
+                     c(col(meancomps$epi.own)),
+                     c(col(meancomps$epi.own)))
+    ## usually: neArray[diagidx] == 0
+    neArray[diagidx] <- neArray[diagidx] + meancomps$epi.own
+    
+    ## add endemic component to the array
+    res <- array(c(meancomps$endemic, neArray),
+          dim = dim(neArray) + c(0, 0, 1),
+          dimnames = with(dimnames(neArray), list(t=t, i=i, j=c("endemic",j))))
+    stopifnot(all.equal(rowSums(res, dims = 2), meancomps$mean,
+                        check.attributes = FALSE))
+    res
+}
+
+## get the w_{ji} Y_{j,t-1} values from a fitted hhh4 model
+## (i.e., before summing the neighbourhood component over j)
+## in an array with dimensions (t, i, j)
+neOffsetArray <- function (object, coefW = NULL, subset = object$control$subset)
+{
+    env <- new.env(hash = FALSE, parent = environment(terms(object)$offset$ne))
+    env$pars <- if (is.null(coefW)) coefW(object) else coefW
+    env$subset <- subset
+    res <- with(env, apply(neweights$w(pars, nbmat, data), 2L, function (wi) {
+        tm1 <- subset - lag
+        is.na(tm1) <- tm1 <= 0
+        t(Y[tm1,,drop=FALSE]) * wi
+    }))
+    dim(res) <- c(object$nUnit, length(subset), object$nUnit)
+    dimnames(res) <- list("j" = colnames(object$stsObj),
+                          "t" = rownames(object$stsObj)[subset],
+                          "i" = colnames(object$stsObj))
+    stopifnot(all.equal(colSums(res),  # sum over j
+                        terms(object)$offset$ne(env$pars)[subset,,drop=FALSE],
+                        check.attributes = FALSE))
+    ## permute dimensions as (t, i, j)
+    aperm(res, perm = c(2L, 3L, 1L), resize = TRUE)
+}
