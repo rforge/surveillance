@@ -13,7 +13,9 @@
 }
 
 \usage{
-linelist2sts(linelist,dateCol,aggregate.by="1 week",dRange=NULL,
+linelist2sts(linelist,dateCol,aggregate.by=c("1 day", "1 week", "7 day",
+"1 week", "1 month", "3 month", "1 year"),
+            dRange=NULL,
             startYearFormat=switch(aggregate.by,
 "1 day"="\%V","7 day"="\%V","1 week"="\%V","1 month"="\%Y","3 month"="\%Y"),
            startEpochFormat=switch(aggregate.by,

@@ -68,6 +68,7 @@ algo.twins(disProgObj, control=list(burnin=1000, filter=10,
 }
 
 \examples{
+\dontrun{
 # Load the data used in the Held et al. (2006) paper
 data("hepatitisA")
 
@@ -85,6 +86,7 @@ plot(otwins, ask=FALSE)
 hist(otwins$logFile$psi,xlab=expression(psi),main="")
 if (require("coda")) {
     print(summary(mcmc(otwins$logFile[,c("psi","xipsi","K")])))
+}
 }
 }
 

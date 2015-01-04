@@ -1,0 +1,10 @@
+#Getting valgrind to work on a Mac.
+
+#Install valgrind
+#http://stackoverflow.com/questions/26564125/yosemite-and-valgrind
+
+#Compile & install package with symbols
+#http://cran.r-project.org/doc/manuals/r-release/R-exts.html#Using-valgrind
+R CMD INSTALL --dsym .
+
+R -d "valgrind --tool=memcheck --leak-check=full --dsymutil=yes --track-origins=yes -v" --vanilla < algo-twins.R &> error-8.txt
