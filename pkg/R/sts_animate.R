@@ -5,7 +5,7 @@
 ###
 ### Animated map (and time series chart) of an sts-object (or matrix of counts)
 ###
-### Copyright (C) 2013-2014 Sebastian Meyer
+### Copyright (C) 2013-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -44,10 +44,13 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
         cti <- if (cumulative) seq_len(i) else i
         ls <- stsplot_space(object, tps=tps[cti], population=population,
                             at=at, ...)
-        if (is.list(timeplot) && require("gridExtra")) {
-            ## NOTE: unfortunately (R-exts, Section 1.1.3.1), only loading the
-            ## namespace of package "gridExtra" would not be sufficient here;
-            ## nothing would be plotted by grid.arrange() in that case ...
+        if (is.list(timeplot) && requireNamespace("gridExtra")) {
+            ## For gridExtra 0.9.1, loading its namespace is not sufficient:
+            ## gridExtra::grid.arrange() produces an empty plot in that case.
+            ## Since CRAN now disallows require("gridExtra") in package code,
+            ## the user has to manually attach the package beforehand.
+            ## NOTE: Plotting by namespace works with the current version at
+            ## https://github.com/baptiste/gridextra
             lt <- do.call("stsplot_timeSimple", c(
                 list(x=object, tps=tps, highlight=cti),
                 timeplot))
