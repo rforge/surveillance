@@ -6,8 +6,10 @@
 \encoding{latin1}
 
 \section{Changes in surveillance version 1.8-3 (2015-01-05)}{
-  This version consists only of a minor update of the \code{DESCRIPTION}
-  file to allow for the new INLA additional repository.
+  \itemize{
+    \item This version consists only of a minor update of the \code{DESCRIPTION}
+    file to allow for the new INLA additional repository.
+  }
 }
 
 \section{Changes in surveillance version 1.8-2 (2014-12-16)}{

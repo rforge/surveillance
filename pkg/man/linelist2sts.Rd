@@ -17,9 +17,9 @@ linelist2sts(linelist,dateCol,aggregate.by=c("1 day", "1 week", "7 day",
 "1 week", "1 month", "3 month", "1 year"),
             dRange=NULL,
             startYearFormat=switch(aggregate.by,
-"1 day"="\%V","7 day"="\%V","1 week"="\%V","1 month"="\%Y","3 month"="\%Y"),
+"1 day"="\%V","7 day"="\%V","1 week"="\%V","1 month"="\%Y","3 month"="\%Y","1 year"="\%Y"),
            startEpochFormat=switch(aggregate.by,
-"1 day"="\%j","7 day"="\%V","1 week"="\%V","1 month"="\%m","3 month"="\%Q")
+"1 day"="\%j","7 day"="\%V","1 week"="\%V","1 month"="\%m","3 month"="\%Q","1 year"="1")
 )
 }
 \arguments{
@@ -50,6 +50,11 @@ linelist2sts(linelist,dateCol,aggregate.by=c("1 day", "1 week", "7 day",
   extended such that the starting and ending dates are mondays. This
   might not be an appropriate way in all situations this function is
   to be used.
+
+  Please note that the formatting strings are implemented by the
+  internal \code{formatDate} function, which uses the \code{strptime}
+  formatting strings (ISO8601 are made Windows compatible) as well as
+  formatting of quarters using "\%Q", "\%OQ" and "\%q".
 }
 
 \value{
@@ -66,7 +71,7 @@ Michael \enc{Höhle}{Hoehle}
 }
 
 \seealso{
-  See also \code{\link{seq.Date}}.
+  See also \code{\link{seq.Date}}, \code{\link{strptime}}, \code{\link{isoWeekYear}}.
 }
 
 \examples{
