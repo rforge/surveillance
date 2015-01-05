@@ -77,7 +77,8 @@ unionSpatialPolygons <- function (SpP,
             ## library("maptools") in package code (cf. R-exts 1.1.3.1),
             ## the user has to attach "maptools" manually beforehand
             if (!"maptools" %in% .packages()) {
-                stop("package \"maptools\" needs to be attached")
+                stop("need 'library(\"maptools\")'; ",
+                     "then call surveillance::unionSpatialPolygons")
             }
             gpclibCheck() && maptools::gpclibPermit()
             maptools::unionSpatialPolygons(
