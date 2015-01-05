@@ -393,7 +393,7 @@ Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1111/biom.12194">Höhle, M. and An der Heiden, M. (<b>2014</b>)</a></dd>
 <dd><i>Bayesian Nowcasting during the STEC O104:H4 Outbreak in Germany, 2011</i></dd>
-<dd>Biometrics, E-pub ahead of print</dd>
+<dd>Biometrics, 70(4):993–1002.</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1016/j.csda.2008.02.015">Höhle, M. and Paul, M. (<b>2008</b>)</a></dd>
