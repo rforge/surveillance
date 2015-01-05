@@ -58,6 +58,17 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
             lt$aspect.ratio <- timeplot_height * ls$aspect.ratio
             gridExtra::grid.arrange( # calls grid.draw()
                 ls, lt, heights=c(1-timeplot_height, timeplot_height))
+            ## alternative using package "gtable":
+            ## drawDetails.lattice <- function (x, recording = FALSE)
+            ##     plot(x$p, newpage = FALSE)
+            ## heights <- c(1-timeplot_height, timeplot_height)
+            ## gt <- gtable::gtable(widths = grid::unit(1, units = "null"),
+            ##                      heights = grid::unit(heights, units = "null"))
+            ## gt <- gtable::gtable_add_grob(gt, list(grid::grob(p = ls, cl = "lattice"),
+            ##                                        grid::grob(p = lt, cl = "lattice")),
+            ##                               t = 1:2, l = 1)
+            ## grid::grid.newpage()
+            ## grid::grid.draw(gt)
         } else print(ls)
         if (verbose) setTxtProgressBar(pb, i)
         if (dev.interactive()) Sys.sleep(sleep)
