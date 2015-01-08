@@ -173,3 +173,26 @@ layout.labels <- function (obj, labels = TRUE)
     ## return layout item
     c("panel.text", labels.args)
 }
+
+
+### determine the total area of a SpatialPolygons object
+## CAVE: sum(sapply(obj@polygons, slot, "area"))
+##       is not correct if the object contains holes
+
+areaSpatialPolygons <- function (obj, byid = FALSE)
+{
+    if (requireNamespace("rgeos", quietly = TRUE)) {
+        rgeos::gArea(obj, byid = byid)
+    } else {
+        areas <- vapply(
+            X = obj@polygons,
+            FUN = function (p) sum(
+                vapply(X = p@Polygons,
+                       FUN = function (x) (1-2*x@hole) * x@area,
+                       FUN.VALUE = 0, USE.NAMES = FALSE)
+            ),
+            FUN.VALUE = 0, USE.NAMES = FALSE
+        )
+        if (byid) setNames(areas, row.names(obj)) else sum(areas)
+    }
+}

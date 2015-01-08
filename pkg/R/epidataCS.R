@@ -6,7 +6,7 @@
 ### Data structure for CONTINUOUS SPATIO-temporal infectious disease case data
 ### and a spatio-temporal grid of endemic covariates
 ###
-### Copyright (C) 2009-2014 Sebastian Meyer
+### Copyright (C) 2009-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -63,11 +63,12 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     tiles <- NULL                       # FIXME: add argument to as.epidataCS
     stgrid <- if (missing(stgrid) && inherits(tiles, "SpatialPolygons")) {
         if (verbose) cat("\t(missing, using time-constant 'tiles' grid)\n")
-        stgrid_template <- data.frame(start = min(events$time),
-                                      stop = max(events$time),
-                                      tile = row.names(tiles),
-                                      area = sapply(tiles@polygons, slot, "area"),
-                                      check.rows = FALSE, check.names = FALSE)
+        stgrid_template <- data.frame(
+            start = min(events$time),
+            stop = max(events$time),
+            tile = row.names(tiles),
+            area = areaSpatialPolygons(tiles, byid = TRUE),
+            check.rows = FALSE, check.names = FALSE)
         check_stgrid(stgrid_template, verbose = FALSE)
     } else {
         check_stgrid(stgrid, T, verbose = verbose)
@@ -400,8 +401,9 @@ check_W <- function (W, area.other = NULL, other, tolerance = 0.001)
 
 check_W_area <- function (W, area.other, other, tolerance = 0.001)
 {
-    area.W <- sum(sapply(W@polygons, slot, "area"))
-    if (!isTRUE(all.equal(area.other, area.W, tolerance = tolerance)))
+    area.W <- areaSpatialPolygons(W)
+    if (!isTRUE(all.equal.numeric(area.other, area.W, tolerance = tolerance,
+                                  check.attributes = FALSE)))
         warning("area of 'W' (", area.W, ") differs from ",
                 "total tile area in '", other, "' (", area.other, ")")
 }
@@ -435,7 +437,7 @@ check_tiles <- function (tiles, levels,
     }
 
     ## check areas
-    areas.tiles <- sapply(tiles[levels,]@polygons, slot, "area")
+    areas.tiles <- areaSpatialPolygons(tiles[levels,], byid = TRUE)
     if (!is.null(areas.stgrid)) {
         check_tiles_areas(areas.tiles, areas.stgrid, tolerance=tolerance)
     }
@@ -477,9 +479,9 @@ check_tiles_events <- function (tiles, events)
 
 check_tiles_areas <- function (areas.tiles, areas.stgrid, tolerance = 0.05)
 {
-    stopifnot(length(areas.tiles) == length(areas.stgrid))
-    areas_all_equal <- all.equal(areas.stgrid, areas.tiles,
-                                 tolerance = tolerance)
+    areas_all_equal <- all.equal.numeric(areas.stgrid, areas.tiles,
+                                         tolerance = tolerance,
+                                         check.attributes = FALSE)
     if (!isTRUE(areas_all_equal))
         warning("tile areas in 'stgrid' differ from areas of 'tiles': ",
                 areas_all_equal)

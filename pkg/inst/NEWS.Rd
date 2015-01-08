@@ -5,12 +5,34 @@
 \title{News for Package 'surveillance'}
 \encoding{latin1}
 
-\section{Changes in surveillance version 1.8-3 (2015-01-05)}{
+
+\section{Changes in surveillance version 1.8-4 (2015-01-08)}{
+
+\subsection{BUG FIXES}{
   \itemize{
-    \item This version consists only of a minor update of the \code{DESCRIPTION}
-    file to allow for the new INLA additional repository.
+    \item The functions \code{as.epidataCS()} and \code{simEpidataCS()}
+    could throw inappropriate warnings when checking polygon areas
+    (only if \code{W} or \code{tiles}, respectively, contained holes).
   }
 }
+
+}
+
+
+
+\section{Changes in surveillance version 1.8-3 (2015-01-05)}{
+  
+  \itemize{
+    \item Accommodate a new note given by R-devel checks, and set the new
+    INLA additional repository in the \file{DESCRIPTION} file.
+
+    \item Made \code{linelist2sts()} work for quarters by adding extra
+    \code{"\%q"} formatting in \code{formatDate()}.
+  }
+
+}
+
+
 
 \section{Changes in surveillance version 1.8-2 (2014-12-16)}{
 
