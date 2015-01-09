@@ -5,7 +5,7 @@
 ###
 ### Some internal helper functions for "twinstim".
 ###
-### Copyright (C) 2009-2014 Sebastian Meyer
+### Copyright (C) 2009-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -21,20 +21,20 @@ determineSources <- function (i, eventTimes, removalTimes, distvec, eps.s,
     eventTypes = NULL, qmatrix)
 {
     tp <- eventTimes[i]
-    type <- eventTypes[i]   # NULL[i] -> NULL
     infectivity <- (eventTimes < tp) & (removalTimes >= tp)
     #<- eventTimes<tp, not "=" because CIF is left-continuous.
     #Also guarantees no self-infection
-    proximity <- as.vector(distvec <= eps.s, mode = "logical")
-    #<- as.vector to remove names
-    matchType <- if (is.null(eventTypes)) TRUE else {
+    proximity <- distvec <= eps.s
+    sources <- if (is.null(eventTypes)) {
+        which(infectivity & proximity)
+    } else {
+        type <- eventTypes[i]
         typeInfective <- qmatrix[,type] # indexed by integer code of factor
         #<- logical vector indicating for each type if it could infect type of i
-        as.vector(typeInfective, mode = "logical")[eventTypes]
-        #<- as.vector to remove names
+        matchType <- typeInfective[eventTypes]
+        which(infectivity & proximity & matchType)
     }
-    # return indexes of potential epidemic sources
-    which(infectivity & proximity & matchType)
+    unname(sources)
 }
 
 ## determine the .sources for an epidataCS object, i.e.
