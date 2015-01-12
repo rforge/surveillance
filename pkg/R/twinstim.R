@@ -6,7 +6,7 @@
 ### Maximum Likelihood inference for the two-component spatio-temporal intensity
 ### model described in Meyer et al (2012), DOI: 10.1111/j.1541-0420.2011.01684.x
 ###
-### Copyright (C) 2009-2014 Sebastian Meyer
+### Copyright (C) 2009-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -212,18 +212,20 @@ twinstim <- function (
         gIntUpper <- mfe[["(obsInfLength)"]]
         gIntLower <- pmax(0, t0-eventTimes)
         eventCoords <- coordinates(data$events)[inmfe,,drop=FALSE]
+        ## if (verbose && N > 6000)
+        ##     cat("calculating distance matrix of", N, "events ...\n")
         eventDists <- as.matrix(dist(eventCoords, method = "euclidean"))
         influenceRegion <- data$events@data$.influenceRegion[inmfe]
         iRareas <- sapply(influenceRegion, attr, "area",
                           simplify=TRUE, USE.NAMES=FALSE)
-        # determine possible event sources (need to re-do this because
-        # subsetting has crashed old row indexes from the epidataCS object)
-        # actually only eventSources of includes are needed
-        eventSources <- lapply(seq_len(N), function (i)
-                               determineSources(i, eventTimes, removalTimes,
-                                                eventDists[i,],
-                                                eps.s, eventTypes, qmatrix))
-        # calculate sum_{k=1}^K q_{kappa_j,k} for all j = 1:N
+        eventSources <- if (N == nobs(data) && identical(qmatrix, data$qmatrix)) {
+            data$events@data$.sources
+        } else { # re-determine because subsetting has invalidated row indexes
+            lapply(seq_len(N), function (i)
+                determineSources(i, eventTimes, removalTimes, eventDists[i,],
+                                 eps.s, eventTypes, qmatrix))
+        }
+        ## calculate sum_{k=1}^K q_{kappa_j,k} for all j = 1:N
         qSum <- unname(rowSums(qmatrix)[eventTypes])   # N-vector
     } else if (verbose) message("no epidemic component in model")
 

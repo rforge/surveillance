@@ -6,7 +6,15 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-4 (2015-01-08)}{
+\section{Changes in surveillance version 1.8-4 (2015-01-12)}{
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item Initial data processing in \code{twinstim()} is faster
+    since event sources are only re-determined if there is effective
+    need for an update (due to subsetting or a change of \code{qmatrix}).
+  }
+}
 
 \subsection{BUG FIXES}{
   \itemize{
