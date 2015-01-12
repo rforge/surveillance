@@ -21,6 +21,9 @@
     \item The functions \code{as.epidataCS()} and \code{simEpidataCS()}
     could throw inappropriate warnings when checking polygon areas
     (only if \code{W} or \code{tiles}, respectively, contained holes).
+
+    \item Non-convergent endemic-only \code{twinstim} models
+    produced an error (spotted by Bing Zhang).
   }
 }
 

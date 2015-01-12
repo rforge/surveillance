@@ -1213,7 +1213,7 @@ twinstim <- function (
                     !is.null(optimRes$message) && nzchar(optimRes$message)) {
                     cat("MESSAGE: \"", optimRes$message, "\"\n", sep="")
                 }
-                if (useScore && !constantsiaf &&
+                if (hase && useScore && !constantsiaf &&
                     grepl("false", msgNotConverged)) {
                     cat("SOLUTION: increase the precision of 'siaf$Deriv' (and 'siaf$F')\n")
                     if (optimMethod == "nlminb") {
