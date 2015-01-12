@@ -133,7 +133,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     removalTimes <- events$time + events$eps.t
 
     # Calculate distance matrix of events
-    if (verbose) cat("Calculating euclidean distance matrix of events ...\n")
+    if (verbose) cat("Calculating Euclidean distance matrix of events ...\n")
     eventDists <- as.matrix(dist(eventCoords, method = "euclidean"))
     #diag(eventDists) <- Inf   # infinite distance to oneself (no self-infection), not needed
 
@@ -216,6 +216,12 @@ check_events <- function (events, dropTypes = TRUE, verbose = TRUE)
     stopifnot(inherits(events, "SpatialPointsDataFrame"))
     if (ncol(events@coords) != 2L) {
         stop("only two spatial dimensions are supported")
+    }
+
+    # check suitability of Euclidean geometry
+    if (identical(FALSE, is.projected(events))) { # is.projected may return NA
+        warning("\"epidataCS\" expects planar coordinates; ",
+                "see 'spTransform' in package \"rgdal\"")
     }
 
     # Check existence of type column
