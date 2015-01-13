@@ -15,9 +15,9 @@ number of events along the time axis (\code{epidataCSplot_time}) as a
 }
 
 \usage{
-\method{plot}{epidataCS}(x, aggregate = c("time", "space"), subset, bytype = TRUE, ...)
+\method{plot}{epidataCS}(x, aggregate = c("time", "space"), subset, by = type, ...)
 
-epidataCSplot_time(x, subset, bytype = TRUE,
+epidataCSplot_time(x, subset, by = type,
                    t0.Date = NULL, freq = TRUE, col = rainbow(nTypes),
                    cumulative = list(),
                    add = FALSE, mar = NULL, xlim = NULL, ylim = NULL,
@@ -25,7 +25,7 @@ epidataCSplot_time(x, subset, bytype = TRUE,
                    panel.first = abline(h=axTicks(2), lty=2, col="grey"),
                    legend.types = list(), ...)
 
-epidataCSplot_space(x, subset, bytype = TRUE,
+epidataCSplot_space(x, subset, by = type,
                     cex.fun = sqrt, points.args = list(), add = FALSE,
                     legend.types = list(), legend.counts = list(), ...)
 }
@@ -61,12 +61,14 @@ epidataCSplot_space(x, subset, bytype = TRUE,
     region \code{x$W}.
   }
 
-  \item{bytype}{logical indicating if the plot should distinguish
-    between event types. If this is \code{TRUE} (default),
-    the bars of the temporal plot are stacked by type, and the point colors
-    in the spatial plot differ by type, respectively.
-    To select specific event types for plotting use the \code{subset}
-    argument, e.g., \code{subset=(type=="B")}.}
+  \item{by}{an expression evaluated in \code{marks(x)}, defining how
+    events should be stratified in the plot (the result is converted to
+    a factor), or \code{NULL} to disregard event types.
+    By default (\code{by = type}) the plot distinguishes between event
+    types, i.e., the bars of the temporal plot are stacked by type, and
+    the point colors in the spatial plot differ by type, respectively.\cr
+    Note: to select specific event types for plotting use the
+    \code{subset} argument, e.g., \code{subset=(type=="B")}.}
   \item{t0.Date}{the beginning of the observation period
     \code{t0 = x$stgrid$start[1]} as a \code{"\link{Date}"} (or
     anything coercible by \code{as.Date} without further arguments),
@@ -140,7 +142,7 @@ data("imdepi")
 
 ## show the occurrence of events along time
 plot(imdepi, "time", main = "Histogram of event time points")
-plot(imdepi, "time", bytype = FALSE, main = "Aggregated over both event types")
+plot(imdepi, "time", by = NULL, main = "Aggregated over both event types")
 
 ## show the distribution in space
 plot(imdepi, "space", lwd=2)

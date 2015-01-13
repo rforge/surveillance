@@ -10,9 +10,10 @@
 
 \subsection{NEW FEATURES}{
   \itemize{
-    \item New argument \code{bytype} for \code{plot.epidataCS()}, which
-    can be set to \code{FALSE} to make the plot not distinguish between
-    event types.
+    \item New argument \code{by} for \code{plot.epidataCS()}, which
+    defines a stratifying variable for the events (default is the event
+    type as before). It can also be set to \code{NULL} to make the plot
+    not distinguish between event types.
   }
 }
 

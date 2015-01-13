@@ -12,19 +12,19 @@
 
 
 plot.epidataCS <- function (x, aggregate = c("time", "space"), subset,
-                            bytype = TRUE, ...)
+                            by = type, ...)
 {
     aggregate <- match.arg(aggregate)
     FUN <- paste("epidataCSplot", aggregate, sep = "_")
     do.call(FUN, args = list(x = quote(x), subset = substitute(subset),
-                             bytype = bytype, ...))
+                             by = substitute(by), ...))
 }
 
 
 ### plot.epidataCS(x, aggregate = "time") -> number of cases over time
 ## in case t0.Date is specified, hist.Date() is used and breaks must set in ... (e.g. "months")
 
-epidataCSplot_time <- function (x, subset, bytype = TRUE,
+epidataCSplot_time <- function (x, subset, by = type,
     t0.Date = NULL, freq = TRUE,
     col = rainbow(nTypes), cumulative = list(), add = FALSE, mar = NULL,
     xlim = NULL, ylim = NULL, xlab = "Time", ylab = NULL, main = NULL,
@@ -32,18 +32,23 @@ epidataCSplot_time <- function (x, subset, bytype = TRUE,
     legend.types = list(), ...)
 {
     timeRange <- with(x$stgrid, c(start[1L], stop[length(stop)]))
-    ## extract the data to plot
-    eventTimesTypes <- if (missing(subset)) {
-        x$events@data[c("time", "type")]
+    ## subset event marks
+    eventMarks <- if (missing(subset)) {
+        marks.epidataCS(x, coords = FALSE)
     } else {
-        do.call(base::subset, list(x = quote(marks.epidataCS(x)),
-                                   subset = substitute(subset),
-                                   select = c("time", "type")))
+        do.call(base::subset, list(
+            x = quote(marks.epidataCS(x, coords = FALSE)),
+            subset = substitute(subset)
+        ))
     }
-    if (nrow(eventTimesTypes) == 0L) stop("no events left after 'subset'")
-    ## should the plot be aggregated over all event types?
-    if (!bytype) {
-        eventTimesTypes$type <- factor("all")
+    if (nrow(eventMarks) == 0L) stop("no events left after 'subset'")
+    ## extract the data to plot
+    by <- substitute(by)
+    eventTimesTypes <- eventMarks[c("time", "type")]
+    eventTimesTypes$type <- if (is.null(by)) { # disregard event types
+        factor("all")
+    } else { # stratification of counts (default is to stack bars by event type)
+        as.factor(eval(by, envir = eventMarks))
     }
     typeNames <- levels(eventTimesTypes$type)
     nTypes <- length(typeNames)
@@ -157,18 +162,23 @@ epidataCSplot_time <- function (x, subset, bytype = TRUE,
 
 ### plot.epidataCS(x, aggregate = "space") -> spatial point pattern
 
-epidataCSplot_space <- function (x, subset, bytype = TRUE,
+epidataCSplot_space <- function (x, subset, by = type,
     cex.fun = sqrt, points.args = list(), add = FALSE,
     legend.types = list(), legend.counts = list(), ...)
 {
     ## extract the points to plot
-    events <- if (missing(subset)) x$events else {
+    events <- if (missing(subset)) {
+        x$events
+    } else { # calls sp:::subset.Spatial
         eval(substitute(base::subset(x$events, subset=.subset),
                         list(.subset=substitute(subset))))
     }
     ## should the plot distinguish between different event types?
-    if (!bytype) {
-        events@data$type <- factor("all")
+    by <- substitute(by)
+    events@data$type <- if (is.null(by)) { # disregard event types
+        factor("all")
+    } else { # default is to distinguish points by event type
+        as.factor(eval(by, envir = events@data))
     }
     ## count events by location and type
     eventCoordsTypesCounts <- countunique(
