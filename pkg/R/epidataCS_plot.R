@@ -11,11 +11,13 @@
 ################################################################################
 
 
-plot.epidataCS <- function (x, aggregate = c("time", "space"), subset, ...)
+plot.epidataCS <- function (x, aggregate = c("time", "space"), subset,
+                            bytype = TRUE, ...)
 {
     aggregate <- match.arg(aggregate)
-    FUN <- paste("epidataCSplot", aggregate, sep="_")
-    do.call(FUN, args=list(x=quote(x), subset=substitute(subset), ...))
+    FUN <- paste("epidataCSplot", aggregate, sep = "_")
+    do.call(FUN, args = list(x = quote(x), subset = substitute(subset),
+                             bytype = bytype, ...))
 }
 
 
@@ -155,14 +157,20 @@ epidataCSplot_time <- function (x, subset, bytype = TRUE,
 
 ### plot.epidataCS(x, aggregate = "space") -> spatial point pattern
 
-epidataCSplot_space <- function (x, subset,
+epidataCSplot_space <- function (x, subset, bytype = TRUE,
     cex.fun = sqrt, points.args = list(), add = FALSE,
     legend.types = list(), legend.counts = list(), ...)
 {
+    ## extract the points to plot
     events <- if (missing(subset)) x$events else {
         eval(substitute(base::subset(x$events, subset=.subset),
                         list(.subset=substitute(subset))))
     }
+    ## should the plot distinguish between different event types?
+    if (!bytype) {
+        events@data$type <- factor("all")
+    }
+    ## count events by location and type
     eventCoordsTypesCounts <- countunique(
         cbind(coordinates(events), type = as.integer(events$type))
         )

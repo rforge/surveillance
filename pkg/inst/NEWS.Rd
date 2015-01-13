@@ -6,7 +6,15 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-4 (2015-01-12)}{
+\section{Changes in surveillance version 1.8-4 (2015-01-13)}{
+
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item New argument \code{bytype} for \code{plot.epidataCS()}, which
+    can be set to \code{FALSE} to make the plot not distinguish between
+    event types.
+  }
+}
 
 \subsection{MINOR CHANGES}{
   \itemize{

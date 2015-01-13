@@ -15,16 +15,17 @@ number of events along the time axis (\code{epidataCSplot_time}) as a
 }
 
 \usage{
-\method{plot}{epidataCS}(x, aggregate = c("time", "space"), subset, ...)
+\method{plot}{epidataCS}(x, aggregate = c("time", "space"), subset, bytype = TRUE, ...)
 
-epidataCSplot_time(x, subset, bytype = TRUE, t0.Date = NULL, freq = TRUE,
-                   col = rainbow(nTypes), cumulative = list(),
+epidataCSplot_time(x, subset, bytype = TRUE,
+                   t0.Date = NULL, freq = TRUE, col = rainbow(nTypes),
+                   cumulative = list(),
                    add = FALSE, mar = NULL, xlim = NULL, ylim = NULL,
                    xlab = "Time", ylab = NULL, main = NULL,
                    panel.first = abline(h=axTicks(2), lty=2, col="grey"),
                    legend.types = list(), ...)
 
-epidataCSplot_space(x, subset,
+epidataCSplot_space(x, subset, bytype = TRUE,
                     cex.fun = sqrt, points.args = list(), add = FALSE,
                     legend.types = list(), legend.counts = list(), ...)
 }
@@ -60,11 +61,12 @@ epidataCSplot_space(x, subset,
     region \code{x$W}.
   }
 
-  \item{bytype}{logical indicating if the bars of the histogram
-    should be stacked by type (default). Otherwise, the counts are
-    aggregated over all event types. To select specific event types for
-    plotting use the \code{subset} argument, e.g.,
-    \code{subset=(type=="B")}.}
+  \item{bytype}{logical indicating if the plot should distinguish
+    between event types. If this is \code{TRUE} (default),
+    the bars of the temporal plot are stacked by type, and the point colors
+    in the spatial plot differ by type, respectively.
+    To select specific event types for plotting use the \code{subset}
+    argument, e.g., \code{subset=(type=="B")}.}
   \item{t0.Date}{the beginning of the observation period
     \code{t0 = x$stgrid$start[1]} as a \code{"\link{Date}"} (or
     anything coercible by \code{as.Date} without further arguments),
@@ -138,6 +140,7 @@ data("imdepi")
 
 ## show the occurrence of events along time
 plot(imdepi, "time", main = "Histogram of event time points")
+plot(imdepi, "time", bytype = FALSE, main = "Aggregated over both event types")
 
 ## show the distribution in space
 plot(imdepi, "space", lwd=2)
