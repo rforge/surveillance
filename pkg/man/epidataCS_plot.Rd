@@ -17,7 +17,7 @@ number of events along the time axis (\code{epidataCSplot_time}) as a
 \usage{
 \method{plot}{epidataCS}(x, aggregate = c("time", "space"), subset, ...)
 
-epidataCSplot_time(x, subset, t0.Date = NULL, freq = TRUE,
+epidataCSplot_time(x, subset, bytype = TRUE, t0.Date = NULL, freq = TRUE,
                    col = rainbow(nTypes), cumulative = list(),
                    add = FALSE, mar = NULL, xlim = NULL, ylim = NULL,
                    xlab = "Time", ylab = NULL, main = NULL,
@@ -59,7 +59,12 @@ epidataCSplot_space(x, subset,
     \code{"\linkS4class{SpatialPolygons}"}, which draws the observation
     region \code{x$W}.
   }
-    
+
+  \item{bytype}{logical indicating if the bars of the histogram
+    should be stacked by type (default). Otherwise, the counts are
+    aggregated over all event types. To select specific event types for
+    plotting use the \code{subset} argument, e.g.,
+    \code{subset=(type=="B")}.}
   \item{t0.Date}{the beginning of the observation period
     \code{t0 = x$stgrid$start[1]} as a \code{"\link{Date}"} (or
     anything coercible by \code{as.Date} without further arguments),
@@ -91,7 +96,8 @@ epidataCSplot_space(x, subset,
     plotting window has been set up but before the histogram is plotted.
     Defaults to adding horizontal grid lines.}
   \item{legend.types}{if a list (of arguments for \code{\link{legend}}),
-    a legend for the event types is added to the plot.}
+    a legend for the event types is added to the plot in case there is
+    more than one type.}
 
   \item{cex.fun}{function which takes a vector of counts of events
     at each unique location and returns a (vector of) \code{cex}
@@ -130,7 +136,7 @@ Sebastian Meyer
 \examples{
 data("imdepi")
 
-## show the occurrence of events along the time axis (-> histogram)
+## show the occurrence of events along time
 plot(imdepi, "time", main = "Histogram of event time points")
 
 ## show the distribution in space

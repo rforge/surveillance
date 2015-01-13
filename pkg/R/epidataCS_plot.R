@@ -5,7 +5,7 @@
 ###
 ### plot-method for "epidataCS" objects
 ###
-### Copyright (C) 2009-2014 Sebastian Meyer
+### Copyright (C) 2009-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -22,13 +22,15 @@ plot.epidataCS <- function (x, aggregate = c("time", "space"), subset, ...)
 ### plot.epidataCS(x, aggregate = "time") -> number of cases over time
 ## in case t0.Date is specified, hist.Date() is used and breaks must set in ... (e.g. "months")
 
-epidataCSplot_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
+epidataCSplot_time <- function (x, subset, bytype = TRUE,
+    t0.Date = NULL, freq = TRUE,
     col = rainbow(nTypes), cumulative = list(), add = FALSE, mar = NULL,
     xlim = NULL, ylim = NULL, xlab = "Time", ylab = NULL, main = NULL,
     panel.first = abline(h=axTicks(2), lty=2, col="grey"),
     legend.types = list(), ...)
 {
     timeRange <- with(x$stgrid, c(start[1L], stop[length(stop)]))
+    ## extract the data to plot
     eventTimesTypes <- if (missing(subset)) {
         x$events@data[c("time", "type")]
     } else {
@@ -37,6 +39,10 @@ epidataCSplot_time <- function (x, subset, t0.Date = NULL, freq = TRUE,
                                    select = c("time", "type")))
     }
     if (nrow(eventTimesTypes) == 0L) stop("no events left after 'subset'")
+    ## should the plot be aggregated over all event types?
+    if (!bytype) {
+        eventTimesTypes$type <- factor("all")
+    }
     typeNames <- levels(eventTimesTypes$type)
     nTypes <- length(typeNames)
     if (!freq && nTypes > 1L)
