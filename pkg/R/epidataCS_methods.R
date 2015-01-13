@@ -52,8 +52,12 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
 
     # Update influenceRegions of events
     if (any(ir2update)) {
+        clipper <- attr(object$events$.influenceRegion, "clipper")
+        if (is.null(clipper))  # epidataCS < 1.8-1
+            clipper <- "polyclip"
         object$events$.influenceRegion[ir2update] <-
-            .influenceRegions(object$events[ir2update,], object$W, nCircle2Poly)
+            .influenceRegions(object$events[ir2update,], object$W, nCircle2Poly,
+                              clipper = clipper)
         attr(object$events$.influenceRegion, "nCircle2Poly") <- nCircle2Poly
     }
 
