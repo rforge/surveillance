@@ -6,7 +6,7 @@
 ### Standard S3-methods for "epidataCS" objects, which represent
 ### CONTINUOUS SPATIO-temporal infectious disease case data
 ###
-### Copyright (C) 2009-2014 Sebastian Meyer
+### Copyright (C) 2009-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -174,16 +174,19 @@ tail.epidataCS <- function (x, n = 6L, ...)
 
 ### extract marks of the events (actually also including time and tile)
 
-marks.epidataCS <- function (x, coords = TRUE, ...)
+idxNonMarks <- function (x)
 {
     endemicCovars <- setdiff(names(x$stgrid), c(
         reservedColsNames_stgrid, obligColsNames_stgrid))
-    idxnonmarks <- match(c(reservedColsNames_events, endemicCovars),
-                         names(x$events@data))
+    match(c(reservedColsNames_events, endemicCovars), names(x$events@data))
+}
+
+marks.epidataCS <- function (x, coords = TRUE, ...)
+{
     if (coords) { # append coords (cp. as.data.frame.SpatialPointsDataFrame)
-        data.frame(x$events@data[-idxnonmarks], x$events@coords)
-    } else {                            # return marks without coordinates
-        x$events@data[-idxnonmarks]
+        data.frame(x$events@data[-idxNonMarks(x)], x$events@coords)
+    } else { # return marks without coordinates
+        x$events@data[-idxNonMarks(x)]
     }
 }
 
