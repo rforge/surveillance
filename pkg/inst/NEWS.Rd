@@ -33,6 +33,9 @@
 
     \item Non-convergent endemic-only \code{twinstim} models
     produced an error (spotted by Bing Zhang).
+
+    \item The \code{"owin"}-method of \code{intersectPolyCircle} could
+    have returned a rectangle-type \code{"owin"} instead of a polygon.
   }
 }
 

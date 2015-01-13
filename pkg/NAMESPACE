@@ -75,7 +75,7 @@ importMethodsFrom(Matrix, coerce, diag, forceSymmetric, solve)
 
 importFrom(spatstat, area.owin, as.im.function, coords.ppp, diameter,
                      diameter.owin, disc, inside.owin, intersect.owin,
-                     is.polygonal, runifpoint, shift.owin,
+                     is.polygonal, as.polygonal, runifpoint, shift.owin,
                      spatstat.options, vertices)
 importFrom(spatstat, marks)
 export(marks)                           # we define an epidataCS-method
