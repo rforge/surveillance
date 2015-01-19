@@ -196,6 +196,60 @@ marks.epidataCS <- function (x, coords = TRUE, ...)
 
 
 
+### permute event times and/or locations holding remaining columns fixed
+
+permute.epidataCS <- function (x, what = c("time", "space", "both"),
+                               keep, recreate = TRUE, verbose = FALSE)
+{
+    stopifnot(inherits(x, "epidataCS"))
+    what <- match.arg(what)
+    
+    ## clean events from auxiliary columns
+    events <- x$events[-idxNonMarks(x)]
+
+    ## permutation index
+    perm <- if (missing(keep)) {
+        sample.int(length(events))
+    } else { # some events should not be relabeled
+        keep <- eval(substitute(keep), envir = x$events@data)
+        stopifnot(is.logical(keep), !is.na(keep))
+        which2permute <- which(!keep)
+        howmany2permute <- length(which2permute)
+        if (howmany2permute < 2L) {
+            if (verbose) message("Note: data unchanged ('keep' all)")
+            return(x)
+        }
+        perm <- seq_along(events)
+        perm[which2permute] <- which2permute[sample.int(howmany2permute)]
+        perm
+    }
+    
+    ## permute time points and/or locations
+    if (what %in% c("time", "both")) {
+        events$time <- events$time[perm]
+        ## invalidates .sources, .obsInfLength, BLOCK & Co. (stgrid)
+    }
+    if (what %in% c("space", "both")) {
+        events@coords <- events@coords[perm,,drop=FALSE]
+        ## invalidates .sources, .bdist, .influenceRegion, tile & Co. (stgrid)
+        events$tile <- events$tile[perm]
+    }
+
+    if (recreate) { # create new "epidataCS" object
+        npoly <- attr(x$events$.influenceRegion, "nCircle2Poly")
+        clipper <- attr(x$events$.influenceRegion, "clipper")
+        if (is.null(clipper))  # epidataCS < 1.8-1
+            clipper <- "polyclip"
+        as.epidataCS(events = events, stgrid = x$stgrid[,-1L],
+                     W = x$W, qmatrix = x$qmatrix, nCircle2Poly = npoly,
+                     clipper = clipper, verbose = verbose)
+    } else { # return the SpatialPointsDataFrame of events only
+        events
+    }
+}
+
+
+
 ### printing methods
 
 print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)

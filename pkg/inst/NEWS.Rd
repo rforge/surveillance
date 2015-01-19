@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-4 (2015-01-13)}{
+\section{Changes in surveillance version 1.8-4 (2015-01-19)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -14,6 +14,9 @@
     defines a stratifying variable for the events (default is the event
     type as before). It can also be set to \code{NULL} to make the plot
     not distinguish between event types.
+
+    \item New function \code{permute.epidataCS()} to randomly permute
+    time points or locations of the events (holding other marks fixed).
   }
 }
 
