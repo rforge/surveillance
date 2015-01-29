@@ -6,7 +6,7 @@
 ### hhh4 is an extended version of algo.hhh for the sts-class
 ### The function allows the incorporation of random effects and covariates.
 ###
-### Copyright (C) 2010-2014 Michaela Paul and Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -256,7 +256,7 @@ setControl <- function (control, stsObj)
 
   ### stop if no component is included in the model
   
-  if (length(componentsHHH4(list(control=control))) == 0L)
+  if (length(comps <- componentsHHH4(list(control=control))) == 0L)
       stop("none of the components 'ar', 'ne', 'end' is included in the model")
   
 
@@ -267,6 +267,11 @@ setControl <- function (control, stsObj)
   if (!is.vector(control$subset, mode="numeric") ||
       !all(control$subset %in% seq_len(nTime)))
       stop("'control$subset' must be %in% 1:", nTime)
+  lags <- c(ar = control$ar$lag, ne = control$ne$lag)
+  maxlag <- suppressWarnings(max(lags[names(lags) %in% comps])) # could be -Inf
+  if (control$subset[1L] <= maxlag) {
+      warning("'control$subset' should be > ", maxlag, " due to epidemic lags")
+  }
 
   if (!is.list(control$optimizer) ||
       any(! sapply(c("stop", "regression", "variance"),
