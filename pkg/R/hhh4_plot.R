@@ -5,7 +5,7 @@
 ###
 ### Plot-method(s) for fitted hhh4() models
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2012-2014 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -114,6 +114,11 @@ plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
     stopifnot(is.matrix(meanHHHunit), !is.null(colnames(meanHHHunit)),
               nrow(meanHHHunit) == length(x$control$subset))
     meanHHHunit <- meanHHHunit[x$control$subset %in% tpInRange,,drop=FALSE]
+    if (any(is.na(meanHHHunit[,"mean"]))) { # -> polygon() will be wrong
+        ## could be due to wrong x$control$subset wrt the epidemic lags
+        ## a workaround is then to set 'start' to a later time point
+        stop("predicted mean contains missing values")
+    }
     
     ## establish basic plot window
     if (is.null(ylim)) ylim <- c(0, max(obs[tpInRange],na.rm=TRUE))
