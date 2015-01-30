@@ -151,7 +151,7 @@ epidataCSplot_time <- function (x, subset, by = type,
     if (is.list(legend.types) && length(typesEffective) > 1) {
         legend.types <- modifyList(
             list(x="topleft", legend=typeNames[typesEffective],
-                 title="Type", fill=col[typesEffective]),
+                 title=deparse(by), fill=col[typesEffective]),
             legend.types)
         do.call("legend", legend.types)
     }
@@ -217,7 +217,7 @@ epidataCSplot_space <- function (x, subset, by = type,
     if (is.list(legend.types) && length(typesEffective) > 1) {
         legend.types <- modifyList(
             list(x="topright", legend=typeNames[typesEffective],
-                 title="Type",
+                 title=deparse(by),
                  #pt.cex=points.args$cex, # better use par("cex")
                  pch=points.args$pch[typesEffective],
                  col=points.args$col[typesEffective],
