@@ -124,9 +124,6 @@
       \code{\link{aggregate,sts-method}}}
     \item{year}{\code{signature(x = "sts")}:
       extracts the corresponding year of each observation of \code{x}}
-    \item{obsinyear}{\code{signature(x = "sts")}:
-      extracts the corresponding week number within the year of each
-      observation of \code{x}}
     \item{as.data.frame}{\code{signature(x = "sts")}:
       converts the \code{observed}, \code{epoch}, \code{state} and
       \code{alarm} slots of \code{x} into a data frame with column names
@@ -142,7 +139,7 @@
   }
 }
 
-\author{M. \enc{Höhle}{Hoehle}}
+\author{M. \enc{H?hle}{Hoehle}}
 \examples{
 if (requireNamespace("maptools")) {
    # load disProg-object "ha" and convert to S4-class "sts"
