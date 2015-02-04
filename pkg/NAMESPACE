@@ -145,6 +145,10 @@ S3method(multiplicity, Spatial)
 # Spatio-temporal cluster detection
 export(stcd)
 
+# test of spatio-temporal interaction
+export(knox)
+S3method(print, knox)
+
 
 ### sts(BP)-specific
 

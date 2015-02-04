@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-4 (2015-01-27)}{
+\section{Changes in surveillance version 1.8-4 (2015-02-04)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -17,6 +17,10 @@
 
     \item New function \code{permute.epidataCS()} to randomly permute
     time points or locations of the events (holding other marks fixed).
+
+    \item The new function \code{knox()} implements the Knox test for
+    space-time interaction. It supports both the Poisson approximation
+    and a Monte Carlo permutation approach to determine the p-value.
   }
 }
 
