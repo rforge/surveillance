@@ -31,6 +31,7 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
   \item{simulate.p.value}{
     logical indicating if a Monte Carlo permutation test should be
     performed instead of the default Poisson approximation. 
+    See the note below.
   }
   \item{B}{
     number of permutations for the Monte Carlo approach.
