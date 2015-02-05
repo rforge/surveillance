@@ -139,7 +139,7 @@
   }
 }
 
-\author{M. \enc{HÃ¶hle}{Hoehle}}
+\author{M. \enc{Höhle}{Hoehle}}
 \examples{
 if (requireNamespace("maptools")) {
    # load disProg-object "ha" and convert to S4-class "sts"
