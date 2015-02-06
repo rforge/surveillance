@@ -39,11 +39,18 @@ knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
             ds = if (is.logical(ds)) .lab else paste(c("<=", " >"), eps.s)
         ))
     class(knoxtab) <- "table"
+
+    ## expected number of close pairs in the absence of spatio-temporal interaction
+    npairs <- sum(knoxtab)
+    expected <- sum(knoxtab[1L,]) / npairs * sum(knoxtab[,1L])
+    ##<- this order of terms avoids integer overflow
     
     ## test statistic is the number of spatio-temporally close pairs
     METHOD <- "Knox test"
     STATISTIC <- knoxtab[1L]
-    npairs <- sum(knoxtab)
+
+    ## determine statistical significance
+    pval_Poisson <- ppois(STATISTIC, expected, lower.tail = FALSE)
     PVAL <- if (simulate.p.value) { # Monte Carlo permutation approach
         stopifnot(isScalar(B))
         B <- as.integer(B)
@@ -55,19 +62,21 @@ knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
                 sum(closeInSpace & closeInTime[sample.int(npairs)]),
             FUN.VALUE = 0L, USE.NAMES = FALSE)
         ## boxplot(permstats, ylim = range(STATISTIC, permstats)); points(STATISTIC, pch = 16)
-        mean(c(STATISTIC, permstats) >= STATISTIC)
+        structure(mean(c(STATISTIC, permstats) >= STATISTIC),
+                  Poisson = pval_Poisson)
     } else {
         METHOD <- paste(METHOD, "with Poisson approximation")
-        expected <- sum(knoxtab[1L,]) / npairs * sum(knoxtab[,1L])
-        ppois(STATISTIC, expected, lower.tail = FALSE)
+        pval_Poisson
     }
 
     ## return test results
     structure(
-        list(statistic = setNames(STATISTIC, "number of close pairs"),
-             p.value = PVAL, method = METHOD,
+        list(method = METHOD,
              data.name = paste("dt =", deparse(substitute(dt)),
                                "and ds =", deparse(substitute(ds))),
+             statistic = setNames(STATISTIC, "number of close pairs"),
+             p.value = PVAL, alternative = "greater",
+             null.value = setNames(expected, "number"),
              table = knoxtab), #null.distribution = permstats
         class = c("knox", "htest")
     )

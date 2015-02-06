@@ -48,18 +48,42 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
 \value{
   an object of class \code{"knox"} (inheriting from \code{"htest"}),
   which is a list with the following components:
-  \item{statistic}{the number of close pairs.}
-  \item{p.value}{the p-value for the test.}
   \item{method}{a character string indicating the type of test
     performed, and whether the Poisson approximation or Monte Carlo
     simulation was used.}
   \item{data.name}{a character string giving the supplied \code{dt} and
     \code{ds} arguments.}
+  \item{statistic}{the number of close pairs.}
+  \item{p.value}{the p-value for the test. In case
+    \code{simulate.p.value = TRUE}, the p-value from the Poisson
+    approximation is still attached as an attribute \code{"Poisson"}.}
+  \item{alternative}{the character string \code{"greater"} (this is a
+    one-sided test).}
+  \item{null.value}{the expected number of close pairs in the absence of
+    space-time interaction.}
   \item{table}{the contingency table of \code{dt <= eps.t} and
     \code{ds <= eps.s}.}
 }
 
+\author{
+  Sebastian Meyer
+}
+
+\seealso{
+  \itemize{
+    \item the related \code{\link[ecodist]{mantel}} test (Mantel, 1967)
+    implemented in package \pkg{ecodist},
+    \item the space-time K-function (Diggle et al, 1995) implemented in
+    package \pkg{splancs} to combine information from different scales
+    \code{eps.t} and \code{eps.s} while also handling edge effects.
+  }
+}
+
 \references{
+  Diggle, P. J.; Chetwynd, A. G.; Häggkvist, R. and Morris, S. E. (1995):
+  Second-order analysis of space-time clustering
+  \emph{Statistical Methods in Medical Research}, \bold{4}, 124-136.
+
   Knox, G. (1963):
   Detection of low intensity epidemicity: application to cleft lip and palate.
   \emph{British Journal of Preventive & Social Medicine}, \bold{17}, 121-127.
@@ -76,15 +100,6 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
   Mantel, N. (1967):
   The detection of disease clustering and a generalized regression approach.
   \emph{Cancer Research}, \bold{27}, 209-220.
-}
-
-\author{
-  Sebastian Meyer
-}
-
-\seealso{
-  the related \code{\link[ecodist]{mantel}} test (Mantel, 1967), which
-  is implemented in package \pkg{ecodist}
 }
 
 \examples{
