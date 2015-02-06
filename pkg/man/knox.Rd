@@ -80,7 +80,7 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
 }
 
 \references{
-  Diggle, P. J.; Chetwynd, A. G.; HÃ¤ggkvist, R. and Morris, S. E. (1995):
+  Diggle, P. J.; Chetwynd, A. G.; Häggkvist, R. and Morris, S. E. (1995):
   Second-order analysis of space-time clustering
   \emph{Statistical Methods in Medical Research}, \bold{4}, 124-136.
 
