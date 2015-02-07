@@ -221,6 +221,7 @@ twinstim <- function (
         eventSources <- if (N == nobs(data) && identical(qmatrix, data$qmatrix)) {
             data$events@data$.sources
         } else { # re-determine because subsetting has invalidated row indexes
+            if (verbose) cat("updating list of potential sources ...\n")
             lapply(seq_len(N), function (i)
                 determineSources(i, eventTimes, removalTimes, eventDists[i,],
                                  eps.s, eventTypes, qmatrix))
@@ -1184,7 +1185,7 @@ twinstim <- function (
                 cat("\nMLE from first optimization:\n")
                 print(optimRes1$par)
                 cat("loglik(MLE) =", optimRes1$value, "\n")
-                cat("\nfine-tuning MLE using Nelder-Mead optimization...\n")
+                cat("\nfine-tuning MLE using Nelder-Mead optimization ...\n")
             }
             optimArgs$par <- optimRes1$par
             optimArgs$method <- "Nelder-Mead"
@@ -1333,7 +1334,7 @@ twinstim <- function (
     fit["tau"] <- list(
         if (cumCIF) {
             if (verbose)
-                cat("\nCalculating fitted cumulative intensities at events...\n")
+                cat("\nCalculating fitted cumulative intensities at events ...\n")
             LambdagEvents(cores, cumCIF.pb)
         })
 
