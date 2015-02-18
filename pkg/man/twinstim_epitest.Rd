@@ -15,7 +15,7 @@
 }
 
 \usage{
-epitest(model, data, B = 199, seed = NULL, cores = 1, progress = TRUE)
+epitest(model, data, B = 199, seed = NULL, cores = 1, verbose = TRUE)
 }
 
 \arguments{
@@ -54,8 +54,14 @@ epitest(model, data, B = 199, seed = NULL, cores = 1, progress = TRUE)
     (which is not available on Windows, see
     \code{\link[parallel]{mclapply}} in package \pkg{parallel}).
   }
-  \item{progress}{
-    specifies how the progress should be reported.
+  \item{verbose}{
+    the amount of tracing in the range \code{0:2}.
+    Level 0 (or \code{FALSE}) means no output, level 1 (or \code{TRUE},
+    the default) will show a \code{\link{txtProgressBar}} (if
+    \code{cores = 1}) or output a dot (if \code{cores > 1}) after each
+    permutation, and level 2 means to print the obtained test
+    statistics. Other choices for the dot in level 1 are possible by
+    specifying the desired symbol as the \code{verbose} argument.
   }
 }
 
@@ -97,7 +103,10 @@ data("imdepifit")
 imdepi2 <- update(subset(imdepi, time > 1826), eps.s = 20)
 imdfit <- update(imdepifit, data = imdepi2, t0 = 1826,
                  epidemic = ~1, siaf = NULL, control.siaf = NULL)
-et <- epitest(imdfit, imdepi2, B = 99, seed = 1, cores = 2)
+et <- epitest(imdfit, imdepi2, B = 9, seed = 1, cores = 1, verbose = 2)
+et
+
+## histogram of the permutation distribution
 hist(et$permstats$D, xlab = "Test statistic")
 abline(v=et$statistic, lwd = 2)
 axis(3, at = et$statistic, labels = "Data", tick = FALSE, line = -1, font = 2)

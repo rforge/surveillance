@@ -10,11 +10,12 @@
 ### $Date$
 ################################################################################
 
-epitest <- function (model, data, B = 199, seed = NULL, cores = 1,
-                     progress = TRUE)
+epitest <- function (model, data, B = 199, seed = NULL,
+                     cores = 1, verbose = TRUE)
 {
     stopifnot(inherits(model, "twinstim"), inherits(data, "epidataCS"),
-              model$converged, isScalar(B), B >= 1, isScalar(cores), cores >= 1)
+              model$converged, isScalar(B), B >= 1, isScalar(cores), cores >= 1,
+              length(verbose) == 1L)
     B <- as.integer(B)
     cores <- as.integer(cores)
     if (model$npars["q"] == 0L) {
@@ -26,7 +27,7 @@ epitest <- function (model, data, B = 199, seed = NULL, cores = 1,
         l0 <- m0$loglik
         l1 <- m1$loglik
         c(l0 = l0, l1 = l1, D = 2 * (l1 - l0),
-          converged = isTRUE(m0$converged) && isTRUE(m1$converged))
+          converged = isTRUE(m1$converged) && isTRUE(m0$converged))
     }
     
     ## observed test statistic
@@ -38,20 +39,45 @@ epitest <- function (model, data, B = 199, seed = NULL, cores = 1,
     if (!isTRUE(m0$converged)) {
         stop("endemic-only model did not converge")
     }
-    observed <- as.list(lrt(m0 = m0, m1 = model))
-    STATISTIC <- structure(observed$D, l0 = observed$l0, l1 = observed$l1)
+    LRT <- lrt(m0 = m0, m1 = model)
+    STATISTIC <- structure(LRT["D"], l0 = LRT[["l0"]], l1 = LRT[["l1"]])
     
     ## progress bar
-    increment_pb <- if (identical(FALSE, progress)) {
-        function () {}
-    } else if (cores == 1L && isTRUE(progress)) {
-        pb <- txtProgressBar(min = 0, max = B, initial = 0, style = 3)
-        on.exit(close(pb))
-        function () setTxtProgressBar(pb, pb$getVal() + 1L)
-    } else {
-        psym <- if (isTRUE(progress)) "." else progress
+    increment_pb <- if (is.character(verbose)) { # progress symbol
         on.exit(cat("\n"))
-        function () cat(psym)
+        function (...) cat(verbose)
+    } else {
+        verbose <- as.integer(verbose)
+        if (verbose <= 0L) {        # no output
+            function (...) {}
+        } else if (verbose == 1L) { # progress bar or dots
+            if (cores == 1L) {
+                pb <- txtProgressBar(min = 0, max = B, initial = 0, style = 3)
+                on.exit(close(pb))
+                function (...) setTxtProgressBar(pb, pb$getVal() + 1L)
+            } else {
+                on.exit(cat("\n"))
+                function (...) cat(".")
+            }
+        } else if (verbose >= 2L) { # print test statistics
+            cat("Endemic/Epidemic log-likelihoods and LRT statistic:\n",
+                paste0(names(LRT)[1:3], " = ", sprintf("%4.1f", LRT[1:3]),
+                       collapse = " | "),
+                "\n\nResults from B=", B, " permutations of the event times:\n",
+                sep = "")
+            function (m0, m1) {
+                lrt <- lrt(m0, m1)
+                cat(paste0(names(lrt)[1:3], " = ", sprintf("%4.1f", lrt[1:3]),
+                           collapse = " | "))
+                if (!lrt["converged"]) {
+                    msg <- c(m0 = m0$converged, m1 = m1$converged)
+                    msg <- msg[msg != "TRUE"]
+                    cat(" | WARNING (", paste0(names(msg), collapse = " and "),
+                        "): ", paste0(unique(msg), collapse = " and "), sep = "")
+                }
+                cat("\n")
+            }
+        }
     }
     
     ## set random seed for reproducibility
@@ -59,7 +85,8 @@ epitest <- function (model, data, B = 199, seed = NULL, cores = 1,
         if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
             set.seed(NULL)
         .orig.seed <- get(".Random.seed", envir = .GlobalEnv)
-        on.exit(assign(".Random.seed", .orig.seed, envir = .GlobalEnv))
+        on.exit(assign(".Random.seed", .orig.seed, envir = .GlobalEnv),
+                add = TRUE)
         set.seed(seed = seed, kind = if (cores > 1L) "L'Ecuyer-CMRG")
         ##parallel::mc.reset.stream()  # redundant, mclapply() takes care itself
     }
@@ -75,7 +102,7 @@ epitest <- function (model, data, B = 199, seed = NULL, cores = 1,
                               optim.args = list(control = list(trace = 0)))
         m0 <- update.twinstim(m1, epidemic = ~0, siaf = NULL, tiaf = NULL,
                               control.siaf = NULL)
-        increment_pb()
+        increment_pb(m0, m1)
         list(m0 = m0, m1 = m1)
     }
 
@@ -108,7 +135,7 @@ epitest <- function (model, data, B = 199, seed = NULL, cores = 1,
             "(based on", sum(permstats[["converged"]]), "replicates)"),
         data.name = paste0(deparse(substitute(data)),
             "\ntwinstim:  ", deparse(substitute(model))),
-        statistic = setNames(STATISTIC, "D"),
+        statistic = STATISTIC,
         p.value = PVAL,
         permfits = permfits,
         permstats = permstats
