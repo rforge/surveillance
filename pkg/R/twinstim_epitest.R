@@ -14,7 +14,9 @@ epitest <- function (model, data, B = 199, seed = NULL, cores = 1,
                      progress = TRUE)
 {
     stopifnot(inherits(model, "twinstim"), inherits(data, "epidataCS"),
-              model$converged, isScalar(B), B > 0, isScalar(cores))
+              model$converged, isScalar(B), B >= 1, isScalar(cores), cores >= 1)
+    B <- as.integer(B)
+    cores <- as.integer(cores)
     if (model$npars["q"] == 0L) {
         stop("no epidemic component in 'model'")
     }
@@ -29,8 +31,8 @@ epitest <- function (model, data, B = 199, seed = NULL, cores = 1,
     
     ## observed test statistic
     t0 <- model$timeRange[1L]
-    m0 <- update.twinstim(model, epidemic = ~0,
-                          model = FALSE, cumCIF = FALSE,
+    m0 <- update.twinstim(model, epidemic = ~0, siaf = NULL, tiaf = NULL,
+                          control.siaf = NULL, model = FALSE, cumCIF = FALSE,
                           cores = 1, verbose = FALSE,
                           optim.args = list(control = list(trace = 0)))
     if (!isTRUE(m0$converged)) {
@@ -52,36 +54,49 @@ epitest <- function (model, data, B = 199, seed = NULL, cores = 1,
         function () cat(psym)
     }
     
-    ## for reproducibility
-    set.seed(seed = seed, kind = "L'Ecuyer-CMRG")
-    parallel::mc.reset.stream()
+    ## set random seed for reproducibility
+    if (!is.null(seed)) {
+        if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
+            set.seed(NULL)
+        .orig.seed <- get(".Random.seed", envir = .GlobalEnv)
+        on.exit(assign(".Random.seed", .orig.seed, envir = .GlobalEnv))
+        set.seed(seed = seed, kind = if (cores > 1L) "L'Ecuyer-CMRG")
+        ##parallel::mc.reset.stream()  # redundant, mclapply() takes care itself
+    }
     
-    ## permute the data, update model and compute endemic-only model
-    permfits <- parallel::mclapply(
-        X = integer(B),
-        FUN = function (...) {
-            .permdata <- permute.epidataCS(data, what = "time",
-                                           keep = time <= t0, verbose = FALSE)
-            m1 <- update.twinstim(model, data = .permdata,
-                                  model = FALSE, cumCIF = FALSE,
-                                  cores = 1, verbose = FALSE,
-                                  optim.args = list(control = list(trace = 0)))
-            m0 <- update.twinstim(m1, epidemic = ~0)
-            increment_pb()
-            list(m0 = m0, m1 = m1)
-        },
-        mc.preschedule = TRUE, mc.set.seed = TRUE,
-        mc.silent = FALSE, mc.cores = cores)
+    ## define the function to be replicated B times:
+    ## permute data, update epidemic model, compute endemic-only model
+    permfits1 <- function (...) {
+        .permdata <- permute.epidataCS(data, what = "time",
+                                       keep = time <= t0, verbose = FALSE)
+        m1 <- update.twinstim(model, data = .permdata,
+                              model = FALSE, cumCIF = FALSE,
+                              cores = 1, verbose = FALSE,
+                              optim.args = list(control = list(trace = 0)))
+        m0 <- update.twinstim(m1, epidemic = ~0, siaf = NULL, tiaf = NULL,
+                              control.siaf = NULL)
+        increment_pb()
+        list(m0 = m0, m1 = m1)
+    }
+
+    ## rock'n'roll (the computationally intensive part)
+    permfits <- if (cores == 1L) {
+        lapply(X = integer(B), FUN = permfits1)
+    } else {
+        parallel::mclapply(X = integer(B), FUN = permfits1,
+                           mc.preschedule = TRUE, mc.set.seed = TRUE,
+                           mc.silent = FALSE, mc.cores = cores)
+    }
     
     ## compute the test statistic
     permstats <- as.data.frame(t(vapply(
-        X = permfits, FUN = do.call, what = "lrt", 
+        X = permfits, FUN = do.call, what = lrt, 
         FUN.VALUE = numeric(4L), USE.NAMES = TRUE
     )))
     permstats$converged <- as.logical(permstats$converged)
     
     ## compute permutation-based p-value
-    PVAL <- mean(c(STATISTIC, permstats[["D"]]) >= STATISTIC)
+    PVAL <- mean(c(STATISTIC, permstats[["D"]][permstats[["converged"]]]) >= STATISTIC)
     ## asymptotic p-value for comparison (invalid)
     attr(PVAL, "chisq") <- pchisq(c(STATISTIC),
                                   df = length(coef(model)) - length(coef(m0)),
@@ -90,7 +105,7 @@ epitest <- function (model, data, B = 199, seed = NULL, cores = 1,
     ## gather results
     res <- list(
         method = paste("Permutation Test for Space-Time Interaction\n\t",
-            "(based on", B, "replicates)"),
+            "(based on", sum(permstats[["converged"]]), "replicates)"),
         data.name = paste0(deparse(substitute(data)),
             "\ntwinstim:  ", deparse(substitute(model))),
         statistic = setNames(STATISTIC, "D"),
