@@ -13,30 +13,22 @@
 }
 
 \usage{
-permute.epidataCS(x, what = c("time", "space", "both"),
-                  keep, recreate = TRUE, verbose = FALSE)
+permute.epidataCS(x, what = c("time", "space"), keep)
 }
 
 \arguments{
-  \item{x}{an object of class \code{"epidataCS"}.}
+  \item{x}{an object of class \code{"\link{epidataCS}"}.}
   \item{what}{character string determining what to permute: time points
-    (default), locations or both.}
+    (default) or locations.}
   \item{keep}{optional logical expression to be evaluated in the context
     of \code{x$events@data}, determining for which events the time and
     location should be kept as is. For instance, to keep some
-    pre-history before time point 30 unchanged, use
+    \dQuote{pre-history} before time point 30 unchanged, use
     \code{keep = time <= 30}.}
-  \item{recreate}{logical indicating if a new \code{"epidataCS"} object
-    should be created (default) or if only the permuted events should be
-    returned, i.e., a \code{"\linkS4class{SpatialPointsDataFrame}"}.}
-  \item{verbose}{logical passed to \code{\link{as.epidataCS}} if
-    \code{recreate = TRUE}.}
 }
 
 \value{
-  depending on the \code{recreate} argument, either an
-  \code{"epidataCS"} object (default) or a
-  \code{"\linkS4class{SpatialPointsDataFrame}"}.
+  the permuted \code{"\link{epidataCS}"} object.
 }
 
 \author{
@@ -49,10 +41,11 @@ permute.epidataCS(x, what = c("time", "space", "both"),
 
 \examples{
 data("imdepi")
-imdepi_2y <- subset(imdepi, time < 2*365)  # for speed
+
 set.seed(3)
-permepi <- permute.epidataCS(imdepi_2y, what = "time", keep = time <= 30)
-print(imdepi_2y, n = 8)
+permepi <- permute.epidataCS(imdepi, what = "time", keep = time <= 30)
+
+print(imdepi, n = 8)
 print(permepi, n = 8)
 ## the first 6 events are kept (as are all row.names),
 ## the time labels of the remaining events are shuffled

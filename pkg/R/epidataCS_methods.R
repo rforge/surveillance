@@ -198,18 +198,14 @@ marks.epidataCS <- function (x, coords = TRUE, ...)
 
 ### permute event times and/or locations holding remaining columns fixed
 
-permute.epidataCS <- function (x, what = c("time", "space", "both"),
-                               keep, recreate = TRUE, verbose = FALSE)
+permute.epidataCS <- function (x, what = c("time", "space"), keep)
 {
     stopifnot(inherits(x, "epidataCS"))
     what <- match.arg(what)
     
-    ## clean events from auxiliary columns
-    events <- x$events[-idxNonMarks(x)]
-
     ## permutation index
     perm <- if (missing(keep)) {
-        sample.int(length(events))
+        sample.int(nobs.epidataCS(x))
     } else { # some events should not be relabeled
         keep <- eval(substitute(keep), envir = x$events@data,
                      enclos = parent.frame())
@@ -217,36 +213,46 @@ permute.epidataCS <- function (x, what = c("time", "space", "both"),
         which2permute <- which(!keep)
         howmany2permute <- length(which2permute)
         if (howmany2permute < 2L) {
-            if (verbose) message("Note: data unchanged ('keep' all)")
+            message("Note: data unchanged ('keep' all)")
             return(x)
         }
-        perm <- seq_along(events)
+        perm <- seq_len(nobs.epidataCS(x))
         perm[which2permute] <- which2permute[sample.int(howmany2permute)]
         perm
     }
     
+    ## rescue attributes of .influenceRegion (dropped when indexing)
+    iRattr <- attributes(x$events$.influenceRegion)
+    
     ## permute time points and/or locations
-    if (what %in% c("time", "both")) {
-        events$time <- events$time[perm]
-        ## invalidates .sources, .obsInfLength, BLOCK & Co. (stgrid)
+    PERMVARS <- if (what == "time") {
+        c("time", "BLOCK", "start", ".obsInfLength")
+    } else {
+        x$events@coords <- x$events@coords[perm,,drop=FALSE]
+        c("tile", ".bdist", ".influenceRegion")
     }
-    if (what %in% c("space", "both")) {
-        events@coords <- events@coords[perm,,drop=FALSE]
-        ## invalidates .sources, .bdist, .influenceRegion, tile & Co. (stgrid)
-        events$tile <- events$tile[perm]
+    x$events@data[PERMVARS] <- x$events@data[perm, PERMVARS]
+    
+    ## re-sort on time if necessary
+    if (what == "time") {
+        x$events <- x$events[order(x$events$time), ]
     }
-
-    if (recreate) { # create new "epidataCS" object
-        npoly <- attr(x$events$.influenceRegion, "nCircle2Poly")
-        clipper <- attr(x$events$.influenceRegion, "clipper")
-        if (is.null(clipper))  # epidataCS < 1.8-1
-            clipper <- "polyclip"
-        as.epidataCS(events = events, stgrid = x$stgrid[,-1L],
-                     W = x$W, qmatrix = x$qmatrix, nCircle2Poly = npoly,
-                     clipper = clipper, verbose = verbose)
-    } else { # return the SpatialPointsDataFrame of events only
-        events
-    }
+    
+    ## .sources and endemic variables need an update
+    x$events$.sources <- determineSources.epidataCS(x)
+    ENDVARS <- setdiff(names(x$stgrid),
+                       c(reservedColsNames_stgrid, obligColsNames_stgrid))
+    gridcellsOfEvents <- match(
+        do.call("paste", c(x$events@data[c("BLOCK", "tile")], sep = "\r")),
+        do.call("paste", c(x$stgrid[c("BLOCK", "tile")], sep = "\r"))
+    )
+    x$events@data[ENDVARS] <- x$stgrid[gridcellsOfEvents, ENDVARS]
+    
+    ## restore attributes of .influenceRegion
+    attributes(x$events$.influenceRegion) <- iRattr
+    
+    ## done
+    x
 }
 
 

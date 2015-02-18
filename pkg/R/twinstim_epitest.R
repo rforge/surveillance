@@ -94,8 +94,7 @@ epitest <- function (model, data, B = 199, seed = NULL,
     ## define the function to be replicated B times:
     ## permute data, update epidemic model, compute endemic-only model
     permfits1 <- function (...) {
-        .permdata <- permute.epidataCS(data, what = "time",
-                                       keep = time <= t0, verbose = FALSE)
+        .permdata <- permute.epidataCS(data, what = "time", keep = time <= t0)
         m1 <- update.twinstim(model, data = .permdata,
                               model = FALSE, cumCIF = FALSE,
                               cores = 1, verbose = FALSE,
