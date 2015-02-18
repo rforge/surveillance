@@ -291,6 +291,7 @@ export(tiaf,
        tiaf.constant, tiaf.step,
        tiaf.exponential)
 export(epidataCS2sts)
+export(epitest)
 
 S3method(nobs, epidataCS)
 S3method("[", epidataCS)
