@@ -40,6 +40,12 @@
 
 \subsection{BUG FIXES}{
   \itemize{
+    \item The \code{bodaFit} function did not draw samples from the
+    joint posterior. Instead draws were from the respective posterior
+    marginals. A new argument \code{samplingMethod} is now introduced
+    defaulting to the proper 'joint'. For backwards compatibility use
+    the value 'marginal'.
+    
     \item The functions \code{as.epidataCS()} and \code{simEpidataCS()}
     could throw inappropriate warnings when checking polygon areas
     (only if \code{W} or \code{tiles}, respectively, contained holes).
