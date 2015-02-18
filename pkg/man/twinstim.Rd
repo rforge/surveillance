@@ -283,7 +283,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   \item{counts}{number of log-likelihood and score evaluations during
     optimization.}
   \item{converged}{either \code{TRUE} (if the optimizer converged) or a
-    character string containing a failure message).}
+    character string containing a failure message.}
   \item{fisherinfo}{\emph{expected} Fisher information evaluated at the
     MLE. Only non-\code{NULL} for full likelihood inference
     (\code{partial = FALSE}) and if spatial and temporal interaction
