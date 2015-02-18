@@ -1,14 +1,15 @@
-\name{permute.epidataCS}
+\name{epidataCS_permute}
 \alias{permute.epidataCS}
 \title{
   Randomly Permute Time Points or Locations of \code{"epidataCS"}
 }
 
 \description{
-  Monte Carlo tests of space-time interaction use the distribution
-  of some test statistic under the null hypothesis of no space-time
-  interaction. For this purpose, the function \code{permute.epidataCS}
-  randomly permutes the time or space labels of the events.
+  Monte Carlo tests for space-time interaction (\code{\link{epitest}})
+  use the distribution of some test statistic under the null hypothesis
+  of no space-time interaction. For this purpose, the function
+  \code{permute.epidataCS} randomly permutes the time or space labels of
+  the events.
 }
 
 \usage{
@@ -40,6 +41,10 @@ permute.epidataCS(x, what = c("time", "space", "both"),
 
 \author{
   Sebastian Meyer
+}
+
+\seealso{
+  \code{\link{epitest}}
 }
 
 \examples{

@@ -31,7 +31,8 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
   \item{simulate.p.value}{
     logical indicating if a Monte Carlo permutation test should be
     performed instead of the default Poisson approximation. 
-    See the note below.
+    See the note below and do not forget to \code{\link{set.seed}} if
+    reproducibility is required.
   }
   \item{B}{
     number of permutations for the Monte Carlo approach.
@@ -76,6 +77,8 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
     \item the space-time K-function (Diggle et al, 1995) implemented in
     package \pkg{splancs} to combine information from different scales
     \code{eps.t} and \code{eps.s} while also handling edge effects.
+    \item function \code{\link{epitest}} for testing
+    \code{"\link{twinstim}"} models.
   }
 }
 
@@ -105,7 +108,8 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
 \examples{
 data("imdepi")
 knox(dt = dist(imdepi$events$time), eps.t = 30,
-     ds = dist(coordinates(imdepi$events)), eps.s = 50)
+     ds = dist(coordinates(imdepi$events)), eps.s = 50,
+     simulate.p.value = FALSE) # save time
 }
 
 \keyword{htest}

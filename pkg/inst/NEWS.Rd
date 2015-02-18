@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-4 (2015-02-04)}{
+\section{Changes in surveillance version 1.8-4 (2015-02-18)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -21,6 +21,9 @@
     \item The new function \code{knox()} implements the Knox test for
     space-time interaction. It supports both the Poisson approximation
     and a Monte Carlo permutation approach to determine the p-value.
+
+    \item New function \code{epitest()}: a permutation test for
+    space-time interaction in epidemic \code{twinstim} models.
   }
 }
 
