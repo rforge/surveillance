@@ -211,7 +211,8 @@ permute.epidataCS <- function (x, what = c("time", "space", "both"),
     perm <- if (missing(keep)) {
         sample.int(length(events))
     } else { # some events should not be relabeled
-        keep <- eval(substitute(keep), envir = x$events@data)
+        keep <- eval(substitute(keep), envir = x$events@data,
+                     enclos = parent.frame())
         stopifnot(is.logical(keep), !is.na(keep))
         which2permute <- which(!keep)
         howmany2permute <- length(which2permute)
