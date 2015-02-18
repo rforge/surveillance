@@ -88,10 +88,9 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
 
 "[.epidataCS" <- function (x, i, j, ..., drop = TRUE)
 {
-    ## Store nCircle2Poly attribute of x$events$.influenceRegion since this will
-    ## be dropped when subsetting
-    nCircle2Poly <- attr(x$events$.influenceRegion, "nCircle2Poly")
-
+    ## rescue attributes of .influenceRegion (dropped when indexing)
+    iRattr <- attributes(x$events$.influenceRegion)
+    
     ## apply [,SpatialPointsDataFrame-method (where "drop" is ignored)
     cl <- sys.call()
     cl[[1]] <- as.name("[")
@@ -123,10 +122,10 @@ update.epidataCS <- function (object, eps.t, eps.s, qmatrix, nCircle2Poly, ...)
         }
     }
     
-    ## restore nCircle2Poly attribute
-    attr(x$events$.influenceRegion, "nCircle2Poly") <- nCircle2Poly
-
-    ## Done
+    ## restore attributes of .influenceRegion
+    attributes(x$events$.influenceRegion) <- iRattr
+    
+    ## done
     return(x)
 }
 
