@@ -51,7 +51,7 @@ epitest <- function (model, data, B = 199, seed = NULL,
         if (verbose <= 0L) {        # no output
             function (...) {}
         } else if (verbose == 1L) { # progress bar or dots
-            if (cores == 1L) {
+            if (cores == 1L && interactive()) {
                 pb <- txtProgressBar(min = 0, max = B, initial = 0, style = 3)
                 on.exit(close(pb))
                 function (...) setTxtProgressBar(pb, pb$getVal() + 1L)
