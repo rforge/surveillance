@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-4 (2015-02-18)}{
+\section{Changes in surveillance version 1.8-4 (2015-02-23)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -24,6 +24,10 @@
 
     \item New function \code{epitest()}: a permutation test for
     space-time interaction in epidemic \code{twinstim} models.
+
+    \item New function \code{plapply()}: a parallel and verbose version
+    of \code{lapply()} wrapping around both \code{mclapply()} and
+    \code{parLapply()} of package \pkg{parallel}.
   }
 }
 

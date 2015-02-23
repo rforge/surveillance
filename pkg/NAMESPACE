@@ -113,6 +113,7 @@ export(refvalIdxByDate)
 export(ks.plot.unif)
 export(checkResidualProcess)       # for twinstim and twinSIR
 export(qlomax)                     # quantile function of the Lomax distribution
+export(plapply)
 
 # spatial utilities
 export(discpoly)
