@@ -15,7 +15,7 @@
 }
 
 \usage{
-epitest(model, data, B = 199, seed = NULL, cores = 1, verbose = TRUE)
+epitest(model, data, B = 199, seed = NULL, verbose = TRUE, ...)
 }
 
 \arguments{
@@ -41,31 +41,22 @@ epitest(model, data, B = 199, seed = NULL, cores = 1, verbose = TRUE)
   }
   \item{seed}{
     an object specifying how the random number generator should be
-    initialized (via \code{\link{set.seed}}). By default (\code{NULL}),
-    no care of the \code{\link{.Random.seed}} is taken. If
-    non-\code{NULL}, the original \code{.Random.seed} will be restored
-    afterwards. If \code{cores > 1}, the \code{\link{RNGkind}}
-    \code{"L'Ecuyer-CMRG"} will be used for reproducibility, see the
-    description of \code{\link[parallel]{mcparallel}} in package
-    \pkg{parallel}.
-  }
-  \item{cores}{
-    number of processes to use in parallel operation using forking
-    (which is not available on Windows, see
-    \code{\link[parallel]{mclapply}} in package \pkg{parallel}).
+    initialized to make results reproducible. The argument is passed to
+    \code{\link{plapply}}.
+    By default (\code{NULL}), no care of the \code{\link{.Random.seed}}
+    is taken.
   }
   \item{verbose}{
     the amount of tracing in the range \code{0:2}.
     Level 0 (or \code{FALSE}) means no output,
-    level 1 (or \code{TRUE}, the default) will show a
-    \code{\link{txtProgressBar}} (if \code{cores = 1} in an
-    \code{\link{interactive}} \R session) or output a dot (otherwise)
-    after each permutation,
-    and level 2 means to print the permutation test statistics as they
-    arrive.
-    Other choices for the dot in level 1 are possible by
-    specifying the desired symbol as the \code{verbose} argument.
+    level 1 (or \code{TRUE}, the default) will show a progress bar,
+    and level 2 prints the test statistic resulting from each permutation.
+    Ignored if parallelized using clusters.
+    See \code{\link{plapply}} for other choices.
   }
+  \item{\dots}{further arguments for \code{\link{plapply}} to configure
+    parallel operation: \code{.cores} (forking on Unix)
+    or \code{.cl} (cluster especially on Windows).}
 }
 
 \value{
@@ -107,8 +98,8 @@ data("imdepifit")
 imdepi2 <- update(subset(imdepi, time > 1826), eps.s = 20)
 imdfit2 <- update(imdepifit, data = imdepi2, t0 = 1826,
                   epidemic = ~1, siaf = NULL, control.siaf = NULL)
-mc.cores <- if(.Platform$OS.type == "unix") getOption("mc.cores", 2) else 1
-et <- epitest(imdfit2, imdepi2, B = 19, seed = 1, cores = mc.cores)
+et <- epitest(imdfit2, imdepi2, B = 19, seed = 1, verbose = FALSE,
+              .cores = 1 + (.Platform$OS.type == "unix"))
 et
 
 ## histogram of the permutation distribution
