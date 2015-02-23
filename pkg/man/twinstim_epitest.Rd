@@ -15,7 +15,7 @@
 }
 
 \usage{
-epitest(model, data, B = 199, seed = NULL, verbose = TRUE, ...)
+epitest(model, data, B = 199, verbose = TRUE, ...)
 }
 
 \arguments{
@@ -39,13 +39,6 @@ epitest(model, data, B = 199, seed = NULL, verbose = TRUE, ...)
     \dQuote{resolution} of the p-value: the smallest attainable p-value
     is \code{1/(B+1)}.
   }
-  \item{seed}{
-    an object specifying how the random number generator should be
-    initialized to make results reproducible. The argument is passed to
-    \code{\link{plapply}}.
-    By default (\code{NULL}), no care of the \code{\link{.Random.seed}}
-    is taken.
-  }
   \item{verbose}{
     the amount of tracing in the range \code{0:2}.
     Level 0 (or \code{FALSE}) means no output,
@@ -56,7 +49,9 @@ epitest(model, data, B = 199, seed = NULL, verbose = TRUE, ...)
   }
   \item{\dots}{further arguments for \code{\link{plapply}} to configure
     parallel operation: \code{.cores} (forking on Unix)
-    or \code{.cl} (cluster especially on Windows).}
+    or \code{.cl} (cluster especially on Windows), as well as
+    \code{.seed} to make the results reproducible.
+  }
 }
 
 \value{
@@ -98,8 +93,8 @@ data("imdepifit")
 imdepi2 <- update(subset(imdepi, time > 1826), eps.s = 20)
 imdfit2 <- update(imdepifit, data = imdepi2, t0 = 1826,
                   epidemic = ~1, siaf = NULL, control.siaf = NULL)
-et <- epitest(imdfit2, imdepi2, B = 19, seed = 1, verbose = FALSE,
-              .cores = 1 + (.Platform$OS.type == "unix"))
+et <- epitest(imdfit2, imdepi2, B = 19, verbose = FALSE,
+              .seed = 1, .cores = 1 + (.Platform$OS.type == "unix"))
 et
 
 ## histogram of the permutation distribution

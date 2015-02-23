@@ -10,7 +10,7 @@
 ### $Date$
 ################################################################################
 
-epitest <- function (model, data, B = 199, seed = NULL, verbose = TRUE, ...)
+epitest <- function (model, data, B = 199, verbose = TRUE, ...)
 {
     stopifnot(inherits(model, "twinstim"), inherits(data, "epidataCS"),
               model$converged, isScalar(B), B >= 1)
@@ -75,7 +75,7 @@ epitest <- function (model, data, B = 199, seed = NULL, verbose = TRUE, ...)
 
     ## rock'n'roll (the computationally intensive part)
     permfits <- plapply(X = integer(B), FUN = permfits1,
-                        .seed = seed, .verbose = verbose, ...)
+                        .verbose = verbose, ...)
     
     ## compute the test statistic
     permstats <- as.data.frame(t(vapply(
