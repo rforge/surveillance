@@ -71,6 +71,7 @@ plapply(X, FUN, ...,
 }
 
 \examples{
+## example inspired by help("lapply")
 x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE,FALSE,FALSE,TRUE))
 
 ## if neither parallel nor verbose then this simply equals lapply()

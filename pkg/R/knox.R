@@ -11,7 +11,7 @@
 ################################################################################
 
 
-knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
+knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999, ...)
 {
     stopifnot(length(dt) == length(ds))
 
@@ -56,13 +56,11 @@ knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
         B <- as.integer(B)
         METHOD <- paste(METHOD, "with simulated p-value\n\t (based on", 
                         B, "replicates)")
-        permstats <- vapply( # replicate() uses sapply()
-            X = integer(B),
-            FUN = function (...)
-                sum(closeInSpace & closeInTime[sample.int(npairs)]),
-            FUN.VALUE = 0L, USE.NAMES = FALSE)
-        ## boxplot(permstats, ylim = range(STATISTIC, permstats)); points(STATISTIC, pch = 16)
-        structure(mean(c(STATISTIC, permstats) >= STATISTIC),
+        permstats <- plapply(X = integer(B), FUN = function (...)
+            sum(closeInSpace & closeInTime[sample.int(npairs)]), ...)
+        ## boxplot(unlist(permstats), ylim = range(STATISTIC, permstats))
+        ## points(STATISTIC, pch = 4, lwd = 2)
+        structure(mean(c(STATISTIC, permstats, recursive = TRUE) >= STATISTIC),
                   Poisson = pval_Poisson)
     } else {
         METHOD <- paste(METHOD, "with Poisson approximation")
@@ -77,7 +75,8 @@ knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
              statistic = setNames(STATISTIC, "number of close pairs"),
              p.value = PVAL, alternative = "greater",
              null.value = setNames(expected, "number"),
-             table = knoxtab), #null.distribution = permstats
+             table = knoxtab),
+        ##null.distribution = unlist(permstats, recursive=FALSE, use.names=FALSE)
         class = c("knox", "htest")
     )
 }

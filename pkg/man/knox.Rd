@@ -9,11 +9,12 @@ Given temporal and spatial distances as well as corresponding critical
 thresholds defining what \dQuote{close} means, the function
 \code{knox} performs Knox (1963, 1964) test for space-time interaction.
 The corresponding p-value can be calculated either by the Poisson
-approximation or by a Monte Carlo permutation approach (Mantel, 1967).
+approximation or by a Monte Carlo permutation approach (Mantel, 1967)
+with support for parallel computation via \code{\link{plapply}}.
 }
 
 \usage{
-knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
+knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999, ...)
 }
 
 \arguments{
@@ -36,6 +37,13 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
   }
   \item{B}{
     number of permutations for the Monte Carlo approach.
+  }
+  \item{\dots}{
+    arguments configuring \code{\link{plapply}}:
+    \code{.cores} (forking) or \code{.cl} (cluster),
+    as well as \code{.seed} and \code{.verbose}.
+    By default, no parallelization is performed (\code{.cores = 1}),
+    and a progress bar is shown (\code{.verbose = TRUE}).
   }
 }
 
@@ -109,7 +117,17 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999)
 data("imdepi")
 knox(dt = dist(imdepi$events$time), eps.t = 30,
      ds = dist(coordinates(imdepi$events)), eps.s = 50,
-     simulate.p.value = FALSE) # save time
+     simulate.p.value = FALSE) # to save time
+
+## compute permutations in parallel using forking on Unix-alikes
+if (surveillance.options("allExamples") &&
+    .Platform$OS.type == "unix") {
+    knox(dt = dist(imdepi$events$time), eps.t = 30,
+         ds = dist(coordinates(imdepi$events)), eps.s = 50,
+         simulate.p.value = TRUE, B = 499,
+         .cores = 2, .seed = 1, .verbose = FALSE)
+    ## all 499 random permutations yield a lower test statistic => p=1/500
+}
 }
 
 \keyword{htest}
