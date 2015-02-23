@@ -93,7 +93,7 @@ data("imdepifit")
 imdepi2 <- update(subset(imdepi, time > 1826), eps.s = 20)
 imdfit2 <- update(imdepifit, data = imdepi2, t0 = 1826,
                   epidemic = ~1, siaf = NULL, control.siaf = NULL)
-et <- epitest(imdfit2, imdepi2, B = 19, verbose = FALSE,
+et <- epitest(imdfit2, imdepi2, B = 19, verbose = 2,
               .seed = 1, .cores = 1 + (.Platform$OS.type == "unix"))
 et
 
