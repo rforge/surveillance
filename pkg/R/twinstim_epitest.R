@@ -87,7 +87,7 @@ epitest <- function (model, data, B = 199, verbose = TRUE, ...)
     ## compute permutation-based p-value
     PVAL <- mean(c(STATISTIC, permstats[["D"]][permstats[["converged"]]]) >= STATISTIC)
     ## asymptotic p-value for comparison (invalid)
-    attr(PVAL, "chisq") <- pchisq(c(STATISTIC),
+    attr(PVAL, "chisq") <- pchisq(as.vector(STATISTIC), # drop attributes
                                   df = length(coef(model)) - length(coef(m0)),
                                   lower.tail = FALSE)
     
