@@ -29,7 +29,8 @@ epitest <- function (model, data, B = 199, verbose = TRUE, ...)
     
     ## observed test statistic
     t0 <- model$timeRange[1L]
-    m0 <- update.twinstim(model, epidemic = ~0, siaf = NULL, tiaf = NULL,
+    m0 <- update.twinstim(model, data = data,
+                          epidemic = ~0, siaf = NULL, tiaf = NULL,
                           control.siaf = NULL, model = FALSE, cumCIF = FALSE,
                           cores = 1, verbose = FALSE,
                           optim.args = list(control = list(trace = 0)))
