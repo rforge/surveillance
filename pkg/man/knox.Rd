@@ -133,12 +133,13 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
 data("imdepi")
 
 ## Exact p-value via Monte Carlo permutation test
-## Permutations can be computed in parallel (here we only use B=99 for speed)
+## Permutations can be computed in parallel, here by forking (.cores argument)
+## (on Windows, use clusters via the .cl argument, see ?plapply)
 if (.Platform$OS.type == "unix") {
     knoxtest <- knox(
         dt = dist(imdepi$events$time), eps.t = 30,
         ds = dist(coordinates(imdepi$events)), eps.s = 50,
-        simulate.p.value = TRUE, B = 99,
+        simulate.p.value = TRUE, B = 99, # for speed
         .cores = 2, .seed = 1, .verbose = FALSE
     )
     knoxtest # all 99 permutations yield a lower test statistic => p=1/100
