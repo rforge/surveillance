@@ -11,7 +11,7 @@
 ################################################################################
 
 
-knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999, ...)
+knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
 {
     stopifnot(length(dt) == length(ds))
 
@@ -58,8 +58,6 @@ knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999, ...)
                         B, "replicates)")
         permstats <- plapply(X = integer(B), FUN = function (...)
             sum(closeInSpace & closeInTime[sample.int(npairs)]), ...)
-        ## boxplot(unlist(permstats), ylim = range(STATISTIC, permstats))
-        ## points(STATISTIC, pch = 4, lwd = 2)
         structure(mean(c(STATISTIC, permstats, recursive = TRUE) >= STATISTIC),
                   Poisson = pval_Poisson)
     } else {
@@ -75,8 +73,10 @@ knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999, ...)
              statistic = setNames(STATISTIC, "number of close pairs"),
              p.value = PVAL, alternative = "greater",
              null.value = setNames(expected, "number"),
+             permstats = if (simulate.p.value) {
+                 unlist(permstats, recursive = FALSE, use.names = FALSE)
+             },
              table = knoxtab),
-        ##null.distribution = unlist(permstats, recursive=FALSE, use.names=FALSE)
         class = c("knox", "htest")
     )
 }
@@ -91,4 +91,22 @@ print.knox <- function (x, ...)
     print(x$table)
     cat("\n")
     invisible(x)
+}
+
+plot.knox <- function (x, ...)
+{
+    if (is.null(data <- x[["permstats"]])) {
+        stop("this plot-method is for a permutation-based Knox test")
+    }
+    xmarks <- setNames(c(x[["null.value"]], x[["statistic"]]),
+                       c("expected", "observed"))
+    defaultArgs <- list(
+        data = data, xlab = "number of close pairs", col = "lavender",
+        xlim = extendrange(c(data, xmarks))
+    )
+    do.call("truehist", modifyList(defaultArgs, list(...), keep.null = TRUE))
+    abline(v = xmarks, lwd = 2)
+    axis(3, at = xmarks, labels = names(xmarks),
+         tick = FALSE, line = -1, font = 2)
+    invisible(NULL)
 }

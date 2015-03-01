@@ -1,5 +1,6 @@
 \name{knox}
 \alias{knox}
+\alias{plot.knox}
 \title{
 Knox Test for Space-Time Interaction
 }
@@ -11,10 +12,15 @@ thresholds defining what \dQuote{close} means, the function
 The corresponding p-value can be calculated either by the Poisson
 approximation or by a Monte Carlo permutation approach (Mantel, 1967)
 with support for parallel computation via \code{\link{plapply}}.
+There is a simple \code{plot}-method showing a \code{\link{truehist}} of
+the simulated null distribution together with the expected and observed
+values.
 }
 
 \usage{
-knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999, ...)
+knox(dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
+
+\method{plot}{knox}(x, ...)
 }
 
 \arguments{
@@ -31,9 +37,11 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999, ...)
   }
   \item{simulate.p.value}{
     logical indicating if a Monte Carlo permutation test should be
-    performed instead of the default Poisson approximation. 
-    See the note below and do not forget to \code{\link{set.seed}} if
-    reproducibility is required.
+    performed (as per default). Do not forget to set the
+    \code{\link{.Random.seed}} via an extra \code{.seed} argument if
+    reproducibility is required (see the \dots arguments below).
+    If \code{simulate.p.value = FALSE}, the Poisson approximation is
+    used (but see the note below).
   }
   \item{B}{
     number of permutations for the Monte Carlo approach.
@@ -43,7 +51,13 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999, ...)
     \code{.cores} (forking) or \code{.cl} (cluster),
     as well as \code{.seed} and \code{.verbose}.
     By default, no parallelization is performed (\code{.cores = 1}),
-    and a progress bar is shown (\code{.verbose = TRUE}).
+    and a progress bar is shown (\code{.verbose = TRUE}).\cr
+    For the \code{plot}-method, further arguments passed to
+    \code{\link{truehist}}.
+  }
+  \item{x}{
+    an object of class \code{"knox"} as returned by the
+    \code{knox} test.
   }
 }
 
@@ -72,6 +86,8 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999, ...)
     space-time interaction.}
   \item{table}{the contingency table of \code{dt <= eps.t} and
     \code{ds <= eps.s}.}
+
+  The \code{plot}-method invisibly returns \code{NULL}.
 }
 
 \author{
@@ -115,19 +131,24 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = FALSE, B = 999, ...)
 
 \examples{
 data("imdepi")
+
+## Exact p-value via Monte Carlo permutation test
+## Permutations can be computed in parallel (here we only use B=99 for speed)
+if (.Platform$OS.type == "unix") {
+    knoxtest <- knox(
+        dt = dist(imdepi$events$time), eps.t = 30,
+        ds = dist(coordinates(imdepi$events)), eps.s = 50,
+        simulate.p.value = TRUE, B = 99,
+        .cores = 2, .seed = 1, .verbose = FALSE
+    )
+    knoxtest # all 99 permutations yield a lower test statistic => p=1/100
+    plot(knoxtest)
+}
+
+## The Poisson approximation should be ok for this contingency table
 knox(dt = dist(imdepi$events$time), eps.t = 30,
      ds = dist(coordinates(imdepi$events)), eps.s = 50,
-     simulate.p.value = FALSE) # to save time
-
-## compute permutations in parallel using forking on Unix-alikes
-if (surveillance.options("allExamples") &&
-    .Platform$OS.type == "unix") {
-    knox(dt = dist(imdepi$events$time), eps.t = 30,
-         ds = dist(coordinates(imdepi$events)), eps.s = 50,
-         simulate.p.value = TRUE, B = 499,
-         .cores = 2, .seed = 1, .verbose = FALSE)
-    ## all 499 random permutations yield a lower test statistic => p=1/500
-}
+     simulate.p.value = FALSE)
 }
 
 \keyword{htest}
