@@ -13,11 +13,16 @@
 
 
 plapply <- function (X, FUN, ...,
-                     .cores = 1, .cl = NA, .seed = NULL, .verbose = TRUE)
+                     .parallel = 1, .seed = NULL, .verbose = TRUE)
 {
-    if (!(useCluster <- !identical(NA, .cl))) {
-        stopifnot(isScalar(.cores), .cores >= 1)
-        .cores <- as.integer(.cores)
+    if (!(useCluster <- inherits(.parallel, "cluster"))) {
+        stopifnot(isScalar(.parallel), .parallel >= 1)
+        .parallel <- as.vector(.parallel, mode = "integer")
+        if (.Platform$OS.type == "windows" && .parallel > 1L) {
+            useCluster <- TRUE
+            .parallel <- parallel::makeCluster(.parallel)
+            on.exit(parallel::stopCluster(.parallel))
+        }
     }
     FUN <- match.fun(FUN)
     .FUN <- if (useCluster || is.primitive(FUN)) {
@@ -25,14 +30,14 @@ plapply <- function (X, FUN, ...,
     } else { # be verbose on.exit of FUN
         verboseExpr <- if (isTRUE(.verbose)) {
             ## progress bar or dots
-            if (.cores == 1L && interactive()) {
+            if (.parallel == 1L && interactive()) {
                 env <- new.env(hash = FALSE, parent = environment(FUN))
                 environment(FUN) <- env  # where the progress bar lives
                 env$pb <- txtProgressBar(min = 0, max = length(X), initial = 0, style = 3)
-                on.exit(close(env$pb))
+                on.exit(close(env$pb), add = TRUE)
                 quote(setTxtProgressBar(pb, pb$getVal() + 1L))
             } else {
-                on.exit(cat("\n"))
+                on.exit(cat("\n"), add = TRUE)
                 quote(cat("."))
             }
         } else if (is.call(.verbose) || is.expression(.verbose)) {
@@ -40,7 +45,7 @@ plapply <- function (X, FUN, ...,
             .verbose
         } else if (is.character(.verbose)) {
             ## custom progress symbol
-            on.exit(cat("\n"))
+            on.exit(cat("\n"), add = TRUE)
             substitute(cat(.verbose))
         } # else NULL (no output)
         ## add on.exit(verboseExpr) to body(FUN)
@@ -50,7 +55,7 @@ plapply <- function (X, FUN, ...,
     ## set random seed for reproducibility
     if (!is.null(.seed)) {
         if (useCluster) {
-            parallel::clusterSetRNGStream(cl = .cl, iseed = .seed)
+            parallel::clusterSetRNGStream(cl = .parallel, iseed = .seed)
         } else {
             if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
                 set.seed(NULL)  # initialize
@@ -58,19 +63,19 @@ plapply <- function (X, FUN, ...,
             .orig.seed <- get(".Random.seed", envir = .GlobalEnv)
             on.exit(assign(".Random.seed", .orig.seed, envir = .GlobalEnv),
                     add = TRUE)
-            set.seed(seed = .seed, kind = if (.cores > 1L) "L'Ecuyer-CMRG")
+            set.seed(seed = .seed, kind = if (.parallel > 1L) "L'Ecuyer-CMRG")
         }
     }
 
     ## rock'n'roll
     if (useCluster) {
-        parallel::parLapply(cl = .cl, X = X, fun = .FUN, ...)
-    } else if (.cores == 1L) {
+        parallel::parLapply(cl = .parallel, X = X, fun = .FUN, ...)
+    } else if (.parallel == 1L) {
         lapply(X = X, FUN = .FUN, ...)
     } else { # use forking
         parallel::mclapply(X = X, FUN = .FUN, ...,
                            mc.preschedule = TRUE, mc.set.seed = TRUE,
-                           mc.silent = FALSE, mc.cores = .cores)
+                           mc.silent = FALSE, mc.cores = .parallel)
     }
 }
 

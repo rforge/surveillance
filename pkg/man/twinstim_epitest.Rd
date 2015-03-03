@@ -48,8 +48,7 @@ epitest(model, data, B = 199, verbose = TRUE, ...)
     See \code{\link{plapply}} for other choices.
   }
   \item{\dots}{further arguments for \code{\link{plapply}} to configure
-    parallel operation: \code{.cores} (forking on Unix)
-    or \code{.cl} (cluster especially on Windows), as well as
+    parallel operation, i.e., \code{.parallel} as well as
     \code{.seed} to make the results reproducible.
   }
 }
@@ -89,12 +88,12 @@ data("imdepifit")
 ## for the example to run quickly,
 ## we use the cases of the last two years only,
 ## assume spatial interaction to be constant within 20 km,
-## and compute only a few permutations (in parallel on Unix-alikes)
+## and compute only a few permutations (in parallel)
 imdepi2 <- update(subset(imdepi, time > 1826), eps.s = 20)
 imdfit2 <- update(imdepifit, data = imdepi2, t0 = 1826,
                   epidemic = ~1, siaf = NULL, control.siaf = NULL)
 et <- epitest(imdfit2, imdepi2, B = 19, verbose = 2,
-              .seed = 1, .cores = 1 + (.Platform$OS.type == "unix"))
+              .seed = 1, .parallel = 2)
 et
 
 ## histogram of the permutation distribution

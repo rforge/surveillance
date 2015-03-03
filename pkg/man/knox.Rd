@@ -48,9 +48,8 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
   }
   \item{\dots}{
     arguments configuring \code{\link{plapply}}:
-    \code{.cores} (forking) or \code{.cl} (cluster),
-    as well as \code{.seed} and \code{.verbose}.
-    By default, no parallelization is performed (\code{.cores = 1}),
+    \code{.parallel}, \code{.seed}, and \code{.verbose}.
+    By default, no parallelization is performed (\code{.parallel = 1}),
     and a progress bar is shown (\code{.verbose = TRUE}).\cr
     For the \code{plot}-method, further arguments passed to
     \code{\link{truehist}}.
@@ -132,19 +131,17 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
 \examples{
 data("imdepi")
 
-## Exact p-value via Monte Carlo permutation test
-## Permutations can be computed in parallel, here by forking (.cores argument)
-## (on Windows, use clusters via the .cl argument, see ?plapply)
-if (.Platform$OS.type == "unix") {
-    knoxtest <- knox(
-        dt = dist(imdepi$events$time), eps.t = 30,
-        ds = dist(coordinates(imdepi$events)), eps.s = 50,
-        simulate.p.value = TRUE, B = 99, # for speed
-        .cores = 2, .seed = 1, .verbose = FALSE
-    )
-    knoxtest # all 99 permutations yield a lower test statistic => p=1/100
-    plot(knoxtest)
-}
+## Obtain the p-value via a Monte Carlo permutation test,
+## where the permutations can be computed in parallel
+## (using forking on Unix-alikes and a cluster on Windows, see ?plapply)
+knoxtest <- knox(
+    dt = dist(imdepi$events$time), eps.t = 30,
+    ds = dist(coordinates(imdepi$events)), eps.s = 50,
+    simulate.p.value = TRUE, B = 99, # for speed
+    .parallel = 2, .seed = 1, .verbose = FALSE
+)
+knoxtest # all 99 permutations yield a lower test statistic => p=1/100
+plot(knoxtest)
 
 ## The Poisson approximation should be ok for this contingency table
 knox(dt = dist(imdepi$events$time), eps.t = 30,
