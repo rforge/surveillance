@@ -149,6 +149,7 @@ export(stcd)
 # test of spatio-temporal interaction
 export(knox)
 S3method(print, knox)
+S3method(plot, knox)
 
 
 ### sts(BP)-specific
