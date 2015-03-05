@@ -1091,10 +1091,11 @@ twinstim <- function (
         ## Configure the optim procedure (check optim.args)
 
         # default arguments
-        optimArgs <- alist(par =, fn = negll, gr = negsc,
-                           method = if (partial) "Nelder-Mead" else "nlminb",
-                           lower = -Inf, upper = Inf,
-                           control = list(), hessian = TRUE)
+        optimArgs <- list(par = NULL, # replaced by optim.args$par below
+                          fn = quote(negll), gr = quote(negsc),
+                          method = if (partial) "Nelder-Mead" else "nlminb",
+                          lower = -Inf, upper = Inf,
+                          control = list(), hessian = TRUE)
         # user arguments
         namesOptimArgs <- names(optimArgs)
         namesOptimUser <- names(optim.args)
@@ -1105,8 +1106,8 @@ twinstim <- function (
                     paste(namesOptimUser[!optimValid], collapse = ", "),
                     immediate. = TRUE)
         }
-        doHessian <- eval(optimArgs$hessian)
-        optimMethod <- eval(optimArgs$method)
+        doHessian <- optimArgs$hessian
+        optimMethod <- optimArgs$method
 
 
         ## Call 'optim', 'nlminb', or 'nlm' with the above arguments

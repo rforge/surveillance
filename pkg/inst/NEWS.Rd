@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-4 (2015-02-23)}{
+\section{Changes in surveillance version 1.8-4 (2015-03-05)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -59,6 +59,10 @@
 
     \item The \code{"owin"}-method of \code{intersectPolyCircle} could
     have returned a rectangle-type \code{"owin"} instead of a polygon.
+
+    \item An error occurred in \code{twinstim()} if \code{finetune=TRUE}
+    or choosing \code{optim()} instead of the default \code{nlminb()}
+    optimizer without supplying a \code{control} list in \code{optim.args}.
   }
 }
 
