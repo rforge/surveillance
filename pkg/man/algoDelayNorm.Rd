@@ -3,7 +3,7 @@
 \alias{algoDelayNorm}
 \title{The function takes \code{range} values of the surveillance time
 series \code{sts} and for each time point uses a Bayesian model of the negative binomial family with
-log link inspired by the work of Noufaily et al. (2012) and of Manitz and H?hle (2014).}
+log link inspired by the work of Noufaily et al. (2012) and of Manitz and H?hle (2014). Asymptotic normal approximation of the posteriori.}
 \usage{
 algoDelayNorm(sts,control = list(range = NULL, b = 3, w = 3,
                                            mc.munu=100, mc.y=10,
