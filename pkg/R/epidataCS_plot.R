@@ -133,16 +133,23 @@ epidataCSplot_time <- function (x, subset, by = type,
     }
 
     ## plot histogram (over all types)
-    plot(histdata, freq = freq, add = TRUE, col = col[1L], ...)
+    suppressWarnings( # about wrong AREAS if breaks are non-equidistant
+        plot(histdata, freq = freq, add = TRUE, col = col[1L], ...)
+    )
     if (!add)  # doesn't work as expected when adding to plot with cumulative axis
         box()  # because white filling of bars might overdraw the inital box
 
     ## add type-specific sub-histograms
     typesEffective <- sort(unique(eventTimesTypes$type))
     for (typeIdx in seq_along(typesEffective)[-1L]) {
-        plot(gethistdata(breaks = histdata$breaks, # have to use same breaks
-                         types = typesEffective[typeIdx:length(typesEffective)]),
-             freq = freq, add = TRUE, col = col[typesEffective[typeIdx]], ...)
+        .histdata <- gethistdata(
+            breaks = histdata$breaks, # have to use same breaks
+            types = typesEffective[typeIdx:length(typesEffective)]
+        )
+        suppressWarnings( # about wrong AREAS if breaks are non-equidistant
+            plot(.histdata, freq = freq, add = TRUE,
+                 col = col[typesEffective[typeIdx]], ...)
+        )
     }
 
     ## optionally add cumulative number of cases
