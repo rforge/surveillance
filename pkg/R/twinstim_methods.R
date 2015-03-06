@@ -6,7 +6,7 @@
 ### Methods for objects of class "twinstim", specifically:
 ### vcov, logLik, print, summary, plot (intensity, iaf), R0, residuals, update
 ###
-### Copyright (C) 2009-2014 Sebastian Meyer
+### Copyright (C) 2009-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -18,30 +18,15 @@
 ##     object$coefficients
 ## }
 
-### but a method to extract the coefficients in a list might be useful
-## "npars" is a named vector or list, where each element states the number of
-## coefficients in a group of coefficients.
-coeflist <- function (coefs, npars)
+## list coefficients by component
+coeflist.twinstim <- coeflist.simEpidataCS <- function (x, ...)
 {
-    coeflist <- vector("list", length(npars))
-    names(coeflist) <- names(npars)
-    csum <- c(0L,cumsum(npars))
-    for (i in seq_along(coeflist)) {
-        coeflist[[i]] <- coefs[seq.int(from=csum[i]+1L, length.out=npars[[i]])]
-    }
-    coeflist
-}
-
-## extended and twinstim-specific version,
-## which renames elements and unions nbeta0 and p as "endemic"
-mycoeflist <- function (coefs, npars)
-{
-    coeflist <- coeflist(coefs, npars)
-    coeflist <- c(list(c(coeflist[[1]], coeflist[[2]])), coeflist[-(1:2)])
+    coeflist <- coeflist.default(x$coefficients, x$npars)
+    ## rename elements and union "nbeta0" and "p" as "endemic"
+    coeflist <- c(list(c(coeflist[[1L]], coeflist[[2L]])), coeflist[-(1:2)])
     names(coeflist) <- c("endemic", "epidemic", "siaf", "tiaf")
     coeflist
 }
-
 
 ## asymptotic variance-covariance matrix (inverse of expected fisher information)
 vcov.twinstim <- function (object, ...)

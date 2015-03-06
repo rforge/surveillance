@@ -14,6 +14,14 @@ intersectPolyCircle <- function (object, center, radius, ...)
 ## internal function with methods for "twinSIR" and "simEpidata"
 getModel <- function (object, ...) UseMethod("getModel")
 
+## list coefficients by component
+coeflist <- function (x, ...) UseMethod("coeflist")
+coeflist.default <- function (x, npars, ...)
+{
+    f <- factor(rep.int(names(npars), npars), levels = names(npars))
+    split.default(x = x, f = f, drop = FALSE)
+}
+
 
 ### Declare some existing R functions (which we import) to be S4-generic.
 ### This is not strictly necessary, but considered better programming style, and

@@ -143,6 +143,12 @@ S3method(intersectPolyCircle, gpc.poly)
 # little helper: multiplicity of points
 S3method(multiplicity, Spatial)
 
+# list coefficients by model component
+export(coeflist)
+S3method(coeflist, default)
+S3method(coeflist, twinstim)
+S3method(coeflist, simEpidataCS)
+
 # Spatio-temporal cluster detection
 export(stcd)
 

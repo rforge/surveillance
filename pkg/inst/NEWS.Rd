@@ -28,6 +28,10 @@
     \item New function \code{plapply()}: a parallel and verbose version
     of \code{lapply()} wrapping around both \code{mclapply()} and
     \code{parLapply()} of package \pkg{parallel}.
+
+    \item New S3-generic \code{coeflist()} to list model coefficients by
+    component. It currently has a default method and one for
+    \code{"twinstim"} and \code{"simEpidataCS"}.
   }
 }
 
