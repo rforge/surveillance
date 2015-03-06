@@ -18,8 +18,8 @@ number of events along the time axis (\code{epidataCSplot_time}) as a
 \method{plot}{epidataCS}(x, aggregate = c("time", "space"), subset, by = type, ...)
 
 epidataCSplot_time(x, subset, by = type,
-                   t0.Date = NULL, freq = TRUE, col = rainbow(nTypes),
-                   cumulative = list(),
+                   t0.Date = NULL, breaks = "stgrid", freq = TRUE,
+                   col = rainbow(nTypes), cumulative = list(),
                    add = FALSE, mar = NULL, xlim = NULL, ylim = NULL,
                    xlab = "Time", ylab = NULL, main = NULL,
                    panel.first = abline(h=axTicks(2), lty=2, col="grey"),
@@ -73,12 +73,20 @@ epidataCSplot_space(x, subset, by = type,
     \code{t0 = x$stgrid$start[1]} as a \code{"\link{Date}"} (or
     anything coercible by \code{as.Date} without further arguments),
     enabling a nice x-axis using \code{\link{hist.Date}} and sensible
-    \code{breaks} of the histogram (which must also be specified in
-    this case, e.g., \code{breaks="months"}). The event times then equal
+    \code{breaks} of the histogram, e.g., \code{breaks="months"}.
+    The event times then equal
     \code{t0.Date + as.integer(x$events$time - t0)}, i.e. possible
     fractional parts of the event times are removed (which ensures that
     using \code{breaks = "months"} or other automatic types always
     works).}
+  \item{breaks}{
+    a specification of the histogram break points, see
+    \code{\link{hist}} (or \code{\link{hist.Date}} if \code{t0.Date} is
+    used). The default value \code{"stgrid"} is special and means to use
+    the temporal grid points
+    \code{with(x$stgrid, c(start[1L], unique.default(stop)))}
+    as breaks (or their \code{"Date"} equivalents).
+  }
   \item{freq}{see \code{\link{hist}}, defaults to \code{TRUE}.}
   \item{col}{fill colour for the bars of the histogram, defaults to
     the vector of \code{\link{rainbow}} colours.}

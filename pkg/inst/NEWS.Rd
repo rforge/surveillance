@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-4 (2015-03-05)}{
+\section{Changes in surveillance version 1.8-4 (2015-03-06)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -39,6 +39,9 @@
     \code{qmatrix}).
 
     \item \code{formatPval()} disables \code{scientific} notation by default.
+
+    \item The \code{"time"} plot for \code{"epidataCS"} uses the
+    temporal grid points as the default histogram \code{breaks}.
   }
 }
 
@@ -63,6 +66,9 @@
     \item An error occurred in \code{twinstim()} if \code{finetune=TRUE}
     or choosing \code{optim()} instead of the default \code{nlminb()}
     optimizer without supplying a \code{control} list in \code{optim.args}.
+
+    \item The \code{"time"} plot for \code{"epidataCS"} did not
+    necessarily use the same histogram \code{breaks} for all strata.
   }
 }
 

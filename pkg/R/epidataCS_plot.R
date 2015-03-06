@@ -25,7 +25,7 @@ plot.epidataCS <- function (x, aggregate = c("time", "space"), subset,
 ## in case t0.Date is specified, hist.Date() is used and breaks must set in ... (e.g. "months")
 
 epidataCSplot_time <- function (x, subset, by = type,
-    t0.Date = NULL, freq = TRUE,
+    t0.Date = NULL, breaks = "stgrid", freq = TRUE,
     col = rainbow(nTypes), cumulative = list(), add = FALSE, mar = NULL,
     xlim = NULL, ylim = NULL, xlab = "Time", ylab = NULL, main = NULL,
     panel.first = abline(h=axTicks(2), lty=2, col="grey"),
@@ -55,6 +55,17 @@ epidataCSplot_time <- function (x, subset, by = type,
     if (!freq && nTypes > 1L)
         warning("a stacked barplot of multiple event types only makes sense for 'freq=TRUE'")
 
+    ## default breaks at stop times of stgrid
+    if (identical(breaks, "stgrid")) {
+        breaks <- c(timeRange[1L], unique.default(x$stgrid$stop))
+        if (any(eventTimesTypes$time < timeRange[1L])) {
+            message("Note: ignoring events of the pre-history (before \"stgrid\")")
+            eventTimesTypes <- base::subset(eventTimesTypes, time >= timeRange[1L])
+            if (nrow(eventTimesTypes) == 0L) stop("no events left to plot")
+        }
+    }
+
+    ## calculate cumulative numbers if requested
     if (is.list(cumulative)) {
         csums <- tapply(eventTimesTypes$time, eventTimesTypes["type"],
                         function (t) cumsum(table(t)), simplify=FALSE)
@@ -74,26 +85,35 @@ epidataCSplot_time <- function (x, subset, by = type,
         stopifnot(length(t0.Date) == 1L)
         t0.Date <- as.Date(t0.Date)
         t0 <- timeRange[1L]
-        if (is.null(xlim)) xlim <- t0.Date + (timeRange - t0)
-        if (missing(xlab)) xlab <- paste0("Time (", list(...)[["breaks"]], ")")
+        if (is.numeric(breaks) && length(breaks) > 1L)  # transform to Date
+            breaks <- t0.Date + (breaks - t0)
+        if (is.null(xlim))
+            xlim <- t0.Date + (timeRange - t0)
+        if (missing(xlab) && is.character(breaks))
+            xlab <- paste0("Time (", breaks, ")")
         eventTimesTypes$time <- t0.Date + as.integer(eventTimesTypes$time - t0)
         ## we need integer dates here because otherwise, if the last event
         ## occurs on the last day of a month, year, etc. (depending on
         ## 'breaks') with a fractional date (e.g. as.Date("2009-12-31") + 0.5),
         ## then the automatic 'breaks' (e.g., breaks = "months") will not cover
         ## the data (in the example, it will only reach until
-        ## as.Date("2009-12-31")).
+        ## as.Date("2009-12-31")). The following would fail:
+        ## data("imdepi"); plot(imdepi, t0.Date = "2002-01-15", breaks = "months")
     }
-    gethistdata <- function (types = seq_len(nTypes)) {
+    gethistdata <- function (breaks, types = seq_len(nTypes)) {
         times <- eventTimesTypes$time[eventTimesTypes$type %in% types]
         if (is.null(t0.Date)) {
-            hist(times, plot=FALSE, warn.unused=FALSE, ...)
+            hist(times, breaks=breaks, plot=FALSE, warn.unused=FALSE, ...)
         } else {
-            hist(times, plot=FALSE, ...)
+            hist(times, breaks=breaks, plot=FALSE, ...)
             ## warn.unused=FALSE is hard-coded in hist.Date
         }
     }
-    histdata <- gethistdata()
+    histdata <- gethistdata(breaks=breaks)
+    if (!is.null(t0.Date)) {
+        ## hist.Date() drops the Date class, but we need it for later re-use
+        class(histdata$breaks) <- "Date"
+    }
     if (!add) {
         if (is.null(xlim)) xlim <- timeRange
         if (is.null(ylim)) {
@@ -120,7 +140,8 @@ epidataCSplot_time <- function (x, subset, by = type,
     ## add type-specific sub-histograms
     typesEffective <- sort(unique(eventTimesTypes$type))
     for (typeIdx in seq_along(typesEffective)[-1L]) {
-        plot(gethistdata(typesEffective[typeIdx:length(typesEffective)]),
+        plot(gethistdata(breaks = histdata$breaks, # have to use same breaks
+                         types = typesEffective[typeIdx:length(typesEffective)]),
              freq = freq, add = TRUE, col = col[typesEffective[typeIdx]], ...)
     }
 
