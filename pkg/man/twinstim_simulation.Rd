@@ -329,7 +329,7 @@ summary(mysim1)
 plot(mysim1, aggregate="space")
 
 ## plot both epidemics using the plot-method for simEpidataCSlist's
-plot(mysims, aggregate="time", subset=type=="B")
+plot(mysims, aggregate="time", subset=type=="B", breaks = 10)
 
 
 if (surveillance.options("allExamples")) {
