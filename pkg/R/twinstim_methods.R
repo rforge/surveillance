@@ -471,15 +471,13 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, newcoef = NULL, ...)
     R0s
 }
 
-## calculate simple R0 (over circular domain, without epidemic covariates)
-simpleR0 <- function (object, eps.s = NULL, eps.t = NULL,
-                      types = seq_len(nTypes))
+## calculate simple R0 (over circular domain, without epidemic covariates,
+## for type-invariant siaf/tiaf)
+simpleR0 <- function (object, eps.s = NULL, eps.t = NULL)
 {
     stopifnot(inherits(object, c("twinstim", "simEpidataCS")))
-    qSumTypes <- rowSums(object$qmatrix)
-    nTypes <- length(qSumTypes)
     if (object$npars[["q"]] == 0L)
-        return(setNames(rep_len(0, nTypes), names(qSumTypes))[types])
+        return(0)
     
     gamma0 <- object$coefficients[["e.(Intercept)"]]
     if (length(gamma0) == 0L) {
@@ -501,16 +499,13 @@ simpleR0 <- function (object, eps.s = NULL, eps.t = NULL,
 
     ## integral of siaf over a disc of radius eps.s
     Fcircle <- getFcircle(siaf, object$control.siaf$F)
-    siafInt <- vapply(X = types,
-                      FUN = function (type) Fcircle(eps.s, coeflist$siaf, type),
-                      FUN.VALUE = 0, USE.NAMES = FALSE)
+    siafInt <- Fcircle(eps.s, coeflist$siaf)
 
     ## integral of tiaf over a period of length eps.t
-    tiafInt <- object$formula$tiaf$G(eps.t, coeflist$tiaf, types) -
-        object$formula$tiaf$G(0, coeflist$tiaf, types)
+    tiafInt <- tiaf$G(eps.t, coeflist$tiaf) - tiaf$G(0, coeflist$tiaf)
 
     ## calculate basic R0
-    qSumTypes[types] * exp(gamma0) * siafInt * tiafInt
+    exp(gamma0) * siafInt * tiafInt
 }            
 
 
