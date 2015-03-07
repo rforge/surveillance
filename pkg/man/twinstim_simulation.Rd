@@ -227,6 +227,10 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   objects of class \code{"\link{twinstim}"}:
   \code{timeRange}, \code{formula}, \code{coefficients}, \code{npars},
   \code{call}, \code{runtime}.
+  It has corresponding \code{\link{coeflist}},
+  \code{\link[=residuals.simEpidataCS]{residuals}},
+  \code{\link[=R0.simEpidataCS]{R0}}, and
+  \code{\link[=intensityplot.simEpidataCS]{intensityplot}} methods.
 
   The \code{simulate.twinstim} method has some additional
   \emph{attributes} set on its result:
