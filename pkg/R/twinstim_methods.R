@@ -439,19 +439,14 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, newcoef = NULL, ...)
         typeTcombis$gInt <-
             with(typeTcombis, tiaf$G(eps.t, tiafpars, type)) -
                 tiaf$G(rep.int(0,nTypes), tiafpars, types)[typeTcombis$type]
-        
+
+        Fcircle <- getFcircle(siaf, object$control.siaf$F)
         typeScombis <- expand.grid(type=types, eps.s=unique(eps.s),
                                    KEEP.OUT.ATTRS=FALSE)
         typeScombis$fInt <- apply(typeScombis, MARGIN=1, FUN=function (type_eps.s) {
-            type <- type_eps.s[1]
-            eps.s <- type_eps.s[2]
-            if (is.null(siaf$Fcircle)) {
-                do.call(siaf$F, c(list(discpoly(c(0,0), eps.s, class="owin"),
-                                       siaf$f, siafpars, type),
-                                  object$control.siaf$F))
-            } else {
-                siaf$Fcircle(eps.s, siafpars, type)
-            }
+            type <- type_eps.s[1L]
+            eps.s <- type_eps.s[2L]
+            Fcircle(eps.s, siafpars, type)
         })
         
         ## match combinations to rows of original events or 'newevents'
@@ -475,6 +470,48 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, newcoef = NULL, ...)
     R0s <- qSum * gammapred * siafInt * tiafInt
     R0s
 }
+
+## calculate simple R0 (over circular domain, without epidemic covariates)
+simpleR0 <- function (object, eps.s = NULL, eps.t = NULL,
+                      types = seq_len(nTypes))
+{
+    stopifnot(inherits(object, c("twinstim", "simEpidataCS")))
+    qSumTypes <- rowSums(object$qmatrix)
+    nTypes <- length(qSumTypes)
+    if (object$npars[["q"]] == 0L)
+        return(setNames(rep_len(0, nTypes), names(qSumTypes))[types])
+    
+    gamma0 <- object$coefficients[["e.(Intercept)"]]
+    if (length(gamma0) == 0L) {
+        stop("'simpleR0' requires an epidemic intercept")
+    }
+    coeflist <- coeflist(object)
+    siaf <- object$formula$siaf
+    tiaf <- object$formula$tiaf
+
+    ## default radii of interaction
+    if (is.null(eps.s)) {
+        eps.s <- attr(siaf, "eps")
+        if (length(eps.s) > 1L) stop("found non-unique 'eps.s'; please set one")
+    } else stopifnot(isScalar(eps.s))
+    if (is.null(eps.t)) {
+        eps.t <- attr(tiaf, "eps")
+        if (length(eps.t) > 1L) stop("found non-unique 'eps.t'; please set one")
+    } else stopifnot(isScalar(eps.t))
+
+    ## integral of siaf over a disc of radius eps.s
+    Fcircle <- getFcircle(siaf, object$control.siaf$F)
+    siafInt <- vapply(X = types,
+                      FUN = function (type) Fcircle(eps.s, coeflist$siaf, type),
+                      FUN.VALUE = 0, USE.NAMES = FALSE)
+
+    ## integral of tiaf over a period of length eps.t
+    tiafInt <- object$formula$tiaf$G(eps.t, coeflist$tiaf, types) -
+        object$formula$tiaf$G(0, coeflist$tiaf, types)
+
+    ## calculate basic R0
+    qSumTypes[types] * exp(gamma0) * siafInt * tiafInt
+}            
 
 
 
