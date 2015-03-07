@@ -189,7 +189,12 @@ export(earsC)
 export(farringtonFlexible)
 export(categoricalCUSUM, pairedbinCUSUM, pairedbinCUSUM.runlength)
 export(nowcast, backprojNP)
+export(algoDelay)
+export(algoDelayNorm)
 
+# sts creation functions
+export(sts_creation)
+export(sts_observation)
 
 ### disProg-specific
 
