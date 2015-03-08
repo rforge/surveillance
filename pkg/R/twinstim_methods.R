@@ -478,6 +478,8 @@ simpleR0 <- function (object, eps.s = NULL, eps.t = NULL)
     stopifnot(inherits(object, c("twinstim", "simEpidataCS")))
     if (object$npars[["q"]] == 0L)
         return(0)
+    if (any(rowSums(object$qmatrix) != 1))
+        warning("'simpleR0' is not correct for type-specific epidemic models")
     
     gamma0 <- object$coefficients[["e.(Intercept)"]]
     if (length(gamma0) == 0L) {
