@@ -95,18 +95,11 @@ print.knox <- function (x, ...)
 
 plot.knox <- function (x, ...)
 {
-    if (is.null(data <- x[["permstats"]])) {
+    if (is.null(permstats <- x[["permstats"]])) {
         stop("this plot-method is for a permutation-based Knox test")
     }
-    xmarks <- setNames(c(x[["null.value"]], x[["statistic"]]),
-                       c("expected", "observed"))
-    defaultArgs <- list(
-        data = data, xlab = "number of close pairs", col = "lavender",
-        xlim = extendrange(c(data, xmarks))
-    )
-    do.call("truehist", modifyList(defaultArgs, list(...), keep.null = TRUE))
-    abline(v = xmarks, lwd = 2)
-    axis(3, at = xmarks, labels = names(xmarks),
-         tick = FALSE, line = -1, font = 2)
-    invisible(NULL)
+    epitestplot(permstats = permstats,
+                xmarks = setNames(c(x[["null.value"]], x[["statistic"]]),
+                    c("expected", "observed")),
+                xlab = "number of close pairs", ...)
 }

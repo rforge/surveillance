@@ -10,13 +10,18 @@
 ### $Date$
 ################################################################################
 
-epitest <- function (model, data, B = 199, verbose = TRUE, ...)
+epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
+                     verbose = TRUE, ...)
 {
     stopifnot(inherits(model, "twinstim"), inherits(data, "epidataCS"),
               model$converged, isScalar(B), B >= 1)
     B <- as.integer(B)
     if (model$npars["q"] == 0L) {
         stop("no epidemic component in 'model'")
+    }
+    if (model$npars["q"] > 1L) {
+        warning("epidemic covariate effects not identifiable for permuted data",
+                immediate. = TRUE)
     }
     
     ## auxiliary function to compute the LRT statistic
@@ -38,19 +43,21 @@ epitest <- function (model, data, B = 199, verbose = TRUE, ...)
         stop("endemic-only model did not converge")
     }
     LRT <- lrt(m0 = m0, m1 = model)
-    STATISTIC <- structure(LRT["D"], l0 = LRT[["l0"]], l1 = LRT[["l1"]])
+    STATISTIC_D <- structure(LRT["D"], l0 = LRT[["l0"]], l1 = LRT[["l1"]])
+    STATISTIC_R0 <- c("simpleR0" = simpleR0(model, eps.s = eps.s, eps.t = eps.t))
     
     ## 'verbose' expression to print test statistics
     if (is.numeric(verbose) && verbose >= 2L) {
+        stats2string <- function (lrt, simpleR0)
+            paste0(c(names(lrt)[1:3], "simpleR0"), " = ",
+                   sprintf(paste0("%4.", c(0,0,1,2), "f"), c(lrt[1:3], simpleR0)),
+                   collapse = " | ")
         cat("Endemic/Epidemic log-likelihoods and LRT statistic:\n",
-            paste0(names(LRT)[1:3], " = ", sprintf("%4.1f", LRT[1:3]),
-                   collapse = " | "),
+            stats2string(LRT, STATISTIC_R0),
             "\n\nResults from B=", B, " permutations of the event times:\n",
             sep = "")
-        verbose <- quote({
-            lrt <- lrt(m0, m1)
-            cat(paste0(names(lrt)[1:3], " = ", sprintf("%4.1f", lrt[1:3]),
-                       collapse = " | "))
+        verbose <- substitute({
+            cat(STATS2STRING)
             if (!lrt["converged"]) {
                 msg <- c(m0 = m0$converged, m1 = m1$converged)
                 msg <- msg[msg != "TRUE"]
@@ -58,12 +65,14 @@ epitest <- function (model, data, B = 199, verbose = TRUE, ...)
                     "): ", paste0(unique(msg), collapse = " and "), sep = "")
             }
             cat("\n")
-        })
+        }, list(STATS2STRING = body(stats2string)))
     }
     
     ## define the function to be replicated B times:
-    ## permute data, update epidemic model, compute endemic-only model
-    permfits1 <- function (...) { # needs 'data' and 'model'
+    ## permute data, update epidemic model, compute endemic-only model,
+    ## and compute test statistics
+    permfits1 <- function (...) {
+        ## depends on 'data', 'model', 'lrt', 'eps.s', and 'eps.t'
         .permdata <- permute.epidataCS(data, what = "time", keep = time <= t0)
         m1 <- update.twinstim(model, data = .permdata,
                               model = FALSE, cumCIF = FALSE,
@@ -71,26 +80,30 @@ epitest <- function (model, data, B = 199, verbose = TRUE, ...)
                               optim.args = list(control = list(trace = 0)))
         m0 <- update.twinstim(m1, epidemic = ~0, siaf = NULL, tiaf = NULL,
                               control.siaf = NULL)
-        list(m0 = m0, m1 = m1)
+        lrt <- lrt(m0, m1)
+        simpleR0 <- simpleR0(m1, eps.s = eps.s, eps.t = eps.t)
+        list(m0 = m0, m1 = m1,
+             stats = c(lrt[1:3], simpleR0 = simpleR0, lrt["converged"]))
     }
 
     ## rock'n'roll (the computationally intensive part)
     permfits <- plapply(X = integer(B), FUN = permfits1,
                         .verbose = verbose, ...)
     
-    ## compute the test statistic
+    ## extract the statistics
     permstats <- as.data.frame(t(vapply(
-        X = permfits, FUN = do.call, what = lrt, 
-        FUN.VALUE = numeric(4L), USE.NAMES = TRUE
+        X = permfits, FUN = "[[", "stats",
+        FUN.VALUE = numeric(5L), USE.NAMES = TRUE
     )))
     permstats$converged <- as.logical(permstats$converged)
     
     ## compute permutation-based p-value
-    PVAL <- mean(c(STATISTIC, permstats[["D"]][permstats[["converged"]]]) >= STATISTIC)
-    ## asymptotic p-value for comparison (invalid)
-    attr(PVAL, "chisq") <- pchisq(as.vector(STATISTIC), # drop attributes
-                                  df = length(coef(model)) - length(coef(m0)),
-                                  lower.tail = FALSE)
+    PVAL_D <- mean(c(STATISTIC_D, permstats[permstats$converged, "D"]) >= STATISTIC_D)
+    PVAL_R0 <- mean(c(STATISTIC_R0, permstats[permstats$converged, "simpleR0"]) >= STATISTIC_R0)
+    ## invalid asymptotic p-value of LRT for comparison
+    ## attr(PVAL_D, "chisq") <- pchisq(as.vector(STATISTIC_D), # drop attributes
+    ##                                 df = length(coef(model)) - length(coef(m0)),
+    ##                                 lower.tail = FALSE)
     
     ## gather results
     res <- list(
@@ -98,11 +111,35 @@ epitest <- function (model, data, B = 199, verbose = TRUE, ...)
             "(based on", sum(permstats[["converged"]]), "replicates)"),
         data.name = paste0(deparse(substitute(data)),
             "\ntwinstim:  ", deparse(substitute(model))),
-        statistic = STATISTIC,
-        p.value = PVAL,
+        statistic = structure(STATISTIC_R0, "D" = unname(STATISTIC_D)),
+        p.value = structure(PVAL_R0, "D-based" = PVAL_D),
         permfits = permfits,
         permstats = permstats
     )
-    class(res) <- "htest"
+    class(res) <- c("epitest", "htest")
     res
+}
+
+plot.epitest <- function (x, ...)
+{
+    epitestplot(x$permstats$simpleR0,
+                xmarks = setNames(x$statistic, "observed"),
+                xlab = expression("Simple " * R[0]), ...)
+}
+
+## auxiliary function also used by plot.knox()
+epitestplot <- function (permstats, xmarks = NULL, xlab = "test statistic", ...)
+{
+    defaultArgs <- list(
+        data = permstats, xlab = xlab, col = "lavender",
+        main = "Monte Carlo permutation test for space-time interaction",
+        xlim = extendrange(c(permstats, xmarks))
+    )
+    do.call("truehist", modifyList(defaultArgs, list(...), keep.null = TRUE))
+    if (!is.null(xmarks)) {
+        abline(v = xmarks, lwd = 2)
+        axis(3, at = xmarks, labels = names(xmarks), # if NULL the value is used
+             tick = FALSE, line = -1, font = 2)
+    }
+    invisible(NULL)
 }
