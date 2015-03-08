@@ -74,10 +74,12 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
     permfits1 <- function (...) {
         ## depends on 'data', 'model', 'lrt', 'eps.s', and 'eps.t'
         .permdata <- permute.epidataCS(data, what = "time", keep = time <= t0)
+        ## sink(paste0("/tmp/trace_", Sys.getpid()), append = TRUE)
         m1 <- update.twinstim(model, data = .permdata,
                               model = FALSE, cumCIF = FALSE,
                               cores = 1, verbose = FALSE,
                               optim.args = list(control = list(trace = 0)))
+        ## sink()
         m0 <- update.twinstim(m1, epidemic = ~0, siaf = NULL, tiaf = NULL,
                               control.siaf = NULL)
         lrt <- lrt(m0, m1)

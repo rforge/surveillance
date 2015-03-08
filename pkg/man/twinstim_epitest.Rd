@@ -51,7 +51,7 @@ epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL, verbose = TRUE, ...)
     Level 0 (or \code{FALSE}) means no output,
     level 1 (or \code{TRUE}, the default) will show a progress bar,
     and level 2 prints the test statistic resulting from each permutation.
-    Ignored if parallelized using clusters.
+    Does not work if parallelized using clusters.
     See \code{\link{plapply}} for other choices.
   }
   \item{\dots}{further arguments for \code{\link{plapply}} to configure
