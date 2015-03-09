@@ -46,7 +46,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
                                           verbose = FALSE,
                                           alpha = 0.01, trend = TRUE,
                                           limit54=c(5,4), 
-                                          inferenceMethod=c("INLA","asym"),
+                                          inferenceMethod=c("asym","INLA"),
                                           noPeriods = 1, pastWeeksNotIncluded = 26,
                                           delay = TRUE)) {
   #Check if the INLA package is available.
@@ -156,7 +156,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
     control$inferenceMethod <- "asym" }
   else {
     control$inferenceMethod <- match.arg(control$inferenceMethod, 
-                                         c("INLA","asym"))
+                                         c("asym","INLA"))
   }
   
   # Define objects

@@ -9,7 +9,7 @@ bodaDelay(sts, control = list(range = NULL, b = 3, w = 3,
                                           verbose = FALSE,
                                           alpha = 0.01, trend = TRUE,
                                           limit54=c(5,4), 
-                                          inferenceMethod=c("INLA","asym"),
+                                          inferenceMethod=c("asym","INLA"),
                                           noPeriods = 1, pastWeeksNotIncluded = 26,
                                           delay = TRUE))
 }
@@ -58,7 +58,7 @@ user to change these numbers.}
 \description{
 The function takes \code{range} values of the surveillance time
 series \code{sts} and for each time point uses a Bayesian model of the negative binomial family with
-log link inspired by the work of Noufaily et al. (2012) and of Manitz and \enc{Höhle}{Hoehle} (2014). It allows delay-corrected aberration detection as explained in Salmon et al. (2015). A \code{reportingTriangle} has to be provided in the \code{control} slot.
+log link inspired by the work of Noufaily et al. (2012) and of Manitz and \enc{H?hle}{Hoehle} (2014). It allows delay-corrected aberration detection as explained in Salmon et al. (2015). A \code{reportingTriangle} has to be provided in the \code{control} slot.
 }
 \examples{
 data(salmAllOnset)
@@ -88,6 +88,6 @@ plot(salm.delay)
 \references{
 A statistical algorithm for the early detection of outbreaks of infectious disease, Farrington, C.P., Andrews, N.J, Beale A.D. and Catchpole, M.A. (1996), J. R. Statist. Soc. A, 159, 547-563.
 An improved algorithm for outbreak detection in multiple surveillance systems, Noufaily, A., Enki, D.G., Farrington, C.P., Garthwaite, P., Andrews, N.J., Charlett, A. (2012), Statistics in Medicine, published online.
-Bayesian outbreak detection in the presence of reporting delays, Salmon, M., Schumacher, D., Stark, K., \enc{Höhle}{Hoehle}, M. (2015), in revision.
+Bayesian outbreak detection in the presence of reporting delays, Salmon, M., Schumacher, D., Stark, K., \enc{H?hle}{Hoehle}, M. (2015), in revision.
 }
 
