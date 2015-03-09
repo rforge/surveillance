@@ -7,7 +7,7 @@
 ### class "twinstim". The function basically uses Ogata's modified thinning
 ### algorithm (cf. Daley & Vere-Jones, 2003, Algorithm 7.5.V.).
 ###
-### Copyright (C) 2010-2014 Sebastian Meyer
+### Copyright (C) 2010-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -887,9 +887,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     
     ### transform eventMatrix back into a data.frame with original factor variables
 
-    if (trace > 0L) {
-      cat("\nConverting simulated events into an object of class \"epidataCS\"...\n")
-    }
+    cat("\nPreparing simulated events for \"epidataCS\" ...\n")
     preEventData <- eventData
 
     # drop unused entries (due to large pre-allocation) from objects
@@ -1144,7 +1142,7 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
                 c(list(res), vector(nsim-1L, mode="list"))
             }
         # force garbage collection
-        capture.output(gc())
+        gc()
         # run the remaining simulations
         simcall$.onlyEvents <- simplify
         for (i in 2:nsim) {
