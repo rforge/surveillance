@@ -189,8 +189,8 @@ export(earsC)
 export(farringtonFlexible)
 export(categoricalCUSUM, pairedbinCUSUM, pairedbinCUSUM.runlength)
 export(nowcast, backprojNP)
-export(algoDelay)
-export(algoDelayNorm)
+export(bodaDelay)
+
 
 # sts creation functions
 export(sts_creation)

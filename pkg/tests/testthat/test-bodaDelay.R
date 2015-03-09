@@ -1,7 +1,5 @@
 library("INLA")
- library("testthat")
-
-library("delayPackage")
+library("testthat")
 library("surveillance")
 ##################################################################
 context("Checking the provided reporting triangle")
@@ -18,16 +16,16 @@ controlDelay <-  list(range = rangeTest, b = 4, w = 3,
                       delay=TRUE)
 test_that("The absence of reporting triangle throws an error",{
   data("salmNewport")
-  expect_error(algoDelay(salmNewport, controlDelay),"You have to")
+  expect_error(bodaDelay(salmNewport, controlDelay),"You have to")
 })
 test_that("The function spots uncorrect reporting triangles",{
   data('salmAllOnset')
   stsFake <- salmAllOnset
   stsFake@control$reportingTriangle$n <- head(stsFake@control$reportingTriangle$n,n=10)
-  expect_error(algoDelay(stsFake, controlDelay),"The reporting triangle number")
+  expect_error(bodaDelay(stsFake, controlDelay),"The reporting triangle number")
   stsFake <- salmAllOnset
   stsFake@control$reportingTriangle$n[1,] <- stsFake@control$reportingTriangle$n[1,]/2
-  expect_error(algoDelay(stsFake, controlDelay),"The reporting triangle is wrong")
+  expect_error(bodaDelay(stsFake, controlDelay),"The reporting triangle is wrong")
 })
 ##################################################################
 context("Data glm function")
@@ -58,7 +56,7 @@ vectorOfDates <- as.Date(salmAllOnset@epoch, origin="1970-01-01")
 dayToConsider <- vectorOfDates[rangeTest[1]]
 observed <- salmAllOnset@observed
 population <- salmAllOnset@populationFrac
-dataGLM <- algoDelay.data.glm(dayToConsider=dayToConsider, 
+dataGLM <- bodaDelay.data.glm(dayToConsider=dayToConsider, 
                               b=b, freq=freq, 
                               epochAsDate=epochAsDate,
                               epochStr=epochStr,
@@ -70,7 +68,7 @@ dataGLM <- algoDelay.data.glm(dayToConsider=dayToConsider,
                               reportingTriangle=reportingTriangle, 
                               delay=delay) 
 delay <- FALSE
-dataGLMNoDelay <- algoDelay.data.glm(dayToConsider=dayToConsider, 
+dataGLMNoDelay <- bodaDelay.data.glm(dayToConsider=dayToConsider, 
                                   b=b, freq=freq, 
                                   epochAsDate=epochAsDate,
                                   epochStr=epochStr,
@@ -128,13 +126,26 @@ argumentsGLM <- list(dataGLM=dataGLM,reportingTriangle=reportingTriangle,
                      populationOffset=populationOffset,
                      factorsBool=TRUE,pastAberrations=FALSE,
                      glmWarnings=glmWarnings,
-                     verbose=verbose,delay=delay,k=k,control=controlDelay)
+                     verbose=verbose,delay=delay,k=k,control=controlDelay,
+                     inferenceMethod="INLA")
 
-model <- do.call(algoDelay.fitGLM, args=argumentsGLM)
+model <- do.call(bodaDelay.fitGLM, args=argumentsGLM)
 test_that("The fit glm function gives the right class of output?",{
   expect_equal(class(model),"inla")
 })
 
+argumentsGLM <- list(dataGLM=dataGLM,reportingTriangle=reportingTriangle,
+                     timeTrend=timeTrend,alpha=alpha,
+                     populationOffset=populationOffset,
+                     factorsBool=TRUE,pastAberrations=FALSE,
+                     glmWarnings=glmWarnings,
+                     verbose=verbose,delay=delay,k=k,control=controlDelay,
+                     inferenceMethod="asym")
+
+model <- do.call(bodaDelay.fitGLM, args=argumentsGLM)
+test_that("The fit glm function gives the right class of output?",{
+  expect_equal(class(model)==c("negbin", "glm", "lm" ),rep(TRUE,3))
+})
 ################################################################################
 context("formula function")
 ################################################################################

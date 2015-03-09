@@ -66,8 +66,14 @@ densityDelay <- apply(rT2011,2,sum, na.rm=TRUE)/sum(rT2011, na.rm=TRUE)
 # alpha for the upperbound
 alpha <- 0.05
 # Create the sts with the full time series
-stsSim <- sts_creation(theta=theta,beta=beta,gamma1=gamma1,gamma2=gamma2,m=m,overdispersion=overdispersion,dates=dates,sizesOutbreak=sizesOutbreak,datesOutbreak=datesOutbreak,delayMax=D,
-                         densityDelay=densityDelay,alpha=alpha)
+stsSim <- sts_creation(theta=theta,beta=beta,
+                       gamma1=gamma1,gamma2=gamma2,
+                       m=m,overdispersion=overdispersion
+                       ,dates=dates,sizesOutbreak=sizesOutbreak,
+                       datesOutbreak=datesOutbreak,
+                       delayMax=D,
+                         densityDelay=densityDelay,
+                         alpha=alpha)
 plot(stsSim)
 }
 \references{

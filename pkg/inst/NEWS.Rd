@@ -10,6 +10,12 @@
 
 \subsection{NEW FEATURES}{
   \itemize{
+  \item New functions and data to reproduce the results given in 
+  Bayesian outbreak detection in the presence of reporting delays, 
+  Salmon, M., Schumacher, D., Stark, K., \enc{HÃ¶hle}{Hoehle}, M. (2015), 
+  in revision. Functions include \code{bodaDelay},
+  \code{sts_observation} and \code{sts_creation}.
+  
     \item New argument \code{by} for \code{plot.epidataCS()}, which
     defines a stratifying variable for the events (default is the event
     type as before). It can also be set to \code{NULL} to make the plot
@@ -363,13 +369,13 @@
     handle the inherit right-truncation of reporting data (best
     visualized as a reporting triangle). The new code implements the
     generalized-Dirichlet and the hierarchical Bayesian approach described in
-    \enc{Höhle}{Hoehle} and an der Heiden (2014). No backwards
+    \enc{H?hle}{Hoehle} and an der Heiden (2014). No backwards
     compatibility to the old nowcasting procedure is given. 
     
     \item The package contains a new monitoring function
     \code{boda}. This is a first experimental surveillance
     implementation of the Bayesian Outbreak Detection Algorithm (BODA)
-    proposed in Manitz and \enc{Höhle}{Hoehle} (2012). The function
+    proposed in Manitz and \enc{H?hle}{Hoehle} (2012). The function
     relies on the non-CRAN package \pkg{INLA}, which has to be installed first
     in order to use this function. Expect initial problems.
 
@@ -598,7 +604,7 @@
     model (fitted by \code{estimateGLRNbHook}) was incorrectly taken as
     \code{mod[[1]]$theta} instead of \code{1/mod[[1]]$theta}. The error is
     due to a different parametrization of the negative binomial
-    distribution compared to the parametrization in \enc{Höhle}{Hoehle}
+    distribution compared to the parametrization in \enc{H?hle}{Hoehle}
     and Paul (2008).
     
     \item The score function of \code{hhh4()} was wrong when fitting
@@ -1304,7 +1310,7 @@
     \itemize{
       \item Support for \code{"twinSIR"} models (with associated
             \code{"epidata"} objects) as described 
-            in \cite{Höhle (2009)} has been moved from package
+            in \cite{H?hle (2009)} has been moved from package
 	    \CRANpkg{RLadyBug} to \pkg{surveillance}.
             That means continuous-time discrete-space \acronym{SIR} models.
       \item Support for \code{"twinstim"} models as described in
@@ -1359,7 +1365,7 @@
   \itemize{
     \item A few minor bug fixes
     \item Small improvements in the C-implementation of the \code{twins()}
-      function by Daniel Sabanés Bové fixing the segmentation fault
+      function by Daniel Saban?s Bov? fixing the segmentation fault
       issue on 64-bit architectures. 
   }
 }
@@ -1428,7 +1434,7 @@
       binomial cusum can be run by calling
            \code{rogerson( x, control(..., distribution="binomial"))}
     \item An experimental implementation of the twins model documented in
-      Held, L., Hofmann, M., Höhle, M. and Schmid V. (2006) A two-component
+      Held, L., Hofmann, M., H?hle, M. and Schmid V. (2006) A two-component
       model for counts of infectious diseases, Biostatistics, 7, pp.
       422--437 is now available as algo.twins.
   }

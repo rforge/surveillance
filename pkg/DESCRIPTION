@@ -2,7 +2,7 @@ Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
 Version: 1.8-4
 Date: 2015-01-06
-Authors@R: c(MH = person("Michael", "Höhle",
+Authors@R: c(MH = person("Michael", "H?hle",
                   email = "hoehle@math.su.se",
                   role = c("aut", "cre", "ths")),
              SM = person("Sebastian", "Meyer",
@@ -19,8 +19,8 @@ Authors@R: c(MH = person("Michael", "Höhle",
              person("Christian", "Lang", role = "ctb"),
              person("Juliane", "Manitz", role = "ctb"),
              person("Andrea", "Riebler", role = "ctb"),
-             person("Daniel", "Sabanés Bové", role = "ctb"),
-             person("Maëlle", "Salmon", role = "ctb"),
+             person("Daniel", "Saban?s Bov?", role = "ctb"),
+             person("Ma?lle", "Salmon", role = "ctb"),
              person("Dirk", "Schumacher", role = "ctb"),
              person("Stefan", "Steiner", role = "ctb"),
              person("Mikko", "Virtanen", role = "ctb"),
@@ -28,14 +28,14 @@ Authors@R: c(MH = person("Michael", "Höhle",
              person("R Core Team", role = "ctb",
                     comment = "A few code segments are modified versions of
                                code from base R"))
-Author: Michael Höhle [aut, cre, ths], Sebastian Meyer [aut],
+Author: Michael H?hle [aut, cre, ths], Sebastian Meyer [aut],
         Michaela Paul [aut], Leonhard Held [ctb, ths],
         Thais Correa [ctb], Mathias Hofmann [ctb], Christian Lang [ctb],
-        Juliane Manitz [ctb], Andrea Riebler [ctb], Daniel Sabanés Bové [ctb],
-        Maëlle Salmon [ctb], Dirk Schumacher [ctb], Stefan Steiner [ctb],
+        Juliane Manitz [ctb], Andrea Riebler [ctb], Daniel Saban?s Bov? [ctb],
+        Ma?lle Salmon [ctb], Dirk Schumacher [ctb], Stefan Steiner [ctb],
         Mikko Virtanen [ctb], Valentin Wimmer [ctb], R Core Team [ctb]
         (A few code segments are modified versions of code from base R)
-Maintainer: Michael Höhle <hoehle@math.su.se>
+Maintainer: Michael H?hle <hoehle@math.su.se>
 Depends: R (>= 3.0.2), methods, grDevices, graphics, stats, utils, 
         sp (>= 1.0-15), xtable, polyCub (>= 0.4-3)
 Imports: Rcpp (>= 0.11.0), MASS, Matrix, spatstat (>= 1.36-0)
@@ -68,7 +68,7 @@ Description: A package implementing statistical methods for the modeling and
         logistic and multinomial logistic modelling is also included.
         Continuous self-exciting spatio-temporal point processes are
         modeled through additive-multiplicative conditional
-        intensities as described in Höhle (2009) ("twinSIR", discrete
+        intensities as described in H?hle (2009) ("twinSIR", discrete
         space) and Meyer et al (2012) ("twinstim", continuous space).
         The package contains several real-world data sets, the ability
         to simulate outbreak data, visualize the results of the
