@@ -11,7 +11,7 @@
 ################################################################################
 
 epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
-                     verbose = TRUE, ...)
+                     fixed = NULL, verbose = TRUE, ...)
 {
     stopifnot(inherits(model, "twinstim"), inherits(data, "epidataCS"),
               model$converged, isScalar(B), B >= 1)
@@ -23,6 +23,8 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
         warning("epidemic covariate effects not identifiable for permuted data",
                 immediate. = TRUE)
     }
+    if (!is.null(fixed))
+        stopifnot(is.character(fixed))
     
     ## auxiliary function to compute the LRT statistic
     lrt <- function (m0, m1) {
@@ -38,7 +40,7 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
                           epidemic = ~0, siaf = NULL, tiaf = NULL,
                           control.siaf = NULL, model = FALSE, cumCIF = FALSE,
                           cores = 1, verbose = FALSE,
-                          optim.args = list(control = list(trace = 0)))
+                          optim.args = list(fixed = fixed, control = list(trace = 0)))
     if (!isTRUE(m0$converged)) {
         stop("endemic-only model did not converge")
     }
@@ -72,13 +74,13 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
     ## permute data, update epidemic model, compute endemic-only model,
     ## and compute test statistics
     permfits1 <- function (...) {
-        ## depends on 'data', 'model', 'lrt', 'eps.s', and 'eps.t'
+        ## depends on 'data', 'model', 'lrt', 'eps.s', 'eps.t', and 'fixed'
         .permdata <- permute.epidataCS(data, what = "time", keep = time <= t0)
         ## sink(paste0("/tmp/trace_", Sys.getpid()), append = TRUE)
         m1 <- update.twinstim(model, data = .permdata,
                               model = FALSE, cumCIF = FALSE,
                               cores = 1, verbose = FALSE,
-                              optim.args = list(control = list(trace = 0)))
+                              optim.args = list(fixed = fixed, control = list(trace = 0)))
         ## sink()
         m0 <- update.twinstim(m1, epidemic = ~0, siaf = NULL, tiaf = NULL,
                               control.siaf = NULL)

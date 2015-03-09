@@ -992,10 +992,8 @@ twinstim <- function (
             stopifnot(fixed %in% seq_len(npars))
             fixed
         } else if (is.character(fixed)) {
-            if (any(!fixed %in% names(initpars)))
-                stop("'optim.args$fixed' must be a subset of: ",
-                     paste0("\"",names(initpars), "\"", collapse=", "))
-            fixed
+            ## we silently ignore names of non-existent parameters
+            intersect(fixed, names(initpars))
         } else if (is.logical(fixed)) {
             stopifnot(length(fixed) == npars)
             which(fixed)

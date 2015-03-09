@@ -20,7 +20,8 @@
 }
 
 \usage{
-epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL, verbose = TRUE, ...)
+epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL,
+        fixed = NULL, verbose = TRUE, ...)
 
 \method{plot}{epitest}(x, ...)
 }
@@ -46,6 +47,10 @@ epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL, verbose = TRUE, ...)
     is \code{1/(B+1)}.
   }
   \item{eps.s,eps.t}{arguments for \code{\link{simpleR0}}.}
+  \item{fixed}{
+    optional character vector naming parameters to fix at their original
+    value when re-fitting the \code{model} on permuted data.
+  }
   \item{verbose}{
     the amount of tracing in the range \code{0:2}.
     Level 0 (or \code{FALSE}) means no output,
