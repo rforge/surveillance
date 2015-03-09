@@ -120,6 +120,7 @@ test_that("the factor variable has the right number of levels",{
 ##################################################################
 context("Fit glm function")
 if(requireNamespace("INLA")) {
+  library("INLA")
   argumentsGLM <- list(dataGLM=dataGLM,reportingTriangle=reportingTriangle,
                        timeTrend=timeTrend,alpha=alpha,
                        populationOffset=populationOffset,
