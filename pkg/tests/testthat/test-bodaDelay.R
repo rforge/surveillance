@@ -120,20 +120,20 @@ test_that("the factor variable has the right number of levels",{
 
 ##################################################################
 context("Fit glm function")
-
-argumentsGLM <- list(dataGLM=dataGLM,reportingTriangle=reportingTriangle,
-                     timeTrend=timeTrend,alpha=alpha,
-                     populationOffset=populationOffset,
-                     factorsBool=TRUE,pastAberrations=FALSE,
-                     glmWarnings=glmWarnings,
-                     verbose=verbose,delay=delay,k=k,control=controlDelay,
-                     inferenceMethod="INLA")
-
-model <- do.call(bodaDelay.fitGLM, args=argumentsGLM)
-test_that("The fit glm function gives the right class of output?",{
-  expect_equal(class(model),"inla")
-})
-
+if(requireNamespace("INLA")) {
+  argumentsGLM <- list(dataGLM=dataGLM,reportingTriangle=reportingTriangle,
+                       timeTrend=timeTrend,alpha=alpha,
+                       populationOffset=populationOffset,
+                       factorsBool=TRUE,pastAberrations=FALSE,
+                       glmWarnings=glmWarnings,
+                       verbose=verbose,delay=delay,k=k,control=controlDelay,
+                       inferenceMethod="INLA")
+  
+  model <- do.call(bodaDelay.fitGLM, args=argumentsGLM)
+  test_that("The fit glm function gives the right class of output?",{
+    expect_equal(class(model),"inla")
+  })
+}
 argumentsGLM <- list(dataGLM=dataGLM,reportingTriangle=reportingTriangle,
                      timeTrend=timeTrend,alpha=alpha,
                      populationOffset=populationOffset,
