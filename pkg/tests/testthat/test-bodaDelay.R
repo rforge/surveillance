@@ -1,4 +1,3 @@
-library("INLA")
 library("testthat")
 library("surveillance")
 ##################################################################
