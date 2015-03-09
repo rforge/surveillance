@@ -37,6 +37,9 @@
     \item New S3-generic \code{coeflist()} to list model coefficients by
     component. It currently has a default method and one for
     \code{"twinstim"} and \code{"simEpidataCS"}.
+
+    \item New argument \code{newcoef} for \code{simulate.twinstim()} to
+    customize the model parameters used for the simulation.
   }
 }
 

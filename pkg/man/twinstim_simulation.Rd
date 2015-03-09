@@ -28,7 +28,7 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     .skipChecks = FALSE, .onlyEvents = FALSE)
 
 \method{simulate}{twinstim}(object, nsim = 1, seed = NULL, data, tiles,
-    rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5,
+    newcoef = NULL, rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5,
     control.siaf = object$control.siaf,
     W = data$W, trace = FALSE, nCircle2Poly = NULL, gmax = NULL,
     .allocate = 500, simplify = TRUE, ...)
@@ -198,6 +198,14 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     \code{events} for use as the prehistory, and defaults for
     \code{rmarks} and \code{nCircle2Poly}.
   }
+  \item{newcoef}{
+    an optional named numeric vector of (a subset of) parameters to
+    replace the original point estimates in \code{coef(object)}.
+    Elements which do not match any model parameter by name are silently
+    ignored. The \code{newcoef}s may also be supplied in a list
+    following the same conventions as for the \code{start} argument in
+    \code{\link{twinstim}}.
+  }
   \item{simplify}{
     logical. It is strongly recommended to set \code{simplify = TRUE}
     (default) if \code{nsim} is large. This saves space and computation time,
@@ -324,16 +332,16 @@ plot(stateD, add=TRUE, border=2, lwd=2)
 ## simulate 2 realizations (during a VERY short period -- for speed)
 ## considering events from data(imdepi) before t=31 as pre-history
 mysims <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
-                   tiles=districtsD, t0=31, T=61, trace=FALSE,
-                   nCircle2Poly=16, simplify=TRUE)
+                   tiles=districtsD, newcoef=c("e.typeC"=-1),
+                   t0=31, T=61, simplify=TRUE)
 
 ## extract the first realization -> object of class simEpidataCS
-mysim1 <- mysims[[2]]
-summary(mysim1)
-plot(mysim1, aggregate="space")
+mysim2 <- mysims[[2]]
+summary(mysim2)
+plot(mysim2, aggregate="space")
 
 ## plot both epidemics using the plot-method for simEpidataCSlist's
-plot(mysims, aggregate="time", subset=type=="B", breaks = 10)
+plot(mysims, aggregate="time", by=NULL)
 
 
 if (surveillance.options("allExamples")) {

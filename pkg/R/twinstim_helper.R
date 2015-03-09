@@ -346,9 +346,9 @@ check_twinstim_start <- function (start)
         names(start)[names(start) == "epidemic"] <- "e"
         names(start)[names(start) == "siaf"] <- "e.siaf"
         names(start)[names(start) == "tiaf"] <- "e.tiaf"
-        start <- unlist(start, use.names=TRUE)
+        start <- unlist(start, recursive=FALSE, use.names=TRUE)
     }
     if (!is.vector(start, mode="numeric") || is.null(names(start)))
-        stop("parameter 'start' values must be named and numeric")
+        stop("parameter values must be named and numeric")
     return(start)
 }

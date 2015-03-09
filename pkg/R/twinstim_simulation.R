@@ -1036,7 +1036,7 @@ residuals.simEpidataCS <- function (object, ...)
 ###        when nEvents is active -> atm, simplify ignores this
 
 simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
-    rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5,
+    newcoef = NULL, rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5,
     control.siaf = object$control.siaf,
     W = data$W, trace = FALSE, nCircle2Poly = NULL, gmax = NULL,
     .allocate = 500, simplify = TRUE, ...)
@@ -1093,14 +1093,12 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
         }
     }
     theta <- coef(object)
-    beta0 <- beta <- gamma <- siafpars <- tiafpars <- NULL
-    with(as.list(object$npars), {
-        beta0    <<- theta[seq_len(nbeta0)]
-        beta     <<- theta[nbeta0+seq_len(p)]
-        gamma    <<- theta[nbeta0+p+seq_len(q)]
-        siafpars <<- theta[nbeta0+p+q+seq_len(nsiafpars)]
-        tiafpars <<- theta[nbeta0+p+q+nsiafpars+seq_len(ntiafpars)]
-    })
+    if (!is.null(newcoef)) {
+        newcoef <- check_twinstim_start(newcoef)
+        newcoef <- newcoef[names(newcoef) %in% names(theta)]
+        theta[names(newcoef)] <- newcoef
+    }
+    thetalist <- coeflist.default(theta, object$npars)
 
 
     ### Run the simulation(s)
@@ -1111,9 +1109,10 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
                     tiaf=quote(formula(object)$tiaf),
                     qmatrix=quote(object$qmatrix),
                     rmarks=quote(rmarks), events=quote(data$events),
-                    stgrid=quote(data$stgrid), tiles=quote(tiles), beta0=beta0,
-                    beta=beta, gamma=gamma, siafpars=siafpars,
-                    tiafpars=tiafpars, t0=t0, T=T, nEvents=nEvents,
+                    stgrid=quote(data$stgrid), tiles=quote(tiles),
+                    beta0=thetalist[[1L]], beta=thetalist[[2L]],
+                    gamma=thetalist[[3L]], siafpars=thetalist[[4L]],
+                    tiafpars=thetalist[[5L]], t0=t0, T=T, nEvents=nEvents,
                     control.siaf=control.siaf,
                     W=quote(W), trace=trace, nCircle2Poly=nCircle2Poly,
                     gmax=gmax, .allocate=.allocate,
