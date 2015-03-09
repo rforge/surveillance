@@ -78,6 +78,9 @@
 
     \item The \code{"time"} plot for \code{"epidataCS"} did not
     necessarily use the same histogram \code{breaks} for all strata.
+
+    \item Specifying a step function of interaction via a numeric vector
+    of knots did not work in \code{twinstim()}.
   }
 }
 

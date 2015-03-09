@@ -285,8 +285,7 @@ control2nlminb <- function (control, defaults)
         attr(ret, "knots") <- attr(iaf, "knots")
         attr(ret, "maxRange") <- attr(iaf, "maxRange")
         attr(ret, "Boundary.knots") <- attr(iaf, "Boundary.knots")
-        ## indicate if this is a constant iaf
-        attr(ret, "constant") <- isTRUE(attr(iaf, "constant"))
+        attr(ret, "constant") <- attr(iaf, "constant")
         ret
     } else if (is.vector(iaf, mode = "numeric")) {
         do.call(paste(type,"step",sep="."), args = list(knots = iaf))
@@ -295,6 +294,9 @@ control2nlminb <- function (control, defaults)
              "' must be NULL (or missing), a list (-> continuous ",
              "function), or numeric (-> knots of step function)")
     }
+    ## indicate if this is a constant iaf
+    attr(res, "constant") <- isTRUE(attr(res, "constant"))
+    ## attach unique interaction ranges
     if (!is.null(eps)) {         # in simEpidataCS() eps is not known beforehand
         attr(res, "eps") <- sort(unique(eps))
     }
