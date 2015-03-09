@@ -421,8 +421,6 @@ twinstim <- function (
         } else {
             if (!constantsiaf && verbose)
                 message("Continuing without memoisation of 'siaf$f' cubature ...")
-            ## However, trivial caching is used manually in case of fixed
-            ## "siafpars" and in LambdagEvents()
             .siafInt
         }
 
