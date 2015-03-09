@@ -18,7 +18,10 @@ getModel <- function (object, ...) UseMethod("getModel")
 coeflist <- function (x, ...) UseMethod("coeflist")
 coeflist.default <- function (x, npars, ...)
 {
-    f <- factor(rep.int(names(npars), npars), levels = names(npars))
+    if (is.null(groupnames <- names(npars))) {
+        stop("'npars' must be named")
+    }
+    f <- factor(rep.int(groupnames, npars), levels = groupnames)
     split.default(x = x, f = f, drop = FALSE)
 }
 
