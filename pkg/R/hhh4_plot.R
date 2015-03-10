@@ -15,10 +15,15 @@ plot.hhh4 <- function (x,
                        type = c("fitted", "season", "maxEV", "ri", "neweights"),
                        ...)
 {
-    cl <- sys.call()
-    cl$type <- NULL
+    cl <- sys.call()  # not match.call() because plotHHH4_season() has no 'x'
+    ## remove the type argument from the call
+    if (is.null(names(cl)) && nargs() > 1L) { # unnamed call plot(x, type)
+        cl[[3L]] <- NULL  # remove the second argument
+    } else {
+        cl$type <- NULL
+    }
     cl[[1L]] <- as.name(paste("plotHHH4", match.arg(type), sep="_"))
-    eval(cl, envir=parent.frame())
+    eval(cl, envir = parent.frame())
 }
 
 
