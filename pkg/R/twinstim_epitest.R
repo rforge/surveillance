@@ -54,9 +54,10 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
             paste0(c(names(lrt)[1:3], "simpleR0"), " = ",
                    sprintf(paste0("%4.", c(0,0,1,2), "f"), c(lrt[1:3], simpleR0)),
                    collapse = " | ")
-        cat("Endemic/Epidemic log-likelihoods and LRT statistic:\n",
-            stats2string(LRT, STATISTIC_R0),
-            "\n\nResults from B=", B, " permutations of the event times:\n",
+        cat("Endemic/Epidemic log-likelihoods, LRT statistic, and simple R0:\n",
+            stats2string(LRT, STATISTIC_R0), "\n",
+            "\nResults from B=", B, " permutations of the event times:\n",
+            ## will actually not be printed if parallelized using clusters ...
             sep = "")
         verbose <- substitute({
             cat(STATS2STRING)

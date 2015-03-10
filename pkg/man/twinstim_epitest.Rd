@@ -108,7 +108,8 @@ data("imdepifit")
 imdepiB50 <- update(subset(imdepi, type == "B"), eps.s = 50)
 imdfitB50 <- update(imdepifit, data = imdepiB50,
                     epidemic = ~1, siaf = NULL, control.siaf = NULL)
-et <- epitest(imdfitB50, imdepiB50, B = 9, verbose = 2,
+et <- epitest(imdfitB50, imdepiB50, B = 9,
+              verbose = 2 * (.Platform$OS.type == "unix"),
               .seed = 1, .parallel = 2)
 et
 plot(et)
