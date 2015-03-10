@@ -15,6 +15,7 @@ plot.hhh4 <- function (x,
                        type = c("fitted", "season", "maxEV", "ri", "neweights"),
                        ...)
 {
+    stopifnot(x$convergence)
     cl <- sys.call()  # not match.call() because plotHHH4_season() has no 'x'
     ## remove the type argument from the call
     if (is.null(names(cl)) && nargs() > 1L) { # unnamed call plot(x, type)

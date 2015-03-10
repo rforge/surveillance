@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-4 (2015-03-09)}{
+\section{Changes in surveillance version 1.8-4 (2015-03-10)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -84,6 +84,9 @@
 
     \item Specifying a step function of interaction via a numeric vector
     of knots did not work in \code{twinstim()}.
+
+    \item \code{plot.hhh4()} did not support an unnamed \code{type}
+    argument such as \code{plot(x, "season")}.
   }
 }
 
