@@ -35,9 +35,11 @@ plapply(X, FUN, ...,
     with the specified \code{.seed} before running \code{parLapply}.
     Otherwise, \code{\link{set.seed}(.seed)} is called and the
     \code{\link{RNGkind}} is changed to \code{"L'Ecuyer-CMRG"} if
-    \code{.parallel > 1} (see the description of
-    \code{\link[parallel]{mcparallel}} in package \pkg{parallel}).
-    The original \code{\link{.Random.seed}} will be restored
+    \code{.parallel > 1} (see the section on random numbers in the
+    documentation of \code{mcparallel} in package \pkg{parallel}).
+    % no link to mcparallel since it is not available on Windows (R-3.1.2)
+    If \code{.seed} is non-\code{NULL},
+    the original \code{\link{.Random.seed}} will be restored
     \code{on.exit} of the function.
   }
   \item{.verbose}{
