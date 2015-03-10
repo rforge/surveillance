@@ -49,16 +49,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
                                           inferenceMethod=c("asym","INLA"),
                                           noPeriods = 1, pastWeeksNotIncluded = 26,
                                           delay = TRUE)) {
-  #Check if the INLA package is available.
-  if (inferenceMethod=="INLA"){
-  if (!requireNamespace("INLA", quietly = TRUE)) {
-    stop("The bodaDelay function requires the INLA package to be installed.\n",
-         "  The package is not available on CRAN, but can be downloaded by calling\n",
-         "\tsource(\"http://www.math.ntnu.no/inla/givemeINLA.R\")\n",
-         "  as described at http://www.r-inla.org/download in detail.\n",
-         "Or set inferenceMethod to asym.")
-  }
-  }
+
   ######################################################################
   # Use special Date class mechanism to find reference months/weeks/days
   ######################################################################  
@@ -157,6 +148,16 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
   else {
     control$inferenceMethod <- match.arg(control$inferenceMethod, 
                                          c("asym","INLA"))
+  }
+  #Check if the INLA package is available.
+  if (control$inferenceMethod=="INLA"){
+    if (!requireNamespace("INLA", quietly = TRUE)) {
+      stop("The bodaDelay function requires the INLA package to be installed.\n",
+           "  The package is not available on CRAN, but can be downloaded by calling\n",
+           "\tsource(\"http://www.math.ntnu.no/inla/givemeINLA.R\")\n",
+           "  as described at http://www.r-inla.org/download in detail.\n",
+           "Or set inferenceMethod to asym.")
+    }
   }
   
   # Define objects
