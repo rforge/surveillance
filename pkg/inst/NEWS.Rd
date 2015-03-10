@@ -1295,7 +1295,7 @@
             not all documented as good as it could be). This includes code
             for the \code{"twinstim"} and the \code{"hhh4"} model.
 	    The \code{"twinSIR"} class of models has been
-            migrated from package \CRANpkg{RLadyBug} to \pkg{surveillance}.
+            migrated from package \pkg{RLadyBug} to \pkg{surveillance}.
             It may take a while before this version will become available from CRAN.
             For further details see below.
     }
@@ -1315,7 +1315,7 @@
       \item Support for \code{"twinSIR"} models (with associated
             \code{"epidata"} objects) as described 
             in \cite{Höhle (2009)} has been moved from package
-	    \CRANpkg{RLadyBug} to \pkg{surveillance}.
+	    \pkg{RLadyBug} to \pkg{surveillance}.
             That means continuous-time discrete-space \acronym{SIR} models.
       \item Support for \code{"twinstim"} models as described in
             \cite{Meyer et al (2012)}. That means continuous-time
