@@ -50,6 +50,8 @@ epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL,
   \item{fixed}{
     optional character vector naming parameters to fix at their original
     value when re-fitting the \code{model} on permuted data.
+    The special value \code{fixed = TRUE} means to fix all epidemic
+    parameters but the intercept.
   }
   \item{verbose}{
     the amount of tracing in the range \code{0:2}.

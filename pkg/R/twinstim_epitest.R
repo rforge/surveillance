@@ -23,8 +23,12 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
         warning("epidemic covariate effects not identifiable for permuted data",
                 immediate. = TRUE)
     }
-    if (!is.null(fixed))
-        stopifnot(is.character(fixed))
+    if (isTRUE(fixed)) {
+        fixed <- setdiff(names(coeflist.twinstim(model)$epidemic),
+                         "e.(Intercept)")
+    } else {
+        stopifnot(is.null(fixed) || is.character(fixed))
+    }
     
     ## auxiliary function to compute the LRT statistic
     lrt <- function (m0, m1) {
