@@ -86,10 +86,9 @@ boda(sts, control=list(range=NULL, X=NULL, trend=FALSE,
 
   #Apply the boda algorithm in its simples form, i.e. spline is
   #described by iid random effects and no extra covariates
-  #(NOTE: requires the INLA package to be installed)
+  library("INLA")  # needs to be attached
   cam.boda1 <- boda(cam.sts, control=control)
 
-  #In case INLA is not installed, boda throws an error
   if(!inherits(cam.boda1,'try-error')){
     plot(cam.boda1,xlab='time [weeks]', ylab='No. reported',dx.upperbound=0)
   }
