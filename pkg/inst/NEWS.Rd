@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.8-4 (2015-03-10)}{
+\section{Changes in surveillance version 1.8-4 (2015-03-11)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -87,6 +87,9 @@
 
     \item \code{plot.hhh4()} did not support an unnamed \code{type}
     argument such as \code{plot(x, "season")}.
+
+    \item \code{simEpidataCS()} did not work if \code{t0} was in the
+    last block of \code{stgrid} (thus it did not work for single-cell grids).
   }
 }
 

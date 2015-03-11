@@ -141,7 +141,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     ### Subset stgrid to include actual time range only
 
     # BLOCK in stgrid such that start time is equal to or just before t0
-    block_t0 <- stgrid$BLOCK[match(TRUE, stgrid$start > t0) - 1L]
+    block_t0 <- stgrid$BLOCK[match(TRUE, c(stgrid$start,Inf) > t0) - 1L]
     # BLOCK in stgrid such that stop time is equal to or just after T
     block_T <- stgrid$BLOCK[match(TRUE, stgrid$stop >= T)]
     stgrid <- stgrid[stgrid$BLOCK>=block_t0 & stgrid$BLOCK<=block_T,,drop=FALSE]
@@ -149,7 +149,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     stgrid$stop[stgrid$BLOCK == block_T] <- T
     # matrix of BLOCKS and start times (used later)
     blockstarts <- with(stgrid,
-        cbind(block_t0:block_T, start[match(block_t0:block_T, BLOCK)])
+        cbind(block_t0:block_T, start[match(block_t0:block_T, BLOCK)],
+              deparse.level = 0L)
     )
 
 
@@ -229,6 +230,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     ## helper function to attach covariates from 'stgrid' to events
     attachstgridvars <- function (eventData, stgridvars)
     {
+        if (length(stgridvars) == 0L) return(eventData)
         gridcellsOfEvents <- integer(nrow(eventData))
         for (i in seq_along(gridcellsOfEvents)) {
             gridcellsOfEvents[i] <- gridcellOfEvent(eventData[i,"time"],
@@ -429,7 +431,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
     hIntWK <- if (hash) {
         dsexpeta <- local({
-            eta <- drop(mmhGrid %*% beta)
+            eta <- drop(mmhGrid %*% beta)  # =0 if p = 0
             if (!is.null(offsetGrid)) eta <- offsetGrid + eta
             ds * exp(unname(eta))
         })
@@ -546,7 +548,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     eTerms <- tmp[[1]]; rownames(eTerms) <- NULL
     bdists <- tmp[[2]]
     influenceRegions <- tmp[[3]]
-    sources <- lapply(seq_len(Nout), function(x) integer(0L))
+    sources <- rep.int(list(integer(0L)), Nout)
 
     # Transform eventData into a matrix, which is faster with rbind
     # (factors will be recreated at the end of simulation)
