@@ -89,7 +89,9 @@
     argument such as \code{plot(x, "season")}.
 
     \item \code{simEpidataCS()} did not work if \code{t0} was in the
-    last block of \code{stgrid} (thus it did not work for single-cell grids).
+    last block of \code{stgrid} (thus it did not work for single-cell
+    grids), and mislabeled the \code{start} column copied to
+    \code{events} if there were no covariates in \code{stgrid}.
   }
 }
 

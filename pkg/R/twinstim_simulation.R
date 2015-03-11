@@ -917,7 +917,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     stgridIgnoreCols <- match(c("BLOCK",
                                 setdiff(obligColsNames_stgrid, "start")),
                               names(stgrid))
-    eventData <- cbind(eventData, stgrid[stgrididx, -stgridIgnoreCols])
+    eventData <- cbind(eventData, stgrid[stgrididx, -stgridIgnoreCols, drop = FALSE])
     rownames(eventData) <- seqAlongEvents
 
     # add hidden columns
@@ -926,6 +926,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     eventData$.bdist <- bdists[seqAlongEvents]
     eventData$.influenceRegion <- influenceRegions[seqAlongEvents]
     attr(eventData$.influenceRegion, "nCircle2Poly") <- nCircle2Poly
+    attr(eventData$.influenceRegion, "clipper") <- "polyclip"
 
 
     ### Construct "epidataCS" object
