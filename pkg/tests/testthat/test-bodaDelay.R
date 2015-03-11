@@ -12,7 +12,7 @@ controlDelay <-  list(range = rangeTest, b = 4, w = 3,
                       alpha = alpha, trend = TRUE,
                       limit54=c(0,50),
                       noPeriods = 10, pastWeeksNotIncluded = 26,
-                      delay=TRUE)
+                      delay=TRUE, inferenceMethod="asym")
 test_that("The absence of reporting triangle throws an error",{
   data("salmNewport")
   expect_error(bodaDelay(salmNewport, controlDelay),"You have to")

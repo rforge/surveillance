@@ -504,9 +504,6 @@ bodaDelay.data.glm <- function(dayToConsider, b, freq,
   
   if (verbose) { print(response)}
   
-  # Delays
-  
-  delays <- as.factor(0:(dim(reportingTriangle$n)[2]-1))
   
   # If the delays are not to be taken into account it is like farringtonFlexible
   if (!delay) {
@@ -517,6 +514,10 @@ bodaDelay.data.glm <- function(dayToConsider, b, freq,
   }
   # If the delays are to be taken into account we need a bigger dataframe
   else {
+    # Delays
+    
+    delays <- as.factor(0:(dim(reportingTriangle$n)[2]-1))
+    
     # Take the subset of the reporting triangle corresponding to the timepoints used for fitting the model
     reportingTriangleGLM <- reportingTriangle$n[rownames(reportingTriangle$n) %in% as.character(vectorOfDates[blockIndexes]),]
     
