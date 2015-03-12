@@ -77,8 +77,8 @@ isoWeekYear<-function(Y,M=NULL,D=NULL){
 gsub2 <- function(pattern, replacement, x) {
     len <- length(x)
     mapply(FUN = gsub,
-           pattern = rep_len(pattern, len),
-           replacement = rep_len(replacement, len),
+           pattern = rep_len(as.character(pattern), len),
+           replacement = rep_len(as.character(replacement), len),
            x = x,
            MoreArgs = list(fixed = TRUE),
            SIMPLIFY = TRUE, USE.NAMES = FALSE)
