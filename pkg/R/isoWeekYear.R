@@ -116,11 +116,10 @@ formatDate <- function(x, format) {
       formatStr <- gsub2("%OQ",as.roman(Q),formatStr)
     }
     
-    ##Year/week
-    isoYear <- isoWeekYear(x)$ISOYear
-    isoWeek <- sprintf("%.2d",isoWeekYear(x)$ISOWeek)
-    
-    if (sessionInfo()[[1]]$os == "mingw32") {
+    if (.Platform$OS.type == "windows") {
+      ##Year/week
+      isoYear <- isoWeekYear(x)$ISOYear
+      isoWeek <- sprintf("%.2d",isoWeekYear(x)$ISOWeek)
       formatStr <- gsub2("%G",isoYear,formatStr)
       formatStr <- gsub2("%V",isoWeek,formatStr)
     }
