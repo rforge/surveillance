@@ -137,10 +137,10 @@ data("imdepi")
 knoxtest <- knox(
     dt = dist(imdepi$events$time), eps.t = 30,
     ds = dist(coordinates(imdepi$events)), eps.s = 50,
-    simulate.p.value = TRUE, B = 99, # for speed
+    simulate.p.value = TRUE, B = 29, # only few permutations for speed
     .parallel = 2, .seed = 1, .verbose = FALSE
 )
-knoxtest # all 99 permutations yield a lower test statistic => p=1/100
+knoxtest # all 29 permutations yield a lower test statistic => p = 1/30
 plot(knoxtest)
 
 ## The Poisson approximation should be ok for this contingency table
