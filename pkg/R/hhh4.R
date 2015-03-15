@@ -227,7 +227,8 @@ setControl <- function (control, stsObj)
                "if 'control$ar$f' is a matrix")
       ## check ne$weights specification
       checkWeights(control$ne$weights, nUnit, nTime,
-                   neighbourhood(stsObj), control$data)
+                   neighbourhood(stsObj), control$data,
+                   check0diag = control$ar$inModel)
   } else control$ne$weights <- NULL
 
   

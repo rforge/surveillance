@@ -5,7 +5,7 @@
 ###
 ### Helper functions for neighbourhood weight matrices in hhh4()
 ###
-### Copyright (C) 2012-2014 Sebastian Meyer
+### Copyright (C) 2012-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -55,7 +55,7 @@ weightedSumNE <- function (observed, weights, lag)
 
 ### checks for a fixed matrix/array
 
-checkWeightsArray <- function (W, nUnits, nTime, name)
+checkWeightsArray <- function (W, nUnits, nTime, name, check0diag = FALSE)
 {
     if (!is.array(W))
         stop("'", name, "' must return a matrix/array")
@@ -64,10 +64,12 @@ checkWeightsArray <- function (W, nUnits, nTime, name)
              nUnits, " x ", nUnits, " (x ", nTime, ")")
     if (any(is.na(W)))
         stop("missing values in '", name, "' are not allowed")
-    diags <- if (is.matrix(W)) diag(W) else apply(W, 3, diag)
-    if (any(diags != 0))
-        warning("'", name, "' has nonzeros on the diagonal",
-                if (!is.matrix(W)) "s")
+    if (check0diag) {
+        diags <- if (is.matrix(W)) diag(W) else apply(W, 3, diag)
+        if (any(diags != 0))
+            warning("'", name, "' has nonzeros on the diagonal",
+                    if (!is.matrix(W)) "s")
+    }
 }
 
 
@@ -95,7 +97,8 @@ checkWeightsFUN <- function (object)
 ### entry function for checks in hhh4()
 
 checkWeights <- function (weights, nUnits, nTime,
-                          nbmat, data)  # only used for parametric weights
+                          nbmat, data,  # only used for parametric weights
+                          check0diag = FALSE)
 {
     name <- "control$ne$weights"
 
@@ -115,7 +118,8 @@ checkWeights <- function (weights, nUnits, nTime,
     
     ## apply matrix/array checks
     if (is.list(weights)) { # parametric weights
-        checkWeightsArray(testweights, nUnits, nTime, name=paste0(name, "$w"))
+        checkWeightsArray(testweights, nUnits, nTime, name=paste0(name, "$w"),
+                          check0diag = check0diag)
         dim.d <- length(weights$initial)
         dw <- weights$dw(weights$initial, nbmat, data)
         d2w <- weights$d2w(weights$initial, nbmat, data)
@@ -134,7 +138,8 @@ checkWeights <- function (weights, nUnits, nTime,
             lapply(d2w, checkWeightsArray, nUnits, nTime,
                    name=paste0(name, "$d2w[[i]]"))
         }
-    } else checkWeightsArray(testweights, nUnits, nTime, name=name)
+    } else checkWeightsArray(testweights, nUnits, nTime, name=name,
+                             check0diag = check0diag)
     
     ## Done
     invisible(TRUE)
