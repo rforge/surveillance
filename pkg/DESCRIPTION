@@ -47,7 +47,7 @@ Suggests: parallel, grid, gridExtra, lattice, colorspace, scales, animation,
         spdep, numDeriv, maxLik,
         testthat, coda, splancs, gamlss,
         INLA, runjags
-Description: A package implementing statistical methods for the modeling and
+Description: Implemention of statistical methods for the modeling and
         change-point detection in time series of counts, proportions and
         categorical data, as well as for the modeling of continuous-time
         epidemic phenomena, e.g. discrete-space setups such as the spatially
@@ -58,7 +58,7 @@ Description: A package implementing statistical methods for the modeling and
         surveillance of infectious diseases, but applications could just as well
         originate from environmetrics, reliability engineering, econometrics or
         social sciences.
-        Currently the package contains implementations of typical
+        Currently, the package contains implementations of typical
         outbreak detection procedures such as Farrington et al (1996),
         Noufaily et al (2012) or the negative binomial LR-CUSUM method
         described in Hoehle and Paul (2008). Furthermore, inference
