@@ -25,7 +25,7 @@ epidataCSplot_time(x, subset, by = type,
                    panel.first = abline(h=axTicks(2), lty=2, col="grey"),
                    legend.types = list(), ...)
 
-epidataCSplot_space(x, subset, by = type,
+epidataCSplot_space(x, subset, by = type, tiles = x$W,
                     cex.fun = sqrt, points.args = list(), add = FALSE,
                     legend.types = list(), legend.counts = list(), ...)
 }
@@ -40,8 +40,8 @@ epidataCSplot_space(x, subset, by = type,
     \code{epidataCSplot_time}, respectively.
     For \code{"time"}, the number of events over time is plotted as
     \code{\link{hist}} (or \code{\link{hist.Date}}).
-    For \code{"space"}, the observation region \code{x$W} and the
-    locations of the events therein are plotted.
+    For \code{"space"}, the observation region \code{x$W} (or the
+    \code{tiles}) and the locations of the events therein are plotted.
   }
   \item{subset}{
     logical expression indicating a subset of events to consider for
@@ -57,8 +57,7 @@ epidataCSplot_space(x, subset, by = type,
     passed to \code{\link{hist}} or \code{\link{hist.Date}},
     respectively. In \code{epidataCSplot_space}, further arguments are
     passed to the \code{plot}-method for
-    \code{"\linkS4class{SpatialPolygons}"}, which draws the observation
-    region \code{x$W}.
+    \code{"\linkS4class{SpatialPolygons}"}, which draws \code{tiles}.
   }
 
   \item{by}{an expression evaluated in \code{marks(x)}, defining how
@@ -111,6 +110,9 @@ epidataCSplot_space(x, subset, by = type,
     a legend for the event types is added to the plot in case there is
     more than one type.}
 
+  \item{tiles}{the observation region \code{x$W} (default) or,
+    alternatively, a \code{"\linkS4class{SpatialPolygons}"}
+    representation of the tiles of \code{x$stgrid}.}
   \item{cex.fun}{function which takes a vector of counts of events
     at each unique location and returns a (vector of) \code{cex}
     value(s) for the sizes of the corresponding \code{points}.

@@ -193,7 +193,7 @@ epidataCSplot_time <- function (x, subset, by = type,
 
 ### plot.epidataCS(x, aggregate = "space") -> spatial point pattern
 
-epidataCSplot_space <- function (x, subset, by = type,
+epidataCSplot_space <- function (x, subset, by = type, tiles = x$W,
     cex.fun = sqrt, points.args = list(), add = FALSE,
     legend.types = list(), legend.counts = list(), ...)
 {
@@ -240,7 +240,7 @@ epidataCSplot_space <- function (x, subset, by = type,
     points.args_pointwise$cex <- points.args_pointwise$cex * cex.fun(pointCounts)
     
     ## plot
-    if (!add) plot(x$W, ...)
+    if (!add) plot(tiles, ...)
     do.call("points", c(alist(x=eventCoordsTypesCounts[,1:2,drop=FALSE]),
                         points.args_pointwise))
 
