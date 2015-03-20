@@ -182,7 +182,7 @@ epidataCSplot_time <- function (x, subset, by = type,
     if (is.list(legend.types) && length(typesEffective) > 1) {
         legend.types <- modifyList(
             list(x="topleft", legend=typeNames[typesEffective],
-                 title=deparse(by), fill=col[typesEffective]),
+                 title=deparse(by, nlines = 1), fill=col[typesEffective]),
             legend.types)
         do.call("legend", legend.types)
     }
@@ -193,9 +193,9 @@ epidataCSplot_time <- function (x, subset, by = type,
 
 ### plot.epidataCS(x, aggregate = "space") -> spatial point pattern
 
-epidataCSplot_space <- function (x, subset, by = type, tiles = x$W,
+epidataCSplot_space <- function (x, subset, by = type, tiles = x$W, pop = NULL,
     cex.fun = sqrt, points.args = list(), add = FALSE,
-    legend.types = list(), legend.counts = list(), ...)
+    legend.types = list(), legend.counts = list(), sp.layout = NULL, ...)
 {
     ## extract the points to plot
     events <- if (missing(subset)) {
@@ -211,14 +211,25 @@ epidataCSplot_space <- function (x, subset, by = type, tiles = x$W,
     } else { # default is to distinguish points by event type
         as.factor(eval(by, envir = events@data))
     }
-    ## count events by location and type
-    eventCoordsTypesCounts <- countunique(
-        cbind(coordinates(events), type = as.integer(events$type))
-        )
-    pointCounts <- eventCoordsTypesCounts[,"COUNT"]
     typeNames <- levels(events$type)
     nTypes <- length(typeNames)
-    typesEffective <- sort(unique(eventCoordsTypesCounts[,"type"]))
+    eventCoordsTypes <- data.frame(
+        coordinates(events), type = as.integer(events$type),
+        row.names = NULL, check.rows = FALSE, check.names = FALSE)
+
+    ## count events by location and type
+    eventCoordsTypesCounts <- if (is.null(pop)) {
+        countunique(eventCoordsTypes)
+    } else {
+        ## work with "SpatialPolygons" -> spplot()
+        events$COUNT <- multiplicity(eventCoordsTypes)
+        events[!duplicated(eventCoordsTypes), c("type", "COUNT")]
+    }
+    pointCounts <- eventCoordsTypesCounts$COUNT
+    countsLegend <- unique(round(10^(do.call("seq", c(
+        as.list(log10(range(pointCounts))), list(length.out=5)
+    )))))
+    typesEffective <- sort(unique(eventCoordsTypesCounts$type))
 
     ## point style
     colTypes <- list(...)[["colTypes"]]  # backwards compatibility for < 1.8
@@ -236,44 +247,92 @@ epidataCSplot_space <- function (x, subset, by = type, tiles = x$W,
     points.args_pointwise <- points.args
     points.args_pointwise[styleArgs] <- lapply(
         points.args_pointwise[styleArgs], "[",
-        eventCoordsTypesCounts[,"type"])
+        eventCoordsTypesCounts$type)
     points.args_pointwise$cex <- points.args_pointwise$cex * cex.fun(pointCounts)
     
     ## plot
-    if (!add) plot(tiles, ...)
-    do.call("points", c(alist(x=eventCoordsTypesCounts[,1:2,drop=FALSE]),
-                        points.args_pointwise))
-
-    ## optionally add legends
-    if (is.list(legend.types) && length(typesEffective) > 1) {
-        legend.types <- modifyList(
-            list(x="topright", legend=typeNames[typesEffective],
-                 title=deparse(by),
-                 #pt.cex=points.args$cex, # better use par("cex")
-                 pch=points.args$pch[typesEffective],
-                 col=points.args$col[typesEffective],
-                 pt.lwd=points.args$lwd[typesEffective]),
-            legend.types)
-        do.call("legend", legend.types)
-    }
-    if (is.list(legend.counts) && any(pointCounts > 1)) {
-        if (is.null(legend.counts[["counts"]])) {
-            counts <- unique(round(10^(do.call("seq", c(
-                as.list(log10(range(pointCounts))), list(length.out=5)
-                )))))
-        } else {
-            counts <- as.vector(legend.counts[["counts"]], mode="integer")
-            legend.counts[["counts"]] <- NULL
+    if (is.null(pop)) {
+        ## classical plotting system
+        if (!add) plot(tiles, ...)
+        do.call("points", c(alist(x=eventCoordsTypesCounts[,1:2,drop=FALSE]),
+                            points.args_pointwise))
+        ## optionally add legends
+        if (is.list(legend.types) && length(typesEffective) > 1) {
+            legend.types <- modifyList(
+                list(x="topright", legend=typeNames[typesEffective],
+                     title=deparse(by, nlines = 1),
+                     #pt.cex=points.args$cex, # better use par("cex")
+                     pch=points.args$pch[typesEffective],
+                     col=points.args$col[typesEffective],
+                     pt.lwd=points.args$lwd[typesEffective]),
+                legend.types)
+            do.call("legend", legend.types)
         }
-        legend.counts <- modifyList(
-            list(x="bottomright", bty="n", legend=counts,
-                 pt.cex=points.args$cex * cex.fun(counts),
-                 pch=points.args$pch[1L],
-                 col=if(length(unique(points.args$col)) == 1L)
-                 points.args$col[1L] else 1,
-                 pt.lwd=points.args$lwd[1L]),
-            legend.counts)
-        do.call("legend", legend.counts)
+        if (is.list(legend.counts) && any(pointCounts > 1)) {
+            if (!is.null(legend.counts[["counts"]])) {
+                countsLegend <- as.vector(legend.counts[["counts"]], mode="integer")
+                legend.counts[["counts"]] <- NULL
+            }
+            legend.counts <- modifyList(
+                list(x="bottomright", bty="n", legend=countsLegend,
+                     pt.cex=points.args$cex * cex.fun(countsLegend),
+                     pch=points.args$pch[1L],
+                     col=if(length(unique(points.args$col)) == 1L)
+                             points.args$col[1L] else 1,
+                     pt.lwd=points.args$lwd[1L]),
+                legend.counts)
+            do.call("legend", legend.counts)
+        }
+        invisible()
+    } else {
+        if (!is(tiles, "SpatialPolygonsDataFrame")) {
+            stop("'pop' requires 'tiles' to be a \"SpatialPolygonsDataFrame\"")
+        }
+        ## grid plotting system -> spplot()
+        layout.points <- c(list("sp.points", eventCoordsTypesCounts),
+                           points.args_pointwise)
+        ## optional legend definitions
+        legend.types <- if (is.list(legend.types) && length(typesEffective) > 1) {
+            legend.types <- modifyList(
+                list(corner = c(1, 1), # "topright"
+                     title = deparse(by, nlines = 1), cex.title = 1, border = TRUE,
+                     points = list(
+                         pch = points.args$pch[typesEffective],
+                         col = points.args$col[typesEffective],
+                         lwd = points.args$lwd[typesEffective]
+                     ),
+                     text = list(typeNames[typesEffective])),
+                legend.types
+            )
+            corner.types <- legend.types$corner
+            legend.types$corner <- NULL
+            list(inside = list(fun = lattice::draw.key(legend.types), corner = corner.types))
+        }
+        legend.counts <- if (is.list(legend.counts) && any(pointCounts > 1)) {
+            if (!is.null(legend.counts[["counts"]])) {
+                countsLegend <- as.vector(legend.counts[["counts"]], mode="integer")
+                legend.counts[["counts"]] <- NULL
+            }
+            legend.counts <- modifyList(
+                list(corner = c(1,0), # "bottomright"
+                     points = list(
+                         cex = points.args$cex * cex.fun(countsLegend),
+                         pch = points.args$pch[1L],
+                         col = if(length(unique(points.args$col)) == 1L)
+                             points.args$col[1L] else 1,
+                         lwd = points.args$lwd[1L]
+                     ),
+                     text = list(as.character(countsLegend)),
+                     padding.text=2, between=0),
+                legend.counts
+            )
+            corner.counts <- legend.counts$corner
+            legend.counts$corner <- NULL
+            list(inside = list(fun = lattice::draw.key(legend.counts), corner = corner.counts))
+        }
+        ## create the plot
+        spplot(obj = tiles, zcol = pop,
+               sp.layout = c(sp.layout, list(layout.points)),
+               legend = c(legend.types, legend.counts), ...)
     }
-    invisible()
 }

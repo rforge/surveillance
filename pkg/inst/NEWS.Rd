@@ -19,7 +19,10 @@
     type as before). It can also be set to \code{NULL} to make the plot
     not distinguish between event types.
     
-    \item New argument \code{tiles} for the spatial plot of \code{"epidataCS"}.
+    \item The spatial plot of \code{"epidataCS"} gained the arguments
+    \code{tiles}, \code{pop} and \code{sp.layout}, and can now produce
+    an \code{spplot()} with the tile-specific population levels behind
+    the point pattern.
     
     \item New function \code{permute.epidataCS()} to randomly permute
     time points or locations of the events (holding other marks fixed).
