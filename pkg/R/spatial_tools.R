@@ -138,8 +138,9 @@ polyAtBorder <- function (SpP,
 }
 
 
-### sp.layout item for spplot() to draw labels for Spatial* objects
+### sp.layout items for spplot()
 
+## draw labels for Spatial* objects
 layout.labels <- function (obj, labels = TRUE)
 {
     stopifnot(inherits(obj, "Spatial"))
@@ -172,6 +173,23 @@ layout.labels <- function (obj, labels = TRUE)
 
     ## return layout item
     c("panel.text", labels.args)
+}
+
+## draw a scalebar with labels
+layout.scalebar <- function (obj, corner = c(0.05, 0.95), scale = 1,
+                             labels = c(0, scale), height = 0.05)
+{
+    stopifnot(inherits(obj, "Spatial"))
+    if (identical(FALSE, is.projected(obj)))
+        warning("a scale bar requires projected coordinates")
+    
+    offset <- bbox(obj)[, 1L] + corner * apply(bbox(obj), 1L, diff)
+    list(
+        list("SpatialPolygonsRescale", layout.scale.bar(height = height),
+             offset = offset, scale = scale, fill = c(NA, 1)),
+        list("sp.text", offset, labels[1L], pos = 3),
+        list("sp.text", offset + c(scale[1L], 0), labels[2L], pos = 3)
+    )
 }
 
 

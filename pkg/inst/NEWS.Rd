@@ -42,6 +42,9 @@
 
     \item New argument \code{newcoef} for \code{simulate.twinstim()} to
     customize the model parameters used for the simulation.
+
+    \item New auxiliary function \code{layout.scalebar} for use as part
+    of \code{sp.layout} in \code{spplot()}.
   }
 }
 
