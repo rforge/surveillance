@@ -66,6 +66,10 @@ plapply <- function (X, FUN, ...,
             if (.parallel == 1L) {
                 set.seed(seed = .seed)
             } else {
+                stopifnot(requireNamespace("parallel", quietly = TRUE))
+                ## Note @ R 3.1.3: this loading of package "parallel"
+                ## before set.seed() is crucial; otherwise, the first run of
+                ## plapply() would not be reproducible !!!
                 set.seed(seed = .seed, kind = "L'Ecuyer-CMRG")
                 parallel::mc.reset.stream()
             }
