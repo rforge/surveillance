@@ -63,7 +63,12 @@ plapply <- function (X, FUN, ...,
             .orig.seed <- get(".Random.seed", envir = .GlobalEnv)
             on.exit(assign(".Random.seed", .orig.seed, envir = .GlobalEnv),
                     add = TRUE)
-            set.seed(seed = .seed, kind = if (.parallel > 1L) "L'Ecuyer-CMRG")
+            if (.parallel == 1L) {
+                set.seed(seed = .seed)
+            } else {
+                set.seed(seed = .seed, kind = "L'Ecuyer-CMRG")
+                parallel::mc.reset.stream()
+            }
         }
     }
 
