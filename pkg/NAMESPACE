@@ -157,6 +157,8 @@ export(stcd)
 export(knox)
 S3method(print, knox)
 S3method(plot, knox)
+S3method(xtable, knox)
+S3method(toLatex, knox)
 
 
 ### sts(BP)-specific

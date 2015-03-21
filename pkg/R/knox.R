@@ -103,3 +103,32 @@ plot.knox <- function (x, ...)
                     c("expected", "observed")),
                 xlab = "number of close pairs", ...)
 }
+
+xtable.knox <- function (x, caption = NULL, label = NULL,
+                         align = paste0("r|rr", if (!is.null(sumlabel)) "|r"),
+                         digits = 0, display = NULL, ...,
+                         sumlabel = "$\\sum$")
+{
+    tab <- x$table
+    if (!is.null(sumlabel)) {
+        FUN <- setNames(list(sum), sumlabel)
+        tab <- addmargins(tab, FUN = FUN, quiet = TRUE)
+    }
+    xtable(tab, caption = caption, label = label, align = align,
+           digits = digits, display = display, ...)
+}
+
+toLatex.knox <- function (object, hline.after = NULL,
+                          sanitize.text.function = NULL, ...)
+{
+    xtab <- xtable(object, ...)
+    if (is.null(hline.after))
+        hline.after <- unique(c(-1,0,2,nrow(xtab)))
+    if (is.null(sanitize.text.function))
+        sanitize.text.function <- function (x)
+            gsub("<=", "$\\le$", gsub(">", "$>$", x, fixed = TRUE), fixed = TRUE)
+    res <- print(xtab, hline.after = hline.after,
+                 sanitize.text.function = sanitize.text.function, ...)
+    class(res) <- "Latex"
+    invisible(res) # print.xtable() by default does 'print.results'
+}
