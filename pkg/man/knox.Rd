@@ -130,23 +130,19 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
 
 \examples{
 data("imdepi")
+imdepiB <- subset(imdepi, type == "B")
 
 ## Obtain the p-value via a Monte Carlo permutation test,
 ## where the permutations can be computed in parallel
 ## (using forking on Unix-alikes and a cluster on Windows, see ?plapply)
 knoxtest <- knox(
-    dt = dist(imdepi$events$time), eps.t = 30,
-    ds = dist(coordinates(imdepi$events)), eps.s = 50,
-    simulate.p.value = TRUE, B = 29, # only few permutations for speed
+    dt = dist(imdepiB$events$time), eps.t = 30,
+    ds = dist(coordinates(imdepiB$events)), eps.s = 50,
+    simulate.p.value = TRUE, B = 199,
     .parallel = 2, .seed = 1, .verbose = FALSE
 )
-knoxtest # all 29 permutations yield a lower test statistic => p = 1/30
+knoxtest
 plot(knoxtest)
-
-## The Poisson approximation should be ok for this contingency table
-knox(dt = dist(imdepi$events$time), eps.t = 30,
-     ds = dist(coordinates(imdepi$events)), eps.s = 50,
-     simulate.p.value = FALSE)
 }
 
 \keyword{htest}
