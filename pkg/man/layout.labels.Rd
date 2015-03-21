@@ -72,8 +72,11 @@ spplot(measlesWeserEms@map, zcol = "AREA", sp.layout = list(li),
 
 ## scalebar function
 load(system.file("shapes", "districtsD.RData", package = "surveillance"))
-sc <- layout.scalebar(districtsD, scale = 100, labels = c("0", "100 km"))
-spplot(districtsD, zcol = "POPULATION", sp.layout = sc)
+bavaria <- districtsD[substr(row.names(districtsD), 1, 2) == "09", ]
+sb <- layout.scalebar(bavaria, corner = c(0.75,0.9), scale = 50,
+                      labels = c("0", "50 km"))
+spplot(bavaria, zcol = "POPULATION", sp.layout = sb,
+       col.regions = rev(heat.colors(100)))
 }
 
 \keyword{aplot}
