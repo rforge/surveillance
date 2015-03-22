@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.9-0 (2015-03-21)}{
+\section{Changes in surveillance version 1.9-0 (2015-03-22)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -27,13 +27,15 @@
     \item New function \code{permute.epidataCS()} to randomly permute
     time points or locations of the events (holding other marks fixed).
 
-    \item The new function \code{knox()} implements the Knox test for
-    space-time interaction. It supports both the Poisson approximation
-    and a Monte Carlo permutation approach to determine the p-value.
-
-    \item New function \code{epitest()}: a permutation test for
-    space-time interaction in epidemic \code{twinstim} models.
-    It makes use of the new auxiliary function \code{simpleR0()}.
+    \item New functions implementing tests for space-time interaction:
+    \itemize{
+      \item \code{knox()} supports both the Poisson approximation and a
+      Monte Carlo permutation approach to determine the p-value,
+      \item \code{stKtest()} wraps space-time K-function methods from
+      package \CRANpkg{splancs} for use with \code{"epidataCS"},
+      \item and \code{epitest()} for \code{twinstim} models
+      (makes use of the new auxiliary function \code{simpleR0()}).
+    }
 
     \item New function \code{plapply()}: a parallel and verbose version
     of \code{lapply()} wrapping around both \code{mclapply()} and

@@ -97,22 +97,14 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
 }
 
 \seealso{
-  \itemize{
-    \item the related \code{\link[ecodist]{mantel}} test (Mantel, 1967)
-    implemented in package \pkg{ecodist},
-    \item the space-time K-function (Diggle et al, 1995) implemented in
-    package \pkg{splancs} to combine information from different scales
-    \code{eps.t} and \code{eps.s} while also handling edge effects.
-    \item function \code{\link{epitest}} for testing
-    \code{"\link{twinstim}"} models.
-  }
+  the space-time K-function test \code{\link{stKtest}}
+  to combine information from different scales 
+  \code{eps.t} and \code{eps.s} while also handling edge effects,
+  as well as function \code{\link{epitest}} for testing
+  \code{"\link{twinstim}"} models.
 }
 
 \references{
-  Diggle, P. J.; Chetwynd, A. G.; Häggkvist, R. and Morris, S. E. (1995):
-  Second-order analysis of space-time clustering
-  \emph{Statistical Methods in Medical Research}, \bold{4}, 124-136.
-
   Knox, G. (1963):
   Detection of low intensity epidemicity: application to cleft lip and palate.
   \emph{British Journal of Preventive & Social Medicine}, \bold{17}, 121-127.
