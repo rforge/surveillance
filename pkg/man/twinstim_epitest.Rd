@@ -78,6 +78,8 @@ epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL,
   \item{data.name}{a character string giving the supplied \code{data} and
     \code{model} arguments.}
   \item{statistic}{the observed test statistic.}
+  \item{parameter}{the (effective) number of permutations used to
+    calculate the p-value (only those with convergent fits are used).}
   \item{p.value}{the p-value for the test.
     It is based on the subset of convergent fits only.}
   \item{permfits}{the list of model fits (endemic-only and epidemic)

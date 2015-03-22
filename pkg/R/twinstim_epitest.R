@@ -116,11 +116,11 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
     
     ## gather results
     res <- list(
-        method = paste("Permutation Test for Space-Time Interaction\n\t",
-            "(based on", sum(permstats[["converged"]]), "replicates)"),
+        method = "Monte Carlo Permutation Test for Space-Time Interaction",
         data.name = paste0(deparse(substitute(data)),
             "\ntwinstim:  ", deparse(substitute(model))),
         statistic = structure(STATISTIC_R0, "D" = unname(STATISTIC_D)),
+        parameter = setNames(sum(permstats$converged), "B"),
         p.value = structure(PVAL_R0, "D-based" = PVAL_D),
         permfits = permfits,
         permstats = permstats

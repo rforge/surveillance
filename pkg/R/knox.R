@@ -54,14 +54,15 @@ knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
     PVAL <- if (simulate.p.value) { # Monte Carlo permutation approach
         stopifnot(isScalar(B))
         B <- as.integer(B)
-        METHOD <- paste(METHOD, "with simulated p-value\n\t (based on", 
-                        B, "replicates)")
+        METHOD <- paste(METHOD, "with simulated p-value")
+        PARAMETER <- setNames(B, "B")
         permstats <- plapply(X = integer(B), FUN = function (...)
             sum(closeInSpace & closeInTime[sample.int(npairs)]), ...)
         structure(mean(c(STATISTIC, permstats, recursive = TRUE) >= STATISTIC),
                   Poisson = pval_Poisson)
     } else {
         METHOD <- paste(METHOD, "with Poisson approximation")
+        PARAMETER <- setNames(expected, "lambda")
         pval_Poisson
     }
 
@@ -71,7 +72,7 @@ knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
              data.name = paste("dt =", deparse(substitute(dt)),
                                "and ds =", deparse(substitute(ds))),
              statistic = setNames(STATISTIC, "number of close pairs"),
-             p.value = PVAL, alternative = "greater",
+             parameter = PARAMETER, p.value = PVAL, alternative = "greater",
              null.value = setNames(expected, "number"),
              permstats = if (simulate.p.value) {
                  unlist(permstats, recursive = FALSE, use.names = FALSE)

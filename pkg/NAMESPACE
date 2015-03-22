@@ -153,12 +153,14 @@ S3method(coeflist, simEpidataCS)
 # Spatio-temporal cluster detection
 export(stcd)
 
-# test of spatio-temporal interaction
+# tests for space-time interaction
 export(knox)
 S3method(print, knox)
 S3method(plot, knox)
 S3method(xtable, knox)
 S3method(toLatex, knox)
+export(stKtest)
+S3method(plot, stKtest)
 
 
 ### sts(BP)-specific

@@ -76,6 +76,9 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
   \item{data.name}{a character string giving the supplied \code{dt} and
     \code{ds} arguments.}
   \item{statistic}{the number of close pairs.}
+  \item{parameter}{if \code{simulate.p.value = TRUE}, the number
+    \code{B} of permutations, otherwise the \code{lambda} parameter of
+    the Poisson distribution, i.e., the same as \code{null.value}.}
   \item{p.value}{the p-value for the test. In case
     \code{simulate.p.value = TRUE}, the p-value from the Poisson
     approximation is still attached as an attribute \code{"Poisson"}.}
