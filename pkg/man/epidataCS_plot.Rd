@@ -177,9 +177,9 @@ plot(imdepi, "space", lwd = 2, col = "lavender")
 load(system.file("shapes", "districtsD.RData", package = "surveillance"))
 districtsD$log10pop <- log10(districtsD$POPULATION)
 keylabels <- c(1,2,5) * rep(10^(4:6), each=3)
-plot(imdepi, "space", tiles = districtsD, pop = "log10pop",
+plot(imdepi, "space", tiles = districtsD, pop = "log10pop", col = "white",
      ## modify point style for better visibility on gray background
-     points.args = list(pch = 19, col = c("orangered", "darkblue")),
+     points.args = list(pch = 19, col = c("orangered", "blue")),
      ## metric scale bar due to projected coordinates, see proj4string(imdepi$W)
      sp.layout = layout.scalebar(imdepi$W, scale=100, labels=c("0", "100 km")),
      ## gray background levels for the district population
