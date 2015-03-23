@@ -159,7 +159,7 @@ plot.stKtest <- function (x, which = c("D", "R", "MC"),
         st.R <- st.D/stse
         defaultArgs.R <- list(
             x = K0, y = st.R,
-            panel.first = abline(h = c(-2,0,2), lty = c(2,1,2)),
+            panel.first = quote(abline(h = c(-2,0,2), lty = c(2,1,2))),
             xlab = "K(s)K(t)", ylab = "R", main = "Standardized residuals",
             ylim = range(0, st.R, finite = TRUE)
         )
