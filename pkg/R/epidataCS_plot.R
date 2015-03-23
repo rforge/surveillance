@@ -332,7 +332,7 @@ epidataCSplot_space <- function (x, subset, by = type, tiles = x$W, pop = NULL,
         }
         ## create the plot
         spplot(obj = tiles, zcol = pop,
-               sp.layout = c(sp.layout, list(layout.points)),
+               sp.layout = c(list(layout.points), sp.layout),
                legend = c(legend.types, legend.counts), ...)
     }
 }
