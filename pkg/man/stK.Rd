@@ -66,6 +66,8 @@ stKtest(object, eps.s = NULL, eps.t = NULL, B = 199,
     returned by \code{\link[splancs]{stsecal}}.}
   \item{mctest}{the observed and permutation values of the test
     statistic as returned by \code{\link[splancs]{stmctest}}.}
+
+  The \code{plot}-method invisibly returns \code{NULL}.
 }
 
 \references{

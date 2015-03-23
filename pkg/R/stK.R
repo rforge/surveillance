@@ -111,4 +111,5 @@ plot.stKtest <- function (x, Dzero = FALSE, ...)
 {
     splancs::stdiagn(pts = x$pts, stkh = x$stK, stse = x$seD, stmc = x$mctest,
                      Dzero = Dzero)
+    invisible()
 }
