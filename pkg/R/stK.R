@@ -107,9 +107,73 @@ stKtest <- function (object, eps.s = NULL, eps.t = NULL, B = 199,
     )
 }
 
-plot.stKtest <- function (x, Dzero = FALSE, ...)
+## diagnostic plots related to space-time K-function analysis
+## inspired by splancs::stdiagn authored by Barry Rowlingson and Peter Diggle
+plot.stKtest <- function (x, which = c("D", "R", "MC"),
+                          args.D = list(), args.D0 = args.D,
+                          args.R = list(), args.MC = list(), ...)
 {
-    splancs::stdiagn(pts = x$pts, stkh = x$stK, stse = x$seD, stmc = x$mctest,
-                     Dzero = Dzero)
+    stkh <- x$stK
+    stse <- x$seD
+    stmc <- x$mctest
+    
+    if (identical(which, "stdiagn")) {
+        splancs::stdiagn(pts = x$pts, stkh = stkh, stse = stse, stmc = stmc)
+        return(invisible())
+    }
+    
+    which <- match.arg(which, several.ok = TRUE)
+    stopifnot(is.list(args.D), is.list(args.D0), is.list(args.R), is.list(args.MC))
+
+    ## K_0(s,t) = K(s) * K(t)
+    K0 <- outer(stkh$ks, stkh$kt)
+    ## D(s,t) = K(s,t) - K_0(s,t)
+    st.D <- stkh$kst - K0
+
+    oldpar <- par(mfrow = sort(n2mfrow(length(which))))
+    on.exit(par(oldpar))
+
+    ## D plots
+    Dzero <- which[which %in% c("D", "D0")] == "D0"
+    whichDzero <- match(Dzero, c(FALSE, TRUE))
+    omar <- par(mar = c(2,2,par("mar")[3L],1))
+    mapply(
+        FUN = function (z, Dzero, args) {
+            defaultArgs <- list(
+                x = stkh$s, y = stkh$t, z = z,
+                main = if (Dzero) "Excess risk" else "D plot",
+                xlab = "Distance", ylab = "Time lag", zlab = "",
+                ticktype = "detailed", shade = 0.5, col = "lavender",
+                theta = -30, phi = 15, expand = 0.5
+            )
+            do.call("persp", modifyList(defaultArgs, args))
+        },
+        z = list(st.D, st.D/K0)[whichDzero],
+        Dzero = Dzero, args = list(args.D, args.D0)[whichDzero],
+        SIMPLIFY = FALSE, USE.NAMES = FALSE
+    )
+    par(omar)
+
+    ## Residual plot
+    if ("R" %in% which) {
+        st.R <- st.D/stse
+        defaultArgs.R <- list(
+            x = K0, y = st.R,
+            panel.first = abline(h = c(-2,0,2), lty = c(2,1,2)),
+            xlab = "K(s)K(t)", ylab = "R", main = "Standardized residuals",
+            ylim = range(0, st.R, finite = TRUE)
+        )
+        do.call("plot.default", modifyList(defaultArgs.R, args.R))
+    }
+
+    ## MC permutation test plot
+    if ("MC" %in% which) {
+        defaultArgs.MC <- list(
+            permstats = stmc$t, xmarks = setNames(stmc$t0, "observed"),
+            main = "MC permutation test"
+        )
+        do.call("epitestplot", modifyList(defaultArgs.MC, args.MC))
+    }
+
     invisible()
 }

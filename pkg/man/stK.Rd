@@ -9,14 +9,14 @@ Diggle et al (1995) K-function test for space-time clustering
 The function \code{stKtest} wraps functions in package \pkg{splancs} to
 perform the K-function based Monte Carlo permutation test for space-time
 clustering (Diggle et al, 1995) for \code{"epidataCS"}.
-The associated \code{plot}-method simply calls \code{\link[splancs]{stdiagn}}.
 }
 
 \usage{
 stKtest(object, eps.s = NULL, eps.t = NULL, B = 199,
         cores = 1, seed = NULL, poly = object$W)
 
-\method{plot}{stKtest}(x, Dzero = FALSE, ...)
+\method{plot}{stKtest}(x, which = c("D", "R", "MC"),
+     args.D = list(), args.D0 = args.D, args.R = list(), args.MC = list(), ...)
 }
 
 \arguments{
@@ -45,8 +45,19 @@ stKtest(object, eps.s = NULL, eps.t = NULL, B = 199,
     case, the \code{poly} argument can be used to specify a substitute.
   }
   \item{x}{an \code{"stKtest"}.}
-  \item{Dzero}{logical indicating whether to plot the estimated
-    \eqn{D_0(s,t)} instead of the default \eqn{D(s,t)}.}
+  \item{which}{
+    a character vector indicating which diagnostic plots to produce.
+    The full set is \code{c("D", "D0", "R", "MC")}.
+    The special value \code{which = "stdiagn"} means to call the
+    associated \pkg{splancs} function \code{\link[splancs]{stdiagn}}.
+  }
+  \item{args.D,args.D0,args.R,args.MC}{
+    argument lists for the plot functions \code{\link{persp}} (for
+    \code{"D"} and \code{"D0"}), \code{\link{plot.default}}
+    (\code{"R"}), and \code{\link[MASS]{truehist}} (\code{"MC"}),
+    respectively, to modify the default settings.
+    Ignored if \code{which = "stdiagn"}.
+  }
   \item{\dots}{ignored (argument of the generic).}
 }
 
@@ -91,8 +102,8 @@ if (requireNamespace("splancs")) {
     imdepiB <- subset(imdepi, type == "B")
     mainpoly <- coordinates(imdepiB$W@polygons[[1]]@Polygons[[5]])
     if (surveillance.options("allExamples")) {
-        SGRID <- c(0, 10, 50, 100, 200)
-        TGRID <- c(0, 10, 20, 30)
+        SGRID <- c(0, 10, 25, 50, 75, 100, 150, 200)
+        TGRID <- c(0, 7, 14, 21, 28)
         B <- 99
         CORES <- 2
     } else { # dummy settings for fast CRAN checks
