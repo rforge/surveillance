@@ -221,7 +221,7 @@ permute.epidataCS <- function (x, what = c("time", "space"), keep)
     }
     
     ## rescue attributes of .influenceRegion (dropped when indexing)
-    iRattr <- attributes(x$events$.influenceRegion)
+    iRattr <- attributes(x$events@data$.influenceRegion)
     
     ## permute time points and/or locations
     PERMVARS <- if (what == "time") {
@@ -234,11 +234,11 @@ permute.epidataCS <- function (x, what = c("time", "space"), keep)
     
     ## re-sort on time if necessary
     if (what == "time") {
-        x$events <- x$events[order(x$events$time), ]
+        x$events <- x$events[order(x$events@data$time), ]
     }
     
     ## .sources and endemic variables need an update
-    x$events$.sources <- determineSources.epidataCS(x)
+    x$events@data$.sources <- determineSources.epidataCS(x)
     ENDVARS <- setdiff(names(x$stgrid),
                        c(reservedColsNames_stgrid, obligColsNames_stgrid))
     gridcellsOfEvents <- match(
@@ -248,7 +248,7 @@ permute.epidataCS <- function (x, what = c("time", "space"), keep)
     x$events@data[ENDVARS] <- x$stgrid[gridcellsOfEvents, ENDVARS]
     
     ## restore attributes of .influenceRegion
-    attributes(x$events$.influenceRegion) <- iRattr
+    attributes(x$events@data$.influenceRegion) <- iRattr
     
     ## done
     x

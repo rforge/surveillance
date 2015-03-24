@@ -41,12 +41,12 @@ determineSources <- function (i, eventTimes, removalTimes, distvec, eps.s,
 ## lapply the previous function to all of object$events
 determineSources.epidataCS <- function (object)
 {
-    eventTimes <- object$events$time
-    removalTimes <- eventTimes + object$events$eps.t
+    eventTimes <- object$events@data$time
+    removalTimes <- eventTimes + object$events@data$eps.t
     eventDists <- as.matrix(dist(object$events@coords, method = "euclidean"))
     lapply(seq_along(eventTimes), function (i) {
         determineSources(i, eventTimes, removalTimes, eventDists[i,],
-                         object$events$eps.s, object$events$type,
+                         object$events@data$eps.s, object$events@data$type,
                          object$qmatrix) 
     })
 }
