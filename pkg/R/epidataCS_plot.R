@@ -159,11 +159,12 @@ epidataCSplot_time <- function (x, subset, by = type,
     if (is.list(cumulative)) {
         aT2 <- axTicks(2)
         div <- length(aT2) - 1L
+        darken <- function (col, f = 0.6)
+            apply(col2rgb(col)/255*f, 2L, function (x) rgb(x[1L], x[2L], x[3L]))
         cumulative <- modifyList(
             list(maxat = ceiling(max(unlist(csums))/div)*div,
-                 col = apply(col2rgb(col)/255*0.6, 2, function (x)
-                             rgb(x[1L], x[2L], x[3L])),
-                 lwd = 3, axis = TRUE, lab = "Cumulative number of cases"),
+                 col = darken(col), lwd = 3, axis = TRUE,
+                 lab = "Cumulative number of cases"),
             cumulative)
         csum2y <- function (x) x / cumulative$maxat * aT2[length(aT2)]
         for (typeIdx in typesEffective) {
