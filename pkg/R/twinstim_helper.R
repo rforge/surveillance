@@ -136,8 +136,8 @@ crudebeta0 <- function (nEvents, offset.mean, W.area, period, nTypes)
             function (siafpars) iRareas
         } else {
             function (siafpars)
-                sapply(influenceRegion, attr, "area",
-                       simplify=TRUE, USE.NAMES=FALSE)
+                vapply(X = influenceRegion, FUN = attr, which = "area",
+                       FUN.VALUE = 0, USE.NAMES = FALSE)
         }
     } else if (is.null(siaf$Fcircle) || # if siaf$Fcircle not available
                (is.null(siaf$effRange) && noCircularIR))
