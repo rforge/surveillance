@@ -54,11 +54,13 @@ epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL,
     parameters but the intercept.
   }
   \item{verbose}{
-    the amount of tracing in the range \code{0:2}.
-    Level 0 (or \code{FALSE}) means no output,
-    level 1 (or \code{TRUE}, the default) will show a progress bar,
-    and level 2 prints the test statistic resulting from each permutation.
-    Does not work if parallelized using clusters.
+    the amount of tracing in the range \code{0:3}.
+    Set to 0 (or \code{FALSE}) for no output,
+    1 (or \code{TRUE}, the default) for a progress bar,
+    2 for the test statistics resulting from each permutation,
+    and to 3 for additional tracing of the log-likelihood
+    maximization in each permutation (not useful if parallelized).
+    Tracing does not work if permutations are parallelized using clusters.
     See \code{\link{plapply}} for other choices.
   }
   \item{\dots}{further arguments for \code{\link{plapply}} to configure
