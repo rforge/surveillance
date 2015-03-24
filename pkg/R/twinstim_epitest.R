@@ -108,7 +108,8 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
                                   control = list(trace = is.numeric(verbose) && verbose >= 3)))
         ## sink()
         m0 <- update.twinstim(m1, epidemic = ~0, siaf = NULL, tiaf = NULL,
-                              control.siaf = NULL)
+                              control.siaf = NULL,
+                              optim.args = list(control = list(trace = 0)))
         lrt <- lrt(m0, m1)
         simpleR0 <- simpleR0(m1, eps.s = eps.s, eps.t = eps.t)
         list(m0 = m0, m1 = m1,
