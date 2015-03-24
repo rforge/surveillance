@@ -216,8 +216,8 @@ twinstim <- function (
         ##     cat("calculating distance matrix of", N, "events ...\n")
         eventDists <- as.matrix(dist(eventCoords, method = "euclidean"))
         influenceRegion <- data$events@data$.influenceRegion[inmfe]
-        iRareas <- sapply(influenceRegion, attr, "area",
-                          simplify=TRUE, USE.NAMES=FALSE)
+        iRareas <- vapply(X = influenceRegion, FUN = attr, which = "area",
+                          FUN.VALUE = 0, USE.NAMES = FALSE)
         eventSources <- if (N == nobs(data) && identical(qmatrix, data$qmatrix)) {
             data$events@data$.sources
         } else { # re-determine because subsetting has invalidated row indexes
@@ -552,10 +552,10 @@ twinstim <- function (
             ncolsRes = 1L, score = matrix(1,N,ncolsRes), f = siaf$f, g = tiaf$g)
             # second line arguments are for score functions with defaults for loglik
         {
-            e <- sapply(includes, function (i) {
+            e <- vapply(X = includes, FUN = function (i) {
                 sources <- eventSources[[i]]
                 nsources <- length(sources)
-                if (nsources == 0L) rep.int(0, ncolsRes) else {
+                if (nsources == 0L) numeric(ncolsRes) else {
                     scoresources <- score[sources,,drop=FALSE]
                     predsources <- gammapred[sources]
                     repi <- rep.int(i, nsources)
@@ -567,8 +567,9 @@ twinstim <- function (
                     .colSums(scoresources * predsources * fsources * gsources,
                              nsources, ncolsRes)
                 }
-            }, simplify=TRUE, USE.NAMES=FALSE) # a vector if ncolsRes=1
-            if (ncolsRes == 1L) e else t(e)    # otherwise of dim Nin x ncolsRes
+            }, FUN.VALUE = numeric(ncolsRes), USE.NAMES = FALSE)
+            ## return a vector if ncolsRes=1, otherwise a matrix (Nin x ncolsRes)
+            if (ncolsRes == 1L) e else t(e)
         }
     }
 
