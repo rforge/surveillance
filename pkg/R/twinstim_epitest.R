@@ -24,7 +24,7 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
                 immediate. = TRUE)
     }
     if (isTRUE(fixed)) {
-        fixed <- setdiff(names(coeflist.twinstim(model)$epidemic),
+        fixed <- setdiff(grep("^e\\.", names(coef(model)), value = TRUE),
                          "e.(Intercept)")
     } else {
         stopifnot(is.null(fixed) || is.character(fixed))
