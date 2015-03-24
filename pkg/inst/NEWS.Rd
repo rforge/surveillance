@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.9-0 (2015-03-22)}{
+\section{Changes in surveillance version 1.9-0 (2015-03-24)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -102,6 +102,10 @@
     last block of \code{stgrid} (thus it did not work for single-cell
     grids), and mislabeled the \code{start} column copied to
     \code{events} if there were no covariates in \code{stgrid}.
+
+    \item Evaluating \code{intensity.twinstim()$hFUN()} at time points
+    before \code{t0} was an error. The function now returns
+    \code{NA_real_} as for time points beyond \code{T}.
   }
 }
 

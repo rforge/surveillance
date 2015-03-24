@@ -5,7 +5,7 @@
 ###
 ### Plot the temporal or spatial evolution of the estimated intensity
 ###
-### Copyright (C) 2012-2014 Sebastian Meyer
+### Copyright (C) 2012-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -80,11 +80,17 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
         if (aggregate == "time") {
             function (tp) {
                 stopifnot(isScalar(tp))
-                if (tp == t0) hInt[1L] else {
+                if (tp == t0) {
+                    hInt[1L]
+                } else {
                     starts <- histIntervals$start
                     idx <- match(TRUE, c(starts,T) >= tp) - 1L
-                    block <- histIntervals$BLOCK[idx]
-                    hInt[as.character(block)]
+                    if (identical(idx, 0L)) { # tp <= t0
+                        NA_real_
+                    } else { # idx is NA if tp > T
+                        block <- histIntervals$BLOCK[idx]
+                        hInt[as.character(block)]
+                    }
                 }
             }
         } else {
