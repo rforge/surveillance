@@ -169,7 +169,8 @@ plot.stKtest <- function (x, which = c("D", "R", "MC"),
     ## MC permutation test plot
     if ("MC" %in% which) {
         defaultArgs.MC <- list(
-            permstats = stmc$t, xmarks = setNames(stmc$t0, "observed"),
+            permstats = stmc$t,
+            xmarks = setNames(stmc$t0, "observed"),
             main = "MC permutation test"
         )
         do.call("epitestplot", modifyList(defaultArgs.MC, args.MC))

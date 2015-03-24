@@ -99,10 +99,13 @@ plot.knox <- function (x, ...)
     if (is.null(permstats <- x[["permstats"]])) {
         stop("this plot-method is for a permutation-based Knox test")
     }
-    epitestplot(permstats = permstats,
-                xmarks = setNames(c(x[["null.value"]], x[["statistic"]]),
-                    c("expected", "observed")),
-                xlab = "number of close pairs", ...)
+    defaultArgs <- list(
+        permstats = permstats,
+        xmarks = setNames(c(x[["null.value"]], x[["statistic"]]),
+            c("expected", "observed")),
+        xlab = "number of close pairs"
+    )
+    do.call("epitestplot", modifyList(defaultArgs, list(...)))
 }
 
 xtable.knox <- function (x, caption = NULL, label = NULL,
