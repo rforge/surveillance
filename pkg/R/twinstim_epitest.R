@@ -74,6 +74,17 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
             cat("\n")
         }, list(STATS2STRING = body(stats2string)))
     }
+
+    ## if siafpars are fixed, determine siafInt for use in all permutations
+    siafInt <- NULL
+    siafpars <- coeflist(model)$siaf
+    if (length(siafpars) > 0L && all(names(siafpars) %in% fixed) &&
+        is.null(siafInt <- environment(model)$siafInt)) {
+        cat("pre-evaluating 'siaf' integrals with fixed parameters ...\n")
+        setup <- update.twinstim(model, data = data, optim.args = NULL, verbose = FALSE)
+        assign("siafpars", siafpars, envir = environment(setup))
+        siafInt <- with(environment(setup), do.call("..siafInt", .siafInt.args))
+    }
     
     ## define the function to be replicated B times:
     ## permute data, update epidemic model, compute endemic-only model,
@@ -81,8 +92,10 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
     permfits1 <- function (...) {
         ## depends on 'data', 'model', 'lrt', 'eps.s', 'eps.t', and 'fixed'
         .permdata <- permute.epidataCS(data, what = "time", keep = time <= t0)
+        .siafInt <- siafInt[match(row.names(.permdata$events), row.names(data$events))]
         ## sink(paste0("/tmp/trace_", Sys.getpid()), append = TRUE)
         m1 <- update.twinstim(model, data = .permdata,
+                              control.siaf = list(siafInt = .siafInt),
                               model = FALSE, cumCIF = FALSE,
                               cores = 1, verbose = FALSE,
                               optim.args = list(fixed = fixed, control = list(trace = 0)))

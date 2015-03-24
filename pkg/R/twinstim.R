@@ -389,9 +389,13 @@ twinstim <- function (
         ntiafpars <- tiaf$npars
 
         ## Check control.siaf
-        if (constantsiaf) control.siaf <- NULL else {
-            stopifnot(is.null(control.siaf) || is.list(control.siaf))
-            if (is.list(control.siaf)) stopifnot(sapply(control.siaf, is.list))
+        if (constantsiaf) {
+            control.siaf <- NULL
+        } else if (is.list(control.siaf)) {
+            if (!is.null(control.siaf$F)) stopifnot(is.list(control.siaf$F))
+            if (!is.null(control.siaf$Deriv)) stopifnot(is.list(control.siaf$Deriv))
+        } else if (!is.null(control.siaf)) {
+            stop("'control.siaf' must be a list or NULL")
         }
 
         ## should we compute siafInt in parallel?
@@ -409,20 +413,31 @@ twinstim <- function (
 
         ## Define function that integrates the two-dimensional 'siaf' function
         ## over the influence regions of the events
-        .siafInt <- .siafIntFUN(siaf = siaf, noCircularIR = all(eps.s > bdist),
-                                parallel = useParallel)
-        .siafInt.args <- c(alist(siafpars), control.siaf$F)
-
-        ## Memoisation of .siafInt
-        ..siafInt <- if (!constantsiaf && requireNamespace("memoise")) {
-            memoise::memoise(.siafInt)
-            ## => speed-up optimization since 'nlminb' evaluates the loglik and
-            ## score for the same set of parameters at the end of each iteration
+        ..siafInt <- if (is.null(control.siaf[["siafInt"]])) {
+            .siafInt <- .siafIntFUN(siaf = siaf, noCircularIR = all(eps.s > bdist),
+                                    parallel = useParallel)
+            ## Memoisation of .siafInt
+            if (!constantsiaf && requireNamespace("memoise")) {
+                memoise::memoise(.siafInt)
+                ## => speed-up optimization since 'nlminb' evaluates the loglik and
+                ## score for the same set of parameters at the end of each iteration
+            } else {
+                if (!constantsiaf && verbose)
+                    message("Continuing without memoisation of 'siaf$f' cubature ...")
+                .siafInt
+            }
         } else {
-            if (!constantsiaf && verbose)
-                message("Continuing without memoisation of 'siaf$f' cubature ...")
-            .siafInt
+            ## predefined cubature results in epitest(..., fixed = TRUE),
+            ## where siafInt is identical during all permutations (only permuted)
+            stopifnot(is.vector(control.siaf[["siafInt"]], mode = "numeric"),
+                      length(control.siaf[["siafInt"]]) == N)
+            local({
+                env <- new.env(hash = FALSE, parent = .GlobalEnv)
+                env$siafInt <- control.siaf[["siafInt"]]
+                as.function(alist(siafpars=, ...=, siafInt), envir = env)
+            })
         }
+        .siafInt.args <- c(alist(siafpars), control.siaf$F)
 
     } else {
         
