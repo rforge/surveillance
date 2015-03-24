@@ -23,7 +23,7 @@
 epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL,
         fixed = NULL, verbose = TRUE, ...)
 
-\method{plot}{epitest}(x, ...)
+\method{plot}{epitest}(x, xlab = expression("Simple " * R[0]), ...)
 }
 
 \arguments{
@@ -71,6 +71,9 @@ epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL,
   }
   \item{x}{
     an object of class \code{"epitest"} as returned by \code{epitest}.
+  }
+  \item{xlab}{
+    a label for the test statistic.
   }
 }
 

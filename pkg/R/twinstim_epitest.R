@@ -150,11 +150,11 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
     res
 }
 
-plot.epitest <- function (x, ...)
+plot.epitest <- function (x, xlab = expression("Simple " * R[0]), ...)
 {
     epitestplot(x$permstats$simpleR0,
                 xmarks = setNames(x$statistic, "observed"),
-                xlab = expression("Simple " * R[0]), ...)
+                xlab = xlab, ...)
 }
 
 ## auxiliary function also used by plot.knox()
