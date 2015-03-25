@@ -39,14 +39,20 @@ layout.scalebar(obj, corner = c(0.05, 0.95), scale = 1,
     For \code{layout.scalebar}, a character vector of length two giving
     the labels to be put above the left and right ends of the scale bar.
   }
-  \item{corner}{the location of the scale bar in the unit square, where
+  \item{corner}{
+    the location of the scale bar in the unit square, where
     \code{c(0,0)} refers to the bottom left corner. By default, the
-    scale bar is placed in the top left corner (with a small buffer).}
-  \item{scale}{the width of the scale bar.
-    Take the \code{\link{proj4string}(obj)} into account.
-    Note that a proper scale bar requires projected coordinates.}
-  \item{height}{the height of the scale bar, see
-    \code{\link{layout.scale.bar}}.}
+    scale bar is placed in the top left corner (with a small buffer).
+  }
+  \item{scale}{
+    the width of the scale bar in the units of \code{\link{proj4string}(obj)}.
+    If \code{identical(FALSE, \link{is.projected}(obj))}
+    (i.e., \code{obj} has longlat coordinates), \code{scale} is
+    interpreted in kilometres.
+  }
+  \item{height}{
+    the height of the scale bar, see \code{\link{layout.scale.bar}}.
+  }
 }
 
 \value{
@@ -64,18 +70,22 @@ Sebastian Meyer
 }
 
 \examples{
-## labels function
+## districts in the Regierungsbezirk Weser-Ems (longlat coordinates)
 data("measlesWeserEms")
-(li <- layout.labels(measlesWeserEms@map, labels = list(font=2, labels="GEN")))
-spplot(measlesWeserEms@map, zcol = "AREA", sp.layout = list(li),
-       col.regions = rev(heat.colors(100)))
+mapWE <- measlesWeserEms@map
+li1 <- layout.labels(mapWE, labels = list(font=2, labels="GEN"))
+li2 <- layout.scalebar(mapWE, corner = c(0.05, 0.05), scale = 20,
+                       labels = c("0", "20 km"))
+spplot(mapWE, zcol = "AREA", sp.layout = c(list(li1), li2),
+       col.regions = rev(heat.colors(100)), scales = list(draw = TRUE))
 
-## scalebar function
+## districts in Bavaria (projected coordinates)
 load(system.file("shapes", "districtsD.RData", package = "surveillance"))
 bavaria <- districtsD[substr(row.names(districtsD), 1, 2) == "09", ]
 sb <- layout.scalebar(bavaria, corner = c(0.75,0.9), scale = 50,
                       labels = c("0", "50 km"))
 spplot(bavaria, zcol = "POPULATION", sp.layout = sb,
+       xlab = "x [km]", ylab = "y [km]", scales = list(draw = TRUE),
        col.regions = rev(heat.colors(100)))
 }
 

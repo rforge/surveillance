@@ -180,16 +180,37 @@ layout.scalebar <- function (obj, corner = c(0.05, 0.95), scale = 1,
                              labels = c(0, scale), height = 0.05)
 {
     stopifnot(inherits(obj, "Spatial"))
-    if (identical(FALSE, is.projected(obj)))
-        warning("a scale bar requires projected coordinates")
-    
-    offset <- bbox(obj)[, 1L] + corner * apply(bbox(obj), 1L, diff)
+    BB <- bbox(obj)
+    force(labels)  # the default should use the original 'scale' value in km
+    if (identical(FALSE, is.projected(obj))) {
+        ## 'obj' has longlat coordinates, 'scale' is interpreted in kilometres
+        scale <- .scale2longlat(t(rowMeans(BB)), scale)
+    }
+    offset <- BB[, 1L] + corner * apply(BB, 1L, diff.default)
     list(
         list("SpatialPolygonsRescale", layout.scale.bar(height = height),
              offset = offset, scale = scale, fill = c(NA, 1)),
         list("sp.text", offset, labels[1L], pos = 3),
         list("sp.text", offset + c(scale[1L], 0), labels[2L], pos = 3)
     )
+}
+
+.scale2longlat <- function (focusLL, distKM)
+{
+    ## .destPoint() is copied from the "raster" package by Robert J. Hijmans
+    ## 'p' is a longlat coordinate matrix, 'd' is a vector of distances in metres
+    .destPoint <- function (p, d, b=90, r=6378137) {
+        toRad <- pi/180
+        lon1 <- p[, 1] * toRad
+        lat1 <- p[, 2] * toRad
+        b <- b * toRad
+        lat2 <- asin(sin(lat1) * cos(d/r) + cos(lat1) * sin(d/r) * cos(b))
+        lon2 <- lon1 + atan2(sin(b) * sin(d/r) * cos(lat1), cos(d/r) - sin(lat1) * sin(lat2))
+        lon2 <- (lon2 + pi)%%(2 * pi) - pi
+        cbind(lon2, lat2)/toRad
+    }
+    rightLL <- .destPoint(focusLL, distKM * 1000)
+    rightLL[,1L] - focusLL[,1L]
 }
 
 
