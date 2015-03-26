@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.9-0 (2015-03-24)}{
+\section{Changes in surveillance version 1.9-0 (2015-03-26)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -64,6 +64,10 @@
 
     \item The \code{"time"} plot for \code{"epidataCS"} uses the
     temporal grid points as the default histogram \code{breaks}.
+
+    \item The special \code{fe()} function which sets up fixed effects
+    in \code{hhh4()} models gained an argument \code{unitSpecific} as a
+    convenient shortcut for \code{which = rep(TRUE, nUnits)}.
   }
 }
 

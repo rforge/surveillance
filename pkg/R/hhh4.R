@@ -309,8 +309,9 @@ isInModel <- function(formula, name=deparse(substitute(formula)))
 }
 
 # used to incorporate covariates and unit-specific effects
-fe <- function(x,          # covariate 
-               which=NULL, # Null= overall, vector with booleans = unit-specific
+fe <- function(x,          # covariate
+               unitSpecific = FALSE, # TRUE means which = rep.int(TRUE, nUnits)
+               which=NULL, # NULL = overall, vector with booleans = unit-specific
                initial=NULL) # vector of inital values for parameters
 {
   stsObj <- get("stsObj", envir=parent.frame(1), inherits=TRUE) #checkFormula()
@@ -344,19 +345,19 @@ fe <- function(x,          # covariate
   intercept <- all(terms==1)
   
   # overall or unit-specific effect?
-  unitSpecific <- !is.null(which)
-  
-  # check argument which
-  if(unitSpecific && (!is.vector(which) | (length(which) != nUnits) | !is.logical(which))){
-    stop("argument which = \'",deparse(substitute(which)), "\' is not correct\n")
-  }
-  
-  if(unitSpecific){
-    terms[,!which] <- 0
+  unitSpecific <- unitSpecific || !is.null(which)
+  if (unitSpecific) {
+      if (is.null(which)) {
+          which <- rep.int(TRUE, nUnits)
+      } else {
+          stopifnot(is.vector(which, mode="logical"), length(which) == nUnits)
+      }
+      
+      terms[,!which] <- 0
   }
   
   # get dimension of parameter
-  dim.fe <- ifelse(unitSpecific, sum(which), 1)
+  dim.fe <- if (unitSpecific) sum(which) else 1
   
   # check length of initial values + set default values
   if (is.null(initial)) {
@@ -365,10 +366,11 @@ fe <- function(x,          # covariate
     stop("initial values for '",deparse(substitute(x)),"' must be of length ",dim.fe)
   }
   
-  summ <- ifelse(unitSpecific,"colSums","sum")
+  summ <- if (unitSpecific) "colSums" else "sum"
     
   name <- deparse(substitute(x))
-  if(unitSpecific) name <- paste(name, colnames(stsObj)[which], sep=".")
+  if (unitSpecific)
+      name <- paste(name, colnames(stsObj)[which], sep=".")
     
   result <- list(terms=terms,
                 name=name,

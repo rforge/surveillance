@@ -249,7 +249,7 @@ measles <- disProg2sts(measles.weser)
 summary(hhh4(measles, control=model1))
 
 # now use region-specific intercepts in endemic component
-f.end2 <- addSeason2formula(f = ~ -1 + fe(1, which=rep(TRUE, ncol(measles))) + t,
+f.end2 <- addSeason2formula(f = ~ -1 + fe(1, unitSpecific = TRUE) + t,
                             S = 1, period = 52)
 model2 <- list(ar = list(f = ~ 1), 
                end = list(f = f.end2, offset = population(measles)),
@@ -259,11 +259,11 @@ summary(hhh4(measles, control=model2), idx2Exp=1, amplitudeShift=TRUE)
 
 # include autoregressive parameter phi for adjacent "Kreise"
 # no linear trend in endemic component
-f.end3 <- addSeason2formula(f = ~ -1 + fe(1, which=rep(TRUE, ncol(measles))), 
+f.end3 <- addSeason2formula(f = ~ -1 + fe(1, unitSpecific = TRUE), 
                             S = 1, period = 52)
 model3 <- list(ar = list(f = ~ 1),
-               ne = list(f = ~1),
-               end = list(f = f.end3, offset= population(measles)),
+               ne = list(f = ~ 1),
+               end = list(f = f.end3, offset = population(measles)),
                family = "NegBin1")
 # run model
 res3 <- hhh4(measles, control=model3)
