@@ -2083,35 +2083,6 @@ fitHHH <- function(theta, sd.corr, model,
 
 
 
-##############
-addSeason2formula <- function(f=~1,       # formula to start with
-                              S=1,         # number of sine/cosine pairs
-                              period=52,
-                              timevar="t"
-                              ){
-  # return formula as is if S = 0
-  if(max(S) == 0) return(f)
-  
-  f <- paste(deparse(f), collapse="")
-  # create formula
-  if(length(S)==1 && S>0){
-    for(i in seq_len(S)){
-      f <- paste0(f,
-                  " + sin(",2*i,"*pi*",timevar,"/",period,")",
-                  " + cos(",2*i,"*pi*",timevar,"/",period,")")
-    }
-  } else {
-    for(i in seq_len(max(S))){
-      which <- paste(i <= S,collapse=",")
-      f <- paste0(f,
-                  " + fe( sin(",2*i,"*pi*",timevar,"/",period,"), which=c(",which,"))",
-                  " + fe( cos(",2*i,"*pi*",timevar,"/",period,"), which=c(",which,"))")
-    }
-  }
-  return(as.formula(f, env=.GlobalEnv))
-}
-
-
 ## check analytical score functions and Fisher informations for
 ## a given model (the result of interpretControl(control, stsObj))
 ## and given parameters theta (regression par.) and sd.corr (variance par.).
