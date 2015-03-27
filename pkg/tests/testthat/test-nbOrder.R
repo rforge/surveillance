@@ -19,7 +19,7 @@ nbmat <- structure(
     )
 
 test_that("nbOrder() returns the validated matrix", {
-    if (!requireNamespace("spdep"), quietly = TRUE) {
+    if (!requireNamespace("spdep", quietly = TRUE)) {
         skip("package \"spdep\" is not installed")
     }
     expect_that(nbOrder(adjmat, maxlag=Inf),
