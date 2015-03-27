@@ -18,12 +18,13 @@ nbmat <- structure(
     .Dimnames = rep.int(list(c("a", "b", "c", "d", "e")), 2L)
     )
 
-if (requireNamespace("spdep")) {
-    test_that("nbOrder() returns the validated matrix", {
-        expect_that(nbOrder(adjmat, maxlag=Inf),
-                    is_identical_to(nbmat))
-    })
-}
+test_that("nbOrder() returns the validated matrix", {
+    if (!requireNamespace("spdep"), quietly = TRUE) {
+        skip("package \"spdep\" is not installed")
+    }
+    expect_that(nbOrder(adjmat, maxlag=Inf),
+                is_identical_to(nbmat))
+})
 
 test_that("zetaweights(.,maxlag=1,normalize=FALSE) is inverse of nbOrder", {
     expect_that(zetaweights(nbmat, maxlag=1, normalize=FALSE),
