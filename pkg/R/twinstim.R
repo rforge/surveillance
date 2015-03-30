@@ -40,17 +40,6 @@ twinstim <- function (
     epilink <- match.arg(epilink, choices = c("log", "identity"))
     epilinkinv <- switch(epilink, "log" = exp, "identity" = identity)
 
-    ## # Collect polyCub.midpoint warnings (and apply unique on them at the end)
-    ## .POLYCUB.WARNINGS <- NULL
-    ## .polyCub <- function (...) {
-    ##     int <- withCallingHandlers(
-    ##            polyCub.midpoint(...),
-    ##            warning = function (w) {
-    ##                .POLYCUB.WARNINGS <<- c(.POLYCUB.WARNINGS, list(w))
-    ##                invokeRestart("muffleWarning")
-    ##            })
-    ## }
-    
     ## Clean the model environment when exiting the function
     on.exit(suppressWarnings(rm(cl, cumCIF, cumCIF.pb, data, doHessian,
         eventDists, eventsData, finetune, neghess, fisherinfo, fit, fixed,
@@ -232,7 +221,9 @@ twinstim <- function (
         }
         ## calculate sum_{k=1}^K q_{kappa_j,k} for all j = 1:N
         qSum <- unname(rowSums(qmatrix)[eventTypes])   # N-vector
-    } else if (verbose) message("no epidemic component in model")
+    } else if (verbose) {
+        message("no epidemic component in model")
+    }
 
 
     ### Drop "terms" and restore original formula environment
@@ -1268,11 +1259,6 @@ twinstim <- function (
     ##############
 
 
-    ## ### Issue collected polyCub.midpoint warnings
-    
-    ## sapply(unique(.POLYCUB.WARNINGS), warning)
-
-
     ### Set up list object to be returned
 
     fit <- list(
@@ -1348,7 +1334,7 @@ twinstim <- function (
             }, simplify=TRUE, USE.NAMES=FALSE)
         } else {                        # cannot use progress bar
             simplify2array(parallel::mclapply(
-                eventTimes[includes], heIntTWK,
+                X=eventTimes[includes], FUN=heIntTWK,
                 beta0=beta0, beta=beta,
                 gammapred=gammapred, siafpars=siafpars,tiafpars=tiafpars,
                 mc.preschedule=TRUE, mc.cores=cores
