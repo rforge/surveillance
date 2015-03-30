@@ -11,6 +11,20 @@
 ### $Date$
 ################################################################################
 
+## extract the link function used for the epidemic predictor (default: log-link)
+.epilink <- function (x)
+{
+    link <- attr(x$formula$epidemic, "link")
+    if (is.null(link)) "log" else link
+}
+
+## ## compare two "twinstim" fits
+## all.equal.twinstim <- function (target, current, ...,
+##                                 ignore = c("runtime", "call"))
+## {
+##     target[ignore] <- current[ignore] <- NULL
+##     NextMethod("all.equal")
+## }
 
 ### don't need a specific coef-method (identical to stats:::coef.default)
 ## coef.twinstim <- function (object, ...)
@@ -82,14 +96,16 @@ summary.twinstim <- function (object, test.iaf = FALSE,
     correlation = FALSE, symbolic.cor = FALSE, ...)
 {
     ans <- unclass(object)[c("call", "converged", "counts")]
-    ans$cov <- vcov(object)
     npars <- object$npars
-    coefs <- coef(object)
     nbeta0 <- npars[1]; p <- npars[2]; nbeta <- nbeta0 + p
     q <- npars[3]
     nNotIaf <- nbeta + q
     niafpars <- npars[4] + npars[5]
-    est <- coefs
+    est <- coef(object)
+    ans$cov <- tryCatch(vcov(object), error = function (e) {
+        warning(e)
+        matrix(NA_real_, length(est), length(est))
+    })
     se <- sqrt(diag(ans$cov))
     zval <- est/se
     pval <- 2 * pnorm(abs(zval), lower.tail = FALSE)
@@ -97,7 +113,10 @@ summary.twinstim <- function (object, test.iaf = FALSE,
     dimnames(coefficients) <- list(names(est),
         c("Estimate", "Std. Error", "z value", "Pr(>|z|)"))
     ans$coefficients.beta <- coefficients[seq_len(nbeta),,drop=FALSE]
-    ans$coefficients.gamma <- coefficients[nbeta+seq_len(q),,drop=FALSE]
+    ans$coefficients.gamma <- structure(
+        coefficients[nbeta+seq_len(q),,drop=FALSE],
+        link = .epilink(object)
+    )
     ans$coefficients.iaf <- coefficients[nNotIaf+seq_len(niafpars),,drop=FALSE]
     if (!test.iaf) {
         ## usually, siaf and tiaf parameters are strictly positive,
@@ -140,13 +159,13 @@ print.summary.twinstim <- function (x,
             signif.stars = signif.stars, signif.legend = (q==0L) && signif.stars, ...)
     } else cat("\nNo coefficients in the endemic component.\n")
     if (q + niafpars > 0L) {
-        cat("\nCoefficients of the epidemic component:\n")
+        cat("\nCoefficients of the epidemic component",
+            if (attr(x$coefficients.gamma, "link") != "log")
+                paste0(" (LINK FUNCTION: ",
+                       attr(x$coefficients.gamma, "link"), ")"),
+            ":\n", sep = "")
         printCoefmat(rbind(x$coefficients.gamma, x$coefficients.iaf), digits = digits,
             signif.stars = signif.stars, ...)
-#         if (niafpars > 0L) {
-#             #cat("Coefficients of interaction functions:\n")
-#             printCoefmat(x$coefficients.iaf, digits = digits, signif.stars = signif.stars, ...)
-#         }
     } else cat("\nNo epidemic component.\n")
     cat("\nAIC: ", format(x$aic, digits=max(4, digits+1)))
     cat("\nLog-likelihood:", format(x$loglik, digits = digits))
@@ -255,6 +274,8 @@ xtable.summary.twinstim <- function (x, caption = NULL, label = NULL,
     cis <- confint(x, level=ci.level)
     tabh <- x$coefficients.beta
     tabe <- x$coefficients.gamma
+    if (attr(tabe, "link") != "log")
+        stop("only implemented for the standard log-link models")
     tab <- rbind(tabh, tabe)
     tab <- tab[grep("^([he]\\.\\(Intercept\\)|h.type)", rownames(tab),
                     invert=TRUE),,drop=FALSE]
@@ -388,7 +409,9 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, newcoef = NULL, ...)
             stop("epidemic model matrix has the wrong number of columns ",
                  "(check the variable types in 'newevents' (factors, etc))")
         }
-        gammapred <- drop(exp(mme %*% gamma))
+        gammapred <- drop(mme %*% gamma)  # identity link
+        if (.epilink(object) == "log")
+            gammapred <- exp(gammapred)
         names(gammapred) <- rownames(newevents)
 
         ## now, convert types of newevents to integer codes
@@ -485,6 +508,7 @@ simpleR0 <- function (object, eps.s = NULL, eps.t = NULL)
     if (length(gamma0) == 0L) {
         stop("'simpleR0' requires an epidemic intercept")
     }
+    eta0 <- if (.epilink(object) == "log") exp(gamma0) else gamma0
     coeflist <- coeflist(object)
     siaf <- object$formula$siaf
     tiaf <- object$formula$tiaf
@@ -507,7 +531,7 @@ simpleR0 <- function (object, eps.s = NULL, eps.t = NULL)
     tiafInt <- tiaf$G(eps.t, coeflist$tiaf) - tiaf$G(0, coeflist$tiaf)
 
     ## calculate basic R0
-    exp(gamma0) * siafInt * tiafInt
+    eta0 * siafInt * tiafInt
 }            
 
 
