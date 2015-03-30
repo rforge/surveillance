@@ -13,6 +13,7 @@
 epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
                      fixed = NULL, verbose = TRUE, ...)
 {
+    ## check input
     stopifnot(inherits(model, "twinstim"), inherits(data, "epidataCS"),
               model$converged, isScalar(B), B >= 1)
     B <- as.integer(B)
@@ -23,6 +24,10 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
         warning("epidemic covariate effects not identifiable for permuted data",
                 immediate. = TRUE)
     }
+    ## if (.epiloglink(model)) {
+    ##     warning("boundary issues may occur with the epidemic log-link",
+    ##             immediate. = TRUE)
+    ## }
     if (isTRUE(fixed)) {
         fixed <- setdiff(grep("^e\\.", names(coef(model)), value = TRUE),
                          "e.(Intercept)")
@@ -39,7 +44,7 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
     }
     
     ## observed test statistic
-    t0 <- model$timeRange[1L]
+    t0 <- model$timeRange[1L]  # will not permute events before t0
     m0 <- update.twinstim(model, data = data,
                           epidemic = ~0, siaf = NULL, tiaf = NULL,
                           control.siaf = NULL, model = FALSE, cumCIF = FALSE,
@@ -150,12 +155,20 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
     res
 }
 
-plot.epitest <- function (x, ...)
+plot.epitest <- function (x, teststat = c("simpleR0", "D"), ...)
 {
-    defaultArgs <- list(
-        permstats = x$permstats$simpleR0,
-        xmarks = setNames(x$statistic, "observed"),
-        xlab = expression("Simple " * R[0])
+    teststat <- match.arg(teststat)
+    defaultArgs <- switch(teststat,
+        "simpleR0" = list(
+            permstats = x$permstats$simpleR0,
+            xmarks = setNames(x$statistic, "observed"),
+            xlab = expression("Simple " * R[0])
+        ),
+        "D" = list(
+            permstats = x$permstats$D,
+            xmarks = setNames(attr(x$statistic, "D"), "observed"),
+            xlab = expression(D == 2 %.% log(L[full]/L[endemic]))
+        )
     )
     do.call("epitestplot", modifyList(defaultArgs, list(...)))
 }

@@ -9,10 +9,9 @@
   interaction invoked by the \code{epidemic} model component is
   statistically significant.
   The test statistic is the reproduction number \code{\link{simpleR0}}.
-  %% A likelihood ratio test of the supplied epidemic model against
-  %% the corresponding endemic-only model is performed, i.e., the test
-  %% statistic is twice the log-likelihood difference of the models.
-  Its null distribution is obtained by a Monte Carlo permutation
+  A likelihood ratio test of the supplied epidemic model against
+  the corresponding endemic-only model is also available.
+  The null distribution of the test statistic is obtained by a Monte Carlo permutation
   approach (via \code{\link{permute.epidataCS}}) similar to the
   \code{\link{knox}} test.
   There is a simple \code{plot}-method showing a \code{\link{truehist}} of
@@ -23,7 +22,7 @@
 epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL,
         fixed = NULL, verbose = TRUE, ...)
 
-\method{plot}{epitest}(x, ...)
+\method{plot}{epitest}(x, teststat = c("simpleR0", "D"), ...)
 }
 
 \arguments{
@@ -71,6 +70,11 @@ epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL,
   }
   \item{x}{
     an object of class \code{"epitest"} as returned by \code{epitest}.
+  }
+  \item{teststat}{
+    a character string determining the test statistic to plot, either
+    \code{"\link{simpleR0}"} or \code{"D"} (twice the log-likelihood
+    difference of the models).
   }
 }
 
