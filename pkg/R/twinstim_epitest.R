@@ -24,7 +24,7 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
         warning("epidemic covariate effects not identifiable for permuted data",
                 immediate. = TRUE)
     }
-    ## if (.epiloglink(model)) {
+    ## if (.epilink(model) == "log") {
     ##     warning("boundary issues may occur with the epidemic log-link",
     ##             immediate. = TRUE)
     ## }
