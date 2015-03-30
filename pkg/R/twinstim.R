@@ -20,7 +20,7 @@ twinstim <- function (
     endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix,
     data, subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
     na.action = na.fail, start = NULL, partial = FALSE,
-    control.siaf = list(F=list(), Deriv=list()),
+    epilink = "log", control.siaf = list(F=list(), Deriv=list()),
     optim.args = list(), finetune = FALSE,
     model = FALSE, cumCIF = FALSE, cumCIF.pb = interactive(),
     cores = 1, verbose = TRUE
@@ -35,6 +35,10 @@ twinstim <- function (
     cl <- match.call()
     partial <- as.logical(partial)
     finetune <- if (partial) FALSE else as.logical(finetune)
+
+    ## (inverse) link function for the epidemic linear predictor of event marks
+    epilink <- match.arg(epilink, choices = c("log", "identity"))
+    epilinkinv <- switch(epilink, "log" = exp, "identity" = identity)
 
     ## # Collect polyCub.midpoint warnings (and apply unique on them at the end)
     ## .POLYCUB.WARNINGS <- NULL
@@ -234,6 +238,8 @@ twinstim <- function (
     ### Drop "terms" and restore original formula environment
     
     epidemic <- formula(epidemic)
+    if (epilink != "log") # set as attribute only if non-standard link function
+        attr(epidemic, "link") <- epilink
     environment(epidemic) <- origenv.epidemic
     ## We keep the original formula environment since it will be used to
     ## evaluate the modified twinstim-call in drop1/add1 (with default
@@ -491,7 +497,7 @@ twinstim <- function (
     #  theta - parameter vector c(beta0, beta, gamma, siafpars, tiafpars), where
     #    beta0   - endemic intercept (maybe type-specific)
     #    beta    - other parameters of the endemic component exp(offset + eta_h(t,s))
-    #    gamma   - parameters of the epidemic term exp(eta_e(t,s))
+    #    gamma   - coefficients of the epidemic predictor
     #    siafpars- parameters of the epidemic spatial interaction function
     #    tiafpars- parameters of the epidemic temporal interaction function
     #  mmh[Events/Grid] - model matrix related to beta, i.e the endemic component,
@@ -633,12 +639,14 @@ twinstim <- function (
         # dN part of the log-likelihood
         hEvents <- if (hash) .hEvents(beta0, beta) else 0
         eEvents <- if (hase) {
-                gammapred <- drop(exp(mme %*% gamma)) # N-vector
+                gammapred <- drop(epilinkinv(mme %*% gamma)) # N-vector
                 .eEvents(gammapred, siafpars, tiafpars) # Nin-vector! (only 'includes' here)
             } else 0
         lambdaEvents <- hEvents + eEvents  # Nin-vector
         llEvents <- sum(log(lambdaEvents))
         # here one might have got -Inf values in case of 0-intensity at an event time
+        # if epilinkinv is 'identity', lambdaEvents may contain negative entries
+        # (eEvents < -hEvents) => llEvents is NaN (point process intensity must be >0)
 
         # lambda integral of the log-likelihood
         heInt <- heIntTWK(beta0, beta, gammapred, siafpars, tiafpars)   # !hase => missing(gammapred), but lazy evaluation omits an error in this case because heIntTWK doesn't ask for gammapred
@@ -662,7 +670,7 @@ twinstim <- function (
         tiafpars <- theta[nbeta0+p+q+nsiafpars+seq_len(ntiafpars)]
 
         if (hase) {
-            gammapred <- drop(exp(mme %*% gamma))  # N-vector
+            gammapred <- drop(epilinkinv(mme %*% gamma))  # N-vector
             hEvents <- if (hash) .hEvents(beta0, beta) else 0
             eEvents <- .eEvents(gammapred, siafpars, tiafpars) # Nin-vector! (only 'includes' here)
             lambdaEvents <- hEvents + eEvents  # Nin-vector
@@ -709,11 +717,13 @@ twinstim <- function (
         eScore <- if (hase)
         {
             score_gamma <- local({
-                nom <- .eEvents(gammapred, siafpars, tiafpars,
+                nom <- .eEvents(switch(epilink, "log" = gammapred, "identity" = rep.int(1, N)),
+                                siafpars, tiafpars,
                                 ncolsRes=q, score=mme) # Nin-vector if q=1
                 sEventsSum <- .colSums(nom / lambdaEvents, Nin, q)
                             # |-> dotted version also works for vector-arguments
-                sInt <- .colSums(mme * (qSum * gammapred * siafInt * tiafInt), N, q)
+                dgammapred <- switch(epilink, "log" = mme * gammapred, "identity" = mme)
+                sInt <- .colSums(dgammapred * (qSum * siafInt * tiafInt), N, q)
                 sEventsSum - sInt
             })
 
@@ -772,7 +782,7 @@ twinstim <- function (
         zeromatrix <- matrix(0, Nin, 0)
 
         if (hase) {
-            gammapred <- drop(exp(mme %*% gamma))  # N-vector
+            gammapred <- drop(epilinkinv(mme %*% gamma))  # N-vector
             hEvents <- if (hash) .hEvents(beta0, beta) else 0
             eEvents <- .eEvents(gammapred, siafpars, tiafpars) # Nin-vector! (only 'includes' here)
             lambdaEvents <- hEvents + eEvents  # Nin-vector
@@ -806,7 +816,8 @@ twinstim <- function (
         eScoreEvents <- if (hase)
         {
             scoreEvents_gamma_nom <-
-                .eEvents(gammapred, siafpars, tiafpars, ncolsRes = q, score = mme)  # Ninxq matrix
+                .eEvents(switch(epilink, "log" = gammapred, "identity" = rep.int(1, N)),
+                         siafpars, tiafpars, ncolsRes = q, score = mme)  # Ninxq matrix
 
             scoreEvents_siafpars_nom <- if (hassiafpars) {
                 .eEvents(gammapred, siafpars, tiafpars, ncolsRes = nsiafpars, f = siaf$deriv)  # Ninxnsiafpars matrix
@@ -849,7 +860,7 @@ twinstim <- function (
         # calculcate the observed intensities
         hEvents <- if (hash) .hEvents(beta0, beta) else 0
         eEvents <- if (hase) {
-                gammapred <- drop(exp(mme %*% gamma))  # N-vector
+                gammapred <- drop(epilinkinv(mme %*% gamma))  # N-vector
                 .eEvents(gammapred, siafpars, tiafpars)  # Nin-vector! (only 'includes' here)
             } else 0
         lambdaEvents <- hEvents + eEvents  # Nin-vector
@@ -1309,7 +1320,7 @@ twinstim <- function (
     # final siaf and tiaf integrals over influence regions / periods
     # and final gammapred (also used by intensity.twinstim)
     if (hase) {
-        gammapred <- drop(exp(mme %*% gamma)) # N-vector
+        gammapred <- drop(epilinkinv(mme %*% gamma)) # N-vector
         if (!fixedsiafpars) siafInt <- do.call("..siafInt", .siafInt.args)
         if (!fixedtiafpars) tiafInt <- .tiafInt(tiafpars)
     }

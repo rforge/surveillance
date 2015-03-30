@@ -16,7 +16,7 @@
 twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
          subset, t0 = data$stgrid$start[1], T = tail(data$stgrid$stop,1),
          na.action = na.fail, start = NULL, partial = FALSE,
-         control.siaf = list(F = list(), Deriv = list()),
+         epilink = "log", control.siaf = list(F = list(), Deriv = list()),
          optim.args = list(), finetune = FALSE,
          model = FALSE, cumCIF = FALSE, cumCIF.pb = interactive(),
          cores = 1, verbose = TRUE)
@@ -123,6 +123,16 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     logical indicating if a partial likelihood similar to the approach
     by Diggle et al. (2010) should be used (default is \code{FALSE}).
     Note that the partial likelihood implementation is not well tested.
+  }
+  \item{epilink}{
+    a character string determining the link function to be used for the
+    \code{epidemic} linear predictor of event marks. By default, the
+    log-link is used. The experimental alternative
+    \code{epilink = "identity"} (for use by \code{\link{epitest}}) does
+    not guarantee the force of infection to be positive. If this leads
+    to a negative total intensity (endemic + epidemic), the point
+    process is not well defined (the log-likelihood will be
+    \code{\link{NaN}}).
   }
   \item{control.siaf}{
     a list with elements \code{"F"} and \code{"Deriv"}, which are lists

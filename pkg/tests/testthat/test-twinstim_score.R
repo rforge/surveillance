@@ -37,3 +37,25 @@ test_that("score vector agrees with numerical approximation", {
 ##       (it does asymptotically at the MLE)
 ## numfi <- -numDeriv::hessian(func = model$ll, x = theta)
 ## anafi <- model$fi(theta)
+
+
+### now check with identity link for the epidemic predictor
+
+model2 <- update(model, siaf = NULL, tiaf = NULL, epidemic = ~1, epilink = "log")
+model2i <- update(model2, epilink = "identity")
+theta2 <- theta2i <- theta[1:4]
+theta2i["e.(Intercept)"] <- exp(theta2["e.(Intercept)"])
+
+test_that("likelihoods with log-link and identity link are the same", {
+    expect_that(model2$ll(theta2), equals(model2i$ll(theta2i)))
+})
+
+test_that("identity link score vector agrees with numerical approximation", {
+    numsc <- if (surveillance.options("allExamples")) {
+        numDeriv::grad(func = model2i$ll, x = theta2i)
+    } else { # for faster --as-cran tests
+        c(-679.706275919901, -91.0659401491325, -114.082117122738,
+          -1532144485.45524)
+    }
+    expect_that(model2i$sc(theta2i), equals(numsc))
+})
