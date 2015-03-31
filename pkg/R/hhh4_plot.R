@@ -241,14 +241,11 @@ getMaxEV <- function (x)
     if (identical(type <- attr(Lambda, "type"), "zero")) {
         rep.int(0, nrow(x$stsObj))
     } else {
-        sapply(seq_len(nrow(x$stsObj)),
-               if (identical(type, "diagonal")) {
-                   function (t) max(Lambda(t))  # or max(diag(Lambda(t)))
-               } else { # type is NULL
-                   function (t)
-                       eigen(Lambda(t), symmetric=FALSE,
-                             only.values=TRUE)$values[1L]
-               }, simplify=TRUE, USE.NAMES=FALSE)
+        diagonal <- identical(type, "diagonal")
+        vapply(X = seq_len(nrow(x$stsObj)),
+               FUN = function (t)
+                   maxEV(Lambda(t), symmetric = FALSE, diagonal = diagonal),
+               FUN.VALUE = 0, USE.NAMES = FALSE)
     }
 }
 
@@ -294,6 +291,31 @@ createLambda <- function (object)
     attr(Lambda, "type") <- type
     Lambda
 }
+
+## determine the dominant eigenvalue of the Lambda matrix
+maxEV <- function (Lambda,
+                   symmetric = isSymmetric.matrix(Lambda),
+                   diagonal = FALSE)
+{
+    maxEV <- if (diagonal) {
+        max(Lambda)  # faster than max(diag(Lambda))
+    } else {
+        eigen(Lambda, symmetric = symmetric, only.values = TRUE)$values[1L]
+    }
+    
+    ## dominant eigenvalue may be complex
+    if (is.complex(maxEV)) {
+        if (Im(maxEV) == 0) { # if other eigenvalues are complex
+            Re(maxEV)
+        } else {
+            warning("dominant eigenvalue is complex, using its absolute value")
+            abs(maxEV)
+        }
+    } else {
+        maxEV
+    }
+}
+
 
 
 ###
@@ -536,23 +558,16 @@ getMaxEV_season <- function (x)
         Lambda
     }
 
-    ## calculate the maximum eigenvalue of Lambda_t
-    maxEV <- function(t)
-    {
-        ev <- eigen(createLambda(t), only.values=TRUE)$values
-        if (is.complex(ev)) {
-            warning("Lambda_",t," has complex eigenvalues")
-            ev <- abs(ev)   # if complex, use abs EVs
-        }
-        max(ev)
-    }
-
     ## do this for t in 0:freq
-    maxEV.const <- maxEV(0)
+    diagonal <- !("ne" %in% components)
+    .maxEV <- function (t) {
+        maxEV(createLambda(t), symmetric = FALSE, diagonal = diagonal)
+    }
+    maxEV.const <- .maxEV(0)
     maxEV.season <- if (all(c(s2.phi$season, s2.lambda$season) %in% c(-Inf, 0))) {
         rep.int(maxEV.const, freq)
     } else {
-        vapply(seq_len(freq), FUN = maxEV, FUN.VALUE = 0, USE.NAMES = FALSE)
+        vapply(X = seq_len(freq), FUN = .maxEV, FUN.VALUE = 0, USE.NAMES = FALSE)
     }
 
     ## Done
