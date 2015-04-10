@@ -42,7 +42,7 @@
 
 bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
                                           mc.munu=100, mc.y=10,
-                                          pastAberrations = TRUE, 
+                                          pastAberrations = FALSE, 
                                           verbose = FALSE,
                                           alpha = 0.01, trend = TRUE,
                                           limit54=c(5,4), 
@@ -89,7 +89,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
   if (is.null(control[["range", exact=TRUE]])) {
     control$range <- (freq*(control$b)+control$w +1):dim(observed)[1] 
   }
-  if (is.null(control[["pastAberrations",exact=TRUE]])) {control$pastAberrations=TRUE}
+  if (is.null(control[["pastAberrations",exact=TRUE]])) {control$pastAberrations=FALSE}
   
   if (is.null(control[["verbose",exact=TRUE]]))    {control$verbose=FALSE}
   
