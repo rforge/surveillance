@@ -19,8 +19,9 @@
 }
 
 \usage{
-epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL,
-        fixed = NULL, verbose = TRUE, ...)
+epitest(model, data, method = "time", B = 199,
+        eps.s = NULL, eps.t = NULL, fixed = NULL,
+        verbose = TRUE, ...)
 
 \method{plot}{epitest}(x, teststat = c("simpleR0", "D"), ...)
 }
@@ -37,6 +38,25 @@ epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL,
   \item{data}{
     an object of class \code{"\link{epidataCS}"}, the \code{data} to
     which the \code{model} was fitted.
+  }
+  \item{method}{
+    one of the following character strings specifying the test method:
+    \describe{
+      \item{\code{"LRT"}:}{
+        a simple likelihood ratio test of the epidemic
+        \code{model} against the corresponding endemic-only model,
+      }
+      \item{\code{"time"}/\code{"space"}:}{
+        a Monte Carlo permutation test where the null distribution is
+        obtained by relabeling time points or locations, respectively
+        (using \code{\link{permute.epidataCS}}).
+      }
+      \item{\code{"simulate"}:}{
+        obtain the null distribution of the test statistic by
+        simulations from the endemic-only model
+        (using \code{\link{simulate.twinstim}}).
+      }
+    }
   }
   \item{B}{
     the number of permutations for the Monte Carlo approach.
@@ -80,14 +100,21 @@ epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL,
 
 \value{
   a list (inheriting from \code{"htest"}) with the following components:
+  
   \item{method}{a character string indicating the type of test performed.}
   \item{data.name}{a character string giving the supplied \code{data} and
     \code{model} arguments.}
   \item{statistic}{the observed test statistic.}
   \item{parameter}{the (effective) number of permutations used to
     calculate the p-value (only those with convergent fits are used).}
-  \item{p.value}{the p-value for the test.
-    It is based on the subset of convergent fits only.}
+  \item{p.value}{the p-value for the test. For the \code{method}s
+    involving resampling under the null (\code{method != "LRT"}),
+    it is based on the subset of convergent fits only and the p-value
+    from the simple LRT is attached as an attribute \code{"LRT"}.}
+
+  In addition, if \code{method != "LRT"}, the result will have the
+  following elements:
+  
   \item{permfits}{the list of model fits (endemic-only and epidemic)
     from the \code{B} permutations.}
   \item{permstats}{a data frame with \code{B} rows and the columns
@@ -112,12 +139,18 @@ epitest(model, data, B = 199, eps.s = NULL, eps.t = NULL,
 data("imdepi")
 data("imdepifit")
 
-## for the example to run quickly, we only use B-cases,
-## assume spatial interaction to be constant within 50 km,
-## and compute only a few permutations (in parallel)
+## test for space-time interaction of the B-cases
+## assuming spatial interaction to be constant within 50 km
 imdepiB50 <- update(subset(imdepi, type == "B"), eps.s = 50)
 imdfitB50 <- update(imdepifit, data = imdepiB50,
-                    epidemic = ~1, siaf = NULL, control.siaf = NULL)
+                    epidemic = ~1, epilink = "identity",
+                    siaf = NULL, control.siaf = NULL,
+                    start = c("e.(Intercept)" = 1e-6))
+
+## simple likelihood ratio test
+epitest(imdfitB50, imdepiB50, method = "LRT")
+
+## permutation test (only few permutations for speed, in parallel)
 et <- epitest(imdfitB50, imdepiB50, B = 4 + 25*surveillance.options("allExamples"),
               verbose = 2 * (.Platform$OS.type == "unix"),
               .seed = 1, .parallel = 2)

@@ -10,24 +10,23 @@
 ### $Date$
 ################################################################################
 
-epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
-                     fixed = NULL, verbose = TRUE, ...)
+epitest <- function (model, data, method = "time", B = 199,
+                     eps.s = NULL, eps.t = NULL, fixed = NULL,
+                     verbose = TRUE, ...)
 {
     ## check input
     stopifnot(inherits(model, "twinstim"), inherits(data, "epidataCS"),
               model$converged, isScalar(B), B >= 1)
     B <- as.integer(B)
+    method <- match.arg(method, choices = c("LRT", "simulate", "time", "space"))
+                                        # eval(formals(permute.epidataCS)$what)
     if (model$npars["q"] == 0L) {
         stop("no epidemic component in 'model'")
     }
-    if (model$npars["q"] > 1L) {
-        warning("epidemic covariate effects not identifiable for permuted data",
+    if (.epilink(model) == "log") {
+        warning("boundary issues with the epidemic log-link",
                 immediate. = TRUE)
     }
-    ## if (.epilink(model) == "log") {
-    ##     warning("boundary issues may occur with the epidemic log-link",
-    ##             immediate. = TRUE)
-    ## }
     if (isTRUE(fixed)) {
         fixed <- setdiff(grep("^e\\.", names(coef(model)), value = TRUE),
                          "e.(Intercept)")
@@ -44,7 +43,6 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
     }
     
     ## observed test statistic
-    t0 <- model$timeRange[1L]  # will not permute events before t0
     m0 <- update.twinstim(model, data = data,
                           epidemic = ~0, siaf = NULL, tiaf = NULL,
                           control.siaf = NULL, model = FALSE, cumCIF = FALSE,
@@ -56,7 +54,39 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
     LRT <- lrt(m0 = m0, m1 = model)
     STATISTIC_D <- structure(LRT["D"], l0 = LRT[["l0"]], l1 = LRT[["l1"]])
     STATISTIC_R0 <- c("simpleR0" = simpleR0(model, eps.s = eps.s, eps.t = eps.t))
+
+    ## LRT p-value (CAVE: invalid for the default log-link models)
+    DF <- length(coef(model)) - length(coef(m0)) # number of epidemic parameters
+    PVAL_LRT <- pchisq(as.vector(STATISTIC_D), # drop attributes
+                       df = DF, lower.tail = FALSE)
     
+    ## result template
+    res <- list(
+        method = "Likelihood Ratio Test for Space-Time Interaction",
+        data.name = paste0(deparse(substitute(data)),
+            "\ntwinstim:  ", deparse(substitute(model))),
+        statistic = STATISTIC_D,
+        parameter = c("df" = DF),
+        p.value = PVAL_LRT
+    )
+    class(res) <- c("epitest", "htest")
+
+    if (method == "LRT") {
+        ## we are done
+        return(res)
+    }
+    
+    ## otherwise: determine the null distribution via permutation or simulation
+    res$method <- if (method == "simulate") {
+        .NotYetImplemented() # "Test for Space-Time Interaction (based on endemic simulations)"
+    } else {
+        "Monte Carlo Permutation Test for Space-Time Interaction"
+    }
+    if (model$npars["q"] > 1L) {
+        warning("epidemic covariate effects will not be identifiable",
+                immediate. = TRUE)
+    }
+
     ## interpret 'verbose' level
     .verbose <- if (is.numeric(verbose)) {
         if (verbose >= 2) {
@@ -100,9 +130,10 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
     ## define the function to be replicated B times:
     ## permute data, update epidemic model, compute endemic-only model,
     ## and compute test statistics
+    t0 <- model$timeRange[1L]  # will not permute events before t0
     permfits1 <- function (...) {
         ## depends on 'data', 'model', 'lrt', 'eps.s', 'eps.t', and 'fixed'
-        .permdata <- permute.epidataCS(data, what = "time", keep = time <= t0)
+        .permdata <- permute.epidataCS(data, what = method, keep = time <= t0)
         .siafInt <- siafInt[match(row.names(.permdata$events), row.names(data$events))]
         ## sink(paste0("/tmp/trace_", Sys.getpid()), append = TRUE)
         m1 <- update.twinstim(model, data = .permdata,
@@ -135,23 +166,13 @@ epitest <- function (model, data, B = 199, eps.s = NULL, eps.t = NULL,
     ## compute permutation-based p-value
     PVAL_D <- mean(c(STATISTIC_D, permstats[permstats$converged, "D"]) >= STATISTIC_D)
     PVAL_R0 <- mean(c(STATISTIC_R0, permstats[permstats$converged, "simpleR0"]) >= STATISTIC_R0)
-    ## invalid asymptotic p-value of LRT for comparison
-    ## attr(PVAL_D, "chisq") <- pchisq(as.vector(STATISTIC_D), # drop attributes
-    ##                                 df = length(coef(model)) - length(coef(m0)),
-    ##                                 lower.tail = FALSE)
     
-    ## gather results
-    res <- list(
-        method = "Monte Carlo Permutation Test for Space-Time Interaction",
-        data.name = paste0(deparse(substitute(data)),
-            "\ntwinstim:  ", deparse(substitute(model))),
-        statistic = structure(STATISTIC_R0, "D" = unname(STATISTIC_D)),
-        parameter = setNames(sum(permstats$converged), "B"),
-        p.value = structure(PVAL_R0, "D-based" = PVAL_D),
-        permfits = permfits,
-        permstats = permstats
-    )
-    class(res) <- c("epitest", "htest")
+    ## set results
+    res$statistic <- structure(STATISTIC_R0, "D" = unname(STATISTIC_D))
+    res$parameter <- c("B" = sum(permstats$converged))
+    res$p.value <- structure(PVAL_R0, "D-based" = PVAL_D, "LRT" = PVAL_LRT)
+    res$permfits <- permfits
+    res$permstats <- permstats
     res
 }
 
@@ -170,7 +191,10 @@ plot.epitest <- function (x, teststat = c("simpleR0", "D"), ...)
             xlab = expression(D == 2 %.% log(L[full]/L[endemic]))
         )
     )
-    do.call("epitestplot", modifyList(defaultArgs, list(...)))
+    args <- modifyList(defaultArgs, list(...))
+    if (is.null(args[["permstats"]]))
+        stop("nothing to plot (no 'permstats' available)")
+    do.call("epitestplot", args)
 }
 
 ## auxiliary function also used by plot.knox()
