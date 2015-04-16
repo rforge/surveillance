@@ -280,7 +280,7 @@ bodaDelay.fitGLM <- function(dataGLM,reportingTriangle,alpha,
                   control.predictor=list(compute=TRUE,link=link),
                   control.compute=list(cpo=TRUE,config=TRUE),
                   control.inla = list(int.strategy = "grid",dz=1,diff.logdens = 10),
-                  control.family = list(hyper = list(theta = list(prior = "normal", param = c(0, 0.001)))))
+                  control.family = list(hyper = list(theta = list(prior = "normal", param = c(0, 0.01)))))
     
     if (pastAberrations){
       # if we have failures => recompute those manually
