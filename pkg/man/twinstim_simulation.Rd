@@ -22,8 +22,8 @@
 \usage{
 simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     events, stgrid, tiles, beta0, beta, gamma, siafpars, tiafpars,
-    t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5,
-    control.siaf = list(F=list(), Deriv=list()),
+    epilink = "log", t0 = stgrid$start[1], T = tail(stgrid$stop,1),
+    nEvents = 1e5, control.siaf = list(F=list(), Deriv=list()),
     W = NULL, trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
     .skipChecks = FALSE, .onlyEvents = FALSE)
 
@@ -119,6 +119,15 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     respectively. \code{beta0} is either a single endemic intercept or a
     vector of type-specific endemic intercepts in the same order as in
     \code{qmatrix}.
+  }
+  \item{epilink}{
+    a character string determining the link function to be used for the
+    \code{epidemic} linear predictor of event marks. By default, the
+    log-link is used. The experimental alternative is
+    \code{epilink = "identity"}. Note that the identity link does not
+    guarantee the force of infection to be positive. If this leads to a
+    negative total intensity (endemic + epidemic), the point process is
+    not well defined and simulation cannot proceed.
   }
   \item{t0}{
     \code{events} having occured during (-Inf;\code{t0}] are regarded as part of the

@@ -21,7 +21,7 @@
 utils::globalVariables(c("BLOCK", "tile", "area"))
 
 simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
-    events, stgrid, tiles, beta0, beta, gamma, siafpars, tiafpars,
+    events, stgrid, tiles, beta0, beta, gamma, siafpars, tiafpars, epilink = "log",
     t0 = stgrid$start[1], T = tail(stgrid$stop,1), nEvents = 1e5,
     control.siaf = list(F=list(), Deriv=list()),
     W = NULL, trace = 5, nCircle2Poly = 32, gmax = NULL, .allocate = 500,
@@ -269,6 +269,10 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
              ncol(mme), ")")
     }
 
+    ## (inverse) link function for the epidemic linear predictor of event marks
+    epilink <- match.arg(epilink, choices = c("log", "identity"))
+    epilinkinv <- switch(epilink, "log" = exp, "identity" = identity)
+
 
     ### Build endemic model matrix
 
@@ -479,7 +483,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         # Matrix of terms in the epidemic component
         eTerms <- cbind(
             qSum = qSumTypes[eventTypes],
-            expeta = exp(drop(mme %*% gamma)),
+            expeta = epilinkinv(drop(mme %*% gamma)),
             siafInt = siafInts
         )
         # Return
@@ -604,7 +608,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     pointRejected <- FALSE
 
     # did we have numerical problems simulating from Exp(lambdagUpper) in the current loop?
-    hadNumericalProblemsInf <- hadNumericalProblems0 <- FALSE
+    hadNumericalProblems0 <- FALSE
 
     # index of the current loop
     loopCounter <- 0L
@@ -653,26 +657,32 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         pointRejected <- FALSE
 
         ## Simulate waiting time for the subsequent infection
-        Delta <- tryCatch(rexp(1, rate = lambdagUpper),
-            warning = function (w) {
-                if (lambdagUpper < 1) {   # rate was to small for rexp
-                    if (lambdagUpper > 0) assign("hadNumericalProblems0", TRUE, inherits = TRUE)
-                    if (nextChangePoint == Inf) NULL else Inf
-                } else {   # rate was to big for rexp
-                    0   # since R-2.7.0 rexp(1, Inf) returns 0 with no warning!
-                }
+        if (is.na(lambdagUpper)) {
+            warning("simulation stopped due to undefined intensity")
+            break
+        }
+        if (lambdagUpper < 0) {
+            warning("simulation stopped due to negative overall intensity")
+            break
+        }
+        Delta <- if (lambdagUpper == 0) Inf else tryCatch(
+            rexp(1, rate = lambdagUpper),
+            warning = function (w) { # rate was too small (for R >= 2.7.0,
+                                     # rexp(1, Inf) returns 0 without warning)
+                assign("hadNumericalProblems0", TRUE, inherits = TRUE)
+                Inf
             })
 
-        # Stop if lambdaStarMax too small AND no more changes in rate
-        if (is.null(Delta)) break
         # Stop if lambdaStarMax too big meaning Delta == 0 (=> concurrent events)
         if (Delta == 0) {
-            hadNumericalProblemsInf <- TRUE
+            warning("simulation stopped due to infinite overall intensity")
             break
         }
         # Stop at all costs if end of simulation time [t0; T) has been reached
-        if (isTRUE(min(ct+Delta, nextChangePoint) >= T)) break
-        # ">=" because we don't want an event at "end"
+        if (isTRUE(min(ct+Delta, nextChangePoint) >= T)) {
+            # ">=" because we don't want an event at "end"
+            break
+        }
 
         oldct <- ct
         if (ct + Delta > nextChangePoint) {
@@ -871,11 +881,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     ##############
 
 
-    ### Throw warnings in case of numerical difficulties
+    ### Throw warning in case of numerical difficulties
 
-    if (hadNumericalProblemsInf) {
-        warning("simulation ended due to an infinite overall infection rate")
-    }
     if (hadNumericalProblems0) {
         warning("occasionally, the overall infection rate was numerically equal to 0")
     }
@@ -966,6 +973,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                    epidemic = formula(epidemic),
                    siaf = siaf, tiaf = tiaf
                    )
+    if (epilink != "log") # set as attribute only if non-standard link function
+        attr(epi$formula$epidemic, "link") <- epilink
     # coefficients as a numeric vector to be compatible with twinstim-methods
     epi$coefficients <- coefs  #list(beta0=beta0, beta=beta, gamma=gamma,
                                #     siafpars=siafpars, tiafpars=tiafpars)
@@ -1118,7 +1127,8 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
                     stgrid=quote(data$stgrid), tiles=quote(tiles),
                     beta0=thetalist[[1L]], beta=thetalist[[2L]],
                     gamma=thetalist[[3L]], siafpars=thetalist[[4L]],
-                    tiafpars=thetalist[[5L]], t0=t0, T=T, nEvents=nEvents,
+                    tiafpars=thetalist[[5L]], epilink = .epilink(object),
+                    t0=t0, T=T, nEvents=nEvents,
                     control.siaf=control.siaf,
                     W=quote(W), trace=trace, nCircle2Poly=nCircle2Poly,
                     gmax=gmax, .allocate=.allocate,
