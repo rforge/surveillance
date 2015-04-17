@@ -5,7 +5,7 @@
 ###
 ### Plot estimated interaction kernel (siaf/tiaf) as a function of distance
 ###
-### Copyright (C) 2012-2014 Sebastian Meyer
+### Copyright (C) 2012-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -53,7 +53,9 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
 
     ## interaction as a function of distance and intercept for scaling
     FUN <- function (x, iafpars, types, gamma0 = NULL) {
-        scale <- if (length(gamma0)) exp(gamma0) else 1
+        scale <- if (length(gamma0)) {
+            if (.epilink(object) == "log") exp(gamma0) else gamma0
+        } else 1
         vals <- scale * IAF(x, iafpars, types)
     }
     if (which == "siaf") {
@@ -171,7 +173,8 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
             ## if (loglog) ylab[[1]] <- substitute(log(ylab), list(ylab=ylab[[1]]))
             if (scaled) {
                 ylab <- ##if (loglog) as.expression(call("+", quote(gamma[0]), ylab[[1]])) else
-                    as.expression(call("paste", quote(e^{gamma[0]}),
+                    as.expression(call("paste",
+                        if (.epilink(object) == "log") quote(e^{gamma[0]}) else quote(gamma[0]),
                         quote(phantom() %.% phantom()), ylab[[1]]))
             }
         }
