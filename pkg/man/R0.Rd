@@ -24,7 +24,8 @@ R0(object, ...)
 \method{R0}{twinstim}(object, newevents, trimmed = TRUE, newcoef = NULL, ...)
 \method{R0}{simEpidataCS}(object, trimmed = TRUE, ...)
 
-simpleR0(object, eps.s = NULL, eps.t = NULL)
+simpleR0(object, eta = coef(object)[["e.(Intercept)"]],
+         eps.s = NULL, eps.t = NULL)
 }
 
 \arguments{
@@ -73,6 +74,7 @@ simpleR0(object, eps.s = NULL, eps.t = NULL)
   \item{\dots}{additional arguments passed to methods.
     Currently unused for the \code{twinstim} method.}
 
+  \item{eta}{a value for the epidemic linear predictor, see details.}
   \item{eps.s,eps.t}{the spatial/temporal radius of interaction.
     If \code{NULL} (the default), the original value from the data is
     used if this is unique and an error is thrown otherwise.}
@@ -106,10 +108,11 @@ the observation period \eqn{(t_0;T]} (i.e. over
 \eqn{(0; \min(T-t_j,\epsilon)]}).
 
 The function \code{simpleR0} computes
-\deqn{\exp(\gamma_0) \cdot
+\deqn{\exp(\eta) \cdot
   \int_{b(\bold{0},\delta)} f(\bold{s}) d\bold{s} \cdot 
   \int_0^{\epsilon} g(t) dt ,}
-disregarding any epidemic effects of types and marks. It is thus only
+where \eqn{\eta} defaults to \eqn{\gamma_0} disregarding any epidemic
+effects of types and marks. It is thus only
 suitable for simple epidemic \code{\link{twinstim}} models with
 \code{epidemic = ~1}, a diagonal (or secondary diagonal) \code{qmatrix},
 and type-invariant interaction functions.
