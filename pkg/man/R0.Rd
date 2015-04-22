@@ -25,7 +25,7 @@ R0(object, ...)
 \method{R0}{simEpidataCS}(object, trimmed = TRUE, ...)
 
 simpleR0(object, eta = coef(object)[["e.(Intercept)"]],
-         eps.s = NULL, eps.t = NULL)
+         eps.s = NULL, eps.t = NULL, newcoef = NULL)
 }
 
 \arguments{

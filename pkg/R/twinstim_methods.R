@@ -497,14 +497,17 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, newcoef = NULL, ...)
 ## calculate simple R0 (over circular domain, without epidemic covariates,
 ## for type-invariant siaf/tiaf)
 simpleR0 <- function (object, eta = coef(object)[["e.(Intercept)"]],
-                      eps.s = NULL, eps.t = NULL)
+                      eps.s = NULL, eps.t = NULL, newcoef = NULL)
 {
     stopifnot(inherits(object, c("twinstim", "simEpidataCS")))
     if (object$npars[["q"]] == 0L)
         return(0)
     if (any(rowSums(object$qmatrix) != 1))
         warning("'simpleR0' is not correct for type-specific epidemic models")
-    
+
+    if (!is.null(newcoef)) { # use alternative coefficients
+        object$coefficients <- newcoef
+    }
     coeflist <- coeflist(object)
     siaf <- object$formula$siaf
     tiaf <- object$formula$tiaf
