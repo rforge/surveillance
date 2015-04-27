@@ -91,6 +91,26 @@ unionSpatialPolygons <- function (SpP,
 }
 
 
+### Compute distance from points to a polygonal boundary
+## nncross.ppp() is about 20 times faster than the previous bdist.points()
+## approach [-> distppl()], since it calls C-code [-> distppllmin()]
+## minor drawback: the polygonal boundary needs to be transformed to "psp"
+
+bdist <- function (xy, poly)
+{
+    if (nrow(xy) > 0L) {
+        nncross.ppp(
+            X = ppp(x = xy[,1L], y = xy[,2L], check = FALSE),
+            Y = if (is.polygonal(poly)) edges(poly, check = FALSE) else poly,
+            what = "dist"
+        )
+    } else {
+       ## spatstat 1.41-1 returns a 0-row _data.frame_ for the trivial case
+       numeric(0L)
+   }
+}
+
+
 ### sample n points uniformly on a disc with radius r
 
 runifdisc <- function (n, r = 1, buffer = 0)
