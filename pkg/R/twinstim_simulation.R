@@ -1048,7 +1048,7 @@ simEndemicEvents <- function (object, tiles)
         ##lambdaGrid[rep.int(seq_len(nrow(lambdaGrid)), nGrid), c("tile", "BLOCK")],
         time = unlist(tps, recursive = FALSE, use.names = FALSE),
         tile = rep.int(lambdaGrid[["tile"]], nGrid),
-        type = factor(types, levels = rownames(object$qmatrix)),
+        type = factor(types, levels = seq_len(nTypes), labels = rownames(object$qmatrix)),
         row.names = NULL, check.rows = FALSE, check.names = FALSE
     )
     
@@ -1056,8 +1056,12 @@ simEndemicEvents <- function (object, tiles)
     nByTile <- tapply(X = nGrid, INDEX = lambdaGrid["tile"], FUN = sum)
     xyByTile <- sapply(
         X = names(nByTile),
-        FUN = function (tile)
-            coordinates(spsample(x = tiles[tile,], n = nByTile[tile], type = "random")),
+        FUN = function (tile) {
+            n <- nByTile[tile]
+            if (n > 0L)
+                coordinates(spsample(x = tiles[tile,], n = n, type = "random", iter = 10))
+            ## else NULL
+        },
         simplify = FALSE, USE.NAMES = TRUE
     )
     
