@@ -19,7 +19,7 @@
 }
 
 \usage{
-epitest(model, data, method = "time", B = 199,
+epitest(model, data, tiles, method = "time", B = 199,
         eps.s = NULL, eps.t = NULL, fixed = NULL,
         verbose = TRUE, ...)
 
@@ -38,6 +38,11 @@ epitest(model, data, method = "time", B = 199,
   \item{data}{
     an object of class \code{"\link{epidataCS}"}, the \code{data} to
     which the \code{model} was fitted.
+  }
+  \item{tiles}{
+    (only used by \code{method = "simulate"})
+    a \code{"\linkS4class{SpatialPolygons}"} representation of the
+    \code{tile}s in \code{data$stgrid}.
   }
   \item{method}{
     one of the following character strings specifying the test method:

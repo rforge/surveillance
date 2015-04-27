@@ -10,7 +10,7 @@
 ### $Date$
 ################################################################################
 
-epitest <- function (model, data, method = "time", B = 199,
+epitest <- function (model, data, tiles, method = "time", B = 199,
                      eps.s = NULL, eps.t = NULL, fixed = NULL,
                      verbose = TRUE, ...)
 {
@@ -33,6 +33,8 @@ epitest <- function (model, data, method = "time", B = 199,
     } else {
         stopifnot(is.null(fixed) || is.character(fixed))
     }
+    t0 <- model$timeRange[1L]  # will not permute events before t0
+    T <- model$timeRange[2L]
     
     ## auxiliary function to compute the LRT statistic
     lrt <- function (m0, m1) {
@@ -45,7 +47,7 @@ epitest <- function (model, data, method = "time", B = 199,
     ## observed test statistic
     m0 <- update.twinstim(model, data = data,
                           epidemic = ~0, siaf = NULL, tiaf = NULL,
-                          control.siaf = NULL, model = FALSE, cumCIF = FALSE,
+                          control.siaf = NULL, model = method == "simulate", cumCIF = FALSE,
                           cores = 1, verbose = FALSE,
                           optim.args = list(fixed = fixed, control = list(trace = 0)))
     if (!isTRUE(m0$converged)) {
@@ -78,7 +80,7 @@ epitest <- function (model, data, method = "time", B = 199,
     
     ## otherwise: determine the null distribution via permutation or simulation
     res$method <- if (method == "simulate") {
-        .NotYetImplemented() # "Test for Space-Time Interaction (based on endemic simulations)"
+        paste("Test for Space-Time Interaction (based on", B, "endemic simulations)")
     } else {
         "Monte Carlo Permutation Test for Space-Time Interaction"
     }
@@ -87,6 +89,21 @@ epitest <- function (model, data, method = "time", B = 199,
                 immediate. = TRUE)
     }
 
+    ## define a function which generates data under the null
+    generateNullData <- if (method == "simulate") {
+        rmarks <- .rmarks(data, t0 = t0, T = T)
+        function() {
+            events <- simEndemicEvents(m0, tiles = tiles)
+            events@data <- cbind(events@data, rmarks(n = length(events)))
+            as.epidataCS(events = events, stgrid = data$stgrid[,-1L],
+                         W = data$W, qmatrix = data$qmatrix,
+                         nCircle2Poly = attr(data$events$.influenceRegion, "nCircle2Poly"),
+                         clipper = "polyclip", verbose = FALSE)
+        }
+    } else {
+        function() permute.epidataCS(data, what = method, keep = time <= t0)
+    }
+    
     ## interpret 'verbose' level
     .verbose <- if (is.numeric(verbose)) {
         if (verbose >= 2) {
@@ -115,26 +132,29 @@ epitest <- function (model, data, method = "time", B = 199,
         }
     } else verbose
 
-    ## if siafpars are fixed, determine siafInt for use in all permutations
     siafInt <- NULL
-    siafpars <- coeflist(model)$siaf
-    if (length(siafpars) > 0L && all(names(siafpars) %in% fixed) &&
-        is.null(siafInt <- environment(model)$siafInt)) {
-        if (!identical(FALSE, verbose))
-            cat("pre-evaluating 'siaf' integrals with fixed parameters ...\n")
-        setup <- update.twinstim(model, data = data, optim.args = NULL, verbose = FALSE)
-        assign("siafpars", siafpars, envir = environment(setup))
-        siafInt <- with(environment(setup), do.call("..siafInt", .siafInt.args))
+    if (method != "simulate") {
+        ## if siafpars are fixed, determine siafInt for use in all permutations
+        siafpars <- coeflist(model)$siaf
+        if (length(siafpars) > 0L && all(names(siafpars) %in% fixed) &&
+            is.null(siafInt <- environment(model)$siafInt)) {
+            if (!identical(FALSE, verbose))
+                cat("pre-evaluating 'siaf' integrals with fixed parameters ...\n")
+            setup <- update.twinstim(model, data = data, optim.args = NULL, verbose = FALSE)
+            assign("siafpars", siafpars, envir = environment(setup))
+            siafInt <- with(environment(setup), do.call("..siafInt", .siafInt.args))
+        }
     }
     
     ## define the function to be replicated B times:
-    ## permute data, update epidemic model, compute endemic-only model,
+    ## permute/simulate data, update epidemic model, compute endemic-only model,
     ## and compute test statistics
-    t0 <- model$timeRange[1L]  # will not permute events before t0
     permfits1 <- function (...) {
         ## depends on 'data', 'model', 'lrt', 'eps.s', 'eps.t', and 'fixed'
-        .permdata <- permute.epidataCS(data, what = method, keep = time <= t0)
-        .siafInt <- siafInt[match(row.names(.permdata$events), row.names(data$events))]
+        .permdata <- generateNullData()
+        .siafInt <- if (!is.null(siafInt)) {
+            siafInt[match(row.names(.permdata$events), row.names(data$events))]
+        } # else NULL
         ## sink(paste0("/tmp/trace_", Sys.getpid()), append = TRUE)
         m1 <- update.twinstim(model, data = .permdata,
                               control.siaf = list(siafInt = .siafInt),

@@ -988,6 +988,93 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
 
 
+#############################################################################
+### much more efficient simulation for endemic-only models
+### where intensities are piecewise constant and independent from the history
+#############################################################################
+
+## auxiliary function to calculate the endemic intensity by spatio-temporal cell
+## from the model environment of a "twinstim" fit
+.hGrid <- function (modelenv)
+{
+    .beta0 <- rep_len(if (modelenv$nbeta0==0L) 0 else modelenv$beta0,
+                      modelenv$nTypes)
+    hGrid <- sum(exp(.beta0)) * eval(modelenv$hGridExpr, envir = modelenv)
+    blockstartstop <- modelenv$histIntervals[
+        match(modelenv$gridBlocks, modelenv$histIntervals$BLOCK), ]
+    data.frame(blockstartstop, tile = modelenv$gridTiles, hGrid = hGrid,
+               hInt = hGrid * modelenv$ds * modelenv$dt,
+               row.names = NULL, check.rows = FALSE, check.names = FALSE)
+}
+
+## simulate events from the endemic component of a "twinstim" fit
+## this simulates pure (s,t,k) data with the only extra column being "tile"
+simEndemicEvents <- function (object, tiles)
+{
+    ## check arguments
+    if (is.null(modelenv <- environment(object)))
+        stop("no model environment -- re-fit or update() with 'model=TRUE'")
+    tileLevels <- levels(modelenv$gridTiles)
+    tiles <- check_tiles(tiles, levels = tileLevels,
+                         areas.stgrid = modelenv$ds[seq_along(tileLevels)],
+                         keep.data = FALSE)
+    
+    ## calculate endemic intensity by spatio-temporal cell
+    lambdaGrid <- .hGrid(modelenv)
+    
+    ## simulate number of events by cell
+    nGrid <- rpois(n = nrow(lambdaGrid), lambda = lambdaGrid[["hInt"]])
+    nTotal <- sum(nGrid)
+    
+    ## sample time points
+    tps <- mapply(
+        FUN = runif,
+        n = nGrid, min = lambdaGrid[["start"]], max = lambdaGrid[["stop"]],
+        SIMPLIFY = FALSE, USE.NAMES = FALSE
+    )
+    
+    ## sample types
+    beta0 <- coeflist.default(coef(object), object$npars)[["nbeta0"]]
+    nTypes <- nrow(object$qmatrix)
+    types <- if (nTypes == 1L) {
+        rep.int(1L, nTotal)
+    } else {
+        sample.int(n = nTypes, size = nTotal, replace = TRUE,
+                   prob = if (length(beta0) > 1L) exp(beta0))
+    }
+    
+    ## put event times, tiles, and types in a data frame
+    events <- data.frame(
+        ##lambdaGrid[rep.int(seq_len(nrow(lambdaGrid)), nGrid), c("tile", "BLOCK")],
+        time = unlist(tps, recursive = FALSE, use.names = FALSE),
+        tile = rep.int(lambdaGrid[["tile"]], nGrid),
+        type = factor(types, levels = rownames(object$qmatrix)),
+        row.names = NULL, check.rows = FALSE, check.names = FALSE
+    )
+    
+    ## sample coordinates from tiles
+    nByTile <- tapply(X = nGrid, INDEX = lambdaGrid["tile"], FUN = sum)
+    xyByTile <- sapply(
+        X = names(nByTile),
+        FUN = function (tile)
+            coordinates(spsample(x = tiles[tile,], n = nByTile[tile], type = "random")),
+        simplify = FALSE, USE.NAMES = TRUE
+    )
+    
+    ## set coordinates of events
+    events <- SpatialPointsDataFrame(
+        coords = do.call("rbind", xyByTile),
+        data = events[order(events$tile),],
+        proj4string = tiles@proj4string,
+        match.ID = FALSE)
+
+    ## order by time
+    events <- events[order(events$time),]
+    row.names(events) <- seq_along(events)
+    events
+}
+
+
 ####################################################
 ### some twinstim-methods for "simEpidataCS" objects
 ####################################################
@@ -1050,6 +1137,23 @@ residuals.simEpidataCS <- function (object, ...)
 ### FIXME: actually stgrid's of simulations might have different time ranges
 ###        when nEvents is active -> atm, simplify ignores this
 
+.rmarks <- function (data, t0, T)
+{
+    observedMarks <- subset(marks.epidataCS(data, coords = FALSE),
+                            subset = time > t0 & time <= T)
+    if (nrow(observedMarks) == 0L) {
+        message("Note: 'data' does not contain any events during ('t0';'T'],\n",
+                "      'rmarks' thus samples marks from all of 'data$events'")
+        observedMarks <- marks.epidataCS(data, coords = FALSE)
+    }
+    observedMarks <- observedMarks[match("eps.t", names(observedMarks)):ncol(observedMarks)]
+    function (t, s, n = 1L) {
+        as.data.frame(lapply(observedMarks, function (x)
+            sample(na.omit(x), size = n, replace = TRUE)),
+                      optional = TRUE)
+    }
+}
+
 simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     newcoef = NULL, rmarks = NULL, t0 = NULL, T = NULL, nEvents = 1e5,
     control.siaf = object$control.siaf,
@@ -1092,21 +1196,8 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     epidemic <- formula(object)$epidemic
     # we don't need any reference to the original formula environment
     environment(endemic) <- environment(epidemic) <- .GlobalEnv
-    if (is.null(rmarks)) {
-        observedMarks <- subset(marks.epidataCS(data, coords=FALSE),
-                                subset = time > t0 & time <= T)
-        if (nrow(observedMarks) == 0) {
-            message("Note: 'data' does not contain events in the simulation window ('t0';'T'],\n",
-                    "      'rmarks' thus samples marks from all of 'data$events'")
-            observedMarks <- marks.epidataCS(data, coords=FALSE)
-        }
-        observedMarks <- observedMarks[match("eps.t", names(observedMarks)):ncol(observedMarks)]
-        rmarks <- function (t, s) {
-            as.data.frame(lapply(observedMarks, function (x)
-                                 sample(na.omit(x), size=1L)),
-                          optional=TRUE)
-        }
-    }
+    if (is.null(rmarks))
+        rmarks <- .rmarks(data, t0 = t0, T = T)
     theta <- coef(object)
     if (!is.null(newcoef)) {
         newcoef <- check_twinstim_start(newcoef)
