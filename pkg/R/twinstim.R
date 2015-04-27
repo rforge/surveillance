@@ -634,10 +634,12 @@ twinstim <- function (
                 .eEvents(gammapred, siafpars, tiafpars) # Nin-vector! (only 'includes' here)
             } else 0
         lambdaEvents <- hEvents + eEvents  # Nin-vector
+        if (any(lambdaEvents <= 0))
+            return(-Inf)  # without warning
         llEvents <- sum(log(lambdaEvents))
-        # here one might have got -Inf values in case of 0-intensity at an event time
-        # if epilinkinv is 'identity', lambdaEvents may contain negative entries
-        # (eEvents < -hEvents) => llEvents is NaN (point process intensity must be >0)
+        # * Would be -Inf in case of 0-intensity at any event time
+        # * If epilinkinv is 'identity', lambdaEvents < 0 if eEvents < -hEvents,
+        #   and llEvents would be NaN (point process intensity must be >0)
 
         # lambda integral of the log-likelihood
         heInt <- heIntTWK(beta0, beta, gammapred, siafpars, tiafpars)   # !hase => missing(gammapred), but lazy evaluation omits an error in this case because heIntTWK doesn't ask for gammapred
