@@ -114,9 +114,10 @@ epitest <- function (model, data, tiles, method = "time", B = 199,
                        collapse = " | ")
             cat("Endemic/Epidemic log-likelihoods, LRT statistic, and simple R0:\n",
                 stats2string(LRT, STATISTIC_R0), "\n",
-                "\nResults from B=", B, " permutations of the event times:\n",
+                "\nResults from B=", B, if (method == "simulate")
+                    " endemic simulations" else paste0(" permutations of ", method),
                 ## will actually not be printed if parallelized using clusters ...
-                sep = "")
+                ":\n", sep = "")
             substitute({
                 cat(STATS2STRING)
                 if (!lrt["converged"]) {
