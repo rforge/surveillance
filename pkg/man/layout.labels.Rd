@@ -7,16 +7,17 @@ Layout Items for \code{spplot}
 }
 
 \description{
-Generate \code{sp.layout} items for use in \code{\link{spplot}}.
+Generate \code{sp.layout} items for use by \code{\link{spplot}}
+or plot these items directly in the traditional graphics system.
 Function \code{layout.labels} draws labels at the coordinates of the
 spatial object, and \code{layout.scalebar} returns a labeled scale bar.
 }
 
 \usage{
-layout.labels(obj, labels = TRUE)
+layout.labels(obj, labels = TRUE, plot = FALSE)
 
 layout.scalebar(obj, corner = c(0.05, 0.95), scale = 1,
-                labels = c(0, scale), height = 0.05)
+                labels = c(0, scale), height = 0.05, plot = FALSE)
 }
 
 \arguments{
@@ -53,6 +54,11 @@ layout.scalebar(obj, corner = c(0.05, 0.95), scale = 1,
   \item{height}{
     the height of the scale bar, see \code{\link{layout.scale.bar}}.
   }
+  \item{plot}{
+    logical indicating if the layout item should be plotted using the
+    traditional graphics system. By default (\code{FALSE}), a list for
+    subsequent use by \code{\link{spplot}} is returned.
+  }
 }
 
 \value{
@@ -63,6 +69,10 @@ layout.scalebar(obj, corner = c(0.05, 0.95), scale = 1,
 
   For \code{layout.scalebar}, a list of \code{sp.layout} items
   comprising the polygonal scale bar and the labels.
+
+  If these layout functions are called with \code{plot = TRUE},
+  the item is plotted directly using traditional graphics functions
+  and \code{NULL} is returned.
 }
 
 \author{
@@ -87,6 +97,14 @@ sb <- layout.scalebar(bavaria, corner = c(0.75,0.9), scale = 50,
 spplot(bavaria, zcol = "POPULATION", sp.layout = sb,
        xlab = "x [km]", ylab = "y [km]", scales = list(draw = TRUE),
        col.regions = rev(heat.colors(100)))
+
+## these layout functions also work in the traditional graphics system
+par(mar = c(0,0,0,0))
+plot(bavaria, col = "lavender")
+layout.scalebar(bavaria, corner = c(0.75, 0.9), scale = 50,
+                labels = c("0", "50 km"), plot = TRUE)
+layout.labels(bavaria, labels = list(cex = 0.8,
+              labels = substr(bavaria$GEN, 1, 3)), plot = TRUE)
 }
 
 \keyword{aplot}

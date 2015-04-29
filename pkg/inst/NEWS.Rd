@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.9-0 (2015-03-26)}{
+\section{Changes in surveillance version 1.9-0 (2015-04-29)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -49,7 +49,8 @@
     customize the model parameters used for the simulation.
 
     \item New auxiliary function \code{layout.scalebar} for use as part
-    of \code{sp.layout} in \code{spplot()}.
+    of \code{sp.layout} in \code{spplot()} or in the traditional
+    graphics system.
   }
 }
 

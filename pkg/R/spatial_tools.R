@@ -161,7 +161,7 @@ polyAtBorder <- function (SpP,
 ### sp.layout items for spplot()
 
 ## draw labels for Spatial* objects
-layout.labels <- function (obj, labels = TRUE)
+layout.labels <- function (obj, labels = TRUE, plot = FALSE)
 {
     stopifnot(inherits(obj, "Spatial"))
 
@@ -191,13 +191,18 @@ layout.labels <- function (obj, labels = TRUE)
                               labels.args)
     labels.args$labels <- getLabels(labels.args$labels)
 
-    ## return layout item
-    c("panel.text", labels.args)
+    if (plot) {
+        ## plot labels in the traditional graphics system
+        do.call("text", labels.args)
+    } else {
+        ## return layout item for use by spplot()
+        c("panel.text", labels.args)
+    }
 }
 
 ## draw a scalebar with labels
 layout.scalebar <- function (obj, corner = c(0.05, 0.95), scale = 1,
-                             labels = c(0, scale), height = 0.05)
+                             labels = c(0, scale), height = 0.05, plot = FALSE)
 {
     stopifnot(inherits(obj, "Spatial"))
     BB <- bbox(obj)
@@ -207,12 +212,21 @@ layout.scalebar <- function (obj, corner = c(0.05, 0.95), scale = 1,
         scale <- .scale2longlat(t(rowMeans(BB)), scale)
     }
     offset <- BB[, 1L] + corner * apply(BB, 1L, diff.default)
-    list(
+    textfun <- if (plot) "text" else "panel.text"
+    lis <- list(
         list("SpatialPolygonsRescale", layout.scale.bar(height = height),
-             offset = offset, scale = scale, fill = c(NA, 1)),
-        list("sp.text", offset, labels[1L], pos = 3),
-        list("sp.text", offset + c(scale[1L], 0), labels[2L], pos = 3)
+             offset = offset, scale = scale, fill = c(NA, 1),
+             plot.grid = !plot),
+        list(textfun, x = offset[1L], y = offset[2L],
+             labels = labels[1L], pos = 3),
+        list(textfun, x = offset[1L] + scale[1L], y = offset[2L],
+             labels = labels[2L], pos = 3)
     )
+    if (plot) {
+        for (li in lis) eval(do.call("call", li))
+    } else {
+        lis
+    }
 }
 
 .scale2longlat <- function (focusLL, distKM)
