@@ -51,6 +51,14 @@
     \item New auxiliary function \code{layout.scalebar} for use as part
     of \code{sp.layout} in \code{spplot()} or in the traditional
     graphics system.
+
+    \item New argument \code{epilink} for \code{twinstim()}, offering
+    experimental support for an identity link for the epidemic
+    predictor. The default remains \code{epilink = "log"}.
+
+    \item Simulation from \code{"twinstim"} models and generation of
+    \code{"epidataCS"} is slightly faster now (faster \pkg{spatstat}
+    functions are used to determine the distance of events to the border).
   }
 }
 
