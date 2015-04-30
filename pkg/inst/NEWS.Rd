@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.9-0 (2015-04-29)}{
+\section{Changes in surveillance version 1.9-0 (2015-04-30)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -59,6 +59,9 @@
     \item Simulation from \code{"twinstim"} models and generation of
     \code{"epidataCS"} is slightly faster now (faster \pkg{spatstat}
     functions are used to determine the distance of events to the border).
+
+    \item New option \code{scaled = "standardized"} in \code{iafplot()}
+    to plot \eqn{f(x) / f(0)} or \eqn{g(t) / g(0)}, respectively.
   }
 }
 

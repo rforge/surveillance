@@ -12,7 +12,7 @@
 
 
 iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
-    scaled = TRUE, truncated = FALSE, log = "",
+    scaled = c("intercept", "standardized", "no"), truncated = FALSE, log = "",
     conf.type = if (length(pars) > 1) "MC" else "parbounds",
     conf.level = 0.95, conf.B = 999,
     xgrid = 101, col.estimate = rainbow(length(types)), col.conf = col.estimate,
@@ -24,7 +24,13 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
     if (isTRUE(verticals)) verticals <- list()
     if (isTRUE(do.points)) do.points <- list()
     if (add) log <- paste0("", if (par("xlog")) "x", if (par("ylog")) "y")
+    scaled <- if (is.logical(scaled)) { # surveillance < 1.9-0
+        if (scaled) "intercept" else "no"
+    } else {
+        match.arg(scaled)
+    }
     coefs <- coef(object)
+    epiloglink <- .epilink(object) == "log"
     typeNames <- rownames(object$qmatrix)
     nTypes <- length(typeNames)
     
@@ -34,6 +40,12 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
     if (is.null(IAFobj))
         stop("the model has no epidemic component")
     IAF <- IAFobj[[if (which=="siaf") "f" else "g"]]
+    if (which == "siaf") { # needs to be a function of distance
+        IAF <- as.function(
+            c(alist(x=, ...=), quote(f(cbind(x, 0), ...))),
+            envir = list2env(list(f = IAF), parent = environment(IAF))
+            )
+    }
     isStepFun <- !is.null(knots <- attr(IAFobj, "knots")) &&
         !is.null(maxRange <- attr(IAFobj, "maxRange"))
 
@@ -51,18 +63,24 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
     }
     epsIsFixed <- length(eps) == 1L && is.finite(eps)
 
-    ## interaction as a function of distance and intercept for scaling
-    FUN <- function (x, iafpars, types, gamma0 = NULL) {
-        scale <- if (length(gamma0)) {
-            if (.epilink(object) == "log") exp(gamma0) else gamma0
-        } else 1
-        vals <- scale * IAF(x, iafpars, types)
+    ## scaled interaction function
+    if (scaled == "intercept") {
+        idxgamma0 <- match("e.(Intercept)", names(coefs), nomatch = 0L)
+        if (idxgamma0 == 0L) {
+            message("no scaling due to missing epidemic intercept")
+            scaled <- "no"
+        }
+    } else { # we do not use gamma0 -> 0-length selection
+        idxgamma0 <- 0L
     }
-    if (which == "siaf") {
-        body(FUN)[[length(body(FUN))]] <- do.call("substitute", list(
-            body(FUN)[[length(body(FUN))]],
-            list(x = quote(cbind(x,0)))
-            ))
+    SCALE <- switch(scaled,
+        "intercept" = if (epiloglink) quote(exp(gamma0)) else quote(gamma0),
+        "standardized" = quote(1/IAF(0, iafpars, types)),
+        "no" = 1
+    )
+    FUN <- function (x, iafpars, types, gamma0) {
+        scale <- eval(SCALE)
+        vals <- scale * IAF(x, iafpars, types)
     }
     
     ## truncate at eps
@@ -78,16 +96,8 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
     ##         call("log", body(FUN)[[length(body(FUN))]])
     ## }
 
-    ## epidemic intercept
-    if (scaled) {
-        idxgamma0 <- match("e.(Intercept)", names(coefs), nomatch=0L)
-        if (idxgamma0 == 0L) {
-            message("no scaling due to missing epidemic intercept")
-            scaled <- FALSE
-        }
-    } else idxgamma0 <- 0L              # if no scaling, gamma0 is 0-length
+    ## extract parameters
     gamma0 <- coefs[idxgamma0]
-    ## parameters of the interaction function
     idxiafpars <- grep(paste0("^e\\.",which), names(coefs))
     iafpars <- coefs[idxiafpars]
     ## concatenate parameters
@@ -171,11 +181,15 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
                 expression(g(t))
             }
             ## if (loglog) ylab[[1]] <- substitute(log(ylab), list(ylab=ylab[[1]]))
-            if (scaled) {
+            if (scaled == "intercept") {
                 ylab <- ##if (loglog) as.expression(call("+", quote(gamma[0]), ylab[[1]])) else
                     as.expression(call("paste",
-                        if (.epilink(object) == "log") quote(e^{gamma[0]}) else quote(gamma[0]),
+                        if (epiloglink) quote(e^{gamma[0]}) else quote(gamma[0]),
                         quote(phantom() %.% phantom()), ylab[[1]]))
+            }
+            if (scaled == "standardized") {
+                ylab <- as.expression(call("/", ylab[[1]],
+                    if (which == "siaf") quote(f(0)) else quote(g(0))))
             }
         }
         plot(xlim, ylim, type="n", xlab = xlab, ylab = ylab, log = log, ...)
@@ -203,9 +217,11 @@ iafplot <- function (object, which = c("siaf", "tiaf"), types = NULL,
         
         ## add confidence limits
         if (!is.null(parSample)) {
-            fvalsSample <- apply(parSample, 1, if (scaled) {
+            fvalsSample <- apply(parSample, 1, if (scaled == "intercept") {
                 function (pars) FUN(xgrid, pars[-1L], types[i], pars[1L])
-            } else function (pars) FUN(xgrid, pars, types[i]))
+            } else {
+                function (pars) FUN(xgrid, pars, types[i])
+            })
             if (length(xgrid) == 1L)  # e.g., single-step function
                 fvalsSample <- t(fvalsSample)  # convert to matrix form
             lowerupper <- if (conf.type == "parbounds") {
