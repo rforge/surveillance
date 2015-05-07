@@ -38,7 +38,7 @@ i.e. the \eqn{(1-\alpha)\cdot 100\%} quantile serves as an upperbound.}
 equal to 1 no factor variable is created, the set of reference values is defined as in
 Farrington et al (1996).}
 
-\item{inferenceMethod}{Which inference method used, as defined in Salmon et al (2015). If one chooses \code{INLA} then inference is performed with INLA. If one chooses \code{asymp} then the asymptotic normal approximation of the posteriori is used.}
+\item{inferenceMethod}{Which inference method used, as defined in Salmon et al (2015). If one chooses \code{INLA} then inference is performed with INLA. If one chooses \code{asym} then the asymptotic normal approximation of the posteriori is used.}
 
 \item{pastWeeksNotIncluded}{Number of past weeks to ignore in the calculation.}
 
