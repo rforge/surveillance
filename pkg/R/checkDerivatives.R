@@ -7,7 +7,7 @@
 ### to check the score vector and the Fisher information matrix
 ### CAVE: the return values of both wrappers are not unified
 ###
-### Copyright (C) 2012 Sebastian Meyer
+### Copyright (C) 2012, 2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -18,14 +18,14 @@ checkDerivatives.numDeriv <- function(ll, score, fisher, par,
                                       method.args=list(), ...)
 {
     cat("Checking analytical score vector using numDeriv::grad() ...\n")
-    nsc <- numDeriv::grad(ll, par, method, method.args, ...)
+    nsc <- numDeriv::grad(ll, par, method = method, method.args = method.args, ...)
     asc <- score(par, ...)
     print(all.equal(asc, nsc, check.attributes=FALSE))
     cat("Checking analytical Fisher information matrix using numDeriv::hessian() ...\n")
     if (length(par) > 50)
         cat("NOTE: this might take several minutes considering length(par) =",
             length(par), "\n")
-    nfi <- -numDeriv::hessian(ll, par, "Richardson", method.args, ...)
+    nfi <- -numDeriv::hessian(ll, par, method = "Richardson", method.args = method.args, ...)
     afi <- fisher(par, ...)
     print(all.equal(afi, nfi, check.attributes=FALSE))
     invisible(list(score  = list(analytic=asc, numeric=nsc),
