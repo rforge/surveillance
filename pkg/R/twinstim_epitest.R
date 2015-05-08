@@ -85,7 +85,7 @@ epitest <- function (model, data, tiles, method = "time", B = 199,
         "Monte Carlo Permutation Test for Space-Time Interaction"
     }
     if (model$npars["q"] > 1L) {
-        warning("epidemic covariate effects will not be identifiable",
+        warning("epidemic covariate effects might not be identifiable for null data",
                 immediate. = TRUE)
     }
 
