@@ -111,7 +111,8 @@ stKtest <- function (object, eps.s = NULL, eps.t = NULL, B = 199,
 ## inspired by splancs::stdiagn authored by Barry Rowlingson and Peter Diggle
 plot.stKtest <- function (x, which = c("D", "R", "MC"),
                           args.D = list(), args.D0 = args.D,
-                          args.R = list(), args.MC = list(), ...)
+                          args.R = list(), args.MC = list(),
+                          mfrow = sort(n2mfrow(length(which))), ...)
 {
     stkh <- x$stK
     stse <- x$seD
@@ -130,13 +131,15 @@ plot.stKtest <- function (x, which = c("D", "R", "MC"),
     ## D(s,t) = K(s,t) - K_0(s,t)
     st.D <- stkh$kst - K0
 
-    oldpar <- par(mfrow = sort(n2mfrow(length(which))))
-    on.exit(par(oldpar))
+    if (!is.null(mfrow)) {
+        omfrow <- par(mfrow = mfrow)
+        on.exit(par(omfrow))
+    }
 
     ## D plots
     Dzero <- which[which %in% c("D", "D0")] == "D0"
     whichDzero <- match(Dzero, c(FALSE, TRUE))
-    omar <- par(mar = c(2,2,par("mar")[3L],1))
+    omar <- par(mar = if (is.null(args.D[["mar"]])) c(2,2,par("mar")[3L],1) else args.D[["mar"]])
     mapply(
         FUN = function (z, Dzero, args) {
             defaultArgs <- list(

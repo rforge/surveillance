@@ -16,7 +16,8 @@ stKtest(object, eps.s = NULL, eps.t = NULL, B = 199,
         cores = 1, seed = NULL, poly = object$W)
 
 \method{plot}{stKtest}(x, which = c("D", "R", "MC"),
-     args.D = list(), args.D0 = args.D, args.R = list(), args.MC = list(), ...)
+     args.D = list(), args.D0 = args.D, args.R = list(), args.MC = list(),
+     mfrow = sort(n2mfrow(length(which))), ...)
 }
 
 \arguments{
@@ -57,6 +58,10 @@ stKtest(object, eps.s = NULL, eps.t = NULL, B = 199,
     (\code{"R"}), and \code{\link[MASS]{truehist}} (\code{"MC"}),
     respectively, to modify the default settings.
     Ignored if \code{which = "stdiagn"}.
+  }
+  \item{mfrow}{
+    \code{\link{par}}-setting to layout the plots.
+    Ignored for \code{which = "stdiagn"} and if set to \code{NULL}.
   }
   \item{\dots}{ignored (argument of the generic).}
 }
