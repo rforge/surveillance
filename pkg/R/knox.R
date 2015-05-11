@@ -122,8 +122,8 @@ xtable.knox <- function (x, caption = NULL, label = NULL,
            digits = digits, display = display, ...)
 }
 
-toLatex.knox <- function (object, hline.after = NULL,
-                          sanitize.text.function = NULL, ...)
+toLatex.knox <- function (object, dnn = names(dimnames(object$table)),
+                          hline.after = NULL, sanitize.text.function = NULL, ...)
 {
     xtab <- xtable(object, ...)
     if (is.null(hline.after))
@@ -131,6 +131,17 @@ toLatex.knox <- function (object, hline.after = NULL,
     if (is.null(sanitize.text.function))
         sanitize.text.function <- function (x)
             gsub("<=", "$\\le$", gsub(">", "$>$", x, fixed = TRUE), fixed = TRUE)
-    toLatex.xtable(xtab, hline.after = hline.after,
-                   sanitize.text.function = sanitize.text.function, ...)
+    res <- toLatex.xtable(xtab, hline.after = hline.after,
+                          sanitize.text.function = sanitize.text.function, ...)
+    if (is.null(dnn)) {
+        res
+    } else {
+        stopifnot(length(dnn) == 2)
+        headeridx <- grep("&", res, fixed = TRUE)[1L]
+        res[headeridx] <- paste0(dnn[1L], res[headeridx])
+        res <- append(res, paste0(" & \\multicolumn{2}{|c|}{", dnn[2L], "} & \\\\"),
+                      after = headeridx - 1L)
+        class(res) <- "Latex"
+        res
+    }
 }
