@@ -131,8 +131,6 @@ toLatex.knox <- function (object, hline.after = NULL,
     if (is.null(sanitize.text.function))
         sanitize.text.function <- function (x)
             gsub("<=", "$\\le$", gsub(">", "$>$", x, fixed = TRUE), fixed = TRUE)
-    res <- print(xtab, hline.after = hline.after,
-                 sanitize.text.function = sanitize.text.function, ...)
-    class(res) <- "Latex"
-    invisible(res) # print.xtable() by default does 'print.results'
+    toLatex.xtable(xtab, hline.after = hline.after,
+                   sanitize.text.function = sanitize.text.function, ...)
 }
