@@ -194,6 +194,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
   pastWeeksNotIncluded <- control$pastWeeksNotIncluded
   mc.munu <- control$mc.munu
   mc.y <- control$mc.y
+  sts@control$expected <- numeric(length(observed(sts)))
   # Loop over control$range
   for (k in control$range) {
     
@@ -235,12 +236,14 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
     argumentsThreshold <- list(model,alpha=alpha,dataGLM=dataGLM,reportingTriangle,
                                delay=delay,k=k,control=control,mc.munu=mc.munu,mc.y=mc.y,
                                inferenceMethod=control$inferenceMethod)
-    threshold <- do.call(bodaDelay.threshold,argumentsThreshold)
-    
+    predisons <-do.call(bodaDelay.threshold,argumentsThreshold)
+    threshold <- predisons$quantile
+    expected <- predisons$expected
     ######################################################################
     # Output results if enough cases 
     ###################################################################### 
     sts@upperbound[k] <- threshold
+    sts@control$expected[k] <- expected
     enoughCases <- (sum(observed[(k-control$limit54[2]+1):k])
                     >=control$limit54[1])
     sts@alarm[k] <- FALSE
@@ -253,7 +256,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
       sts@alarm[k] <- NA
     }
   } #done looping over all time points
-
+sts@control$expected <- sts@control$expected[control$range]
 return(sts[control$range,]) 
 }
 ################################################################################
@@ -357,7 +360,7 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
       # Find the mu_td and sum
       for (d in 1:loopLimit)
       {
-        if(sum(dataGLM$response[dataGLM$delay==d],na.rm=TRUE)!=0){
+        if(sum(dataGLM$response[dataGLM$delay==(d-1)],na.rm=TRUE)!=0){
         mu_Tt <- mu_Tt + exp(t(sapply(jointSample, function(x) x$latent[[nrow(dataGLM)-Dmax0+d]])))
         }
   
@@ -369,7 +372,7 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
       # with no delay this is similar to boda.
     } else {
       mT1 <- exp(t(sapply(jointSample, function(x) x$latent[[nrow(dataGLM)]])))
-      
+      mu_Tt <- mean(mT1)
       #Draw (mc.munu \times mc.y) responses. 
       N_Tt <- rnbinom(n=mc.y*mc.munu,size=exp(theta),mu=E*mT1)
       
@@ -401,7 +404,9 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
       
       for (d in 1:loopLimit)
       {
-        if(sum(dataGLM$response[dataGLM$delay==d],na.rm=TRUE)!=0){
+        
+        if(sum(dataGLM$response[dataGLM$delay==(d-1)],na.rm=TRUE)!=0){
+          
           mu_Tt <- mu_Tt + exp(rnorm(n=mc.munu,mean=P$fit[d],sd=P$se.fit[d]))
         }
         
@@ -424,7 +429,7 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
                                  return(NA)}
       set.seed(1)
       mT1 <- exp(rnorm(n=mc.munu,mean=P$fit,sd=P$se.fit))
-      
+      mu_Tt <- exp(P$fit)
       #Draw (mc.munu \times mc.y) responses. 
       N_Tt <- rnbinom(n=mc.y*mc.munu,size=theta,mu=mT1)
       # We have to ditch the na values (values for which theta was negative)
@@ -434,7 +439,7 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
     }
     
   }
-  return(as.numeric(qi))
+  return(list(quantile=as.numeric(qi),expected=mean(mu_Tt)))
   
   
 }
