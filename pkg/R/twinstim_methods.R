@@ -274,7 +274,7 @@ xtable.summary.twinstim <- function (x, caption = NULL, label = NULL,
     cis <- confint(x, level=ci.level)
     tabh <- x$coefficients.beta
     tabe <- x$coefficients.gamma
-    if (attr(tabe, "link") != "log")
+    if (attr(tabe, "link") != "log" && any(rownames(tabe) != "e.(Intercept)"))
         stop("only implemented for the standard log-link models")
     tab <- rbind(tabh, tabe)
     tab <- tab[grep("^([he]\\.\\(Intercept\\)|h.type)", rownames(tab),
