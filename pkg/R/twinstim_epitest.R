@@ -12,7 +12,7 @@
 
 epitest <- function (model, data, tiles, method = "time", B = 199,
                      eps.s = NULL, eps.t = NULL, fixed = NULL,
-                     verbose = TRUE, ...)
+                     verbose = TRUE, compress = FALSE, ...)
 {
     ## check input
     stopifnot(inherits(model, "twinstim"), inherits(data, "epidataCS"),
@@ -169,6 +169,10 @@ epitest <- function (model, data, tiles, method = "time", B = 199,
                               optim.args = list(control = list(trace = 0)))
         lrt <- lrt(m0, m1)
         simpleR0 <- simpleR0(m1, eps.s = eps.s, eps.t = eps.t)
+        if (isTRUE(compress)) { # save memory
+            m0[c("fitted", "fittedComponents", "R0")] <-
+                m1[c("fitted", "fittedComponents", "R0")] <- list(NULL)
+        }
         list(m0 = m0, m1 = m1,
              stats = c(lrt[1:3], simpleR0 = simpleR0, lrt["converged"]))
     }

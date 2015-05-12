@@ -21,7 +21,7 @@
 \usage{
 epitest(model, data, tiles, method = "time", B = 199,
         eps.s = NULL, eps.t = NULL, fixed = NULL,
-        verbose = TRUE, ...)
+        verbose = TRUE, compress = FALSE, ...)
 
 \method{plot}{epitest}(x, teststat = c("simpleR0", "D"), ...)
 }
@@ -86,6 +86,14 @@ epitest(model, data, tiles, method = "time", B = 199,
     maximization in each permutation (not useful if parallelized).
     Tracing does not work if permutations are parallelized using clusters.
     See \code{\link{plapply}} for other choices.
+  }
+  \item{compress}{
+    logical indicating if the \code{nobs}-dependent elements \code{"fitted"},
+    \code{"fittedComponents"}, and \code{"R0"} should be dropped from
+    the permutation-based model fits. Not keeping these elements saves a
+    lot of memory especially with a large number of events.
+    Note, however, that the returned \code{permfits} then no longer are
+    fully valid \code{"twinstim"} objects (but most methods will still work).
   }
   \item{\dots}{further arguments for \code{\link{plapply}} to configure
     parallel operation, i.e., \code{.parallel} as well as
