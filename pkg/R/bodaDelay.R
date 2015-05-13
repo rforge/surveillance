@@ -195,6 +195,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
   mc.munu <- control$mc.munu
   mc.y <- control$mc.y
   sts@control$expected <- numeric(length(observed(sts)))
+  sts@control$pvalues <- numeric(length(observed(sts)))
   # Loop over control$range
   for (k in control$range) {
     
@@ -244,6 +245,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
     ###################################################################### 
     sts@upperbound[k] <- threshold
     sts@control$expected[k] <- expected
+    sts@control$pvalues[k] <- NA
     enoughCases <- (sum(observed[(k-control$limit54[2]+1):k])
                     >=control$limit54[1])
     sts@alarm[k] <- FALSE
@@ -257,6 +259,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
     }
   } #done looping over all time points
 sts@control$expected <- sts@control$expected[control$range]
+sts@control$pvalues <- sts@control$pvalues[control$range]
 return(sts[control$range,]) 
 }
 ################################################################################
