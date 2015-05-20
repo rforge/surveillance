@@ -91,6 +91,8 @@ epitest <- function (model, data, tiles, method = "time", B = 199,
 
     ## define a function which generates data under the null
     generateNullData <- if (method == "simulate") {
+        if (missing(tiles))
+            stop("'tiles' is required for 'method = \"simulate\"'")
         rmarks <- .rmarks(data, t0 = t0, T = T)
         function() {
             events <- simEndemicEvents(m0, tiles = tiles)
