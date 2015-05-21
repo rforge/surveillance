@@ -373,13 +373,14 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
       N_Tt <- N_Tt[is.na(N_Tt)==FALSE]
       qi <- quantile(N_Tt, probs=(1-alpha), type=3, na.rm=TRUE)
       # with no delay this is similar to boda.
+      mu_Tt <- E*median(mu_Tt)
     } else {
       mT1 <- exp(t(sapply(jointSample, function(x) x$latent[[nrow(dataGLM)]])))
-      mu_Tt <- mean(mT1)
       #Draw (mc.munu \times mc.y) responses. 
       N_Tt <- rnbinom(n=mc.y*mc.munu,size=exp(theta),mu=E*mT1)
       
       qi <- quantile(N_Tt, probs=(1-alpha), type=3, na.rm=TRUE)
+      mu_Tt <- median(E*mT1)
     }
   }
   
