@@ -1149,6 +1149,7 @@ residuals.simEpidataCS <- function (object, ...)
         observedMarks <- marks.epidataCS(data, coords = FALSE)
     }
     observedMarks <- observedMarks[match("eps.t", names(observedMarks)):ncol(observedMarks)]
+    rm(list = "data", inherits = FALSE)  # to save memory (environment is kept)
     function (t, s, n = 1L) {
         as.data.frame(lapply(observedMarks, function (x)
             sample(na.omit(x), size = n, replace = TRUE)),
