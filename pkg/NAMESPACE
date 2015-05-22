@@ -168,6 +168,10 @@ S3method(plot, stKtest)
 exportClasses(sts, stsBP)
 export(linelist2sts)
 
+# conversion of "sts" objects
+S3method(as.ts, sts)
+export(as.xts.sts)  # no registered S3-method since we only suggest "xts"
+
 # generics for sts class defined in sts.R
 exportMethods("[", plot)
 exportMethods(toLatex)

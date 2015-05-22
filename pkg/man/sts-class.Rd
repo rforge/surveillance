@@ -32,6 +32,7 @@
 \alias{as.data.frame,sts-method}
 \alias{coerce,sts,ts-method}
 \alias{coerce,ts,sts-method}
+\alias{as.xts.sts}
 
 \encoding{latin1}
 
@@ -159,6 +160,13 @@ plot(ha.sts, type=observed ~ 1 | unit)
 z <- ts(matrix(rpois(300,10), 100, 3), start = c(1961, 1), frequency = 12)
 sts.z <- as(z,"sts")
 plot(sts.z)
+
+## conversion to the quasi-standard "xts" class is also possible
+## -> enables interactive time series plots using package "dygraphs"
+if (require("xts")) {
+    ha.xts <- as.xts(ha.sts)
+    plot(ha.xts)
+}
 
 }
 
