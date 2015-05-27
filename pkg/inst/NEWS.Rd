@@ -6,14 +6,18 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.9-0 (2015-04-30)}{
+\section{Changes in surveillance version 1.9-0 (2015-05-22)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
     \item New functions and data for Bayesian outbreak detection in the
     presence of reporting delays (Salmon et al., 2015):
     \code{bodaDelay()}, \code{sts_observation()}, and \code{sts_creation()}.
-  
+
+    \item New converter \code{as.xts.sts()} to transform \code{"sts"}
+    objects to the quasi standard \code{"xts"} class, e.g., to make use
+    of package \CRANpkg{dygraphs} for interactive time series plots.
+    
     \item New argument \code{by} for \code{plot.epidataCS()}, which
     defines a stratifying variable for the events (default is the event
     type as before). It can also be set to \code{NULL} to make the plot
