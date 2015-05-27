@@ -90,7 +90,9 @@ library(INLA)
 dateObservation <- as.Date("2011-10-24",origin="1970-01-01")
 data(salmNewportTruncated)
 stsC <- salmNewportTruncated[[46]]
-inWeeks <- which(formatDate(epoch(stsC), "\%G") == 2011 & isoWeekYear(as.Date(epoch(stsC)))$ISOWeek>=40 & isoWeekYear(as.Date(epoch(stsC)))$ISOWeek<=48)
+inWeeks <- which(formatDate(epoch(stsC), "\%G") == 2011 & 
+isoWeekYear(as.Date(epoch(stsC)))$ISOWeek>=40 &
+isoWeekYear(as.Date(epoch(stsC)))$ISOWeek<=48)
 ylim <- c(0,max(stsC@observed))
   salm.Normal <- list()
   
@@ -98,12 +100,16 @@ ylim <- c(0,max(stsC@observed))
  salmDelayINLA <- list()
  for (week in 44:46){
  stsC <- salmNewportTruncated[[week]]
-inWeeks <- which(formatDate(epoch(stsC), "\%G") == 2011 & isoWeekYear(as.Date(epoch(stsC)))$ISOWeek>=40 & isoWeekYear(as.Date(epoch(stsC)))$ISOWeek<=48)
+inWeeks <- which(formatDate(epoch(stsC), "\%G") == 2011 & 
+                 isoWeekYear(as.Date(epoch(stsC)))$ISOWeek>=40 & 
+                 isoWeekYear(as.Date(epoch(stsC)))$ISOWeek<=48)
   
-  stsD <- sts_observation(stsC,
-                          dateObservation=as.Date(stsC@epoch[inWeeks],origin="1970-01-01")[9-(49-week)],
-                          cut=TRUE)
-  inWeeks <- which(formatDate(epoch(stsD), "\%G") == 2011 & isoWeekYear(as.Date(epoch(stsD)))$ISOWeek>=40 & isoWeekYear(as.Date(epoch(stsD)))$ISOWeek<=48)
+ stsD <- sts_observation(stsC,
+         dateObservation=as.Date(stsC@epoch[inWeeks],origin="1970-01-01")[9-(49-week)],
+         cut=TRUE)
+  inWeeks <- which(formatDate(epoch(stsD), "\%G") == 2011 &
+                   isoWeekYear(as.Date(epoch(stsD)))$ISOWeek>=40 & 
+                   isoWeekYear(as.Date(epoch(stsD)))$ISOWeek<=48)
   rangeTest <- inWeeks
   alpha <- 0.07
 
