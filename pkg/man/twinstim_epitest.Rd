@@ -1,5 +1,6 @@
 \name{twinstim_epitest}
 \alias{epitest}
+\alias{coef.epitest}
 \alias{plot.epitest}
 \title{Permutation Test for Space-Time Interaction in \code{"twinstim"}}
 
@@ -8,14 +9,6 @@
   model (one with \code{epidemic = ~1}) and tests if the spatio-temporal
   interaction invoked by the \code{epidemic} model component is
   statistically significant.
-  The test statistic is the reproduction number \code{\link{simpleR0}}.
-  A likelihood ratio test of the supplied epidemic model against
-  the corresponding endemic-only model is also available.
-  The null distribution of the test statistic is obtained by a Monte Carlo permutation
-  approach (via \code{\link{permute.epidataCS}}) similar to the
-  \code{\link{knox}} test.
-  There is a simple \code{plot}-method showing a \code{\link{truehist}} of
-  the simulated null distribution together with the observed value.
 }
 
 \usage{
@@ -23,6 +16,7 @@ epitest(model, data, tiles, method = "time", B = 199,
         eps.s = NULL, eps.t = NULL, fixed = NULL,
         verbose = TRUE, compress = FALSE, ...)
 
+\method{coef}{epitest}(object, which = c("m1", "m0"), ...)
 \method{plot}{epitest}(x, teststat = c("simpleR0", "D"), ...)
 }
 
@@ -101,8 +95,12 @@ epitest(model, data, tiles, method = "time", B = 199,
     For the \code{plot}-method, further arguments passed to
     \code{\link{truehist}}.
   }
-  \item{x}{
+  \item{object,x}{
     an object of class \code{"epitest"} as returned by \code{epitest}.
+  }
+  \item{which}{
+    a character string indicating either the full (\code{"m1"}, default)
+    or the endemic-only (\code{"m0"}) model.
   }
   \item{teststat}{
     a character string determining the test statistic to plot, either
@@ -138,6 +136,22 @@ epitest(model, data, tiles, method = "time", B = 199,
     and \code{"converged"} (a boolean indicator if both models converged).}
 
   The \code{plot}-method invisibly returns \code{NULL}.
+  The \code{coef}-method returns the \code{B} x \code{length(coef(model))}
+  matrix of parameter estimates.
+}
+
+\details{
+  The test statistic is the reproduction number \code{\link{simpleR0}}.
+  A likelihood ratio test of the supplied epidemic model against
+  the corresponding endemic-only model is also available.
+  The null distribution of the test statistic is obtained by a Monte Carlo permutation
+  approach (via \code{\link{permute.epidataCS}}) similar to the
+  \code{\link{knox}} test.
+  
+  The \code{plot}-method shows a \code{\link{truehist}} of
+  the simulated null distribution together with the observed value.
+  The \code{coef}-method extracts the parameter estimates from the \code{B}
+  \code{permfits} (by default for the full model \code{which = "m1"}).
 }
 
 \author{
@@ -169,6 +183,7 @@ et <- epitest(imdfitB50, imdepiB50, B = 4 + 25*surveillance.options("allExamples
               .seed = 1, .parallel = 2)
 et
 plot(et)
+summary(coef(et))
 }
 
 \keyword{htest}

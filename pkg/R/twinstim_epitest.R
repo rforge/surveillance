@@ -203,6 +203,16 @@ epitest <- function (model, data, tiles, method = "time", B = 199,
     res
 }
 
+coef.epitest <- function (object, which = c("m1", "m0"), ...)
+{
+    which <- match.arg(which)
+    permcoefs <- vapply(X = object$permfits,
+                        FUN = function (x) coef(x[[which]]),
+                        FUN.VALUE = coef(object$permfits[[1L]][[which]]),
+                        USE.NAMES = TRUE)
+    t(permcoefs)
+}
+
 plot.epitest <- function (x, teststat = c("simpleR0", "D"), ...)
 {
     teststat <- match.arg(teststat)
