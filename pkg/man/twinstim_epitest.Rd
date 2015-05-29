@@ -93,7 +93,8 @@ epitest(model, data, tiles, method = "time", B = 199,
     parallel operation, i.e., \code{.parallel} as well as
     \code{.seed} to make the results reproducible.\cr
     For the \code{plot}-method, further arguments passed to
-    \code{\link{truehist}}.
+    \code{\link{truehist}}.\cr
+    Ignored by the \code{coef}-method.
   }
   \item{object,x}{
     an object of class \code{"epitest"} as returned by \code{epitest}.
