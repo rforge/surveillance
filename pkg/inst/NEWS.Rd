@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.9-0 (2015-05-22)}{
+\section{Changes in surveillance version 1.9-0 (2015-05-29)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -84,6 +84,10 @@
     \item The special \code{fe()} function which sets up fixed effects
     in \code{hhh4()} models gained an argument \code{unitSpecific} as a
     convenient shortcut for \code{which = rep(TRUE, nUnits)}.
+
+    \item The convenient \code{plot} option of \code{permutationTest()}
+    uses \CRANpkg{MASS}::\code{truehist()} instead of \code{hist()} and
+    accepts graphical parameters to customize the histogram.
   }
 }
 
