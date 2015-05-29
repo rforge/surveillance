@@ -105,7 +105,7 @@ plot.knox <- function (x, ...)
             c("expected", "observed")),
         xlab = "number of close pairs"
     )
-    do.call("epitestplot", modifyList(defaultArgs, list(...)))
+    do.call("permtestplot", modifyList(defaultArgs, list(...)))
 }
 
 xtable.knox <- function (x, caption = NULL, label = NULL,

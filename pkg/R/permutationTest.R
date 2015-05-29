@@ -29,7 +29,7 @@ permutationTest <- function(score1, score2, nPermutation = 9999,
     
     if (isTRUE(plot)) plot <- list()
     if (is.list(plot)) {
-        do.call("epitestplot", args = modifyList(
+        do.call("permtestplot", args = modifyList(
             list(permstats = diffMean, xmarks = c("observed" = diffObserved),
                  xlab = "Difference between means", ylab = "Density", main = ""),
             plot))

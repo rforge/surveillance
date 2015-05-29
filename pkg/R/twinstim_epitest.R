@@ -231,11 +231,11 @@ plot.epitest <- function (x, teststat = c("simpleR0", "D"), ...)
     args <- modifyList(defaultArgs, list(...))
     if (is.null(args[["permstats"]]))
         stop("nothing to plot (no 'permstats' available)")
-    do.call("epitestplot", args)
+    do.call("permtestplot", args)
 }
 
-## auxiliary function also used by plot.knox()
-epitestplot <- function (permstats, xmarks = NULL, xlab = "test statistic", ...)
+## auxiliary function also used by plot.knox(), permutationTest(), ...
+permtestplot <- function (permstats, xmarks = NULL, xlab = "test statistic", ...)
 {
     defaultArgs <- list(
         data = permstats, xlab = xlab, col = "lavender",

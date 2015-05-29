@@ -176,7 +176,7 @@ plot.stKtest <- function (x, which = c("D", "R", "MC"),
             xmarks = setNames(stmc$t0, "observed"),
             main = "MC permutation test"
         )
-        do.call("epitestplot", modifyList(defaultArgs.MC, args.MC))
+        do.call("permtestplot", modifyList(defaultArgs.MC, args.MC))
     }
 
     invisible()
