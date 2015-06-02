@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.9-0 (2015-05-29)}{
+\section{Changes in surveillance version 1.9-0 (2015-06-02)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -130,6 +130,11 @@
     \item Evaluating \code{intensity.twinstim()$hFUN()} at time points
     before \code{t0} was an error. The function now returns
     \code{NA_real_} as for time points beyond \code{T}.
+
+    \item Truncated, normalized power-law weights for \code{hhh4()}
+    models, i.e., \code{W_powerlaw(maxlag = M, normalize = TRUE)}
+    with \code{M < max(neighbourhood(stsObj))}, had wrong derivatives
+    and thus failed to converge.
   }
 }
 
