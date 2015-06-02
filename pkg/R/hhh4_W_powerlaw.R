@@ -5,7 +5,7 @@
 ###
 ### Parametric power-law specification for neighbourhood weights in hhh4()
 ###
-### Copyright (C) 2012-2014 Sebastian Meyer
+### Copyright (C) 2012-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -72,21 +72,28 @@ W_powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
     ## construct derivatives with respect to "d" (or log(d), respectively)
     dweights <- d2weights <- as.function(c(alist(d=, nbmat=, ...=), quote({})),
                                          envir=.GlobalEnv)
+    weights.call[[5L]] <- FALSE         # normalize separately
     header <- c(
         if (log) quote(d <- exp(d)),    # such that d is again on original scale
-        substitute(W <- weights.call, list(weights.call=weights.call)),
+        substitute(Wraw <- weights.call, list(weights.call=weights.call)),
+        if (normalize) expression(
+            nUnits <- nrow(Wraw),
+            norm <- .rowSums(Wraw, nUnits, nUnits)
+            ),
         expression(
-            nUnits <- nrow(W),           # such that we can use .rowSums()
-            is.na(nbmat) <- nbmat == 0L, # w_jj(d)=0 => w_jj'(d)=0, sum over j!=i,
-            logo <- log(nbmat)           # have to set NA because we do log(o)
-            )
+            # Wraw == 0 means o = 0 (diagonal) or o > maxlag  =>  deriv = 0
+            is.na(Wraw) <- Wraw == 0,  # set to NA since we will take the log
+            logo <- -log(Wraw)/d       # = log(nbmat) with NA's at Wraw == 0 
+            ),
+        if (normalize) quote(W <- Wraw / norm) else quote(W <- Wraw)
         )
     footer <- expression(deriv[is.na(deriv)] <- 0, deriv)
 
     ## first derivative
     tmp1 <- expression(
-        norm <- .rowSums(nbmat^-d, nUnits, nUnits, na.rm=TRUE),
-        tmpnorm <- .rowSums(nbmat^-d * -log(nbmat), nUnits, nUnits, na.rm=TRUE) / norm,
+        ## in surveillance < 1.9-0, 'norm' and 'tmpnorm' were based on 'nbmat',
+        ## which is incorrect for the truncated case maxlag < max(nbmat)
+        tmpnorm <- .rowSums(Wraw * -logo, nUnits, nUnits, na.rm=TRUE) / norm,
         tmp1 <- logo + tmpnorm
         )
     deriv1 <- if (normalize) {
@@ -105,7 +112,7 @@ W_powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
             header,
             if (normalize) {
                 c(tmp1, expression(
-                    tmp2 <- .rowSums(nbmat^-d * log(nbmat)^2, nUnits, nUnits,
+                    tmp2 <- .rowSums(Wraw * logo^2, nUnits, nUnits,
                                      na.rm=TRUE) / norm - tmpnorm^2,
                     deriv <- W * (tmp1^2 - tmp2)
                     ))

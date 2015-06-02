@@ -25,19 +25,21 @@ test_that("estimates and standard errors are reproducible", {
             "end.t", "end.sin(2 * pi * t/52)", "end.cos(2 * pi * t/52)", 
             "neweights.d", "overdisp"), c("Estimate", "Std. Error"))
     )
-    expect_that(coef(measlesFit, se = TRUE), equals(orig))
+    expect_equal(coef(measlesFit, se = TRUE), orig)
 })
 
 test_that("score vector and Fisher info agree with numerical approximations", {
-    if (!requireNamespace("numDeriv", quietly = TRUE)) {
-        skip("package \"numDeriv\" is not installed")
+    skip_if_not_installed("numDeriv")
+    test <- function (neweights) {
+        measlesModel$ne$weights <- neweights
+        pencomp <- hhh4(measlesWeserEms, measlesModel,
+                        check.analyticals = "numDeriv")$pen
+        expect_equal(pencomp$score$analytic, pencomp$score$numeric,
+                     tolerance = .Machine$double.eps^0.5)
+        expect_equal(pencomp$fisher$analytic, pencomp$fisher$numeric,
+                     tolerance = .Machine$double.eps^0.25)
     }
-    pencomp <- hhh4(measlesWeserEms, measlesModel,
-                    check.analyticals = "numDeriv")$pen
-    expect_that(pencomp$score$analytic,
-                equals(pencomp$score$numeric,
-                       tolerance = .Machine$double.eps^0.5))
-    expect_that(pencomp$fisher$analytic,
-                equals(pencomp$fisher$numeric,
-                       tolerance = .Machine$double.eps^0.25))
+    test(W_powerlaw(maxlag = 5, normalize = FALSE, log = FALSE))
+    ## normalized PL with maxlag < max(nbmat) failed in surveillance < 1.9.0:
+    test(W_powerlaw(maxlag = 3, normalize = TRUE, log = TRUE))
 })
