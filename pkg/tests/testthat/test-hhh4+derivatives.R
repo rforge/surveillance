@@ -5,7 +5,8 @@ measlesModel <- list(
     end = list(f = addSeason2formula(~1 + t, S=1, period=52),
                offset = population(measlesWeserEms)),
     ar = list(f = ~1),
-    ne = list(f = ~1 + log(pop), weights = W_powerlaw(maxlag = 5)),
+    ne = list(f = ~1 + log(pop),
+        weights = W_powerlaw(maxlag = 5, normalize = TRUE)),
     family = "NegBin1", data = list(pop = population(measlesWeserEms))
 )
 
@@ -42,4 +43,32 @@ test_that("score vector and Fisher info agree with numerical approximations", {
     test(W_powerlaw(maxlag = 5, normalize = FALSE, log = FALSE))
     ## normalized PL with maxlag < max(nbmat) failed in surveillance < 1.9.0:
     test(W_powerlaw(maxlag = 3, normalize = TRUE, log = TRUE))
+})
+
+test_that("automatic and manual normalization are equivalent", {
+    ## check for equivalent functions
+    for (type in c("powerlaw")) {
+        W_type <- get(paste0("W_", type), mode = "function")
+        w0 <- W_type(maxlag = 3, normalize = TRUE)
+        w1 <- surveillance:::scaleNEweights.list(
+            W_type(maxlag = 3, normalize = FALSE),
+            normalize = TRUE)
+        pars <- w0$initial
+        nbmat <- neighbourhood(measlesWeserEms)
+        expect_equal(w0$w(pars, nbmat), w1$w(pars, nbmat))
+        expect_equal(w0$dw(pars, nbmat), w1$dw(pars, nbmat))
+        expect_equal(w0$d2w(pars, nbmat), w1$d2w(pars, nbmat))
+    }
+    ## check for equivalent fits (rather redundant)
+    measlesFit2 <- hhh4(
+        stsObj = measlesWeserEms,
+        control = modifyList(measlesModel, list(
+            ne = list(
+                weights = W_powerlaw(maxlag = 5, normalize = FALSE),
+                normalize = TRUE # -> use scaleNEweights.list()
+                )))
+        )
+    .ignore <- c("call", "control", "runtime")
+    measlesFit[.ignore] <- measlesFit2[.ignore] <- NULL
+    expect_equal(measlesFit, measlesFit2)
 })
