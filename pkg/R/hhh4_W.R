@@ -55,7 +55,7 @@ weightedSumNE <- function (observed, weights, lag)
 
 ### checks for a fixed matrix/array
 
-checkWeightsArray <- function (W, nUnits, nTime, name,
+checkWeightsArray <- function (W, nUnits, nTime, name = deparse(substitute(W)),
                                check0diag = FALSE, islands = FALSE)
 {
     if (!is.array(W))
@@ -104,7 +104,7 @@ checkWeights <- function (weights, nUnits, nTime,
                           nbmat, data,  # only used for parametric weights
                           check0diag = FALSE)
 {
-    name <- "control$ne$weights"
+    name <- deparse(substitute(weights)) # "control$ne$weights"
 
     ## check specification
     testweights <- if (is.array(weights)) weights else {
@@ -143,7 +143,7 @@ checkWeights <- function (weights, nUnits, nTime,
             lapply(d2w, checkWeightsArray, nUnits, nTime,
                    name=paste0(name, "$d2w[[i]]"))
         }
-    } else checkWeightsArray(testweights, nUnits, nTime, name=name,
+    } else checkWeightsArray(testweights, nUnits, nTime, name = name,
                              check0diag = check0diag)
     
     ## Done
