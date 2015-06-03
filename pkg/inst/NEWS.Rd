@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.9-0 (2015-06-02)}{
+\section{Changes in surveillance version 1.9-0 (2015-06-03)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -17,6 +17,9 @@
     \item New converter \code{as.xts.sts()} to transform \code{"sts"}
     objects to the quasi standard \code{"xts"} class, e.g., to make use
     of package \CRANpkg{dygraphs} for interactive time series plots.
+    
+    \item New options for scaling and normalization of neighbourhood
+    weights in \code{hhh4()} models.
     
     \item New argument \code{by} for \code{plot.epidataCS()}, which
     defines a stratifying variable for the events (default is the event

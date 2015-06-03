@@ -34,33 +34,24 @@
 }
 
 \usage{
-hhh4(stsObj, 
+hhh4(stsObj,
      control = list(
-               ar = list(f = ~ -1,
-                         offset = 1,
-                         lag = 1,
-                         weights = NULL
-                         ),
-               ne = list(f = ~ -1,
-                         offset = 1,
-                         lag = 1,
-                         weights = neighbourhood(stsObj) == 1
-                         ),
-               end = list(f = ~ 1,
-                          offset = 1
-                          ),
-               family = c("Poisson","NegBin1","NegBinM"),
-               subset = 2:nrow(stsObj),
-               optimizer = list(stop = list(tol=1e-5, niter=100),
-                                regression = list(method="nlminb"),
-                                variance = list(method="nlminb")),
-               verbose = FALSE,
-               start = list(fixed=NULL, random=NULL, sd.corr=NULL),
-               data = list(t = epoch(stsObj)-1),
-               keep.terms = FALSE
-               ),
-     check.analyticals = FALSE
-   )
+         ar = list(f = ~ -1, offset = 1, lag = 1, weights = NULL),
+         ne = list(f = ~ -1, offset = 1, lag = 1,
+                   weights = neighbourhood(stsObj) == 1,
+                   scale = NULL, normalize = FALSE),
+         end = list(f = ~ 1, offset = 1),
+         family = c("Poisson", "NegBin1", "NegBinM"),
+         subset = 2:nrow(stsObj),
+         optimizer = list(stop = list(tol=1e-5, niter=100),
+                          regression = list(method="nlminb"),
+                          variance = list(method="nlminb")),
+         verbose = FALSE,
+         start = list(fixed=NULL, random=NULL, sd.corr=NULL),
+         data = list(t = epoch(stsObj)-1),
+         keep.terms = FALSE
+     ),
+     check.analyticals = FALSE)
 }
 
 \arguments{
@@ -99,6 +90,15 @@ hhh4(stsObj,
 	    Time-varying weights are possible by specifying an
 	    array of \code{dim()} \code{c(nUnits, nUnits, nTime)}, where
 	    \code{nUnits=ncol(stsObj)} and \code{nTime=nrow(stsObj)}.}
+	  \item{scale = NULL}{
+	    optional matrix of the same dimensions as \code{weights} (or
+	    a vector of length \code{ncol(stsObj)}) to scale the
+	    \code{weights} to \code{scale * weights}.
+	  }
+	  \item{normalize = FALSE}{
+	    logical indicating if the (scaled) \code{weights} should be
+	    normalized such that each row sums to 1.
+	  }
 	}
       }
       \item{\code{end}}{Model for the endemic component given as list

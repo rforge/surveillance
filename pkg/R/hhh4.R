@@ -25,7 +25,9 @@ hhh4 <- function (stsObj, control = list(
     ne = list(f = ~ -1,        # a formula "exp(x'phi) * sum_j w_ji * y_j,t-lag"
               offset = 1,      # multiplicative offset
               lag = 1,         # regression on y_j,t-lag
-              weights = neighbourhood(stsObj) == 1),  # weights w_ji
+              weights = neighbourhood(stsObj) == 1,  # weights w_ji
+              scale = NULL,    # such that w_ji = scale * weights
+              normalize = FALSE), # w_ji -> w_ji / rowSums(w_ji), after scaling
     end = list(f = ~ 1,        # a formula "exp(x'nu) * n_it"
                offset = 1),    # optional multiplicative offset e_it
     family = c("Poisson", "NegBin1", "NegBinM"),
@@ -229,7 +231,20 @@ setControl <- function (control, stsObj)
       checkWeights(control$ne$weights, nUnit, nTime,
                    neighbourhood(stsObj), control$data,
                    check0diag = control$ar$inModel)
-  } else control$ne$weights <- NULL
+      ## check optional scaling of weights
+      if (!is.null(control$ne$scale)) {
+          stopifnot(is.numeric(control$ne$scale))
+          if (is.vector(control$ne$scale)) {
+              stopifnot(length(control$ne$scale) == 1L ||
+                            length(control$ne$scale) %% nUnit == 0,
+                        !is.na(control$ne$scale))
+          } else {
+              checkWeightsArray(control$ne$scale, nUnit, nTime)
+          }
+      }
+  } else {
+      control$ne[c("weights", "scale", "normalize")] <- list(NULL, NULL, FALSE)
+  }
 
   
   ### check ENDemic component
@@ -534,7 +549,9 @@ checkFormula <- function(f, component, data, stsObj)
 ## length(pars)*(length(pars)+1)/2 for the hessian.
 ## If neweights=NULL (i.e. no NE component in model), the result is always 0.
 ## offset is a multiplicative offset for \phi_{it}, e.g., the population.
-neOffsetFUN <- function (Y, neweights, nbmat, data, lag = 1, offset = 1)
+## scale is a nUnit-vector or a nUnit x nUnit matrix scaling neweights.
+neOffsetFUN <- function (Y, neweights, scale, normalize,
+                         nbmat, data, lag = 1, offset = 1)
 {
     if (is.null(neweights)) { # no neighbourhood component
         as.function(alist(...=, 0), envir=.GlobalEnv)
@@ -543,9 +560,10 @@ neOffsetFUN <- function (Y, neweights, nbmat, data, lag = 1, offset = 1)
         ##               substitute(matrix(0, r, c), list(r=dimY[1], c=dimY[2]))),
         ##             envir=.GlobalEnv)
     } else if (is.list(neweights)) { # parametric weights
+        wFUN <- scaleNEweights.list(neweights, scale, normalize)
         function (pars, type = "response") {
             name <- switch(type, response="w", gradient="dw", hessian="d2w")
-            weights <- neweights[[name]](pars, nbmat, data)
+            weights <- wFUN[[name]](pars, nbmat, data)
             ## gradient and hessian are lists if length(pars$d) > 1L
             ## and single matrices/arrays if == 1 => _c_onditional lapply
             res <- clapply(weights, function (W)
@@ -554,8 +572,9 @@ neOffsetFUN <- function (Y, neweights, nbmat, data, lag = 1, offset = 1)
             if (type=="response") res[[1L]] else res
         }
     } else { # fixed (known) weight structure (0-length pars)
+        weights <- scaleNEweights.default(neweights, scale, normalize)
         env <- new.env(hash = FALSE, parent = emptyenv())  # small -> no hash
-        env$initoffset <- offset * weightedSumNE(Y, neweights, lag)
+        env$initoffset <- offset * weightedSumNE(Y, weights, lag)
         as.function(c(alist(pars=, type = "response"), quote(initoffset)),
                     envir=env)     # it will not be called for other types
     }
@@ -583,10 +602,12 @@ interpretControl <- function (control, stsObj)
   ## components of the control object did not have an offset
   if (is.null(ar$offset)) ar$offset <- 1
   if (is.null(ne$offset)) ne$offset <- 1
+  ## for backward compatibility with surveillance < 1.9-0
+  if (is.null(ne$normalize)) ne$normalize <- FALSE
   
   ## create list of offsets of the three components
   Ym1 <- rbind(matrix(NA_integer_, ar$lag, nUnits), head(Y, nTime-ar$lag))
-  Ym1.ne <- neOffsetFUN(Y, ne$weights,
+  Ym1.ne <- neOffsetFUN(Y, ne$weights, ne$scale, ne$normalize,
                         neighbourhood(stsObj), control$data, ne$lag, ne$offset)
   offsets <- list(ar=ar$offset*Ym1, ne=Ym1.ne, end=end$offset)
   ## -> offset$ne is a function of the parameter vector 'd', which returns a

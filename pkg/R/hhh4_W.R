@@ -47,6 +47,73 @@ weightedSumNE <- function (observed, weights, lag)
 }
 
 
+### normalize weight matrix such that each row sums to 1 (at each time point)
+
+normalizeW <- function (W)
+{
+    dimW <- dim(W)
+    if (length(dimW) == 2L) {
+        W / .rowSums(W, dimW[1L], dimW[2L])
+    } else { # time-varying weights
+        res <- apply(W, 3L, normalizeW)
+        dim(res) <- dimW
+        res
+    }
+}
+
+
+### scale and/or normalize a weight matrix/array
+
+scaleNEweights.default <- function (weights, scale = NULL, normalize = FALSE)
+{
+    if (!is.null(scale))
+        weights <- scale * weights
+    if (normalize)
+        weights <- normalizeW(weights)
+    weights
+}
+
+scaleNEweights.list <- function (weights, scale = NULL, normalize = FALSE)
+{
+    if (is.null(scale) && !normalize)
+        return(weights)
+    
+    ## update parametric weights functions w, dw, d2w
+    if (normalize) {
+        dprod <- function (u, v, du, dv) du * v + u * dv
+        dfrac <- function (u, v, du, dv) (du * v - u * dv) / v^2
+        w <- function (...)
+            scaleNEweights.default(weights$w(...), scale, TRUE)
+        dw <- function (...) {
+            W <- scaleNEweights.default(weights$w(...), scale)
+            dW <- scaleNEweights.default(weights$dw(...), scale)
+            dimW <- dim(W)
+            normW <- .rowSums(W, dimW[1L], dimW[2L])
+            normdW <- .rowSums(dW, dimW[1L], dimW[2L])
+            dfrac(W, normW, dW, normdW)
+        }
+        ## for d2w() we need all the stuff from dw() -> substitute
+        d2w <- as.function(c(alist(...=), substitute({
+            dWnorm <- DWBODY
+            d2W <- scaleNEweights.default(weights$d2w(...), scale)
+            normd2W <- .rowSums(d2W, dimW[1L], dimW[2L])
+            dfrac(dW, normW, d2W, normdW) -
+                dprod(W/normW, normdW/normW, dWnorm,
+                      dfrac(normdW, normW, normd2W, normdW))
+        }, list(DWBODY = body(dw)))))
+    } else {
+        w <- function (...)
+            scaleNEweights.default(weights$w(...), scale)
+        dw <- function (...)
+            scaleNEweights.default(weights$dw(...), scale)
+        d2w <- function (...)
+            scaleNEweights.default(weights$d2w(...), scale)
+    }
+    
+    ## return list of functions
+    list(w = w, dw = dw, d2w = d2w, initial = weights$initial)
+}
+
 
 ##################################
 ### check ne$weights specification
@@ -122,6 +189,8 @@ checkWeights <- function (weights, nUnits, nTime,
     
     ## apply matrix/array checks
     if (is.list(weights)) { # parametric weights
+        if (length(dim(testweights)) > 2L)
+            warning("time-varying parametric weights are not fully supported")
         checkWeightsArray(testweights, nUnits, nTime, name = paste0(name, "$w"),
                           check0diag = check0diag,
                           islands = any(.rowSums(nbmat, nUnits, nUnits) == 0))
@@ -159,17 +228,19 @@ checkWeights <- function (weights, nUnits, nTime,
 
 ### extract the (final) weight matrix/array from a fitted hhh4 object
 
-getNEweights <- function (object, pars = coefW(object))
+getNEweights <- function (object, pars = coefW(object),
+                          scale = ne$scale, normalize = ne$normalize)
 {
-    neweights <- object$control$ne$weights
-    
-    if (!is.list(neweights))  # NULL or fixed weight structure
-        return(neweights)
-
-    ## parametric weights
-    nd <- length(neweights$initial)
-    if (length(pars) != nd) stop("'pars' must be of length ", nd)
-    neweights$w(pars, neighbourhood(object$stsObj), object$control$data)
+    ne <- object$control$ne
+    weights <- if (is.list(ne$weights)) { # parametric weights
+        nd <- length(ne$weights$initial)
+        if (length(pars) != nd) stop("'pars' must be of length ", nd)
+        ne$weights$w(pars, neighbourhood(object$stsObj), object$control$data)
+    } else { # NULL or fixed weight structure
+        ne$weights
+    }
+    if (is.null(normalize)) normalize <- FALSE  # backward compatibility < 1.9-0
+    scaleNEweights.default(weights, scale, normalize)
 }
 
 
