@@ -58,8 +58,8 @@ weightedSumNE <- function (observed, weights, lag)
 checkWeightsArray <- function (W, nUnits, nTime, name = deparse(substitute(W)),
                                check0diag = FALSE, islands = FALSE)
 {
-    if (!is.array(W))
-        stop("'", name, "' must return a matrix/array")
+    if (!is.array(W) || !(length(dim(W)) %in% 2:3))
+        stop("'", name, "' must return a matrix or 3-dim array")
     if (any(dim(W)[1:2] != nUnits) || isTRUE(dim(W)[3] != nTime))
         stop("'", name, "' must conform to dimensions ",
              nUnits, " x ", nUnits, " (x ", nTime, ")")
