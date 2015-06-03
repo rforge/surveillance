@@ -86,20 +86,36 @@ scaleNEweights.list <- function (weights, scale = NULL, normalize = FALSE)
             scaleNEweights.default(weights$w(...), scale, TRUE)
         dw <- function (...) {
             W <- scaleNEweights.default(weights$w(...), scale)
-            dW <- scaleNEweights.default(weights$dw(...), scale)
+            dW <- clapply(X = weights$dw(...), # matrix or list thereof
+                          FUN = scaleNEweights.default,
+                          scale = scale) # always returns a list
             dimW <- dim(W)
             normW <- .rowSums(W, dimW[1L], dimW[2L])
-            normdW <- .rowSums(dW, dimW[1L], dimW[2L])
-            dfrac(W, normW, dW, normdW)
+            normdW <- lapply(X = dW, FUN = .rowSums, m = dimW[1L], n = dimW[2L])
+            mapply(FUN = dfrac, du = dW, dv = normdW,
+                   MoreArgs = list(u = W, v = normW),
+                   SIMPLIFY = FALSE, USE.NAMES = FALSE)
         }
         ## for d2w() we need all the stuff from dw() -> substitute
         d2w <- as.function(c(alist(...=), substitute({
             dWnorm <- DWBODY
-            d2W <- scaleNEweights.default(weights$d2w(...), scale)
-            normd2W <- .rowSums(d2W, dimW[1L], dimW[2L])
-            dfrac(dW, normW, d2W, normdW) -
-                dprod(W/normW, normdW/normW, dWnorm,
-                      dfrac(normdW, normW, normd2W, normdW))
+            d2W <- clapply(X = weights$d2w(...), # matrix or list thereof
+                           FUN = scaleNEweights.default,
+                           scale = scale) # always returns a list
+            normd2W <- lapply(X = d2W, FUN = .rowSums, m = dimW[1L], n = dimW[2L])
+            ## order of d2w is upper triangle BY ROW
+            dimd <- length(dW)
+            ri <- rep.int(seq_len(dimd), rep.int(dimd, dimd)) # row index
+            ci <- rep.int(seq_len(dimd), dimd)                # column index
+            uppertri <- ci >= ri
+            mapply(FUN = function (k, l, d2W, normd2W) {
+                       dfrac(dW[[k]], normW, d2W, normdW[[l]]) -
+                           dprod(W/normW, normdW[[k]]/normW, dWnorm[[l]],
+                                 dfrac(normdW[[k]], normW, normd2W, normdW[[l]]))
+                   },
+                   k = ri[uppertri], l = ci[uppertri],
+                   d2W = d2W, normd2W = normd2W,
+                   SIMPLIFY = FALSE, USE.NAMES = FALSE)
         }, list(DWBODY = body(dw)))))
     } else {
         w <- function (...)

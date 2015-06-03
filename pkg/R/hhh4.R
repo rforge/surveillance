@@ -565,7 +565,7 @@ neOffsetFUN <- function (Y, neweights, scale, normalize,
             name <- switch(type, response="w", gradient="dw", hessian="d2w")
             weights <- wFUN[[name]](pars, nbmat, data)
             ## gradient and hessian are lists if length(pars$d) > 1L
-            ## and single matrices/arrays if == 1 => _c_onditional lapply
+            ## but can be single matrices/arrays if == 1 => _c_onditional lapply
             res <- clapply(weights, function (W)
                            offset * weightedSumNE(Y, W, lag))
             ##<- clapply always returns a list (possibly of length 1)
@@ -1142,7 +1142,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         dmudd <- lapply(dneOffset, phi.doff)
         d2neOffset <- model$offset[[2L]](pars$d, type="hessian")
         d2mudddd <- lapply(d2neOffset, phi.doff)
-        ## d l(theta,x) /dd dd (fill only upper triangle)
+        ## d l(theta,x) /dd dd (fill only upper triangle, BY ROW)
         ij <- 0L
         for (i in seq_len(dimd)) {
             for (j in i:dimd) {

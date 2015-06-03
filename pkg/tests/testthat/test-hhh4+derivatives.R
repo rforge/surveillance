@@ -47,7 +47,7 @@ test_that("score vector and Fisher info agree with numerical approximations", {
 
 test_that("automatic and manual normalization are equivalent", {
     ## check for equivalent functions
-    for (type in c("powerlaw")) {
+    for (type in c("powerlaw", "np")) {
         W_type <- get(paste0("W_", type), mode = "function")
         w0 <- W_type(maxlag = 3, normalize = TRUE)
         w1 <- surveillance:::scaleNEweights.list(
@@ -55,9 +55,13 @@ test_that("automatic and manual normalization are equivalent", {
             normalize = TRUE)
         pars <- w0$initial
         nbmat <- neighbourhood(measlesWeserEms)
-        expect_equal(w0$w(pars, nbmat), w1$w(pars, nbmat))
-        expect_equal(w0$dw(pars, nbmat), w1$dw(pars, nbmat))
-        expect_equal(w0$d2w(pars, nbmat), w1$d2w(pars, nbmat))
+        expect_equal(w1$w(pars, nbmat), w0$w(pars, nbmat))
+        ## for the power law, dw and d2w are length 1 lists in w1 but not in w0
+        unlistIfPL <- if (type == "powerlaw") function (x) x[[1L]] else identity
+        expect_equal(unlistIfPL(w1$dw(pars, nbmat)), w0$dw(pars, nbmat))
+        expect_equal(unlistIfPL(w1$d2w(pars, nbmat)), w0$d2w(pars, nbmat))
+        ## microbenchmark::microbenchmark(w1$d2w(pars, nbmat), w0$d2w(pars, nbmat))
+        ## -> type-specific implementations of normalized derivatives are faster
     }
     ## check for equivalent fits (rather redundant)
     measlesFit2 <- hhh4(
