@@ -33,12 +33,10 @@ zetaweights <- function (nbmat, d = 1, maxlag = max(nbmat), normalize = FALSE)
     wji[is.na(wji)] <- 0              # for lags > maxlag
 
     ## set dim and names
-    dim(wji) <- dimW <- dim(nbmat)
+    dim(wji) <- dim(nbmat)
     dimnames(wji) <- dimnames(nbmat)
 
-    if (normalize) { # normalize such that each row sums to 1
-        wji / .rowSums(wji, dimW[1L], dimW[2L])
-    } else wji
+    if (normalize) normalizeW(wji) else wji
 }
 
 
