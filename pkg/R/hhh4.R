@@ -20,8 +20,7 @@ ADVICEONERROR <- "\n  Try different starting values, more iterations, or another
 hhh4 <- function (stsObj, control = list(
     ar = list(f = ~ -1,        # a formula "exp(x'lamba)*y_t-lag" (ToDo: matrix)
               offset = 1,      # multiplicative offset
-              lag = 1,         # autoregression on y_i,t-lag
-              weights = NULL), # for a contact matrix model (currently unused)
+              lag = 1),        # autoregression on y_i,t-lag
     ne = list(f = ~ -1,        # a formula "exp(x'phi) * sum_j w_ji * y_j,t-lag"
               offset = 1,      # multiplicative offset
               lag = 1,         # regression on y_j,t-lag
@@ -192,10 +191,15 @@ setControl <- function (control, stsObj)
   ### check AutoRegressive component
 
   if (control$ar$isMatrix <- is.matrix(control$ar$f)) {
+      ## this form is not implemented -> will stop() in interpretControl()
       if (any(dim(control$ar$f) != nUnit))
           stop("'control$ar$f' must be a square matrix of size ", nUnit)
-      # use identity matrix if weight matrix is missing
-      if (is.null(control$ar$weights)) control$ar$weights <- diag(nrow=nUnit)
+      if (is.null(control$ar$weights)) { # use identity matrix
+          control$ar$weights <- diag(nrow=nUnit)
+      } else if (!is.matrix(control$ar$weights) ||
+                 any(dim(control$ar$weights) != nUnit)) {
+          stop("'control$ar$weights' must be a square matrix of size ", nUnit)
+      }
       control$ar$inModel <- TRUE
   } else if (inherits(control$ar$f, "formula")) {
       if (!is.null(control$ar$weights)) {
@@ -206,11 +210,6 @@ setControl <- function (control, stsObj)
       control$ar$inModel <- isInModel(control$ar$f)
   } else {
       stop("'control$ar$f' must be either a formula or a matrix")
-  }
-
-  if (is.matrix(control$ar$weights)) {
-      if (any(dim(control$ar$weights) != nUnit))
-          stop("'control$ar$weights' must be a square matrix of size ", nUnit)
   }
   
   
@@ -632,7 +631,7 @@ interpretControl <- function (control, stsObj)
 
   ## get terms for all components
   all.term <- NULL
-  if(ar$isMatrix) stop("matrix-form of 'control$ar$f is not yet implemented")
+  if(ar$isMatrix) stop("matrix-form of 'control$ar$f' is not implemented")
   if(ar$inModel) # ar$f is a formula
       all.term <- cbind(all.term, checkFormula(ar$f, 1, control$data, stsObj))
   if(ne$inModel)

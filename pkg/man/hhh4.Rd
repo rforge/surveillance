@@ -36,7 +36,7 @@
 \usage{
 hhh4(stsObj,
      control = list(
-         ar = list(f = ~ -1, offset = 1, lag = 1, weights = NULL),
+         ar = list(f = ~ -1, offset = 1, lag = 1),
          ne = list(f = ~ -1, offset = 1, lag = 1,
                    weights = neighbourhood(stsObj) == 1,
                    scale = NULL, normalize = FALSE),
@@ -59,16 +59,14 @@ hhh4(stsObj,
     count data time series.}
   \item{control}{a list containing the model specification and control arguments:
     \describe{
-      \item{\code{ar}}{ Model for the autoregressive component given as
-          list with the following components: 
-          \describe{
+      \item{\code{ar}}{Model for the autoregressive component given as
+        list with the following components: 
+        \describe{
 	  \item{f = ~ -1}{a formula specifying \eqn{\log(\lambda_{it})}{log(\lambda_it)}}
 	  \item{offset = 1}{optional multiplicative offset, either 1 or
 	    a matrix of the same dimension as \code{observed(stsObj)}}
 	  \item{lag = 1}{a positive integer meaning autoregression on
 	    \eqn{y_{i,t-lag}}}
-	  \item{weights = NULL}{optional weights, only used if model is
-	    a contact matrix (currently not implemented)}
 	}
       }
       \item{\code{ne}}{Model for the neighbor-driven component given as
