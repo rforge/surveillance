@@ -383,13 +383,10 @@ legend("topright", legend=levels(events$type), title="Type", pch=1:2, col=1:2)
 ## reconstruct the "imdepi" object from its components
 myimdepi <- as.epidataCS(events = events, stgrid = stgrid,
                          W = stateD, qmatrix = diag(2), nCircle2Poly = 16)
-\dontshow{
-## should be equal as long as the internal structures of "epidataCS",
-## of the embedded classes ("owin", "SpatialPolygons", ...), and the
-## calculation of the influence regions by "polyclip" do not change
-if (!isTRUE(all.equal(imdepi, myimdepi, tolerance=1E-6)))
-    warning("@Sebastian: maybe update data(imdepi)")
-}
+## -> equal to 'imdepi' as long as the internal structures of the embedded
+##    classes ("owin", "SpatialPolygons", ...), and the calculation of the
+##    influence regions by "polyclip" do not change:
+##all.equal(imdepi, myimdepi, tolerance=1E-6)
 }
 
 \keyword{spatial}
