@@ -20,6 +20,7 @@
 ##   10 Dec 2012 (SM): add message about warnings in examples in "check"
 ##    6 Feb 2014 (SM): set _R_CHECK_FORCE_SUGGESTS_ to FALSE (for INLA package)
 ##   25 Aug 2014 (SM): use compact-vignettes=both, i.e., including ghostscript
+##    7 Jun 2015 (SM): added rule to create the NEWS.html as on CRAN
 ################################################################################
 
 ## Define variable for R which enables the use of alternatives,
@@ -93,3 +94,7 @@ checkUsage: install
 
 manual:	
 	$R CMD Rd2pdf --batch --force --output=manual.pdf pkg
+
+NEWS.html: pkg/inst/NEWS.Rd
+	$R --vanilla --slave -e 'tools::Rd2HTML("$<", out = "$@", stylesheet = "http://cran.r-project.org/web/CRAN_web.css")'
+	[ `uname -s` = "Darwin" ] && open "$@" || xdg-open "$@"
