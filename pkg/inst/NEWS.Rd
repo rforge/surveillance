@@ -6,21 +6,42 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.9-0 (2015-06-03)}{
+\section{Changes in surveillance version 1.9-0 (2015-06-08)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
     \item New functions and data for Bayesian outbreak detection in the
     presence of reporting delays (Salmon et al., 2015):
     \code{bodaDelay()}, \code{sts_observation()}, and \code{sts_creation()}.
-
+    
+    \item New functions implementing tests for space-time interaction:
+    \itemize{
+      \item \code{knox()} supports both the Poisson approximation and a
+      Monte Carlo permutation approach to determine the p-value,
+      \item \code{stKtest()} wraps space-time K-function methods from
+      package \CRANpkg{splancs} for use with \code{"epidataCS"},
+      \item and \code{epitest()} for \code{twinstim} models
+      (makes use of the new auxiliary function \code{simpleR0()}).
+    }
+    
+    \item New function \code{plapply()}: a parallel and verbose version
+    of \code{lapply()} wrapping around both \code{mclapply()} and
+    \code{parLapply()} of package \pkg{parallel}.
+    
     \item New converter \code{as.xts.sts()} to transform \code{"sts"}
     objects to the quasi standard \code{"xts"} class, e.g., to make use
     of package \CRANpkg{dygraphs} for interactive time series plots.
     
     \item New options for scaling and normalization of neighbourhood
     weights in \code{hhh4()} models.
-    
+        
+    \item New auxiliary function \code{layout.scalebar()} for use as part
+    of \code{sp.layout} in \code{spplot()} or in the traditional
+    graphics system.
+  }
+  
+  \subsection{New features for \code{"epidataCS"}}{
+  \itemize{
     \item New argument \code{by} for \code{plot.epidataCS()}, which
     defines a stratifying variable for the events (default is the event
     type as before). It can also be set to \code{NULL} to make the plot
@@ -33,31 +54,17 @@
     
     \item New function \code{permute.epidataCS()} to randomly permute
     time points or locations of the events (holding other marks fixed).
+  }
+  }
 
-    \item New functions implementing tests for space-time interaction:
-    \itemize{
-      \item \code{knox()} supports both the Poisson approximation and a
-      Monte Carlo permutation approach to determine the p-value,
-      \item \code{stKtest()} wraps space-time K-function methods from
-      package \CRANpkg{splancs} for use with \code{"epidataCS"},
-      \item and \code{epitest()} for \code{twinstim} models
-      (makes use of the new auxiliary function \code{simpleR0()}).
-    }
-
-    \item New function \code{plapply()}: a parallel and verbose version
-    of \code{lapply()} wrapping around both \code{mclapply()} and
-    \code{parLapply()} of package \pkg{parallel}.
-
+  \subsection{New features for \code{twinstim()}}{
+  \itemize{
     \item New S3-generic \code{coeflist()} to list model coefficients by
     component. It currently has a default method and one for
     \code{"twinstim"} and \code{"simEpidataCS"}.
 
     \item New argument \code{newcoef} for \code{simulate.twinstim()} to
     customize the model parameters used for the simulation.
-
-    \item New auxiliary function \code{layout.scalebar} for use as part
-    of \code{sp.layout} in \code{spplot()} or in the traditional
-    graphics system.
 
     \item New argument \code{epilink} for \code{twinstim()}, offering
     experimental support for an identity link for the epidemic
@@ -69,6 +76,7 @@
 
     \item New option \code{scaled = "standardized"} in \code{iafplot()}
     to plot \eqn{f(x) / f(0)} or \eqn{g(t) / g(0)}, respectively.
+  }
   }
 }
 
