@@ -154,20 +154,19 @@ if (requireNamespace("maptools")) {
 }
 
 ha.sts
-plot(ha.sts, type=observed ~ 1 | unit)
+plot(ha.sts, type = observed ~ 1 | unit)
 
-#Convert ts/mts object to sts
+## convert ts/mts object to sts
 z <- ts(matrix(rpois(300,10), 100, 3), start = c(1961, 1), frequency = 12)
-sts.z <- as(z,"sts")
-plot(sts.z)
+z.sts <- as(z, "sts")
+plot(z.sts)
 
 ## conversion to the quasi-standard "xts" class is also possible
 ## -> enables interactive time series plots using package "dygraphs"
 if (require("xts")) {
-    ha.xts <- as.xts(ha.sts)
-    plot(ha.xts)
+    z.xts <- as.xts(z.sts)
+    plot(z.xts)
 }
-
 }
 
 \keyword{classes}
