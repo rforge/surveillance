@@ -22,7 +22,7 @@ test_that("likelihood is still the same", {
 })
 
 test_that("score vector agrees with numerical approximation", {
-    numsc <- if (surveillance.options("allExamples")) {
+    numsc <- if (surveillance.options("allExamples") && requireNamespace("numDeriv")) {
         numDeriv::grad(func = model$ll, x = theta)
     } else { # for faster --as-cran tests
         c(-365.19927878021, -29.3546236207476, -45.8139085706014,
@@ -51,7 +51,7 @@ test_that("likelihoods with log-link and identity link are the same", {
 })
 
 test_that("identity link score vector agrees with numerical approximation", {
-    numsc <- if (surveillance.options("allExamples")) {
+    numsc <- if (surveillance.options("allExamples") && requireNamespace("numDeriv")) {
         numDeriv::grad(func = model2i$ll, x = theta2i)
     } else { # for faster --as-cran tests
         c(-679.706275919901, -91.0659401491325, -114.082117122738,
