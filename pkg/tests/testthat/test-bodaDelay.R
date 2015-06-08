@@ -119,7 +119,7 @@ test_that("the factor variable has the right number of levels",{
 
 ##################################################################
 context("Fit glm function")
-if (surveillance.options("allExamples")) {
+if (surveillance.options("allExamples") && require("INLA")) {
   argumentsGLM <- list(dataGLM=dataGLM,reportingTriangle=reportingTriangle,
                        timeTrend=timeTrend,alpha=alpha,
                        populationOffset=populationOffset,
