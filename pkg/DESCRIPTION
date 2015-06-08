@@ -45,7 +45,7 @@ Suggests: parallel, grid, xts, gridExtra, lattice, colorspace, scales, animation
         spdep, numDeriv, maxLik,
         testthat, coda, splancs, gamlss,
         INLA, runjags
-Description: Implemention of statistical methods for the modeling and
+Description: Implementation of statistical methods for the modeling and
         change-point detection in time series of counts, proportions and
         categorical data, as well as for the modeling of continuous-time
         epidemic phenomena, e.g., discrete-space setups such as the spatially
