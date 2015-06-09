@@ -6,22 +6,7 @@
 \encoding{latin1}
 
 
-%% \section{Changes in surveillance version 1.9-1 (2015-06-09)}{
-
-%%   \subsection{BUG FIXES}{
-%%     \itemize{
-%%       \item \code{update.hhh4(..., use.estimates = TRUE)} did not
-%%       use the estimated weight function parameters as initial values for
-%%       the new fit. It does so now iff the weight function
-%%       \code{ne$weights} is left unchanged.
-%%     }
-%%   }
-  
-%% }
-
-
-
-\section{Changes in surveillance version 1.9-0 (2015-06-08)}{
+\section{Changes in surveillance version 1.9-0 (2015-06-09)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -161,6 +146,11 @@
     models, i.e., \code{W_powerlaw(maxlag = M, normalize = TRUE)}
     with \code{M < max(neighbourhood(stsObj))}, had wrong derivatives
     and thus failed to converge.
+
+    \item \code{update.hhh4(..., use.estimates = TRUE)} did not
+    use the estimated weight function parameters as initial values for
+    the new fit. It does so now iff the weight function
+    \code{ne$weights} is left unchanged.
   }
 }
 
