@@ -574,8 +574,7 @@ neOffsetFUN <- function (Y, neweights, scale, normalize,
         weights <- scaleNEweights.default(neweights, scale, normalize)
         env <- new.env(hash = FALSE, parent = emptyenv())  # small -> no hash
         env$initoffset <- offset * weightedSumNE(Y, weights, lag)
-        as.function(c(alist(pars=, type = "response"), quote(initoffset)),
-                    envir=env)     # it will not be called for other types
+        as.function(c(alist(...=), quote(initoffset)), envir=env)
     }
 }
 
