@@ -265,5 +265,7 @@ getNEweights <- function (object, pars = coefW(object),
 coefW <- function (object)
 {
     coefs <- if (inherits(object, c("hhh4","ah4"))) object$coefficients else object
-    coefs[grep("^neweights", names(coefs))]
+    coefW <- coefs[grep("^neweights", names(coefs))]
+    names(coefW) <- sub("^neweights\\.", "", names(coefW))
+    coefW
 }
