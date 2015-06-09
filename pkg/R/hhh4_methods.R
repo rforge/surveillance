@@ -508,16 +508,21 @@ neOffsetArray <- function (object, pars = coefW(object),
     if ("ne" %in% componentsHHH4(object)) {
         W <- getNEweights(object, pars = pars)
         Y <- observed(object$stsObj)
-        nelag <- object$control$ne$lag
-        res[] <- apply(W, 2L, function (wi) {
-            tm1 <- subset - nelag
-            is.na(tm1) <- tm1 <= 0
-            t(Y[tm1,,drop=FALSE]) * wi
-        })
-        ## consistency check
-        stopifnot(all.equal(colSums(res),  # sum over j
-                            terms(object)$offset$ne(pars)[subset,,drop=FALSE],
-                            check.attributes = FALSE))
+        tm1 <- subset - object$control$ne$lag
+        is.na(tm1) <- tm1 <= 0
+        tYtm1 <- t(Y[tm1,,drop=FALSE])
+        res[] <- apply(W, 2L, function (wi) tYtm1 * wi)
+        offset <- object$control$ne$offset
+        res <- if (length(offset) > 1L) {
+            offset <- offset[subset,,drop=FALSE]
+            res * rep(offset, each = object$nUnit)
+        } else {
+            res * offset
+        }
+        ## stopifnot(all.equal(
+        ##     colSums(res),  # sum over j
+        ##     terms.hhh4(object)$offset$ne(pars)[subset,,drop=FALSE],
+        ##     check.attributes = FALSE))
     }
     
     ## permute dimensions as (t, i, j)
