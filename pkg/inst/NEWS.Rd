@@ -6,6 +6,21 @@
 \encoding{latin1}
 
 
+%% \section{Changes in surveillance version 1.9-1 (2015-06-09)}{
+
+%%   \subsection{BUG FIXES}{
+%%     \itemize{
+%%       \item \code{update.hhh4(..., use.estimates = TRUE)} did not
+%%       use the estimated weight function parameters as initial values for
+%%       the new fit. It does so now iff the weight function
+%%       \code{ne$weights} is left unchanged.
+%%     }
+%%   }
+  
+%% }
+
+
+
 \section{Changes in surveillance version 1.9-0 (2015-06-08)}{
 
 \subsection{NEW FEATURES}{

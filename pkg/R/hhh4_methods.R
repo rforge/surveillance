@@ -5,7 +5,7 @@
 ###
 ### Standard methods for hhh4-fits
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2012-2014 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -353,6 +353,11 @@ update.hhh4 <- function (object, ..., S = NULL, subset.upper = NULL,
             SIMPLIFY = FALSE, USE.NAMES = FALSE
         )
     }
+    ## update initial values of parametric weight function
+    if (use.estimates && length(coefW <- coefW(object)) &&
+        ! "weights" %in% names(extras$ne)) { # only if function is unchanged
+        control$ne$weights$initial <- coefW
+    }
 
     ## adjust seasonality
     if (!is.null(S)) {
@@ -485,7 +490,7 @@ decompose.hhh4 <- function (x, coefs = x$coefficients, ...)
     res
 }
 
-## get the w_{ji} Y_{j,t-1} values from a fitted hhh4 model
+## get the w_{ji} Y_{j,t-1} values from a hhh4() fit with parametric neweights
 ## (i.e., before summing the neighbourhood component over j)
 ## in an array with dimensions (t, i, j)
 neOffsetArray <- function (object, coefW = NULL, subset = object$control$subset)
