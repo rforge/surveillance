@@ -490,26 +490,36 @@ decompose.hhh4 <- function (x, coefs = x$coefficients, ...)
     res
 }
 
-## get the w_{ji} Y_{j,t-1} values from a hhh4() fit with parametric neweights
+## get the w_{ji} Y_{j,t-1} values from a hhh4() fit
 ## (i.e., before summing the neighbourhood component over j)
 ## in an array with dimensions (t, i, j)
-neOffsetArray <- function (object, coefW = NULL, subset = object$control$subset)
+neOffsetArray <- function (object, pars = coefW(object),
+                           subset = object$control$subset)
 {
-    env <- new.env(hash = FALSE, parent = environment(terms(object)$offset$ne))
-    env$pars <- if (is.null(coefW)) coefW(object) else coefW
-    env$subset <- subset
-    res <- with(env, apply(neweights$w(pars, nbmat, data), 2L, function (wi) {
-        tm1 <- subset - lag
-        is.na(tm1) <- tm1 <= 0
-        t(Y[tm1,,drop=FALSE]) * wi
-    }))
-    dim(res) <- c(object$nUnit, length(subset), object$nUnit)
-    dimnames(res) <- list("j" = colnames(object$stsObj),
-                          "t" = rownames(object$stsObj)[subset],
-                          "i" = colnames(object$stsObj))
-    stopifnot(all.equal(colSums(res),  # sum over j
-                        terms(object)$offset$ne(env$pars)[subset,,drop=FALSE],
-                        check.attributes = FALSE))
+    ## initialize array ordered as (j, t, i) for apply() below
+    res <- array(data = 0,
+                 dim = c(object$nUnit, length(subset), object$nUnit),
+                 dimnames = list(
+                     "j" = colnames(object$stsObj),
+                     "t" = rownames(object$stsObj)[subset],
+                     "i" = colnames(object$stsObj)))
+    
+    ## calculate array values if the fit has an NE component
+    if ("ne" %in% componentsHHH4(object)) {
+        W <- getNEweights(object, pars = pars)
+        Y <- observed(object$stsObj)
+        nelag <- object$control$ne$lag
+        res[] <- apply(W, 2L, function (wi) {
+            tm1 <- subset - nelag
+            is.na(tm1) <- tm1 <= 0
+            t(Y[tm1,,drop=FALSE]) * wi
+        })
+        ## consistency check
+        stopifnot(all.equal(colSums(res),  # sum over j
+                            terms(object)$offset$ne(pars)[subset,,drop=FALSE],
+                            check.attributes = FALSE))
+    }
+    
     ## permute dimensions as (t, i, j)
     aperm(res, perm = c(2L, 3L, 1L), resize = TRUE)
 }
