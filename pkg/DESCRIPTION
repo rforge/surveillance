@@ -1,7 +1,7 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
-Version: 1.9-0
-Date: 2015-06-10
+Version: 1.9-1
+Date: 2015-06-11
 Authors@R: c(MH = person("Michael", "Höhle",
                   email = "hoehle@math.su.se",
                   role = c("aut", "cre", "ths")),
@@ -77,7 +77,7 @@ Description: Implementation of statistical methods for the modeling and
         specified Additional_repositories, if uninstalled dependencies
         are also requested. As this might not work under OS X it
         might be necessary to manually install the 'INLA' package as
-        specified at http://www.r-inla.org/download.
+        specified at <http://www.r-inla.org/download>.
 License: GPL-2
 URL: http://surveillance.r-forge.r-project.org/
 Additional_repositories: http://www.math.ntnu.no/inla/R/stable 
