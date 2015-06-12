@@ -21,6 +21,7 @@
 ##    6 Feb 2014 (SM): set _R_CHECK_FORCE_SUGGESTS_ to FALSE (for INLA package)
 ##   25 Aug 2014 (SM): use compact-vignettes=both, i.e., including ghostscript
 ##    7 Jun 2015 (SM): added rule to create the NEWS.html as on CRAN
+##   12 Jun 2015 (SM): added rule to check with allExamples
 ################################################################################
 
 ## Define variable for R which enables the use of alternatives,
@@ -53,7 +54,7 @@ VERSION := $(shell $R --vanilla --slave -e 'cat(read.dcf("${DESCRIPTION}", field
 #$(shell find . -printf "%TY-%Tm-%Td\n" | sort -nr | head -n 1)
 
 ## phony targets
-.PHONY: clean build check install manual #${DESCRIPTION}
+.PHONY: clean build check check-allExamples install manual #${DESCRIPTION}
 
 clean:
 	cd pkg/src; rm -f *.o *.so *.dll symbols.rds
@@ -81,6 +82,10 @@ check: build
 	if [ $$nwarn -gt 0 ]; then echo "\n\tWARNING: $$nwarn" \
         "warning(s) thrown when running examples,\n" \
 	"\t         see file surveillance.Rcheck/surveillance-Ex.Rout\n"; fi
+
+## check with all examples
+check-allExamples: export _R_SURVEILLANCE_ALL_EXAMPLES_=TRUE
+check-allExamples: check
 
 install: build
 	$R CMD INSTALL surveillance_${VERSION}.tar.gz
