@@ -230,7 +230,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
     
     model <- do.call(bodaDelay.fitGLM, args=argumentsGLM)
     
-    if (is.na(model)==TRUE){
+    if (identical(model, NA)){
       sts@upperbound[k] <- NA
       sts@control$expected[k] <- NA
       sts@alarm[k] <- NA
