@@ -56,7 +56,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
   if (is.null( sts@epochAsDate)) {
     epochAsDate <- FALSE
   } else {
-    epochAsDate <-    sts@epochAsDate
+    epochAsDate <- sts@epochAsDate
   }
 
   ######################################################################
@@ -66,8 +66,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
   observed <- observed(sts)
   freq <- sts@freq
   if (epochAsDate) {
-    epochStr <- switch( as.character(freq), "12" = "month","52" =    "week",
-                        "365" = "day")
+    epochStr <- switch( as.character(freq), "12" = "month","52" = "week", "365" = "day")
   } else {
     epochStr <- "none"
   }
@@ -91,11 +90,11 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
   }
   if (is.null(control[["pastAberrations",exact=TRUE]])) {control$pastAberrations=FALSE}
 
-  if (is.null(control[["verbose",exact=TRUE]]))    {control$verbose=FALSE}
+  if (is.null(control[["verbose",exact=TRUE]])) { control$verbose=FALSE }
 
-  if (is.null(control[["alpha",exact=TRUE]]))        {control$alpha=0.05}
+  if (is.null(control[["alpha",exact=TRUE]])) { control$alpha=0.05 }
 
-  if (is.null(control[["trend",exact=TRUE]]))        {control$trend=TRUE}
+  if (is.null(control[["trend",exact=TRUE]])) { control$trend=TRUE }
 
 
   # No alarm is sounded
@@ -108,7 +107,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
   if (is.null(control[["noPeriods",exact=TRUE]])){control$noPeriods=1}
 
   # Use factors in the model? Depends on noPeriods, no input from the user.
-  if (control$noPeriods!=1) {
+  if (control$noPeriods != 1) {
     control$factorsBool=TRUE
   } else {
     control$factorsBool=FALSE
@@ -116,13 +115,13 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
 
 
   # How many past weeks not to take into account?
-  if (is.null(control[["pastWeeksNotIncluded",exact=TRUE]])){
+  if (is.null(control[["pastWeeksNotIncluded",exact=TRUE]])) {
     control$pastWeeksNotIncluded=control$w
   }
 
-  # Correct for delays?
+  # Correct for delays? (default: FALSE)
   if (is.null(control[["delay",exact=TRUE]])) { control$delay = FALSE }
-  # Reporting triangle here?
+  # Is the reporting triangle available?
   if (control$delay) {
     if (is.null( sts@control$reportingTriangle$n)) {
       stop("You have to provide a reporting triangle in control of the sts-object")
@@ -163,19 +162,14 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
            "  The package is not available on CRAN, but can be downloaded by calling\n",
            "\tsource(\"http://www.math.ntnu.no/inla/givemeINLA.R\")\n",
            "  as described at http://www.r-inla.org/download in detail.\n",
-           "Or set inferenceMethod to asym.")
+           "Or set inferenceMethod to 'asym'.")
     }
   }
 
   # Define objects
   n <- control$b*(2*control$w+1)
 
-
-
-
-
-  # loop over columns of sts
-
+  # loop over columns of sts --- hoehle???
 
   #Vector of dates
   if (epochAsDate){
@@ -237,13 +231,13 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
 
     model <- do.call(bodaDelay.fitGLM, args=argumentsGLM)
 
-    if (identical(model, NA)){
+    if (identical(model, NA)) {
       sts@upperbound[k] <- NA
       sts@control$expected[k] <- NA
       sts@alarm[k] <- NA
       sts@control$pvalues[k] <- NA
     }
-    else{
+    else {
 
       ######################################################################
       # Calculate the threshold
@@ -252,7 +246,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
       argumentsThreshold <- list(model,alpha=alpha,dataGLM=dataGLM,reportingTriangle,
                                  delay=delay,k=k,control=control,mc.munu=mc.munu,mc.y=mc.y,
                                  inferenceMethod=control$inferenceMethod)
-      predisons <-do.call(bodaDelay.threshold,argumentsThreshold)
+      predisons <- do.call(bodaDelay.threshold,argumentsThreshold)
 
       threshold <- predisons$quantile
       expected <- predisons$expected
@@ -265,21 +259,23 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
       enoughCases <- (sum(observed[(k-control$limit54[2]+1):k])
                       >=control$limit54[1])
       sts@alarm[k] <- FALSE
-      if (is.na(threshold)){sts@alarm[k] <- NA}
-      else {
+      if (is.na(threshold)) {
+        sts@alarm[k] <- NA
+      } else {
         if (sts@observed[k]>sts@upperbound[k]) {sts@alarm[k] <- TRUE}
       }
-      if(!enoughCases){
+      if (!enoughCases) {
         sts@upperbound[k] <- NA
         sts@alarm[k] <- NA
       }
     }
-
   }
-#done looping over all time points
-sts@control$expected <- sts@control$expected[control$range]
-sts@control$pvalues <- sts@control$pvalues[control$range]
-return(sts[control$range,])
+
+  #done looping over all time points
+  sts@control$expected <- sts@control$expected[control$range]
+  sts@control$pvalues <- sts@control$pvalues[control$range]
+  #ready to return
+  return(sts[control$range,])
 }
 ################################################################################
 # END OF MAIN FUNCTION
@@ -386,7 +382,7 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
     # take variation in size hyperprior into account by also sampling from it
     theta <- t(sapply(jointSample, function(x) x$hyperpar))
 
-    if (delay){
+    if (delay) {
       mu_Tt <- numeric(mc.munu)
       N_Tt <- numeric(mc.munu*mc.y)
 
@@ -396,12 +392,10 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
       loopLimit <- min(Dmax0,which(is.na(as.matrix(reportingTriangle$n)[k,]))-1,na.rm=TRUE)
 
       # Find the mu_td and sum
-      for (d in 1:loopLimit)
-      {
-        if(sum(dataGLM$response[dataGLM$delay==(d-1)],na.rm=TRUE)!=0){
-        mu_Tt <- mu_Tt + exp(t(sapply(jointSample, function(x) x$latent[[nrow(dataGLM)-Dmax0+d]])))
+      for (d in 1:loopLimit) {
+        if (sum(dataGLM$response[dataGLM$delay==(d-1)],na.rm=TRUE)!=0){
+          mu_Tt <- mu_Tt + exp(t(sapply(jointSample, function(x) x$latent[[nrow(dataGLM)-Dmax0+d]])))
         }
-
       }
 
       N_Tt <- rnbinom(size=theta,mu=E*mu_Tt,n=mc.munu*mc.y)
@@ -419,71 +413,64 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
     }
   }
 
-  if (inferenceMethod=="asym"){
+  if (inferenceMethod=="asym") {
     # Sample from the posterior
     set.seed(1)
 
-
     # take variation in size hyperprior into account by also sampling from it
+    # Note: might be problematic as there is no guarantee that the obtained samples are non-negative
     theta <- rnorm(n=mc.munu,mean=summary(model)$theta,sd=summary(model)$SE.theta)
 
-    if (delay){
+    if (delay) {
       # Maximal delay + 1
+###      browser()
       Dmax0 <- ncol(as.matrix(reportingTriangle$n))
       mu_Tt <- numeric(mc.munu)
       newData <- tail(dataGLM,n=Dmax0)
 
-      P <- try(predict(model,type="link",se.fit=TRUE,
-                newdata=newData),silent=TRUE)
-     if(inherits(P,'try-error')){
-       return(list(quantile=NA,expected=NA))
-     }
+      P <- try(predict(model,type="link",se.fit=TRUE,newdata=newData),silent=TRUE)
+      if(inherits(P,'try-error')) {
+        return(list(quantile=NA,expected=NA))
+      }
       # The sum has to be up to min(D,T-t). This is how we find the right indices.
       loopLimit <- min(Dmax0,which(is.na(as.matrix(reportingTriangle$n)[k,]))-1,na.rm=TRUE)
 
       # Find the mu_td and sum
-
-      for (d in 1:loopLimit)
-      {
-
-        if(sum(dataGLM$response[dataGLM$delay==(d-1)],na.rm=TRUE)!=0){
-
+      for (d in 1:loopLimit) {
+        if(sum(dataGLM$response[dataGLM$delay==(d-1)],na.rm=TRUE)!=0) { ##hoehle: why this protection?
           mu_Tt <- mu_Tt + exp(rnorm(n=mc.munu,mean=P$fit[d],sd=P$se.fit[d]))
         }
-
       }
 
       N_Tt <- rnbinom(size=theta,mu=mu_Tt,n=mc.munu*mc.y)
-      # We have to ditch the na values (values for which theta was negative)
+      # We have to ditch the NA values (values for which theta was negative)
       N_Tt <- N_Tt[is.na(N_Tt)==FALSE]
 
       qi <- quantile(N_Tt, probs=(1-alpha), type=3, na.rm=TRUE)
-      # with no delay this is similar to boda.
-    } else {
-
+    } else { # with no delay this is similar to boda.
+###      browser()
       newData <- tail(dataGLM,n=1)
 
+      P <- try(predict(model,type="link",se.fit=TRUE,newdata=newData),silent=TRUE)
+      if (class(P)=="try-error") {
+        P <- NA ; return(NA)
+      }
 
-      P=try(predict(model,type="link",se.fit=TRUE,
-                    newdata=newData),silent=TRUE)
-      if (class(P)=="try-error"){P<- NA
-                                 return(NA)}
       set.seed(1)
       mT1 <- exp(rnorm(n=mc.munu,mean=P$fit,sd=P$se.fit))
-      mu_Tt <- exp(P$fit)
+      mu_Tt <- exp(P$fit) ###hoehle: why is this calculated and why plug-in???
       #Draw (mc.munu \times mc.y) responses.
       N_Tt <- rnbinom(n=mc.y*mc.munu,size=theta,mu=mT1)
       # We have to ditch the na values (values for which theta was negative)
       N_Tt <- N_Tt[is.na(N_Tt)==FALSE]
-
+      # Determine quantile
       qi <- quantile(N_Tt, probs=(1-alpha), type=3, na.rm=TRUE)
     }
-
   }
+  ##Done
   return(list(quantile=as.numeric(qi),expected=mean(mu_Tt)))
-
-
 }
+
 ################################################################################
 # END OF THRESHOLD GLM FUNCTION
 ################################################################################
@@ -508,7 +495,7 @@ bodaDelay.data.glm <- function(dayToConsider, b, freq,
                                                              epochStr=epochStr
   )
 
-  if (sum((vectorOfDates %in% min(referenceTimePoints)) == rep(FALSE,length(vectorOfDates))) == length(vectorOfDates)){
+  if (sum((vectorOfDates %in% min(referenceTimePoints)) == rep(FALSE,length(vectorOfDates))) == length(vectorOfDates)) {
     warning("Some reference values did not exist (index<1).")
   }
 
@@ -548,7 +535,7 @@ bodaDelay.data.glm <- function(dayToConsider, b, freq,
   # Population
   pop <- population[blockIndexes]
 
-  if (verbose) { print(response)}
+  if (verbose) { print(response) }
 
 
   # If the delays are not to be taken into account it is like farringtonFlexible
@@ -557,18 +544,15 @@ bodaDelay.data.glm <- function(dayToConsider, b, freq,
                           seasgroups=seasgroups,vectorOfDates=vectorOfDates[blockIndexes])
 
     dataGLM$response[(nrow(dataGLM)-pastWeeksNotIncluded):nrow(dataGLM)] <- NA
-  }
-  # If the delays are to be taken into account we need a bigger dataframe
-  else {
-    # Delays
-
-    delays <- as.factor(0:(dim(reportingTriangle$n)[2]-1))
+  } else {
+    # If the delays are to be taken into account we need a bigger dataframe
+    delays <- as.factor(0:(ncol(reportingTriangle$n)-1))
 
     # Take the subset of the reporting triangle corresponding to the timepoints used for fitting the model
     reportingTriangleGLM <- reportingTriangle$n[rownames(reportingTriangle$n) %in% as.character(vectorOfDates[blockIndexes]),]
 
     # All vectors of data will be this long: each entry will correspond to one t and one d
-    lengthGLM <- dim(reportingTriangleGLM)[2]*dim(reportingTriangleGLM)[1]
+    lengthGLM <- prod(dim(reportingTriangleGLM))
 
     # Create the vectors for storing data
     responseGLM <- numeric(lengthGLM)
@@ -579,8 +563,8 @@ bodaDelay.data.glm <- function(dayToConsider, b, freq,
     delaysGLM <- numeric(lengthGLM)
 
     # Fill them D by D
-    D <- dim(reportingTriangleGLM)[2]
-    for (i in (1:dim(reportingTriangleGLM)[1])){
+    D <- ncol(reportingTriangleGLM)
+    for (i in (1:nrow(reportingTriangleGLM))) {
       vectorOfDatesGLM[((i-1)*D+1):(i*D)] <- rep(vectorOfDates[blockIndexes][i],D)
       wtimeGLM[((i-1)*D+1):(i*D)] <- rep(wtime[i],D)
       popGLM[((i-1)*D+1):(i*D)] <- rep(pop[i],D)
@@ -598,12 +582,7 @@ bodaDelay.data.glm <- function(dayToConsider, b, freq,
 
   }
 
-
-
-
-
   return(as.data.frame(dataGLM))
-
 }
 
 ################################################################################
@@ -628,18 +607,20 @@ formulaGLMDelay <- function(timeBool=TRUE,factorsBool=FALSE,delay=FALSE,outbreak
 
   # With time trend?
   if (timeBool){
-    formulaString <- paste(formulaString,"+wtime",sep ="")}
-
-
+    formulaString <- paste(formulaString,"+wtime",sep ="")
+  }
 
   # With factors?
-  if(factorsBool){
-    formulaString <- paste(formulaString,"+as.factor(seasgroups)",sep ="")}
+  if (factorsBool){
+    formulaString <- paste(formulaString,"+as.factor(seasgroups)",sep ="")
+  }
   #   # With delays?
-  if(delay){
-    formulaString <- paste(formulaString,"+as.factor(delay)",sep ="")}
-  if(outbreak){
-    formulaString <- paste(formulaString,"+f(outbreakOrNot,model='linear', prec.linear = 1)",sep ="")}
+  if (delay){
+    formulaString <- paste(formulaString,"+as.factor(delay)",sep ="")
+  }
+  if (outbreak) {
+    formulaString <- paste(formulaString,"+f(outbreakOrNot,model='linear', prec.linear = 1)",sep ="")
+  }
   # Return formula as a string
   return(formulaString)
 }
