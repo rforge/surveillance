@@ -84,7 +84,7 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
     plot. The first color is the fill color of the polygons for the
     counts bars (\code{NA} for unfilled), the 2nd element denotes their
     border color, the 3rd element is the color of the \code{upperbound}
-    plotting.} 
+    plotting.}
   \item{lwd}{Vector of length 3 specifying the line width of the three
     elements to plot. See also the \code{col} argment.}
   \item{alarm.symbol}{a list with entries \code{pch}, \code{col},
@@ -96,16 +96,16 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
   \item{legend.opts}{a list containing the entries to be sent to the
   \code{\link{legend}} function. If no legend is requested use
   \code{legend.opts=NULL}. Otherwise, the following arguments are
-  default 
+  default
     \describe{
       \item{\code{x}}{\code{top}}
       \item{\code{legend}}{The names infected and outbreak.}
       \item{\code{lty}}{If \code{NULL} the \code{lty} argument will be used}
       \item{\code{pch}}{If \code{NULL} the \code{pch} argument is used}
       \item{\code{col}}{If \code{NULL} the \code{col} argument is
-        used}  
+        used}
     }
-    
+
     Any further arguments to the \code{legend} function are
     just provided as additional elements of this list,
     e.g. \code{horiz=TRUE}.
@@ -115,7 +115,7 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
     a little for better visiability.}
   \item{lvl}{A vector of length \code{ncol(x)}, which is used to
     specify the hierarchy level for each time series in the sts object
-    for alarm plots.} 
+    for alarm plots.}
   \item{cex}{A numerical value giving the amount by which plotting text
     and symbols should be magnified relative to the default. See
     \code{?par} for details.}
@@ -128,7 +128,7 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
     plot method. Do not alter this function manually.}
   \item{...}{further arguments for the function \code{matplot}. If
     e.g. \code{xlab} or \code{main} are provided they overwrite the
-    default values.} 
+    default values.}
 }
 
 \details{
@@ -147,23 +147,26 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
   the result of applying the conversion in \code{name} to the epochs of
   the \code{sts} object and \code{xm1} is the scalar result when
   applying the conversion to the natural element just before the first
-  epoch.  Three predefined subsetting functions exist:
-  \code{atChange}, \code{at2ndChange}  and \code{atMedian}, which 
+  epoch. Please note that the input to the subsetting function is converted
+  using \code{as.numeric} before calling the function. Hence, the
+  conversion specification needs to result in a string convertible to integer.
+  Three predefined subsetting functions exist:
+  \code{atChange}, \code{at2ndChange}  and \code{atMedian}, which
   are used to make a tick at each (each 2nd for \code{at2ndChange})
   change and at the median index computed on all having the same value,
-  respectively: 
+  respectively:
   \preformatted{
     atChange <- function(x,xm1) which(diff(c(xm1,x)) != 0)
     at2ndChange <- function(x,xm1) which(diff(c(xm1,x) \%/\% 2) != 0)
     atMedian <- function(x,xm1) tapply(seq_along(x), INDEX=x, quantile, prob=0.5, type=3)
   }
   By defining own functions here, one can obtain an arbitrary degree of
-  flexibility. 
+  flexibility.
   Finally, \code{xaxis.labelFormat} is a \code{\link{strftime}}
   compatible formatting string., e.g. the default value is
   \code{"\%G\\n\\n\%OQ"}, which means ISO year and quarter (in roman
   letters) stacked on top of each other.
-  
+
 }
 
 \value{
