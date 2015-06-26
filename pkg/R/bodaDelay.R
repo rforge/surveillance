@@ -245,7 +245,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
 
       argumentsThreshold <- list(model,alpha=alpha,dataGLM=dataGLM,reportingTriangle,
                                  delay=delay,k=k,control=control,mc.munu=mc.munu,mc.y=mc.y,
-                                 inferenceMethod=control$inferenceMethod)
+                                 inferenceMethod=control$inferenceMethod,verbose=verbose)
       predisons <- do.call(bodaDelay.threshold,argumentsThreshold)
 
       threshold <- predisons$quantile
@@ -353,15 +353,14 @@ bodaDelay.fitGLM <- function(dataGLM,reportingTriangle,alpha,
     }
 
   }
-  if (inferenceMethod=="asym"){
+  if (inferenceMethod=="asym") {
 
     model <- try(MASS::glm.nb(as.formula(theModel),data=dataGLM),
                  silent=TRUE)
-    if(inherits(model,'try-error')){
+    if(inherits(model,'try-error')) {
       return(model=NA)
     }
-
-    }
+  }
   return(model)
 }
 ################################################################################
@@ -373,7 +372,7 @@ bodaDelay.fitGLM <- function(dataGLM,reportingTriangle,alpha,
 ################################################################################
 bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
                                 delay,k,control,dataGLM,reportingTriangle,
-                                inferenceMethod,...) {
+                                inferenceMethod,verbose=FALSE,...) {
   if (inferenceMethod=="INLA"){
     E <- max(0,mean(dataGLM$response, na.rm=TRUE))
     # Sample from the posterior
@@ -422,6 +421,16 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
     theta <- rnorm(n=mc.munu,mean=summary(model)$theta,sd=summary(model)$SE.theta)
 
     if (delay) {
+
+      if (verbose) { ###hoehle - added to check delay estimation
+        cat("Estimation k=",k,":\n")
+        delayIdx <- grep("as\\.factor\\(delay\\)",names(coef(model)))
+        pmfUnscaled <- c(1,exp(coef(model)[delayIdx]))
+        pmf <- pmfUnscaled / sum(pmfUnscaled)
+        cat("Delay distribution: ", sprintf("%.3f",pmf),"\n")
+        cat("Dispersion: ",model$theta,"\n")
+      }
+
       # Maximal delay + 1
 ###      browser()
       Dmax0 <- ncol(as.matrix(reportingTriangle$n))
