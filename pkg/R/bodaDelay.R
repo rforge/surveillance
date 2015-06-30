@@ -134,7 +134,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
       stop("Dates in the reporting triangle do not correspond to epochs of the sts object.")
     }
 
-    if (!(sum(apply(sts@control$reportingTriangle$n,1,sum,na.rm=TRUE)==sts@observed)==length(sts@observed))) {
+    if (!(sum(apply(sts@control$reportingTriangle$n,1,sum,na.rm=TRUE)[as.logical(!is.na(sts@observed))]) == sum(sts@observed,na.rm=TRUE))) {
       stop("The reporting triangle is wrong: not all cases are in the reporting triangle.")
     }
   }
