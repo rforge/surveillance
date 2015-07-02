@@ -5,7 +5,9 @@ date: "1 Jul 2015"
 output: html_document
 ---
 
-This is an knitr/R Markdown document containing the [surveillance package](http://surveillance.r-forge.r-project.org/) 'backend' of the useR2015 talk about 'Zombie Preparedness'. Disclaimer: No claim is made that this is nice code - focus is on the reprodcubility of the results! Furthermore, to get improved visualization some of the standard plot routines of `sts`were tweaked. Hence, some of the code may look more cumbersome than it would be in order to just get a default plot. 
+![userR2015 logo](userR2015-small.png)
+
+This is an knitr/R Markdown document containing the [surveillance package](http://surveillance.r-forge.r-project.org/) 'backend' of the useR2015 talk about ['Zombie Preparedness'](http://www.math.su.se/~hoehle/software/surveillance/hoehle-userR2015-web.pdf). Disclaimer: No claim is made that this is nice code - focus is on the reprodcubility of the results! Furthermore, to get improved visualization some of the standard plot routines of `sts`were tweaked. Hence, some of the code may look more cumbersome than it would be in order to just get a default plot. 
 
 ```{r message=FALSE}
 ######################################################################
