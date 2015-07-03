@@ -121,7 +121,7 @@ echo $contents; } ?>
 	outbreaks by Frisén and Andersson (2009)</li>
     </ul>
   </li>
-    
+
   <li>Online change-point detection in categorical time series:
     <ul>
       <li><code>categoricalCUSUM</code> - includes change-point
@@ -193,8 +193,8 @@ echo $contents; } ?>
     </ul>
   </li>
 
-  <li>Meyer and Held (2014) describe both the spatio-temporal 
-  <code>hhh4()</code> (count data) and <code>twinstim()</code> (individual-level data) 
+  <li>Meyer and Held (2014) describe both the spatio-temporal
+  <code>hhh4()</code> (count data) and <code>twinstim()</code> (individual-level data)
   frameworks with a view to modelling power-law decay of spatial interaction.</li>
 
 </ul>
@@ -246,17 +246,18 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
 <hr />
 <h3>News</h3>
 <ul>
+  <li>2015/07/01 Two talks about the surveillance package given at the <a href="http://user2015.math.aau.dk">useR2015!</a>: <a href="http://staff.math.su.se/hoehle/software/surveillance/hoehle-userR2015-web.pdf">Zombie Preparedness</a> by Michael Höhle as well as <a href="">Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package surveillance</a> by Sebastian Meyer (slides to appear).</li>
   <li>See
     the <a href="http://cran.r-project.org/web/packages/surveillance/news.html">NEWS</a>
-    of the latest version released on CRAN or 
-    the <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/inst/NEWS.Rd?view=markup&root=surveillance">NEWS file</a> 
+    of the latest version released on CRAN or
+    the <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/inst/NEWS.Rd?view=markup&root=surveillance">NEWS file</a>
     of the current development version.
   </li>
   <li>2014/11/08 Two arxiv reports (submitted manuscripts) illustrate the newest package features: <a href="http://arxiv.org/abs/1411.0416">Meyer et al. (2014)</a> (spatio-temporal modelling) and <a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> (monitoring).</li>
   <li>2013/04/23 <a href="StockholmR-Hoehle_4.pdf">Talk</a> at the  Stockholm R useR group (StockholmR) on <a href="http://www.meetup.com/StockholmR/events/105738342/">Making R packages (and) Shiny</a>.</li>
 </ul>
 
-  
+
 <hr/>
 <h3>Documentation</h3>
 
@@ -291,7 +292,7 @@ the shortcourse  <a
  href="http://www.stat.uni-muenchen.de/%7Ehoehle/surv-short/index.html">Statistical
 surveillance of infectious diseases</a> held at the Department of
 Statistics, Universidade Federal de Minas Gerais (UFMG), Belo
-Horizonte, Brazil, Nov 27-28, 2008. 
+Horizonte, Brazil, Nov 27-28, 2008.
 </li>
       <li><a href="hoehle-surveillance.pdf">Invited talk</a> held at
 the 2008 ESCAIDE satellite workshop on <ii>Computer supported outbreak
@@ -335,8 +336,8 @@ further preprints.<br>
 Höhle</a>, Department of Mathematics, Stockholm University, Sweden
 (Project Admin)</li>
       <li><a href="http://www.biostat.uzh.ch/aboutus/people/smeyer.html">Sebastian
-Meyer</a>, Epidemiology, Biostatistics and Prevention Institute (<a href="http://www.ebpi.uzh.ch/">EBPI</a>), University of 
-Zurich, Switzerland</li> 
+Meyer</a>, Epidemiology, Biostatistics and Prevention Institute (<a href="http://www.ebpi.uzh.ch/">EBPI</a>), University of
+Zurich, Switzerland</li>
       <li>Michaela Paul (previously: University of Zurich, Switzerland)</li>
       <li><a href="http://www.normalesup.org/~masalmon/">Ma&eumllle Salmon</a>,
 	Department for Infectious Disease Epidemiology, Robert Koch Institute,
@@ -344,7 +345,7 @@ Zurich, Switzerland</li>
 
       <li>Former student programmers: C. Lang, A. Riebler, V. Wimmer</li>
 
-      <li>Contributions by: L. Held, T. Correa, M. Hofmann, J. Manitz, 
+      <li>Contributions by: L. Held, T. Correa, M. Hofmann, J. Manitz,
 	D. Sabanés Bové, D. Schumacher, S. Steiner, M. Virtanen</li>
     </ul>
   </blockquote>
