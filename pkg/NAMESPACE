@@ -38,7 +38,7 @@ importFrom(utils, head, tail, toLatex)
 ##                   na.omit, as.formula, pnbinom, qnbinom, qnorm, sd, glm, optim,
 ##                   poisson, ppois, qpois, predict.glm, summary.glm, quasipoisson,
 ##                   glm.fit) ## and many more...
-importFrom(utils, packageVersion, modifyList, capture.output, read.table,
+importFrom(utils, packageVersion, modifyList, capture.output, read.table, data,
                   setTxtProgressBar, txtProgressBar, sessionInfo, head.matrix,
                   str, flush.console, write.table, as.roman, tail.matrix)
 
