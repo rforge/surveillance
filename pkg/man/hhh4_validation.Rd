@@ -80,11 +80,11 @@ scores(object, which = c("logs", "rps", "dss", "ses"), units = NULL,
     (\code{"nses"}) is also available but it is improper and not
     computed by default.\cr
     It is possible to name own scoring rules in \code{which}. These
-    must be functions of \code{(x, mu, size)}, where all arguments are
-    time x unit matrices, except that \code{size} is \code{NULL}
+    must be functions of \code{(x, mu, size)}, vectorized in all arguments
+    (time x unit matrices) except that \code{size} is \code{NULL}
     in case of a Poisson model.
-    See the package-internal scoring rules for guidance, e.g.,
-    \code{surveillance:::logs} or \code{surveillance:::dss}.}
+    See the supplied scoring rules for guidance, e.g.,
+    \code{\link{logs}} or \code{\link{dss}}.}
   \item{units}{integer or character vector indexing the units for which
     the scores should be computed. By default (\code{NULL}) all units
     are considered.}

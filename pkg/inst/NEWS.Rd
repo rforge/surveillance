@@ -6,6 +6,19 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.10-0 (2015-07-08)}{
+
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item Calibration tests for count data (Wei and Held, 2014, Test)
+      are now implemented and available as \code{calibrationTest()}.
+    }
+  }
+
+}
+
+
+
 \section{Changes in surveillance version 1.9-1 (2015-06-12)}{
 
   \itemize{

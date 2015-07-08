@@ -162,6 +162,10 @@ S3method(toLatex, knox)
 export(stKtest)
 S3method(plot, stKtest)
 
+# calibration test for Poisson or NegBin predictions
+export(calibrationTest)
+export(dss, logs, rps)  # ses, nses
+
 
 ### sts(BP)-specific
 
