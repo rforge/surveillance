@@ -8,7 +8,7 @@
 ### Czado, C., Gneiting, T. & Held, L. (2009)
 ### Biometrics 65:1254-1261
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2014 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2014-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -55,6 +55,7 @@ dss <- function (x, mu, size=NULL) {
 ## ranked probability score
 ## rps(P,x) = sum_0^Kmax {P(X<=k) - 1(x<=k)}^2
 
+## scalar input (for one single prediction)
 rps.one <- function (x, mu, size=NULL, k=40, tolerance=sqrt(.Machine$double.eps)) {
     ## return NA for non-convergent fits (where mu=NA)
     if (is.na(mu)) return(NA_real_)
@@ -77,12 +78,14 @@ rps.one <- function (x, mu, size=NULL, k=40, tolerance=sqrt(.Machine$double.eps)
 	
     ## check precision
     if ((1-tail(Px,1))^2 > tolerance)
-        warning("precision of finite sum not smaller than tolerance=", tolerance)
+        warning("finite sum approximation error larger than tolerance=",
+                format(tolerance))
 	
     ## compute rps
     sum((Px-ind)^2)
 }
 
+## vectorized version
 rps <- function (x, mu, size=NULL, k=40, tolerance=sqrt(.Machine$double.eps)) {
     res <- if (is.null(size)) {
         mapply(rps.one, x=x, mu=mu,
@@ -96,7 +99,9 @@ rps <- function (x, mu, size=NULL, k=40, tolerance=sqrt(.Machine$double.eps)) {
 }
 
 
-## returns scores in reversed (!) order, i.e. for time points n, n-1, n-2, ...
+
+### apply scoring rules to a set of oneStepAhead() forecasts
+## CAVE: returns scores in reversed order, i.e. for time points n, n-1, n-2, ...
 
 scores <- function (object, which = c("logs","rps","dss","ses"), units = NULL,
                     sign = FALSE, individual = FALSE)
