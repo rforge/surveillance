@@ -85,16 +85,21 @@ logs_EV_1P <- function (mu, tolerance = 1e-4) # tolerance is in absolute value
 logs_EV_1NB <- function (mu, size)
 {
     kmax <- qnbinom(1-10^(-5), mu = mu, size = size) + 5
-    seqq <- sapply(0:kmax, function(i)
-        (lbeta(i+1,size) + log(i+size)) *
-            dnbinom(i, mu=mu, size=size))
-    E <- sum(seqq) - size*log(size) - mu*log(mu) + (mu+size)*log(mu+size)
-    ##variance
-    con2 <- E - size*log((mu+size)/size)
-    seqq2 <- sapply(0:kmax, function(i)
-        ((lbeta(i+1,size) + log(i+size)) + i*log(1+size/mu))^2 *
-            dnbinom(i, mu=mu, size=size))
+    kseq <- 0:kmax
+
+    ## compute values required by both E and V
+    fseq <- dnbinom(kseq, mu = mu, size = size)
+    lgammaseq <- lbeta(kseq + 1L, size) + log(kseq + size)
+    
+    ## expectation
+    seqq1 <- lgammaseq * fseq
+    E <- sum(seqq1) - size*log(size) - mu*log(mu) + (mu+size)*log(mu+size)
+
+    ## variance
+    con2 <- E - size * log(1 + mu/size)
+    seqq2 <- (lgammaseq + kseq * log(1 + size/mu))^2 * fseq
     V <- sum(seqq2) - con2^2
+    
     c(E = E, V = V)
 }
 
