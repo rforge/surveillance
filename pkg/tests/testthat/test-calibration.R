@@ -6,14 +6,22 @@ size2 <- c(0.1, 0.1, 10, 10, 100, 100)
 ##set.seed(2); y <- rnbinom(length(mu), mu = mu, size = size1)
 y <- c(0, 0, 2, 14, 5, 63)
 
-test_that("still the same DSS z-statistics", {
-    zP <- calibrationTest(y, mu, which = "dss")$statistic
-    expect_equal(zP, 6.07760977730636, check.attributes = FALSE)
+zExpected <- rbind(
+    dss = c(P = 6.07760977730636, NB1 = -0.468561113465647, NB2 = 2.81071829075294),
+    logs = c(P = 5.95656242588096, NB1 = 0.403872251419915, NB2 = 2.77090543018323)
+    )
 
-    zNB1 <- calibrationTest(y, mu, size1, which = "dss")$statistic
-    expect_equal(zNB1, -0.468561113465647, check.attributes = FALSE)
-
-    zNB2 <- calibrationTest(y, mu, size2, which = "dss")$statistic
-    expect_equal(zNB2, 2.81071829075294, check.attributes = FALSE)
-})
-
+for (score in rownames(zExpected)) {
+    .zExpected <- zExpected[score, , drop = TRUE]
+    test_that(paste0("still the same z-statistics with ", score), {
+        ## Poisson predictions
+        zP <- calibrationTest(y, mu, which = score)$statistic
+        expect_equal(zP, .zExpected["P"], check.attributes = FALSE)
+        ## NegBin predictions with common size parameter
+        zNB1 <- calibrationTest(y, mu, size1, which = score)$statistic
+        expect_equal(zNB1, .zExpected["NB1"], check.attributes = FALSE)
+        ## NegBin predictions with varying size parameter
+        zNB2 <- calibrationTest(y, mu, size2, which = score)$statistic
+        expect_equal(zNB2, .zExpected["NB2"], check.attributes = FALSE)
+    })
+}
