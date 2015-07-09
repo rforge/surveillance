@@ -48,26 +48,34 @@ logs_EV <- function (mu, size = NULL)
 }
 
 ## for a single Poisson prediction
-logs_EV_1P <- function (mu, tolerance = 1e-4)
+logs_EV_1P <- function (mu, tolerance = 1e-4) # tolerance is in absolute value
 {
+    ## use the same kmax for expectation and variance -> shared computations
+    ## K2 is always a bit larger than K1, so we use K2
+    kmax <- if (mu^3 < tolerance/.Machine$double.eps/2) {
+        ## we can calculate K2 from Theorem 1 (b)
+        qpois(1 - tolerance/(mu^3 + 6*mu^2 + 7*mu + 1), lambda = mu) + 3
+    } else { # very high quantile (e.g., 1 - 1e-16) would yield Inf
+        mu + 10 * sqrt(mu)
+    }
+    kseq <- seq_len(kmax)
+
+    ## compute values required by both E and V
+    fseq <- dpois(kseq, lambda = mu)
+    logfactseq <- lfactorial(kseq)
+    
     ## expectation
     E <- if (mu > tolerance^(-1/4)) { # fast version for "large" mu
         ## approximation error is of order 1/mu^4
         0.5 + 0.5*log(2*pi*mu) - 1/12/mu - 1/24/mu^2 - 19/360/mu^3
     } else {
-        kmax1 <- qpois(1 - tolerance/(mu^2 + 3*mu + 1), lambda = mu) + 2
-        kseq1 <- seq_len(kmax1)
-        seqq1 <- dpois(kseq1, lambda = mu) * lfactorial(kseq1)
+        ##kmax1 <- qpois(1 - tolerance/(mu^2 + 3*mu + 1), lambda = mu) + 2
+        seqq1 <- fseq * logfactseq
         mu * (1-log(mu)) + sum(seqq1)
     }
     
-    ## variance
-    kmax2 <- qpois(1 - tolerance/(mu^3 + 6*mu^2 + 7*mu + 1), lambda = mu) + 3
-    ## TODO: kmax2 is always a bit larger than kmax1 -> could use kmax2 also for E
-    ## TODO: protect against very high quantiles (kmax2 will be Inf) noting that
-    ##       V converges to 0.5 as mu -> Inf, e.g., mu = 900 -> V = 0.4999073
-    kseq2 <- seq_len(kmax2)
-    seqq2 <- (lfactorial(kseq2) - kseq2 * log(mu))^2 * dpois(kseq2, lambda = mu)
+    ## variance (does it converge to 0.5 as mu -> Inf ?)
+    seqq2 <- (logfactseq - kseq * log(mu))^2 * fseq
     V <- sum(seqq2) - (E - mu)^2
     
     c(E = E, V = V)
