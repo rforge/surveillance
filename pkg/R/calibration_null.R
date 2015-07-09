@@ -84,6 +84,7 @@ logs_EV_1P <- function (mu, tolerance = 1e-4) # tolerance is in absolute value
 ## for a single NegBin prediction
 logs_EV_1NB <- function (mu, size)
 {
+    ## TODO: replace simple kmax by formulae from the paper
     kmax <- qnbinom(1-10^(-5), mu = mu, size = size) + 5
     kseq <- 0:kmax
 
@@ -99,6 +100,11 @@ logs_EV_1NB <- function (mu, size)
     con2 <- E - size * log(1 + mu/size)
     seqq2 <- (lgammaseq + kseq * log(1 + size/mu))^2 * fseq
     V <- sum(seqq2) - con2^2
+    ## check against formulation in the paper (Equation 11):
+    ## con2paper <- E + size*log(size) - size*log(size+mu) - lgamma(size)
+    ## seqq2paper <- (-lgamma(kseq+size) + lgamma(kseq+1L) + kseq*log(1+size/mu))^2 * fseq
+    ## Vpaper <- sum(seqq2paper) - con2paper^2
+    ## => V and Vpaper are only identical for kmax -> Inf
     
     c(E = E, V = V)
 }
