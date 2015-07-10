@@ -129,11 +129,39 @@ logs_EV_1NB <- function (mu, size, tolerance = 1e-4)
 ## for a single Poisson prediction
 rps_EV_1P <- function (mu, tolerance = 1e-4) # tolerance is in absolute value
 {
-    .NotYetImplemented()
+    ## expectation
+    E <- mu * gsl::bessel_I0_scaled(2*mu, give=FALSE, strict=TRUE) +
+        mu * gsl::bessel_I1_scaled(2*mu, give=FALSE, strict=TRUE)
+
+    ## variance
+    kmax <- qpois(1-tolerance, lambda = mu) + 5
+    kseq <- 0:kmax
+    psiseq <- (kseq - mu) * (2*ppois(kseq, lambda = mu) - 1) +
+        2 * mu * dpois(kseq, lambda = mu)
+    seqq <- psiseq^2 * dpois(kseq, lambda = mu)
+    V <- sum(seqq) - 4 * E^2
+    
+    c(E = E, V = V)
 }
 
 ## for a single NegBin prediction
 rps_EV_1NB <- function (mu, size, tolerance = 1e-4)
 {
-    .NotYetImplemented()
+    ## expectation
+    kmax1 <- max(qnbinom(1-tolerance/mu, mu = mu*(1+1/size), size = size+1) + 1, 9) # exp(2)
+    kseq1 <- seq_len(kmax1)
+    seqq1 <- sapply(kseq1, function (i)
+        dnbinom(i, mu = mu, size = size) *
+            sum((i:1) * dnbinom(0:(i-1), mu = mu, size = size)))
+    E <- sum(seqq1)
+    
+    ## variance
+    kmax2 <- qnbinom(1-tolerance, mu = mu, size = size) + 5
+    kseq2 <- 0:kmax2
+    psiseq <- kseq2 * (2 * pnbinom(kseq2, mu = mu, size = size) - 1) +
+        mu * (1 - 2 * pnbinom(kseq2 - 1, mu = mu + mu/size, size = size + 1))
+    seqq <- psiseq^2 * dnbinom(kseq2, mu = mu, size = size)
+    V <- sum(seqq) - 4 * E^2
+    
+    c(E = E, V = V)
 }
