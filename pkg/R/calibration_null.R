@@ -162,13 +162,19 @@ rps_EV_1P <- function (mu, tolerance = 1e-4) # tolerance is in absolute value
 rps_EV_1NB <- function (mu, size, tolerance = 1e-4)
 {
     ## expectation
-    kmax1 <- max(qnbinom(1-tolerance/mu, mu = mu*(1+1/size), size = size+1) + 1,
-                 8)  # cf. Theorem 2 (b)
-    kseq1 <- seq_len(kmax1)
-    seqq1 <- sapply(kseq1, function (i)
-        dnbinom(i, mu = mu, size = size) *
-            sum((i:1) * dnbinom(0:(i-1), mu = mu, size = size)))
-    E <- sum(seqq1)
+    ghgz_part <- mu * (1 + mu/size)
+    ghgz <- 4 * ghgz_part / size
+    E <- if (ghgz < 1 && requireNamespace("gsl", quietly = TRUE)) {
+        ghgz_part * gsl::hyperg_2F1(1+size, 0.5, 2, -ghgz, give = FALSE, strict = TRUE)
+    } else {
+        kmax1 <- max(qnbinom(1-tolerance/mu, mu = mu*(1+1/size), size = size+1) + 1,
+                     8)  # cf. Theorem 2 (b)
+        kseq1 <- seq_len(kmax1)
+        seqq1 <- sapply(kseq1, function (i)
+            dnbinom(i, mu = mu, size = size) *
+                sum((i:1) * dnbinom(0:(i-1), mu = mu, size = size)))
+        sum(seqq1)
+    }
     
     ## variance
     kmax2 <- qnbinom(1-tolerance, mu = mu, size = size) + 5
