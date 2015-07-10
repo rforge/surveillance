@@ -130,8 +130,20 @@ logs_EV_1NB <- function (mu, size, tolerance = 1e-4)
 rps_EV_1P <- function (mu, tolerance = 1e-4) # tolerance is in absolute value
 {
     ## expectation
-    E <- mu * gsl::bessel_I0_scaled(2*mu, give=FALSE, strict=TRUE) +
-        mu * gsl::bessel_I1_scaled(2*mu, give=FALSE, strict=TRUE)
+    if (requireNamespace("gsl", quietly = TRUE)) {
+        ## faster and more accurate implementation (works for larger mu)
+        E <- mu * gsl::bessel_I0_scaled(2*mu, give=FALSE, strict=TRUE) +
+            mu * gsl::bessel_I1_scaled(2*mu, give=FALSE, strict=TRUE)
+    } else {
+        E <- mu * besselI(2*mu, 0, expon.scaled = TRUE) +
+            mu * besselI(2*mu, 1, expon.scaled = TRUE)
+        if (identical(E, 0)) {
+            ## R's besselI() works fine for mu <= 50000 (on my .Machine)
+            ## but returns 0 (buffer overflow) for larger arguments
+            warning("'mu' is too large for besselI(), install package \"gsl\"")
+            return(c(E = NA_real_, V = NA_real_))
+        }
+    }
 
     ## variance
     kmax <- qpois(1-tolerance, lambda = mu) + 5
