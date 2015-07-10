@@ -49,10 +49,9 @@ calibrationZ <- function (score, mu, size = NULL,
                           which = c("dss", "logs", "rps"),
                           tolerance = 1e-4, method = 2)
 {
-    which <- match.arg(which)
     stopifnot(method %in% 1:2)
     ## expectation and variance of score for given predictive distribution
-    EV <- do.call(paste0(which, "_EV"), args = alist(mu, size, tolerance))
+    EV <- score_EV(mu, size, tolerance, which)
     ## calculate the z-statistic
     z <- do.call(paste0("zScore", method),
                  args = alist(score, EV[[1L]], EV[[2L]]))

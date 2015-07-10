@@ -11,13 +11,38 @@
 ### $Date$
 ################################################################################
 
-## NOTE: size = NULL refers to Poisson predictions, otherwise NegBin
+## wrapper function calling the necessary "EV" function for the selected score
+score_EV <- function (mu, size = NULL, tolerance = 1e-4,
+                      which = c("dss", "logs", "rps"))
+{
+    which <- match.arg(which)
+    if (which == "dss")
+        return(dss_EV(mu, size))
+
+    ## for "logs" and "rps", the EV function only works with a single prediction
+    ## -> apply to each mu (size)
+    res <- if (is.null(size)) { # Poisson
+        vapply(X = mu,
+               FUN = paste0(which, "_EV_1P"),
+               FUN.VALUE = c(E = 0, V = 0),
+               tolerance = tolerance,
+               USE.NAMES = FALSE)
+    } else { # NegBin
+        mapply(FUN = paste0(which, "_EV_1NB"),
+               mu = mu, size = size,
+               MoreArgs = list(tolerance = tolerance),
+               SIMPLIFY = TRUE, USE.NAMES = FALSE)
+    }
+    ## 'res' has dimension 2 x length(mu)
+    list(E = res[1L,], V = res[2L,])
+}
+
 
 ##########################
 ### Dawid–Sebastiani Score
 ##########################
 
-dss_EV <- function (mu, size = NULL, tolerance = NULL)
+dss_EV <- function (mu, size = NULL)
 {
     sigma2 <- if (is.null(size)) mu else mu * (1 + mu/size)
     E <- 1 + log(sigma2)
@@ -33,20 +58,6 @@ dss_EV <- function (mu, size = NULL, tolerance = NULL)
 #####################
 ### Logarithmic Score
 #####################
-
-logs_EV <- function (mu, size = NULL, tolerance = 1e-4)
-{
-    res <- if (is.null(size)) {
-        vapply(X = mu, FUN = logs_EV_1P, tolerance = tolerance,
-               FUN.VALUE = c(E = 0, V = 0), USE.NAMES = FALSE)
-    } else {
-        mapply(FUN = logs_EV_1NB, mu = mu, size = size,
-               MoreArgs = list(tolerance = tolerance),
-               SIMPLIFY = TRUE, USE.NAMES = FALSE)
-    }
-    ## 'res' has dimension 2 x length(mu)
-    list(E = res[1L,], V = res[2L,])
-}
 
 ## for a single Poisson prediction
 logs_EV_1P <- function (mu, tolerance = 1e-4) # tolerance is in absolute value
@@ -115,7 +126,14 @@ logs_EV_1NB <- function (mu, size, tolerance = 1e-4)
 ### Ranked Probability Score
 ############################
 
-rps_EV <- function (mu, size = NULL, tolerance = 1e-4)
+## for a single Poisson prediction
+rps_EV_1P <- function (mu, tolerance = 1e-4) # tolerance is in absolute value
+{
+    .NotYetImplemented()
+}
+
+## for a single NegBin prediction
+rps_EV_1NB <- function (mu, size, tolerance = 1e-4)
 {
     .NotYetImplemented()
 }
