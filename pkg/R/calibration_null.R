@@ -146,7 +146,8 @@ rps_EV_1P <- function (mu, tolerance = 1e-4) # tolerance is in absolute value
     }
 
     ## variance
-    kmax <- qpois(1-tolerance, lambda = mu) + 5
+    kmax <- max(qpois(1 - tolerance/(10*mu^2 + mu), lambda = mu) + 2,
+                8)  # cf. Theorem 2 (a)
     kseq <- 0:kmax
     fseq <- dpois(kseq, lambda = mu)
     Fseq <- cumsum(fseq)  # = ppois(kseq, lambda = mu)
