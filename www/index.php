@@ -252,8 +252,18 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
     the <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/inst/NEWS.Rd?view=markup&root=surveillance">NEWS file</a>
     of the current development version.
   </li>
-  <li>2015/07/01 Two talks about the surveillance package given at the <a href="http://user2015.math.aau.dk">useR2015!</a> conference: <a href="http://staff.math.su.se/hoehle/software/surveillance/hoehle-userR2015-web.pdf">Zombie Preparedness</a> by Michael Höhle as well as <a href="http://user2015.math.aau.dk/presentations/40.pdf">Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package surveillance</a> by Sebastian Meyer (slides to appear).</li>
-  <li>2014/11/08 Two arxiv reports (submitted manuscripts) illustrate the newest package features: <a href="http://arxiv.org/abs/1411.0416">Meyer et al. (2014)</a> (spatio-temporal modelling) and <a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> (monitoring).</li>
+  <li>2015/07/01 Two talks about the surveillance package given at the <a href="http://user2015.math.aau.dk">useR2015!</a> conference:
+<ul>
+<li><a href="http://staff.math.su.se/hoehle/software/surveillance/hoehle-userR2015-web.pdf">Zombie Preparedness</a> by Michael Höhle</li>
+<li><a href="http://user2015.math.aau.dk/presentations/40.pdf">Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package surveillance</a> by Sebastian Meyer</li>
+</ul>
+</li>
+  <li>2014/11/08 Two arxiv reports (submitted manuscripts) illustrate the newest package features:
+<ul>
+<li><a href="http://arxiv.org/abs/1411.0416">Meyer et al. (2014)</a> (spatio-temporal modelling)</li>
+<li><a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> (monitoring)</li>
+</ul>
+</li>
   <li>2013/04/23 <a href="StockholmR-Hoehle_4.pdf">Talk</a> at the  Stockholm R useR group (StockholmR) on <a href="http://www.meetup.com/StockholmR/events/105738342/">Making R packages (and) Shiny</a>.</li>
 </ul>
 
