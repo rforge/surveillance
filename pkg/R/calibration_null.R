@@ -148,9 +148,10 @@ rps_EV_1P <- function (mu, tolerance = 1e-4) # tolerance is in absolute value
     ## variance
     kmax <- qpois(1-tolerance, lambda = mu) + 5
     kseq <- 0:kmax
-    psiseq <- (kseq - mu) * (2*ppois(kseq, lambda = mu) - 1) +
-        2 * mu * dpois(kseq, lambda = mu)
-    seqq <- psiseq^2 * dpois(kseq, lambda = mu)
+    fseq <- dpois(kseq, lambda = mu)
+    Fseq <- cumsum(fseq)  # = ppois(kseq, lambda = mu)
+    psiseq <- (kseq - mu) * (2*Fseq - 1) + 2*mu * fseq
+    seqq <- psiseq^2 * fseq
     V <- sum(seqq) - 4 * E^2
     
     c(E = E, V = V)
