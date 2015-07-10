@@ -171,9 +171,11 @@ rps_EV_1NB <- function (mu, size, tolerance = 1e-4)
     ## variance
     kmax2 <- qnbinom(1-tolerance, mu = mu, size = size) + 5
     kseq2 <- 0:kmax2
-    psiseq <- kseq2 * (2 * pnbinom(kseq2, mu = mu, size = size) - 1) +
+    fseq <- dnbinom(kseq2, mu = mu, size = size)
+    Fseq <- cumsum(fseq)  # = pnbinom(kseq2, mu = mu, size = size)
+    psiseq <- kseq2 * (2 * Fseq - 1) +
         mu * (1 - 2 * pnbinom(kseq2 - 1, mu = mu + mu/size, size = size + 1))
-    seqq <- psiseq^2 * dnbinom(kseq2, mu = mu, size = size)
+    seqq <- psiseq^2 * fseq
     V <- sum(seqq) - 4 * E^2
     
     c(E = E, V = V)
