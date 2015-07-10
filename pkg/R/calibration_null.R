@@ -162,7 +162,8 @@ rps_EV_1P <- function (mu, tolerance = 1e-4) # tolerance is in absolute value
 rps_EV_1NB <- function (mu, size, tolerance = 1e-4)
 {
     ## expectation
-    kmax1 <- max(qnbinom(1-tolerance/mu, mu = mu*(1+1/size), size = size+1) + 1, 9) # exp(2)
+    kmax1 <- max(qnbinom(1-tolerance/mu, mu = mu*(1+1/size), size = size+1) + 1,
+                 8)  # cf. Theorem 2 (b)
     kseq1 <- seq_len(kmax1)
     seqq1 <- sapply(kseq1, function (i)
         dnbinom(i, mu = mu, size = size) *
