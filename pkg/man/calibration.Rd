@@ -19,8 +19,8 @@
 }
 
 \usage{
-calibrationTest(x, mu, size = NULL,
-                which = c("dss", "logs", "rps"), method = 2)
+calibrationTest(x, mu, size = NULL, which = c("dss", "logs", "rps"),
+                tolerance = 1e-4, method = 2)
 
 dss(x, mu, size = NULL)
 logs(x, mu, size = NULL)
@@ -45,15 +45,20 @@ rps(x, mu, size = NULL, k = 40, tolerance = sqrt(.Machine$double.eps))
   \item{which}{
     character string indicating which proper scoring rule to apply.
   }
+  \item{tolerance}{
+    absolute tolerance for the finite sum approximation for \code{rps}
+    and for the null expectation and variance of \code{"logs"} and
+    \code{"rps"}. Unused for \code{which = "dss"} (closed form).
+  }
   \item{method}{
     selection of the \eqn{z}-statistic: \code{method = 2} refers to
     the alternative test statistic \eqn{Z_s^*} of Wei and Held (2014,
     Discussion), which has been recommended for low counts.
     \code{method = 1} corresponds to Equation 5 in Wei and Held (2014).
   }
-  \item{k,tolerance}{
-    arguments controlling the finite sum approximation for the RPS
-    with truncation at \code{ceiling(mu + k*sd)}.
+  \item{k}{
+    scalar argument controlling the finite sum approximation for the
+    \code{rps} with truncation at \code{ceiling(mu + k*sd)}.
   }
 }
 

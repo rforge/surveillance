@@ -17,7 +17,7 @@
 
 calibrationTest <- function (x, mu, size = NULL,
                              which = c("dss", "logs", "rps"),
-                             method = 2)
+                             tolerance = 1e-4, method = 2)
 {
     stopifnot(x >= 0, mu > 0, is.null(size) || size > 0)
     
@@ -26,7 +26,7 @@ calibrationTest <- function (x, mu, size = NULL,
     score <- do.call(which, args = alist(x = x, mu = mu, size = size))
 
     ## calculate z-statistic
-    z <- calibrationZ(score, mu, size, which, method)
+    z <- calibrationZ(score, mu, size, which, tolerance, method)
 
     ## calculate two-sided p-value
     p <- 2 * pnorm(-abs(z))
@@ -47,12 +47,12 @@ calibrationTest <- function (x, mu, size = NULL,
 ## compute the calibration z-statistic given the computed scores
 calibrationZ <- function (score, mu, size = NULL,
                           which = c("dss", "logs", "rps"),
-                          method = 2)
+                          tolerance = 1e-4, method = 2)
 {
     which <- match.arg(which)
     stopifnot(method %in% 1:2)
     ## expectation and variance of score for given predictive distribution
-    EV <- do.call(paste0(which, "_EV"), args = alist(mu, size))
+    EV <- do.call(paste0(which, "_EV"), args = alist(mu, size, tolerance))
     ## calculate the z-statistic
     z <- do.call(paste0("zScore", method),
                  args = alist(score, EV[[1L]], EV[[2L]]))

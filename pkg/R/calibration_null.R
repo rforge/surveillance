@@ -17,7 +17,7 @@
 ### Dawid–Sebastiani Score
 ##########################
 
-dss_EV <- function (mu, size = NULL)
+dss_EV <- function (mu, size = NULL, tolerance = NULL)
 {
     sigma2 <- if (is.null(size)) mu else mu * (1 + mu/size)
     E <- 1 + log(sigma2)
@@ -34,13 +34,14 @@ dss_EV <- function (mu, size = NULL)
 ### Logarithmic Score
 #####################
 
-logs_EV <- function (mu, size = NULL)
+logs_EV <- function (mu, size = NULL, tolerance = 1e-4)
 {
     res <- if (is.null(size)) {
-        vapply(X = mu, FUN = logs_EV_1P,
+        vapply(X = mu, FUN = logs_EV_1P, tolerance = tolerance,
                FUN.VALUE = c(E = 0, V = 0), USE.NAMES = FALSE)
     } else {
-        mapply(logs_EV_1NB, mu = mu, size = size,
+        mapply(FUN = logs_EV_1NB, mu = mu, size = size,
+               MoreArgs = list(tolerance = tolerance),
                SIMPLIFY = TRUE, USE.NAMES = FALSE)
     }
     ## 'res' has dimension 2 x length(mu)
@@ -82,10 +83,10 @@ logs_EV_1P <- function (mu, tolerance = 1e-4) # tolerance is in absolute value
 }
 
 ## for a single NegBin prediction
-logs_EV_1NB <- function (mu, size)
+logs_EV_1NB <- function (mu, size, tolerance = 1e-4)
 {
     ## TODO: replace simple kmax by formulae from the paper
-    kmax <- qnbinom(1-10^(-5), mu = mu, size = size) + 5
+    kmax <- qnbinom(1-tolerance/10, mu = mu, size = size) + 5
     kseq <- 0:kmax
 
     ## compute values required by both E and V
@@ -114,7 +115,7 @@ logs_EV_1NB <- function (mu, size)
 ### Ranked Probability Score
 ############################
 
-rps_EV <- function (mu, size = NULL)
+rps_EV <- function (mu, size = NULL, tolerance = 1e-4)
 {
     .NotYetImplemented()
 }
