@@ -161,6 +161,18 @@ rps_EV_1P <- function (mu, tolerance = 1e-4) # tolerance is in absolute value
 ## for a single NegBin prediction
 rps_EV_1NB <- function (mu, size, tolerance = 1e-4)
 {
+    ## determine kmax for Var0(RPS), which is always > kmax for E0(RPS),
+    ## cf. Theorem 2 (c), here corrected (1-) and simplified
+    l5 <- (mu + 1)^2 + 1
+    kmax2 <- max(qnbinom(1-tolerance/l5, mu = mu*(1+2/size), size = size+2) + 2,
+                 8)  
+    ## the other listed terms seem to be always smaller than the first one:
+    ## qnbinom(1-tolerance/l5, mu = mu, size = size)
+    ## qnbinom(1-tolerance/l5, mu = mu*(1+1/size), size = size+1) + 1
+    kseq2 <- 0:kmax2
+    fseq2 <- dnbinom(kseq2, mu = mu, size = size)
+    Fseq2 <- cumsum(fseq2)  # = pnbinom(kseq2, mu = mu, size = size)
+
     ## expectation
     ghgz_part <- mu * (1 + mu/size)
     ghgz <- 4 * ghgz_part / size
@@ -170,20 +182,17 @@ rps_EV_1NB <- function (mu, size, tolerance = 1e-4)
         kmax1 <- max(qnbinom(1-tolerance/mu, mu = mu*(1+1/size), size = size+1) + 1,
                      8)  # cf. Theorem 2 (b)
         kseq1 <- seq_len(kmax1)
-        seqq1 <- sapply(kseq1, function (i)
-            dnbinom(i, mu = mu, size = size) *
-                sum((i:1) * dnbinom(0:(i-1), mu = mu, size = size)))
+        seqq1 <- vapply(
+            X = kseq1, # we could use kmax2 (> kmax1) also here
+            FUN = function (i) fseq2[i+1L] * sum((i:1) * fseq2[seq_len(i)]),
+            FUN.VALUE = 0, USE.NAMES = FALSE)
         sum(seqq1)
     }
     
     ## variance
-    kmax2 <- qnbinom(1-tolerance, mu = mu, size = size) + 5
-    kseq2 <- 0:kmax2
-    fseq <- dnbinom(kseq2, mu = mu, size = size)
-    Fseq <- cumsum(fseq)  # = pnbinom(kseq2, mu = mu, size = size)
-    psiseq <- kseq2 * (2 * Fseq - 1) +
+    psiseq <- kseq2 * (2 * Fseq2 - 1) +
         mu * (1 - 2 * pnbinom(kseq2 - 1, mu = mu + mu/size, size = size + 1))
-    seqq <- psiseq^2 * fseq
+    seqq <- psiseq^2 * fseq2
     V <- sum(seqq) - 4 * E^2
     
     c(E = E, V = V)
