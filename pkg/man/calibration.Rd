@@ -84,23 +84,35 @@ rps(x, mu, size = NULL, k = 40, tolerance = sqrt(.Machine$double.eps))
 }
 
 \examples{
+## simulated example
+mu <- c(0.1, 1, 3, 6, pi, 100)
+size <- 0.1
+set.seed(1)
+y <- rnbinom(length(mu), mu = mu, size = size)
+calibrationTest(y, mu = mu, size = size) # p = 0.99
+calibrationTest(y, mu = mu, size = 1) # p = 4.3e-05
+calibrationTest(y, mu = 1, size = 0.1) # p = 0.6959
+calibrationTest(y, mu = 1, size = 0.1, which = "rps") # p = 0.1286
+
+
 ## a univariate surveillance time series
 data("salmonella.agona")
 salmonella <- disProg2sts(salmonella.agona)
 
-## a hhh4() model
+## fit a hhh4() model
 model <- list(end = list(f = addSeason2formula(~1 + t)),
               ar = list(f = ~1),
               family = "NegBin1")
 fit <- hhh4(salmonella, model)
 
-## sequential one-step-ahead predictions for the last 5 weeks
+## do sequential one-step-ahead predictions for the last 5 weeks
 pred <- oneStepAhead(fit, nrow(salmonella)-5, type="rolling",
                      which.start="final", verbose=FALSE)
 pred
 
-## calibration test
+## test if the model is calibrated
 with(pred, calibrationTest(x = observed, mu = pred, size = exp(psi)))
+## p = 0.8746
 }
 
 \keyword{htest}
