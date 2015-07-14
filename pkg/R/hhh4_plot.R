@@ -132,22 +132,47 @@ plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
     title(main=main, line=0.5)
 
     ## draw polygons
-    xpoly <- c(tpSubset[1], tpSubset, tail(tpSubset,1))
-    polygon(xpoly, c(0,meanHHHunit[,"mean"],0),
-            col=col[1], border=border[1])
-    if (x$control$ar$inModel)
-        polygon(xpoly, c(0,rowSums(meanHHHunit[,c("endemic","epi.own")]),0),
-                col=col[2], border=border[2])
-    if (x$control$end$inModel)
-        polygon(xpoly, c(0,meanHHHunit[,"endemic"],0),
-                col=col[3], border=border[3])
-
+    non0 <- which(c("end", "ar", "ne") %in% componentsHHH4(x))
+    plotComponentPolygons(
+        x = tpSubset,
+        y = meanHHHunit[,c("endemic", "epi.own", "epi.neighbours")[non0],drop=FALSE],
+        col = col[3:1][non0], border = border[3:1][non0], add = TRUE)
+    
     ## add observed counts within [start;end]
     ptidx <- if (hide0s) intersect(tpInRange, which(obs > 0)) else tpInRange
     points(tp[ptidx], obs[ptidx], col=col[4], pch=pch, cex=pt.cex)
 
     ## invisibly return the fitted component means for the selected region
     invisible(meanHHHunit)
+}
+
+
+### function which does the actual plotting of the polygons
+
+plotComponentPolygons <- function (x, y, col = 1:6, border = col, add = FALSE)
+{
+    if (!is.vector(x, mode = "numeric") || is.unsorted(x, strictly = TRUE))
+        stop("'x' must be a strictly increasing sequence of time points")
+    stopifnot(nrow(y <- as.matrix(y)) == (nTime <- length(x)))  # y >= 0
+    yc <- if ((nPoly <- ncol(y)) > 1L) {
+        apply(X = y, MARGIN = 1L, FUN = cumsum) # nPoly x nTime
+    } else t(y)
+    
+    if (!add) {
+        ## establish basic plot window
+        plot(range(x), range(yc[nPoly,]), type = "n")
+    }
+    
+    ## recycle graphical parameters
+    col <- rep_len(col, nPoly)
+    border <- rep_len(border, nPoly)
+    
+    ## draw polygons
+    xpoly <- c(x[1L], x, x[length(x)])
+    for (poly in nPoly:1) {
+        polygon(x = xpoly, y = c(0, yc[poly, ], 0),
+                col = col[poly], border = border[poly])
+    }
 }
 
 
