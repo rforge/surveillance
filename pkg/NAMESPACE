@@ -452,6 +452,7 @@ export(plotHHH4_fitted, plotHHH4_fitted1,
        plotHHH4_maxEV, getMaxEV,
        plotHHH4_ri,
        plotHHH4_neweights)
+S3method(calibrationTest, hhh4)
 
 ## backwards-compatibility for old class name "ah4"
 S3method(print, ah4)
