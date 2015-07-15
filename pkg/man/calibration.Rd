@@ -1,5 +1,6 @@
 \name{calibrationTest}
 \alias{calibrationTest}
+\alias{calibrationTest.default}
 \alias{dss}
 \alias{logs}
 \alias{rps}
@@ -19,8 +20,11 @@
 }
 
 \usage{
-calibrationTest(x, mu, size = NULL, which = c("dss", "logs", "rps"),
-                tolerance = 1e-4, method = 2)
+calibrationTest(x, ...)
+
+\method{calibrationTest}{default}(x, mu, size = NULL,
+                which = c("dss", "logs", "rps"),
+                tolerance = 1e-4, method = 2, ...)
 
 dss(x, mu, size = NULL)
 logs(x, mu, size = NULL)
@@ -29,12 +33,12 @@ rps(x, mu, size = NULL, k = 40, tolerance = sqrt(.Machine$double.eps))
 
 \arguments{
   \item{x}{
-    numeric vector of observed counts. All involved functions are
+    a numeric vector of observed counts. All involved functions are
     vectorized and also accept matrices or arrays.
     The score functions preserve the dimensions.
   }
   \item{mu}{
-    numeric vector of means of the predictive distributions for the
+    a numeric vector of means of the predictive distributions for the
     observations \code{x}.
   }
   \item{size}{
@@ -43,7 +47,7 @@ rps(x, mu, size = NULL, k = 40, tolerance = sqrt(.Machine$double.eps))
     negative binomial distributions for the observations \code{x}.
   }
   \item{which}{
-    character string indicating which proper scoring rule to apply.
+    a character string indicating which proper scoring rule to apply.
   }
   \item{tolerance}{
     absolute tolerance for the finite sum approximation for \code{rps}

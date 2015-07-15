@@ -164,6 +164,8 @@ S3method(plot, stKtest)
 
 # calibration test for Poisson or NegBin predictions
 export(calibrationTest)
+S3method(calibrationTest, default)
+export(calibrationTest.default)
 export(dss, logs, rps)  # ses, nses
 
 

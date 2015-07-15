@@ -10,6 +10,7 @@ fixef <- function (object, ...) UseMethod("fixef")
 ranef <- function (object, ...) UseMethod("ranef")
 intersectPolyCircle <- function (object, center, radius, ...)
     UseMethod("intersectPolyCircle")
+calibrationTest <- function (x, ...) UseMethod("calibrationTest")
 
 ## internal function with methods for "twinSIR" and "simEpidata"
 getModel <- function (object, ...) UseMethod("getModel")
