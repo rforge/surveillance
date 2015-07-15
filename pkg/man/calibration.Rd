@@ -64,6 +64,9 @@ rps(x, mu, size = NULL, k = 40, tolerance = sqrt(.Machine$double.eps))
     scalar argument controlling the finite sum approximation for the
     \code{rps} with truncation at \code{ceiling(mu + k*sd)}.
   }
+  \item{\dots}{
+    unused (argument of the generic).
+  }
 }
 
 \value{

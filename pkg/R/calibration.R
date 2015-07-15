@@ -17,7 +17,7 @@
 
 calibrationTest.default <- function (x, mu, size = NULL,
                                      which = c("dss", "logs", "rps"),
-                                     tolerance = 1e-4, method = 2)
+                                     tolerance = 1e-4, method = 2, ...)
 {
     stopifnot(x >= 0, mu > 0, is.null(size) || size > 0)
     
