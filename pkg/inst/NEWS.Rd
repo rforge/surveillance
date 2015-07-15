@@ -6,14 +6,28 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-07-08)}{
+\section{Changes in surveillance version 1.10-0 (2015-07-15)}{
 
-  \subsection{NEW FEATURES}{
-    \itemize{
-      \item Calibration tests for count data (Wei and Held, 2014, Test)
-      are now implemented and available as \code{calibrationTest()}.
-    }
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item Calibration tests for count data (Wei and Held, 2014, Test)
+    are now implemented and available as \code{calibrationTest()}.
+    
+    \item New \code{"hhh4"}-method for \code{scores()} (which is now
+    generic) to directly evaluate the fitted values against the
+    observed counts using proper scoring rules.
   }
+}
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item The first argument of \code{scores()} is now called \code{x}
+    instead of \code{object} (for consistency with \code{calibrationTest()}).
+    
+    \item The result of \code{oneStepAhead()} now has the dedicated
+    class attribute \code{"oneStepAhead"} (previously was just a list).
+  }
+}
 
 }
 

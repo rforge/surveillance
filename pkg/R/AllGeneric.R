@@ -11,6 +11,14 @@ ranef <- function (object, ...) UseMethod("ranef")
 intersectPolyCircle <- function (object, center, radius, ...)
     UseMethod("intersectPolyCircle")
 calibrationTest <- function (x, ...) UseMethod("calibrationTest")
+scores <- function (x, ...) {
+    if (identical(class(x), "list")) {
+        ## backward compatibility with surveillance < 1.10-0
+        scores.oneStepAhead(x, ...)
+    } else {
+        UseMethod("scores")
+    }
+}
 
 ## internal function with methods for "twinSIR" and "simEpidata"
 getModel <- function (object, ...) UseMethod("getModel")

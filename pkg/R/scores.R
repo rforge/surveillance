@@ -99,54 +99,65 @@ rps <- function (x, mu, size=NULL, k=40, tolerance=sqrt(.Machine$double.eps)) {
 }
 
 
+### apply a set of scoring rules at once
 
-### apply scoring rules to a set of oneStepAhead() forecasts
-## CAVE: returns scores in reversed order, i.e. for time points n, n-1, n-2, ...
-
-scores <- function (object, which = c("logs","rps","dss","ses"), units = NULL,
-                    sign = FALSE, individual = FALSE)
+scores.default <- function(x, mu, size,
+                           which = c("logs", "rps", "dss", "ses"),
+                           sign = FALSE, ...)
 {
-    mu <- object$pred     # predicted counts
-    x <- object$observed  # observed counts
-    size <- object$psi    # estimated -log(overdispersion), 1 or ncol(x) columns
-    ntps <- nrow(x)       # the number of predicted time points
-    
-    if (!is.null(size)) { # => NegBin
-        size <- exp(size) # transform to parameterization suitable for dnbinom()
-        if (ncol(size) != ncol(x)) { # => ncol(size)=1, unit-independent psi
-            ## replicate to obtain a ntps x ncol(x) matrix
-            size <- matrix(size, nrow=ntps, ncol=ncol(x), byrow=FALSE)
-        }
-        colnames(size) <- colnames(x)  # such that we can select by unit name
-    }
-    ## At this point, mu, x and size all are ntps x ncol(x) matrices
-
-    ## select units
-    if (!is.null(units)) {
-        x <- x[,units,drop=FALSE]
-        mu <- mu[,units,drop=FALSE]
-        size <- size[,units,drop=FALSE]
-    }
-    nUnits <- ncol(x)
-    if (nUnits == 1L)
-        individual <- TRUE  # no need to apply rowMeans() below
-
     ## compute sign of x-mu
-    signXmMu <- if(sign) sign(x-mu) else NULL
+    signXmMu <- if (sign) sign(x-mu) else NULL
     
-    ## compute individual scores (these are ntps x nUnits matrices)
+    ## compute individual scores (these are dim(x) matrices)
     scorelist <- lapply(which, do.call, args = alist(x=x, mu=mu, size=size),
                         envir = environment())
     
     ## gather individual scores in an array
-    result <- array(c(unlist(scorelist, recursive=FALSE, use.names=FALSE),
-                      signXmMu),
-                    dim = c(ntps, nUnits, length(which) + sign),
-                    dimnames = c(dimnames(x),
-                                 list(c(which, if (sign) "sign"))))
+    array(c(unlist(scorelist, recursive=FALSE, use.names=FALSE),
+            signXmMu),
+          dim = c(dim(x), length(which) + sign),
+          dimnames = c(dimnames(x),
+              list(c(which, if (sign) "sign"))))
+}
 
+### apply scoring rules to a set of oneStepAhead() forecasts
+## CAVE: returns scores in reversed order, i.e. for time points n, n-1, n-2, ...
+
+scores.oneStepAhead <- function (x, which = c("logs","rps","dss","ses"),
+                                 units = NULL, sign = FALSE, individual = FALSE,
+                                 reverse = TRUE, ...)
+{
+    y <- x$observed  # observed counts
+    mu <- x$pred     # predicted counts
+    size <- x$psi    # estimated -log(overdispersion), 1 or ncol(y) columns
+    ntps <- nrow(y)  # the number of predicted time points
+    
+    if (!is.null(size)) { # => NegBin
+        size <- exp(size) # transform to parameterization suitable for dnbinom()
+        if (ncol(size) != ncol(y)) { # => ncol(size)=1, unit-independent psi
+            ## replicate to obtain a ntps x ncol(y) matrix
+            size <- matrix(size, nrow=ntps, ncol=ncol(y), byrow=FALSE)
+        }
+        colnames(size) <- colnames(y)  # such that we can select by unit name
+    }
+    ## At this point, y, mu and size all are ntps x ncol(y) matrices
+
+    ## select units
+    if (!is.null(units)) {
+        y <- y[,units,drop=FALSE]
+        mu <- mu[,units,drop=FALSE]
+        size <- size[,units,drop=FALSE]
+    }
+    nUnits <- ncol(y)
+    if (nUnits == 1L)
+        individual <- TRUE  # no need to apply rowMeans() below
+
+    result <- scores.default(x = y, mu = mu, size = size,
+                             which = which, sign = sign)
+    
     ## reverse order of the time points (historically)
-    result <- result[ntps:1L,,,drop=FALSE]
+    if (reverse)
+        result <- result[ntps:1L,,,drop=FALSE]
 
     ## average over units if requested
     if (individual) {
@@ -155,4 +166,25 @@ scores <- function (object, which = c("logs","rps","dss","ses"), units = NULL,
         apply(X=result, MARGIN=3L, FUN=rowMeans)
         ## this gives a ntps x (5L+sign) matrix (or a vector in case ntps=1)
     }
+}
+
+
+## calculate scores with respect to fitted values
+
+scores.hhh4 <- function (x, which = c("logs","rps","dss","ses"),
+                         subset = x$control$subset, units = seq_len(x$nUnit),
+                         sign = FALSE, ...)
+{
+    ## slow implementation via "fake" oneStepAhead():
+    ##fitted <- oneStepAhead(x, tp = subset[1L] - 1L, type = "final",
+    ##                       keep.estimates = FALSE, verbose = FALSE)
+    ##scores.oneStepAhead(fitted, which = which, units = units, sign = sign,
+    ##                    individual = TRUE, reverse = FALSE)
+
+    result <- scores.default(
+        x = x$stsObj@observed[subset, units, drop = FALSE],
+        mu = x$fitted.values[match(subset, x$control$subset), units, drop = FALSE],
+        size = psi2size(x, subset, units),
+        which = which, sign = sign)
+    drop(result)
 }

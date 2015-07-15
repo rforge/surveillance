@@ -5,7 +5,7 @@
 ###
 ### Compute one-step-ahead predictions (means) at a series of time points
 ###
-### Copyright (C) 2011-2012 Michaela Paul, 2012-2014 Sebastian Meyer
+### Copyright (C) 2011-2012 Michaela Paul, 2012-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -168,11 +168,13 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
     }
 
     ## done
-    c(list(pred = pred, observed = observed,
+    res <- c(list(pred = pred, observed = observed,
            psi = if (withPsi) psi else NULL,
            allConverged = all(!is.na(pred))),
       if (keep.estimates) list(coefficients = coefficients,
                                Sigma.orig = Sigma.orig,
                                logliks = logliks)
       )
+    class(res) <- "oneStepAhead"
+    res
 }

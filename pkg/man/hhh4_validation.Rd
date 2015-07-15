@@ -2,6 +2,8 @@
 \name{hhh4_validation}
 \alias{oneStepAhead}
 \alias{scores}
+\alias{scores.oneStepAhead}
+\alias{scores.hhh4}
 
 \title{Predictive Model Assessment for \code{hhh4} Models}
 \description{
@@ -9,7 +11,8 @@
   predictions for a (random effects) HHH model fitted by \code{\link{hhh4}}. 
 
   The function \code{scores} computes a number of (strictly) proper
-  scoring rules based on such one-step-ahead predictions.
+  scoring rules based on such one-step-ahead predictions
+  (or, for the \code{hhh4}-method, directly based on the fitted values).
 
   See Paul and Held (2011) for further details.
 }
@@ -19,8 +22,11 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
              which.start = c("current", "final"),
              keep.estimates = FALSE, verbose = TRUE, cores = 1)
 
-scores(object, which = c("logs", "rps", "dss", "ses"), units = NULL,
-       sign = FALSE, individual = FALSE)
+scores(x, ...)
+\method{scores}{oneStepAhead}(x, which = c("logs", "rps", "dss", "ses"),
+       units = NULL, sign = FALSE, individual = FALSE, reverse = TRUE, ...)
+\method{scores}{hhh4}(x, which = c("logs", "rps", "dss", "ses"),
+       subset = x$control$subset, units = seq_len(x$nUnit), sign = FALSE, ...)
 }
 
 \arguments{
@@ -71,7 +77,7 @@ scores(object, which = c("logs", "rps", "dss", "ses"), units = NULL,
     \code{type="rolling"} and \code{which.start="current"} (use
     \code{which.start="final"} for this to work).}
   
-  \item{object}{result of \code{oneStepAhead}.}
+  \item{x}{an object of class \code{"oneStepAhead"} or \code{"hhh4"}.}
   \item{which}{character vector determining which scores to compute.
     The package \pkg{surveillance} implements the following proper
     scoring rules: logarithmic score (\code{"logs"}), ranked probability
@@ -85,6 +91,10 @@ scores(object, which = c("logs", "rps", "dss", "ses"), units = NULL,
     in case of a Poisson model.
     See the supplied scoring rules for guidance, e.g.,
     \code{\link{logs}} or \code{\link{dss}}.}
+  \item{subset}{
+    subset of time points for which to calculate the scores.
+    Defaults to the subset used for fitting the model.
+  }
   \item{units}{integer or character vector indexing the units for which
     the scores should be computed. By default (\code{NULL}) all units
     are considered.}
@@ -96,10 +106,15 @@ scores(object, which = c("logs", "rps", "dss", "ses"), units = NULL,
   \item{individual}{logical indicating if the individual scores of the
     \code{units} should be returned. By default (\code{FALSE}), the
     individual scores are averaged over all \code{units}.}
+  \item{reverse}{logical indicating if the rows (time points) should be
+    reversed in the result (historical default for the
+    \code{oneStepAhead}-method).}
+  \item{\dots}{unused (argument of the generic).}
 }
 
 \value{
-\code{oneStepAhead} returns a list with the following components:
+\code{oneStepAhead} returns a list (of class \code{"oneStepAhead"})
+with the following components:
 \item{pred}{one-step-ahead predictions in a matrix, where each row
   corresponds to one of the time points requested via the argument
   \code{tp}, and which has \code{ncol(result$stsObj)}
@@ -131,7 +146,9 @@ result is an array of dimensions
 Otherwise, the result is a matrix with \code{nrow(pred)} rows and
 \code{5+sign} columns. If there is only one predicted time point, the
 first dimension is dropped in both cases.
-CAVE: The order of the rows (time points) is reversed!
+CAVE: For historical reasons, \code{scores.oneStepAhead} by default
+\code{reverse}s the order of the rows (time points)!
+The \code{hhh4}-method of \code{scores} does not reverse rows.
 }
 
 \references{
@@ -183,10 +200,19 @@ stopifnot(identical(
     unname(tail(fitted(result), 5))))
 
 ## compute scores
-(sc <- scores(pred))
+(sc <- scores(pred, reverse = FALSE))
 
-## compute mean scores
-colMeans(sc)
+## scores with respect to the fitted values are similar
+(scFitted <- scores(result, subset = nrow(salmonella)-c(4:0)))
+
+\dontshow{
+## test that scFitted is equivalent to scores(oneStepAhead(..., type = "final"))
+stopifnot(all.equal(
+    scFitted,
+    scores(oneStepAhead(result, nrow(salmonella)-5, type="final", verbose=FALSE),
+           reverse = FALSE),
+    check.attributes = FALSE))
+}
 
 ## plot a (non-randomized) PIT histogram for the predictions
 with(pred, pit(x = observed, pdistr = "pnbinom", mu = pred, size = exp(psi)))
