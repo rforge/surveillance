@@ -19,10 +19,25 @@ calibrationTest.hhh4 <- function (x,
     res <- calibrationTest.default(
         x = x$stsObj@observed[subset, units, drop = FALSE],
         mu = x$fitted.values[match(subset, x$control$subset), units, drop = FALSE],
-        size = psi2size(x, subset, units),
+        size = psi2size.hhh4(x, subset, units),
         ...)
 
     ## change "data.name" to be the name of the supplied model
     res$data.name <- deparse(substitute(x))
     res
+}
+
+calibrationTest.oneStepAhead <- function (x, ...)
+{
+    ## perform the calibration test
+    res <- calibrationTest.default(
+        x = x$observed,
+        mu = x$pred,
+        size = psi2size.oneStepAhead(x),
+        ...)
+
+    ## change "data.name" to be the name of the supplied "oneStepAhead" object
+    res$data.name <- deparse(substitute(x))
+    res
+
 }

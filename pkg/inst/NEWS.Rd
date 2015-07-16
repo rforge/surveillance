@@ -6,12 +6,15 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-07-15)}{
+\section{Changes in surveillance version 1.10-0 (2015-07-16)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
     \item Calibration tests for count data (Wei and Held, 2014, Test)
     are now implemented and available as \code{calibrationTest()}.
+    In addition to a default method taking pure counts and predictive
+    means and dispersion parameters, there are convenient methods for
+    \code{"hhh4"} and \code{"oneStepAhead"} objects.
     
     \item New \code{"hhh4"}-method for \code{scores()} (which is now
     generic) to directly evaluate the fitted values against the

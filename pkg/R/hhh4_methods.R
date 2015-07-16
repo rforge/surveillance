@@ -417,7 +417,7 @@ hhh4coef2start <- function (fit)
 }
 
 ## extract estimated overdispersion in dnbinom() parametrization (and as matrix)
-psi2size <- function (object, subset = NULL, units = NULL)
+psi2size.hhh4 <- function (object, subset = NULL, units = NULL)
 {
     pars <- splitParams(object$coefficients, terms.hhh4(object))
     size <- exp(pars$overdisp)

@@ -163,6 +163,7 @@ export(stKtest)
 S3method(plot, stKtest)
 
 # calibration test for Poisson or NegBin predictions
+export(pit)
 export(calibrationTest)
 S3method(calibrationTest, default)
 export(calibrationTest.default)
@@ -427,11 +428,7 @@ export(zetaweights, W_powerlaw)
 export(W_np)
 export(oneStepAhead)
 export(scores)
-S3method(scores, default)
-S3method(scores, oneStepAhead)
-S3method(scores, hhh4)
 export(permutationTest)
-export(pit)
 
 ## S3-methods
 S3method(print, hhh4)
@@ -456,7 +453,12 @@ export(plotHHH4_fitted, plotHHH4_fitted1,
        plotHHH4_maxEV, getMaxEV,
        plotHHH4_ri,
        plotHHH4_neweights)
+
+#S3method(scores, default)  # rather an internal auxiliary function, undocumented
+S3method(scores, hhh4)
+S3method(scores, oneStepAhead)
 S3method(calibrationTest, hhh4)
+S3method(calibrationTest, oneStepAhead)
 
 ## backwards-compatibility for old class name "ah4"
 S3method(print, ah4)

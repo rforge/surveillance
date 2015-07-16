@@ -127,26 +127,16 @@ scores.oneStepAhead <- function (x, which = c("logs","rps","dss","ses"),
                                  units = NULL, sign = FALSE, individual = FALSE,
                                  reverse = TRUE, ...)
 {
-    y <- x$observed  # observed counts
-    mu <- x$pred     # predicted counts
-    size <- x$psi    # estimated -log(overdispersion), 1 or ncol(y) columns
-    ntps <- nrow(y)  # the number of predicted time points
-    
-    if (!is.null(size)) { # => NegBin
-        size <- exp(size) # transform to parameterization suitable for dnbinom()
-        if (ncol(size) != ncol(y)) { # => ncol(size)=1, unit-independent psi
-            ## replicate to obtain a ntps x ncol(y) matrix
-            size <- matrix(size, nrow=ntps, ncol=ncol(y), byrow=FALSE)
-        }
-        colnames(size) <- colnames(y)  # such that we can select by unit name
-    }
-    ## At this point, y, mu and size all are ntps x ncol(y) matrices
+    y <- x$observed  # observed counts during the prediction window
+    mu <- x$pred     # predicted counts (same dim as y)
+    ## transform overdispersion to dnbinom() parameterization
+    size <- psi2size.oneStepAhead(x) # -> NULL or full dim(y) matrix
 
     ## select units
     if (!is.null(units)) {
         y <- y[,units,drop=FALSE]
         mu <- mu[,units,drop=FALSE]
-        size <- size[,units,drop=FALSE]
+        size <- size[,units,drop=FALSE] # works with size = NULL
     }
     nUnits <- ncol(y)
     if (nUnits == 1L)
@@ -157,14 +147,14 @@ scores.oneStepAhead <- function (x, which = c("logs","rps","dss","ses"),
     
     ## reverse order of the time points (historically)
     if (reverse)
-        result <- result[ntps:1L,,,drop=FALSE]
+        result <- result[nrow(result):1L,,,drop=FALSE]
 
     ## average over units if requested
     if (individual) {
         drop(result)
     } else {
         apply(X=result, MARGIN=3L, FUN=rowMeans)
-        ## this gives a ntps x (5L+sign) matrix (or a vector in case ntps=1)
+        ## this gives a nrow(y) x (5L+sign) matrix (or a vector in case nrow(y)=1)
     }
 }
 
@@ -184,7 +174,7 @@ scores.hhh4 <- function (x, which = c("logs","rps","dss","ses"),
     result <- scores.default(
         x = x$stsObj@observed[subset, units, drop = FALSE],
         mu = x$fitted.values[match(subset, x$control$subset), units, drop = FALSE],
-        size = psi2size(x, subset, units),
+        size = psi2size.hhh4(x, subset, units),
         which = which, sign = sign)
     drop(result)
 }
