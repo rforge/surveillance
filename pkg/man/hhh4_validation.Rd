@@ -4,6 +4,7 @@
 \alias{scores}
 \alias{scores.oneStepAhead}
 \alias{scores.hhh4}
+\alias{calibrationTest.oneStepAhead}
 
 \title{Predictive Model Assessment for \code{hhh4} Models}
 \description{
@@ -27,6 +28,8 @@ scores(x, ...)
        units = NULL, sign = FALSE, individual = FALSE, reverse = TRUE, ...)
 \method{scores}{hhh4}(x, which = c("logs", "rps", "dss", "ses"),
        subset = x$control$subset, units = seq_len(x$nUnit), sign = FALSE, ...)
+
+\method{calibrationTest}{oneStepAhead}(x, ...)
 }
 
 \arguments{
@@ -109,7 +112,10 @@ scores(x, ...)
   \item{reverse}{logical indicating if the rows (time points) should be
     reversed in the result (historical default for the
     \code{oneStepAhead}-method).}
-  \item{\dots}{unused (argument of the generic).}
+  \item{\dots}{Unused by the \code{scores}-methods.\cr
+    For the \code{calibrationTest}-method, further arguments are passed
+    to \code{\link{calibrationTest.default}}, e.g., \code{which} to
+    select a scoring rule.}
 }
 
 \value{
@@ -149,6 +155,11 @@ first dimension is dropped in both cases.
 CAVE: For historical reasons, \code{scores.oneStepAhead} by default
 \code{reverse}s the order of the rows (time points)!
 The \code{hhh4}-method of \code{scores} does not reverse rows.
+
+
+The \code{calibrationTest}-method is just a convenient wrapper around
+\code{\link{calibrationTest.default}}.
+See also \code{\link{calibrationTest.hhh4}}.
 }
 
 \references{
