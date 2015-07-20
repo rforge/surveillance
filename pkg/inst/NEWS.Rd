@@ -19,6 +19,11 @@
     \item New \code{"hhh4"}-method for \code{scores()} (which is now
     generic) to directly evaluate the fitted values against the
     observed counts using proper scoring rules.
+
+    \item \code{plotHHH4_fitted()} (and \code{plotHHH4_fitted1()})
+    gained an option \code{decompose} to plot the contributions from
+    each single unit (and the endemic part) instead of the default
+    endemic + AR + neighbours decomposition.
   }
 }
 

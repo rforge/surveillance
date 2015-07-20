@@ -36,14 +36,15 @@ plotHHH4_fitted(x, units = 1, names = NULL,
                 pch = 19, pt.cex = 0.6, pt.col = 1,
                 par.settings = list(),
                 legend = TRUE, legend.args = list(),
-                legend.observed = FALSE, ...)
+                legend.observed = FALSE,
+                decompose = NULL, meanHHH = NULL, ...)
 
 plotHHH4_fitted1(x, unit = 1, main = NULL,
                  col = c("grey85", "blue", "orange"),
                  pch = 19, pt.cex = 0.6, pt.col = 1, border = col, 
                  start = x$stsObj@start, end = NULL,
                  xlim = NULL, ylim = NULL, xlab = "", ylab = "No. infected",
-                 hide0s = FALSE, meanHHH = NULL)
+                 hide0s = FALSE, decompose = NULL, meanHHH = NULL)
 
 plotHHH4_season(..., components = NULL, intercept = FALSE,
                 xlim = NULL, ylim = NULL,
@@ -120,6 +121,10 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
     \code{list(x="topright", inset=0.02)}.}
   \item{legend.observed}{logical indicating if the legend should contain
     a line for the dots corresponding to observed counts.}
+  \item{decompose}{if \code{TRUE} or (a permutation of)
+    \code{colnames(x$stsObj)}, the fitted mean will be decomposed
+    into the contributions from each single unit and the endemic part
+    instead of the default endemic + AR + neighbours decomposition.}
   \item{start,end}{time range to plot specified by vectors of length two
     in the form \code{c(year,number)}, see \code{"\linkS4class{sts}"}.}
   \item{xlim}{numeric vector of length 2 specifying the x-axis range.
@@ -261,6 +266,9 @@ plot(measlesFit, units=bigunits,
      legend=5, legend.args=list(x="top"), xlab="Time (weekly)",
      hide0s=TRUE, ylim=c(0,max(observed(measlesWeserEms)[,bigunits])),
      start=c(2002,1), end=c(2002,26), par.settings=list(xaxs="i"))
+
+## plot completely decomposed mean structure (useless without 'ne' component)
+plot(measlesFit, units=bigunits, col=rainbow(measlesFit$nUnit), decompose=TRUE)
 }
 
 \keyword{hplot}
