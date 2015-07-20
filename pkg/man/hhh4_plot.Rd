@@ -32,15 +32,15 @@
 \method{plot}{hhh4}(x, type=c("fitted", "season", "maxEV", "ri", "neweights"), ...)
 
 plotHHH4_fitted(x, units = 1, names = NULL,
-                col = c("orange", "blue", "grey85", "black"),
-                pch = 19, pt.cex = 0.6,
+                col = c("grey85", "blue", "orange"),
+                pch = 19, pt.cex = 0.6, pt.col = 1,
                 par.settings = list(),
                 legend = TRUE, legend.args = list(),
                 legend.observed = FALSE, ...)
 
 plotHHH4_fitted1(x, unit = 1, main = NULL,
-                 col = c("grey30", "grey60", "grey85", "grey0"),
-                 pch = 19, pt.cex = 0.6, border = col, 
+                 col = c("grey85", "blue", "orange"),
+                 pch = 19, pt.cex = 0.6, pt.col = 1, border = col, 
                  start = x$stsObj@start, end = NULL,
                  xlim = NULL, ylim = NULL, xlab = "", ylab = "No. infected",
                  hide0s = FALSE, meanHHH = NULL)
@@ -100,12 +100,10 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
     \code{plotHHH4_fitted1} will use the appropriate element of
     \code{colnames(x$stsObj)}, whereas \code{plotHHH4_season} uses
     default titles.}
-  \item{col,border}{length 4 vector specifying the colors for the
-    spatio-temporal, autoregressive, endemic, and observed elements in
-    this order. For \code{plotHHH4_fitted}, a length 3 vector also
-    works, in which case the default \code{"black"} will be used for the
-    dots of observed counts.}
-  \item{pch,pt.cex}{style specifications for the dots drawn to represent
+  \item{col,border}{length 3 vectors specifying the fill and border colors for the
+    endemic, autoregressive, and spatio-temporal component polygons (in
+    this order).}
+  \item{pch,pt.cex,pt.col}{style specifications for the dots drawn to represent
     the observed counts. \code{pch=NA} can be used to disable these dots.}
   \item{par.settings}{list of graphical parameters for
     \code{\link{par}}. Sensible defaults for \code{mfrow}, \code{mar} and

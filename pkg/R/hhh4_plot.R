@@ -33,17 +33,21 @@ plot.hhh4 <- function (x,
 ###
 
 plotHHH4_fitted <- function (x, units = 1, names = NULL,
-                             col = c("orange","blue","grey85","black"),
-                             pch = 19, pt.cex = 0.6,
+                             col = c("grey85", "blue", "orange"),
+                             pch = 19, pt.cex = 0.6, pt.col = 1,
                              par.settings = list(),
                              legend = TRUE, legend.args = list(),
                              legend.observed = FALSE, ...)
 {
     if (is.null(units)) units <- seq_len(x$nUnit)
     if (!is.null(names)) stopifnot(length(units) == length(names))
-    if (length(col) == 3) col <- c(col, "black") else if (length(col) != 4)
-        stop("'col' must be of length 3 or 4") # for backwards compatibility
-
+    if (length(col) == 4) { # compatibility with surveillance < 1.10-0
+        pt.col <- col[4L]
+        col <- rev(col[-4L])
+    } else if (length(col) != 3) {
+        stop("'col' must be of length 3")
+    }
+    
     if (is.list(par.settings)) {
         par.defaults <- list(mfrow = sort(n2mfrow(length(units))),
                              mar = c(4,4,2,0.5)+.1, las = 1)
@@ -63,7 +67,7 @@ plotHHH4_fitted <- function (x, units = 1, names = NULL,
         legendidx <- 1L + c(if (legend.observed && !is.na(pch)) 0L,
                             which(c("ne","ar","end") %in% componentsHHH4(x)))
         default.args <- list(
-            x="topright", col=c(col[4],col[1:3])[legendidx], lwd=6,
+            x="topright", col=c(pt.col,rev(col))[legendidx], lwd=6,
             lty=c(NA,1,1,1)[legendidx], pch=c(pch,NA,NA,NA)[legendidx],
             pt.cex=pt.cex, pt.lwd=1, bty="n", inset=0.02,
             legend=c("observed","spatiotemporal","autoregressive","endemic")[legendidx]
@@ -76,7 +80,7 @@ plotHHH4_fitted <- function (x, units = 1, names = NULL,
     names(meanHHHunits) <- if (is.character(units)) units else colnames(x$stsObj)[units]
     for(i in seq_along(units)) {
         meanHHHunits[[i]] <- plotHHH4_fitted1(x, units[i], main=names[i],
-                                              col=col, pch=pch, pt.cex=pt.cex,
+                                              col=col, pch=pch, pt.cex=pt.cex, pt.col=pt.col,
                                               ...)
         if (i %in% legend) do.call("legend", args=legend.args)
     }
@@ -87,8 +91,8 @@ plotHHH4_fitted <- function (x, units = 1, names = NULL,
 ### plot estimated component means for a single region
 
 plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
-                             col=c("grey30","grey60","grey85","grey0"),
-                             pch=19, pt.cex=0.6, border=col,
+                             col=c("grey85", "blue", "orange"),
+                             pch=19, pt.cex=0.6, pt.col=1, border=col,
                              start=x$stsObj@start, end=NULL,
                              xlim=NULL, ylim=NULL, xlab="", ylab="No. infected",
                              hide0s=FALSE, meanHHH=NULL)
@@ -98,6 +102,10 @@ plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
         is.na(unit <- match(.unit <- unit, colnames(stsObj))))
         stop("region '", .unit, "' does not exist")
     if (is.null(main)) main <- colnames(stsObj)[unit]
+    if (length(col) == 4) { # compatibility with surveillance < 1.10-0
+        pt.col <- col[4L]
+        col <- rev(col[-4L])
+    }
 
     ## get observed counts
     obs <- observed(stsObj)[,unit]
@@ -136,11 +144,11 @@ plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
     plotComponentPolygons(
         x = tpSubset,
         y = meanHHHunit[,c("endemic", "epi.own", "epi.neighbours")[non0],drop=FALSE],
-        col = col[3:1][non0], border = border[3:1][non0], add = TRUE)
+        col = col[non0], border = border[non0], add = TRUE)
     
     ## add observed counts within [start;end]
     ptidx <- if (hide0s) intersect(tpInRange, which(obs > 0)) else tpInRange
-    points(tp[ptidx], obs[ptidx], col=col[4], pch=pch, cex=pt.cex)
+    points(tp[ptidx], obs[ptidx], col=pt.col, pch=pch, cex=pt.cex)
 
     ## invisibly return the fitted component means for the selected region
     invisible(meanHHHunit)

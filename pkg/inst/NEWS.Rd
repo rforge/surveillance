@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-07-16)}{
+\section{Changes in surveillance version 1.10-0 (2015-07-20)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -29,6 +29,12 @@
     
     \item The result of \code{oneStepAhead()} now has the dedicated
     class attribute \code{"oneStepAhead"} (previously was just a list).
+
+    \item Changed interpretation of the \code{col} argument of
+    \code{plotHHH4_fitted()} and \code{plotHHH4_fitted1()} (moved color
+    of \dQuote{observed} to separate argument \code{pt.col} and reversed
+    remaining colors). The old \code{col} specification as a vector of
+    length 4 still works (catched internally) but is undocumented.
   }
 }
 
