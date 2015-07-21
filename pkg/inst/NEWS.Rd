@@ -45,6 +45,11 @@
     \code{1:nrow(observed)} by default and thus no longer needs to be
     explicitly set when creating a \code{new("sts", ...)} for this
     standard case.
+
+    \item Initialization of \code{new("sts", ...)} now supports the
+    argument \code{frequency} (for consistency with \code{ts()}).
+    Note that \code{freq} still works (via partial argument matching)
+    and that the corresponding \code{"sts"} slot is still called \code{freq}.
   }
 }
 
