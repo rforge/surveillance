@@ -5,7 +5,7 @@
 ###
 ### Time series plot for sts-objects
 ###
-### Copyright (C) 2007-2013 Michael Hoehle
+### Copyright (C) 2007-2014 Michael Hoehle, 2013-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -15,7 +15,7 @@
 # stsplot_time sets the scene and calls stsplot_time1 for each unit
 ######################################################################
 
-stsplot_time <- function(x, units,
+stsplot_time <- function(x, units = NULL,
                          method=x@control$name, disease=x@control$data,
                          as.one=FALSE, same.scale=TRUE, par.list=list(), ...)
 {
@@ -23,12 +23,12 @@ stsplot_time <- function(x, units,
   observed <- x@observed
   population <- x@populationFrac
   binaryTS <- x@multinomialTS
-  nUnits <- ncol(observed)
+  if (is.null(units)) # plot all units
+      units <- seq_len(ncol(observed))
+  nUnits <- length(units)
 
   #multivariate time series
   if(nUnits > 1){
-    if (missing(units))
-      units <- seq_len(nUnits)
     if(as.one) { # all areas in one plot
       stop("this type of plot is currently not implemented")
     } else {
@@ -59,7 +59,7 @@ stsplot_time <- function(x, units,
         argsK <- modifyList(args, list(x=x, k=k, main="", legend.opts=NULL),
                             keep.null = TRUE)
         do.call("stsplot_time1",args=argsK)
-        title(main=colnames(observed)[k], line=-1)
+        title(main=if (is.character(k)) k else colnames(observed)[k], line=-1)
       }
       
       #reset graphical params
@@ -68,7 +68,7 @@ stsplot_time <- function(x, units,
   } else {  #univariate time series
     par.list$mfrow <- NULL #no mf formatting..
     oldpar <- par(par.list)
-    stsplot_time1(x=x, ...)
+    stsplot_time1(x=x, k=units, ...)
     par(oldpar)
   }
   invisible()

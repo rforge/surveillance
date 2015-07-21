@@ -53,6 +53,14 @@
   }
 }
 
+\subsection{BUG FIXES}{
+  \itemize{
+    \item \code{stsplot_time()} did not account for the optional
+    \code{units} argument for multivariate \code{"sts"} objects
+    when choosing a suitable value for \code{par("mfrow")}.
+  }
+}
+
 }
 
 
