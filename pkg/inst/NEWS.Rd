@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-07-20)}{
+\section{Changes in surveillance version 1.10-0 (2015-07-21)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -40,6 +40,11 @@
     of \dQuote{observed} to separate argument \code{pt.col} and reversed
     remaining colors). The old \code{col} specification as a vector of
     length 4 still works (catched internally) but is undocumented.
+
+    \item The \code{epoch} slot of class \code{"sts"} is now initialized to
+    \code{1:nrow(observed)} by default and thus no longer needs to be
+    explicitly set when creating a \code{new("sts", ...)} for this
+    standard case.
   }
 }
 
