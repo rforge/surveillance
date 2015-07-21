@@ -105,8 +105,8 @@ stsplot_time1 <- function(
   xaxis.dates <- !is.null(xaxis.labelFormat) 
 
   if (binaryTS) {
-    observed <- ifelse(is.na(observed) | population!=0,observed/population,0)
-    upperbound <- ifelse(is.na(upperbound) | population!=0,upperbound/population,0)
+    observed <- ifelse(population!=0,observed/population,0)
+    upperbound <- ifelse(population!=0,upperbound/population,0)
     if (ylab == "No. infected") { ylab <- "Proportion infected" }
   }
   
