@@ -173,7 +173,7 @@ stsplot_time1 <- function(
   }
 
   doLegend <- if (missing(legend.opts)) {
-      length(stateIdx) + length(alarmIdx) > 0 || any(!is.na(upperbound))
+      length(stateIdx) + length(alarmIdx) > 0 || any(upperbound > 0, na.rm = TRUE)
   } else {
       is.list(legend.opts)
   }
