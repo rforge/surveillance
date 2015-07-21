@@ -33,7 +33,7 @@ stsplot_time1(x, k=1, ylim=NULL,
               type="s", lty=c(1,1,2), col=c(NA,1,4), lwd=c(1,1,1),
               outbreak.symbol=list(pch=3, col=3, cex=1, lwd=1),
               alarm.symbol=list(pch=24, col=2, cex=1, lwd=1),
-              legend.opts=list(x="top",legend=NULL,lty=NULL,pch=NULL,col=NULL),
+              legend.opts=list(),
               dx.upperbound=0L, hookFunc=function(){},
               .hookFuncInheritance=function() {}, ...)
 
@@ -96,19 +96,15 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
   \item{outbreak.symbol}{a list with entries \code{pch}, \code{col},
     \code{cex} and \code{lwd} specifying the appearance of the outbreak
     symbol in the plot.}
-  \item{legend.opts}{a list containing the entries to be sent to the
-  \code{\link{legend}} function. If no legend is requested use
-  \code{legend.opts=NULL}. Otherwise, the following arguments are
-  default
+  \item{legend.opts}{if this is a list (of arguments for
+    \code{\link{legend}}), a legend will be produced.
+    To disable the legend use, e.g., \code{legend.opts=NULL}.
+    Otherwise, the following arguments are default:
     \describe{
-      \item{\code{x}}{\code{top}}
-      \item{\code{legend}}{The names infected and outbreak.}
-      \item{\code{lty}}{If \code{NULL} the \code{lty} argument will be used}
-      \item{\code{pch}}{If \code{NULL} the \code{pch} argument is used}
-      \item{\code{col}}{If \code{NULL} the \code{col} argument is
-        used}
+      \item{\code{x}}{\code{"top"}}
+      \item{\code{legend}}{\code{c("Infected","Threshold","Outbreak","Alarm")}}
+      \item{\code{lty,pch,col}}{the corresponding graphical settings}
     }
-
     Any further arguments to the \code{legend} function are
     just provided as additional elements of this list,
     e.g. \code{horiz=TRUE}.

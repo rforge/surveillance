@@ -84,7 +84,7 @@ stsplot_time1 <- function(
     type="s", lty=c(1,1,2), col=c(NA,1,4), lwd=c(1,1,1),
     outbreak.symbol=list(pch=3, col=3, cex=1, lwd=1),
     alarm.symbol=list(pch=24, col=2, cex=1, lwd=1),
-    legend.opts=list(x="top", legend=NULL, lty=NULL, pch=NULL, col=NULL),
+    legend.opts=list(),
     dx.upperbound=0L, hookFunc=function(){}, .hookFuncInheritance=function() {}, ...)
 {
 
@@ -173,14 +173,13 @@ stsplot_time1 <- function(
   }
 
   if(is.list(legend.opts)) {
-    #Fill empty (mandatory) slots in legend.opts list
-    if (is.null(legend.opts$x)) legend.opts$x <- "topleft"
-    if (is.null(legend.opts$lty)) legend.opts$lty <- c(lty[1],lty[3],NA,NA)
-    if (is.null(legend.opts$col)) legend.opts$col <- c(col[2],col[3],outbreak.symbol$col,alarm.symbol$col)
-    if (is.null(legend.opts$pch)) legend.opts$pch <- c(NA,NA,outbreak.symbol$pch,alarm.symbol$pch)
-    if (is.null(legend.opts$legend)) {
-      legend.opts$legend <- c("Infected", "Threshold","Outbreak","Alarm" )
-    }
+      legend.opts <- modifyList(
+          list(x = "top",
+               lty = c(lty[1],lty[3],NA,NA),
+               col = c(col[2],col[3],outbreak.symbol$col,alarm.symbol$col),
+               pch = c(NA,NA,outbreak.symbol$pch,alarm.symbol$pch),
+               legend = c("Infected", "Threshold", "Outbreak", "Alarm")),
+          legend.opts)
     #Make the legend
     do.call("legend",legend.opts)
   }
