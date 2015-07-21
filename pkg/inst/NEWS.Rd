@@ -50,6 +50,10 @@
     argument \code{frequency} (for consistency with \code{ts()}).
     Note that \code{freq} still works (via partial argument matching)
     and that the corresponding \code{"sts"} slot is still called \code{freq}.
+
+    \item If \code{missing(legend.opts)} in \code{stsplot_time1()}, the
+    default legend will only be produced if the \code{"sts"} object
+    contains information on outbreaks, alarms, or upperbounds.
   }
 }
 

@@ -29,12 +29,12 @@
 
 #Open
 06/09/2014 implement "as.one=TRUE" for stsplot_time (see plot.disProg)
-14/10/2014 the need to set legend.opts=NULL for sts objects without
-           alarm/upperbound info is not nice -> maybe change default in
-           stsplot_time to do legend if sts object contains upperbounds
 
 #Done
 21/07/2015 initialize "epoch" as 1:nrow(observed) by default
+21/07/2015 the need to set legend.opts=NULL for sts objects without
+           alarm/upperbound info is not nice -> changed default in
+           stsplot_time1 to do legend only if useful
 
 
 #======================================================================

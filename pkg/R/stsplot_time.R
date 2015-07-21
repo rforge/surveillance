@@ -172,7 +172,12 @@ stsplot_time1 <- function(
     axis( side=2 ,...)#cex=cex, cex.axis=cex.axis)
   }
 
-  if(is.list(legend.opts)) {
+  doLegend <- if (missing(legend.opts)) {
+      length(stateIdx) + length(alarmIdx) > 0 || any(!is.na(upperbound))
+  } else {
+      is.list(legend.opts)
+  }
+  if(doLegend) {
       legend.opts <- modifyList(
           list(x = "top",
                lty = c(lty[1],lty[3],NA,NA),

@@ -96,9 +96,11 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
   \item{outbreak.symbol}{a list with entries \code{pch}, \code{col},
     \code{cex} and \code{lwd} specifying the appearance of the outbreak
     symbol in the plot.}
-  \item{legend.opts}{if this is a list (of arguments for
-    \code{\link{legend}}), a legend will be produced.
-    To disable the legend use, e.g., \code{legend.opts=NULL}.
+  \item{legend.opts}{a list of arguments for \code{\link{legend}}.
+    If \code{\link{missing}(legend.opts)} (i.e., not explicitly
+    specified), the default legend will only be produced if \code{x}
+    contains any information on outbreaks, alarms, or upperbounds.
+    To disable the legend, use, e.g., \code{legend.opts=NULL}.
     Otherwise, the following arguments are default:
     \describe{
       \item{\code{x}}{\code{"top"}}
@@ -198,8 +200,7 @@ plot(ha.sts, hookFunc=hookFunc)
 data("salmNewport")
 plot(aggregate(salmNewport,by="unit"), xlab="Time (weeks)",
      xaxis.tickFreq=list("\%m"=atChange,"\%G"=atChange),
-     xaxis.labelFreq=list("\%G"=atMedian),xaxis.labelFormat="\%G",
-     legend.opts=NULL)
+     xaxis.labelFreq=list("\%G"=atMedian),xaxis.labelFormat="\%G")
 
 ## Formatting now also works for daily data (illustrate by artifical
 ## outbreak converted to sts object by linelist2sts)
@@ -212,7 +213,7 @@ surveillance.options("stsTickFactors"=c("\%d"=1, "\%W"=0.33,
                 "\%V"=0.33, "\%m"=1.75, "\%Q"=1.25, "\%Y"=1.5, "\%G"=1.5))
 plot(sts,xaxis.tickFreq=list("\%d"=atChange,"\%m"=atChange),
      xaxis.labelFreq=list("\%d"=at2ndChange),xaxis.labelFormat="\%d-\%b",
-     legend.opts=NULL, xlab="Time (days)")
+     xlab="Time (days)")
 }
 
 \keyword{hplot}
