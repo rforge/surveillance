@@ -213,6 +213,11 @@ echo $contents; } ?>
       <li><code>nowcast</code> - Nowcasting using frequentist approaches described in Lawless (1994) as well as more flexible hierarchical Bayes approaches developed in Höhle and an der Heiden (2014).</li>
     </ul>
   </li>
+  <li>
+    <ul>
+    <li><code>bodaDelay</code> - Delay adjusted outbreak detection synthesizing the <code>farringtonFlexible</code> and <code>boda</code> algorithms into a context where the surveillance reports have delays before arriving. See Salmon et al. (2015) for details.
+    </ul>
+  </li>
 </ul>
 
 <hr />
@@ -452,7 +457,12 @@ and has <a href="http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html">s
 <dt></dt>
 <dd><a href="http://arxiv.org/abs/1411.1292">Salmon, M., Schumacher, D. and Höhle, M. (<b>2014</b>)</a></dd>
 <dd><i>Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance</i></dd>
-<dd>Submitted to the Journal of Statistical Software</dd>
+<dd>Conditionally accepted for the Journal of Statistical Software</dd>
+
+<dt></dt>
+<dd>Salmon, M., Schumacher, D., Stark, K. and Höhle, M. (<b>2015</b>)</a></dd>
+<dd><i>Bayesian outbreak detection in the presence of reporting delays</i></dd>
+<dd>To appear in Biometrical Journal</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1093/aje/kwt069">Werber, D., King, L.A., Müller, L., Follin, P., Buchholz, U., Bernard, H., Rosner, B.M., Ethelberg, S., de Valk, H., Höhle, M. (<b>2013</b>)</a></dd>
