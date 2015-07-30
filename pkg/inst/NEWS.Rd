@@ -15,7 +15,7 @@
     In addition to a default method taking pure counts and predictive
     means and dispersion parameters, there are convenient methods for
     \code{"hhh4"} and \code{"oneStepAhead"} objects.
-    
+
     \item New \code{"hhh4"}-method for \code{scores()} (which is now
     generic) to directly evaluate the fitted values against the
     observed counts using proper scoring rules.
@@ -31,7 +31,7 @@
   \itemize{
     \item The first argument of \code{scores()} is now called \code{x}
     instead of \code{object} (for consistency with \code{calibrationTest()}).
-    
+
     \item The result of \code{oneStepAhead()} now has the dedicated
     class attribute \code{"oneStepAhead"} (previously was just a list).
 
@@ -59,6 +59,16 @@
 
 \subsection{BUG FIXES}{
   \itemize{
+    \item Fixed bug in \code{algo.outbreakP} causing a halt in the
+    computations of \code{value="cases"} when
+    \code{calc.outbreakP.statistic} returned \code{NaN}. Now, a
+    \code{NaN} is returned.
+
+    \item \code{wrap.algo} argument \code{control.hook} used
+    \code{control} argument defined outside it's scope (and not the one
+    provided to the function). It is now added as additional 2nd argument
+    to the \code{control.hook} function.
+
     \item \code{stsplot_time()} did not account for the optional
     \code{units} argument for multivariate \code{"sts"} objects
     when choosing a suitable value for \code{par("mfrow")}.
@@ -74,7 +84,7 @@
   \itemize{
     \item This is a quick patch release to make the test suite run
     smoothly on CRAN's Windows and Solaris Sparc systems.
-    
+
     \item The new \code{hhh4()} option to scale neighbourhood weights
     did not work for parametric weights with more than one parameter
     if \code{normalize=FALSE}.
@@ -91,7 +101,7 @@
     \item New functions and data for Bayesian outbreak detection in the
     presence of reporting delays (Salmon et al., 2015):
     \code{bodaDelay()}, \code{sts_observation()}, and \code{sts_creation()}.
-    
+
     \item New functions implementing tests for space-time interaction:
     \itemize{
       \item \code{knox()} supports both the Poisson approximation and a
@@ -101,35 +111,35 @@
       \item and \code{epitest()} for \code{twinstim} models
       (makes use of the new auxiliary function \code{simpleR0()}).
     }
-    
+
     \item New function \code{plapply()}: a parallel and verbose version
     of \code{lapply()} wrapping around both \code{mclapply()} and
     \code{parLapply()} of package \pkg{parallel}.
-    
+
     \item New converter \code{as.xts.sts()} to transform \code{"sts"}
     objects to the quasi standard \code{"xts"} class, e.g., to make use
     of package \CRANpkg{dygraphs} for interactive time series plots.
-    
+
     \item New options for scaling and normalization of neighbourhood
     weights in \code{hhh4()} models.
-        
+
     \item New auxiliary function \code{layout.scalebar()} for use as part
     of \code{sp.layout} in \code{spplot()} or in the traditional
     graphics system.
   }
-  
+
   \subsection{New features for \code{"epidataCS"}}{
   \itemize{
     \item New argument \code{by} for \code{plot.epidataCS()}, which
     defines a stratifying variable for the events (default is the event
     type as before). It can also be set to \code{NULL} to make the plot
     not distinguish between event types.
-    
+
     \item The spatial plot of \code{"epidataCS"} gained the arguments
     \code{tiles}, \code{pop} and \code{sp.layout}, and can now produce
     an \code{spplot()} with the tile-specific population levels behind
     the point pattern.
-    
+
     \item New function \code{permute.epidataCS()} to randomly permute
     time points or locations of the events (holding other marks fixed).
   }
@@ -187,7 +197,7 @@
     marginals. A new argument \code{samplingMethod} is now introduced
     defaulting to the proper 'joint'. For backwards compatibility use
     the value 'marginal'.
-    
+
     \item The functions \code{as.epidataCS()} and \code{simEpidataCS()}
     could throw inappropriate warnings when checking polygon areas
     (only if \code{W} or \code{tiles}, respectively, contained holes).
@@ -237,7 +247,7 @@
 
 
 \section{Changes in surveillance version 1.8-3 (2015-01-05)}{
-  
+
   \itemize{
     \item Accommodate a new note given by R-devel checks, and set the new
     INLA additional repository in the \file{DESCRIPTION} file.
@@ -256,7 +266,7 @@
   \itemize{
     \item In the coefficient vector resulting from a \code{hhh4} fit,
     random intercepts are now named.
-    
+
     \item Parameter \code{start} values in \code{hhh4()} are now
     matched by name but need not be complete in that case (default
     initial values are used for unspecified parameters).
@@ -295,7 +305,7 @@
 
 
 \section{Changes in surveillance version 1.8-1 (2014-10-29)}{
-  
+
 \subsection{NEW FEATURES}{
   \itemize{
     \item The \code{R0}-method for \code{"twinstim"} gained an argument
@@ -350,7 +360,7 @@
     default plots the multiplicative effect of seasonality on the
     respective component (new argument \code{intercept=FALSE}).
     The default set of components to plot has also changed.
-    
+
     \item When \code{as.epidata()} and \code{simEpidata()} calculate
     distance-based epidemic weights from the \code{f} functions, they no
     longer set the distance of an infectious individual to itself
@@ -481,7 +491,7 @@
 
 
 \section{Changes in surveillance version 1.8-0 (2014-06-16)}{
-  
+
 \subsection{PACKAGE INFRASTRUCTURE}{
   \itemize{
     \item Package \pkg{surveillance} now depends on newer versions of
@@ -519,8 +529,8 @@
     visualized as a reporting triangle). The new code implements the
     generalized-Dirichlet and the hierarchical Bayesian approach described in
     \enc{Höhle}{Hoehle} and an der Heiden (2014). No backwards
-    compatibility to the old nowcasting procedure is given. 
-    
+    compatibility to the old nowcasting procedure is given.
+
     \item The package contains a new monitoring function
     \code{boda}. This is a first experimental surveillance
     implementation of the Bayesian Outbreak Detection Algorithm (BODA)
@@ -528,7 +538,7 @@
     relies on the non-CRAN package \pkg{INLA}, which has to be installed first
     in order to use this function. Expect initial problems.
 
-    
+
     \item New \code{toLatex}-method for \code{"sts"} objects.
 
     \item The new function \code{stsplot_space()} provides an improved
@@ -551,7 +561,7 @@
     etc. As a consequence, the old argument \code{xaxis.years} is
     removed. See \code{stsplot_time()} for more information.
 
-    
+
     \item Inference for neighbourhood weights in \code{hhh4()} models:
     \code{W_powerlaw()} and \code{W_np()} both implement weights
     depending on the order of neighbourhood between regions, a power-law
@@ -566,16 +576,16 @@
     stored as component \code{"lags"} of the return value (previously
     there was an unused component \code{"lag"} which was always 1 and
     has been removed now).
-    
+
     \item \code{oneStepAhead()}:
     \itemize{
       \item Added support for parallel computation of predictions using
       \code{mclapply()} from package \pkg{parallel}.
       \item New argument \code{type} with a new \code{type}
       \code{"first"} to base all subsequent one-step-ahead predictions
-      on a single initial fit. 
+      on a single initial fit.
       \item Nicer interpretation of \code{verbose} levels, and
-      \code{txtProgressBar()}. 
+      \code{txtProgressBar()}.
     }
 
     \item The \code{plot()}-method for fitted \code{hhh4()} objects now
@@ -593,7 +603,7 @@
     default methods work smoothly now (due to changes to
     \code{logLik.hhh4()} documented below).
 
-    
+
     \item New predefined interaction functions for \code{twinstim()}:
     \code{siaf.student()} implements a \eqn{t}-kernel for the distance
     decay, and \code{siaf.step()} and \code{tiaf.step()} provide step
@@ -622,7 +632,7 @@
     \item The new function \code{glm_epidataCS()} can be used to fit
     an endemic-only \code{twinstim()} via \code{glm()}.
     This is mainly provided for testing purposes since wrapping into
-    \code{glm} usually takes longer. 
+    \code{glm} usually takes longer.
   }
 }
 
@@ -644,7 +654,7 @@
       \item Default of \code{tp[2]} is now the penultimate time point of
       the fitted subset (not of the whole \code{stsObj}).
       \item \code{+1} on rownames of \code{$pred} (now the same as for
-      \code{$observed}). 
+      \code{$observed}).
     }
 
     \item The optional \code{"twinstim"} result components
@@ -670,7 +680,7 @@
       respectively (by the new argument \code{truncated}).
       \item now uses \code{scaled=TRUE} by default.
     }
-    
+
     \item The argument \code{colTypes} of
     \code{plot.epidataCS(,aggregate="space")} is deprecated (use
     \code{points.args$col} instead).
@@ -711,7 +721,7 @@
     influence regions (\code{col.influence=NULL}), is \code{verbose} if
     \code{interactive()}, and ignores \code{sleep} on non-interactive
     devices.
-    
+
     \item The \code{multiplicity}-generic and its default method have
     been integrated into \CRANpkg{spatstat} and are imported from there.
   }
@@ -744,10 +754,10 @@
     \item Fixed a bug in \code{LRCUSUM.runlength} where computations
     were erroneously always done under  the in-control parameter
     \code{mu0} instead of \code{mu}.
-    
+
     \item Fixed a bug during alarm plots (\code{stsplot_alarm()}),
     where the use of \code{alarm.symbol} was ignored.
-    
+
     \item Fixed a bug in \code{algo.glrnb} where the overdispersion
     parameter \code{alpha} from the automatically fitted \code{glm.nb}
     model (fitted by \code{estimateGLRNbHook}) was incorrectly taken as
@@ -755,11 +765,11 @@
     due to a different parametrization of the negative binomial
     distribution compared to the parametrization in \enc{Höhle}{Hoehle}
     and Paul (2008).
-    
+
     \item The score function of \code{hhh4()} was wrong when fitting
     endemic-only models to a \code{subset} including the first time
     point. This led to \dQuote{false convergence}.
-    
+
     \item \code{twinstim()} did not work without an endemic offset if
     \code{is.null(optim.args$par)}.
   }
@@ -779,7 +789,7 @@
     BSL) for polygon clipping operations (via
     \code{spatstat::intersect.owin()}). This results in a slightly
     different \code{$events$.influenceRegion} component of
-    \code{"epidataCS"} objects, one reason being that 
+    \code{"epidataCS"} objects, one reason being that
     \pkg{polyclip} uses integer arithmetic.
     Change of \code{twinstim()} estimates for a newly created
     \code{"epidataCS"} compared with the same data prepared in earlier
@@ -787,8 +797,8 @@
     the mean relative difference of coefficients is 3.7e-08, while the
     \code{logLik()} is \code{all.equal()}).
     As an alternative, \pkg{rgeos} can still be chosen to do the polygon
-    operations. 
-    
+    operations.
+
     \item The \pkg{surveillance}-internal code now depends on
     \R >= 2.15.2 (for \code{nlminb()} \code{NA} fix of PR#15052,
     consistent \code{rownames(model.matrix)} of PR#14992,
@@ -866,10 +876,10 @@
     compared to previously. Furthermore, the functionality is only
     tested for weekly data (monthly data are experimental). The same
     functionality applies to \code{farringtonFlexible()}.
-    
+
     \item To make the different retrospective modelling frameworks of
     the \pkg{surveillance} package jointly applicable, it is now possible
-    to convert (aggregate) \code{"epidataCS"} 
+    to convert (aggregate) \code{"epidataCS"}
     (continuous-time continuous-space data) into an \code{"sts"} object
     (multivariate time series of counts) by the new function
     \code{epidataCS2sts}.
@@ -902,9 +912,9 @@
   \itemize{
     \item Using \code{tiaf.exponential()} in a \code{twinstim()} now works
     with \code{nTypes=1} for multi-type data.
-    
+
     \item A legend can be added automatically in \code{iafplot()}.
-    
+
     \item The \code{untie} methods are now able to produce jittered points
     with a required minimum separation (\code{minsep}).
 
@@ -941,7 +951,7 @@
     \item Increased default \code{maxit} for the Nelder-Mead optimizer
     in \code{hhh4} from 50 to 300, and removed default artificial lower
     bound (-20) on intercepts of epidemic components.
-    
+
     \item Renamed returned list from \code{oneStepAhead}
     (mean->pred, x->observed, params->coefficients,
     variances->Sigma.orig) for consistency, and
@@ -973,7 +983,7 @@
     and hence not being in the \code{"epoch"} slot of the \code{"sts"}
     object are now ignored (previously the resulting \code{NA}s caused the
     function to halt). A warning is displayed in this case.
-    
+
     \item \code{hhh4}: The entry \eqn{(5,6)} of the marginal Fisher
     information matrix in models with random intercepts in all three
     components was incorrect.
@@ -1212,7 +1222,7 @@
     \item \code{hhh4()} optimization routines can now be customized for
     the updates of regression and variance parameters seperately, which
     for instance enables the use of Nelder-Mead for the variance
-    updates, which seems to be more stable/robust as it does 
+    updates, which seems to be more stable/robust as it does
     not depend on the inverse Fisher info and is usually faster.
     \item The \code{ranef()} extraction function for \code{"ah4"} objects
     gained a useful \code{tomatrix} argument, which re-arranges random
@@ -1251,7 +1261,7 @@
     defaults.
     \item The result of \code{algo.farrington.fitGLM.fast()} now
     additionally inherits from the \code{"lm"} class to avoid warnings
-    from \code{predict.lm()} about fake object. 
+    from \code{predict.lm()} about fake object.
     \item Improved \file{NAMESPACE} imports.
     \item Some additional tiny bug fixes, see the subversion log on
     R-Forge for details.
@@ -1263,7 +1273,7 @@
 
 
 \section{Changes in surveillance version 1.4-2 (2012-08-17)}{
-  
+
   \subsection{SYNOPSIS}{
     \itemize{
       \item This is mainly a patch release for the \code{twinstim}-related
@@ -1274,7 +1284,7 @@
       installation of the \pkg{surveillance} package).
     }
   }
-  
+
   \subsection{NEW FEATURES}{
     \itemize{
       \item Important new \code{twinstim()}-feature: fix parameters
@@ -1296,7 +1306,7 @@
       functions \emph{including many examples}.
     }
   }
-  
+
   \subsection{BUG FIXES (\code{"twinstim"}-related)}{
     \itemize{
       \item \code{nlminb} (instead of \code{optim}'s \code{"BFGS"}) is
@@ -1304,7 +1314,7 @@
       \item The \code{twinstim}-argument \code{nCub} can now be omitted when
       using \code{siaf.constant()} (as documented) and is internally set to
       \code{NA_real_} in this case. Furthermore, \code{nCub} and
-      \code{nCub.adaptive} are set to \code{NULL} if there is 
+      \code{nCub.adaptive} are set to \code{NULL} if there is
       no epidemic component in the model.
       \item \code{toLatex.summary.twinstim} now again works for
       \code{summary(*, test.iaf=FALSE)}.
@@ -1331,7 +1341,7 @@
       \code{browser()}-call and avoid potentially infinite loop.
     }
   }
-  
+
   \subsection{BUG FIXES (\code{"twinSIR"}-related)}{
     \itemize{
       \item The \code{.allocate} argument of \code{simEpidata()} has
@@ -1339,7 +1349,7 @@
       \item Simulation without endemic \code{cox()}-terms now works.
     }
   }
-  
+
   \subsection{MINOR CHANGES}{
     \itemize{
       \item Simplified \code{imdepi} data to monthly instead of weekly
@@ -1357,7 +1367,7 @@
       \item Removed the \dots-argument from \code{simEpidataCS()}.
       \item The coefficients returned by \code{simEpidataCS()} are now stored
       in a vector rather than a list for compatibility with
-      \code{"twinstim"}-methods. 
+      \code{"twinstim"}-methods.
       \item Argument \code{cex.fun} of \code{intensityplot.twinstim()} now
       defaults to the \code{sqrt} function (as in \code{plot.epidataCS()}.
     }
@@ -1366,7 +1376,7 @@
 
 
 \section{Changes in surveillance version 1.4 (2012-07-26)}{
-  
+
   \subsection{SYNOPSIS}{
     \itemize{
       \item Besides minor bug fixes, additional functionality has entered the package
@@ -1374,7 +1384,7 @@
             (version 1.3 has not appeared on CRAN), including a proper \file{NAMESPACE}.
     }
   }
-  
+
   \subsection{NEW FEATURES}{
     \itemize{
       \item Support for non-parametric back-projection using the function
@@ -1390,14 +1400,14 @@
       \item \code{residuals.twinstim()} and \code{residuals.twinSIR()}:
 	    extract the \dQuote{residual process}, see \cite{Ogata
             (1988)}. The residuals of \code{"twinSIR"} and
-            \code{"twinstim"} models may be checked graphically by the new 
+            \code{"twinstim"} models may be checked graphically by the new
             function \code{checkResidualProcess()}.
       \item Many new features for the \code{"twinstim"} class of
             self-exciting spatio-temporal point process models (see
 	    below).
     }
   }
-  
+
   \subsection{NEW FEATURES AND SIGNIFICANT CHANGES FOR \code{"twinstim"}}{
     \itemize{
       \item Modified arguments of \code{twinstim()}: new ordering, new
@@ -1421,7 +1431,7 @@
       \item \code{plot}-method for \code{"epidataCS"}
     }
   }
-  
+
   \subsection{MINOR CHANGES}{
     \itemize{
       \item Improved documentation for the new functionalities.
@@ -1458,7 +1468,7 @@
   \subsection{NEW FEATURES}{
     \itemize{
       \item Support for \code{"twinSIR"} models (with associated
-            \code{"epidata"} objects) as described 
+            \code{"epidata"} objects) as described
             in \cite{Höhle (2009)} has been moved from package
 	    \pkg{RLadyBug} to \pkg{surveillance}.
             That means continuous-time discrete-space \acronym{SIR} models.
@@ -1466,7 +1476,7 @@
             \cite{Meyer et al (2012)}. That means continuous-time
             continuous-space infectious disease models.
       \item Added functionality for non-parametric back projection
-            (\code{backprojNP()}) and 
+            (\code{backprojNP()}) and
             now-casting (\code{nowcast()}) based on \code{"sts"} objects.
     }
   }
@@ -1515,7 +1525,7 @@
     \item A few minor bug fixes
     \item Small improvements in the C-implementation of the \code{twins()}
       function by Daniel Sabanés Bové fixing the segmentation fault
-      issue on 64-bit architectures. 
+      issue on 64-bit architectures.
   }
 }
 
