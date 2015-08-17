@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-07-21)}{
+\section{Changes in surveillance version 1.10-0 (2015-08-17)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -72,6 +72,10 @@
     \item \code{stsplot_time()} did not account for the optional
     \code{units} argument for multivariate \code{"sts"} objects
     when choosing a suitable value for \code{par("mfrow")}.
+
+    \item \code{hhh4()} could have used a function \code{dpois()} or
+    \code{dnbinom()} from the global environment instead of the
+    respective function from package \pkg{stats}.
   }
 }
 
