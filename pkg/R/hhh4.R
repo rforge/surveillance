@@ -692,7 +692,7 @@ interpretControl <- function (control, stsObj)
     ## }
     dim.overdisp <- if (control$family == "NegBin1") 1L else nUnits
   }
-  environment(ddistr) <- .GlobalEnv     # function is self-contained
+  environment(ddistr) <- getNamespace("stats")  # function is self-contained
 
   names.overdisp <- if(dim.overdisp > 1L){
     paste0(paste("-log(overdisp", colnames(stsObj), sep="."), ")")
