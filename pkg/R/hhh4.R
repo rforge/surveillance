@@ -672,13 +672,12 @@ interpretControl <- function (control, stsObj)
   index.re <- rep(1:ncol(all.term), times=unlist(all.term["dim.re",])) 
   
   # poisson or negbin model
-  fam <- match.arg(control$family, c("Poisson","NegBin1","NegBinM"))
-  if(fam=="Poisson"){
+  if(control$family == "Poisson"){
     ddistr <- function(y,mu,size){
         dpois(y, lambda=mu, log=TRUE)
     }
     dim.overdisp <- 0L
-  } else {
+  } else { # NegBin
     ddistr <- function(y,mu,size){
         dnbinom(y, mu=mu, size=size, log=TRUE)
     }
@@ -691,7 +690,7 @@ interpretControl <- function (control, stsObj)
     ##                              size=size[!poisidx], log=TRUE)
     ##     res
     ## }
-    dim.overdisp <- if (fam=="NegBin1") 1L else nUnits
+    dim.overdisp <- if (control$family == "NegBin1") 1L else nUnits
   }
   environment(ddistr) <- .GlobalEnv     # function is self-contained
 
