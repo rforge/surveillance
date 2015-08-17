@@ -852,6 +852,27 @@ meanHHH <- function(theta, model, subset=model$subset, total.only=FALSE)
 }
 
 
+### compute dispersion in dnbinom (mu, size) parametrization
+
+sizeHHH <- function (theta, model, subset = model$subset)
+{
+    if (model$nOverdisp == 0L) # Poisson case
+        return(NULL)
+
+    ## extract dispersion in dnbinom() parametrization
+    pars <- splitParams(theta, model)
+    size <- exp(pars$overdisp)             # = 1/psi, pars$overdisp = -log(psi)
+
+    ## return either a vector or a time x unit matrix
+    if (is.null(subset)) {
+        unname(size)  # no longer is "-log(overdisp)"
+    } else {
+        matrix(data = size, nrow = length(subset), ncol = model$nUnits,
+               byrow = TRUE, dimnames = list(NULL, colnames(model$response)))
+    }
+}
+
+
 ############################################
 
 
@@ -860,21 +881,15 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
   if(any(is.na(theta))) stop("NAs in regression parameters.", ADVICEONERROR)
 
   ## unpack model
-  nTime <- model$nTime
-  nUnits <- model$nUnits
   subset <- model$subset
   Y <- model$response[subset,,drop=FALSE]
   #isNA <- model$isNA[subset,,drop=FALSE]
   dimPsi <- model$nOverdisp
   dimRE <- model$nRE
-
-  ## unpack parameters
-  pars <- splitParams(theta, model)
-  psi <- exp(pars$overdisp)             # = 1/psi, pars$overdisp = -log(psi)
-  if(dimPsi > 1L) {
-      psi <- matrix(psi, nTime, nUnits, byrow=TRUE)[subset,,drop=FALSE]
-  }
+  
+  ## unpack random effects
   if (dimRE > 0) {
+      pars <- splitParams(theta, model)
       randomEffects <- pars$random
       sd   <- head(sd.corr, model$nVar)
       corr <- tail(sd.corr, model$nCorr)
@@ -883,7 +898,11 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
   }
   
   ############################################################
-  
+
+  ## evaluate dispersion
+  psi <- sizeHHH(theta, model,
+                 subset = if (dimPsi > 1L) subset) # else scalar or NULL
+
   #psi might be numerically equal to 0 or Inf in which cases dnbinom (in meanHHH)
   #would return NaN (with a warning). The case size=Inf rarely happens and
   #corresponds to a Poisson distribution. Currently this case is not handled
@@ -910,7 +929,7 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
   
   ## log-likelihood
   ll.units <- .colSums(model$family(Y,mu,psi),
-                       length(subset), nUnits, na.rm=TRUE)
+                       length(subset), model$nUnits, na.rm=TRUE)
 
   ## penalized log-likelihood
   ll <- sum(ll.units) + lpen
@@ -934,14 +953,12 @@ penScore <- function(theta, sd.corr, model)
   isNA <- model$isNA[subset,,drop=FALSE]
   dimPsi <- model$nOverdisp
   dimRE <- model$nRE
+  term <- model$terms
+  nGroups <- model$nGroups
+  dimd <- model$nd
 
   ## unpack parameters
   pars <- splitParams(theta, model)
-  psi <- exp(pars$overdisp)             # = 1/psi, pars$overdisp = -log(psi)
-  if(dimPsi > 1L) {
-      psi <- matrix(psi, ncol=model$nUnits, nrow=model$nTime,
-                    byrow=TRUE)[subset,,drop=FALSE]
-  }
   if (dimRE > 0) {
       randomEffects <- pars$random
       sd   <- head(sd.corr, model$nVar)
@@ -950,10 +967,9 @@ penScore <- function(theta, sd.corr, model)
       Sigma.inv <- getSigmaInv(sd, corr, model$nVar, dimBlock)
   }
 
-  ## further model unpacking
-  term <- model$terms
-  nGroups <- model$nGroups
-  dimd <- model$nd
+  ## evaluate dispersion
+  psi <- sizeHHH(theta, model,
+                 subset = if (dimPsi > 1L) subset) # else scalar or NULL
 
   ## evaluate mean
   mu <- meanHHH(theta, model)
@@ -1054,14 +1070,15 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
   isNA <- model$isNA[subset,,drop=FALSE]
   dimPsi <- model$nOverdisp
   dimRE <- model$nRE
+  term <- model$terms
+  nGroups <- model$nGroups
+  dimd  <- model$nd
+  dimFE <- model$nFE
+  idxFE <- model$indexFE
+  idxRE <- model$indexRE
 
   ## unpack parameters
   pars <- splitParams(theta, model)
-  psi <- exp(pars$overdisp)             # = 1/psi, pars$overdisp = -log(psi)
-  if(dimPsi > 1L) {
-      psi <- matrix(psi, ncol=model$nUnits, nrow=model$nTime,
-                    byrow=TRUE)[subset,,drop=FALSE]
-  }
   if (dimRE > 0) {
       randomEffects <- pars$random
       sd   <- head(sd.corr, model$nVar)
@@ -1070,13 +1087,9 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
       Sigma.inv <- getSigmaInv(sd, corr, model$nVar, dimBlock)
   }
 
-  ## further model unpacking
-  term <- model$terms
-  nGroups <- model$nGroups
-  dimd  <- model$nd
-  dimFE <- model$nFE
-  idxFE <- model$indexFE
-  idxRE <- model$indexRE
+  ## evaluate dispersion
+  psi <- sizeHHH(theta, model,
+                 subset = if (dimPsi > 1L) subset) # else scalar or NULL
 
   ## evaluate mean
   mu <- meanHHH(theta, model)
