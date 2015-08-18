@@ -29,7 +29,7 @@ hhh4 <- function (stsObj, control = list(
               normalize = FALSE), # w_ji -> w_ji / rowSums(w_ji), after scaling
     end = list(f = ~ 1,        # a formula "exp(x'nu) * n_it"
                offset = 1),    # optional multiplicative offset e_it
-    family = c("Poisson", "NegBin1", "NegBinM"),
+    family = c("Poisson", "NegBin1", "NegBinM"), # or a factor of length nUnit
     subset = 2:nrow(stsObj),   # epidemic components require Y_{t-lag}
     optimizer = list(stop = list(tol = 1e-5, niter = 100), # control arguments
                      regression = list(method = "nlminb"), # for optimization 
@@ -276,8 +276,14 @@ setControl <- function (control, stsObj)
   
 
   ### check remaining components of the control list
-  
-  control$family <- match.arg(control$family, defaultControl$family)  
+
+  if (is.factor(control$family)) {
+      stopifnot(length(control$family) == nUnit)
+      control$family <- droplevels(control$family)
+      names(control$family) <- colnames(stsObj)
+  } else {
+      control$family <- match.arg(control$family, defaultControl$family)
+  }
 
   if (!is.vector(control$subset, mode="numeric") ||
       !all(control$subset %in% seq_len(nTime)))
@@ -672,11 +678,12 @@ interpretControl <- function (control, stsObj)
   index.re <- rep(1:ncol(all.term), times=unlist(all.term["dim.re",])) 
   
   # poisson or negbin model
-  if(control$family == "Poisson"){
+  if(identical(control$family, "Poisson")){
     ddistr <- function(y,mu,size){
         dpois(y, lambda=mu, log=TRUE)
     }
     dim.overdisp <- 0L
+    index.overdisp <- names.overdisp <- NULL
   } else { # NegBin
     ddistr <- function(y,mu,size){
         dnbinom(y, mu=mu, size=size, log=TRUE)
@@ -690,15 +697,22 @@ interpretControl <- function (control, stsObj)
     ##                              size=size[!poisidx], log=TRUE)
     ##     res
     ## }
-    dim.overdisp <- if (control$family == "NegBin1") 1L else nUnits
+    index.overdisp <- if (is.factor(control$family)) {
+        control$family
+    } else if (control$family == "NegBinM") {
+        factor(colnames(stsObj))
+    } else { # "NegBin1"
+        factor(character(nUnits))
+    }
+    names(index.overdisp) <- colnames(stsObj)
+    dim.overdisp <- nlevels(index.overdisp)
+    names.overdisp <- if (dim.overdisp == 1L) {
+        "-log(overdisp)"
+    } else {
+        paste0("-log(", paste("overdisp", levels(index.overdisp), sep = "."), ")")
+    }
   }
   environment(ddistr) <- getNamespace("stats")  # function is self-contained
-
-  names.overdisp <- if(dim.overdisp > 1L){
-    paste0(paste("-log(overdisp", colnames(stsObj), sep="."), ")")
-  } else {
-    rep("-log(overdisp)", dim.overdisp)  # dim.overdisp may be 0
-  }
 
   # parameter start values from fe() and ri() calls via checkFormula()
   initial <- list(
@@ -758,6 +772,7 @@ interpretControl <- function (control, stsObj)
                  initialSigma = initial$sd.corr,
                  offset = offsets,
                  family = ddistr,
+                 indexPsi = index.overdisp,
                  subset = control$subset,
                  isNA = isNA
                  )
@@ -863,12 +878,13 @@ sizeHHH <- function (theta, model, subset = model$subset)
     pars <- splitParams(theta, model)
     size <- exp(pars$overdisp)             # = 1/psi, pars$overdisp = -log(psi)
 
-    ## return either a vector or a time x unit matrix
+    ## return either a vector or a time x unit matrix of dispersion parameters
     if (is.null(subset)) {
         unname(size)  # no longer is "-log(overdisp)"
     } else {
-        matrix(data = size, nrow = length(subset), ncol = model$nUnits,
-               byrow = TRUE, dimnames = list(NULL, colnames(model$response)))
+        matrix(data = size[model$indexPsi],
+               nrow = length(subset), ncol = model$nUnits, byrow = TRUE,
+               dimnames = list(NULL, names(model$indexPsi)))
     }
 }
 
