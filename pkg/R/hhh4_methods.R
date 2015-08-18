@@ -452,16 +452,12 @@ residuals.hhh4 <- function (object, type = c("deviance", "response"), ...)
     dev.resids <- switch(object$control$family,
         "Poisson" = poisson()$dev.resids,
         "NegBin1" = {
-            psi <- exp(object$coefficients[object$dim[1L]])
-            negative.binomial(psi)$dev.resids
+            size <- psi2size.hhh4(object, subset = NULL)
+            negative.binomial(size)$dev.resids
         },
         "NegBinM" = {
-            psicoefidx <- seq.int(to=object$dim[1L],
-                                  length.out=object$nUnit)
-            psi <- matrix(
-                exp(object$coefficients[psicoefidx]),
-                object$nTime, object$nUnit, byrow=TRUE)
-            negative.binomial(psi)$dev.resids # CAVE: non-standard use
+            size <- psi2size.hhh4(object)
+            negative.binomial(size)$dev.resids # CAVE: non-standard use
         },
         stop("not implemeted for \"", object$control$family, "\"-models"))
 
