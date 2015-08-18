@@ -417,21 +417,19 @@ hhh4coef2start <- function (fit)
 }
 
 ## extract estimated overdispersion in dnbinom() parametrization (and as matrix)
-psi2size.hhh4 <- function (object, subset = NULL, units = NULL)
+psi2size.hhh4 <- function (object, subset = object$control$subset, units = NULL)
 {
-    pars <- splitParams(object$coefficients, terms.hhh4(object))
-    size <- exp(pars$overdisp)
-    if (length(size) == 0L)
-        return(NULL)
-    size <- rep_len(size, object$nUnit)
-    names(size) <- colnames(object$stsObj) # to select 'units'
-    if (!is.null(units))
-        size <- size[units]
-    if (!is.null(subset)) {
-        size <- matrix(size, length(subset), length(size), byrow = TRUE,
-                       dimnames = list(NULL, names(size)))
+    size <- sizeHHH(object$coefficients, terms.hhh4(object), subset = subset)
+    if (!is.null(size) && !is.null(units)) {
+        if (is.null(subset)) {
+            warning("ignoring 'units' (not compatible with 'subset = NULL')")
+            size
+        } else {
+            size[, units, drop = FALSE]
+        }
+    } else {
+        size
     }
-    size
 }
 
 ## character vector of model components that are "inModel"
