@@ -888,6 +888,27 @@ sizeHHH <- function (theta, model, subset = model$subset)
     }
 }
 
+## auxiliary function used in penScore and penFisher
+## it sums colSums(x) within the groups defined by f (of length ncol(x))
+.colSumsGrouped <- function (x, f, na.rm = TRUE)
+{
+    nlev <- nlevels(f)
+    if (nlev == 1L) { # all columns belong to the same group
+        sum(x, na.rm = na.rm)
+    } else {
+        dimx <- dim(x)
+        colsums <- .colSums(x, dimx[1L], dimx[2L], na.rm = na.rm)
+        if (nlev == dimx[2L]) { # each column is its own group
+            colsums
+        } else { # sum colsums within groups
+            unlist(lapply(
+                X = split.default(colsums, f, drop = FALSE),
+                FUN = sum
+                ), recursive = FALSE, use.names = FALSE)
+        }
+    }
+}
+
 
 ############################################
 
@@ -1056,19 +1077,7 @@ penScore <- function(theta, sd.corr, model)
   grPsi <- if(dimPsi > 0L){
       dPsiMat <- psi * (digamma(Y+psi) - digamma(psi) + log(psi) + 1
                         - log(psiPlusMu) - psiYpsiMu)
-      if (dimPsi > 1L) {
-          dPsi <- .colSums(dPsiMat, length(subset), model$nUnits, na.rm=TRUE)
-          if (dimPsi == model$nUnits) { # unit-specific overdispersion
-              dPsi
-          } else { # shared overdispersion
-              unlist(lapply(
-                  X = split.default(dPsi, model$indexPsi, drop = FALSE),
-                  FUN = sum
-                  ), recursive = FALSE, use.names = FALSE)
-          }
-      } else { # single overdispersion parameter (same for all units)
-          sum(dPsiMat, na.rm=TRUE)
-      }
+      .colSumsGrouped(dPsiMat, model$indexPsi)
   } else numeric(0L)
   
   ## add penalty to random effects gradient
@@ -1099,6 +1108,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
   dimFE <- model$nFE
   idxFE <- model$indexFE
   idxRE <- model$indexRE
+  indexPsi <- model$indexPsi
 
   ## unpack parameters
   pars <- splitParams(theta, model)
@@ -1134,12 +1144,11 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
     dThetadPsi <- function(dTheta){
         dThetadPsi.fac * dTheta
     }
-    dPsidPsi <- function(){
-        dPsi <- psi * (digamma(psiPlusY)-digamma(psi) +log(psi)+1 -
-                       log(psiPlusMu) - psiYpsiMu)
-        psi^2 * (trigamma(psiPlusY) - trigamma(psi) + 1/psi - 1/psiPlusMu -
-                 (meanTotal-Y)/psiPlusMu2) + dPsi
-    }
+    dPsiMat <- psi * (digamma(psiPlusY) - digamma(psi) + log(psi) + 1
+                      - log(psiPlusMu) - psiYpsiMu)  # as in penScore()
+    dPsidPsiMat <- psi^2 * (
+        trigamma(psiPlusY) - trigamma(psi) + 1/psi - 1/psiPlusMu -
+            (meanTotal-Y)/psiPlusMu2) + dPsiMat
   } else { # poisson
     deriv2HHH.fac1 <- -Y / (meanTotal^2)
     deriv2HHH.fac2 <- Y / meanTotal - 1
@@ -1189,14 +1198,15 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
 
     if (dimPsi > 0L) {
         ## d l(theta,x) /dpsi dpsi
+        dPsidPsi <- .colSumsGrouped(dPsidPsiMat, indexPsi)
         hessian.Psi.RE[,seq_len(dimPsi)] <- if (dimPsi == 1L) {
-            sum(dPsidPsi(), na.rm=TRUE)
-        } else diag(colSums(dPsidPsi(), na.rm=TRUE))
+            dPsidPsi
+        } else {
+            diag(dPsidPsi)
+        }
         ## d l(theta) / dd dpsi
         for (i in seq_len(dimd)) {      # will not be run if dimd==0
-            dPsi.i <- colSums(dThetadPsi(dmudd[[i]]),na.rm=TRUE)
-            if(dimPsi==1L) dPsi.i <- sum(dPsi.i)
-            hessian.d.Psi[i,] <- dPsi.i
+            hessian.d.Psi[i,] <- .colSumsGrouped(dThetadPsi(dmudd[[i]]), indexPsi)
         }
     }
     
@@ -1221,7 +1231,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         Z.j <- term["Z.intercept",j][[1]] 
         "%mj%" <- get(term["mult",j][[1]]) 
         dIJ <- colSums(didj %mj% Z.j)   # didj must not contain NA's (all NA's set to 0)
-        hessian.FE.RE[idxFE==i,idxRE==j] <<- diag(dIJ)[ which.i, ]
+        hessian.FE.RE[idxFE==i,idxRE==j] <<- diag(dIJ)[ which.i, ] # FIXME: does not work if type="car"
         dIJ <- dIJ[ which.i ]           # added which.i subsetting in r432
       } else if(unitSpecific.j){
         dIJ <- diag(colSums(didj))[ which.i, which.j ] 
@@ -1280,46 +1290,48 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
       if(is.matrix(Xit)){
         Xit <- Xit[subset,,drop=FALSE]
       }
-      m.Xit <- mean.comp[[comp.i]]*Xit
+      m.Xit <- mean.comp[[comp.i]] * Xit
       
       random.i <- term["random",i][[1]]
       unitSpecific.i <- term["unitSpecific",i][[1]]
 
       ## fill psi-related entries and select fillHess function
-      if(random.i){
+      if (random.i) {
         Z.i <- term["Z.intercept",i][[1]]   # Z.i and %m% (of i) determined here
         "%m%" <- get(term["mult",i][[1]])   # will also be used in j's for loop
         fillHess <- i.random
-        if(dimPsi==1L){
-          dPsi<- dThetadPsi(m.Xit)
-          dPsi[isNA] <- 0
-          hessian.FE.Psi[idxFE==i,]<- sum(dPsi)
-          hessian.Psi.RE[,c(FALSE,idxRE==i)] <- colSums( dPsi%m%Z.i)
-        } else if(dimPsi>1L){
-          dPsi<- dThetadPsi(m.Xit)
-          dPsi[isNA] <- 0
-          hessian.FE.Psi[idxFE==i,]<- colSums( dPsi)
-          hessian.Psi.RE[,c(rep.int(FALSE, dimPsi),idxRE==i)] <- diag(colSums( dPsi%m%Z.i))
-        }
-        
-      } else if(unitSpecific.i){
-        which.i <- term["which",i][[1]]
-        fillHess <- i.unit
-        if(dimPsi>0L){
-          dPsi <- colSums(dThetadPsi(m.Xit),na.rm=TRUE)
-          hessian.FE.Psi[idxFE==i,] <- if(dimPsi==1L) {
-              dPsi[which.i]
+        if (dimPsi > 0L) {
+          dThetadPsiMat <- dThetadPsi(m.Xit)
+          hessian.FE.Psi[idxFE==i,] <- .colSumsGrouped(dThetadPsiMat, indexPsi)
+          dThetadPsi.i <- .colSums(dThetadPsiMat %m% Z.i, length(subset), term["dim.re",i][[1]], na.rm=TRUE)
+          if (dimPsi==1L) {
+              hessian.Psi.RE[,dimPsi + which(idxRE==i)] <- dThetadPsi.i
+          } else if (dimPsi==model$nUnits) {
+              hessian.Psi.RE[,dimPsi + which(idxRE==i)] <- diag(dThetadPsi.i)
+              ## FIXME: does not work with type="car"
           } else {
-              diag(dPsi)[which.i,]
+              hessian.Psi.RE[cbind(indexPsi,dimPsi + which(idxRE==i))] <- dThetadPsi.i
+              ## FIXME: does not work with type="car"
           }
         }
-        
+      } else if (unitSpecific.i) {
+        which.i <- term["which",i][[1]]
+        fillHess <- i.unit
+        if (dimPsi > 0L) {
+          dThetadPsi.i <- .colSums(dThetadPsi(m.Xit), length(subset), model$nUnits, na.rm=TRUE)
+          if (dimPsi==1L) {
+              hessian.FE.Psi[idxFE==i,] <- dThetadPsi.i[which.i]
+          } else if (dimPsi==model$nUnits) {
+              hessian.FE.Psi[idxFE==i,] <- diag(dThetadPsi.i)[which.i,]
+          } else {
+              hessian.FE.Psi[cbind(which(idxFE==i),indexPsi[which.i])] <-
+                  dThetadPsi.i[which.i]
+          }
+        }
       } else {
         fillHess <- i.fixed
-        if(dimPsi>0L){
-          dPsi<- colSums(dThetadPsi(m.Xit),na.rm=TRUE)
-          if(dimPsi==1L){ dPsi <- sum(dPsi) }
-          hessian.FE.Psi[idxFE==i,] <-dPsi
+        if (dimPsi > 0L) {
+          hessian.FE.Psi[idxFE==i,] <- .colSumsGrouped(dThetadPsi(m.Xit), indexPsi)
         }
       }
 
