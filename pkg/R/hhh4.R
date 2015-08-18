@@ -1027,7 +1027,7 @@ penScore <- function(theta, sd.corr, model)
       } else if(term["random",i][[1]]){
         Z <- term["Z.intercept",i][[1]]  
         "%m%" <- get(term["mult",i][[1]])
-        dRTheta <- colSums(dTheta %m% Z)
+        dRTheta <- .colSums(dTheta %m% Z, length(subset), term["dim.re",i][[1]])
         grad.re <- c(grad.re, dRTheta)
         grad.fe <- c(grad.fe, sum(dTheta))
       } else{
@@ -1035,7 +1035,7 @@ penScore <- function(theta, sd.corr, model)
       }
     }
     
-    list(fe=grad.fe, re=unname(grad.re))
+    list(fe=grad.fe, re=grad.re)
   }
   
   gradients <- computeGrad(mu[c("epi.own","epi.neighbours","endemic")])
