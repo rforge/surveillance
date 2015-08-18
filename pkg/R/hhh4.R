@@ -1054,15 +1054,22 @@ penScore <- function(theta, sd.corr, model)
   
   ## gradient for overdispersion parameter psi
   grPsi <- if(dimPsi > 0L){
-      dPsi <- psi * (digamma(Y+psi) - digamma(psi) + log(psi) + 1
-                     - log(psiPlusMu) - psiYpsiMu)
-      # multiple psi_i's or single psi?
-      if(dimPsi>1L) colSums(dPsi, na.rm=TRUE) else sum(dPsi, na.rm=TRUE)
+      dPsiMat <- psi * (digamma(Y+psi) - digamma(psi) + log(psi) + 1
+                        - log(psiPlusMu) - psiYpsiMu)
+      if (dimPsi > 1L) {
+          dPsi <- .colSums(dPsiMat, length(subset), model$nUnits, na.rm=TRUE)
+          if (dimPsi == model$nUnits) { # unit-specific overdispersion
+              dPsi
+          } else { # shared overdispersion
+              unlist(lapply(
+                  X = split.default(dPsi, model$indexPsi, drop = FALSE),
+                  FUN = sum
+                  ), recursive = FALSE, use.names = FALSE)
+          }
+      } else { # single overdispersion parameter (same for all units)
+          sum(dPsiMat, na.rm=TRUE)
+      }
   } else numeric(0L)
-  
-  if(any(is.na(grPsi))){
-      stop("derivatives for overdispersion parameter psi not computable")
-  }
   
   ## add penalty to random effects gradient
   s.pen <- if(dimRE > 0) c(Sigma.inv %*% randomEffects) else numeric(0L)
