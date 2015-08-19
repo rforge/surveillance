@@ -139,7 +139,7 @@ logLik.hhh4 <- function(object, ...)
 coef.hhh4 <- function(object, se=FALSE,
                       reparamPsi=TRUE, idx2Exp=NULL, amplitudeShift=FALSE, ...)
 {
-    if (object$control$family == "Poisson") reparamPsi <- FALSE
+    if (identical(object$control$family, "Poisson")) reparamPsi <- FALSE
     coefs <- object$coefficients
     coefnames <- names(coefs)
     idx <- getCoefIdxRenamed(coefnames, reparamPsi, idx2Exp, amplitudeShift,
@@ -171,7 +171,7 @@ coef.hhh4 <- function(object, se=FALSE,
 vcov.hhh4 <- function (object,
                        reparamPsi=TRUE, idx2Exp=NULL, amplitudeShift=FALSE, ...)
 {
-    if (object$control$family == "Poisson") reparamPsi <- FALSE
+    if (identical(object$control$family, "Poisson")) reparamPsi <- FALSE
     idx <- getCoefIdxRenamed(names(object$coefficients),
                              reparamPsi, idx2Exp, amplitudeShift, warn=FALSE)
     newcoefs <- coef.hhh4(object, se=FALSE, reparamPsi=reparamPsi,
@@ -449,17 +449,16 @@ residuals.hhh4 <- function (object, type = c("deviance", "response"), ...)
     ## Cf. residuals.ah, it calculates:
     ## deviance = sign(y - mean) * sqrt(2 * (distr(y) - distr(mean)))
     ## pearson = (y - mean)/sqrt(variance)
-    dev.resids <- switch(object$control$family,
-        "Poisson" = poisson()$dev.resids,
-        "NegBin1" = {
-            size <- psi2size.hhh4(object, subset = NULL)
-            negative.binomial(size)$dev.resids
-        },
-        "NegBinM" = {
-            size <- psi2size.hhh4(object)
-            negative.binomial(size)$dev.resids # CAVE: non-standard use
-        },
-        stop("not implemeted for \"", object$control$family, "\"-models"))
+    dev.resids <- if (identical(object$control$family, "Poisson")) {
+        poisson()$dev.resids
+    } else {
+        size <- if (identical(object$control$family, "NegBin1")) {
+            psi2size.hhh4(object, subset = NULL)
+        } else {
+            psi2size.hhh4(object) # CAVE: a matrix -> non-standard "size"
+        }
+        negative.binomial(size)$dev.resids
+    }
 
     di2 <- dev.resids(y=obs, mu=fit, wt=1)
     sign(obs-fit) * sqrt(pmax.int(di2, 0))
