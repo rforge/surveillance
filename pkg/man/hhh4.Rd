@@ -108,9 +108,14 @@ hhh4(stsObj,
 	}
       }
       \item{\code{family}}{Distributional family -- either \code{"Poisson"},
-	or the Negative Binomial distribution with one common
-	overdispersion parameter for all units (\code{"NegBin1"}) or an
-	overdispersion parameter for each unit (\code{"NegBinM"}).
+	or the Negative Binomial distribution. For the latter, the
+	overdispersion parameter can be assumed to be the same for all
+        units (\code{"NegBin1"}), to vary freely over all units
+	(\code{"NegBinM"}), or to be shared by some units (specified by
+        a factor of length \code{ncol(stsObj)} such that its number of
+        levels determines the number of overdispersion parameters).
+        Note that \code{"NegBinM"} is equivalent to
+        \code{factor(colnames(stsObj), levels = colnames(stsObj))}.
       }
       \item{\code{subset}}{Typically \code{2:nrow(obs)} if model contains
 	autoregression}

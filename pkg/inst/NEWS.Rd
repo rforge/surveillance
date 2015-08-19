@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-08-17)}{
+\section{Changes in surveillance version 1.10-0 (2015-08-19)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -15,6 +15,10 @@
     In addition to a default method taking pure counts and predictive
     means and dispersion parameters, there are convenient methods for
     \code{"hhh4"} and \code{"oneStepAhead"} objects.
+
+    \item Shared overdispersion across units in negative binomial
+    \code{hhh4()} time series models (by specifying a factor variable
+    as the \code{family} argument).
 
     \item New \code{"hhh4"}-method for \code{scores()} (which is now
     generic) to directly evaluate the fitted values against the
