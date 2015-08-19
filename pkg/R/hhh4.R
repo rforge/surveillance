@@ -700,7 +700,8 @@ interpretControl <- function (control, stsObj)
     index.overdisp <- if (is.factor(control$family)) {
         control$family
     } else if (control$family == "NegBinM") {
-        factor(colnames(stsObj))
+        factor(colnames(stsObj), levels = colnames(stsObj))
+        ## do not sort levels (for consistency with unitSpecific effects)
     } else { # "NegBin1"
         factor(character(nUnits))
     }
@@ -899,7 +900,7 @@ sizeHHH <- function (theta, model, subset = model$subset)
         dimx <- dim(x)
         colsums <- .colSums(x, dimx[1L], dimx[2L], na.rm = na.rm)
         if (nlev == dimx[2L]) { # each column is its own group
-            colsums
+            colsums[order(f)]
         } else { # sum colsums within groups
             unlist(lapply(
                 X = split.default(colsums, f, drop = FALSE),
@@ -1206,6 +1207,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         }
         ## d l(theta) / dd dpsi
         for (i in seq_len(dimd)) {      # will not be run if dimd==0
+            ## dPsi.i <- colSums(dThetadPsi(dmudd[[i]]),na.rm=TRUE)
+            ## hessian.d.Psi[i,] <- if(dimPsi==1L) sum(dPsi.i) else dPsi.i[order(indexPsi)]
             hessian.d.Psi[i,] <- .colSumsGrouped(dThetadPsi(dmudd[[i]]), indexPsi)
         }
     }
@@ -1306,9 +1309,6 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
           dThetadPsi.i <- .colSums(dThetadPsiMat %m% Z.i, length(subset), term["dim.re",i][[1]], na.rm=TRUE)
           if (dimPsi==1L) {
               hessian.Psi.RE[,dimPsi + which(idxRE==i)] <- dThetadPsi.i
-          } else if (dimPsi==model$nUnits) {
-              hessian.Psi.RE[,dimPsi + which(idxRE==i)] <- diag(dThetadPsi.i)
-              ## FIXME: does not work with type="car"
           } else {
               hessian.Psi.RE[cbind(indexPsi,dimPsi + which(idxRE==i))] <- dThetadPsi.i
               ## FIXME: does not work with type="car"
@@ -1321,8 +1321,6 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
           dThetadPsi.i <- .colSums(dThetadPsi(m.Xit), length(subset), model$nUnits, na.rm=TRUE)
           if (dimPsi==1L) {
               hessian.FE.Psi[idxFE==i,] <- dThetadPsi.i[which.i]
-          } else if (dimPsi==model$nUnits) {
-              hessian.FE.Psi[idxFE==i,] <- diag(dThetadPsi.i)[which.i,]
           } else {
               hessian.FE.Psi[cbind(which(idxFE==i),indexPsi[which.i])] <-
                   dThetadPsi.i[which.i]
@@ -1331,6 +1329,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
       } else {
         fillHess <- i.fixed
         if (dimPsi > 0L) {
+          ## dPsi <- colSums(dThetadPsi(m.Xit),na.rm=TRUE)
+          ## hessian.FE.Psi[idxFE==i,] <- if (dimPsi==1L) sum(dPsi) else dPsi[order(indexPsi)]
           hessian.FE.Psi[idxFE==i,] <- .colSumsGrouped(dThetadPsi(m.Xit), indexPsi)
         }
       }
