@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-08-19)}{
+\section{Changes in surveillance version 1.10-0 (2015-08-21)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -58,6 +58,12 @@
     \item If \code{missing(legend.opts)} in \code{stsplot_time1()}, the
     default legend will only be produced if the \code{"sts"} object
     contains information on outbreaks, alarms, or upperbounds.
+
+    \item The default \code{summary()} of a \code{"twinstim"} fit is more
+    concise since it no longer includes the number of log-likelihood and
+    score function evaluations and the elapsed time during model fitting.
+    Set the new \code{runtime} argument of \code{summary.twinstim()} to
+    \code{TRUE} to add this information to the summary as before.
   }
 }
 
