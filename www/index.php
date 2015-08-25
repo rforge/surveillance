@@ -430,6 +430,7 @@ Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
 <dd><a href="http://dx.doi.org/10.1111/j.1541-0420.2011.01684.x">Meyer, S., Elias, J. and Höhle, M. (<b>2012</b>)</a></dd>
 <dd><i>A space-time conditional intensity model for invasive meningococcal disease occurrence</i></dd>
 <dd>Biometrics, Vol. 68(2), pp. 607-616</dd>
+<dd>(The Accepted Author Manuscript is available as <a href="http://arxiv.org/abs/1508.05740">arXiv:1508.05740</a>)</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1214/14-AOAS743">Meyer, S. and Held, L. (<b>2014</b>)</a></dd>
@@ -442,7 +443,7 @@ and has <a href="http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html">s
 <dt></dt>
 <dd><a href="http://arxiv.org/abs/1411.0416">Meyer, S., Held, L. and Höhle, M. (<b>2014</b>)</a></dd>
 <dd><i>Spatio-Temporal Analysis of Epidemic Phenomena Using the <code>R</code> Package <code>surveillance</code></i></dd>
-<dd>Submitted to the Journal of Statistical Software</dd>
+<dd>In revision for the Journal of Statistical Software</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1002/sim.4177">Paul, M. and Held, L. (<b>2011</b>)</a></dd>
