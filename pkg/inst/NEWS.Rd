@@ -29,6 +29,9 @@
     each single unit (and the endemic part) instead of the default
     endemic + AR + neighbours decomposition.
 
+    \item The argument \code{idx2Exp} of \code{coef.hhh4()} may now be
+    conveniently set to \code{TRUE} to exp-transform all coefficients.
+
     \item The generator function \code{sts()} can now be used to
     initialize objects of class \code{"sts"} (instead of writing
     \code{new("sts", ...)}).

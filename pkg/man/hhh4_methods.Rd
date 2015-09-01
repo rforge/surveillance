@@ -66,8 +66,11 @@ from a call to \code{\link{hhh4}}.
     to standard scale, where zero corresponds to a Poisson distribution. 
   }
   \item{se}{logical switch indicating if standard errors are required}
-  \item{idx2Exp}{vector with integers idicating the parameters
-    which should be returned on exp-scale.}
+  \item{idx2Exp}{integer vector selecting the parameters
+    which should be returned on exp-scale.
+    Alternatively, \code{idx2Exp = TRUE} will exp-transform all
+    parameters except for those already affected by
+    \code{reparamPsi} or \code{amplitudeShift}.}
   \item{amplitudeShift}{logical switch indicating whether the parameters
    for sine/cosine terms modelling seasonal patterns 
    (see \code{\link{addSeason2formula}}) should be transformed

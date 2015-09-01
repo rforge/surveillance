@@ -223,17 +223,20 @@ getCoefIdxRenamed <- function (coefnames, reparamPsi=TRUE, idx2Exp=NULL,
     } else NULL
 
     ## indexes of coefficients to exp()-transform
-    idx2Exp <- if (length(idx2Exp)) { # index sets must be disjoint
+    if (isTRUE(idx2Exp)) {
+        idx2Exp <- setdiff(seq_along(coefnames), c(idxPsi, idxAS))
+    } else if (length(idx2Exp)) {
+        stopifnot(is.vector(idx2Exp, mode = "numeric"))
+        ## index sets must be disjoint
         if (length(idxOverlap <- intersect(c(idxPsi, idxAS), idx2Exp))) {
             if (warn)
                 warning("following 'idx2Exp' were ignored due to overlap: ",
                         paste(idxOverlap, collapse=", "))
             idx2Exp <- setdiff(idx2Exp, idxOverlap)
         }
-        if (length(idx2Exp))
-            names(idx2Exp) <- paste0("exp(", coefnames[idx2Exp], ")")
-        idx2Exp
-    } else NULL
+    }
+    if (length(idx2Exp))
+        names(idx2Exp) <- paste0("exp(", coefnames[idx2Exp], ")")
 
     ## done
     list(Psi=idxPsi, AS=idxAS, toExp=idx2Exp)
