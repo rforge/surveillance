@@ -172,6 +172,7 @@ export(dss, logs, rps)  # ses, nses
 
 ### sts(BP)-specific
 
+export(sts)
 exportClasses(sts, stsBP)
 export(linelist2sts)
 

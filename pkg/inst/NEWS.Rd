@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-08-21)}{
+\section{Changes in surveillance version 1.10-0 (2015-09-01)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -28,6 +28,10 @@
     gained an option \code{decompose} to plot the contributions from
     each single unit (and the endemic part) instead of the default
     endemic + AR + neighbours decomposition.
+
+    \item The generator function \code{sts()} can now be used to
+    initialize objects of class \code{"sts"} (instead of writing
+    \code{new("sts", ...)}).
   }
 }
 
