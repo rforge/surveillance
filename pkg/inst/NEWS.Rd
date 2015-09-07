@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-09-01)}{
+\section{Changes in surveillance version 1.10-0 (2015-09-07)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -35,6 +35,9 @@
     \item The generator function \code{sts()} can now be used to
     initialize objects of class \code{"sts"} (instead of writing
     \code{new("sts", ...)}).
+
+    \item Additional arguments of \code{layout.scalebar()} now allow to
+    change the style of the labels.
   }
 }
 

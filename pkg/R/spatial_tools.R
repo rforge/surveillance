@@ -202,7 +202,8 @@ layout.labels <- function (obj, labels = TRUE, plot = FALSE)
 
 ## draw a scalebar with labels
 layout.scalebar <- function (obj, corner = c(0.05, 0.95), scale = 1,
-                             labels = c(0, scale), height = 0.05, plot = FALSE)
+                             labels = c(0, scale), height = 0.05,
+                             pos = 3, ..., plot = FALSE)
 {
     stopifnot(inherits(obj, "Spatial"))
     BB <- bbox(obj)
@@ -218,9 +219,9 @@ layout.scalebar <- function (obj, corner = c(0.05, 0.95), scale = 1,
              offset = offset, scale = scale, fill = c(NA, 1),
              plot.grid = !plot),
         list(textfun, x = offset[1L], y = offset[2L],
-             labels = labels[1L], pos = 3),
+             labels = labels[1L], pos = pos, ...),
         list(textfun, x = offset[1L] + scale[1L], y = offset[2L],
-             labels = labels[2L], pos = 3)
+             labels = labels[2L], pos = pos, ...)
     )
     if (plot) {
         for (li in lis) eval(do.call("call", li))
