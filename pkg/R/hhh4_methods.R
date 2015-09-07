@@ -419,6 +419,35 @@ hhh4coef2start <- function (fit)
     res
 }
 
+## extract coefficients in a list
+coeflist.hhh4 <- function (x, ...)
+{
+    ## determine number of parameters by parameter group
+    model <- terms.hhh4(x)
+    dim.fe.group <- unlist(model$terms["dim.fe",], recursive = FALSE, use.names = FALSE)
+    dim.re.group <- unlist(model$terms["dim.re",], recursive = FALSE, use.names = FALSE)
+    nFERE <- lapply(X = list(fe = dim.fe.group, re = dim.re.group),
+           FUN = function (dims) {
+               nParByComp <- tapply(
+                   X = dims,
+                   INDEX = factor(
+                       unlist(model$terms["offsetComp",],
+                              recursive = FALSE, use.names = FALSE),
+                       levels = 1:3, labels = c("ar", "ne", "end")),
+                   FUN = sum, simplify = TRUE)
+               nParByComp[is.na(nParByComp)] <- 0 # component not in model 
+               nParByComp
+           })
+
+    ## extract coefficients in a list (by parameter group)
+    coefs <- coef.hhh4(x, se = FALSE, ...)
+    list(fixed = coeflist.default(coefs[seq_len(x$dim[1L])],
+             c(nFERE$fe, "neweights" = model$nd, "overdisp" = model$nOverdisp)),
+         random = coeflist.default(coefs[x$dim[1L] + seq_len(x$dim[2L])],
+             nFERE$re),
+         sd.corr = x$Sigma.orig)
+}
+
 ## extract estimated overdispersion in dnbinom() parametrization (and as matrix)
 psi2size.hhh4 <- function (object, subset = object$control$subset, units = NULL)
 {

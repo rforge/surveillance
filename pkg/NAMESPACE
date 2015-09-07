@@ -149,6 +149,7 @@ export(coeflist)
 S3method(coeflist, default)
 S3method(coeflist, twinstim)
 S3method(coeflist, simEpidataCS)
+S3method(coeflist, hhh4)
 
 # Spatio-temporal cluster detection
 export(stcd)

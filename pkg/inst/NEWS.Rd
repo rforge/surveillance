@@ -20,8 +20,8 @@
     \code{hhh4()} time series models (by specifying a factor variable
     as the \code{family} argument).
 
-    \item New \code{"hhh4"}-method for \code{scores()} (which is now
-    generic) to directly evaluate the fitted values against the
+    \item \code{scores()} is now generic and has a method for \code{"hhh4"}
+    fits to directly evaluate the fitted values against the
     observed counts using proper scoring rules.
 
     \item \code{plotHHH4_fitted()} (and \code{plotHHH4_fitted1()})
@@ -31,6 +31,8 @@
 
     \item The argument \code{idx2Exp} of \code{coef.hhh4()} may now be
     conveniently set to \code{TRUE} to exp-transform all coefficients.
+
+    \item Added a \code{coeflist()}-method for \code{"hhh4"} fits.
 
     \item The generator function \code{sts()} can now be used to
     initialize objects of class \code{"sts"} (instead of writing
