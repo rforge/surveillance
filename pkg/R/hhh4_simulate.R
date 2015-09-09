@@ -96,6 +96,7 @@ simulate.hhh4 <- function (object, # result from a call to hhh4
                      simplify=if (simplify) "array" else FALSE)
     if (simplify) {
         dimnames(res)[1:2] <- list(subset, colnames(model$response))
+        attr(res, "stsObserved") <- object$stsObj[subset,]
         class(res) <- "hhh4sims"
     }
     
