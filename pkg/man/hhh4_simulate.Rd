@@ -46,7 +46,11 @@
     coefficients used for simulation from the model in \code{object}.
     Default is to use the fitted parameters.
     Note that the \code{coefs}-vector must be in the same order and
-    scaling as \code{coef(object)}.
+    scaling as \code{coef(object)}, which especially means
+    \code{reparamPsi = TRUE} (as per default when using the
+    \code{coef}-method to extract the parameters).
+    The overdispersion parameter in \code{coefs} is the inverse of the
+    dispersion parameter \code{size} in \code{\link{rnbinom}}.
   }
   \item{components}{
     character vector indicating which components of the fitted model
