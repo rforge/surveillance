@@ -21,7 +21,7 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
                          timeplot = list(height = 0.3),
                          sleep = 0.5, verbose = interactive(), draw = TRUE)
 {
-    if (dev.interactive())
+    if (draw && dev.interactive())
         message("Advice: use facilities of the \"animation\" package, e.g.,\n",
                 "        saveHTML() to view the animation in a web browser.")
 
