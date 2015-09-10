@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-09-09)}{
+\section{Changes in surveillance version 1.10-0 (2015-09-10)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -81,6 +81,11 @@
     score function evaluations and the elapsed time during model fitting.
     Set the new \code{runtime} argument of \code{summary.twinstim()} to
     \code{TRUE} to add this information to the summary as before.
+
+    \item The \code{animate}-method for \code{"sts"} objects gained an
+    argument \code{draw} (to disable the default instantaneous plotting)
+    and now invisibly returns the sequential plot objects (of class
+    \code{"gtable"} or \code{"trellis"}) in a list for post-processing.
   }
 }
 

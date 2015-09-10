@@ -19,7 +19,7 @@
 animate.sts <- function (object, tps = NULL, cumulative = FALSE,
                          population = NULL, at = 10, ...,
                          timeplot = list(height = 0.3),
-                         sleep = 0.5, verbose = interactive())
+                         sleep = 0.5, verbose = interactive(), draw = TRUE)
 {
     if (dev.interactive())
         message("Advice: use facilities of the \"animation\" package, e.g.,\n",
@@ -40,6 +40,7 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
         tps <- seq_len(nrow(object))
     if (verbose)
         pb <- txtProgressBar(min=0, max=length(tps), initial=0, style=3)
+    grobs <- vector(mode = "list", length = length(tps))
     for(i in seq_along(tps)) {
         cti <- if (cumulative) seq_len(i) else i
         ls <- stsplot_space(object, tps=tps[cti], population=population,
@@ -65,7 +66,7 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
                 timeplot))
             lt$aspect.fill <- FALSE
             lt$aspect.ratio <- timeplot_height * ls$aspect.ratio
-            gridExtra::grid.arrange( # calls grid.draw()
+            grobs[[i]] <- gridExtra::arrangeGrob(
                 ls, lt, heights=c(1-timeplot_height, timeplot_height))
             ## alternative using package "gtable":
             ## drawDetails.lattice <- function (x, recording = FALSE)
@@ -76,14 +77,19 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
             ## gt <- gtable::gtable_add_grob(gt, list(grid::grob(p = ls, cl = "lattice"),
             ##                                        grid::grob(p = lt, cl = "lattice")),
             ##                               t = 1:2, l = 1)
-            ## grid::grid.newpage()
-            ## grid::grid.draw(gt)
-        } else print(ls)
+            if (draw) {
+                grid::grid.newpage()
+                grid::grid.draw(grobs[[i]])
+            }
+        } else {
+            grobs[[i]] <- ls
+            if (draw) print(ls)
+        }
         if (verbose) setTxtProgressBar(pb, i)
         if (dev.interactive()) Sys.sleep(sleep)
     }
     if (verbose) close(pb)
-    invisible()
+    invisible(grobs)
 }
 
 
