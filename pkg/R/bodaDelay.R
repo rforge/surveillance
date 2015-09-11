@@ -197,6 +197,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
   mc.y <- control$mc.y
   sts@control$expected <- numeric(length(observed(sts)))
   sts@control$pvalues <- numeric(length(observed(sts)))
+  sts@control$score <- numeric(length(observed(sts)))
   # Loop over control$range
   for (k in control$range) {
 
@@ -245,7 +246,8 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
 
       argumentsThreshold <- list(model,alpha=alpha,dataGLM=dataGLM,reportingTriangle,
                                  delay=delay,k=k,control=control,mc.munu=mc.munu,mc.y=mc.y,
-                                 inferenceMethod=control$inferenceMethod,verbose=verbose)
+                                 inferenceMethod=control$inferenceMethod,verbose=verbose,
+                                 observed=observed)
       predisons <- do.call(bodaDelay.threshold,argumentsThreshold)
 
       threshold <- predisons$quantile
@@ -255,7 +257,7 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
       ######################################################################
       sts@upperbound[k] <- threshold
       sts@control$expected[k] <- expected
-      sts@control$pvalues[k] <- NA
+      sts@control$pvalues[k] <- predisons$score
       enoughCases <- (sum(observed[(k-control$limit54[2]+1):k])
                       >=control$limit54[1])
       sts@alarm[k] <- FALSE
@@ -372,7 +374,7 @@ bodaDelay.fitGLM <- function(dataGLM,reportingTriangle,alpha,
 ################################################################################
 bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
                                 delay,k,control,dataGLM,reportingTriangle,
-                                inferenceMethod,verbose=FALSE,...) {
+                                inferenceMethod,verbose=FALSE,observed=observed,...) {
   if (inferenceMethod=="INLA"){
     E <- max(0,mean(dataGLM$response, na.rm=TRUE))
     # Sample from the posterior
@@ -400,6 +402,7 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
       N_Tt <- rnbinom(size=theta,mu=E*mu_Tt,n=mc.munu*mc.y)
       N_Tt <- N_Tt[is.na(N_Tt)==FALSE]
       qi <- quantile(N_Tt, probs=(1-alpha), type=3, na.rm=TRUE)
+      pi <- 1-sum(N_Tt<observed[k],na.rm=TRUE)/sum(!is.na(N_Tt))
       # with no delay this is similar to boda.
       mu_Tt <- E*median(mu_Tt)
     } else {
@@ -408,6 +411,7 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
       N_Tt <- rnbinom(n=mc.y*mc.munu,size=exp(theta),mu=E*mT1)
 
       qi <- quantile(N_Tt, probs=(1-alpha), type=3, na.rm=TRUE)
+      pi <- 1-sum(N_Tt<observed[k],na.rm=TRUE)/sum(!is.na(N_Tt))
       mu_Tt <- median(E*mT1)
     }
   }
@@ -456,6 +460,7 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
       N_Tt <- N_Tt[is.na(N_Tt)==FALSE]
 
       qi <- quantile(N_Tt, probs=(1-alpha), type=3, na.rm=TRUE)
+      pi <- 1-sum(N_Tt<observed[k],na.rm=TRUE)/sum(!is.na(N_Tt))
     } else { # with no delay this is similar to boda.
 ###      browser()
       newData <- tail(dataGLM,n=1)
@@ -474,10 +479,11 @@ bodaDelay.threshold <- function(model, mc.munu,mc.y,alpha,
       N_Tt <- N_Tt[is.na(N_Tt)==FALSE]
       # Determine quantile
       qi <- quantile(N_Tt, probs=(1-alpha), type=3, na.rm=TRUE)
+      pi <- 1-sum(N_Tt<observed[k],na.rm=TRUE)/sum(!is.na(N_Tt))
     }
   }
   ##Done
-  return(list(quantile=as.numeric(qi),expected=mean(mu_Tt)))
+  return(list(quantile=as.numeric(qi),expected=mean(mu_Tt),score=as.numeric(pi)))
 }
 
 ################################################################################
