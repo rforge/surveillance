@@ -92,9 +92,14 @@
   \code{"\linkS4class{sts}"} (\code{nsim = 1}) or a list of those
   (\code{nsim > 1}).
 
-  If \code{simplify=TRUE}: an array of dimension
+  If \code{simplify=TRUE}: an object of class
+  \code{"hhh4sims"}, which is an array of dimension
   \code{c(length(subset), ncol(object$stsObj), nsim)}, where the third
   dimension is dropped if \code{nsim=1} (yielding a matrix).
+  The originally observed counts during the simulation period,
+  \code{object$stsObj[subset,]}, are attached for reference
+  (used by the \code{plot}-methods) as an attribute \code{"stsObserved"},
+  and the initial condition \code{y.start} as attribute \code{"initial"}.
 }
 
 \references{
