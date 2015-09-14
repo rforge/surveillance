@@ -17,6 +17,9 @@
 ## logarithmic score
 ## logs(P,x) = -log(P(X=x))
 
+.logs <- function (px)
+    -log(px)
+
 logs <- function (x, mu, size=NULL) {
     if (is.null(size)) {
         - dpois(x, lambda=mu, log=TRUE)
@@ -46,53 +49,67 @@ nses <- function (x, mu, size=NULL) {
 ## Dawid-Sebastiani score
 ## dss(P,x) = ((x-mu_p)/sigma_p)^2 + 2*log(sigma_p)
 
-dss <- function (x, mu, size=NULL) {
-    sigma2 <- if (is.null(size)) mu else mu * (1 + mu/size)
-    ((x-mu)^2)/sigma2 + log(sigma2)
-}
+.dss <- function (meanP, varP, x)
+    (x-meanP)^2 / varP + log(varP)
+
+dss <- function (x, mu, size=NULL)
+    .dss(meanP = mu,
+         varP = if (is.null(size)) mu else mu * (1 + mu/size),
+         x = x)
 
 
 ## ranked probability score
 ## rps(P,x) = sum_0^Kmax {P(X<=k) - 1(x<=k)}^2
 
-## scalar input (for one single prediction)
-rps.one <- function (x, mu, size=NULL, k=40, tolerance=sqrt(.Machine$double.eps)) {
-    ## return NA for non-convergent fits (where mu=NA)
-    if (is.na(mu)) return(NA_real_)
-
-    ## determine variance of distribution
-    sigma2 <- if (is.null(size)) mu else mu * (1 + mu/size)
-    
-    ## determine the maximum number of summands as Kmax=mean+k*sd
-    kmax <- ceiling(mu + k*sqrt(sigma2))
-    
-    ## compute 1(x<=k)
-    ind <- 1*(x < seq_len(kmax+1))
-	
+## for a single prediction (general formulation)
+.rps <- function (P, ..., x, kmax, tolerance = sqrt(.Machine$double.eps))
+{
     ## compute P(X<=k)
-    Px <- if (is.null(size)) {
-        ppois(0:kmax, lambda=mu)
-    } else {
-        pnbinom(0:kmax, mu=mu, size=size)
-    }
-	
+    k <- 0:kmax
+    Pk <- P(k, ...)
+    
     ## check precision
-    if ((1-tail(Px,1))^2 > tolerance)
+    if ((1 - Pk[length(Pk)])^2 > tolerance)
         warning("finite sum approximation error larger than tolerance=",
                 format(tolerance))
-	
-    ## compute rps
-    sum((Px-ind)^2)
+
+    ## compute the RPS
+    sum((Pk - (x <= k))^2)
+}
+
+## for a single Poisson prediction
+rps_1P <- function (x, mu, k=40, tolerance=sqrt(.Machine$double.eps)) {
+    ## return NA for non-convergent fits (where mu=NA)
+    if (is.na(mu)) return(NA_real_)
+    ## determine the maximum number of summands as Kmax=mean+k*sd
+    kmax <- ceiling(mu + k*sqrt(mu))
+    ## compute the RPS
+    .rps(P = ppois, lambda = mu, x = x,
+         kmax = kmax, tolerance = tolerance)
+}
+
+## for a single NegBin prediction
+rps_1NB <- function (x, mu, size, k=40, tolerance=sqrt(.Machine$double.eps)) {
+    ## return NA for non-convergent fits (where mu=NA)
+    if (is.na(mu)) return(NA_real_)
+    ## determine the maximum number of summands as Kmax=mean+k*sd
+    sigma2 <- mu * (1 + mu/size)
+    kmax <- ceiling(mu + k*sqrt(sigma2))
+    ## compute the RPS
+    .rps(P = pnbinom, mu = mu, size = size, x = x,
+         kmax = kmax, tolerance = tolerance)
 }
 
 ## vectorized version
 rps <- function (x, mu, size=NULL, k=40, tolerance=sqrt(.Machine$double.eps)) {
     res <- if (is.null(size)) {
-        mapply(rps.one, x=x, mu=mu,
-               MoreArgs=list(k=k, tolerance=tolerance), SIMPLIFY=TRUE, USE.NAMES=FALSE)
+        mapply(rps_1P, x=x, mu=mu,
+               MoreArgs=list(k=k, tolerance=tolerance),
+               SIMPLIFY=TRUE, USE.NAMES=FALSE)
     } else {
-        mapply(rps.one, x=x, mu=mu, size=size,
-               MoreArgs=list(k=k, tolerance=tolerance), SIMPLIFY=TRUE, USE.NAMES=FALSE)
+        mapply(rps_1NB, x=x, mu=mu, size=size,
+               MoreArgs=list(k=k, tolerance=tolerance),
+               SIMPLIFY=TRUE, USE.NAMES=FALSE)
     }
     attributes(res) <- attributes(x)  # set dim and dimnames
     res
