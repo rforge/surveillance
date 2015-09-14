@@ -34,6 +34,8 @@
     has a dedicated class: \code{"hhh4sims"}) to show the final
     size distribution or the simulated time series
     (possibly stratified by groups of units).
+    There is also a new \code{scores}-method to compute proper scoring
+    rules based on such simulations.
 
     \item The argument \code{idx2Exp} of \code{coef.hhh4()} may now be
     conveniently set to \code{TRUE} to exp-transform all coefficients.

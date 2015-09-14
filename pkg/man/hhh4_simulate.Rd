@@ -1,9 +1,7 @@
-\encoding{latin1}
 \name{hhh4_simulate}
 \alias{simulate.hhh4}
 
-\title{Simulates data based on the model proposed by Paul and Held (2011)
-}
+\title{Simulate \code{"hhh4"} Count Time Series}
 
 \description{
    Simulates a multivariate time series of counts based on the
@@ -18,7 +16,7 @@
 
 \arguments{
   \item{object}{
-    an object of class \code{"hhh4"}.
+    an object of class \code{"\link{hhh4}"}.
   }
   \item{nsim}{
     number of time series to simulate. Defaults to \code{1}.
@@ -112,7 +110,7 @@ Michaela Paul and Sebastian Meyer
 }
 
 \seealso{
-\code{\link{hhh4}}, \code{\link{simHHH}}
+  \code{\link{plot.hhh4sims}} and \code{\link{scores.hhh4sims}}
 }
 
 \examples{
