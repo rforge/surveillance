@@ -109,6 +109,10 @@
     \item \code{hhh4()} could have used a function \code{dpois()} or
     \code{dnbinom()} from the global environment instead of the
     respective function from package \pkg{stats}.
+
+    \item The default time variable \code{t} created as part of the
+    \code{data} argument in \code{hhh4()} was incompatible with
+    \code{"sts"} objects having \code{epochAsDate=TRUE}.
   }
 }
 

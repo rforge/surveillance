@@ -48,7 +48,7 @@ hhh4(stsObj,
                           variance = list(method="nlminb")),
          verbose = FALSE,
          start = list(fixed=NULL, random=NULL, sd.corr=NULL),
-         data = list(t = epoch(stsObj)-1),
+         data = list(t = stsObj@epoch - min(stsObj@epoch)),
          keep.terms = FALSE
      ),
      check.analyticals = FALSE)

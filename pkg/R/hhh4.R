@@ -38,7 +38,7 @@ hhh4 <- function (stsObj, control = list(
     start = list(fixed = NULL, # list of start values, replacing initial
                  random = NULL,  # values from fe() and ri() in 'f'ormulae
                  sd.corr = NULL), 
-    data = list(t = epoch(stsObj) - 1), # named list of covariates
+    data = list(t = stsObj@epoch - min(stsObj@epoch)), # named list of covariates
     keep.terms = FALSE  # whether to keep interpretControl(control, stsObj)
     ), check.analyticals = FALSE)
 {
