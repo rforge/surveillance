@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-09-10)}{
+\section{Changes in surveillance version 1.10-0 (2015-09-14)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -31,8 +31,9 @@
 
     \item New \code{plot}-method for simulations from \code{"hhh4"}
     models (using \code{simulate.hhh4(..., simplify = TRUE)}, which now
-    has a dedicated class: \code{"hhh4sims"}) to investigate the final
-    size distribution (possibly stratified by groups of units).
+    has a dedicated class: \code{"hhh4sims"}) to show the final
+    size distribution or the simulated time series
+    (possibly stratified by groups of units).
 
     \item The argument \code{idx2Exp} of \code{coef.hhh4()} may now be
     conveniently set to \code{TRUE} to exp-transform all coefficients.

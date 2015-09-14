@@ -468,9 +468,11 @@ export(as.hhh4simslist)
 S3method(as.hhh4simslist, hhh4sims)
 S3method(as.hhh4simslist, list)
 S3method(as.hhh4simslist, hhh4simslist)
+S3method("[", hhh4simslist)
+S3method("[[", hhh4simslist)
 S3method(plot, hhh4simslist)
 export(plotHHH4sims_size)
-export(plotHHH4sims_size_total)
+export(plotHHH4sims_time)
 
 ## backwards-compatibility for old class name "ah4"
 S3method(print, ah4)

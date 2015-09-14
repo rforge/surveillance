@@ -11,32 +11,45 @@
 ### $Date$
 ################################################################################
 
-plot.hhh4sims <- function (x, ...)
+plot.hhh4sims <- function (x, ...) {
+    ## use the object name of x
+    x <- eval(substitute(as.hhh4simslist(x)), envir = parent.frame())
     plot.hhh4simslist(x, ...)
-
-## time.hhh4sims <- function (x, ...)
-##     as.integer(dimnames(x)[[1L]])
+}
 
 
-## class for a list of "hhh4sims" arrays
-hhh4simslist <- function (x)
+## class for a list of "hhh4sims" arrays from different models
+## (over the same period with same initial values)
+hhh4simslist <- function (x, initial, stsObserved)
 {
-    attr(x, "stsObserved") <- attr(x[[1L]], "stsObserved")
-    for (i in seq_along(x)) attr(x[[i]], "stsObserved") <- NULL
+    ## drop attributes from every single hhh4sims object
+    for (i in seq_along(x))
+        attr(x[[i]], "class") <- attr(x[[i]], "initial") <-
+            attr(x[[i]], "stsObserved") <- NULL
+    ## set as list attributes
+    attr(x, "initial") <- initial
+    attr(x, "stsObserved") <- stsObserved
     class(x) <- "hhh4simslist"
     x
 }
 
-
 ## converter functions
 as.hhh4simslist <- function (x, ...) UseMethod("as.hhh4simslist")
 
-as.hhh4simslist.hhh4sims <- function (x, ...) {
-    if (nargs() > 1L) {
-        as.hhh4simslist.list(list(x, ...))
+as.hhh4simslist.hhh4sims <- function (x, ...)
+{
+    ## we do not use x here, but construct a list() from the sys.call()
+    ## such that as.hhh4simslist(name1 = model1, name2 = model2) works
+    cl <- sys.call()
+    cl[[1L]] <- as.name("list")
+    xx <- eval(cl, envir = parent.frame())
+    objnames <- as.character(cl)[-1L]
+    if (is.null(names(xx))) {
+        names(xx) <- objnames
     } else {
-        hhh4simslist(list(x))
+        names(xx)[names(xx) == ""] <- objnames[names(xx) == ""]
     }
+    as.hhh4simslist.list(xx)
 }
 
 as.hhh4simslist.list <- function (x, ...)
@@ -45,41 +58,69 @@ as.hhh4simslist.list <- function (x, ...)
     lapply(X = x, FUN = function (Xi)
         if (!inherits(Xi, "hhh4sims"))
             stop(sQuote("x"), " is not a list of ", dQuote("hhh4sims")))
-    hhh4simslist(x)
+    hhh4simslist(x,
+                 initial = attr(x[[1L]], "initial"),
+                 stsObserved = attr(x[[1L]], "stsObserved"))
 }
 
 as.hhh4simslist.hhh4simslist <- function (x, ...) x
+
+
+## select a subset of the simulation while keeping attributes in sync
+"[.hhh4simslist" <- function (x, i, j, ..., drop = FALSE)
+{
+    cl <- sys.call()
+    cl[[1L]] <- as.name("[")
+    cl[[2L]] <- quote(x)
+    cl$drop <- drop
+    subseti <- as.function(c(alist(x=), cl), envir = parent.frame())
+    x[] <- lapply(X = x, subseti)
+    if (!missing(i))
+        attr(x, "stsObserved") <- attr(x, "stsObserved")[i,]
+    if (!missing(j)) {
+        attr(x, "stsObserved") <- suppressMessages(attr(x, "stsObserved")[, j])
+        is.na(attr(x, "stsObserved")@neighbourhood) <- TRUE
+        attr(x, "initial") <- attr(x, "initial")[, j, drop = FALSE]
+    }
+    x
+}
+
+## select a specific "hhh4sims" from the list of simulations
+## (the inverse of as.hhh4simslist.hhh4sims(xx))
+"[[.hhh4simslist" <- function (x, i)
+{
+    xx <- NextMethod("[[")
+    a <- attributes(xx)
+    attributes(xx) <- c(a[c("dim", "dimnames")],
+                        attributes(x)[c("initial", "stsObserved")],
+                        list(class = "hhh4sims"),
+                        a[c("call", "seed")])
+    xx
+}
 
 
 ####################
 ### plot methods ###
 ####################
 
-plot.hhh4simslist <- function (x, type = c("size"), ...)
+check_groups <- function (groups, units)
 {
-    cl <- sys.call()
-
-    ## remove the "type" argument from the call
-    if (is.null(names(cl)) && nargs() > 1L) { # unnamed call plot(x, type)
-        cl[[3L]] <- NULL  # remove the second argument
+    if (isTRUE(groups)) {
+        factor(units, levels = units)
     } else {
-        cl$type <- NULL
+        stopifnot(length(groups) == length(units))
+        as.factor(groups)
     }
-    
-    cl[[1L]] <- as.name(paste("plotHHH4sims", match.arg(type), sep="_"))
-    eval(cl, envir = parent.frame())
 }
 
-
-### simulated final size distribution as boxplots (stratified by units)
-
-plotHHH4sims_size <- function (x, ...,
+plot.hhh4simslist <- function (x, type = c("size", "time"), ...,
                                groups = NULL, par.settings = list())
 {
+    FUN <- paste("plotHHH4sims", match.arg(type), sep = "_")
     if (is.null(groups))
-        return(plotHHH4sims_size_total(x, ...))
-    
-    x <- as.hhh4simslist(x)
+        return(do.call(FUN, list(quote(x), ...)))
+
+    ## stratified plots by groups of units
     groups <- check_groups(groups, colnames(attr(x, "stsObserved")))
     
     if (is.list(par.settings)) {
@@ -93,40 +134,26 @@ plotHHH4sims_size <- function (x, ...,
     invisible(sapply(
         X = levels(groups),
         FUN = function (group) {
-            idx_group <- which(group == groups)
-            x_group <- x
-            x_group[] <- lapply(X = x_group, FUN = "[",
-                              , idx_group, , drop = FALSE)
-            attr(x_group, "stsObserved") <- suppressMessages(
-                attr(x_group, "stsObserved")[, idx_group])
-            plotHHH4sims_size_total(x_group, ..., main = group)
+            x_group <- x[, which(group == groups) , ]
+            do.call(FUN, list(quote(x_group), ..., main = group))
         },
-        simplify = FALSE, USE.NAMES = TRUE))
+        simplify = FALSE, USE.NAMES = TRUE))    
 }
 
-check_groups <- function (groups, units)
-{
-    if (isTRUE(groups)) {
-        factor(units, levels = units)
-    } else {
-        stopifnot(length(groups) == length(units))
-        as.factor(groups)
-    }
-}
 
 ### simulated final size distribution as boxplots aggregated over all units
 
-plotHHH4sims_size_total <- function (x,
-                                     horizontal = TRUE, trafo = NULL,
-                                     label.observed = TRUE, ...)
+plotHHH4sims_size <- function (x, horizontal = TRUE, trafo = NULL,
+                               observed = TRUE, ...)
 {
     x <- as.hhh4simslist(x)
-    nsims <- sapply(x, colSums, dims = 2) # sum over dims 1:2 (time-space)
     if (is.null(trafo)) trafo <- scales::identity_trans()
+    if (isTRUE(observed)) observed <- list()
+    nsims <- sapply(x, colSums, dims = 2) # sum over dims 1:2 (time-space)
     nsimstrafo <- trafo$trans(nsims)
     
     ## default boxplot arguments
-    fslab <- "Final size"
+    fslab <- "size"
     if (trafo$name != "identity")
         fslab <- paste0(fslab, " (", trafo$name, "-scale)")
     defaultArgs <- list(ylab=fslab, yaxt="n", las=1, cex.axis=1, border=1)
@@ -156,20 +183,132 @@ plotHHH4sims_size_total <- function (x,
     axis(2-horizontal, at=trafo$transform(aty), labels=aty, las=boxplot.args$las)
 
     ## add line showing observed size
-    observed <- observed(attr(x, "stsObserved"))
-    if (horizontal) {
-        abline(v=trafo$trans(sum(observed)), lty=2, lwd=2)
-    } else {
-        abline(h=trafo$trans(sum(observed)), lty=2, lwd=2)
+    if (is.list(observed)) {
+        nObs <- sum(observed(attr(x, "stsObserved")))
+        observed <- modifyList(
+            list(col = 1, lty = 2, lwd = 2, 
+                 labels = nObs, font = 2, las = boxplot.args$las,
+                 mgp = if (horizontal) c(3, 0.4, 0)),
+            observed)
+        observed_line <- c(
+            setNames(list(trafo$trans(nObs)), if (horizontal) "v" else "h"),
+            observed[c("col", "lty", "lwd")])
+        do.call("abline", observed_line)
+        if (!is.null(observed[["labels"]]))
+            do.call("axis", c(
+                list(side = 2-horizontal, at = trafo$trans(nObs)),
+                observed))
     }
-    if (label.observed)
-        axis(2-horizontal, at=trafo$trans(sum(observed)),
-             labels=sum(observed), font=2, lwd=2, las=boxplot.args$las,
-             mgp=if (horizontal) c(3,0.4,0))
-
+    
     ## numeric summary
     mysummary <- function(x)
         c(mean=mean(x), quantile(x, probs=c(0.025, 0.5, 0.975)))
     nsum <- t(apply(nsims, 2, mysummary))
     invisible(nsum)
+}
+
+
+### Plot mean time series of the simulated counts
+
+aggregateCounts <- function (x, by = c("time", "unit"))
+{
+    by <- match.arg(by)
+    byidx <- 1 + (by == "unit")
+    aggregate1 <- function (sims)
+        apply(sims, c(byidx, if (!is.matrix(sims)) 3), sum)
+    clapply(x, aggregate1)
+}
+
+plotHHH4sims_time <- function (
+    x, average = mean, individual = length(x) == 1,
+    conf.level = if (individual) 0.95 else NULL, #score = "rps",
+    matplot.args = list(), initial.args = list(), legend = length(x) > 1,
+    xlim = NULL, ylim = NULL, add = FALSE, ...)
+{
+    x <- as.hhh4simslist(x)
+    nModels <- length(x)
+    ytInit <- rowSums(attr(x, "initial"))
+    stsObserved <- attr(x, "stsObserved")
+    ytObs <- rowSums(observed(stsObserved))
+    ytSim <- aggregateCounts(x, by = "time")
+    average <- match.fun(average)
+    ytMeans <- vapply(
+        X = ytSim,
+        FUN = function (x) apply(x, 1, average),
+        FUN.VALUE = numeric(length(ytObs)), USE.NAMES = TRUE)
+
+    ## axis range
+    if (is.null(xlim) && is.list(initial.args))
+        xlim <- c(1 - length(ytInit) - 0.5, length(ytObs) + 0.5)
+    if (is.null(ylim))
+        ylim <- c(0, max(ytObs, if (individual)
+            unlist(ytSim, recursive = FALSE, use.names = FALSE) else ytMeans))
+    
+    ## graphical parameters
+    stopifnot(is.list(matplot.args))
+    matplot.args <- modifyList(
+        list(y = ytMeans, type = "b", lty = 1, lwd = 3, pch = 20,
+             col = rainbow(nModels)),
+        matplot.args)
+    col <- rep_len(matplot.args$col, nModels)
+
+    ## observed time series data during simulation period
+    if (!add)
+        plot(stsObserved, type = observed ~ time, xlim = xlim, ylim = ylim, ...)
+
+    ## add initial counts
+    if (is.list(initial.args)) {
+        initial.args <- modifyList(
+            list(x = seq(to = 0, by = 1, length.out = length(ytInit)),
+                 y = ytInit, type = "h", lwd = 5),
+            initial.args)
+        do.call("lines", initial.args)
+    }
+    
+    ## add counts of individual simulation runs
+    if (individual) {
+        for (i in seq_len(nModels))
+            matlines(ytSim[[i]], lty=1, col=scales::alpha(col[i], alpha=0.1))
+        col <- col2rgb(col)
+        col <- apply(col, 2, function (x)
+                     if (all(x == 0)) "grey" else
+                     do.call("rgb", as.list(x / 255 * 0.5)))
+    }
+
+    ## add means (or medians)
+    matplot.args[["col"]] <- col
+    do.call("matlines", matplot.args)
+
+    ## add CIs
+    if (isScalar(conf.level)) {
+        alpha2 <- (1-conf.level)/2
+        ytQuant <- lapply(ytSim, function (sims)
+            t(apply(sims, 1, quantile, probs=c(alpha2, 1-alpha2))))
+        matlines(sapply(ytQuant, "[", TRUE, 1L), col=col, lwd=matplot.args$lwd, lty=2)
+        matlines(sapply(ytQuant, "[", TRUE, 2L), col=col, lwd=matplot.args$lwd, lty=2)
+    }
+
+    ## add scores
+    ## if (length(score)==1) {
+    ##     scorestime <- simplify2array(
+    ##         simscores(x, by="time", scores=score, plot=FALSE),
+    ##         higher=FALSE)
+    ##     matlines(scales::rescale(scorestime, to=ylim),
+    ##              lty=2, lwd=1, col=col)
+    ## }
+
+    ## add legend
+    if (!identical(FALSE, legend)) {
+        legendArgs <- list(x="topright", legend=names(x), bty="n",
+                           col=col, lwd=matplot.args$lwd, lty=matplot.args$lty)
+        if (is.list(legend))
+            legendArgs <- modifyList(legendArgs, legend)
+        do.call("legend", legendArgs)
+    }
+
+    ## Done
+    ret <- cbind(observed = ytObs, ytMeans)
+    ## if (length(score) == 1)
+    ##     attr(ret, score) <- scorestime
+    invisible(ret)
 }
