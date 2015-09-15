@@ -462,7 +462,8 @@ S3method(scores, oneStepAhead)
 S3method(calibrationTest, hhh4)
 S3method(calibrationTest, oneStepAhead)
 
-## for plots of hhh4 simulations
+## methods for simulations from hhh4 fits
+S3method(aggregate, hhh4sims)
 S3method(plot, hhh4sims)
 export(as.hhh4simslist)
 S3method(as.hhh4simslist, hhh4sims)
@@ -470,6 +471,7 @@ S3method(as.hhh4simslist, list)
 S3method(as.hhh4simslist, hhh4simslist)
 S3method("[", hhh4simslist)
 S3method("[[", hhh4simslist)
+S3method(aggregate, hhh4simslist)
 S3method(plot, hhh4simslist)
 export(plotHHH4sims_size)
 export(plotHHH4sims_time)

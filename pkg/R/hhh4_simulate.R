@@ -182,3 +182,79 @@ checkCoefs <- function (object, coefs, reparamPsi=TRUE)
     names(coefs) <- names(theta)
     coefs
 }
+
+
+### aggregate predictions over time and/or (groups of) units
+
+aggregate.hhh4sims <- function (x, units = TRUE, time = FALSE, ..., drop = FALSE)
+{
+    ax <- attributes(x)
+
+    if (time) {
+        ## sum counts over the whole simulation period
+        res <- colSums(x)
+        ## -> a nUnits x nsim matrix -> will no longer be "hhh4sims"
+        if (isTRUE(units)) { # sum over all units
+            res <- colSums(res) # now a vector of length nsim
+        } else if (!identical(FALSE, units)) { # sum over groups of units
+            stopifnot(length(units) == dim(x)[2])
+            res <- t(rowSumsBy.matrix(t(res), units))
+        }
+    } else {
+        if (isTRUE(units)) { # sum over all units
+            res <- apply(X = x, MARGIN = c(1L, 3L), FUN = sum)
+            if (!drop) {
+                ## restore unit dimension conforming to "hhh4sims" class
+                dim(res) <- c(ax$dim[1L], 1L, ax$dim[3L])
+                dnres <- ax$dimnames
+                dnres[2L] <- list(NULL)
+                dimnames(res) <- dnres
+                ## restore attributes
+                attr(res, "initial") <- as.matrix(rowSums(ax$initial))
+                attr(res, "stsObserved") <- aggregate(ax$stsObserved, by = "unit")
+                class(res) <- "hhh4sims"
+            }
+        } else if (!identical(FALSE, units)) { # sum over groups of units
+            stopifnot(length(units) == dim(x)[2])
+            groupnames <- names(split.default(seq_along(units), units))
+            res <- apply(X = x, MARGIN = 3L, FUN = rowSumsBy.matrix, by = units)
+            dim(res) <- c(ax$dim[1L], length(groupnames), ax$dim[3L])
+            dnres <- ax$dimnames
+            dnres[2L] <- list(groupnames)
+            dimnames(res) <- dnres
+            if (!drop) {
+                ## restore attributes
+                attr(res, "initial") <- rowSumsBy.matrix(ax$initial, units)
+                attr(res, "stsObserved") <- rowSumsBy.sts(ax$stsObserved, units)
+                class(res) <- "hhh4sims"
+            }
+        } else {
+            return(x)
+        }
+    }
+    
+    ## done
+    res
+}
+
+rowSumsBy.matrix <- function (x, by, na.rm = FALSE)
+{
+    dn <- dim(x)
+    res <- vapply(X = split.default(x = seq_len(dn[2L]), f = by),
+                  FUN = function (idxg)
+                      .rowSums(x[, idxg, drop = FALSE],
+                               dn[1L], length(idxg), na.rm = na.rm),
+                  FUN.VALUE = numeric(dn[1L]), USE.NAMES = TRUE)
+    if (dn[1L] == 1L) t(res) else res
+}
+
+rowSumsBy.sts <- function (x, by, na.rm = FALSE)
+{
+    ## map, neighbourhood, upperbound, control get lost by aggregation of units
+    sts(epoch = x@epoch, freq = x@freq, start = x@start,
+        observed = rowSumsBy.matrix(x@observed, by, na.rm),
+        state = rowSumsBy.matrix(x@state, by, na.rm) > 0,
+        alarm = rowSumsBy.matrix(x@alarm, by, na.rm) > 0,
+        populationFrac = rowSumsBy.matrix(x@populationFrac, by, na.rm),
+        epochAsDate = x@epochAsDate, multinomialTS = x@multinomialTS)
+}

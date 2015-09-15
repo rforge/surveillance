@@ -98,6 +98,20 @@ as.hhh4simslist.hhh4simslist <- function (x, ...) x
     xx
 }
 
+## aggregate predictions over time and/or (groups of) units
+aggregate.hhh4simslist <- function (x, units = TRUE, time = FALSE, ..., drop = FALSE)
+{
+    if (drop || time) { # unclass(x) to use default "[["-method in lapply
+        lapply(X = unclass(x), FUN = aggregate.hhh4sims,
+               units = units, time = time,..., drop = TRUE)
+    } else {
+        as.hhh4simslist.list(
+            lapply(X = x, FUN = aggregate.hhh4sims,
+                   units = units, time = time, ..., drop = FALSE)
+            )
+    }
+}
+
 
 ####################
 ### plot methods ###
@@ -210,15 +224,6 @@ plotHHH4sims_size <- function (x, horizontal = TRUE, trafo = NULL,
 
 ### Plot mean time series of the simulated counts
 
-aggregateCounts <- function (x, by = c("time", "unit"))
-{
-    by <- match.arg(by)
-    byidx <- 1 + (by == "unit")
-    aggregate1 <- function (sims)
-        apply(sims, c(byidx, if (!is.matrix(sims)) 3), sum)
-    clapply(x, aggregate1)
-}
-
 plotHHH4sims_time <- function (
     x, average = mean, individual = length(x) == 1,
     conf.level = if (individual) 0.95 else NULL, #score = "rps",
@@ -230,7 +235,7 @@ plotHHH4sims_time <- function (
     ytInit <- rowSums(attr(x, "initial"))
     stsObserved <- attr(x, "stsObserved")
     ytObs <- rowSums(observed(stsObserved))
-    ytSim <- aggregateCounts(x, by = "time")
+    ytSim <- aggregate.hhh4simslist(x, units = TRUE, time = FALSE, drop = TRUE)
     average <- match.fun(average)
     ytMeans <- vapply(
         X = ytSim,
