@@ -94,6 +94,12 @@
 
 \subsection{BUG FIXES}{
   \itemize{
+    \item Fixed a bug in \code{algo.bayes}, where an alarm was already
+    sounded if the current observation was equal to the quantile of the
+    predictive posterior. This was changed in order to get \eqn{alarm_t
+    = I(obs_t > quantile_t)} which is consistent with the use in
+    \code{boda} and \code{bodaDelay}.
+
     \item Fixed bug in \code{algo.outbreakP} causing a halt in the
     computations of \code{value="cases"} when
     \code{calc.outbreakP.statistic} returned \code{NaN}. Now, a
