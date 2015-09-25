@@ -76,7 +76,9 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
     on the plot.}
   \item{xaxis.tickFreq,xaxis.labelFreq,xaxis.labelFormat}{see Details.}
   \item{epochsAsDate}{Boolean indicating whether to treat the epochs as
-    Date objects. Default: Value of the corresponding slot in \code{x}.}
+    Date objects (or to transform them to dates such that the new x-axis
+    formatting is applied).
+    Default: Value of the corresponding slot in \code{x}.}
   \item{xlab}{a title for the x axis. See \code{plot.default}.}
   \item{ylab}{a title for the y axis. See \code{plot.default}.}
   \item{main}{an overall title for the plot: see 'title'.}
@@ -136,10 +138,10 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
   The time series plot relies on the work-horse \code{stsplot_time1}.
   Its arguments are (almost) similiar to \code{\link{plot.survRes}}.
 
-  In case the epochs of the \code{sts} object are \code{Date} objects it
-  is possible to obtain very flexible formatting of the x-axis and its
+  The setting \code{epochsAsDate = TRUE}
+  enables very flexible formatting of the x-axis and its
   annotations using the \code{xaxis.tickFreq}, \code{xaxis.labelFreq}
-  and \code{xaxis.labelFormat}. The first two are named lists containing
+  and \code{xaxis.labelFormat} arguments. The first two are named lists containing
   pairs with the \emph{name} being a \code{\link{strftime}} single
   conversion specification and the second part is a function which based
   on this conversion returns a subset of the rows in the \code{sts}

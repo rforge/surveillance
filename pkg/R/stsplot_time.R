@@ -362,12 +362,12 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelF
     #epochAsDate -- experimental functionality to handle ISO 8601
     ################################################################
     
-    dates <- epoch(x)
+    dates <- epoch(x, as.Date = TRUE)
     #make one which has one extra element at beginning with same spacing
     datesOneBefore <- c(dates[1]-(dates[2]-dates[1]),dates)
     
     #Make the line. Use lwd.ticks to get full line but no marks.
-    axis( side=1,labels=FALSE,at=c(1,length(observed)),lwd.ticks=0,...) 
+    axis( side=1,labels=FALSE,at=c(1,length(dates)),lwd.ticks=0,...) 
     
     ###Make the ticks (depending on the selected level).###
     tcl <- par()$tcl
@@ -400,7 +400,7 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelF
       #Format labels (if any) for the requested subset
       if (length(labelIdx)>0) {
           labels <- rep(NA,nrow(x))
-          labels[labelIdx] <- formatDate(epoch(x)[labelIdx],xaxis.labelFormat)
+          labels[labelIdx] <- formatDate(dates[labelIdx],xaxis.labelFormat)
           axis(1,at=1:nrow(x), labels=labels,tick=FALSE,...)
       }
     }

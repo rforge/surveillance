@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-09-14)}{
+\section{Changes in surveillance version 1.10-0 (2015-09-25)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -89,6 +89,11 @@
     argument \code{draw} (to disable the default instantaneous plotting)
     and now invisibly returns the sequential plot objects (of class
     \code{"gtable"} or \code{"trellis"}) in a list for post-processing.
+
+    \item The flexible time axis configurations for \code{"sts"} plots
+    introduced in version 1.8-0 now also work for classical \code{"sts"}
+    objects with integer epochs and standard frequencies
+    (try \code{plot(..., epochsAsDate = TRUE)}).
   }
 }
 
