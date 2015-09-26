@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-09-25)}{
+\section{Changes in surveillance version 1.10-0 (2015-09-26)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -94,6 +94,9 @@
     introduced in version 1.8-0 now also work for classical \code{"sts"}
     objects with integer epochs and standard frequencies
     (try \code{plot(..., epochsAsDate = TRUE)}).
+
+    \item \code{stsplot_time()} initiates \code{par} settings only
+    if the \code{par.list} argument is a list.
   }
 }
 

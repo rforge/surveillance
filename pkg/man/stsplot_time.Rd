@@ -67,7 +67,10 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
     plotted with the same \code{ylim}. Default is to do so. Only
     relevant for multivariate plots (\code{ncol(x) > 1}).}
   \item{par.list}{a list of arguments delivered to a call of
-    \code{\link{par}} before each plot.}
+    \code{\link{par}} to set graphical parameters before plotting.
+    The \code{mfrow} splitting is handled per default. Afterwards,
+    the \code{par}ameters are reverted to their original values.
+    Use \code{par.list=NULL} to disable the internal \code{par} call.}
 
   \item{k}{the unit to plot, i.e., an element of \code{1:ncol(x)}.}
   \item{ylim}{the y limits of the plot(s). Ignored if

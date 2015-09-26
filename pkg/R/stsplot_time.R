@@ -27,18 +27,24 @@ stsplot_time <- function(x, units = NULL,
       units <- seq_len(ncol(observed))
   nUnits <- length(units)
 
+  #graphical parameters
+  if (is.list(par.list)) {
+    if (nUnits > 1 && !as.one) {
+      par.list <- modifyList( #default: reduced margins and mfrow panels
+        list(mar = c(5,4,1,1), mfrow = magic.dim(nUnits)),
+        par.list)
+    } else {
+      par.list$mfrow <- NULL #no mf formatting..
+    }
+    oldpar <- par(par.list)
+    on.exit(par(oldpar))
+  }
+  
   #multivariate time series
   if(nUnits > 1){
     if(as.one) { # all areas in one plot
       stop("this type of plot is currently not implemented")
     } else {
-      par.list <- modifyList(
-        list(mar = c(5,4,1,1), mfrow = magic.dim(nUnits)),
-        par.list)
-
-      #set window size
-      oldpar <- par(par.list)
-
       #All plots on same scale? If yes, then check if a scale
       #is already specified using the ylim argument
       args <- list(...)
@@ -61,15 +67,9 @@ stsplot_time <- function(x, units = NULL,
         do.call("stsplot_time1",args=argsK)
         title(main=if (is.character(k)) k else colnames(observed)[k], line=-1)
       }
-      
-      #reset graphical params
-      par(oldpar)
     }
   } else {  #univariate time series
-    par.list$mfrow <- NULL #no mf formatting..
-    oldpar <- par(par.list)
     stsplot_time1(x=x, k=units, ...)
-    par(oldpar)
   }
   invisible()
 }
