@@ -122,7 +122,7 @@ setMethod(f="plot", signature=signature(x="stsNC", y="missing"),
                   return(invisible())
               }
 
-              invisible(callNextMethod(x=x,y=y,.hookFuncInheritance=nowcastPlotHook,...))
+              callNextMethod(x=x, type=type, ..., .hookFuncInheritance=nowcastPlotHook)
           })
 
 
