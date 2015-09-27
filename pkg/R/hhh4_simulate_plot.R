@@ -66,9 +66,22 @@ as.hhh4simslist.list <- function (x, ...)
 as.hhh4simslist.hhh4simslist <- function (x, ...) x
 
 
-## select a subset of the simulation while keeping attributes in sync
+## 'x[i]': select models (elements of the list)
+## 'x[i,j,]': subset simulations while keeping attributes in sync
 "[.hhh4simslist" <- function (x, i, j, ..., drop = FALSE)
 {
+    ## case 1: select models
+    if (nargs() == 2L) {
+        ## select elements of the list
+        xx <- NextMethod("[")
+        ## restore class attributes
+        xx <- hhh4simslist(xx,
+                           initial = attr(x, "initial"),
+                           stsObserved = attr(x, "stsObserved"))
+        return(xx)
+    }
+
+    ## case 2: subset simulations
     cl <- sys.call()
     cl[[1L]] <- as.name("[")
     cl[[2L]] <- quote(x)
@@ -161,6 +174,7 @@ plotHHH4sims_size <- function (x, horizontal = TRUE, trafo = NULL,
                                observed = TRUE, ...)
 {
     x <- as.hhh4simslist(x)
+    if (horizontal) x <- rev(x)
     if (is.null(trafo)) trafo <- scales::identity_trans()
     if (isTRUE(observed)) observed <- list()
     nsims <- sapply(X = x, FUN = colSums, dims = 2, # sum over 1:2 (time x unit)
