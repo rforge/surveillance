@@ -71,8 +71,8 @@ from a call to \code{\link{hhh4}}.
   \item{idx2Exp}{integer vector selecting the parameters
     which should be returned on exp-scale.
     Alternatively, \code{idx2Exp = TRUE} will exp-transform all
-    parameters except for those already affected by
-    \code{reparamPsi} or \code{amplitudeShift}.}
+    parameters except for those associated with \code{log()} covariates
+    or already affected by \code{reparamPsi} or \code{amplitudeShift}.}
   \item{amplitudeShift}{logical switch indicating whether the parameters
    for sine/cosine terms modelling seasonal patterns 
    (see \code{\link{addSeason2formula}}) should be transformed

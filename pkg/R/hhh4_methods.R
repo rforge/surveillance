@@ -224,7 +224,8 @@ getCoefIdxRenamed <- function (coefnames, reparamPsi=TRUE, idx2Exp=NULL,
 
     ## indexes of coefficients to exp()-transform
     if (isTRUE(idx2Exp)) {
-        idx2Exp <- setdiff(seq_along(coefnames), c(idxPsi, idxAS))
+        idxLogCovar <- grep(".log(", coefnames, fixed = TRUE)
+        idx2Exp <- setdiff(seq_along(coefnames), c(idxLogCovar, idxPsi, idxAS))
     } else if (length(idx2Exp)) {
         stopifnot(is.vector(idx2Exp, mode = "numeric"))
         ## index sets must be disjoint
