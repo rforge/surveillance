@@ -97,6 +97,10 @@
 
     \item \code{stsplot_time()} initiates \code{par} settings only
     if the \code{par.list} argument is a list.
+
+    \item The new \code{all.equal()} method for class \code{"hhh4"}
+    compares two fits ignoring their \code{"runtime"} and \code{"call"}
+    elements (at least).
   }
 }
 

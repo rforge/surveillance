@@ -10,7 +10,6 @@
 ### $Date$
 ################################################################################
 
-
 ## NOTE: we also apply print.hhh4 in print.summary.hhh4()
 print.hhh4 <- function (x, digits = max(3, getOption("digits")-3), ...)
 {
@@ -571,4 +570,14 @@ neOffsetArray <- function (object, pars = coefW(object),
     
     ## permute dimensions as (t, i, j)
     aperm(res, perm = c(2L, 3L, 1L), resize = TRUE)
+}
+
+
+## compare two hhh4 fits ignoring at least the "runtime" and "call" elements
+all.equal.hhh4 <- function (target, current, ..., ignore = NULL)
+{
+    ignore <- unique.default(c(ignore, "runtime", "call"))
+    for (comp in ignore)
+        target[[comp]] <- current[[comp]] <- NULL
+    NextMethod("all.equal")
 }

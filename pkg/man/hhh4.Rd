@@ -279,11 +279,7 @@ summary(res3, idx2Exp=1:2, amplitudeShift=TRUE)
                    dimnames = c(dimnames(neighbourhood(measles)), list(NULL)))
 res3_tv <- hhh4(measles, control = modifyList(model3,
                 list(ne=list(weights=.neweights))))
-.disregardComponents <- function(obj) {
-    obj$call <- obj$control$ne$weights <- obj$runtime <- NULL
-    obj
-}
-stopifnot(all.equal(.disregardComponents(res3), .disregardComponents(res3_tv)))
+stopifnot(all.equal(res3, res3_tv, ignore = "control"))
 }
 
 \dontrun{
