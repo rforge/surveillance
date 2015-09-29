@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-09-26)}{
+\section{Changes in surveillance version 1.10-0 (2015-09-29)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -129,6 +129,10 @@
     \item The default time variable \code{t} created as part of the
     \code{data} argument in \code{hhh4()} was incompatible with
     \code{"sts"} objects having \code{epochAsDate=TRUE}.
+
+    \item A consistency check in \code{as.epidata.default()} failed for
+    SI-type data (and, more generally, for all data which ended with an
+    I-event in the last time block). Spotted by George Wood.
   }
 }
 

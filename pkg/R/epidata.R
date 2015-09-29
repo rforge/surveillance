@@ -6,7 +6,7 @@
 ### Data structure "epidata" representing the SIR event history of a fixed
 ### geo-referenced population (e.g., farms, households) for twinSIR() analysis
 ###
-### Copyright (C) 2008-2010, 2012, 2014 Sebastian Meyer
+### Copyright (C) 2008-2010, 2012, 2014-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -242,6 +242,7 @@ as.epidata.default <- function(data, id.col, start.col, stop.col, atRiskY.col,
     # Check consistency of atRiskY and event (not at-risk after event) 
     .checkFunction <- function(eventblock, eventid)
     {
+        if (eventblock == nBlocks) return(invisible())
         rowsOfNextBlock <- beginBlock[eventblock+1L]:endBlock[eventblock+1L]
         nextBlockData <- data[rowsOfNextBlock, c("id", "atRiskY")]
         idIdx <- which(nextBlockData[["id"]] == eventid)
