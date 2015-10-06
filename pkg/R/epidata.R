@@ -32,7 +32,7 @@
 
 as.epidata.data.frame <- function (data, t0, tE.col, tI.col, tR.col,
                                    id.col, coords.cols, f = list(), w = list(),
-                                   keep.cols = TRUE, ...)
+                                   D = dist, keep.cols = TRUE, ...)
 {
     if (missing(t0)) {
         return(NextMethod("as.epidata"))  # as.epidata.default
@@ -129,7 +129,7 @@ as.epidata.data.frame <- function (data, t0, tE.col, tI.col, tR.col,
         data = evHist,
         id.col = "id", start.col = "start", stop.col = "stop",
         atRiskY.col = "atRiskY", event.col = "event", Revent.col = "Revent",
-        coords.cols = coords.cols, f = f, w = w)
+        coords.cols = coords.cols, f = f, w = w, D = D)
 }
 
 
@@ -140,7 +140,7 @@ as.epidata.data.frame <- function (data, t0, tE.col, tI.col, tR.col,
 ################################################################################
 
 as.epidata.default <- function(data, id.col, start.col, stop.col, atRiskY.col,
-    event.col, Revent.col, coords.cols, f = list(), w = list(), ...)
+    event.col, Revent.col, coords.cols, f = list(), w = list(), D = dist, ...)
 {
     cl <- match.call()
     
@@ -266,11 +266,11 @@ as.epidata.default <- function(data, id.col, start.col, stop.col, atRiskY.col,
     class(data) <- c("epidata", "data.frame")
 
     # Compute epidemic variables
-    update.epidata(data, f = f, w = w)
+    update.epidata(data, f = f, w = w, D = D)
 }
 
 
-update.epidata <- function (object, f = list(), w = list(), ...)
+update.epidata <- function (object, f = list(), w = list(), D = dist, ...)
 {
     oldclass <- class(object)
     class(object) <- "data.frame" # avoid use of [.epidata
@@ -283,9 +283,6 @@ update.epidata <- function (object, f = list(), w = list(), ...)
 
     ## check f and calculate distance matrix
     if (length(f) > 0L) {
-        if (is.null(coords.cols <- attr(object, "coords.cols"))) {
-            stop("need coordinates for distance-dependent force of infection")
-        }
         if (!is.list(f) || is.null(names(f)) || any(!sapply(f, is.function))) {
             stop("'f' must be a named list of functions")
         }
@@ -302,10 +299,25 @@ update.epidata <- function (object, f = list(), w = list(), ...)
         ## keep functions as attribute
         attr(object, "f")[names(f)] <- f
         
-        ## compute distance matrix
-        coords <- as.matrix(firstDataBlock[coords.cols], rownames.force = FALSE)
-        rownames(coords) <- as.character(firstDataBlock[["id"]])
-        distmat <- as.matrix(dist(coords, method = "euclidean"))
+        ## check / compute distance matrix
+        distmat <- if (is.function(D)) {
+            if (is.null(coords.cols <- attr(object, "coords.cols"))) {
+                stop("need coordinates to calculate the distance matrix")
+            }
+            coords <- as.matrix(firstDataBlock[coords.cols],
+                                rownames.force = FALSE)
+            rownames(coords) <- as.character(firstDataBlock[["id"]])
+            as.matrix(D(coords))
+        } else if (is.matrix(D)) {
+            stopifnot(is.numeric(D))
+            if (any(!firstDataBlock[["id"]] %in% rownames(D),
+                    !firstDataBlock[["id"]] %in% colnames(D))) {
+                stop("'dimnames(D)' must contain the individuals' IDs")
+            }
+            D
+        } else {
+            stop("'D' must be a function or a matrix")
+        }
     } else {
         attr(object, "f") <- list()
     }

@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-09-29)}{
+\section{Changes in surveillance version 1.10-0 (2015-10-06)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -48,6 +48,11 @@
 
     \item Additional arguments of \code{layout.scalebar()} now allow to
     change the style of the labels.
+
+    \item A pre-computed distance matrix \code{D} can now be used as
+    input for the \code{as.epidata()} converter -- offering an alternative
+    to the default Euclidean distance based on the individuals coordinates.
+    (Request of George Wood to support \code{twinSIR} models on networks.)
   }
 }
 
