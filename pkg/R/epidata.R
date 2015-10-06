@@ -263,6 +263,8 @@ as.epidata.default <- function(data, id.col, start.col, stop.col, atRiskY.col,
     attr(data, "coords.cols") <- coords.cols
     # <- must include this info because externally of this function
     #    we don't know how many coords.cols (dimensions) we have
+    attr(data, "f") <- list()  # initialize
+    attr(data, "w") <- list()  # initialize
     class(data) <- c("epidata", "data.frame")
 
     # Compute epidemic variables
@@ -301,7 +303,7 @@ update.epidata <- function (object, f = list(), w = list(), D = dist, ...)
         
         ## check / compute distance matrix
         distmat <- if (is.function(D)) {
-            if (is.null(coords.cols <- attr(object, "coords.cols"))) {
+            if (length(coords.cols <- attr(object, "coords.cols")) == 0L) {
                 stop("need coordinates to calculate the distance matrix")
             }
             coords <- as.matrix(firstDataBlock[coords.cols],
@@ -318,8 +320,6 @@ update.epidata <- function (object, f = list(), w = list(), D = dist, ...)
         } else {
             stop("'D' must be a function or a matrix")
         }
-    } else {
-        attr(object, "f") <- list()
     }
 
     ## check covariate-based epidemic weights
@@ -338,8 +338,6 @@ update.epidata <- function (object, f = list(), w = list(), D = dist, ...)
 
         ## compute wij matrix for each of w
         wijlist <- compute_wijlist(w = w, data = firstDataBlock)
-    } else {
-        attr(object, "w") <- list()
     }
 
     ## Compute sum of epidemic covariates over infectious individuals
