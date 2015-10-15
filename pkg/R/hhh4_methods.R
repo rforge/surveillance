@@ -91,7 +91,7 @@ print.summary.hhh4 <- function (x, digits = max(3, getOption("digits")-3), ...)
 
     if (!is.null(x$maxEV_range))
         cat("Epidemic dominant eigenvalue: ",
-            paste(round(x$maxEV_range,2), collapse = " -- "), "\n\n")
+            paste(sprintf("%.2f", x$maxEV_range), collapse = " -- "), "\n\n")
     if(x$dim["random"]==0){
         cat('Log-likelihood:  ',round(x$loglikelihood,digits=digits-2),'\n')  
         cat('AIC:             ',round(x$AIC,digits=digits-2),'\n')
