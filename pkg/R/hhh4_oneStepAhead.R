@@ -35,8 +35,9 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
         model <- result$terms <- with(result, interpretControl(control, stsObj))
     nTime <- model$nTime
     nUnits <- model$nUnits
-    psiIdx <- model$nFE + model$nd + seq_len(model$nOverdisp)
-    withPsi <- length(psiIdx) > 0L
+    dimPsi <- model$nOverdisp
+    withPsi <- dimPsi > 0L
+    psiIdx <- model$nFE + model$nd + seq_len(dimPsi)
     
     ## check that tp is within the time period of the data
     maxlag <- if (is.null(result$lags) || all(is.na(result$lags)))
@@ -67,7 +68,7 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
     pred <- matrix(NA_real_, nrow=ntps, ncol=nUnits,
                    dimnames=list(tps+1, colnames(observed)))
     if (withPsi)
-        psi <- matrix(NA_real_, nrow=ntps, ncol=length(psiIdx),
+        psi <- matrix(NA_real_, nrow=ntps, ncol=dimPsi,
                       dimnames=list(tps, names(model$initialTheta)[psiIdx]))
     if (keep.estimates) {
         coefficients <- matrix(NA_real_,
@@ -167,6 +168,11 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
 
     }
 
+    ## with shared overdispersion parameters we need to expand psi to ncol(pred)
+    if (dimPsi > 1L && dimPsi != nUnits) {
+        psi <- psi[,model$indexPsi]
+    }
+    
     ## done
     res <- c(list(pred = pred, observed = observed,
            psi = if (withPsi) psi else NULL,

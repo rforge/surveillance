@@ -131,8 +131,8 @@ with the following components:
 \item{psi}{in case of a negative-binomial model, a matrix of the
   estimated overdispersion parameter(s) at each time point on 
   the internal -log-scale (1 column if \code{"NegBin1"},
-  \code{ncol(observed)} columns if \code{"NegBinM"}). For a
-  \code{"Poisson"} model, this component is \code{NULL}.}
+  \code{ncol(observed)} columns if \code{"NegBinM"} or shared overdispersion). 
+  For a \code{"Poisson"} model, this component is \code{NULL}.}
 \item{allConverged}{logical indicating if all successive fits
   converged.}
 

@@ -42,11 +42,12 @@ test_that("\"NegBinM\" fit is invariant to the ordering of the overdispersion pa
 })
 
 
-test_that("estimates with shared overdispersion are reproducible", {
-    fluFitShared <- hhh4(stsObj = fluBWsub, control = c(fluModel, list(
-        family = factor(substr(colnames(fluBWsub), 3, 3) == "1",
-            levels = c(TRUE, FALSE), labels = c("region1", "elsewhere")))))
+## fit a model with shared overdispersion parameters
+fluFitShared <- hhh4(stsObj = fluBWsub, control = c(fluModel, list(
+    family = factor(substr(colnames(fluBWsub), 3, 3) == "1",
+                    levels = c(TRUE, FALSE), labels = c("region1", "elsewhere")))))
 
+test_that("estimates with shared overdispersion are reproducible", {
     ## dput(coef(fluFitShared, se = TRUE))
     orig <- structure(
         c(0.0172448275799737, -2.29936227176632, -0.311391919170833, 
@@ -80,4 +81,13 @@ test_that("estimates with shared overdispersion are reproducible", {
         )
     
     expect_equal(coef(fluFitShared, se = TRUE), orig)
+})
+
+test_that("calibrationTest.oneStepAhead() works and \"final\" is equivalent to fit", {
+    mysubset <- tail(fluFitShared$control$subset, 16)
+    osa_final <- oneStepAhead(fluFitShared, tp = mysubset[1L]-1L,
+                              type = "final", verbose = FALSE)
+    idx <- 3:5  # ignore "method" and "data.name" in calibrationTest() output
+    expect_equal(calibrationTest(osa_final, which = "dss")[idx], 
+                 calibrationTest(fluFitShared, which = "dss", subset = mysubset)[idx])
 })
