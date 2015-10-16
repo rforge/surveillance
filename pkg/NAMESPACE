@@ -167,6 +167,8 @@ S3method(plot, stKtest)
 export(pit)
 export(pit.default)
 S3method(pit, default)
+S3method(pit, oneStepAhead)
+S3method(pit, hhh4)
 S3method(plot, pit)
 
 # calibration test for Poisson or NegBin predictions

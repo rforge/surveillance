@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-10-06)}{
+\section{Changes in surveillance version 1.10-0 (2015-10-16)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -20,9 +20,8 @@
     \code{hhh4()} time series models (by specifying a factor variable
     as the \code{family} argument).
 
-    \item \code{scores()} is now generic and has a method for \code{"hhh4"}
-    fits to directly evaluate the fitted values against the
-    observed counts using proper scoring rules.
+    \item \code{scores()} and \code{pit()} are now generic and have convenient
+    methods for \code{"oneStepAhead"} predictions and \code{"hhh4"} fits.
 
     \item \code{plotHHH4_fitted()} (and \code{plotHHH4_fitted1()})
     gained an option \code{decompose} to plot the contributions from

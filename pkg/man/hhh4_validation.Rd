@@ -5,6 +5,8 @@
 \alias{scores.oneStepAhead}
 \alias{scores.hhh4}
 \alias{calibrationTest.oneStepAhead}
+\alias{pit.oneStepAhead}
+\alias{pit.hhh4}
 
 \title{Predictive Model Assessment for \code{hhh4} Models}
 \description{
@@ -16,6 +18,9 @@
   (or, for the \code{hhh4}-method, directly based on the fitted values).
 
   See Paul and Held (2011) for further details.
+
+  There are also \code{\link{calibrationTest}} and \code{\link{pit}}
+  methods for \code{oneStepAhead} predictions.
 }
 
 \usage{
@@ -30,6 +35,9 @@ scores(x, ...)
        subset = x$control$subset, units = seq_len(x$nUnit), sign = FALSE, ...)
 
 \method{calibrationTest}{oneStepAhead}(x, ...)
+
+\method{pit}{oneStepAhead}(x, ...)
+\method{pit}{hhh4}(x, subset = x$control$subset, units = seq_len(x$nUnit), ...)
 }
 
 \arguments{
@@ -95,12 +103,12 @@ scores(x, ...)
     See the supplied scoring rules for guidance, e.g.,
     \code{\link{logs}} or \code{\link{dss}}.}
   \item{subset}{
-    subset of time points for which to calculate the scores.
-    Defaults to the subset used for fitting the model.
-  }
+    subset of time points for which to calculate the scores
+    (or the PIT histogram).
+    Defaults to the subset used for fitting the model.}
   \item{units}{integer or character vector indexing the units for which
-    the scores should be computed. By default (\code{NULL}) all units
-    are considered.}
+    the scores (or the PIT histogram) should be computed.
+    By default (\code{NULL}) all units are considered.}
   \item{sign}{logical indicating if the function should also return
     \code{sign(x-mu)}, i.e., the sign of the difference between
     the observed counts and corresponding predictions.
@@ -115,7 +123,9 @@ scores(x, ...)
   \item{\dots}{Unused by the \code{scores}-methods.\cr
     For the \code{calibrationTest}-method, further arguments are passed
     to \code{\link{calibrationTest.default}}, e.g., \code{which} to
-    select a scoring rule.}
+    select a scoring rule.\cr
+    For the \code{pit}-methods, further arguments are passed to
+    \code{\link{pit.default}}.}
 }
 
 \value{
@@ -157,8 +167,8 @@ CAVE: For historical reasons, \code{scores.oneStepAhead} by default
 The \code{hhh4}-method of \code{scores} does not reverse rows.
 
 
-The \code{calibrationTest}-method is just a convenient wrapper around
-\code{\link{calibrationTest.default}}.
+The \code{\link{calibrationTest}}- and \code{\link{pit}}-methods are
+just convenient wrappers around the respective default methods.
 See also \code{\link{calibrationTest.hhh4}}.
 }
 

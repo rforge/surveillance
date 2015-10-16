@@ -99,3 +99,32 @@ plot.pit <- function (x, main = "", ylab = NULL, ...)
     abline(h = if (relative) 1 else 1/length(x$mids), lty = 2, col = "grey")
     invisible(x)
 }
+
+
+## a convenient wrapper for Poisson and NegBin predictions
+
+.pit <- function (x, mu, size = NULL, ...)
+{
+    if (is.null(size)) {
+        pit.default(x = x, pdistr = "ppois", lambda = mu, ...)
+    } else {
+        pit.default(x = x, pdistr = "pnbinom", mu = mu, size = size, ...)
+    }
+}
+
+
+## pit-methods for oneStepAhead() predictions and "hhh4" fits
+## (similar to the scores-methods)
+
+pit.oneStepAhead <- function (x, ...)
+{
+    .pit(x = x$observed, mu = x$pred, size = psi2size.oneStepAhead(x), ...)
+}
+
+pit.hhh4 <- function (x, subset = x$control$subset, units = seq_len(x$nUnit), ...)
+{
+    .pit(x = x$stsObj@observed[subset, units, drop = FALSE],
+         mu = x$fitted.values[match(subset, x$control$subset), units, drop = FALSE],
+         size = psi2size.hhh4(x, subset, units),
+         ...)
+}
