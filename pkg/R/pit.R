@@ -8,7 +8,7 @@
 ### Czado, C., Gneiting, T. & Held, L. (2009)
 ### Biometrics 65:1254-1261
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2013-2014 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2013-2015 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -20,9 +20,9 @@
 ## J - number of bins 
 ## ... - additional arguments for pdistr(), recycled to the length of x.
 ##       Ignored if pdistr is a list.
-## plot - NULL (no plot) or a list of arguments for plot.histogram
+## plot - a list of arguments for plot.histogram (otherwise no plot is produced)
 
-pit <- function (x, pdistr, J=10, relative=TRUE, ..., plot = list())
+pit.default <- function (x, pdistr, J=10, relative=TRUE, ..., plot = list())
 {
     PxPxm1 <- pitPxPxm1(x, pdistr, ...)
     breaks <- (0:J)/J
@@ -31,12 +31,11 @@ pit <- function (x, pdistr, J=10, relative=TRUE, ..., plot = list())
     scale <- if (relative) J else 1
     f_j <- scale * diff.default(Fbar_seq)
     
-    res <- structure(list(breaks=breaks, counts=f_j, density=f_j,
-                          mids=breaks[-(J+1)] + 1/J/2,
-                          xname="PIT", equidist=TRUE),
-                     class="histogram")
+    res <- list(breaks = breaks, counts = f_j, density = f_j,
+                mids = breaks[-(J+1)] + 1/J/2, xname = "PIT", equidist = TRUE)
+    class(res) <- c("pit", "histogram")
 
-    if (is.null(plot)) res else pitplot(res, plot)
+    if (is.list(plot)) do.call("plot", c(list(x = res), plot)) else res
 }
 
 pitPxPxm1 <- function (x, pdistr, ...)
@@ -86,17 +85,17 @@ pit1 <- function (u, Px, Pxm1)
     mean(F_u)
 }
 
+
 ## plot the PIT histogram
-pitplot <- function (pit, args)
+
+plot.pit <- function (x, main = "", ylab = NULL, ...)
 {
-    relative <- !isTRUE(all.equal(1, sum(pit$density)))
-    defaultArgs <- list(x = pit, main = "",
-                        ylab = if(relative) "Relative Frequency" else "Density")
-    args <- if (is.list(args)) {
-        args[["x"]] <- NULL             # manual x is ignored
-        args <- modifyList(defaultArgs, args)
-    } else defaultArgs
-    do.call("plot", args)
-    abline(h=if (relative) 1 else 1/length(pit$mids), lty=2, col="grey")
-    invisible(pit)
+    relative <- !isTRUE(all.equal(1, sum(x$density)))
+    if (is.null(ylab))
+        ylab <- if (relative) "Relative Frequency" else "Density"
+    ## call plot.histogram
+    NextMethod("plot", main = main, ylab = ylab, ...)
+    ## add reference line
+    abline(h = if (relative) 1 else 1/length(x$mids), lty = 2, col = "grey")
+    invisible(x)
 }

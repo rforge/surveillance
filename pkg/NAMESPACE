@@ -163,8 +163,13 @@ S3method(toLatex, knox)
 export(stKtest)
 S3method(plot, stKtest)
 
-# calibration test for Poisson or NegBin predictions
+# PIT histograms
 export(pit)
+export(pit.default)
+S3method(pit, default)
+S3method(plot, pit)
+
+# calibration test for Poisson or NegBin predictions
 export(calibrationTest)
 S3method(calibrationTest, default)
 export(calibrationTest.default)

@@ -19,6 +19,7 @@ scores <- function (x, ...) {
         UseMethod("scores")
     }
 }
+pit <- function (x, ...) UseMethod("pit")
 
 ## internal function with methods for "twinSIR" and "simEpidata"
 getModel <- function (object, ...) UseMethod("getModel")
