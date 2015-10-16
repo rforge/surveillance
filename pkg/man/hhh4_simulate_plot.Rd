@@ -15,7 +15,9 @@ Summarize Simulations from \code{"hhh4"} Models
 Arrays of simulated counts from \code{\link{simulate.hhh4}} can be
 visualized in various levels of aggregation: final size, time series.
 Furthermore, proper scoring rules can be calculated based on the
-simulated predictive distributions.
+simulated predictive distributions. Be aware, though, that the current
+implementation can only compute univariate scores, i.e., it treats the
+predictions at the various time points as independent.
 }
 
 \usage{
@@ -181,6 +183,8 @@ plot(measlesSims)
 plot(measlesSims, type = "time", individual = TRUE, ylim = c(0, 80))
 
 ## compare proper scoring rules for a specific subset of the regions
+## (CAVE: these are univariate scores for each time point and region,
+##        which do not account for dependence over time)
 measlesScores5 <- scores(measlesSims, which = "rps",
                          units = substr(colnames(measlesWeserEms), 4, 4) == "5")
 sapply(measlesScores5, mean)

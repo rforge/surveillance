@@ -175,11 +175,12 @@ plotHHH4sims_size <- function (x, horizontal = TRUE, trafo = NULL,
 {
     x <- as.hhh4simslist(x)
     if (horizontal) x <- rev(x)
-    if (is.null(trafo)) trafo <- scales::identity_trans()
+    if (is.null(trafo)) #trafo <- scales::identity_trans()
+        trafo <- list(name = "identity", transform = identity)
     if (isTRUE(observed)) observed <- list()
     nsims <- sapply(X = x, FUN = colSums, dims = 2, # sum over 1:2 (time x unit)
                     simplify = TRUE, USE.NAMES = TRUE)
-    nsimstrafo <- trafo$trans(nsims)
+    nsimstrafo <- trafo$transform(nsims)
     
     ## default boxplot arguments
     fslab <- "size"
@@ -220,12 +221,12 @@ plotHHH4sims_size <- function (x, horizontal = TRUE, trafo = NULL,
                  mgp = if (horizontal) c(3, 0.4, 0)),
             observed)
         observed_line <- c(
-            setNames(list(trafo$trans(nObs)), if (horizontal) "v" else "h"),
+            setNames(list(trafo$transform(nObs)), if (horizontal) "v" else "h"),
             observed[c("col", "lty", "lwd")])
         do.call("abline", observed_line)
         if (!is.null(observed[["labels"]]))
             do.call("axis", c(
-                list(side = 2-horizontal, at = trafo$trans(nObs)),
+                list(side = 2-horizontal, at = trafo$transform(nObs)),
                 observed))
     }
     
