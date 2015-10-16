@@ -289,7 +289,8 @@ plotHHH4sims_time <- function (
     ## add counts of individual simulation runs
     if (individual) {
         for (i in seq_len(nModels))
-            matlines(ytSim[[i]], lty=1, col=scales::alpha(col[i], alpha=0.1))
+            matlines(ytSim[[i]], lty=1, col=if (requireNamespace("scales"))
+                scales::alpha(col[i], alpha=0.1) else col[i])
         col <- col2rgb(col)
         col <- apply(col, 2, function (x)
                      if (all(x == 0)) "grey" else
