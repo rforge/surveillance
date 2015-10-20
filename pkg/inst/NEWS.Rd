@@ -30,6 +30,9 @@
     Furthermore, a formatted time axis similar to \code{stsplot_time1()}
     can now be enabled via the new argument \code{xaxis}.
 
+    \item The new \code{plot} \code{type} \code{"maps"} for \code{"hhh4"}
+    fits shows maps of the fitted mean components averaged over time.
+
     \item New \code{plot}-method for simulations from \code{"hhh4"}
     models (using \code{simulate.hhh4(..., simplify = TRUE)}, which now
     has a dedicated class: \code{"hhh4sims"}) to show the final

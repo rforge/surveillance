@@ -461,7 +461,7 @@ S3method(plot, hhh4)
 export(plotHHH4_fitted, plotHHH4_fitted1,
        plotHHH4_season, getMaxEV_season,
        plotHHH4_maxEV, getMaxEV,
-       plotHHH4_ri,
+       plotHHH4_maps, plotHHH4_ri,
        plotHHH4_neweights)
 
 #S3method(scores, default)  # rather an internal auxiliary function, undocumented

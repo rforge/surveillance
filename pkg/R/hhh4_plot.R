@@ -12,7 +12,7 @@
 
 
 plot.hhh4 <- function (x,
-                       type = c("fitted", "season", "maxEV", "ri", "neweights"),
+                       type = c("fitted", "season", "maxEV", "maps", "ri", "neweights"),
                        ...)
 {
     stopifnot(x$convergence)
@@ -243,6 +243,68 @@ plotComponentPolygons <- function (x, y, col = 1:6, border = col, add = FALSE)
     for (poly in nPoly:1) {
         polygon(x = xpoly, y = c(0, yc[poly, ], 0),
                 col = col[poly], border = border[poly])
+    }
+}
+
+
+###
+### Maps of the fitted mean components averaged over time
+###
+
+plotHHH4_maps <- function (x,
+    which = c("mean", "endemic", "epi.own", "epi.neighbours"),
+    main = which, zmax = NULL, col.regions = hcl.colors(10),
+    labels = FALSE, sp.layout = NULL, ...,
+    map = x$stsObj@map, meanHHH = NULL)
+{
+    which <- match.arg(which, several.ok = TRUE)
+    
+    ## extract district-specific mean components
+    if (is.null(meanHHH)) {
+        meanHHH <- meanHHH(x$coefficients, terms.hhh4(x))
+    }
+    
+    ## select only 'which' components and convert to an array
+    meanHHH <- simplify2array(meanHHH[which], higher = TRUE)
+    
+    ## check map
+    map <- as(map, "SpatialPolygonsDataFrame")
+    if (!all(dimnames(meanHHH)[[2L]] %in% row.names(map))) {
+        stop("'row.names(map)' do not cover all fitted districts")
+    }
+    
+    ## average over time
+    comps <- as.data.frame(colMeans(meanHHH, dims = 1))
+    
+    ## attach to map data
+    map@data <- cbind(map@data, comps[row.names(map),,drop=FALSE])
+
+    ## color key range
+    if (is.null(zmax)) {
+        zmax <- ceiling(sapply(comps, max))
+        ## sub-components should have the same color range
+        .idxsub <- setdiff(seq_along(zmax), match("mean", names(zmax)))
+        zmax[.idxsub] <- suppressWarnings(max(zmax[.idxsub]))
+    }
+
+    ## add sp.layout item for district labels
+    if (!is.null(layout.labels <- layout.labels(map, labels))) {
+        sp.layout <- c(sp.layout, list(layout.labels))
+    }
+    
+    ## produce maps
+    grobs <- mapply(
+        FUN = function (zcol, main, zmax)
+            spplot(map, zcol = zcol, main = main,
+                   at = seq(0, zmax, length.out = length(col.regions) + 1L),
+                   col.regions = col.regions, sp.layout = sp.layout, ...),
+        zcol = names(comps), main = main, zmax = zmax,
+        SIMPLIFY = FALSE, USE.NAMES = FALSE)
+    if (length(grobs) == 1L) {
+        grobs[[1L]]
+    } else {
+        mfrow <- sort(n2mfrow(length(grobs)))
+        gridExtra::grid.arrange(grobs = grobs, nrow = mfrow[1L], ncol = mfrow[2L])
     }
 }
 
