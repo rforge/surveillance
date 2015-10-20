@@ -253,9 +253,14 @@ measlesFit <- hhh4(measlesWeserEms, measlesModel)
 plot(measlesFit, units=2)
 
 ## 'xaxis' option for a nicely formatted time axis
+## default tick locations and labels:
+plot(measlesFit, units=2, xaxis=list(epochsAsDate=TRUE, line=1))
+## an alternative with monthly ticks:
+oopts <- surveillance.options(stsTickFactors = c("\%m"=0.75, "\%Y" = 1.5))
 plot(measlesFit, units=2, xaxis=list(epochsAsDate=TRUE,
     xaxis.tickFreq=list("\%m"=atChange, "\%Y"=atChange),
     xaxis.labelFreq=list("\%Y"=atMedian), xaxis.labelFormat="\%Y"))
+surveillance.options(oopts)
 
 ## plot the multiplicative effect of seasonality
 plot(measlesFit, type="season")
