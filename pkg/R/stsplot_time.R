@@ -163,7 +163,9 @@ stsplot_time1 <- function(
 
   #Label x-axis 
   if(xaxis.dates & axes) {
-    addFormattedXAxis(x, epochsAsDate, xaxis.labelFormat,xaxis.tickFreq,xaxis.labelFreq,...)
+    addFormattedXAxis(x = x, epochsAsDate = epochsAsDate, xaxis.tickFreq = xaxis.tickFreq,
+                      xaxis.labelFreq = xaxis.labelFreq, xaxis.labelFormat = xaxis.labelFormat,
+                      ...)
   }
   #Label y-axis
   if (axes) {
@@ -263,7 +265,9 @@ stsplot_alarm <- function(
 
   #Label of x-axis 
   if(xaxis.dates){
-    addFormattedXAxis(x, epochsAsDate, xaxis.labelFormat,xaxis.tickFreq,xaxis.labelFreq,...)
+    addFormattedXAxis(x = x, epochsAsDate = epochsAsDate, xaxis.tickFreq = xaxis.tickFreq,
+                      xaxis.labelFreq = xaxis.labelFreq, xaxis.labelFormat = xaxis.labelFormat,
+                      ...)
   }
   axis( side=2, at=1:ncol(x),cex.axis=cex.yaxis, labels=colnames(x),las=2)
 
@@ -304,7 +308,10 @@ at2ndChange <- function(x,xm1) {
 }
 
 #Helper function to format the x-axis of the time series
-addFormattedXAxis <- function(x, epochsAsDate = FALSE, xaxis.labelFormat, xaxis.tickFreq, xaxis.labelFreq, ...) {
+addFormattedXAxis <- function(x, epochsAsDate = FALSE,
+                              xaxis.tickFreq = list("%Q"=atChange),
+                              xaxis.labelFreq = xaxis.tickFreq, xaxis.labelFormat = "%G\n\n%OQ",
+                              ...) {
   
   #Old style if there are no Date objects
   if (!epochsAsDate) {
@@ -368,7 +375,7 @@ addFormattedXAxis <- function(x, epochsAsDate = FALSE, xaxis.labelFormat, xaxis.
     axis( side=1,labels=FALSE,at=c(1,length(dates)),lwd.ticks=0,...) 
     
     ###Make the ticks (depending on the selected level).###
-    tcl <- par()$tcl
+    tcl <- par("tcl")
     tickFactors <- surveillance.options("stsTickFactors")
     
     #Loop over all pairs in the xaxis.tickFreq list
@@ -380,7 +387,7 @@ addFormattedXAxis <- function(x, epochsAsDate = FALSE, xaxis.labelFormat, xaxis.
       #Find tick size by table lookup
       tclFactor <- tickFactors[pmatch(format, names(tickFactors))]
       if (is.na(tclFactor)) { 
-        warning("No tcl factor found for",format,". Setting it at 1") 
+        warning("no \"tcl\" factor found for \"", format ,"\" -> setting it to 1")
         tclFactor <- 1
       }
       axis(1,at=idx, labels=NA,tcl=tclFactor*tcl,...)
