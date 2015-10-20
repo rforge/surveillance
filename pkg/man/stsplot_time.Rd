@@ -4,10 +4,6 @@
 \alias{stsplot_time}
 \alias{stsplot_time1}
 \alias{stsplot_alarm}
-% helper functions for time axis formatting
-\alias{atChange}
-\alias{at2ndChange}
-\alias{atMedian}
 
 \title{
   Time-Series Plots for \code{"sts"} Objects
@@ -77,11 +73,12 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
     \code{same.scale=FALSE}.}
   \item{axes}{a logical value indicating whether both axes should be drawn
     on the plot.}
-  \item{xaxis.tickFreq,xaxis.labelFreq,xaxis.labelFormat}{see Details.}
+  \item{xaxis.tickFreq,xaxis.labelFreq,xaxis.labelFormat}{see
+    \code{\link{addFormattedXAxis}}.}
   \item{epochsAsDate}{Boolean indicating whether to treat the epochs as
     Date objects (or to transform them to dates such that the new x-axis
     formatting is applied).
-    Default: Value of the corresponding slot in \code{x}.}
+    Default: Value of the \code{epochAsDate} slot of \code{x}.}
   \item{xlab}{a title for the x axis. See \code{plot.default}.}
   \item{ylab}{a title for the y axis. See \code{plot.default}.}
   \item{main}{an overall title for the plot: see 'title'.}
@@ -140,39 +137,6 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
 \details{
   The time series plot relies on the work-horse \code{stsplot_time1}.
   Its arguments are (almost) similiar to \code{\link{plot.survRes}}.
-
-  The setting \code{epochsAsDate = TRUE}
-  enables very flexible formatting of the x-axis and its
-  annotations using the \code{xaxis.tickFreq}, \code{xaxis.labelFreq}
-  and \code{xaxis.labelFormat} arguments. The first two are named lists containing
-  pairs with the \emph{name} being a \code{\link{strftime}} single
-  conversion specification and the second part is a function which based
-  on this conversion returns a subset of the rows in the \code{sts}
-  objects. The subsetting function has the following header:
-  \code{function(x,xm1)}, where \code{x} is a vector containing
-  the result of applying the conversion in \code{name} to the epochs of
-  the \code{sts} object and \code{xm1} is the scalar result when
-  applying the conversion to the natural element just before the first
-  epoch. Please note that the input to the subsetting function is converted
-  using \code{as.numeric} before calling the function. Hence, the
-  conversion specification needs to result in a string convertible to integer.
-  Three predefined subsetting functions exist:
-  \code{atChange}, \code{at2ndChange}  and \code{atMedian}, which
-  are used to make a tick at each (each 2nd for \code{at2ndChange})
-  change and at the median index computed on all having the same value,
-  respectively:
-  \preformatted{
-    atChange <- function(x,xm1) which(diff(c(xm1,x)) != 0)
-    at2ndChange <- function(x,xm1) which(diff(c(xm1,x) \%/\% 2) != 0)
-    atMedian <- function(x,xm1) tapply(seq_along(x), INDEX=x, quantile, prob=0.5, type=3)
-  }
-  By defining own functions here, one can obtain an arbitrary degree of
-  flexibility.
-  Finally, \code{xaxis.labelFormat} is a \code{\link{strftime}}
-  compatible formatting string., e.g. the default value is
-  \code{"\%G\\n\\n\%OQ"}, which means ISO year and quarter (in roman
-  letters) stacked on top of each other.
-
 }
 
 \value{

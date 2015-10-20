@@ -204,7 +204,7 @@ exportMethods(reportingTriangle,delayCDF,score)
 # plot variants
 export(stsplot_space)
 export(stsplot_time, stsplot_time1, stsplot_alarm)
-export(atChange, at2ndChange, atMedian) #for time axis formatting
+export(addFormattedXAxis, atChange, at2ndChange, atMedian) #for time axis formatting
 export(stsplot_spacetime) # old implementation of (animated) map
 S3method(animate, sts)    # S3-method for an S4 class, see ?Methods
 
