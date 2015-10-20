@@ -94,8 +94,6 @@ stsplot_time1 <- function(
   alarm      <- x@alarm[,k]
   upperbound <- x@upperbound[,k]
   hasAlarm   <- all(!is.na(alarm))
-  startyear <-  x@start[1]
-  firstweek <-  x@start[2]
   method <-     x@control$name
   disease <-    x@control$data
   population <- x@populationFrac[,k]
@@ -165,7 +163,7 @@ stsplot_time1 <- function(
 
   #Label x-axis 
   if(xaxis.dates & axes) {
-    addFormattedXAxis(x, epochsAsDate, observed, firstweek,xaxis.labelFormat,xaxis.tickFreq,xaxis.labelFreq,...)
+    addFormattedXAxis(x, epochsAsDate, xaxis.labelFormat,xaxis.tickFreq,xaxis.labelFreq,...)
   }
   #Label y-axis
   if (axes) {
@@ -223,8 +221,6 @@ stsplot_alarm <- function(
   alarm      <- x@alarm[,k]
   upperbound <- x@upperbound[,k]
   hasAlarm   <- all(!is.na(alarm))
-  startyear <-  x@start[1]
-  firstweek <-  x@start[2]
   method <-     x@control$name
   disease <-    x@control$data
   ylim <- c(0.5, ncol(x))
@@ -267,7 +263,7 @@ stsplot_alarm <- function(
 
   #Label of x-axis 
   if(xaxis.dates){
-    addFormattedXAxis(x, epochsAsDate, observed, firstweek, xaxis.labelFormat,xaxis.tickFreq,xaxis.labelFreq,...)
+    addFormattedXAxis(x, epochsAsDate, xaxis.labelFormat,xaxis.tickFreq,xaxis.labelFreq,...)
   }
   axis( side=2, at=1:ncol(x),cex.axis=cex.yaxis, labels=colnames(x),las=2)
 
@@ -308,18 +304,20 @@ at2ndChange <- function(x,xm1) {
 }
 
 #Helper function to format the x-axis of the time series
-addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelFormat, xaxis.tickFreq,xaxis.labelFreq,...) {
+addFormattedXAxis <- function(x, epochsAsDate, xaxis.labelFormat, xaxis.tickFreq, xaxis.labelFreq, ...) {
   
   #Old style if there are no Date objects
   if (!epochsAsDate) {
     #Declare commonly used variables.
+    nTime <- nrow(x)
     startyear <-  x@start[1]
+    firstweek <-  x@start[2]
     
     if (x@freq ==52) {  #Weekly epochs are the most supported 
       # At which indices to put the "at" tick label. This will
       # be exactly those week numbers where the new quarter begins: 1, 14, 27 and 40 + i*52.
       # Note that week number and index is not the same due to the "firstweek" argument
-      weeks <- 1:length(observed) + (firstweek-1)
+      weeks <- seq_len(nTime) + (firstweek-1)
       noYears <- ceiling(max(weeks)/52)
       quarterStarts <- rep( (0:(noYears))*52, each=4) + rep( c(1,14,27,40), noYears+1)
       weeks <- subset(weeks, !is.na(match(weeks,quarterStarts)))
@@ -334,15 +332,15 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelF
       #Computed axis labels -- add quarters (this is the old style)
       labels.week <- paste(year,"\n\n",quarter,sep="")
       #Make the line. Use lwd.ticks to get full line but no marks.
-      axis( side=1,labels=FALSE,at=c(1,length(observed)),lwd.ticks=0,line=1,...) 
+      axis( side=1,labels=FALSE,at=c(1,nTime),lwd.ticks=0,line=1,...) 
       axis( at=weekIdx[which(quarter != "I")] , labels=labels.week[which(quarter != "I")] , side=1, line = 1 ,...)       
       #Bigger tick marks at the first quarter (i.e. change of the year)
       at <- weekIdx[which(quarter == "I")]
-      axis( at=at, labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
+      axis( at=at, labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par("tcl"))
       
     } else { ##other frequency (not really supported)
       #A label at each unit
-      myat.unit <- seq(firstweek,length.out=length(observed) )
+      myat.unit <- seq(firstweek,length.out=nTime)
       
       # get the right year order
       month <- (myat.unit-1) %% x@freq + 1
@@ -351,11 +349,11 @@ addFormattedXAxis <- function(x, epochsAsDate, observed, firstweek, xaxis.labelF
       mylabels.unit <- paste(year,"\n\n", (myat.unit-1) %% x@freq + 1,sep="")
       
       #Add axis
-      axis( at=(1:length(observed)), labels=NA, side=1, line = 1, ...) 
-      axis( at=(1:length(observed))[month==1], labels=mylabels.unit[month==1] , side=1, line = 1 ,...)
+      axis( at=seq_len(nTime), labels=NA, side=1, line = 1, ...) 
+      axis( at=seq_len(nTime)[month==1], labels=mylabels.unit[month==1] , side=1, line = 1 ,...)
       #Bigger tick marks at the first unit
-      at <- (1:length(observed))[(myat.unit - 1) %% x@freq == 0]
-      axis( at=at, labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par()$tcl)
+      at <- seq_len(nTime)[(myat.unit - 1) %% x@freq == 0]
+      axis( at=at, labels=rep(NA,length(at)), side=1, line = 1 ,tcl=2*par("tcl"))
     } 
   } else {   
     ################################################################
