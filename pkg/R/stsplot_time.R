@@ -379,7 +379,7 @@ addFormattedXAxis <- function(x, epochsAsDate = FALSE,
     tickFactors <- surveillance.options("stsTickFactors")
     
     #Loop over all pairs in the xaxis.tickFreq list
-     for (i in seq(xaxis.tickFreq)) {
+     for (i in seq_along(xaxis.tickFreq)) {
       format <- names(xaxis.tickFreq)[i]
       xm1x <- as.numeric(formatDate(datesOneBefore,format))                         
       idx <- xaxis.tickFreq[[i]](x=xm1x[-1],xm1=xm1x[1])
@@ -396,7 +396,7 @@ addFormattedXAxis <- function(x, epochsAsDate = FALSE,
     ###Make the labels (depending on the selected level)###
     if (!is.null(xaxis.labelFormat)) {
       labelIdx <- NULL
-      for (i in seq(xaxis.labelFreq)) {
+      for (i in seq_along(xaxis.labelFreq)) {
         format <- names(xaxis.labelFreq)[i]
         xm1x <- as.numeric(formatDate(datesOneBefore,format))                         
         labelIdx <- c(labelIdx,xaxis.labelFreq[[i]](x=xm1x[-1],xm1=xm1x[1]))
