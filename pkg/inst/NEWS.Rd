@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-10-16)}{
+\section{Changes in surveillance version 1.10-0 (2015-10-20)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -27,6 +27,8 @@
     gained an option \code{decompose} to plot the contributions from
     each single unit (and the endemic part) instead of the default
     endemic + AR + neighbours decomposition.
+    Furthermore, a formatted time axis similar to \code{stsplot_time1()}
+    can now be enabled via the new argument \code{xaxis}.
 
     \item New \code{plot}-method for simulations from \code{"hhh4"}
     models (using \code{simulate.hhh4(..., simplify = TRUE)}, which now

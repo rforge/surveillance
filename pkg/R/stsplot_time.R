@@ -304,7 +304,7 @@ at2ndChange <- function(x,xm1) {
 }
 
 #Helper function to format the x-axis of the time series
-addFormattedXAxis <- function(x, epochsAsDate, xaxis.labelFormat, xaxis.tickFreq, xaxis.labelFreq, ...) {
+addFormattedXAxis <- function(x, epochsAsDate = FALSE, xaxis.labelFormat, xaxis.tickFreq, xaxis.labelFreq, ...) {
   
   #Old style if there are no Date objects
   if (!epochsAsDate) {

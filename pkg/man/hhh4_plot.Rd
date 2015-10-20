@@ -42,7 +42,7 @@ plotHHH4_fitted(x, units = 1, names = NULL,
 plotHHH4_fitted1(x, unit = 1, main = NULL,
                  col = c("grey85", "blue", "orange"),
                  pch = 19, pt.cex = 0.6, pt.col = 1, border = col, 
-                 start = x$stsObj@start, end = NULL,
+                 start = x$stsObj@start, end = NULL, xaxis = NULL,
                  xlim = NULL, ylim = NULL, xlab = "", ylab = "No. infected",
                  hide0s = FALSE, decompose = NULL, meanHHH = NULL)
 
@@ -127,6 +127,12 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
     instead of the default endemic + AR + neighbours decomposition.}
   \item{start,end}{time range to plot specified by vectors of length two
     in the form \code{c(year,number)}, see \code{"\linkS4class{sts}"}.}
+  \item{xaxis}{if this is a list (of arguments for
+    \code{\link{addFormattedXAxis}}, the time axis is nicely labelled
+    similar to \code{\link{stsplot_time}}.
+    Note that in this case, the time indexes \code{1:nrow(x$stsObj)}
+    will be used as x-values in the plot, which is different from the
+    long-standing default (\code{xaxis = NULL}) with a real time scale.}
   \item{xlim}{numeric vector of length 2 specifying the x-axis range.
     The default (\code{NULL}) is to plot the complete time range.}
   \item{ylim}{y-axis range.
@@ -245,6 +251,11 @@ measlesFit <- hhh4(measlesWeserEms, measlesModel)
 
 ## fitted values for a single unit
 plot(measlesFit, units=2)
+
+## 'xaxis' option for a nicely formatted time axis
+plot(measlesFit, units=2, xaxis=list(epochsAsDate=TRUE,
+    xaxis.tickFreq=list("\%m"=atChange, "\%Y"=atChange),
+    xaxis.labelFreq=list("\%Y"=atMedian), xaxis.labelFormat="\%Y"))
 
 ## plot the multiplicative effect of seasonality
 plot(measlesFit, type="season")

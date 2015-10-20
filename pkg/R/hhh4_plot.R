@@ -130,7 +130,7 @@ plotHHH4_fitted_check_col_decompose <- function (col, decompose, unitNames)
 plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
                              col=c("grey85", "blue", "orange"),
                              pch=19, pt.cex=0.6, pt.col=1, border=col,
-                             start=x$stsObj@start, end=NULL,
+                             start=x$stsObj@start, end=NULL, xaxis=NULL,
                              xlim=NULL, ylim=NULL, xlab="", ylab="No. infected",
                              hide0s=FALSE, decompose=NULL, meanHHH=NULL)
 {
@@ -161,7 +161,14 @@ plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
     end <- if(is.null(end)) tp[length(tp)] else yearepoch2point(end,stsObj@freq)
     stopifnot(start < end)
     tpInRange <- which(tp >= start & tp <= end)            # plot only those
-    tpSubset <- tp[intersect(x$control$subset, tpInRange)] # fitted time points
+    tpInSubset <- intersect(x$control$subset, tpInRange)   # fitted time points
+
+    ## use time indexes as x-values for use of addFormattedXAxis()
+    if (is.list(xaxis)) {
+        tp <- seq_along(obs)
+        start <- tpInRange[1L]
+        end <- tpInRange[length(tpInRange)]
+    }
 
     ## get fitted component means
     meanHHHunit <- if (is.null(decompose)) {
@@ -184,19 +191,21 @@ plotHHH4_fitted1 <- function(x, unit=1, main=NULL,
     
     ## establish basic plot window
     if (is.null(ylim)) ylim <- c(0, max(obs[tpInRange],na.rm=TRUE))
-    plot(c(start,end), ylim, xlim=xlim, xlab=xlab, ylab=ylab, type="n")
+    plot(c(start,end), ylim, xlim=xlim, xlab=xlab, ylab=ylab, type="n",
+         xaxt = if (is.list(xaxis)) "n" else "s")
+    if (is.list(xaxis)) do.call("addFormattedXAxis", c(list(x = stsObj), xaxis))
     title(main=main, line=0.5)
 
     ## draw polygons
     if (is.null(decompose)) {
         non0 <- which(c("end", "ar", "ne") %in% componentsHHH4(x))
         plotComponentPolygons(
-            x = tpSubset,
+            x = tp[tpInSubset],
             y = meanHHHunit[,c("endemic", "epi.own", "epi.neighbours")[non0],drop=FALSE],
             col = col[non0], border = border[non0], add = TRUE)
     } else {
         non0 <- apply(X = meanHHHunit > 0, MARGIN = 2L, FUN = any)
-        plotComponentPolygons(x = tpSubset, y = meanHHHunit[, non0, drop = FALSE],
+        plotComponentPolygons(x = tp[tpInSubset], y = meanHHHunit[, non0, drop = FALSE],
                               col = col[non0], border = border[non0], add = TRUE)
     }
     
