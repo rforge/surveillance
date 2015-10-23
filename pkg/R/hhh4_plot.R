@@ -292,7 +292,9 @@ plotHHH4_maps <- function (x,
 
     ## color key range
     if (is.null(zmax)) {
-        zmax <- ceiling(sapply(comps, max))
+        zmax <- if (prop) {
+            ceiling(10*sapply(comps, max))/10
+        } else ceiling(sapply(comps, max))
         ## sub-components should have the same color range
         .idxsub <- setdiff(seq_along(zmax), match("mean", names(zmax)))
         zmax[.idxsub] <- suppressWarnings(max(zmax[.idxsub]))
