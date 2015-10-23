@@ -253,7 +253,8 @@ plotComponentPolygons <- function (x, y, col = 1:6, border = col, add = FALSE)
 
 plotHHH4_maps <- function (x,
     which = c("mean", "endemic", "epi.own", "epi.neighbours"),
-    main = which, zmax = NULL, col.regions = hcl.colors(10),
+    prop = FALSE, main = which, zmax = NULL,
+    col.regions = hcl.colors(10),
     labels = FALSE, sp.layout = NULL, ...,
     map = x$stsObj@map, meanHHH = NULL)
 {
@@ -264,8 +265,18 @@ plotHHH4_maps <- function (x,
         meanHHH <- meanHHH(x$coefficients, terms.hhh4(x))
     }
     
-    ## select only 'which' components and convert to an array
-    meanHHH <- simplify2array(meanHHH[which], higher = TRUE)
+    ## select relevant components and convert to an array
+    meanHHH <- simplify2array(
+        meanHHH[c("mean", "endemic", "epi.own", "epi.neighbours")],
+        higher = TRUE)
+    
+    ## convert to proportions
+    if (prop) {
+        meanHHH[,,-1L] <- meanHHH[,,-1L,drop=FALSE] / c(meanHHH[,,1L])
+    }
+    
+    ## select only 'which' components
+    meanHHH <- meanHHH[,,which,drop=FALSE]
     
     ## check map
     map <- as(map, "SpatialPolygonsDataFrame")

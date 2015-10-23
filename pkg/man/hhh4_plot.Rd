@@ -62,7 +62,8 @@ plotHHH4_maxEV(...,
 getMaxEV(x)
 
 plotHHH4_maps(x, which = c("mean", "endemic", "epi.own", "epi.neighbours"),
-              main = which, zmax = NULL, col.regions = hcl.colors(10),
+              prop = FALSE, main = which, zmax = NULL,
+              col.regions = hcl.colors(10),
               labels = FALSE, sp.layout = NULL, ...,
               map = x$stsObj@map, meanHHH = NULL)
 
@@ -181,6 +182,8 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
   \item{which}{a character vector specifying the components of the mean
     for which to produce maps. By default, the overall mean and all
     three components are shown.}
+  \item{prop}{a logical indicating whether the component maps should
+    display proportions of the total mean instead of absolute numbers.}
   \item{zmax}{a numeric vector of length \code{length(which)} (recycled
     as necessary) specifying upper limits for the color keys of the
     maps. The default is to use the same scale for the component maps
