@@ -160,7 +160,9 @@ epidataCSplot_time <- function (x, subset, by = type,
         aT2 <- axTicks(2)
         div <- length(aT2) - 1L
         darken <- function (col, f = 0.6)
-            apply(col2rgb(col)/255*f, 2L, function (x) rgb(x[1L], x[2L], x[3L]))
+            apply(X = col2rgb(col, alpha = TRUE), MARGIN = 2L,
+                  FUN = function (x) rgb(f*x[1L], f*x[2L], f*x[3L], x[4L],
+                                         maxColorValue = 255))
         cumulative <- modifyList(
             list(maxat = ceiling(max(unlist(csums))/div)*div,
                  col = darken(col), lwd = 3, axis = TRUE,
