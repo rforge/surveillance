@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10-0 (2015-10-20)}{
+\section{Changes in surveillance version 1.10-0 (2015-11-04)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -23,6 +23,11 @@
     \item \code{scores()} and \code{pit()} are now generic and have convenient
     methods for \code{"oneStepAhead"} predictions and \code{"hhh4"} fits.
 
+    \item The initial values used for model updates during the
+    \code{oneStepAhead()} procedure can now be specified directly
+    through the \code{which.start} argument (as an alternative to the
+    previous options \code{"current"} and \code{"final"}).
+    
     \item \code{plotHHH4_fitted()} (and \code{plotHHH4_fitted1()})
     gained an option \code{decompose} to plot the contributions from
     each single unit (and the endemic part) instead of the default

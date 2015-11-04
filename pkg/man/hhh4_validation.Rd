@@ -62,13 +62,16 @@ scores(x, ...)
     \code{result$fitted.values}, if the \code{tp}'s are part of the
     fitted subset \code{result$control$subset}.}
   \item{which.start}{
-    Which initial values should be used when successively
-    refitting the model for subsets of the data (up to time point
+    Which initial parameter values should be used when successively
+    refitting the model to subsets of the data (up to time point
     \code{tp[1]}, up to \code{tp[1]+1}, ...) if \code{type="rolling"}?
-    Default (\code{"current"}) is to use the fitted parameters from the
-    previous time point. Alternatively, \code{"final"} means to always
-    use the fitted values from \code{result} as initial values for the
-    model update. \code{which.start} is ignored for other \code{type}s.
+    Default (\code{"current"}) is to use the parameter estimates from the
+    previous time point, and \code{"final"} means to always
+    use the estimates from \code{result} as initial values.
+    Alternatively, \code{which.start} can be a list of \code{start}
+    values as expected by \code{\link{hhh4}}, which then replace
+    the corresponding estimates from \code{result} as initial values.
+    This argument is ignored for \dQuote{non-rolling} \code{type}s.
   }
   \item{keep.estimates}{
     logical indicating if parameter estimates and log-likelihoods from

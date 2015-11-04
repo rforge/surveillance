@@ -24,10 +24,14 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
 {
     stopifnot(inherits(result, c("ah4", "hhh4")))
     type <- match.arg(type)
-    which.start <- if (type == "rolling") match.arg(which.start) else "final"
-    if (cores > 1 && which.start == "current")
-        stop("no parallelization for 'type=\"rolling\"' ",
-             "if 'which.start=\"current\"'")
+    if (type == "rolling" && !is.list(which.start)) {
+        ## new in surveillance 1.10-0: if 'which.start' is a list, it is
+        ## directly used as the 'start' argument for hhh4() in all time steps
+        which.start <- match.arg(which.start)
+        if (cores > 1 && which.start == "current")
+            stop("no parallelization for 'type=\"rolling\"' ",
+                 "if 'which.start=\"current\"'")
+    }
 
     ## get model terms
     model <- result[["terms"]]
@@ -106,6 +110,7 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
                 cat("One-step-ahead prediction @ t =", tp, "...\n")
             if (type == "rolling") { # update fit
                 fit <- update.hhh4(result, subset.upper=tp, use.estimates=TRUE,
+                                   start=if (is.list(which.start)) which.start,
                                    verbose=FALSE, # chaotic in parallel
                                    keep.terms=TRUE) # need "model" -> $terms
                 if (!fit$convergence) {
@@ -138,9 +143,12 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
             
             if (type == "rolling") { # update fit
                 fit.old <- fit # backup
+                start <- if (is.list(which.start)) {
+                    which.start
+                } else if (which.start == "current") hhh4coef2start(fit)
+                ## else NULL
                 fit <- update.hhh4(result, subset.upper=tps[i],
-                                   start=if (which.start == "current")
-                                       hhh4coef2start(fit), # takes precedence
+                                   start=start, # takes precedence
                                    use.estimates=TRUE,
                                    keep.terms=TRUE) # need "model" -> $terms
                 if (!fit$convergence) {
