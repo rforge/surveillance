@@ -1,13 +1,13 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
 Version: 1.10-0
-Date: 2015-07-10
+Date: 2015-11-04
 Authors@R: c(MH = person("Michael", "Höhle",
                   email = "hoehle@math.su.se",
-                  role = c("aut", "cre", "ths")),
+                  role = c("aut", "ths")),
              SM = person("Sebastian", "Meyer",
                   email = "Sebastian.Meyer@ifspm.uzh.ch",
-                  role = "aut"),
+                  role = c("aut", "cre")),
              MP = person("Michaela", "Paul", role = "aut"),
              LH = person("Leonhard", "Held",
                   email = "Leonhard.Held@uzh.ch",
@@ -34,7 +34,7 @@ Author: Michael Höhle [aut, cre, ths], Sebastian Meyer [aut],
         Maëlle Salmon [ctb], Dirk Schumacher [ctb], Stefan Steiner [ctb],
         Mikko Virtanen [ctb], Wei Wei [ctb], Valentin Wimmer [ctb], R Core Team [ctb]
         (A few code segments are modified versions of code from base R)
-Maintainer: Michael Höhle <hoehle@math.su.se>
+Maintainer: Sebastian Meyer <Sebastian.Meyer@ifspm.uzh.ch>
 Depends: R (>= 3.0.2), methods, grDevices, graphics, stats, utils, 
         sp (>= 1.0-15), xtable, polyCub (>= 0.4-3)
 Imports: Rcpp (>= 0.11.0), MASS, Matrix, spatstat (>= 1.36-0)
