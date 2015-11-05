@@ -75,5 +75,5 @@ test_that("automatic and manual normalization are equivalent", {
                 )))
         )
     expect_equal(measlesFit, measlesFit2, ignore = "control",
-                 tolerance = 1e-6) # increased to pass on Windows
+                 tolerance = 1e-6) # increased to pass on 32-bit Windows
 })
