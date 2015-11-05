@@ -74,5 +74,6 @@ test_that("automatic and manual normalization are equivalent", {
                 normalize = TRUE # -> use scaleNEweights.list()
                 )))
         )
-    expect_equal(measlesFit, measlesFit2, ignore = "control", tolerance = 1e-6)
+    expect_equal(measlesFit, measlesFit2, ignore = "control",
+                 tolerance = 1e-6) # increased to pass on Windows
 })
