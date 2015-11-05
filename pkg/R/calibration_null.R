@@ -39,7 +39,7 @@ score_EV <- function (mu, size = NULL, tolerance = 1e-4,
 
 
 ##########################
-### Dawid–Sebastiani Score
+### Dawid-Sebastiani Score
 ##########################
 
 dss_EV <- function (mu, size = NULL)
