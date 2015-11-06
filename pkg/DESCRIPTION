@@ -27,7 +27,7 @@ Authors@R: c(MH = person("Michael", "Höhle",
              person("R Core Team", role = "ctb",
                     comment = "A few code segments are modified versions of
                                code from base R"))
-Author: Michael Höhle [aut, cre, ths], Sebastian Meyer [aut],
+Author: Michael Höhle [aut, ths], Sebastian Meyer [aut, cre],
         Michaela Paul [aut], Leonhard Held [ctb, ths],
         Thais Correa [ctb], Mathias Hofmann [ctb], Christian Lang [ctb],
         Juliane Manitz [ctb], Andrea Riebler [ctb], Daniel Sabanés Bové [ctb],
