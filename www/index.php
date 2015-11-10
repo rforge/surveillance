@@ -69,7 +69,7 @@ echo $contents; } ?>
     <ul>
       <li>Prospective detection of aberrations in routinely collected public
 	health data seen as univariate and multivariate time series of counts.</li>
-      <li>General regression modelling of spatio-temporal epidemic phenomena (retrospectively).</li>
+      <li>Temporal and spatio-temporal modelling of epidemic phenomena.</li>
     </ul>
 
   <dt>License:</dt>
@@ -162,9 +162,9 @@ echo $contents; } ?>
 
 <ul>
 
-  <li>Meyer et al. (2014) provide a guide to the
+  <li>Meyer et al. (2015) provide a guide to the
   spatio-temporal analysis of epidemic phenomena using the R package <code>surveillance</code>.
-  The paper describes three regression-oriented model frameworks capturing endemic and epidemic dynamics,
+  The paper describes three regression-oriented modelling frameworks capturing endemic and epidemic dynamics,
   which are illustrated by applications to infectious disease surveillance data:
   <ul>
     <li><code>twinstim</code> for geo-referenced event data (i.e., a spatio-temporal point pattern)</li>
@@ -177,7 +177,7 @@ echo $contents; } ?>
     <ul>
       <li><code>algo.hhh</code> - Held et al. (2005) and Paul et al. (2008)</li>
       <li><code>algo.twins</code> - Held et al. (2006)</li>
-      <li><code>hhh4</code> - Paul and Held (2011)</li>
+      <li><code>hhh4</code> - Paul and Held (2011) and Held and Paul (2012)</li>
     </ul>
   </li>
 
@@ -194,7 +194,7 @@ echo $contents; } ?>
   </li>
 
   <li>Meyer and Held (2014) describe both the spatio-temporal
-  <code>hhh4()</code> (count data) and <code>twinstim()</code> (individual-level data)
+  <code>hhh4()</code> (for areal count time series) and <code>twinstim()</code> (for individual-level data)
   frameworks with a view to modelling power-law decay of spatial interaction.</li>
 
 </ul>
@@ -251,7 +251,7 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
 <hr />
 <h3>News</h3>
 <ul>
-  <li>See
+  <li>For package updates, see
     the <a href="http://cran.r-project.org/web/packages/surveillance/news.html">NEWS</a>
     of the latest version released on CRAN or
     the <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/inst/NEWS.Rd?view=markup&root=surveillance">NEWS file</a>
@@ -265,8 +265,8 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
 </li>
   <li>2014/11/08 Two arxiv reports (submitted manuscripts) illustrate the newest package features:
 <ul>
-<li><a href="http://arxiv.org/abs/1411.0416">Meyer et al. (2014)</a> (spatio-temporal modelling)</li>
-<li><a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> (monitoring)</li>
+<li><a href="http://arxiv.org/abs/1411.0416">Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package surveillance</a></li>
+<li><a href="http://arxiv.org/abs/1411.1292">Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance</li>
 </ul>
 </li>
   <li>2013/04/23 <a href="StockholmR-Hoehle_4.pdf">Talk</a> at the  Stockholm R useR group (StockholmR) on <a href="http://www.meetup.com/StockholmR/events/105738342/">Making R packages (and) Shiny</a>.</li>
@@ -280,7 +280,7 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
 <blockquote>
   <blockquote>
     <ul>
-       <li>Two recent manuscripts provide an overview as well as step-by-step instructions on what you can do with the package: <a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> covers prospective monitoring whereas <a href="http://arxiv.org/abs/1411.0416">Meyer et al. (2014)</a> covers spatio-temporal modelling.</li>
+       <li>Two recent manuscripts provide an overview as well as step-by-step instructions on what you can do with the package: <a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> covers prospective monitoring whereas <a href="http://arxiv.org/abs/1411.0416">Meyer et al. (2015)</a> covers spatio-temporal modelling.</li>
       <li>A good (but slightly outdated) introduction to the outbreak detection part of the package is
 provided in the paper <a
  href="http://dx.doi.org/10.1007/s00180-007-0074-8"><span
@@ -350,18 +350,17 @@ further preprints.<br>
       <li><a href="http://www.math.su.se/%7Ehoehle">Michael
 Höhle</a>, Department of Mathematics, Stockholm University, Sweden
 (Project Admin)</li>
-      <li><a href="http://www.biostat.uzh.ch/aboutus/people/smeyer.html">Sebastian
-Meyer</a>, Epidemiology, Biostatistics and Prevention Institute (<a href="http://www.ebpi.uzh.ch/">EBPI</a>), University of
+      <li><a href="http://www.ebpi.uzh.ch/en/aboutus/departments/biostatistics/teambiostats/meyer.html">Sebastian
+Meyer</a>, Epidemiology, Biostatistics and Prevention Institute, University of
 Zurich, Switzerland</li>
       <li>Michaela Paul (previously: University of Zurich, Switzerland)</li>
       <li><a href="http://www.normalesup.org/~masalmon/">Ma&eumllle Salmon</a>,
 	Department for Infectious Disease Epidemiology, Robert Koch Institute,
 	Germany</li>
 
-      <li>Former student programmers: C. Lang, A. Riebler, V. Wimmer</li>
-
-      <li>Contributions by: L. Held, T. Correa, M. Hofmann, J. Manitz,
-	D. Sabanés Bové, D. Schumacher, S. Steiner, M. Virtanen</li>
+      <li>Contributions by: L. Held, T. Correa, M. Hofmann, C. Lang, J. Manitz,
+      A. Riebler, D. Sabanés Bové, D. Schumacher, S. Steiner, M. Virtanen,
+      W. Wei, V. Wimmer</li>
     </ul>
   </blockquote>
 
@@ -394,6 +393,11 @@ Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
 <dd><a href = "http://dx.doi.org/10.1093/biostatistics/kxj016">Held, L., Hofmann, M., Höhle, M. and Schmid, V. (<b>2006</b>)</a></dd>
 <dd><i>A two-component model for counts of infectious diseases</i></dd>
 <dd>Biostatistics, Vol. 7(3), pp. 422-437</dd>
+
+<dt></dt>
+<dd><a href = "http://dx.doi.org/10.1002/bimj.201200037">Held, L., and Paul, M. (<b>2012</b>)</a></dd>
+<dd><i>Modeling seasonality in space-time infectious disease surveillance data</i></dd>
+<dd>Biometrical Journal, Vol. 54(6), pp. 824-843</dd>
 
 <dt></dt>
 <dd><a href="http://www.stat.uni-muenchen.de/%7Ehoehle/pubs/hoehle2010-preprint.pdf">Höhle, M. (<b>2010</b>)</a></dd>
@@ -441,9 +445,9 @@ or as <a href="http://arxiv.org/abs/1308.5115">arXiv:1308.5115</a>,
 and has <a href="http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html">supplementary animations</a>)</dd>
 
 <dt></dt>
-<dd><a href="http://arxiv.org/abs/1411.0416">Meyer, S., Held, L. and Höhle, M. (<b>2014</b>)</a></dd>
+<dd><a href="http://arxiv.org/abs/1411.0416">Meyer, S., Held, L. and Höhle, M. (<b>2015</b>)</a></dd>
 <dd><i>Spatio-Temporal Analysis of Epidemic Phenomena Using the <code>R</code> Package <code>surveillance</code></i></dd>
-<dd>In revision for the Journal of Statistical Software</dd>
+<dd>Revised for the Journal of Statistical Software</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1002/sim.4177">Paul, M. and Held, L. (<b>2011</b>)</a></dd>
