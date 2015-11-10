@@ -91,7 +91,7 @@ echo $contents; } ?>
   <li><tt>surveillance</tt> provides the <tt>S4</tt> class data
     structure <tt>"sts"</tt> and a framework for methodological developments
     of change-point algorithms for time series of counts.</li>
-  <li>Salmon et al. (2014) provide an overall guide to the
+  <li><a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> provide an overall guide to the
   monitoring capabilities of <code>surveillance</code>. </li>
 
   <li>Prospective outbreak detection procedures for count data time series:
@@ -162,7 +162,7 @@ echo $contents; } ?>
 
 <ul>
 
-  <li>Meyer et al. (2015) provide a guide to the
+  <li><a href="http://arxiv.org/abs/1411.0416">Meyer et al. (2015)</a> provide a guide to the
   spatio-temporal analysis of epidemic phenomena using the R package <code>surveillance</code>.
   The paper describes three regression-oriented modelling frameworks capturing endemic and epidemic dynamics,
   which are illustrated by applications to infectious disease surveillance data:
@@ -266,7 +266,7 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
   <li>2014/11/08 Two arxiv reports (submitted manuscripts) illustrate the newest package features:
 <ul>
 <li><a href="http://arxiv.org/abs/1411.0416">Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package surveillance</a></li>
-<li><a href="http://arxiv.org/abs/1411.1292">Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance</li>
+<li><a href="http://arxiv.org/abs/1411.1292">Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance</a></li>
 </ul>
 </li>
   <li>2013/04/23 <a href="StockholmR-Hoehle_4.pdf">Talk</a> at the  Stockholm R useR group (StockholmR) on <a href="http://www.meetup.com/StockholmR/events/105738342/">Making R packages (and) Shiny</a>.</li>
@@ -465,9 +465,9 @@ and has <a href="http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html">s
 <dd>Conditionally accepted for the Journal of Statistical Software</dd>
 
 <dt></dt>
-<dd>Salmon, M., Schumacher, D., Stark, K. and Höhle, M. (<b>2015</b>)</a></dd>
+<dd><a href="http://dx.doi.org/10.1002/bimj.201400159">Salmon, M., Schumacher, D., Stark, K. and Höhle, M. (<b>2015</b>)</a></dd>
 <dd><i>Bayesian outbreak detection in the presence of reporting delays</i></dd>
-<dd>To appear in Biometrical Journal</dd>
+<dd>Biometrical Journal, Vol. 57(6), pp. 1051--1067</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1093/aje/kwt069">Werber, D., King, L.A., Müller, L., Follin, P., Buchholz, U., Bernard, H., Rosner, B.M., Ethelberg, S., de Valk, H., Höhle, M. (<b>2013</b>)</a></dd>
