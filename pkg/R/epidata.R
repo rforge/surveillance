@@ -310,15 +310,15 @@ update.epidata <- function (object, f = list(), w = list(), D = dist, ...)
                                 rownames.force = FALSE)
             rownames(coords) <- as.character(firstDataBlock[["id"]])
             as.matrix(D(coords))
-        } else if (is.matrix(D)) {
-            stopifnot(is.numeric(D))
-            if (any(!firstDataBlock[["id"]] %in% rownames(D),
-                    !firstDataBlock[["id"]] %in% colnames(D))) {
+        } else { # a numeric matrix (or "Matrix")
+            if (length(dn <- dimnames(D)) != 2L) {
+                stop("if not a function, 'D' must be a matrix-like object")
+            }
+            if (!all(firstDataBlock[["id"]] %in% dn[[1L]],
+                     firstDataBlock[["id"]] %in% dn[[2L]])) {
                 stop("'dimnames(D)' must contain the individuals' IDs")
             }
             D
-        } else {
-            stop("'D' must be a function or a matrix")
         }
     }
 

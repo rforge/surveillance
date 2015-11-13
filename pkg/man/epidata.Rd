@@ -188,7 +188,7 @@ as.epidata(data, ...)
     Euclidean distance via the function \code{\link{dist}}) and
     the result converted to a matrix via \code{\link{as.matrix}},
     or a pre-computed distance matrix with \code{dimnames} containing
-    the individual ids.
+    the individual ids (a classed \code{"\linkS4class{Matrix}"} is supported).
   }
   \item{keep.cols}{
     logical indicating if all columns in \code{data}

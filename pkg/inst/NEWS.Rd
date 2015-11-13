@@ -6,6 +6,19 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.10.1 (2015-11-13)}{
+
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item \code{update.epidata()} can now handle a distance matrix
+    \code{D} in the form of a classed \code{"Matrix"}
+    (suggested by George Wood).
+  }
+}
+
+}
+
+
 \section{Changes in surveillance version 1.10-0 (2015-11-04)}{
 
 \subsection{NEW FEATURES}{
