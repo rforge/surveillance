@@ -68,11 +68,10 @@ intensity.twinstim <- function (x, aggregate = c("time", "space"),
                 fact * c(tapply(expeta * modelenv$dt, gridTiles, sum,
                                 simplify = TRUE))
             }
-        } else {
-            ngrid <- if (aggregate == "time") {
-                gridBlocks[length(gridBlocks)]
-            } else nlevels(gridTiles)
-            rep.int(0, ngrid)
+        } else { ## the endemic intensity is 0
+            ## but a non-endemic "twinstim" holds no information on 'stgrid':
+            ## 'gridBlocks' and 'gridTiles', respectively, are undefined
+            NULL
         }
 
     ## endemic component as a function of time or location

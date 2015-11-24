@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10.1 (2015-11-13)}{
+\section{Changes in surveillance version 1.10.1 (2015-11-24)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -16,7 +16,14 @@
   }
 }
 
+\subsection{BUG FIXES}{
+  \itemize{
+    \item \code{intensity.twinstim()} did not work for non-endemic models.
+  }
 }
+
+}
+
 
 
 \section{Changes in surveillance version 1.10-0 (2015-11-04)}{
