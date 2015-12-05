@@ -57,36 +57,64 @@ user to change these numbers.}
 \description{
 The function takes \code{range} values of the surveillance time
 series \code{sts} and for each time point uses a Bayesian model of the negative binomial family with
-log link inspired by the work of Noufaily et al. (2012) and of Manitz and \enc{Höhle}{Hoehle} (2014). It allows delay-corrected aberration detection as explained in Salmon et al. (2015). A \code{reportingTriangle} has to be provided in the \code{control} slot.
+log link inspired by the work of Noufaily et al. (2012) and of Manitz and \enc{HÃ¶hle}{Hoehle} (2014). It allows delay-corrected aberration detection as explained in Salmon et al. (2015). A \code{reportingTriangle} has to be provided in the \code{control} slot.
 }
 \examples{
-data(salmAllOnset)
-rangeTest <- 410:412
-alpha <- 0.05
-# Control slot for the proposed algorithm with D=0 correction
-controlNormal <- list(range = rangeTest, b = 4, w = 3,
-                      pastAberrations = TRUE, mc.munu=10, mc.y=10,
-                      verbose = FALSE,
-                      alpha = alpha, trend = TRUE,
-                      limit54=c(0,50),
-                      noPeriods = 10, pastWeeksNotIncluded = 26,
-                      delay=FALSE,inferenceMethod="asym")
-# Control slot for the proposed algorithm with D=10 correction
-controlDelay <-  list(range = rangeTest, b = 4, w = 3,
-                      pastAberrations = TRUE, mc.munu=10, mc.y=10,
-                      verbose = FALSE,
-                      alpha = alpha, trend = TRUE,
-                      limit54=c(0,50),
-                      noPeriods = 10, pastWeeksNotIncluded = 26,
-                      delay=TRUE,inferenceMethod="asym")
-salm.Normal <- bodaDelay(salmAllOnset, controlNormal)
-salm.delay <- bodaDelay(salmAllOnset, controlDelay)
-plot(salm.Normal)
-plot(salm.delay)
+\dontrun{data(stsNewport)
+salm.Normal <- list()
+salmDelayAsym <- list()
+for (week in 43:45){
+  listWeeks <- as.Date(row.names(stsNewport@control$reportingTriangle$n), origin="1970-01-01")
+  dateObs <- listWeeks[isoWeekYear(listWeeks)$ISOYear==2011&
+                         isoWeekYear(listWeeks)$ISOWeek==(week)]
+  stsC <- sts_observation(stsNewport,
+                          dateObservation=dateObs,
+                          cut=TRUE)
+  inWeeks <- which(formatDate(epoch(stsC), "%G") == 2011 & 
+                     isoWeekYear(as.Date(epoch(stsC)))$ISOWeek>=40 & 
+                     isoWeekYear(as.Date(epoch(stsC)))$ISOWeek<=48)
+  
+  rangeTest <- inWeeks
+  alpha <- 0.07
+  #  isoWeekYear(epoch(dataTrunc))$ISOWeek >39 & 
+  # isoWeekYear(epoch(dataTrunc))$ISOWeek <=47)
+  # Control slot for Noufaily method          
+  controlNoufaily <- list(range=rangeTest,noPeriods=10,
+                          b=4,w=3,weightsThreshold=2.58,pastWeeksNotIncluded=26,
+                          pThresholdTrend=1,thresholdMethod="nbPlugin",alpha=alpha*2,
+                          limit54=c(0,50))
+  # Control slot for the Proposed algorithm with D=0 correction
+  controlNormal <- list(range = rangeTest, b = 4, w = 3,
+                        reweight = TRUE, mc.munu=10000, mc.y=100,
+                        verbose = FALSE,
+                        alpha = alpha, trend = TRUE,
+                        limit54=c(0,50), 
+                        noPeriods = 10, pastWeeksNotIncluded = 26,
+                        delay=FALSE)
+  # Control slot for the Proposed algorithm with D=10 correction
+  
+  controlDelayNorm <-  list(range = rangeTest, b = 4, w = 3,
+                            reweight = FALSE, mc.munu=10000, mc.y=100,
+                            verbose = FALSE,
+                            alpha = alpha, trend = TRUE,
+                            limit54=c(0,50), 
+                            noPeriods = 10, pastWeeksNotIncluded = 26,
+                            delay=TRUE,inferenceMethod="asym")
+  set.seed(1)
+  
+  salm.Normal[[week]] <- farringtonFlexible(stsC, controlNoufaily)
+  
+  salmDelayAsym[[week]] <- bodaDelay(stsC, controlDelayNorm)
+  
+}
+
+par(mfrow=c(2,3))
+lapply(salmDelayAsym[c(43,44,45)],plot, legend=NULL, main="", ylim=c(0,35))
+lapply(salm.Normal[c(43,44,45)],plot, legend=NULL, main="", ylim=c(0,35))} 
 
 }
 \references{
 A statistical algorithm for the early detection of outbreaks of infectious disease, Farrington, C.P., Andrews, N.J, Beale A.D. and Catchpole, M.A. (1996), J. R. Statist. Soc. A, 159, 547-563.
 An improved algorithm for outbreak detection in multiple surveillance systems, Noufaily, A., Enki, D.G., Farrington, C.P., Garthwaite, P., Andrews, N.J., Charlett, A. (2012), Statistics in Medicine, published online.
-Bayesian outbreak detection in the presence of reporting delays, Salmon, M., Schumacher, D., Stark, K., \enc{Höhle}{Hoehle}, M. (2015), in revision.
+Bayesian outbreak detection in the presence of reporting delays, Salmon, M., Schumacher, D., Stark, K., \enc{HÃ¶hle}{Hoehle}, M. (2015), in revision.
 }
