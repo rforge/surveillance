@@ -237,33 +237,39 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
                          inferenceMethod=control$inferenceMethod)
     
     model <- do.call(bodaDelay.fitGLM, args=argumentsGLM)
-    
-    ######################################################################
-    # Calculate the threshold 
-    ###################################################################### 
-    quantileMethod <- control$quantileMethod
-    argumentsThreshold <- list(model,alpha=alpha,dataGLM=dataGLM,reportingTriangle,
-                               delay=delay,k=k,control=control,mc.munu=mc.munu,mc.y=mc.y,
-                               inferenceMethod=control$inferenceMethod,
-                               quantileMethod=quantileMethod)
-    
-    threshold <- do.call(bodaDelay.threshold,argumentsThreshold)
-    
-    ######################################################################
-    # Output results if enough cases 
-    ###################################################################### 
-    sts@upperbound[k] <- threshold
-    enoughCases <- (sum(observed[(k-control$limit54[2]+1):k])
-                    >=control$limit54[1])
-    sts@alarm[k] <- FALSE
-    if (is.na(threshold)){sts@alarm[k] <- NA}
-    else {
-      if (sts@observed[k]>sts@upperbound[k]) {sts@alarm[k] <- TRUE}
-    }
-    if(!enoughCases){
+    if(is.null(model)){
       sts@upperbound[k] <- NA
       sts@alarm[k] <- NA
     }
+    else{
+      ######################################################################
+      # Calculate the threshold 
+      ###################################################################### 
+      quantileMethod <- control$quantileMethod
+      argumentsThreshold <- list(model,alpha=alpha,dataGLM=dataGLM,reportingTriangle,
+                                 delay=delay,k=k,control=control,mc.munu=mc.munu,mc.y=mc.y,
+                                 inferenceMethod=control$inferenceMethod,
+                                 quantileMethod=quantileMethod)
+      
+      threshold <- do.call(bodaDelay.threshold,argumentsThreshold)
+      
+      ######################################################################
+      # Output results if enough cases 
+      ###################################################################### 
+      sts@upperbound[k] <- threshold
+      enoughCases <- (sum(observed[(k-control$limit54[2]+1):k])
+                      >=control$limit54[1])
+      sts@alarm[k] <- FALSE
+      if (is.na(threshold)){sts@alarm[k] <- NA}
+      else {
+        if (sts@observed[k]>sts@upperbound[k]) {sts@alarm[k] <- TRUE}
+      }
+      if(!enoughCases){
+        sts@upperbound[k] <- NA
+        sts@alarm[k] <- NA
+      }
+    }
+ 
   } #done looping over all time points
   
   return(sts[control$range,]) 
@@ -335,6 +341,9 @@ bodaDelay.fitGLM <- function(dataGLM,reportingTriangle,alpha,
   if (inferenceMethod=="asym"){
     
     model <- MASS::glm.nb(as.formula(theModel),data=dataGLM)
+    if(!model$converged){
+      return(NULL)
+    }
   }
   
   return(model)
