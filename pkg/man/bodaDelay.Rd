@@ -4,13 +4,15 @@
 \usage{
 bodaDelay(sts, control = list(range = NULL, b = 3, w = 3,
                                           mc.munu=100, mc.y=10,
-                                          pastAberrations = FALSE,
+                                          pastAberrations = TRUE, 
                                           verbose = FALSE,
                                           alpha = 0.01, trend = TRUE,
-                                          limit54=c(5,4),
+                                          limit54=c(5,4), 
                                           inferenceMethod=c("asym","INLA"),
-                                          noPeriods = 1, pastWeeksNotIncluded = 26,
-                                          delay = TRUE))
+                                          quantileMethod=c("MC","MM"),
+                                          noPeriods = 1, 
+                                          pastWeeksNotIncluded = 26,
+                                          delay = TRUE)) 
 }
 \arguments{
 \item{sts}{sts-object to be analysed. Needs to have a reporting triangle.}
@@ -44,14 +46,15 @@ Farrington et al (1996).}
 
 \item{delay}{Boolean indicating whether to take reporting delays into account.}
 
-\item{mc.munu}{Number of samples for the parameters of the negative binomial distribution
-when performing Monte Carlo to calculate a threshold}
+\item{mc.munu}{Number of samples for the parameters of the negative binomial distribution for calculating a threshold}
 
 \item{mc.y}{Number of samples for observations
 when performing Monte Carlo to calculate a threshold}
 
 \item{limit54}{c(cases,period) is a vector allowing the
 user to change these numbers.}
+
+\item{quantileMethod}{Character, either \code{MC} or \code{MH}. Indicates how to compute the quantile based on the posterior distribution (no matter the inference method): either by sampling \code{mc.munu} values from the posterior distribution of the parameters and then for each sampled parameters vector sampling \code{mc.y} response values so that one gets a vector of response values based on which one computes an empirical quantile (MC method, as explained in Salmon et al. 2015); or by sampling \code{mc.munu} from the posterior distribution of the parameters and then compute the quantile of the mixture distribution using bisectionning, which is faster.}
 
 }
 \description{

@@ -4,7 +4,7 @@
 
 \title{Surveillance for an univariate count data time series using the
   Bayesian Outbreak Detection Algorithm (BODA) described in Manitz and
-  \enc{Höhle}{Hoehle} (2013)}
+  \enc{H?hle}{Hoehle} (2013)}
 \description{
 %
   The function takes \code{range} values of the surveillance time
@@ -17,10 +17,11 @@
 %
 }
 \usage{
-boda(sts, control=list(range=NULL, X=NULL, trend=FALSE,
-     season=FALSE, prior=c('iid','rw1','rw2'), alpha=0.05,
-     mc.munu=100, mc.y=10, verbose=FALSE,multicore=TRUE,
-     samplingMethod=c('joint','marginals')))
+boda(sts, control=list(range=NULL, X=NULL, trend=FALSE, season=FALSE,
+                                   prior=c('iid','rw1','rw2'), alpha=0.05, mc.munu=100, 
+                                   mc.y=10, verbose=FALSE,multicore=TRUE,
+                                   samplingMethod=c('joint','marginals'),
+                                   quantileMethod=c("MC","MM")))
 }
 \arguments{
   \item{sts}{object of class sts (including the \code{observed} and the
@@ -47,6 +48,7 @@ boda(sts, control=list(range=NULL, X=NULL, trend=FALSE,
       \item{\code{multicore}}{Detect using \code{parallel::detectCores}
 	how many logical cores are available and set INLA to use this number.}
       \item{\code{samplingMethod}}{Should one sample from the parameters joint distribution (joint) or from their respective marginal posterior distribution (marginals)?}
+      \item{quantileMethod}{Character, either \code{MC} or \code{MH}. Indicates how to compute the quantile based on the posterior distribution (no matter the inference method): either by sampling \code{mc.munu} values from the posterior distribution of the parameters and then for each sampled parameters vector sampling \code{mc.y} response values so that one gets a vector of response values based on which one computes an empirical quantile (MC method, as explained in Manitz and Hoehle 2013); or by sampling \code{mc.munu} from the posterior distribution of the parameters and then compute the quantile of the mixture distribution using bisectionning, which is faster.}
     }
   }
 }
@@ -96,11 +98,11 @@ boda(sts, control=list(range=NULL, X=NULL, trend=FALSE,
   } 
 }
 
-\author{J. Manitz, M. \enc{Höhle}{Hoehle}, M. Salmon}
+\author{J. Manitz, M. \enc{H?hle}{Hoehle}, M. Salmon}
 
 \references{
   Bayesian model algorithm for monitoring reported cases of
-  campylobacteriosis in Germany (2013), Manitz J and \enc{Höhle}{Hoehle} M,
+  campylobacteriosis in Germany (2013), Manitz J and \enc{H?hle}{Hoehle} M,
   Biometrical Journal, 55(4), pp. 509 526.
 }
 
