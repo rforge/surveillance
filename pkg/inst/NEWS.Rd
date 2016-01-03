@@ -18,6 +18,10 @@
 
 \subsection{BUG FIXES}{
   \itemize{
+    \item Fixed bug in \code{categoricalCUSUM()}, which ignored alarms
+    generated for the last time point in \code{range}. Furthermore, the
+    exact computation in case of returns of the type \code{"vaule"} for
+    the binomial are now checked through an attribute.
     \item \code{intensity.twinstim()} did not work for non-endemic models.
   }
 }
@@ -47,7 +51,7 @@
     \code{oneStepAhead()} procedure can now be specified directly
     through the \code{which.start} argument (as an alternative to the
     previous options \code{"current"} and \code{"final"}).
-    
+
     \item \code{plotHHH4_fitted()} (and \code{plotHHH4_fitted1()})
     gained an option \code{decompose} to plot the contributions from
     each single unit (and the endemic part) instead of the default
