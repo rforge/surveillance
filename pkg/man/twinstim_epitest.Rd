@@ -9,6 +9,9 @@
   model (one with \code{epidemic = ~1}) and tests if the spatio-temporal
   interaction invoked by the \code{epidemic} model component is
   statistically significant.
+  The approach is described in detail in Meyer et al. (2015),
+  where it is also compared to alternative global tests for clustering
+  such as the \code{\link{knox}} test.
 }
 
 \usage{
@@ -153,6 +156,15 @@ epitest(model, data, tiles, method = "time", B = 199,
   the simulated null distribution together with the observed value.
   The \code{coef}-method extracts the parameter estimates from the \code{B}
   \code{permfits} (by default for the full model \code{which = "m1"}).
+}
+
+\references{
+  Meyer, S.; Warnke, I.; Rössler, W.; Held, L. (2015):
+  Model-based testing for space-time interaction using point processes:
+  An application to psychiatric hospital admissions in an urban area.
+  \emph{Spatial and Spatio-temporal Epidemiology}. In revision.
+  Preprint available as
+  \href{http://arxiv.org/abs/1512.09052}{arXiv:1512.09052}.
 }
 
 \author{
