@@ -162,15 +162,15 @@ echo $contents; } ?>
 
 <ul>
 
-  <li><a href="http://arxiv.org/abs/1411.0416">Meyer et al. (2015)</a> provide a guide to the
+  <li><a href="http://arxiv.org/abs/1411.0416">Meyer, Held and Höhle (2015)</a> provide a guide to the
   spatio-temporal analysis of epidemic phenomena using the R package <code>surveillance</code>.
-  The paper describes three regression-oriented modelling frameworks capturing endemic and epidemic dynamics,
-  which are illustrated by applications to infectious disease surveillance data:
+  The paper describes three regression approaches to the modelling of spatio-temporal data with epidemic features:
   <ul>
-    <li><code>twinstim</code> for geo-referenced event data (i.e., a spatio-temporal point pattern)</li>
-    <li><code>twinSIR</code> for the SI[R][S] event history of a fixed population</li>
-    <li><code>hhh4</code> for multivariate time series of counts</li>
+    <li><code>twinstim</code> for a spatio-temporal point pattern of infective events</li>
+    <li><code>twinSIR</code> for the susceptible-infectious-recovered (SIR) event history of a fixed population</li>
+    <li><code>hhh4</code> for areal time series of counts</li>
   </ul>
+  The respective implementations are exemplified by analyses of public health surveillance data on measles and invasive meningococcal disease.
   </li>
 
   <li>Methodological papers on multivariate time series models for count data:
@@ -184,38 +184,37 @@ echo $contents; } ?>
   <li>Methodological papers on continuous-time point process modelling:
     <ul>
       <li><code>twinSIR</code> - continuous-time/discrete-space modelling as
-	described in H&ouml;hle (2009). The <code>"epidata"</code> class
+	described in Höhle (2009). The <code>"epidata"</code> class
 	provides the associated data structure.</li>
       <li><code>twinstim</code> - continuous-time/continuous-space modelling as described in
 	Meyer et al. (2012).
 	The <code>"epidataCS"</code> class holds the data, which mainly consist
 	of the observed events and exogenous covariates on a space-time grid.</li>
+      <li><code>epitest</code> - Meyer et al. (2015) propose a global test for space-time interaction
+        based on the <code>twinstim</code> class of point process models.
+        The basic idea is to test for evidence of an epidemic model component
+        via a Monte Carlo permutational approach.</li>
     </ul>
   </li>
 
   <li>Meyer and Held (2014) describe both the spatio-temporal
   <code>hhh4()</code> (for areal count time series) and <code>twinstim()</code> (for individual-level data)
-  frameworks with a view to modelling power-law decay of spatial interaction.</li>
-
+  frameworks with a view to modelling a power-law decay of spatial interaction.</li>
 </ul>
 
 
 <hr/>
 <h3>Modelling Structural Delays and Reporting Delays in Surveillance Data</h3>
 <ul>
-  <li>Backprojection methods
+  <li>Backprojection methods:
     <ul>
       <li><code>backprojNP</code> - Non-parametric back-projection method of Becker et al. (1991) used in, e.g., Werber et al. (2013).</li>
     </ul>
   </li>
-  <li>Adjusting for occurred-but-not-yet-reported events
+  <li>Adjusting for occurred-but-not-yet-reported events:
     <ul>
       <li><code>nowcast</code> - Nowcasting using frequentist approaches described in Lawless (1994) as well as more flexible hierarchical Bayes approaches developed in Höhle and an der Heiden (2014).</li>
-    </ul>
-  </li>
-  <li>
-    <ul>
-    <li><code>bodaDelay</code> - Delay adjusted outbreak detection synthesizing the <code>farringtonFlexible</code> and <code>boda</code> algorithms into a context where the surveillance reports have delays before arriving. See Salmon et al. (2015) for details.
+      <li><code>bodaDelay</code> - Delay adjusted outbreak detection synthesizing the <code>farringtonFlexible</code> and <code>boda</code> algorithms into a context where the surveillance reports have delays before arriving. See Salmon et al. (2015) for details.</li>
     </ul>
   </li>
 </ul>
@@ -263,7 +262,7 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
 <li><a href="http://user2015.math.aau.dk/presentations/40.pdf">Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package surveillance</a> by Sebastian Meyer</li>
 </ul>
 </li>
-  <li>2014/11/08 Two arxiv reports (submitted manuscripts) illustrate the newest package features:
+  <li>2014/11/08 Two preprints published on arXiv illustrate the newest package features:
 <ul>
 <li><a href="http://arxiv.org/abs/1411.0416">Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package surveillance</a></li>
 <li><a href="http://arxiv.org/abs/1411.1292">Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance</a></li>
@@ -278,9 +277,8 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
 
 
 <blockquote>
-  <blockquote>
     <ul>
-       <li>Two recent manuscripts provide an overview as well as step-by-step instructions on what you can do with the package: <a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> covers prospective monitoring whereas <a href="http://arxiv.org/abs/1411.0416">Meyer et al. (2015)</a> covers spatio-temporal modelling.</li>
+       <li>Two recent manuscripts provide an overview as well as step-by-step instructions on what you can do with the package: <a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> cover prospective monitoring whereas <a href="http://arxiv.org/abs/1411.0416">Meyer, Held and Höhle (2015)</a> cover spatio-temporal modelling.</li>
       <li>A good (but slightly outdated) introduction to the outbreak detection part of the package is
 provided in the paper <a
  href="http://dx.doi.org/10.1007/s00180-007-0074-8"><span
@@ -337,7 +335,6 @@ further preprints.<br>
 <!-- convert -density 100x100 imdepifit_Gaussian_intensityplot_space1.pdf imdepifit.png from JSS -->
       <img src="imdepifit.png" align="middle"><p>
     </ul>
-  </blockquote>
 </blockquote>
 
 
@@ -413,7 +410,7 @@ Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1111/biom.12194">Höhle, M. and An der Heiden, M. (<b>2014</b>)</a></dd>
 <dd><i>Bayesian Nowcasting during the STEC O104:H4 Outbreak in Germany, 2011</i></dd>
-<dd>Biometrics, 70(4):993–1002.</dd>
+<dd>Biometrics, 70(4):993-1002.</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1016/j.csda.2008.02.015">Höhle, M. and Paul, M. (<b>2008</b>)</a></dd>
@@ -447,7 +444,12 @@ and has <a href="http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html">s
 <dt></dt>
 <dd><a href="http://arxiv.org/abs/1411.0416">Meyer, S., Held, L. and Höhle, M. (<b>2015</b>)</a></dd>
 <dd><i>Spatio-Temporal Analysis of Epidemic Phenomena Using the <code>R</code> Package <code>surveillance</code></i></dd>
-<dd>Revised for the Journal of Statistical Software</dd>
+<dd>Conditionally accepted for the Journal of Statistical Software</dd>
+
+<dt></dt>
+<dd><a href="http://arxiv.org/abs/1512.09052">Meyer, S., Warnke, I., Rössler, U. and Held, L. (<b>2015</b>)</a></dd>
+<dd><i>Model-based testing for space-time interaction using point processes: An application to psychiatric hospital admissions in an urban area</i></dd>
+<dd>Spatial and Spatio-temporal Epidemiology, in revision</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1002/sim.4177">Paul, M. and Held, L. (<b>2011</b>)</a></dd>
