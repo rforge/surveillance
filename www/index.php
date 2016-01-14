@@ -178,6 +178,8 @@ echo $contents; } ?>
       <li><code>algo.hhh</code> - Held et al. (2005) and Paul et al. (2008)</li>
       <li><code>algo.twins</code> - Held et al. (2006)</li>
       <li><code>hhh4</code> - Paul and Held (2011) and Held and Paul (2012)</li>
+      <li>Meyer and Held (2015) extend the <code>hhh4</code> framework to model
+      <em>age-stratified</em>, areal count time series using social contact data.</li>
     </ul>
   </li>
 
@@ -256,6 +258,9 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
     the <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/inst/NEWS.Rd?view=markup&root=surveillance">NEWS file</a>
     of the current development version.
   </li>
+
+  <li>2015/12/03 Meyer and Held (2015) incorporate age-structured social contact data in the spatio-temporal <code>hhh4</code> model for stratified, areal time series of infectious disease counts
+<a href="http://arxiv.org/abs/1512.01065">[preprint]</a></li>
   <li>2015/07/01 Two talks about the surveillance package given at the <a href="http://user2015.math.aau.dk">useR2015!</a> conference:
 <ul>
 <li><a href="http://staff.math.su.se/hoehle/software/surveillance/hoehle-userR2015-web.pdf">Zombie Preparedness</a> by Michael Höhle</li>
@@ -440,6 +445,10 @@ Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
 <dd>(The paper is also available from <a href="http://www.zora.uzh.ch/89321/">ZORA</a>
 or as <a href="http://arxiv.org/abs/1308.5115">arXiv:1308.5115</a>,
 and has <a href="http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html">supplementary animations</a>)</dd>
+
+<dt></dt>
+<dd><a href="http://arxiv.org/abs/1512.01065">Meyer, S. and Held, L. (<b>2015</b>)</a></dd>
+<dd><i>Incorporating social contact data in spatio-temporal models for infectious disease spread</i></dd>
 
 <dt></dt>
 <dd><a href="http://arxiv.org/abs/1411.0416">Meyer, S., Held, L. and Höhle, M. (<b>2015</b>)</a></dd>
