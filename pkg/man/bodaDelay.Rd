@@ -60,7 +60,7 @@ user to change these numbers.}
 \description{
 The function takes \code{range} values of the surveillance time
 series \code{sts} and for each time point uses a Bayesian model of the negative binomial family with
-log link inspired by the work of Noufaily et al. (2012) and of Manitz and \enc{HÃ¶hle}{Hoehle} (2014). It allows delay-corrected aberration detection as explained in Salmon et al. (2015). A \code{reportingTriangle} has to be provided in the \code{control} slot.
+log link inspired by the work of Noufaily et al. (2012) and of Manitz and \enc{Höhle}{Hoehle} (2014). It allows delay-corrected aberration detection as explained in Salmon et al. (2015). A \code{reportingTriangle} has to be provided in the \code{control} slot.
 }
 \examples{
 \dontrun{data(stsNewport)
@@ -119,5 +119,5 @@ lapply(salm.Normal[c(43,44,45)],plot, legend=NULL, main="", ylim=c(0,35))}
 \references{
 A statistical algorithm for the early detection of outbreaks of infectious disease, Farrington, C.P., Andrews, N.J, Beale A.D. and Catchpole, M.A. (1996), J. R. Statist. Soc. A, 159, 547-563.
 An improved algorithm for outbreak detection in multiple surveillance systems, Noufaily, A., Enki, D.G., Farrington, C.P., Garthwaite, P., Andrews, N.J., Charlett, A. (2012), Statistics in Medicine, published online.
-Bayesian outbreak detection in the presence of reporting delays, Salmon, M., Schumacher, D., Stark, K., \enc{HÃ¶hle}{Hoehle}, M. (2015), in revision.
+Bayesian outbreak detection in the presence of reporting delays, Salmon, M., Schumacher, D., Stark, K., \enc{Höhle}{Hoehle}, M. (2015), in revision.
 }
