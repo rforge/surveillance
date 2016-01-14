@@ -149,7 +149,7 @@ categoricalCUSUM <- function(stsObj,
 
   ##Reserve space for the results
   ##start with cusum[timePoint -1] = 0, i.e. set cusum[1] = 0
-  alarm <- matrix(data = 0, nrow = length(range), ncol = nrow(y))
+  alarm <- matrix(data = FALSE, nrow = length(range), ncol = nrow(y))
   upperbound <- matrix(data = 0, nrow = length(range), ncol = nrow(y))
 
   ##Small helper function to be used along the way --> move to other file!
@@ -192,7 +192,7 @@ categoricalCUSUM <- function(stsObj,
   ##Add upperbound-statistic of last segment (note: an alarm might or might be reached here)
   upperbound[(doneidx-res$N+1):nrow(upperbound),]  <- matrix( rep(either(control$ret == "value", res$val, res$cases),each=ncol(upperbound)),ncol=ncol(upperbound),byrow=TRUE)
   ##Inherit alarms as well (last time point might contain an alarm!)
-  alarm[(doneidx-res$N+1):nrow(upperbound),] <- matrix( rep(res$val > h,each=ncol(alarm)), ncol=ncol(alarm),byrow=TRUE)
+  alarm[(doneidx-res$N+1):nrow(upperbound),] <- matrix( rep(res$val > control$h,each=ncol(alarm)), ncol=ncol(alarm),byrow=TRUE)
 
   # Add name and data name to control object
   control$name <- "categoricalCUSUM"
