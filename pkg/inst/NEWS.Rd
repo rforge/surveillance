@@ -22,6 +22,11 @@
     generated for the last time point in \code{range}. Furthermore, the
     exact computation in case of returns of the type \code{"vaule"} for
     the binomial are now checked through an attribute.
+    \item Fixed bug in the \code{estimateGLRNbHook} function of
+    \code{algo.glrnb}, which ignored potential fixed \code{alpha}
+    values. If \code{alpha} is fixed this is now taken into consideration
+    while fitting the negative binomial function. See revised help files
+    for the details.
     \item \code{intensity.twinstim()} did not work for non-endemic models.
   }
 }

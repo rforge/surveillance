@@ -39,8 +39,9 @@ algo.glrnb <- function(disProgObj,
       stop("Error: theta has to be larger than 1!")
     }
   }
-  #if(is.null(control[["alpha",exact=TRUE]]))
-  #    control$alpha <- 0
+  ##Set alpha to null as default. Not necessary, coz it would be taken from
+  ##glrnb output.
+  ##if(is.null(control[["alpha",exact=TRUE]])) control$alpha <- 0
 
   #GLM (only filled if estimated)
   m <- NULL
@@ -78,7 +79,7 @@ algo.glrnb <- function(disProgObj,
     # if it is necessary to estimate alpha. Note: glm.nb uses a different
     # parametrization of the negative binomial distribution, i.e. the
     # variance is 'mu + mu^2/size' (?dnbinom).
-    # Hence the correct alpha is 1/theta
+    # Hence the correct alpha is 1/theta. But now it's the same every time.
     if(is.null(control[["alpha",exact=TRUE]])) control$alpha <- 1/mod[[1]]$theta
   }
 
@@ -203,9 +204,12 @@ algo.glrnb <- function(disProgObj,
 }
 
 
-###################################################
-### chunk number 2:
-###################################################
+#####################################################################
+### Function to estimate a Poisson or glm.nb model on the fly - to be
+### called within the algo.glrnb function. Experts can customize this
+### function.
+#####################################################################
+
 estimateGLRNbHook <- function() {
   #Fetch control object from parent
   control <- parent.frame()$control
@@ -214,7 +218,7 @@ estimateGLRNbHook <- function() {
   #Current range to perform surveillance on
   range <- parent.frame()$range
 
-  #Define training & test data set (the rest)
+  #Define phase1 & phase2 data set (phase2= the rest)
   train <- 1:(range[1]-1)
   test <- range
 
@@ -228,11 +232,29 @@ estimateGLRNbHook <- function() {
   for (s in 1:control$mu0Model$S) {
     formula <- paste(formula,"+cos(2*",s,"*pi/p*t)+ sin(2*",s,"*pi/p*t)",sep="")
   }
-  #Fit the GLM
-  m <- eval(substitute(glm.nb(form,data=data),list(form=as.formula(formula))))
+
+  ##hoehle - 2016-01-16 -- problematic: a full model was fitted, but
+  ##this implied a different alpha. Changed now such that a glm
+  ##is fitted having the specified alpha (i.e. theta) fixed.
+  ##Determine appropriate fitter function
+  if (is.null(control[["alpha",exact=TRUE]])) {
+    ##Fit while also estimating alpha
+    m <- eval(substitute(glm.nb(form,data=data),list(form=as.formula(formula))))
+  } else {
+    ##Fit the Poisson GLM
+    if (control$alpha == 0) {
+      message(paste0("glrnb: Fitting Poisson model because alpha == 0"))
+      m <- eval(substitute(glm(form,family=poisson(),data=data),list(form=as.formula(formula))))
+    } else {
+      message(paste0("glrnb: Fitting glm.nb model with alpha=",control$alpha))
+      m <- eval(substitute(glm(form,family=negative.binomial(theta=1/control$alpha),data=data),list(form=as.formula(formula))))
+    }
+  }
 
   #Predict mu_{0,t}
-  return(list(mod=m,pred=as.numeric(predict(m,newdata=data.frame(t=range),type="response"))))
+  pred <- as.numeric(predict(m,newdata=data.frame(t=range),type="response"))
+
+  return(list(mod=m,pred=pred))
 }
 
 
