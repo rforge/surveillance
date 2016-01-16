@@ -238,7 +238,7 @@ estimateGLRNbHook <- function() {
   ##is fitted having the specified alpha (i.e. theta) fixed.
   ##Determine appropriate fitter function
   if (is.null(control[["alpha",exact=TRUE]])) {
-    ##Fit while also estimating alpha
+    ##Fit while also estimating alpha (if possible!)
     m <- eval(substitute(glm.nb(form,data=data),list(form=as.formula(formula))))
   } else {
     ##Fit the Poisson GLM

@@ -27,6 +27,9 @@
     values. If \code{alpha} is fixed this is now taken into consideration
     while fitting the negative binomial function. See revised help files
     for the details.
+    \item Made a hot-fix such that the \code{algo.quality} function now
+    also works for \code{sts} objects and if the \code{state} or
+    \code{alarm} slots consists of TRUE/FALSE instead of 0/1.
     \item \code{intensity.twinstim()} did not work for non-endemic models.
   }
 }
