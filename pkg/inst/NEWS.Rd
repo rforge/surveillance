@@ -13,6 +13,10 @@
     \item \code{update.epidata()} can now handle a distance matrix
     \code{D} in the form of a classed \code{"Matrix"}
     (suggested by George Wood).
+    \item \code{glrnb()} can now handle \code{ret="cases"} for the
+    generalized likelihood ratio detector based on the negative binomial
+    distribution. It's based on a brute-force search and hence might be
+    slow in some situations.
   }
 }
 

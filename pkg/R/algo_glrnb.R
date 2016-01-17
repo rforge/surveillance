@@ -1,22 +1,19 @@
-###################################################
-### chunk number 1:
-###################################################
-
 ######################################################################
 #
-# Implementation of GLR -- documentation converted to Rd format.
+# Implementation of GLR and ordinary Poisson/NegBin CUSUM
+# -- documentation converted to Rd format.
 #
 # Author: Michael Hoehle (with contributions by Valentin Wimmer)
 # Date:   8 Jan 2008
-#
+# History
+#  - 2016-01-17 added ret="cases" for glr using the NegBin distribution
 ######################################################################
 
 algo.glrnb <- function(disProgObj,
                        control = list(range=range,c.ARL=5,
                          mu0=NULL, alpha=0, Mtilde=1, M=-1, change="intercept",
                          theta=NULL,dir=c("inc","dec"),
-                         ret=c("cases","value"))) {
-
+                         ret=c("cases","value"),xMax=1e4)) {
 
   #Small helper function
   either <- function(cond, whenTrue, whenFalse) { if (cond) return(whenTrue) else return(whenFalse) }
@@ -33,7 +30,9 @@ algo.glrnb <- function(disProgObj,
   if(is.null(control[["dir",exact=TRUE]]))
     control$dir <- "inc"
   if(is.null(control[["ret",exact=TRUE]]))
-  	control$ret <- "value"
+    control$ret <- "value"
+  if(is.null(control[["xMax",exact=TRUE]]))
+    control$xMax <- 1e4
   if(!is.null(control[["theta",exact=TRUE]])) {
     if(control[["theta",exact=TRUE]] == 1) {
       stop("Error: theta has to be larger than 1!")
@@ -59,8 +58,6 @@ algo.glrnb <- function(disProgObj,
   ret <- pmatch(control$ret,c("value","cases"))
   mod <- list()
 
-
-
   # Estimate m (the expected number of cases), i.e. parameter lambda of a
   # poisson distribution based on time points 1:t-1
   if (is.null(control[["mu0",exact=TRUE]]) | is.list(control[["mu0",exact=TRUE]])) {
@@ -81,11 +78,6 @@ algo.glrnb <- function(disProgObj,
     # variance is 'mu + mu^2/size' (?dnbinom).
     # Hence the correct alpha is 1/theta. But now it's the same every time.
     if(is.null(control[["alpha",exact=TRUE]])) control$alpha <- 1/mod[[1]]$theta
-  }
-
-   #Postprocess
-  if ((control$alpha>0) & (control$ret == "cases") & (is.null(control[["theta",exact=TRUE]]))) {
-    stop("Return of cases is currently not implemented for the GLR detector based on the negative binomial distribution!")
   }
 
   #The counts
@@ -109,29 +101,54 @@ algo.glrnb <- function(disProgObj,
     # cat("Doneidx === ",doneidx,"\n")
     # Call the C-interface -- this should depend on the type
     if (control$change == "intercept") {
+
+      #Generalized likehood ratio vs. ordinary CUSUM
       if (is.null(control[["theta",exact=TRUE]])) {
+
         if (control$alpha == 0) { #poisson
-
           if (control$M > 0 ){ # window limited
-
           	res <- .C("glr_cusum_window",as.integer(x),as.double(mu0),length(x),as.integer(control$M),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(dir),as.integer(ret),PACKAGE="surveillance")
-        }
-        	else { # standard
-
+          } else { # standard, not window limited
         	res <- .C("glr_cusum",as.integer(x),as.double(mu0),length(x),as.integer(control$Mtilde),as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(dir),as.integer(ret),PACKAGE="surveillance")
-
-        	}
-        } else { #negbin
+          }
+        } else { #negbin. This is direcly the window limited version, does M=-1 work here?
           res <- .C("glr_nb_window",x=as.integer(x),mu0=as.double(mu0),alpha=as.double(control$alpha),lx=length(x),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),dir=as.integer(dir),PACKAGE="surveillance")
+          ##hoehle - 2016-01-17. Try out calculating upper bound in terms of cases
+          if (control$ret == "cases") {
+            ##Warn that this might be slow.
+            message("Return of cases is for the GLR detector based on the negative binomial distribution is currently\n only implemented brute force and hence might be very slow!")
+
+###            browser()
+            myx <- x
+            res$cases <- rep(0,length(res$val))
+
+            for (pos in seq_len(min(length(x),res$N))) {
+              myx <- x
+              gotAlarm <- (res$N <= pos) #already got an alarm at the position?
+              direction <- ifelse(gotAlarm, -1, 1) #go up or down?
+              alarmChange <- FALSE #have we suceeded in changing x such that the alarm status changed?
+
+              #Loop over values until one is such that an alarm at (or before!) the time point is given
+              while (!alarmChange & (myx[pos] <= control$xMax) & (myx[pos] >=1)) {
+                myx[pos] <- myx[pos] + direction
+                ##cat("pos=",pos,"x=",myx[pos],"\n")
+                tmpRes <- .C("glr_nb_window",x=as.integer(myx),mu0=as.double(mu0),alpha=as.double(control$alpha),lx=length(myx),Mtilde=as.integer(control$Mtilde),M=as.integer(control$M),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(myx))),dir=as.integer(dir),PACKAGE="surveillance")
+                if (!gotAlarm & (tmpRes$N <= pos)) { alarmChange <- TRUE ; res$cases[pos] <- myx[pos]}
+                if (gotAlarm  & (tmpRes$N > pos))  { alarmChange <- TRUE ; res$cases[pos] <- myx[pos] + 1}
+              }
+              if (!alarmChange) { res$cases[pos] <- ifelse(gotAlarm,NA,1e99) } #didn't find alarm before control$xMax
+            }
+          }
+          ##end new 2016 addition to calculate 'cases' for negbin glrnb
+
         }
-      } else { ###################### !is.null(control$theta)
+      } else { ###################### !is.null(control$theta), i.e. ordinary CUSUM
         if (control$alpha == 0) { #poisson
 
           res <- .C("lr_cusum",x=as.integer(x),mu0=as.double(mu0),lx=length(x),as.double(control$theta),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(ret),PACKAGE="surveillance")
 
         } else { #negbin
           res <- .C("lr_cusum_nb",x=as.integer(x),mu0=as.double(mu0),alpha=as.double(control$alpha),lx=length(x),as.double(control$theta),c.ARL=as.double(control$c.ARL),N=as.integer(0),val=as.double(numeric(length(x))),cases=as.double(numeric(length(x))),as.integer(ret),PACKAGE="surveillance")
-
         }
       }
     } else { ################### Epidemic chart #######################

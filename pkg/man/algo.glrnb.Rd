@@ -9,7 +9,7 @@
 \usage{
 algo.glrnb(disProgObj,control = list(range=range,c.ARL=5,
          mu0=NULL, alpha=0, Mtilde=1, M=-1, change="intercept",
-         theta=NULL,dir=c("inc","dec"),ret=c("cases","value")))
+         theta=NULL,dir=c("inc","dec"),ret=c("cases","value"),xMax=1e4))
 }
 \arguments{
 \item{disProgObj}{object of class \code{disProg} to do surveillance
@@ -80,6 +80,10 @@ algo.glrnb(disProgObj,control = list(range=range,c.ARL=5,
         \code{"cases"} the number of cases that would have been
         necessary to produce an alarm or with \code{"value"} the
         glr-statistic is computed (see below).}
+      \item{\code{xMax}}{Maximum value to try for x to see if this is
+        the upperbound number of cases before sounding an alarm
+        (Default: 1e4). This only applies for the GLR using the NegBin
+        when \code{ret="cases"} -- see details.}
     }
   }
 }
@@ -122,13 +126,22 @@ only be obtained my Monte Carlo simulation there is no good way to
 update \code{c.ARL} automatically at the moment. Also, FIR GLR-detectors
 might be worth considering.
 
+In case \code{is.null(theta)} and \code{alpha>0} as well as
+\code{ret="cases"} then a brute-force search is conducted for each time
+point in range in order to determine the number of cases neccessary
+before an alarm is sounded. In case no alarm was sounded so far by time
+\eqn{t}, the function increases \eqn{x[t]} until an alarm is sounded any
+time before time point \eqn{t}. If no alarm is sounded by \code{xMax}, a return value
+of 1e99 is given. Similarly, if an alarm was sounded by time \eqn{t} the
+function counts down instead. Note: This is slow experimental code!
+
 At the moment, window limited ``\code{intercept}'' charts have not been
 extensively tested and are at the moment not supported. As speed is
 not an issue here this doesn't bother too much. Therefore, a value of
 \code{M=-1} is always used in the intercept charts.
 
 }
-\author{M. Hoehle}
+\author{M. \enc{Höhle}{Hoehle}}
 \examples{
 ##Simulate data and apply the algorithm
 S <- 1 ; t <- 1:120 ; m <- length(t)
