@@ -246,7 +246,7 @@ estimateGLRNbHook <- function() {
   #Build the model equation
   formula <- "y ~ 1 "
   if (control$mu0Model$trend) { formula <- paste(formula," + t",sep="") }
-  for (s in 1:control$mu0Model$S) {
+  for (s in seq_len(control$mu0Model$S)) {
     formula <- paste(formula,"+cos(2*",s,"*pi/p*t)+ sin(2*",s,"*pi/p*t)",sep="")
   }
 
