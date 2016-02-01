@@ -6,13 +6,14 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10.1 (2015-11-24)}{
+\section{Changes in surveillance version 1.10.1 (2016-02-01)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
     \item \code{update.epidata()} can now handle a distance matrix
     \code{D} in the form of a classed \code{"Matrix"}
     (suggested by George Wood).
+    
     \item \code{glrnb()} can now handle \code{ret="cases"} for the
     generalized likelihood ratio detector based on the negative binomial
     distribution. It's based on a brute-force search and hence might be
@@ -24,17 +25,26 @@
   \itemize{
     \item Fixed bug in \code{categoricalCUSUM()}, which ignored alarms
     generated for the last time point in \code{range}. Furthermore, the
-    exact computation in case of returns of the type \code{"vaule"} for
+    exact computation in case of returns of the type \code{"value"} for
     the binomial are now checked through an attribute.
+    
     \item Fixed bug in the \code{estimateGLRNbHook} function of
     \code{algo.glrnb}, which ignored potential fixed \code{alpha}
     values. If \code{alpha} is fixed this is now taken into consideration
     while fitting the negative binomial function. See revised help files
     for the details.
+    
     \item Made a hot-fix such that the \code{algo.quality} function now
     also works for \code{sts} objects and if the \code{state} or
     \code{alarm} slots consists of TRUE/FALSE instead of 0/1.
+    
     \item \code{intensity.twinstim()} did not work for non-endemic models.
+
+    \item A parallelized \code{epitest()} could fail with a strange
+    error message if some replications were left unassigned.
+    This seems to happen if forking is used (\code{mclapply}) with
+    insufficient memory. Incomplete replications are now ignored with a
+    warning.
   }
 }
 
