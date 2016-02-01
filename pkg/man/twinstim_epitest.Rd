@@ -190,10 +190,10 @@ imdfitB50 <- update(imdepifit, data = imdepiB50,
 ## simple likelihood ratio test
 epitest(imdfitB50, imdepiB50, method = "LRT")
 
-## permutation test (only few permutations for speed, in parallel)
-et <- epitest(imdfitB50, imdepiB50, B = 4 + 25*surveillance.options("allExamples"),
+## permutation test (only a few permutations for speed)
+et <- epitest(imdfitB50, imdepiB50, B = 3 + 26*surveillance.options("allExamples"),
               verbose = 2 * (.Platform$OS.type == "unix"),
-              .seed = 1, .parallel = 2)
+              .seed = 1, .parallel = 1 + surveillance.options("allExamples"))
 et
 plot(et)
 summary(coef(et))
