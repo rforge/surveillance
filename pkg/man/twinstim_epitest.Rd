@@ -159,11 +159,11 @@ epitest(model, data, tiles, method = "time", B = 199,
 }
 
 \references{
-  Meyer, S.; Warnke, I.; R\enc{ö}{oe}ssler, W.; Held, L. (2015):
+  Meyer, S., Warnke, I., R\enc{ö}{oe}ssler, W. and Held, L. (2015):
   Model-based testing for space-time interaction using point processes:
   An application to psychiatric hospital admissions in an urban area.
-  \emph{Spatial and Spatio-temporal Epidemiology}. In revision.
-  Preprint available at \url{http://arxiv.org/abs/1512.09052}.
+  \emph{Spatial and Spatio-temporal Epidemiology}. In revision.\cr
+  Preprint available at \url{http://arxiv.org/abs/1512.09052}
 }
 
 \author{
