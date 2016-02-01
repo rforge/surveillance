@@ -1,4 +1,4 @@
-#! /usr/local/bin/Rscript
+#! /usr/bin/env Rscript
 ### Rscript file for packing internal datasets
 
 
