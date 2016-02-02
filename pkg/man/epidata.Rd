@@ -17,7 +17,8 @@ Continuous-Time SIR Event History of a Fixed Population
   specific data frames containing the event history of an epidemic together
   with some additional attributes.  These objects are the basis for fitting
   spatio-temporal epidemic intensity models with the function
-  \code{\link{twinSIR}}.  Note that the spatial information itself, i.e.
+  \code{\link{twinSIR}}.  Their implementation is illustrated in Meyer
+  et al. (2016, Section 4).  Note that the spatial information itself, i.e.
   the positions of the individuals, is assumed to be constant over time.  
   Besides epidemics following the SIR compartmental model, also data from SI,
   SIRS and SIS epidemics may be supplied.  Inference for the infectious process
@@ -287,8 +288,15 @@ models to epidemic data.
 Function \code{\link{simEpidata}} for the simulation of epidemic data.
 }
 
+\references{
+  Meyer, S., Held, L. and H\enc{ö}{oe}hle, M. (2016):
+  Spatio-temporal analysis of epidemic phenomena using the \R package
+  \pkg{surveillance}. \emph{Journal of Statistical Software}. In press.\cr
+  Preprint available at \url{http://arxiv.org/abs/1411.0416}
+}
+
 \examples{
-# see example(hagelloch)
+# see help("hagelloch") for an example with a real data set
 
 # here is an artificial event history
 data("foodata")
