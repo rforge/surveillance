@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.10.1 (2016-02-01)}{
+\section{Changes in surveillance version 1.10.1 (2016-02-02)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -18,6 +18,14 @@
     generalized likelihood ratio detector based on the negative binomial
     distribution. It's based on a brute-force search and hence might be
     slow in some situations.
+
+    \item \code{boda()} and \code{bodaDelay()} now support an
+    alternative method (\code{quantileMethod="MM"}) to compute quantiles
+    based on the posterior distribution. The new method samples
+    parameters from the posterior distribution and then computes the
+    quantile of the mixture distribution using bisectionning, which is
+    faster and yields similar results compared to the original method
+    (\code{quantileMethod="MC"}, still the default).
   }
 }
 
