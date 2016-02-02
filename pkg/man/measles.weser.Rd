@@ -107,10 +107,12 @@ data("measlesWeserEms")
 }
 
 \examples{
+## old "disProg" object
 data("measles.weser")
 measles.weser
 plot(measles.weser, as.one=FALSE)
 
+## new "sts" object (with corrections)
 data("measlesWeserEms")
 measlesWeserEms
 plot(measlesWeserEms)
