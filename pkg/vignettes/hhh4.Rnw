@@ -1,7 +1,5 @@
-%\VignetteIndexEntry{Additional documentation of the function hhh4}
+%\VignetteIndexEntry{hhh4: Endemic-epidemic modelling of infectious disease counts}
 %\VignetteDepends{surveillance, maptools, Matrix}
-%\VignetteKeyword{getting started}
-%\VignettePackage{surveillance}
 
 \documentclass[a4paper,11pt]{article}
 \usepackage{natbib}
@@ -9,7 +7,6 @@
 
 % Preamble parts
 \usepackage[T1]{fontenc}        % Make it possible to use danish characters !!
-\usepackage[utf8]{inputenc}
 \usepackage{hyperref}
 \newcommand{\email}[1]{\href{mailto:#1}{\normalfont\texttt{#1}}}
 \usepackage{times}  
@@ -42,19 +39,19 @@
 \newcommand{\sts}{\texttt{sts}}
 \newcommand{\example}[1]{\textit{Example: #1}}
 
-\title{The function \code{hhh4} in the \R-package \surveillance}  %'
+\title{The function \code{hhh4} in the \R\ package \surveillance}
 \author{
 Michaela Paul and Sebastian Meyer\thanks{Author of correspondence: \email{Sebastian.Meyer@ifspm.uzh.ch}}\\
-Division of Biostatistics\\
-Institute of Social and Preventive Medicine\\
-University of Zurich, Switzerland
-} 
+Epidemiology, Biostatistics and Prevention Institute\\
+University of Zurich, Zurich, Switzerland
+}
+\date{28 November 2013}
 
 \begin{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Sweave 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\SweaveOpts{prefix.string=figs/hhh4, width=10,height=4.5, keep.source=T, strip.white=true}
+\SweaveOpts{prefix.string=plots/hhh4, width=10,height=4.5, keep.source=T, strip.white=true}
 \setkeys{Gin}{width=1\textwidth} 
 
 \definecolor{Sinput}{rgb}{0,0,0.56}
@@ -78,9 +75,9 @@ options(width=70)
 set.seed(247)
 
 #####################################################################
-# create directory figs if it does not exist
+# create directory for plots if it does not exist
 #####################################################################
-if(!file.exists("figs/")) dir.create("figs/")
+if(!dir.exists("plots")) dir.create("plots")
 
 
 ######################################################################
@@ -98,15 +95,19 @@ print(paste("Doing computations: ",compute,sep=""))
 \begin{abstract}
   \noindent This document gives an introduction to the use of the function 
   \hhh\ for modelling univariate and multivariate time series of infectious 
-  disease counts. The function is part of the \R-package \surveillance, 
+  disease counts. For the special case of \emph{spatio-temporal} \hhh\ models,
+  i.e., areal time series of counts, see the extra
+  \code{vignette("hhh4\_spacetime")} \citep[based on][Section~5]{meyer.etal2014}.
+  The function \hhh\ is part of the \R\ package \surveillance, 
   which provides tools for the visualization, modelling and monitoring of 
-  surveillance time series. 
-  The basic functionality of \surveillance\ is introduced in 
-  the package vignette \citep{vignette} and in \cite{hoehle-2007} with main 
-  focus on outbreak detection methods. The following illustrates the use 
+  epidemic phenomena.
+  An overview of the outbreak detection functionality of \surveillance\ is
+  given by \citep{salmon.etal2014}, and -- slightly outdated -- in
+  \code{vignette("surveillance")} and in the original paper of \citet{hoehle-2007}.
+  The following illustrates the use 
   of \hhh\ as estimation and prediction routine for the modelling framework 
   proposed by \citet{held-etal-2005}, and extended in \citet{paul-etal-2008}, 
-  \citet{paul-held-2011} and \citet{herzog-etal-2010}.
+  and \citet{paul-held-2011}.
 \end{abstract}
 
 
@@ -159,8 +160,8 @@ of the time series as \code{c(year, epoch)}.
 For spatially stratified time series, the slot \code{neighbourhood}
 denotes an $I \times I$ adjacency matrix with elements 1 if two regions are
 neighbors and 0 otherwise. For map visualizations, the slot \code{map} 
-links the multivariate time series to geographical regions of an ESRI shapefile
-(using functionality from the package \pkg{maptools}~\citep{maptools}).
+links the multivariate time series to geographical regions stored in a
+\code{"SpatialPolygons"} object (package \pkg{sp}).
 Additionally, the slot \code{populationFrac} contains a $T\times I$ matrix
 representing population fractions in unit $i$ at time $t$.
 
@@ -234,7 +235,7 @@ print(image(Matrix(nhood)))
 
 \begin{center}
 \vspace*{-2em}
-\includegraphics[width=0.5\textwidth]{figs/hhh4-nhoodByBw}
+\includegraphics[width=0.5\textwidth]{plots/hhh4-nhoodByBw}
 \end{center}
 
 <<fluAsSTS, keep.source=T>>=

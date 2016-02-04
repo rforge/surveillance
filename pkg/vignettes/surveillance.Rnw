@@ -1,7 +1,4 @@
-%\VignetteIndexEntry{Getting started with the package}
-%\VignetteKeywords{getting started}
-%\VignettePackage{surveillance}
-%\VignetteDepends{surveillance}
+%\VignetteIndexEntry{Getting started with outbreak detection}
 
 \documentclass[a4paper,11pt]{article}
 \usepackage{natbib}
@@ -31,19 +28,20 @@
 \newcommand{\surveillance}{\texttt{surveillance}}
 \usepackage{pdfpages}
 
-\title{The R-Package 'surveillance'}
+\title{Outbreak detection with the \textsf{R} package \surveillance}
 \author{
 Michael H{\"o}hle\thanks{Author of correspondance: Department of Statistics, University of Munich, Ludwigstr.\ 33, 80539 M{\"u}nchen, Germany, Email: \texttt{hoehle@stat.uni-muenchen.de}}$\>\>$, Andrea Riebler and Michaela Paul\\
 Department of Statistics\\
 University of Munich\\
-Germany } \date{\today}
+Germany }
+\date{17 November 2007}
 
 \begin{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Sweave 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Put all in another directory
-\SweaveOpts{prefix.string=figs/vignette}
+\SweaveOpts{prefix.string=plots/surveillance}
  \setkeys{Gin}{width=1\textwidth} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -58,9 +56,9 @@ options(width=70)
 set.seed(1234)
 
 #####################################################################
-# create directory figs if it does not exist
+# create directory for plots if it does not exist
 #####################################################################
-if(!file.exists("figs/")) dir.create("figs/")
+if(!dir.exists("plots")) dir.create("plots")
 
 ######################################################################
 #Do we need to compute or can we just fetch results
@@ -70,16 +68,28 @@ compute <- !file.exists(CACHEFILE)
 #load computed results
 if(!compute) load(CACHEFILE)
 print(paste("Doing computations:", compute))
-
 @ 
 
+\fbox{\vbox{\footnotesize
+\noindent\textbf{Disclaimer}: This vignette reflects package state at version
+1.2 and is hence somewhat outdated. New functionality has been added
+to the package: this includes various modelling frameworks
+for surveillance data (\texttt{hhh4}, \texttt{twinSIR}, and
+\texttt{twinstim}), as well as more outbreak detection methods
+(\texttt{glrnb}, \texttt{boda}, and \texttt{farringtonFlexible}).
+These new features are described in \citet{meyer.etal2014} and
+\citet{salmon.etal2014}, respectively, and
+corresponding vignettes are included in the package;
+see \texttt{vignette(package = "surveillance")} for an overview.
+Note in particular that use of the new \texttt{S4} class \texttt{sts}
+instead of \texttt{disProg} is encouraged to encapsulate the data.
+}}
 
-\maketitle  
-%\mbox{}\hrulefill\\
+{\let\newpage\relax\maketitle}
 
 \begin{abstract}
-  \noindent This document gives an introduction to the R-Package
-  'surveillance' containing tools for outbreak detection in routinely
+  \noindent This document gives an introduction to the \textsf{R} package
+  \surveillance\ containing tools for outbreak detection in routinely
   collected surveillance data. The package contains an implementation
   of the procedures described by~\citet{stroup89},
   \citet{farrington96} and the system used at the Robert Koch
@@ -94,15 +104,7 @@ print(paste("Doing computations:", compute))
   outbreak, time series of counts.
 \end{abstract}
 
-
-{\large Disclaimer}: This vignette reflects package state at version
-1.2 and is hence somewhat outdated. New functionality has been added
-to the package: this includes the \texttt{hhh4}, \texttt{twinSIR} and
-\texttt{twinstim} modelling and the \texttt{glrnb} outbreak detection. A
-description of the \texttt{hhh4} modelling can be found in its own
-vignette \verb+vignette("hhh4")+, \texttt{glrnb} is described in
-\verb+vignette("glrnb")+. Furthermore, use of the new S4 class \texttt{sts}
-instead of \texttt{disProg} is encouraged to encapsulate the data.
+\newpage
 
 \section{Introduction}\label{sec:intro}
 Public health authorities have in an attempt to meet the threats of
@@ -360,7 +362,6 @@ as reference values, i.e.\ $R(w,w_0,b)=(6,6,0)$, and is applied to the
 <<fig=T,width=13,height=6>>=
 k1.b660 <- algo.bayes(k1, control = list(range = 27:192,b=0,w=6,alpha=0.01))
 plot(k1.b660, disease="k1", firstweek = 1, startyear = 2001)
-
 @ 
 
 Several extensions of this simple Bayesian approach are imaginable,
@@ -417,7 +418,6 @@ To compute various performance scores the function
 
 <<>>=
 print(algo.quality(k1.b660))
-
 @ 
 This computes the number of false positives, true negatives, false
 negatives, the sensitivity and the specificity. Furthermore, \texttt{dist}
@@ -555,7 +555,7 @@ comparisons do not make allowance for any more supported statements.
 Consult the work of~\citet{riebler2004} for a more thorough
 comparision using simulation studies.
 
-\section{Multivariate surveillance}
+\section{Multivariate Surveillance}
 
 As of version 0.9-2 \surveillance\ supports the visualization of
 multivariate time series of counts. An (multivariate) object of class
@@ -564,7 +564,7 @@ and the respective state chains, where each column represents an
 individual time series.  Additional elements of the
 \texttt{disProg}-object are a neighbourhood matrix and a matrix with
 population counts. However, only modelling of the time series as
-by~\citet{held2005} is currently available. In the near future the
+by~\citet{held-etal-2005} is currently available. In the near future the
 surveillance algorithms will also be extended to handle these
 multivariate data.
 
@@ -608,7 +608,7 @@ plot(measles.weser,as.one=FALSE,xaxis.years=FALSE)
 @
 \vspace{1em}
 
-The data are analysed using the model proposed by \citet{held2005}.
+The data are analysed using the model proposed by \citet{held-etal-2005}.
 A call to the function \texttt{algo.hhh} fits a Poisson or negative binomial
 model with mean
 \[
@@ -697,7 +697,7 @@ if (compute) { # save computed results
 @
 
 
-\section{Discussion and Future work}
+\section{Discussion and Future Work}
 Many extensions and additions are imaginable to improve the package.
 For now, the package is intended as an academic tool providing a
 test-bench for integrating new surveillance algorithms. Because all
