@@ -55,7 +55,7 @@ Valentin Wimmer$^{(1,2)}$\thanks{Author of correspondence: Email: \texttt{Valent
 <<echo=F,results=hide>>=
 library(surveillance)
 library(xtable)
-options(SweaveHooks=list(fig=function() par(mar=c(5,4,4,0),cex.axis=1.5,cex.lab=1.5,cex.main=1.5)))
+options(SweaveHooks=list(fig=function() par(mar=c(4,4,2,0)+.5)))
 options(width=70)
 set.seed(247)
 
@@ -100,7 +100,7 @@ The state is 1, if e.g. the Robert Koch Institut declares the week to be part of
 As an first example the number of cases of salmonella hadar in the years 2001-2006 is examined.  \\
 
 \textit{Example 1:}
-<<fig=T,width=13,height=6>>=
+<<fig=T,width=10,height=5>>=
 data(shadar)
 plot(shadar,main="Number of salmonella hadar cases in Germany 2001-2006")
 @ 
@@ -114,7 +114,7 @@ The package provides the possibility to simulate surveillance data with the func
 simData <- sim.pointSource(length=300,K=0.5,r=0.6,p=0.95)
 @
 
-<<fig=T,width=13,height=6>>=
+<<fig=T,width=10,height=5>>=
 plot(simData)
 @
 
@@ -148,7 +148,7 @@ With the function \verb+algo.glrnb+ one can compute the the GLR-statistic for ev
 
 At this point in the vignette we move more into the applied direction and refer the user to \citet{hoehle.paul2008} for further theoretical details about the GLR procedure. The next example demonstrates the surveillance with the \verb+algo.glrnb+ in a learning by doing type of way. The example should demonstrate primarily the result of the surveillance. More details to the control-options follow in the next section. All control values are set here on default and the first two years are used to find a model for the in-control mean and so surveillance is starting in week 105. A plot of the results can be obtained as follows
 
-<<fig=T,width=13,height=6>>=
+<<fig=T,width=10,height=5>>=
 survObj <- algo.glrnb(shadar,control=list(range=105:295,alpha=0))
 plot(survObj,startyear=2003)
 @
@@ -225,7 +225,7 @@ surv <- algo.glrnb(disProgObj=shadar,control=control)
 
 The predicted values for the in-control mean in the range are shown as a dashed line in the following plot.
 
-<<fig=T,width=13,height=6>>=
+<<fig=T,width=10,height=5>>=
 plot(shadar)
 with(surv$control,lines(mu0~range,lty=2,lwd=4,col=4))
 @
@@ -347,7 +347,7 @@ control=list(range=105:295,ret="cases",alpha=0)
 surv2 <- algo.glrnb(disProgObj=shadar,control=control)
 @
 
-<<fig=T,echo=F,width=13,height=6>>=
+<<fig=T,echo=F,width=10,height=5>>=
 plot(surv2,startyear=2003)
 @
 
@@ -363,7 +363,7 @@ control=list(range=105:295,ret="cases",dir="dec",alpha=0)
 surv3 <- algo.glrnb(disProgObj=shadar,control=control)
 @
 
-<<fig=T,echo=F,width=13,height=6>>=
+<<fig=T,echo=F,width=10,height=5>>=
 plot(surv3,startyear=2003)
 @
 
