@@ -29,6 +29,13 @@
   }
 }
 
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item Revised \code{vignette("hhh4")} and updated references in the
+    package documentation.
+  }
+}
+
 \subsection{BUG FIXES}{
   \itemize{
     \item Fixed bug in \code{categoricalCUSUM()}, which ignored alarms
