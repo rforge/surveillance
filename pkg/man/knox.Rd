@@ -122,7 +122,7 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
   The detection of disease clustering and a generalized regression approach.
   \emph{Cancer Research}, \bold{27}, 209-220.
 
-  Meyer, S., Warnke, I., R\enc{Ã¶}{oe}ssler, W. and Held, L. (2015):
+  Meyer, S., Warnke, I., R\enc{ö}{oe}ssler, W. and Held, L. (2015):
   Model-based testing for space-time interaction using point processes:
   An application to psychiatric hospital admissions in an urban area.
   \emph{Spatial and Spatio-temporal Epidemiology}. In revision.\cr

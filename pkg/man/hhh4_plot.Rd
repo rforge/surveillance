@@ -259,7 +259,7 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
   \emph{Biometrical Journal}, \bold{54}, 824-843.\cr
   DOI-Link: \url{http://dx.doi.org/10.1002/bimj.201200037}
 
-  Meyer, S., Held, L. and H\enc{Ã¶}{oe}hle, M. (2016):
+  Meyer, S., Held, L. and H\enc{ö}{oe}hle, M. (2016):
   Spatio-temporal analysis of epidemic phenomena using the \R package
   \pkg{surveillance}. \emph{Journal of Statistical Software}. In press.\cr
   Preprint available at \url{http://arxiv.org/abs/1411.0416}
