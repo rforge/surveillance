@@ -163,10 +163,9 @@ bodaDelay <- function(sts, control = list(range = NULL, b = 3, w = 3,
   if (control$inferenceMethod=="INLA"){
     if (!requireNamespace("INLA", quietly = TRUE)) {
       stop("The bodaDelay function requires the INLA package to be installed.\n",
-           "  The package is not available on CRAN, but can be downloaded by calling\n",
-           "\tsource(\"http://www.math.ntnu.no/inla/givemeINLA.R\")\n",
-           "  as described at http://www.r-inla.org/download in detail.\n",
-           "Or set inferenceMethod to asym.")
+           "  The package is not available on CRAN, but can be easily obtained\n",
+           "  from <http://www.r-inla.org/download>.\n",
+           "  Alternatively, set inferenceMethod to \"asym\".")
     }
   }
   

@@ -2,10 +2,9 @@
 # An implementation of the Bayesian Outbreak Detection Algorithm (BODA)
 # described in Manitz and H{\"o}hle (2013), Biometrical Journal.
 #
-# Note: The algorithm requires the non CRAN package INLA to run.
-# You can install this package by writing
-# R> source("http://www.math.ntnu.no/inla/givemeINLA.R")
-# See http://www.r-inla.org/download for details.
+# Note: The algorithm requires the non-CRAN package INLA to run.
+# You can easily install this package as described at
+# http://www.r-inla.org/download
 #
 #
 # Author:
@@ -36,9 +35,8 @@ boda <- function(sts, control=list(range=NULL, X=NULL, trend=FALSE, season=FALSE
   #Check if the INLA package is available.
   if (!requireNamespace("INLA", quietly = TRUE)) {
       stop("The boda function requires the INLA package to be installed.\n",
-           "  The package is not available on CRAN, but can be downloaded by calling\n",
-           "\tsource(\"http://www.math.ntnu.no/inla/givemeINLA.R\")\n",
-           "  as described at http://www.r-inla.org/download in detail.")
+           "  The package is not available on CRAN, but can be easily obtained\n",
+           "  from <http://www.r-inla.org/download>.")
   }
 
   #Possibly speed up the computations by using multiple cores.
