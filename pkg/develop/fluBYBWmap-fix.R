@@ -26,7 +26,11 @@ fixmap <- function () {
     fluBYBW@map@polygons[[match("9778", row.names(fluBYBW@map))]]@Polygons <-
         c(fluBYBW@map@polygons[[match("9778", row.names(fluBYBW@map))]]@Polygons,
           missingpoly)
-    
+
+    ## also need to update "plotOrder" (same length as "Polygons")
+    fluBYBW@map@polygons[[match("9778", row.names(fluBYBW@map))]]@plotOrder <-
+        1:2
+
     plot(fluBYBW@map["9778",], add=TRUE, border=4)
     fluBYBW@map
 }
