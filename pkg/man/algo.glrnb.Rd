@@ -4,7 +4,9 @@
 
 \title{Count Data Regression Charts}
 \description{
- Count data regression charts for the monitoring of surveillance time series.
+ Count data regression charts for the monitoring of surveillance time
+ series as proposed by \enc{Höhle}{Hoehle} and Paul (2008).
+ The implementation is described in Salmon et al. (2016).
 }
 \usage{
 algo.glrnb(disProgObj,control = list(range=range,c.ARL=5,
@@ -102,7 +104,7 @@ algo.glrnb(disProgObj,control = list(range=range,c.ARL=5,
 \details{
 %
   This function implements the seasonal cound data chart based on
-  generalized likelihood ratio (GLR) as described in the Hoehle and Paul
+  generalized likelihood ratio (GLR) as described in the \enc{Höhle}{Hoehle} and Paul
   (2008) paper. A moving-window generalized likelihood ratio
   detector is used, i.e. the detector has the form
 %
@@ -181,7 +183,12 @@ plot(glr.ts2,xaxis.years=FALSE)
 
 \keyword{classif}
 \source{
-Count data regression charts for the monitoring of surveillance time
-series (2008), M. \enc{Höhle}{Hoehle} and M. Paul, Computational Statistics and
-Data Analysis, 52(9), pp. 4357--4368.
+  \enc{Höhle}{Hoehle}, M. and Paul, M. (2008):
+  Count data regression charts for the monitoring of surveillance time
+  series. Computational Statistics and Data Analysis, 52 (9), 4357-4368.
+
+  Salmon, M., Schumacher, D. and \enc{Höhle}{Hoehle}, M. (2016):
+  Monitoring count time series in \R: Aberration detection in public
+  health surveillance. \emph{Journal of Statistical Software}. In press.\cr
+  Preprint available at \url{http://arxiv.org/abs/1411.1292}
 }

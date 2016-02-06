@@ -10,6 +10,7 @@
   predict an upper bound on the number of counts according to the procedure by
   Farrington et al. (1996) and by Noufaily et al. (2012). This bound is then compared to the observed
   number of counts. If the observation is above the bound, then an alarm is raised.
+  The implementation is illustrated in Salmon et al. (2016).
 %
 }
 \usage{
@@ -177,12 +178,21 @@ legend(c(0,10),c('Alarm','Upperbound with old options','Upperbound with new opti
       pch=c(24,NA,NA),lty=c(NA,1,1),
         bg="white",lwd=c(2,2,2),col=c('red','tomato4',"blueviolet"))
 }
-\author{M. Salmon, M. \enc{H?hle}{Hoehle}}
+\author{M. Salmon, M. \enc{Höhle}{Hoehle}}
 \seealso{\code{\link{algo.farrington.fitGLM}},\code{\link{algo.farrington.threshold}}}
 \keyword{classif}
-\references{A statistical algorithm for the early detection of outbreaks of infectious disease, Farrington, C.P., Andrews, N.J, Beale A.D. and Catchpole, M.A. (1996), J. R. Statist. Soc. A, 159, 547-563.
+\references{
+  Farrington, C.P., Andrews, N.J, Beale A.D. and Catchpole, M.A. (1996):
+  A statistical algorithm for the early detection of outbreaks of
+  infectious disease. J. R. Statist. Soc. A, 159, 547-563.
 
+  Noufaily, A., Enki, D.G., Farrington, C.P., Garthwaite, P., Andrews,
+  N.J., Charlett, A. (2012): An improved algorithm for outbreak
+  detection in multiple surveillance systems. Statistics in Medicine,
+  32 (7), 1206-1222.
 
-An improved algorithm for outbreak detection in multiple surveillance systems, Noufaily, A., Enki, D.G., Farrington, C.P., Garthwaite, P., Andrews, N.J., Charlett, A. (2012), Statistics in Medicine, published online.}
-
-
+  Salmon, M., Schumacher, D. and \enc{Höhle}{Hoehle}, M. (2016):
+  Monitoring count time series in \R: Aberration detection in public
+  health surveillance. \emph{Journal of Statistical Software}. In press.\cr
+  Preprint available at \url{http://arxiv.org/abs/1411.1292}
+}

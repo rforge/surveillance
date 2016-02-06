@@ -40,7 +40,7 @@ i.e. the \eqn{(1-\alpha)\cdot 100\%} quantile serves as an upperbound.}
 equal to 1 no factor variable is created, the set of reference values is defined as in
 Farrington et al (1996).}
 
-\item{inferenceMethod}{Which inference method used, as defined in Salmon et al (2015). If one chooses \code{INLA} then inference is performed with INLA. If one chooses \code{asym} then the asymptotic normal approximation of the posteriori is used.}
+\item{inferenceMethod}{Which inference method used, as defined in Salmon et al. (2015). If one chooses \code{INLA} then inference is performed with INLA. If one chooses \code{asym} then the asymptotic normal approximation of the posteriori is used.}
 
 \item{pastWeeksNotIncluded}{Number of past weeks to ignore in the calculation.}
 
@@ -117,7 +117,16 @@ lapply(salm.Normal[c(43,44,45)],plot, legend=NULL, main="", ylim=c(0,35))}
 
 }
 \references{
-A statistical algorithm for the early detection of outbreaks of infectious disease, Farrington, C.P., Andrews, N.J, Beale A.D. and Catchpole, M.A. (1996), J. R. Statist. Soc. A, 159, 547-563.
-An improved algorithm for outbreak detection in multiple surveillance systems, Noufaily, A., Enki, D.G., Farrington, C.P., Garthwaite, P., Andrews, N.J., Charlett, A. (2012), Statistics in Medicine, published online.
-Bayesian outbreak detection in the presence of reporting delays, Salmon, M., Schumacher, D., Stark, K., \enc{Höhle}{Hoehle}, M. (2015), in revision.
+  Farrington, C.P., Andrews, N.J, Beale A.D. and Catchpole, M.A. (1996):
+  A statistical algorithm for the early detection of outbreaks of
+  infectious disease. J. R. Statist. Soc. A, 159, 547-563.
+
+  Noufaily, A., Enki, D.G., Farrington, C.P., Garthwaite, P.,
+  Andrews, N.J., Charlett, A. (2012): An improved algorithm for outbreak
+  detection in multiple surveillance systems. Statistics in Medicine,
+  32 (7), 1206-1222.
+
+  Salmon, M., Schumacher, D., Stark, K., \enc{Höhle}{Hoehle}, M. (2015):
+  Bayesian outbreak detection in the presence of reporting delays.
+  Biometrical Journal, 57 (6), 1051-1067.
 }

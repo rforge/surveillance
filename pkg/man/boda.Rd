@@ -13,6 +13,7 @@
   100\%}{(1-alpha)*100} quantile of this predictive distribution is then
   used as bound: If the actual observation is above the bound an alarm
   is raised. 
+  The implementation is illustrated in Salmon et al. (2016).
 %
 }
 \usage{
@@ -100,9 +101,13 @@ boda(sts, control=list(range=NULL, X=NULL, trend=FALSE, season=FALSE,
 \author{J. Manitz, M. \enc{Höhle}{Hoehle}, M. Salmon}
 
 \references{
-  Bayesian model algorithm for monitoring reported cases of
-  campylobacteriosis in Germany (2013), Manitz J and \enc{Höhle}{Hoehle} M,
-  Biometrical Journal, 55(4), pp. 509 526.
+  Manitz, J. and \enc{Höhle}{Hoehle}, M. (2013):
+  Bayesian outbreak detection algorithm for monitoring reported cases of
+  campylobacteriosis in Germany.
+  Biometrical Journal, 55(4), 509-526.
+
+  Salmon, M., Schumacher, D. and \enc{Höhle}{Hoehle}, M. (2016):
+  Monitoring count time series in \R: Aberration detection in public
+  health surveillance. \emph{Journal of Statistical Software}. In press.\cr
+  Preprint available at \url{http://arxiv.org/abs/1411.1292}
 }
-
-

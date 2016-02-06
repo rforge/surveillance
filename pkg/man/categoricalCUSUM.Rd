@@ -6,9 +6,11 @@
 \title{CUSUM detector for time-varying categorical time series}
 \description{
   Function to process \code{sts} object by binomial, beta-binomial
-  or multinomial CUSUM. Logistic, multinomial logistic, proportional
+  or multinomial CUSUM as described by \enc{Höhle}{Hoehle} (2010).
+  Logistic, multinomial logistic, proportional
   odds or Bradley-Terry regression models are used to specify in-control
   and out-of-control parameters.
+  The implementation is illustrated in Salmon et al. (2016).
 }
 \usage{
 categoricalCUSUM(stsObj,control = list(range=NULL,h=5,pi0=NULL,
@@ -64,9 +66,15 @@ categoricalCUSUM(stsObj,control = list(range=NULL,h=5,pi0=NULL,
   etc. slots trimmed to the \code{control$range} indices.
 }
 \references{
-  Höhle, M. (2010), Changepoint detection in categorical time series,
-  Book chapter to appear in T. Kneib and G. Tutz (Eds.), Statistical
-  Modelling and Regression Structures, Springer.
+  Höhle, M. (2010):
+  Online Change-Point Detection in Categorical Time Series.
+  Book chapter in T. Kneib and G. Tutz (Eds.), Statistical
+  Modelling and Regression Structures, Physica-Verlag.
+
+  Salmon, M., Schumacher, D. and \enc{Höhle}{Hoehle}, M. (2016):
+  Monitoring count time series in \R: Aberration detection in public
+  health surveillance. \emph{Journal of Statistical Software}. In press.\cr
+  Preprint available at \url{http://arxiv.org/abs/1411.1292}  
 }
 \examples{
 if (require("gamlss")) {
