@@ -121,7 +121,7 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 ##########
 
 # Feature requests
-- Permutation test to evaluate importance of epidemic component
+- iafplot(): add rug() of observed event distances
 - as.epidataCS: "events" could be provided as an object of class ppx (which
   would include the window "W") or of class STIDF, then transform appropriately
   (but don't change "epidataCS" class definition).
