@@ -654,11 +654,11 @@ grid <- create.grid(measles.weser, control = cntrl,
                 epidemic = c(0.1, 0.9, 5),
                 negbin = c(0.3, 12, 5)))
 measles.hhh.grid <- algo.hhh.grid(measles.weser,
-  control = cntrl, thetastartMatrix = grid, maxTime = 900)
+  control = cntrl, thetastartMatrix = grid, maxTime = 300)
 @
 <<echo=F,eval=T,results=hide>>=
 if (compute) {
-message("running a grid search for up to 900 seconds")
+message("running a grid search for up to 5 minutes")
 <<measles.hhh.grid>>
 }
 @ 
