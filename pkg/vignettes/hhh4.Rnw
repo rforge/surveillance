@@ -2,34 +2,25 @@
 %\VignetteDepends{surveillance, Matrix}
 
 \documentclass[a4paper,11pt]{article}
-\usepackage{natbib}
-\bibliographystyle{apalike}
 
-% Preamble parts
-\usepackage[T1]{fontenc}        % Make it possible to use danish characters !!
-\usepackage{hyperref}
-\newcommand{\email}[1]{\href{mailto:#1}{\normalfont\texttt{#1}}}
-\usepackage{times}  
-\renewcommand{\sfdefault}{ptm} 
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{natbib}
+\usepackage{lmodern}
 
 \usepackage{bm}
 \usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{latexsym}
-\usepackage{verbatim}
+\usepackage{amsfonts,amssymb}
+
 \usepackage{relsize}
-\usepackage{epsfig}
-\usepackage{comment}
-\usepackage[english]{babel}
-
-\usepackage{pdfpages}
-
 \setlength{\parindent}{0pt} 
 \setcounter{secnumdepth}{1}
 
 \newcommand{\Po}{\operatorname{Po}}
 \newcommand{\NegBin}{\operatorname{NegBin}}
-\newcommand{\n}{{\cal N}}
+\newcommand{\N}{\mathcal{N}}
 
 \newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
 \newcommand{\surveillance}{\pkg{surveillance}}
@@ -39,18 +30,26 @@
 \newcommand{\sts}{\texttt{sts}}
 \newcommand{\example}[1]{\subsubsection*{Example: #1}}
 
+%%% Meta data
+\usepackage{hyperref}
+\hypersetup{
+  pdfauthor = {Michaela Paul and Sebastian Meyer},
+  pdftitle = {The function 'hhh4' in the R package 'surveillance'}
+}
+\newcommand{\email}[1]{\href{mailto:#1}{\normalfont\texttt{#1}}}
+
 \title{The function \code{hhh4} in the \R\ package \surveillance}
 \author{
 Michaela Paul and Sebastian Meyer\thanks{Author of correspondence: \email{Sebastian.Meyer@ifspm.uzh.ch}}\\
 Epidemiology, Biostatistics and Prevention Institute\\
 University of Zurich, Zurich, Switzerland
 }
-\date{6 February 2016}
+\date{7 February 2016}
 
-\begin{document}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Sweave 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%% Sweave 
+\usepackage{Sweave}
 \SweaveOpts{prefix.string=plots/hhh4, keep.source=T, strip.white=true}
 
 \definecolor{Sinput}{rgb}{0,0,0.56}
@@ -61,30 +60,26 @@ University of Zurich, Zurich, Switzerland
 \DefineVerbatimEnvironment{Soutput}{Verbatim}{formatcom={\color{Soutput}},fontfamily=courier, fontshape=it,fontsize=\relsize{-2}}
 \DefineVerbatimEnvironment{Scode}{Verbatim}{formatcom={\color{Scode}},fontshape=sl,fontsize=\relsize{-1}}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Initial R code
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%%% Initial R code
 <<setup, echo=FALSE, results=hide>>=
 library("surveillance")  
 
 options(width=75)
 
-#####################################################################
-# create directory for plots if it does not exist
-#####################################################################
+## create directory for plots if it does not exist
 if(!dir.exists("plots")) dir.create("plots")
 
-######################################################################
-#Do we need to compute or can we just fetch results
-######################################################################
+######################################################
+## Do we need to compute or can we just fetch results?
+######################################################
 compute <- !file.exists("hhh4-cache.RData")
 message("Doing computations: ", compute)
-#load computed results
 if(!compute) load("hhh4-cache.RData")
 @ 
 
+
+
+\begin{document}
 
 \maketitle  
 
@@ -364,7 +359,8 @@ corresponds to an offset (such as population fractions at time $t$ in region $i$
 A simple choice for the weights is $w_{ji}=1$ if units $j$ and $i$ are adjacent
 and 0 otherwise. See \citet{paul-etal-2008} for a discussion of alternative
 weights, and \citet{meyer.held2013} for how to estimate these weights in the
-spatial context using a power-law formulation based on the order of adjacency.
+spatial setting using a parametric power-law formulation based on the order of
+adjacency.
 
 When analyzing a specific disease observed in, say, multiple regions or several
 pathogens (such as influenza and meningococcal disease), the assumption
@@ -376,7 +372,7 @@ $i$. This can be done via
   \item unit-specific fixed parameters, e.g.\ $\log(\lambda_i)=\alpha_i$ 
      \citep{paul-etal-2008};
   \item unit-specific random effects, e.g\ $\log(\lambda_i)=\alpha_0 +a_i$, 
-     $a_i \stackrel{\text{iid}}{\sim} \n(0,\sigma^2_\lambda)$ \citep{paul-held-2011};
+     $a_i \stackrel{\text{iid}}{\sim} \N(0,\sigma^2_\lambda)$ \citep{paul-held-2011};
   \item linking parameters with known (possibly time-varying) explanatory 
      variables, e.g.\ $\log(\lambda_i)=\alpha_0 +x_i\alpha_1$ with
      region-specific vaccination coverage $x_i$ \citep{herzog-etal-2010}.
@@ -611,7 +607,7 @@ region-specific covariates.
 \citet{paul-held-2011} propose a random effects formulation to analyze the weekly
 number of influenza cases in \Sexpr{ncol(fluBYBW)} districts of Southern Germany.
 For example, consider a model with random intercepts in the endemic component: 
-$c_i \stackrel{iid}{\sim} \n(0,\sigma^2_\nu), i=1,\ldots,I$.
+$c_i \stackrel{iid}{\sim} \N(0,\sigma^2_\nu), i=1,\ldots,I$.
 Such effects are specified as:
 <<ri, eval=F>>=
 f.end <- ~ -1 + ri(type = "iid", corr = "all")
@@ -778,6 +774,7 @@ heterogeneity in incidence levels and disease transmission.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{apalike}
 \renewcommand{\bibfont}{\small}
 \bibliography{references}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
