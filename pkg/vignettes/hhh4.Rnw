@@ -209,7 +209,7 @@ controlled by the \code{type} argument:
 \setkeys{Gin}{width=1\textwidth}
 <<plotfluMen, fig=TRUE, width=10, height=4.5>>=
 plot(fluMen, type = observed ~ time | unit, # type of plot (default)
-             same.scale = FALSE,            # unit-specific ylim ?
+             same.scale = FALSE,            # unit-specific ylim?
              col = "grey")                  # color of bars
 @ 
 See \code{help("stsplot")} for a detailed description of the plot routines.
@@ -228,17 +228,15 @@ An \sts\ object containing the data is created as follows:
 flu.counts <- as.matrix(read.table(system.file("extdata/counts_flu_BYBW.txt", 
                                                package = "surveillance"),
                                    check.names = FALSE))
-
-# read in adjacency matrix with elements 1 if two regions share a common border
-nhood <- as.matrix(read.table(system.file("extdata/neighbourhood_BYBW.txt",
-                                          package = "surveillance"),
-                              check.names = FALSE))
 @ 
 
 \begin{center}
 \setkeys{Gin}{width=.5\textwidth}
 <<nhoodByBw, fig=TRUE, width=4.5, height=4.5>>=
-# visualize adjacency matrix
+# read in 0/1 adjacency matrix (1 if regions share a common border)
+nhood <- as.matrix(read.table(system.file("extdata/neighbourhood_BYBW.txt",
+                                          package = "surveillance"),
+                              check.names = FALSE))
 library("Matrix")
 print(image(Matrix(nhood)))
 @
@@ -262,13 +260,16 @@ districts as an extra argument \code{map} in the above \sts\ call. Such a
 \code{"SpatialPolygons"} object can be obtained from, e.g, an external shapefile
 using the function \mbox{\code{readShapePoly}} from package \pkg{maptools}.
 A map enables plots and animations of the cumulative number of cases by region.
-For instance, a disease map of the year 2001 can be obtained as follows:
+For instance, a disease incidence map of the year 2001 can be obtained as
+follows:
 \setkeys{Gin}{width=.5\textwidth}
 \begin{center}
-<<plot-flu-ByBw, fig=TRUE, width=4.5, height=4>>=
+<<plot-flu-ByBw, fig=TRUE, width=4.5, height=4.5>>=
 data("fluBYBW")
 plot(fluBYBW[year(fluBYBW) == 2001, ], # select year 2001
-     type = observed ~ unit)           # total counts by region
+     type = observed ~ unit,           # total counts by region
+     population = fluBYBW@map$X31_12_01 / 100000) # per 100000 inhabitants
+grid::grid.text("Incidence [per 100'000 inhabitants]", x = 0.5, y = 0.02)
 @
 \end{center}
 
@@ -286,17 +287,16 @@ local({
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The following data set contains the weekly number of measles cases in the 16
-German Bundesl\"ander (federal states), in the years 2005--2007. These data 
-have been analyzed by \citet{herzog-etal-2010} after aggregation into successive
+German federal states, in the years 2005--2007. These data 
+have been analyzed by \citet{herzog-etal-2010} after aggregation into
 bi-weekly periods.
 
 <<measles2w>>=
 data("measlesDE")
-# aggregate into successive bi-weekly periods
 measles2w <- aggregate(measlesDE, nfreq = 26)
 @ 
 
-\setkeys{Gin}{width=.8\textwidth}
+\setkeys{Gin}{width=.75\textwidth}
 \begin{center}
 <<plot-measles, fig=TRUE, width=7, height=4>>=
 plot(measles2w, type = observed ~ time,  # aggregate counts over all units
@@ -363,7 +363,7 @@ on unit $i$, $w_{ji}$ are weights reflecting between-unit transmission and $e_{i
 corresponds to an offset (such as population fractions at time $t$ in region $i$).
 A simple choice for the weights is $w_{ji}=1$ if units $j$ and $i$ are adjacent
 and 0 otherwise. See \citet{paul-etal-2008} for a discussion of alternative
-weights and \citet{meyer.held2013} for how to estimate these weights in the
+weights, and \citet{meyer.held2013} for how to estimate these weights in the
 spatial context using a power-law formulation based on the order of adjacency.
 
 When analyzing a specific disease observed in, say, multiple regions or several
@@ -622,9 +622,11 @@ The argument \code{corr = "all"} allows for correlation between region-specific
 random effects in different components, e.g., random incidence levels $c_i$ 
 in the endemic component and random effects $b_i$ in the neighbor-driven component.
 The following call to \hhh\ fits such a random effects model with
-linear trend and $S=3$ seasonal terms in the endemic component, and
-a fixed autoregressive parameter $\lambda$ to the influenza data 
-\citep[cf.][Table~3, model~B2]{paul-held-2011}.
+linear trend and $S=3$ seasonal terms in the endemic component,
+a fixed autoregressive parameter $\lambda$,
+and first-order transmission weights $w_{ji}=\mathbb{I}(j\sim i)$
+-- normalized such that $\sum_i w_{ji} = 1$ for all rows $j$ --
+to the influenza data \citep[cf.][Table~3, model~B2]{paul-held-2011}.
 
 <<modelFluBYBW>>=
 # endemic component: iid random effects, linear trend, S=3 seasonal terms
@@ -675,6 +677,7 @@ provides a natural alternative. In this context, \citet{gneiting-raftery-2007}
 recommend the use of strictly proper scoring 
 rules, such as the logarithmic score (logs) or the ranked probability score (rps).
 See \citet{czado-etal-2009} and \citet{paul-held-2011} for further details.
+
 One-step-ahead predictions for the last 2 years for model B2 could be obtained
 as follows:
 <<oneStepAhead_rolling, eval=FALSE>>=
@@ -689,7 +692,6 @@ time series to compute all (fake) predictions during the last two years:
 predfinal.B2 <- oneStepAhead(result.B2, tp = nrow(fluBYBW) - 2*52,
                              type = "final")
 @ 
-
 The mean scores (logs and rps) corresponding to this set of predictions can then
 be computed as follows:
 <<scores, eval=FALSE>>=
@@ -698,6 +700,16 @@ colMeans(scores(predfinal.B2, which = c("logs", "rps")))
 <<echo=FALSE>>=
 meanSc.B2[c("logs", "rps")]
 @ 
+
+Using predictive model assessments, \citet{meyer.held2013} found that
+power-law transmission weights more appropriately reflect the spread of
+influenza than the previously used first-order weights (which actually allow the
+epidemic to spread only to directly adjacent districts within one week).
+These power-law weights can be constructed by the function \code{W\_powerlaw}
+and require the \code{neighbourhood} of the \sts\ object to contain adjacency
+orders. The latter can be easily obtained from the binary adjacency matrix
+using the function \code{nbOrder}. See the corresponding help pages or
+\citet[Section~5]{meyer.etal2014} for illustrations.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -766,6 +778,7 @@ heterogeneity in incidence levels and disease transmission.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\bibfont}{\small}
 \bibliography{references}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
