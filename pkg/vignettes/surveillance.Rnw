@@ -464,11 +464,7 @@ if (compute) {
   acall <- algo.call(sts,control=control)
 }
 algo.compare(acall)
-
 @ 
-%res <- algo.compare(algo.call(sts,control=control))
-%xtable(res,digits=c(0,0,0,0,0,2,2,2,2))
-
 
 A test on a set of time series can be done as follows. Firstly, a list
 containing 10 simulated time series is created. Secondly, all the
@@ -503,7 +499,6 @@ res <- algo.summary(ten.surv)
 res[,5:8] <- round(res[,5:8]*100)/100
 res
 @ 
-%xtable(algo.summary(ten.surv),digits=c(0,0,0,0,0,2,2,2,2))
 
 A similar procedure can be applied when evaluating the 14 surveillance
 series drawn from SurvStat@RKI~\citep{survstat}. A problem is however,
@@ -543,7 +538,7 @@ algo.summary(lapply(outbrks,one.survstat.surv))
 if (compute) {
   res.survstat <- algo.summary(lapply(outbrks,one.survstat.surv))
 }
-print(res.survstat,digits=3)
+print(res.survstat, digits=3)
 
 @ 
 
