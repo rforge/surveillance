@@ -1,79 +1,68 @@
-%\VignetteIndexEntry{algo.glrnb: count data regression charts using the generalized likelihood ratio statistic}
+%\VignetteIndexEntry{algo.glrnb: Count data regression charts using the generalized likelihood ratio statistic}
 
 \documentclass[a4paper,11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
 \usepackage{natbib}
 \bibliographystyle{apalike}
+\usepackage{lmodern}
 
-% Preabmle parts
-\usepackage[T1]{fontenc}        % Make it possible to use danish characters !!
-\usepackage{url}
-\usepackage{hyperref}
-\usepackage{times}  
-\renewcommand{\sfdefault}{ptm} % Brug times som font - vigtigt i
-                               % pdflatex?
-
-\usepackage{bm}
 \usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{latexsym}
-\usepackage{verbatim}
+\usepackage{amsfonts,amssymb}
 \usepackage{relsize}
-\usepackage{epsfig}
-\usepackage{comment}
-\newcommand{\surveillance}{\texttt{surveillance}}
-\usepackage{pdfpages}
-\setlength{\parindent}{0pt} 
+\setlength{\parindent}{0pt}
 
+%%% Meta data
+\usepackage{hyperref}
+\hypersetup{
+  pdfauthor = {Valentin Wimmer and Michael H\"ohle},
+  pdftitle = {'algo.glrnb': Count data regression charts using the generalized likelihood ratio statistic}
+}
 
-
-\title{The function \texttt{algo.glrnb} in the \textsf{R} package \surveillance}
+\title{\texttt{algo.glrnb}: Count data regression charts using the generalized likelihood ratio statistic}
 \author{
-Valentin Wimmer$^{(1,2)}$\thanks{Author of correspondence: Email: \texttt{Valentin.Wimmer@gmx.de}}$\>\>$ and Michael H\"{o}hle$^{(1,2)}$ \\
+Valentin Wimmer$^{(1,2)}$\thanks{Author of correspondence: \texttt{Valentin.Wimmer@gmx.de}}\; and Michael H\"{o}hle$^{(1,2)}$ \\
 (1) Department of Statistics, University of Munich, Germany\\
 (2) MC-Health -- Munich Center of Health Sciences
 }
 \date{6 June 2008}
 
-\begin{document}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Sweave 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Put all in another directory
+\usepackage{Sweave}
 \SweaveOpts{prefix.string=plots/glrnb}
- \setkeys{Gin}{width=1\textwidth} 
+\setkeys{Gin}{width=1\textwidth} 
 
 \DefineVerbatimEnvironment{Sinput}{Verbatim}{fontshape=sl,fontsize=\relsize{-1}}
-\DefineVerbatimEnvironment{Soutput}{Verbatim}{fontshape=s1,fontsize=\relsize{-1}}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\relsize{-1}}
 \DefineVerbatimEnvironment{Scode}{Verbatim}{fontshape=sl,fontsize=\relsize{-1}}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Initial R code
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 <<echo=F,results=hide>>=
-library(surveillance)
-library(xtable)
+library("surveillance")
 options(SweaveHooks=list(fig=function() par(mar=c(4,4,2,0)+.5)))
 options(width=70)
 set.seed(247)
 
-#####################################################################
-# create directory for plots if it does not exist
-#####################################################################
+## create directory for plots if it does not exist
 if(!dir.exists("plots")) dir.create("plots")
-
 @ 
 
 
+
+\begin{document}
+
 \maketitle  
-%\mbox{}\hrulefill\\
 
 \begin{abstract}
-  \noindent The aim of this document is to show the use of the function \verb+algo.glrnb+ for a type of count data regression chart, the generalized likelihood ratio (GLR) statistic. The function is part of the \textsf{R} package \surveillance\ \citep{hoehle-2007}, which provides outbreak detection algorithms for surveillance data. For an introduction to these monitoring features of the package, see \texttt{vignette("surveillance")}. There one can find information about the data structure of the \verb+disProg+ and \verb+SurvRes+ objects. Furthermore tools for outbreak detection, such as a Bayesian approach, procedures described by \citet{stroup89},
+  \noindent The aim of this document is to show the use of the function \verb+algo.glrnb+ for a type of count data regression chart, the generalized likelihood ratio (GLR) statistic. The function is part of the \textsf{R} package \textbf{surveillance} \citep{hoehle-2007}, which provides outbreak detection algorithms for surveillance data. For an introduction to these monitoring features of the package, see \texttt{vignette("surveillance")}. There one can find information about the data structure of the \verb+disProg+ and \verb+SurvRes+ objects. Furthermore tools for outbreak detection, such as a Bayesian approach, procedures described by \citet{stroup89},
   \citet{farrington96} and the methods used at the Robert Koch Institut, Germany, are explained. 
-  
   The function \verb+algo.glrnb+ is the implementation of the control charts for poisson and negative binomial distributions for monitoring time series of counts described in \citet{hoehle.paul2008}. This document gives an overview of the different features of the function and illustrations of its use are given for simulated and real surveillance data. \\
   
     \noindent{\bf Keywords:} change-point detection, generalized regression charts, poisson and negative binomial distribution, increase and decrease
