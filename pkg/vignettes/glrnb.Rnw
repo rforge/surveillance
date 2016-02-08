@@ -17,7 +17,8 @@
 \usepackage{hyperref}
 \hypersetup{
   pdfauthor = {Valentin Wimmer and Michael H\"ohle},
-  pdftitle = {'algo.glrnb': Count data regression charts using the generalized likelihood ratio statistic}
+  pdftitle = {'algo.glrnb': Count data regression charts using the generalized likelihood ratio statistic},
+  pdfsubject = {R package 'surveillance'}
 }
 
 \title{\texttt{algo.glrnb}: Count data regression charts using the generalized likelihood ratio statistic}

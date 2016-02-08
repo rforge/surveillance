@@ -34,7 +34,8 @@
 \usepackage{hyperref}
 \hypersetup{
   pdfauthor = {Michaela Paul and Sebastian Meyer},
-  pdftitle = {'hhh4': An endemic-epidemic modelling framework for infectious disease counts}
+  pdftitle = {'hhh4': An endemic-epidemic modelling framework for infectious disease counts},
+  pdfsubject = {R package 'surveillance'}
 }
 \newcommand{\email}[1]{\href{mailto:#1}{\normalfont\texttt{#1}}}
 
