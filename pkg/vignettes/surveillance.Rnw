@@ -73,12 +73,12 @@ to the package: this includes various endemic-epidemic modelling frameworks
 for surveillance data (\texttt{hhh4}, \texttt{twinSIR}, and
 \texttt{twinstim}), as well as more outbreak detection methods
 (\texttt{glrnb}, \texttt{boda}, and \texttt{farringtonFlexible}).
-These new features are described in \citet{meyer.etal2014} and
+These new features are described in detail in \citet{meyer.etal2014} and
 \citet{salmon.etal2014}, respectively.
 %and corresponding vignettes are included in the package;
 %see \texttt{vignette(package = "surveillance")} for an overview.
 Note in particular that use of the new \texttt{S4} class \texttt{sts}
-instead of \texttt{disProg} is encouraged to encapsulate the data.
+instead of \texttt{disProg} is encouraged to encapsulate time series data.
 }}
 
 {\let\newpage\relax\maketitle}
