@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{hhh4: Endemic-epidemic modelling of infectious disease counts}
+%\VignetteIndexEntry{hhh4: An endemic-epidemic modelling framework for infectious disease counts}
 %\VignetteDepends{surveillance, Matrix}
 
 \documentclass[a4paper,11pt]{article}
@@ -34,17 +34,17 @@
 \usepackage{hyperref}
 \hypersetup{
   pdfauthor = {Michaela Paul and Sebastian Meyer},
-  pdftitle = {The function 'hhh4' in the R package 'surveillance'}
+  pdftitle = {'hhh4': An endemic-epidemic modelling framework for infectious disease counts}
 }
 \newcommand{\email}[1]{\href{mailto:#1}{\normalfont\texttt{#1}}}
 
-\title{The function \code{hhh4} in the \R\ package \surveillance}
+\title{\code{hhh4}: An endemic-epidemic modelling framework for infectious disease counts}
 \author{
 Michaela Paul and Sebastian Meyer\thanks{Author of correspondence: \email{Sebastian.Meyer@ifspm.uzh.ch}}\\
 Epidemiology, Biostatistics and Prevention Institute\\
 University of Zurich, Zurich, Switzerland
 }
-\date{7 February 2016}
+\date{8 February 2016}
 
 
 
