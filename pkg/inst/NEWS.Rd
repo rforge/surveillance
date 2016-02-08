@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.11.0 (2016-02-06)}{
+\section{Changes in surveillance version 1.11.0 (2016-02-07)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -32,7 +32,9 @@
 \subsection{MINOR CHANGES}{
   \itemize{
     \item Revised \code{vignette("hhh4")} and updated references in the
-    package documentation.
+    package documentation. Also updated (the cache of) the slightly outdated
+    \code{vignette("surveillance")} to account for the corrected version
+    of \code{algo.bayes()} implemented since \pkg{surveillance} 1.10-0.
   }
 }
 
