@@ -60,7 +60,7 @@ clean:
 	cd pkg/src; rm -f *.o *.so *.dll symbols.rds
 	rm -f pkg/*/.Rhistory
 
-build: clean ${SYSDATA} #${DESCRIPTION}
+build: ${SYSDATA} #${DESCRIPTION}
 	$R CMD build --no-resave-data --compact-vignettes=both pkg
 
 ## update date in DESCRIPTION file
