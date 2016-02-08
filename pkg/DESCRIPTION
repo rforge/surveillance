@@ -1,7 +1,7 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
 Version: 1.11.0
-Date: 2016-02-07
+Date: 2016-02-08
 Authors@R: c(MH = person("Michael", "Höhle",
                   email = "hoehle@math.su.se",
                   role = c("aut", "ths")),
@@ -46,37 +46,32 @@ Suggests: parallel, grid, xts, gridExtra, lattice, colorspace, scales, animation
         spdep, numDeriv, maxLik, gsl,
         testthat, coda, splancs, gamlss,
         INLA, runjags
-Description: Statistical methods for the modeling and
-        monitoring of time series of counts, proportions and
-        categorical data, as well as for the modeling of 
-        continuous-time point processes of epidemic phenomena.
-        The monitoring methods focus on aberration detection in
-        count data time series originating from public health surveillance
-        of communicable diseases, but applications could just as well
-        originate from environmetrics, reliability engineering, econometrics,
-        or social sciences. The package implements many typical
-        outbreak detection procedures such as Farrington et al (1996),
-        Noufaily et al (2012), or the negative binomial LR-CUSUM method
-        described in Höhle and Paul (2008). A novel CUSUM approach combining
-        logistic and multinomial logistic modeling is also included.
-        The package contains several real-world data sets, the ability
-        to simulate outbreak data, and to visualize the results of the
-        monitoring in temporal, spatial or spatio-temporal fashion.
-        A recent overview of the available monitoring procedures is
-        given by Salmon et al (2016).
-        For the retrospective analysis of epidemic spread, the package
-        provides three endemic-epidemic modeling frameworks with
-        tools for visualization, likelihood inference, and simulation.
-        'hhh4' estimates models for (multivariate) count time series
-        following Held et al (2005), Paul et al (2008), Paul and Held (2011),
-        Held and Paul (2012), and Meyer and Held (2014).
-        'twinSIR' models the susceptible-infectious-recovered (SIR) event
-        history of a fixed population, e.g, epidemics across farms or
+Description: Statistical methods for the modeling and monitoring of time series
+        of counts, proportions and categorical data, as well as for the modeling
+        of continuous-time point processes of epidemic phenomena.
+        The monitoring methods focus on aberration detection in count data time
+        series from public health surveillance of communicable diseases, but
+        applications could just as well originate from environmetrics,
+        reliability engineering, econometrics, or social sciences. The package
+        implements many typical outbreak detection procedures such as Farrington
+        et al (1996), Noufaily et al (2012), or the negative binomial LR-CUSUM
+        method described in Höhle and Paul (2008). A novel CUSUM approach
+        combining logistic and multinomial logistic modeling is also included.
+        The package contains several real-world data sets, the ability to
+        simulate outbreak data, and to visualize the results of the monitoring
+        in temporal, spatial or spatio-temporal fashion. A recent overview of
+        the available monitoring procedures is given by Salmon et al (2016).
+        For the retrospective analysis of epidemic spread, the package provides
+        three endemic-epidemic modeling frameworks with tools for visualization,
+        likelihood inference, and simulation. 'hhh4' estimates models for
+        (multivariate) count time series following Held et al (2005), Paul et al
+        (2008), Paul and Held (2011), Held and Paul (2012), and Meyer and Held
+        (2014). 'twinSIR' models the susceptible-infectious-recovered (SIR)
+        event history of a fixed population, e.g, epidemics across farms or
         networks, as a multivariate point process as proposed by Höhle (2009).
         'twinstim' estimates self-exciting point process models for a
-        spatio-temporal point pattern of infective events, e.g.,
-        time-stamped geo-referenced surveillance data, as proposed by
-        Meyer et al (2012).
+        spatio-temporal point pattern of infective events, e.g., time-stamped
+        geo-referenced surveillance data, as proposed by Meyer et al (2012).
         A recent overview of the implemented space-time modeling frameworks
         for epidemic phenomena is given by Meyer et al (2016).
 License: GPL-2
