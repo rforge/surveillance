@@ -1,25 +1,23 @@
 %\VignetteIndexEntry{Getting started with outbreak detection}
 
 \documentclass[a4paper,11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
 \usepackage{natbib}
 \bibliographystyle{apalike}
-
-% Preabmle parts
-\usepackage[T1]{fontenc}        % Make it possible to use danish characters !!
-\usepackage{url}
-\usepackage{hyperref}
 \usepackage{lmodern}
 
-%PSTricks
-\usepackage{pdftricks}
-\begin{psinputs}
-  \usepackage{pst-all}
-\end{psinputs}
-
 \usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{epsfig}
-\newcommand{\surveillance}{\texttt{surveillance}}
+\usepackage{amsfonts,amssymb}
+\newcommand{\pkg}[1]{{\bfseries #1}}
+\newcommand{\surveillance}{\pkg{surveillance}}
+
+\usepackage{hyperref}
+\hypersetup{
+  pdfauthor = {Michael H\"ohle and Andrea Riebler and Michaela Paul},
+  pdftitle = {Outbreak detection with the R package 'surveillance'}
+}
 
 \title{Outbreak detection with the \textsf{R} package \surveillance}
 \author{
@@ -69,8 +67,8 @@ if(!compute) load(CACHEFILE)
 
 \fbox{\vbox{\small
 \noindent\textbf{Disclaimer}: This vignette reflects package state at version
-1.2 and is hence somewhat outdated. New functionality has been added
-to the package: this includes various modelling frameworks
+0.9-7 and is hence somewhat outdated. New functionality has been added
+to the package: this includes various endemic-epidemic modelling frameworks
 for surveillance data (\texttt{hhh4}, \texttt{twinSIR}, and
 \texttt{twinstim}), as well as more outbreak detection methods
 (\texttt{glrnb}, \texttt{boda}, and \texttt{farringtonFlexible}).
@@ -132,8 +130,7 @@ mentions the built-in datasets and illustrates how to create new
 datasets by simulation.  Section~\ref{sec:algo} contains a short
 description of how to use the surveillance algorithms and illustrate
 the results.  Further information on the individual functions can be
-found in the on-line documentation of the package, which is also
-provided in printed form as an Appendix of this document.
+found on the corresponding help pages of the package.
 
 \section{Surveillance Data}\label{sec:data}
 Denote by $\{y_t\>;t=1,\ldots,n\}$ the time series of counts
@@ -175,49 +172,16 @@ to generate surveillance data containing point-source like outbreaks,
 for example with a Salmonella serovar. The model is a Hidden Markov
 Model (HMM) where a binary state $X_t, t=1,\ldots,n$, denotes whether
 there was an outbreak and $Y_t$ is the number of observed
-counts, see Fig.~\ref{fig:hmm}.
+counts, see Figure~\ref{fig:hmm}.
 
-\begin{figure}[htbp]
+\begin{figure}[htb]
   \centering
-  \begin{pdfpic}
-    \input pst-eps
-    \TeXtoEPS
-    \SpecialCoor
-  \begin{pspicture}(0,0)(10,3) %lower y -2.5 would be better
-   %\psgrid
-   \psset{arrowsize=7pt,arrowinset=0}
-
-   \rput(1,2.5){\ovalnode{X1}{$X_1$}}
-   \rput(3,2.5){\ovalnode{X2}{$X_2$}}
-   \rput(5,2.5){\ovalnode{X3}{$X_3$}}
-   \rput(6.5,2.5){\ovalnode[linestyle=none]{Xinv1}{}}
-   \rput(7,2.5){$\ldots$}
-   \rput(7.5,2.5){\ovalnode[linestyle=none]{Xinv2}{}}
-   \rput(9,2.5){\ovalnode{Xn}{$X_n$}}
-
-
-   \rput(1,0.5){\ovalnode{Y1}{$Y_1$}}
-   \rput(3,0.5){\ovalnode{Y2}{$Y_2$}}
-   \rput(5,0.5){\ovalnode{Y3}{$Y_3$}}
-   \rput(9,0.5){\ovalnode{Yn}{$Y_n$}}
-
-   \ncline{->}{X1}{X2}
-   \ncline{->}{X2}{X3}
-   \ncline{->}{X3}{Xinv1}
-   \ncline{->}{Xinv2}{Xn}
-
-   \ncline{->}{X1}{Y1}
-   \ncline{->}{X2}{Y2}
-   \ncline{->}{X3}{Y3}
-   \ncline{->}{Xn}{Yn}
- \end{pspicture}
- \endTeXtoEPS
-\end{pdfpic}
+  \includegraphics[width=.75\textwidth]{surveillance-hmm}
 \caption{The Hidden Markov Model}
   \label{fig:hmm}
 \end{figure}
-The state $X_t$ is a homogenous Markov chain with the following
-transition matrix
+
+The state $X_t$ is a homogenous Markov chain with transition matrix
 \begin{center}
   \begin{tabular}{c|cc}
   $X_t\backslash X_{t+1}$ &  0      & 1\\

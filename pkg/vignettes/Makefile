@@ -3,6 +3,8 @@
 ## Because of this and because this Makefile does nothing special to build
 ## the vignettes, it is listed in the top-level .Rbuildignore file
 ## (such that standard R CMD build routines take care of the vignettes).
+## In addition it defines a rule to create the PStricks-based HMM figure
+## included in surveillance.Rnw
 ##
 ## Copyright (C) 2016  Sebastian Meyer <Sebastian.Meyer@ifspm.uzh.ch>
 ## This Makefile can be redistributed and/or modified under the terms
@@ -29,6 +31,15 @@ clean:
 	rm -rf ${TEXFILESFROMRNW} plots/ $(addprefix *-cache.RData,.new .diff)
 cleanall: clean
 	rm -rf ${VIGNETTES}
+
+
+### create surveillance-hmm.pdf
+
+surveillance.pdf: surveillance-hmm.pdf  # additional dependency
+surveillance-hmm.pdf: surveillance-hmm.tex
+	latex -interaction=batchmode $< && dvips -q ${<:.tex=.dvi} && \
+		ps2pdf -q -sOutputFile=- ${<:.tex=.ps} | pdfcrop - $@
+	rm -f $(addprefix $(basename $<).,aux dvi log ps)
 
 
 ### rebuild cache and check if it differs from the old one
