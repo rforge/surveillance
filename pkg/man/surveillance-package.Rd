@@ -108,7 +108,9 @@
 }
 
 \seealso{
-  \code{vignette(package="surveillance")}
+  Additional documentation and illustrations of the methods are
+  available in the form of package vignettes, see
+  \code{vignette(package="surveillance")} for an overview.
 }
 
 \keyword{ package }
