@@ -16,10 +16,11 @@
 \usepackage{hyperref}
 \hypersetup{
   pdfauthor = {Michael H\"ohle and Andrea Riebler and Michaela Paul},
-  pdftitle = {Outbreak detection with the R package 'surveillance'}
+  pdftitle = {Getting started with outbreak detection},
+  pdfsubject = {R package 'surveillance'}
 }
 
-\title{Outbreak detection with the \textsf{R} package \surveillance}
+\title{Getting started with outbreak detection}
 \author{
 Michael H{\"o}hle\thanks{Author of correspondance: Department of Statistics, University of Munich, Ludwigstr.\ 33, 80539 M{\"u}nchen, Germany, Email: \texttt{hoehle@stat.uni-muenchen.de}} , Andrea Riebler and Michaela Paul\\
 Department of Statistics\\
