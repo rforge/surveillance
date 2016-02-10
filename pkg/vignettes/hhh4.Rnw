@@ -64,11 +64,10 @@ University of Zurich, Zurich, Switzerland
 %%% Initial R code
 <<setup, echo=FALSE, results=hide>>=
 library("surveillance")  
-
 options(width=75)
 
-## create directory for plots if it does not exist
-if(!dir.exists("plots")) dir.create("plots")
+## create directory for plots
+dir.create("plots", showWarnings=FALSE)
 
 ######################################################
 ## Do we need to compute or can we just fetch results?
