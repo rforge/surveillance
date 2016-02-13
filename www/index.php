@@ -261,6 +261,10 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
 
   <li>2015/12/03 Meyer and Held (2015) incorporate age-structured social contact data in the spatio-temporal <code>hhh4</code> model for stratified, areal time series of infectious disease counts
 <a href="http://arxiv.org/abs/1512.01065">[preprint]</a></li>
+   <li>2015/09/21 ISDS Webinar on 'Aberration Detection in Public Health Surveillance using the R package <code>surveillance</code>'. 
+   <a href="https://vimeo.com/140669369">[webinar recording]</a> 
+   <a href="https://sites.google.com/site/rapplicationforbiosurveillance/home/meetings">[material]</a>
+   </li>
   <li>2015/07/01 Two talks about the surveillance package given at the <a href="http://user2015.math.aau.dk">useR2015!</a> conference:
 <ul>
 <li><a href="http://staff.math.su.se/hoehle/software/surveillance/hoehle-userR2015-web.pdf">Zombie Preparedness</a> by Michael Höhle</li>
