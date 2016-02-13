@@ -41,7 +41,8 @@
             \item{\code{trans}}{one of the following transformations (warning: anscombe and negbin transformations are experimental)
                 \describe{
                 \item{\code{rossi}}{standardized variables z3 as proposed by Rossi}
-                \item{\code{standard}}{standardized variables z1 (based on asympotic normality)}
+                \item{\code{standard}}{standardized variables z1 (based
+             on asympotic normality) - This is the default.}
                 \item{\code{anscombe}}{anscombe residuals -- experimental}
                 \item{\code{anscombe2nd}}{ anscombe residuals as in Pierce and Schafer (1986) based on 2nd order approximation of E(X)  -- experimental}
                 \item{\code{pearsonNegBin}}{compute Pearson residuals for NegBin -- experimental}
