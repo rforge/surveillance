@@ -83,6 +83,37 @@ echo $contents; } ?>
 
 </dl>
 
+<hr/>
+
+<h3>News</h3>
+<ul>
+  <li>For package updates, see
+    the <a href="http://cran.r-project.org/web/packages/surveillance/news.html">NEWS</a>
+    of the latest version released on CRAN or
+    the <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/inst/NEWS.Rd?view=markup&root=surveillance">NEWS file</a>
+    of the current development version.
+  </li>
+
+  <li>2015/12/03 Meyer and Held (2015) incorporate age-structured social contact data in the spatio-temporal <code>hhh4</code> model for stratified, areal time series of infectious disease counts
+<a href="http://arxiv.org/abs/1512.01065">[preprint]</a></li>
+   <li>2015/09/21 ISDS Webinar on 'Aberration Detection in Public Health Surveillance using the R package <code>surveillance</code>'. 
+   <a href="https://vimeo.com/140669369">[webinar recording]</a> 
+   <a href="https://sites.google.com/site/rapplicationforbiosurveillance/home/meetings">[material]</a>
+   </li>
+  <li>2015/07/01 Two talks about the surveillance package given at the <a href="http://user2015.math.aau.dk">useR2015!</a> conference:
+<ul>
+<li><a href="http://staff.math.su.se/hoehle/software/surveillance/hoehle-userR2015-web.pdf">Zombie Preparedness</a> by Michael Höhle</li>
+<li><a href="http://user2015.math.aau.dk/presentations/40.pdf">Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package surveillance</a> by Sebastian Meyer</li>
+</ul>
+</li>
+  <li>2014/11/08 Two preprints published on arXiv illustrate the newest package features:
+<ul>
+<li><a href="http://arxiv.org/abs/1411.0416">Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package surveillance</a></li>
+<li><a href="http://arxiv.org/abs/1411.1292">Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance</a></li>
+</ul>
+</li>
+  <li>2013/04/23 <a href="StockholmR-Hoehle_4.pdf">Talk</a> at the  Stockholm R useR group (StockholmR) on <a href="http://www.meetup.com/StockholmR/events/105738342/">Making R packages (and) Shiny</a>.</li>
+</ul>
 
 <hr />
 <h3>Prospective Outbreak Detection</h3>
@@ -250,38 +281,7 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
 
 
 <hr />
-<h3>News</h3>
-<ul>
-  <li>For package updates, see
-    the <a href="http://cran.r-project.org/web/packages/surveillance/news.html">NEWS</a>
-    of the latest version released on CRAN or
-    the <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/inst/NEWS.Rd?view=markup&root=surveillance">NEWS file</a>
-    of the current development version.
-  </li>
 
-  <li>2015/12/03 Meyer and Held (2015) incorporate age-structured social contact data in the spatio-temporal <code>hhh4</code> model for stratified, areal time series of infectious disease counts
-<a href="http://arxiv.org/abs/1512.01065">[preprint]</a></li>
-   <li>2015/09/21 ISDS Webinar on 'Aberration Detection in Public Health Surveillance using the R package <code>surveillance</code>'. 
-   <a href="https://vimeo.com/140669369">[webinar recording]</a> 
-   <a href="https://sites.google.com/site/rapplicationforbiosurveillance/home/meetings">[material]</a>
-   </li>
-  <li>2015/07/01 Two talks about the surveillance package given at the <a href="http://user2015.math.aau.dk">useR2015!</a> conference:
-<ul>
-<li><a href="http://staff.math.su.se/hoehle/software/surveillance/hoehle-userR2015-web.pdf">Zombie Preparedness</a> by Michael Höhle</li>
-<li><a href="http://user2015.math.aau.dk/presentations/40.pdf">Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package surveillance</a> by Sebastian Meyer</li>
-</ul>
-</li>
-  <li>2014/11/08 Two preprints published on arXiv illustrate the newest package features:
-<ul>
-<li><a href="http://arxiv.org/abs/1411.0416">Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package surveillance</a></li>
-<li><a href="http://arxiv.org/abs/1411.1292">Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance</a></li>
-</ul>
-</li>
-  <li>2013/04/23 <a href="StockholmR-Hoehle_4.pdf">Talk</a> at the  Stockholm R useR group (StockholmR) on <a href="http://www.meetup.com/StockholmR/events/105738342/">Making R packages (and) Shiny</a>.</li>
-</ul>
-
-
-<hr/>
 <h3>Documentation</h3>
 
 
