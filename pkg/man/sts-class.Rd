@@ -73,8 +73,7 @@
       outbreak in the region}
     \item{\code{alarm}:}{Matrix with the same dimension as
       \code{observed} specifying whether an outbreak detection algorithm
-      declared a specific time point in the region as having an alarm. If
-      the object containins just observations then this slot is null. }
+      declared a specific time point in the region as having an alarm.}
     \item{\code{upperbound}:}{Matrix with upper bound values }
     \item{\code{neighbourhood}:}{Symmetric matrix of size
       \eqn{(number of regions)^2} describing the neighbourhood structure. It
