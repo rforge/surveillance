@@ -6,6 +6,19 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.11.1 (2016-03-02)}{
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item \code{stsplot_spacetime()} now recognizes its \code{opts.col}
+    argument.
+  }
+}
+
+}
+
+
+
 \section{Changes in surveillance version 1.11.0 (2016-02-08)}{
 
 \subsection{NEW FEATURES}{

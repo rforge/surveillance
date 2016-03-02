@@ -5,7 +5,7 @@
 ###
 ### Old implementation of (animated) maps of an sts-object
 ###
-### Copyright (C) 2007-2013 Michael Hoehle
+### Copyright (C) 2007-2013 Michael Hoehle, 2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -25,10 +25,6 @@ stsplot_spacetime <- function(
   if (is.null(colnames(x@observed)))
     stop("The sts observed slot does not have any colnames to match with the shapefile.")
 
-  #Check for color options
-  if (is.null(opts.col)) {
-    opts.col <- list(ncolors=100,use.color=TRUE)
-  }
   #Check for legend options
   if (is.null(legend)) {
     legend <- list(dx=0.4,dy=0.04,x=maplim$x[1],y=maplim$y[1],once=TRUE)
@@ -62,7 +58,9 @@ stsplot_spacetime <- function(
 
   
   #Get color vector
-  gyr <- hcl.colors(ncolors=length(o), use.color=TRUE)
+  opts.col_default <- list(ncolors=length(o), use.color=TRUE)
+  gyr <- do.call("hcl.colors", if (is.list(opts.col))
+    modifyList(opts.col_default, opts.col) else opts.col_default)
   theCut <- cut(o, length(gyr))
   
   #Cut into specified number of colors
