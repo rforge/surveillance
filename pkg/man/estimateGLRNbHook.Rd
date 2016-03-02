@@ -4,8 +4,7 @@
 
 \title{Hook function for in-control mean estimation}
 \description{
- Allows the user to specify his own estimation routine for the in-control mean of \code{algo.glrpois}
- Needs to work for GLRNbHook
+ Allows the user to specify his own estimation routine for the in-control mean of \code{\link{algo.glrpois}}.
 }
 \usage{
 estimateGLRNbHook()

@@ -91,7 +91,7 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
     border color, the 3rd element is the color of the \code{upperbound}
     plotting.}
   \item{lwd}{Vector of length 3 specifying the line width of the three
-    elements to plot. See also the \code{col} argment.}
+    elements to plot. See also the \code{col} argument.}
   \item{alarm.symbol}{a list with entries \code{pch}, \code{col},
     \code{cex} and \code{lwd} specifying the appearance of the outbreak
     symbol in the plot.}
@@ -115,15 +115,15 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
   }
   \item{dx.upperbound}{horizontal change in the plotting of the
     upperbound line. Sometimes it can be convenient to offset this line
-    a little for better visiability.}
+    a little for better visibility.}
   \item{lvl}{A vector of length \code{ncol(x)}, which is used to
     specify the hierarchy level for each time series in the sts object
     for alarm plots.}
   \item{cex}{A numerical value giving the amount by which plotting text
     and symbols should be magnified relative to the default. See
-    \code{?par} for details.}
+    \code{\link{par}} for details.}
   \item{cex.yaxis}{The magnification to be used for y-axis annotation
-    relative to the current setting of 'cex'.}
+    relative to the current setting of \code{cex}.}
   \item{hookFunc}{a function that is called after all the basic plotting
     has be done, i.e., it is not possible to control formatting with
     this function. See Examples.}
@@ -136,7 +136,7 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
 
 \details{
   The time series plot relies on the work-horse \code{stsplot_time1}.
-  Its arguments are (almost) similiar to \code{\link{plot.survRes}}.
+  Its arguments are (almost) similar to \code{\link{plot.survRes}}.
 }
 
 \value{

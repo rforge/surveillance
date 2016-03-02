@@ -81,7 +81,7 @@ algo.glrnb(disProgObj,control = list(range=range,c.ARL=5,
         \code{upperbound}-statistic that is returned. With
         \code{"cases"} the number of cases that would have been
         necessary to produce an alarm or with \code{"value"} the
-        glr-statistic is computed (see below).}
+        GLR-statistic is computed (see below).}
       \item{\code{xMax}}{Maximum value to try for x to see if this is
         the upperbound number of cases before sounding an alarm
         (Default: 1e4). This only applies for the GLR using the NegBin
@@ -96,14 +96,14 @@ algo.glrnb(disProgObj,control = list(range=range,c.ARL=5,
     the threshold value for recognizing the alarm and the input object
     of class disProg. The \code{upperbound} slot of the object are
     filled with the current \eqn{GLR(n)} value or with the number of
-    cases that are necessary to produce an alarm at any timpoint
+    cases that are necessary to produce an alarm at any time point
     \eqn{<=n}. Both lead to the same alarm timepoints, but
     \code{"cases"} has an obvious interpretation.}
 }
 %
 \details{
 %
-  This function implements the seasonal cound data chart based on
+  This function implements the seasonal count data chart based on
   generalized likelihood ratio (GLR) as described in the \enc{Höhle}{Hoehle} and Paul
   (2008) paper. A moving-window generalized likelihood ratio
   detector is used, i.e. the detector has the form
@@ -130,7 +130,7 @@ might be worth considering.
 
 In case \code{is.null(theta)} and \code{alpha>0} as well as
 \code{ret="cases"} then a brute-force search is conducted for each time
-point in range in order to determine the number of cases neccessary
+point in range in order to determine the number of cases necessary
 before an alarm is sounded. In case no alarm was sounded so far by time
 \eqn{t}, the function increases \eqn{x[t]} until an alarm is sounded any
 time before time point \eqn{t}. If no alarm is sounded by \code{xMax}, a return value
@@ -182,7 +182,7 @@ plot(glr.ts2,xaxis.years=FALSE)
 }
 
 \keyword{classif}
-\source{
+\references{
   \enc{Höhle}{Hoehle}, M. and Paul, M. (2008):
   Count data regression charts for the monitoring of surveillance time
   series. Computational Statistics and Data Analysis, 52 (9), 4357-4368.

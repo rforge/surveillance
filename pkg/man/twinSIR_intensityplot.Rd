@@ -81,7 +81,7 @@ The implementation is illustrated in Meyer et al. (2016, Section 4).
     The locations of the rug are the time points of infections.
   }
   \item{\dots}{
-    For the \code{plot.twinSIR} methode, arguments passed to
+    For the \code{plot.twinSIR} method, arguments passed to
     \code{intensityplot.twinSIR}.
     For the \code{intensityplot} methods, further graphical parameters
     passed to the function \code{\link{matplot}}, 

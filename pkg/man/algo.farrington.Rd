@@ -66,7 +66,7 @@
     }
 }
 \details{
-  The following steps are perfomed according to the Farrington
+  The following steps are performed according to the Farrington
   et al. (1996) paper.
 \enumerate{
 \item fit of the initial model and initial estimation of mean and

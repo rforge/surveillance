@@ -58,7 +58,7 @@ as.epidata(data, ...)
     It must contain the observed event history in a form similar to 
     \code{Surv(, type="counting")} with additional information (variables) along 
     the process.  Rows will be sorted automatically during conversion.
-    The observation period is splitted up into \emph{consecutive}
+    The observation period is split up into \emph{consecutive}
     intervals of constant state - thus constant infection intensities.
     The data frame consists of a block of \eqn{N} (number of individuals) 
     rows for each of those time intervals (all rows in a block have the same start 

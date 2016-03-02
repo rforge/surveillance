@@ -192,7 +192,7 @@ twinSIR(formula, data, weights, subset,
   \code{lambda.smooth} smoothing parameter selection based on a mixed
   model representation of an equivalent truncated power spline is offered (see
   reference for further details). The following two steps are iterated
-  until converegence:
+  until convergence:
   \enumerate{
     \item Given fixed smoothing parameter, the penalized
     likelihood is optimized for the regression components using a L-BFGS-B

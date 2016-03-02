@@ -10,7 +10,7 @@
   is estimated, the decoding problem, i.e. the most probable state
   configuration, is found by the Viterbi algorithm and the most
   probable state of the last observation is recorded. On-line
-  detection is performed by sequentally repeating this procedure.
+  detection is performed by sequentially repeating this procedure.
   
   Warning: This function can be very slow - a more efficient implementation would be nice!
 }

@@ -85,8 +85,8 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     \code{data.frame} may be referenced directly by name.
   }
   \item{t0, T}{
-    events having occured during (-Inf;t0] are regarded as part of the
-    prehistory \eqn{H_0} of the process. Only events that occured in the
+    events having occurred during (-Inf;t0] are regarded as part of the
+    prehistory \eqn{H_0} of the process. Only events that occurred in the
     interval (t0; T] are considered in the likelihood.
     The time point \code{t0} (\code{T}) must
     be an element of \code{data$stgrid$start} (\code{data$stgrid$stop}).
@@ -207,7 +207,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     \code{optim}'s methods.
     For \code{method="nlminb"}, the following parameters of the
     \code{optim.args$control} list may be named like for
-    \code{optim} and are renamed appropriatly:
+    \code{optim} and are renamed appropriately:
     \code{maxit} (-> \code{iter.max}), \code{REPORT} (-> \code{trace},
     default: 1), \code{abstol} (-> \code{abs.tol}), and
     \code{reltol} (-> \code{rel.tol}, default: \code{1e-6}).
@@ -216,7 +216,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     information matrix should be used as the Hessian during optimization
     (otherwise a numerical approximation is used).
 
-    Similary, \code{method="nlm"} should also work but is not
+    Similarly, \code{method="nlm"} should also work but is not
     recommended here.    
   }
   \item{finetune}{

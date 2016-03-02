@@ -53,8 +53,8 @@ algo.glrpois(disProgObj,control = list(range=range,c.ARL=5,
     \item{\code{ret}}{a string specifying the type of
         \code{upperbound}-statistic that is returned. With
         \code{"cases"} the number of cases that would have been
-        necassary to produce an alarm or with \code{"value"} the
-        glr-statistic is computed (see below).}  
+        necessary to produce an alarm or with \code{"value"} the
+        GLR-statistic is computed (see below).}  
     } 
   } 
 } 
@@ -65,7 +65,7 @@ algo.glrpois(disProgObj,control = list(range=range,c.ARL=5,
     the threshold value for recognizing the alarm and the input object
     of class disProg. The \code{upperbound} slot of the object are
     filled with the current \eqn{GLR(n)} value or with the number of
-    cases that are necassary to produce an alarm at any timpoint
+    cases that are necessary to produce an alarm at any time point
     \eqn{<=n}. Both lead to the same alarm timepoints, but
     \code{"cases"} has an obvious interpretation.} 
 }

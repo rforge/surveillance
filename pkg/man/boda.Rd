@@ -34,7 +34,7 @@ boda(sts, control=list(range=NULL, X=NULL, trend=FALSE, season=FALSE,
       \item{\code{X}}{}
       \item{\code{trend}}{Boolean indicating whether a linear trend term should be
 	included in the model for the expectation the log-scale}
-      \item{\code{season}}{Boolean to indicate wheather a cyclic spline
+      \item{\code{season}}{Boolean to indicate whether a cyclic spline
 	should be included.}
       \item{\code{alpha}}{The threshold for declaring an observed count as
 	an aberration is the \eqn{(1-\alpha)\cdot 100\%}{(1-alpha)*100\%}

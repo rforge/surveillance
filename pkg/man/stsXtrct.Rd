@@ -13,7 +13,7 @@
   Methods for \code{"["}, i.e., extraction or subsetting of the
   \code{"\linkS4class{sts}"} class in package \pkg{surveillance}.
 
-  Note that \code{[<--methods} methods (i.e. subassigments) are
+  Note that \code{[<-} methods (i.e. subassignments) are
   currently not supported.
 
   \code{drop} is always \code{FALSE}.

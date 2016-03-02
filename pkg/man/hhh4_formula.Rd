@@ -40,7 +40,7 @@ respectively, in formulae used in the function \code{\link{hhh4}}.
     in a bivariate \code{hhh4} model, does \emph{not} mean that the
     (autoregressive) model component is omitted for this unit, but that
     \eqn{\log(\lambda_1) = \alpha_1} and \eqn{\log(\lambda_2) = 0}, which
-    is usually not of interest. ATM, omiting an autoregressive effect for
+    is usually not of interest. ATM, omitting an autoregressive effect for
     a specific unit is not possible.\cr
     If \code{which=NULL}, the parameter is assumed to be the same
     for all units.}
