@@ -466,42 +466,19 @@ algo.farrington.referencetimepoints <- function(dayToConsider,b=control$b,freq=f
 # END OF REFERENCE TIME POINTS FUNCTION
 ################################################################################
 
+
 ################################################################################
 # RESIDUALS FUNCTION
-################################################################################
-
-anscombe.residuals <- function(m,phi) {
-    y <- m$y
-    mu <- fitted.values(m)
-    #Compute raw Anscombe residuals
-    a <- 3/2*(y^(2/3) * mu^(-1/6) - mu^(1/2))
-    
-    #Compute standardized residuals
-    a <- a/sqrt(phi * (1-hatvalues(m)))
-    return(a)
-}
-################################################################################
-# END OF RESIDUALS FUNCTION
+# anscombe.residuals(m,phi)
+# is defined in algo_farrington.R
 ################################################################################
 
 
-
-## ################################################################################
-## # WEIGHTS FUNCTION -- this function has been changed in the original algo_farrington
-## # implementation.
-## ################################################################################
-##
-## algo.farrington.assign.weights <- function(s,weightsThreshold) {
-##     #s_i^(-2) for s_i<weightsThreshold and 1 otherwise
-##     gamma <- length(s)/(sum(    (s^(-2))^(s>weightsThreshold) ))
-##     omega <- numeric(length(s))
-##     omega[s>weightsThreshold] <- gamma*(s[s>weightsThreshold]^(-2))
-##     omega[s<=weightsThreshold] <- gamma
-##     return(omega)
-## }
-## ################################################################################
-## # END OF WEIGHTS FUNCTION
-## ################################################################################
+################################################################################
+# WEIGHTS FUNCTION
+# algo.farrington.assign.weights(s,weightsThreshold)
+# is defined in algo_farrington.R
+################################################################################
 
 
 ################################################################################
