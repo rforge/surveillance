@@ -6,7 +6,7 @@
 ### Maximum Likelihood inference for the two-component spatio-temporal intensity
 ### model described in Meyer et al (2012), DOI: 10.1111/j.1541-0420.2011.01684.x
 ###
-### Copyright (C) 2009-2015 Sebastian Meyer
+### Copyright (C) 2009-2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -1075,8 +1075,10 @@ twinstim <- function (
                     "are redundant and slow!\n",
                     "         Really consider installing package \"memoise\"!\n",
                     sep="")
-            .siafInt.args[[1]] <- initpars[paste("e.siaf", 1:nsiafpars, sep=".")]
-            siafInt <- do.call("..siafInt", .siafInt.args) # memoise()d
+            siafInt <- local({
+                siafpars <- initpars[paste("e.siaf", 1:nsiafpars, sep=".")]
+                do.call("..siafInt", .siafInt.args) # memoise()d
+            })
         }
         if (fixedtiafpars) {
             if (verbose) cat("pre-evaluating 'tiaf' integrals with fixed parameters ...\n")
