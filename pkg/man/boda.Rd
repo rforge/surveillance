@@ -52,15 +52,16 @@ boda(sts, control=list(range=NULL, X=NULL, trend=FALSE, season=FALSE,
     }
   }
 }
-\details{
 
-  Note: This function requires presence of the INLA R package, which is
-  NOT available from CRAN. It can can be downloaded by calling
-  \code{source("http://www.math.ntnu.no/inla/givemeINLA.R")} as described in
-  detail at \url{http://www.r-inla.org/download}. 
+\note{
+  This function requires the \R package \pkg{INLA}, which is currently
+  \emph{not} available from CRAN. It can be obtained from an additional
+  repository as described at \url{http://www.r-inla.org/download}.
+}
 
-  WARNING: This function is currently experimental!! It also heavily
-  depends on the INLA package so changes here might affect the
+\section{Warning}{
+  This function is currently experimental!! It also heavily
+  depends on the \pkg{INLA} package so changes here might affect the
   operational ability of the function. Since the computations
   for the Bayesian GAM are quite involved do not expected this function
   to be particularly fast. Future work could focus on improving the
