@@ -251,11 +251,11 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
   The \code{simulate.twinstim} method has some additional
   \emph{attributes} set on its result:
-  \code{call}, \code{seed}, \code{simplified}, and \code{runtime}
-  with their obvious meanings. Furthermore, if
-  \code{nsim > 1}, it returns an object of class
+  \code{call}, \code{seed}, and \code{runtime}.
+  If \code{nsim > 1}, it returns an object of class
   \code{"simEpidataCSlist"}, the form of which depends on the value of
-  \code{simplify}: if \code{simplify = FALSE}, then the return value is
+  \code{simplify} (which is stored as an attribute \code{simplified}):
+  if \code{simplify = FALSE}, then the return value is
   just a list of sequential simulations, each of class
   \code{"simEpidataCS"}. However, if \code{simplify = TRUE}, then the
   sequential simulations share all components but the simulated

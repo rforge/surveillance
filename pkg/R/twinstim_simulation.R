@@ -7,7 +7,7 @@
 ### class "twinstim". The function basically uses Ogata's modified thinning
 ### algorithm (cf. Daley & Vere-Jones, 2003, Algorithm 7.5.V.).
 ###
-### Copyright (C) 2010-2015 Sebastian Meyer
+### Copyright (C) 2010-2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -1269,11 +1269,13 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
     }
     attr(res, "call") <- cl
     attr(res, "seed") <- RNGstate
-    attr(res, "simplified") <- simplify
     attr(res, "runtime") <- proc.time()[[3]] - ptm
     class(res) <- if (nsim == 1L) {
             c("simEpidataCS", "epidataCS")
-        } else c("simEpidataCSlist")
+        } else {
+            attr(res, "simplified") <- simplify
+            c("simEpidataCSlist")
+        }
     res
 }
 
