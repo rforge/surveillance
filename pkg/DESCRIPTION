@@ -1,7 +1,7 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
 Version: 1.11.1
-Date: 2016-02-10
+Date: 2016-03-04
 Authors@R: c(MH = person("Michael", "Höhle",
                   email = "hoehle@math.su.se",
                   role = c("aut", "ths")),
@@ -79,6 +79,6 @@ Description: Statistical methods for the modeling and monitoring of time series
         <http://arxiv.org/abs/1411.0416>.
 License: GPL-2
 URL: http://surveillance.r-forge.r-project.org/
-Additional_repositories: http://www.math.ntnu.no/inla/R/stable 
+Additional_repositories: https://www.math.ntnu.no/inla/R/stable
 BugReports: https://r-forge.r-project.org/tracker/?group_id=45
 Encoding: latin1
