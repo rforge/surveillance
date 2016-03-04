@@ -6,12 +6,20 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.11.1 (2016-03-02)}{
+\section{Changes in surveillance version 1.11.1 (2016-03-04)}{
 
 \subsection{BUG FIXES}{
   \itemize{
     \item \code{stsplot_spacetime()} now recognizes its \code{opts.col}
     argument.
+  }
+}
+
+\subsection{TECHNICALITIES}{
+  \itemize{
+    \item The vignette code is again compatible with \R < 3.2.0.
+    \item The address of the additional repository for \pkg{INLA} (in
+    the \file{DESCRIPTION} file) has been updated to https.
   }
 }
 
