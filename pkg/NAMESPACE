@@ -40,7 +40,8 @@ importFrom(utils, head, tail, toLatex)
 ##                   glm.fit) ## and many more...
 importFrom(utils, packageVersion, modifyList, capture.output, read.table, data,
                   setTxtProgressBar, txtProgressBar, sessionInfo, head.matrix,
-                  str, flush.console, write.table, as.roman, tail.matrix)
+                  str, flush.console, write.table, as.roman, tail.matrix,
+                  methods)
 
 
 ### sampling from mv.Gausian for OSAIC weights (twinSIR) and iafplot (twinstim)

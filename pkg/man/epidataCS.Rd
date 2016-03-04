@@ -27,7 +27,8 @@
   The \code{"epidataCS"} class is the basis for fitting 
   spatio-temporal endemic-epidemic intensity models with the function
   \code{\link{twinstim}} (Meyer et al., 2012).
-  The implementation is described in Meyer et al. (2016, Section 3).
+  The implementation is described in Meyer et al. (2016, Section 3),
+  see \code{vignette("twinstim")}.
 }
 
 \usage{
@@ -317,10 +318,13 @@ as.epidataCS(events, stgrid, W, qmatrix = diag(nTypes),
 }
 
 \seealso{
+  \code{vignette("twinstim")}.
+
   \code{\link{plot.epidataCS}} for plotting, and
   \code{\link{animate.epidataCS}} for the animation of such an epidemic.
   There is also an \code{\link[=update.epidataCS]{update}} method for the
   \code{"epidataCS"} class.
+
   Models for \code{"epidataCS"} can be fitted with \code{\link{twinstim}}.
   It is also possible to convert the data to \code{\link{epidata}}
   objects (discrete space) for analysis with \code{\link{twinSIR}}

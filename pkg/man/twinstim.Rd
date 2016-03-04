@@ -10,7 +10,8 @@
   A \code{twinstim} model as described in Meyer et al. (2012) is fitted to
   marked spatio-temporal point process data. This constitutes a
   regression approach for conditional intensity function modelling.
-  The implementation is illustrated in Meyer et al. (2016, Section 3).
+  The implementation is illustrated in Meyer et al. (2016, Section 3),
+  see \code{vignette("twinstim")}.
 }
 
 \usage{
@@ -404,9 +405,13 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
 }
 
 \seealso{
-  \code{\link{twinSIR}} for a discrete space alternative.
-  There is also a \code{\link{simulate.twinstim}} method,
+  \code{vignette("twinstim")}.
+  
+  There is a \code{\link{simulate.twinstim}} method,
   which simulates the point process based on the fitted \code{twinstim}.
+
+  A discrete-space alternative is offered by the \code{\link{twinSIR}}
+  modelling framework.
 }
 
 \examples{

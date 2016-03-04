@@ -28,9 +28,9 @@ all: ${VIGNETTES}
 
 .PHONY: clean cleanall
 clean:
-	rm -rf ${TEXFILESFROMRNW} plots/ $(addprefix *-cache.RData,.new .diff)
+	rm -rf *-R.bib plots/ $(addprefix *-cache.RData,.new .diff)
 cleanall: clean
-	rm -rf ${VIGNETTES}
+	rm -rf ${VIGNETTES} ${TEXFILESFROMRNW}
 
 
 ### create surveillance-hmm.pdf
