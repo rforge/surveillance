@@ -1016,7 +1016,7 @@ while \code{knox} and \code{stKtest} implement related classical approaches
 <<imdfit_powerlaw_intensityplot_space, fig.cap="Epidemic proportion of the fitted intensity process accumulated over time by type.", fig.subcap=c("Type B.", "Type C."), fig.width=5, fig.height=5, out.width="0.47\\linewidth", fig.pos="p", echo=FALSE>>=
 for (.type in 1:2) {
     print(intensityplot(imdfit_powerlaw, aggregate="space", which="epidemic proportion",
-                        types=.type, tiles=districtsD, sgrid=5000,
+                        types=.type, tiles=districtsD, sgrid=1000,
                         col.regions = grey(seq(1,0,length.out=10)), at = seq(0,1,by=0.1)))
     grid::grid.text("Epidemic proportion", x=1, rot=90, vjust=-1)
 }
