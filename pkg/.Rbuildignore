@@ -12,3 +12,5 @@ twins.log2
 ^auto
 
 \.\.pdf
+
+^vignettes/.+\.tex
