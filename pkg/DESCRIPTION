@@ -45,7 +45,7 @@ Suggests: parallel, grid, xts, gridExtra, lattice, colorspace, scales, animation
         memoise, polyclip, rgeos, gpclib, maptools, intervals,
         spdep, numDeriv, maxLik, gsl,
         testthat, coda, splancs, gamlss,
-        INLA, runjags
+        INLA, runjags, knitr
 Description: Statistical methods for the modeling and monitoring of time series
         of counts, proportions and categorical data, as well as for the modeling
         of continuous-time point processes of epidemic phenomena.
@@ -82,3 +82,4 @@ URL: http://surveillance.r-forge.r-project.org/
 Additional_repositories: https://www.math.ntnu.no/inla/R/stable
 BugReports: https://r-forge.r-project.org/tracker/?group_id=45
 Encoding: latin1
+VignetteBuilder: utils, knitr
