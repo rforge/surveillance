@@ -4,12 +4,14 @@
 
 <<setup, cache = FALSE, include = FALSE, purl = FALSE>>=
 ## purl=FALSE => not included in the tangle'd R script
-knitr::opts_chunk$set(echo = TRUE, results = 'markup', cache = FALSE,
+knitr::opts_chunk$set(echo = TRUE, tidy = FALSE, results = 'markup',
                       fig.path='plots/twinstim-', fig.width = 8, fig.height = 4,
                       fig.align = "center", fig.scap = NA, out.width = NULL,
-                      tidy = FALSE, highlight = FALSE, size = "small",
-                      error = FALSE, message = FALSE)
+                      cache = FALSE, error = FALSE, message = FALSE)
+knitr::render_sweave()             # use Sweave environments
+knitr::set_header(highlight = '')  # no \usepackage{Sweave} (part of jss class)
 ## R settings
+options(prompt = "R> ", continue = "+  ", useFancyQuotes = FALSE)  # JSS
 options(width = 85, digits = 4)
 options(scipen = 1)  # so that 1e-4 gets printed as 0.0001
 ## xtable settings
@@ -78,6 +80,10 @@ if (!COMPUTE) load("twinstim-cache.RData", verbose = TRUE)
 %% Additional commands
 \newcommand{\class}[1]{\code{#1}}  % could use quotes (JSS does not like them)
 \newcommand{\CRANpkg}[1]{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+
+%% Reduce the font size of code input and output
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{fontshape=sl, fontsize=\small}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\small}
 
 %% Abstract
 \Abstract{
@@ -586,6 +592,7 @@ plot(as.stepfun(imdepi), xlim = summary(imdepi)$timeRange, xaxs = "i",
 #axis(1, at = 2557, labels = "T", font = 2, tcl = -0.3, mgp = c(3, 0.3, 0))
 @ 
 
+\pagebreak[1]
 The \code{plot}-method for \class{epidataCS} offers aggregation of the events over time or space:
 <<imdepi_plot, fig.cap="Occurrence of the two finetypes viewed in the temporal and spatial dimensions.", fig.subcap=c("Temporal pattern.","Spatial pattern."), fig.width=5, fig.height=6, echo=c(2,4,5), out.width="0.47\\linewidth">>=
 par(las = 1)
@@ -661,7 +668,7 @@ The data could then, e.g., be analyzed by the
 areal time-series model presented in \code{vignette("hhh4\_spacetime")}.
 We can also use visualization tools of the \class{sts} class, e.g., to produce
 Figure~\ref{fig:imdsts_plot}:
-<<imdsts_plot, fig.cap="IMD cases (joint types) aggregated as an \\class{sts} object by month and district.", fig.subcap=c("Time series of monthly counts.", "Disease incidence (per 100\\,000 inhabitants)."), fig.width=5, fig.height=5, out.width="0.47\\linewidth", echo=-2>>=
+<<imdsts_plot, fig.cap="IMD cases (joint types) aggregated as an \\class{sts} object by month and district.", fig.subcap=c("Time series of monthly counts.", "Disease incidence (per 100\\,000 inhabitants)."), fig.width=5, fig.height=5, out.width="0.47\\linewidth", fig.pos="ht", echo=-2>>=
 imdsts <- epidataCS2sts(imdepi, freq = 12, start = c(2002, 1), tiles = districtsD)
 par(las = 1, lab = c(7,7,7), mar = c(5,5,1,1))
 plot(imdsts, type = observed ~ time)
@@ -683,8 +690,9 @@ the spatial and temporal interaction functions \code{siaf} ($f$) and \code{tiaf}
 Both formulae are parsed internally using the standard \code{model.frame}
 toolbox from package \pkg{stats} and thus can handle factor variables and
 interaction terms.
-While the \code{endemic} linear predictor incorporates time-dependent and/or
-area-level covariates from \code{stgrid}, 
+While the \code{endemic} linear predictor incorporates
+%time-dependent and/or area-level
+covariates from \code{stgrid}, 
 %% and in the disease mapping context usually contains at least the population density as a multiplicative offset, i.e.,
 %% \code{endemic = ~offset(log(popdensity))}. There can be additional effects of time,
 %% which are functions of the variable \code{start} from \code{stgrid},
@@ -699,8 +707,8 @@ to be associated with the force of infection.
 For the interaction functions, several alternatives are predefined as listed in
 Table~\ref{tab:iafs}. They are applicable out-of-the-box and
 illustrated as part of the following modeling exercise for the IMD data.
-Own interaction functions can also be used provided their implementation obeys a
-certain structure, see \code{help("siaf")} and \code{help("tiaf")}, respectively.
+Own interaction functions can also be implemented following the structure
+described in \code{help("siaf")} and \code{help("tiaf")}, respectively.
 
 <<tab_iafs, echo=FALSE, results="asis", purl=FALSE>>=
 twinstim_iafs <- suppressWarnings(
@@ -911,7 +919,7 @@ Figure~\ref{fig:imdfit_siafs} suggests that the estimated step function is in
 line with the power law.
 
 For the temporal interaction function $g(t)$, model updates and plots are
-similarly possible, e.g.,
+similarly possible, e.g., using
 \code{update(imdfit_Gaussian, tiaf = tiaf.exponential())}. However, the events
 in the IMD data are too rare to infer the time-course of infectivity with
 confidence. 
@@ -955,7 +963,7 @@ imdfit_endemic_sel <- stepComponent(imdfit_endemic, component = "endemic")
 
 \subsection{Model diagnostics}
 
-The element \code{"fittedComponents"} of \class{twinstim} objects contains
+The element \code{"fittedComponents"} of a \class{twinstim} object contains
 the endemic and epidemic values of the estimated intensity at each event
 occurrence. However, plots of the conditional intensity (and
 its components) as a function of location or time provide more insight into the
@@ -1003,15 +1011,15 @@ meanepiprop <- integrate(intensityplot(imdfit_powerlaw, which="epidemic proporti
                          50, 2450, subdivisions=2000, rel.tol=1e-3)$value / 2400
 @ 
 
-Spatial \code{intensityplot}s can be produced via
-\code{aggregate = "space"} and require a geographic representation of \code{stgrid}.
-Figure~\ref{fig:imdfit_powerlaw_intensityplot_space} shows the
-accummulated epidemic proportion by event type.
-It is naturally high in regions with a
-large number of cases and even more so if the population density is low.
-The function \code{epitest} offers a model-based global test for epidemicity,
-while \code{knox} and \code{stKtest} implement related classical approaches
-\citep{meyer.etal2015}.
+Spatial \code{intensityplot}s
+as in Figure~\ref{fig:imdfit_powerlaw_intensityplot_space}
+can be produced via \code{aggregate = "space"}
+and require a geographic representation of \code{stgrid}.
+The epidemic proportion is naturally high around clusters of cases and
+even more so if the population density is low.
+%% The function \code{epitest} offers a model-based global test for epidemicity,
+%% while \code{knox} and \code{stKtest} implement related classical approaches
+%% \citep{meyer.etal2015}.
 
 <<imdfit_powerlaw_intensityplot_space, fig.cap="Epidemic proportion of the fitted intensity process accumulated over time by type.", fig.subcap=c("Type B.", "Type C."), fig.width=5, fig.height=5, out.width="0.47\\linewidth", fig.pos="p", echo=FALSE>>=
 for (.type in 1:2) {
@@ -1023,13 +1031,12 @@ for (.type in 1:2) {
 @ 
 
 
-Another diagnostic tool is the function \code{checkResidualProcess}, which transforms the temporal ``residual
+Another diagnostic tool is the function \code{checkResidualProcess} (Figure~\ref{fig:imdfit_checkResidualProcess}), which transforms the temporal ``residual
 process'' in such a way that it exhibits a uniform distribution and lacks serial
 correlation if the fitted model describes the true CIF well
 \citep[see][Section~3.3]{ogata1988}. % more recent work: \citet{clements.etal2011}
-These properties can be checked graphically as in
-Figure~\ref{fig:imdfit_checkResidualProcess} produced by:
-<<imdfit_checkResidualProcess, fig.cap="The left plot shows the \\code{ecdf} of the transformed residuals with a 95\\% confidence band obtained by inverting the corresponding Kolmogorov-Smirnov test (no evidence for deviation from uniformity). The right-hand plot suggests absence of serial correlation.", results="hide", fig.pos="p", echo=2>>=
+
+<<imdfit_checkResidualProcess, fig.cap="\\code{checkResidualProcess(imdfit\\_powerlaw)}. The left plot shows the \\code{ecdf} of the transformed residuals with a 95\\% confidence band obtained by inverting the corresponding Kolmogorov-Smirnov test (no evidence for deviation from uniformity). The right-hand plot suggests absence of serial correlation.", results="hide", fig.pos="p", echo=FALSE>>=
 par(mar = c(5, 5, 1, 1))
 checkResidualProcess(imdfit_powerlaw)
 @ 
