@@ -28,7 +28,7 @@ all: ${VIGNETTES}
 
 .PHONY: clean cleanall
 clean:
-	rm -rf *-R.bib plots/ $(addprefix *-cache.RData,.new .diff)
+	rm -rf *.aux *.bbl *.blg *.log *.out *-R.bib plots/ $(addprefix *-cache.RData,.new .diff)
 cleanall: clean
 	rm -rf ${VIGNETTES} ${TEXFILESFROMRNW}
 
