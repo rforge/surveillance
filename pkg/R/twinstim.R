@@ -205,15 +205,15 @@ twinstim <- function (
         gIntUpper <- mfe[["(obsInfLength)"]]
         gIntLower <- pmax(0, t0-eventTimes)
         eventCoords <- coordinates(data$events)[inmfe,,drop=FALSE]
-        ## if (verbose && N > 6000)
-        ##     cat("calculating distance matrix of", N, "events ...\n")
-        eventDists <- as.matrix(dist(eventCoords, method = "euclidean"))
         influenceRegion <- data$events@data$.influenceRegion[inmfe]
         iRareas <- vapply(X = influenceRegion, FUN = attr, which = "area",
                           FUN.VALUE = 0, USE.NAMES = FALSE)
         eventSources <- if (N == nobs(data) && identical(qmatrix, data$qmatrix)) {
             data$events@data$.sources
         } else { # re-determine because subsetting has invalidated row indexes
+            ## if (verbose && N > 6000)
+            ##     cat("calculating distance matrix of", N, "events ...\n")
+            eventDists <- as.matrix(dist(eventCoords, method = "euclidean"))
             if (verbose) cat("updating list of potential sources ...\n")
             lapply(seq_len(N), function (i)
                 determineSources(i, eventTimes, removalTimes, eventDists[i,],

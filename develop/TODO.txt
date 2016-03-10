@@ -121,6 +121,9 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 ##########
 
 # Feature requests
+- determineSources() should be implemented in C and it should be avoided to
+  compute the whole distance matrix. It is also wasteful to recompute
+  the eventDists for every data permutation during epitest...
 - iafplot(): add rug() of observed event distances
 - as.epidataCS: "events" could be provided as an object of class ppx (which
   would include the window "W") or of class STIDF, then transform appropriately
