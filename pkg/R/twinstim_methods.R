@@ -4,9 +4,9 @@
 ### a copy of which is available at http://www.r-project.org/Licenses/.
 ###
 ### Methods for objects of class "twinstim", specifically:
-### vcov, logLik, print, summary, plot (intensity, iaf), R0, residuals, update
+### vcov, logLik, print, summary, plot, R0, residuals, update, terms, all.equal
 ###
-### Copyright (C) 2009-2015 Sebastian Meyer
+### Copyright (C) 2009-2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -17,14 +17,6 @@
     link <- attr(x$formula$epidemic, "link")
     if (is.null(link)) "log" else link
 }
-
-## ## compare two "twinstim" fits
-## all.equal.twinstim <- function (target, current, ...,
-##                                 ignore = c("runtime", "call"))
-## {
-##     target[ignore] <- current[ignore] <- NULL
-##     NextMethod("all.equal")
-## }
 
 ### don't need a specific coef-method (identical to stats:::coef.default)
 ## coef.twinstim <- function (object, ...)
@@ -825,3 +817,10 @@ terms.twinstim <- function (x, component=c("endemic", "epidemic"), ...)
     terms.formula(x$formula[[component]], keep.order=TRUE)
 }
 
+## compare two twinstim fits ignoring at least "runtime", "call" and "counts"
+all.equal.twinstim <- function (target, current, ..., ignore = NULL)
+{
+    ignore <- unique.default(c(ignore, "runtime", "call", "counts"))
+    target[ignore] <- current[ignore] <- list(NULL)
+    NextMethod("all.equal")
+}

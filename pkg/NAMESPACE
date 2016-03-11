@@ -387,6 +387,7 @@ S3method(residuals, twinstim)
 S3method(update, twinstim)
 export(update.twinstim)                 # for convenience
 S3method(terms, twinstim)
+S3method(all.equal, twinstim)
 
 export(stepComponent)
 S3method(terms, twinstim_stependemic)
