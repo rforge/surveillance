@@ -817,10 +817,11 @@ terms.twinstim <- function (x, component=c("endemic", "epidemic"), ...)
     terms.formula(x$formula[[component]], keep.order=TRUE)
 }
 
-## compare two twinstim fits ignoring at least "runtime", "call" and "counts"
+## compare two twinstim fits ignoring at least the "runtime" and the "call"
+## just like all.equal.hhh4()
 all.equal.twinstim <- function (target, current, ..., ignore = NULL)
 {
-    ignore <- unique.default(c(ignore, "runtime", "call", "counts"))
+    ignore <- unique.default(c(ignore, "runtime", "call"))
     target[ignore] <- current[ignore] <- list(NULL)
     NextMethod("all.equal")
 }
