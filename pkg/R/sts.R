@@ -119,28 +119,26 @@ init.sts <- function(.Object, epoch=seq_len(nrow(observed)), start=c(2000,1), fr
   return(.Object)
 }
 
-
-###########################################################################
-# Initialization -- two modes possible: full or just disProg, freq and map
-###########################################################################
-
-#Full
 setMethod("initialize", "sts", init.sts)
 
-#Partial -- use a disProg object as start and convert it.
+
+###########################################################################
+# Conversion between old "disProg" and new "sts" classes
+###########################################################################
+
+## transform a "disProg" object to the new "sts" class
 disProg2sts <- function(disProgObj, map=NULL) {
-  #Ensure that epoch slot is not zero
-  if (is.null(disProgObj[["epoch",exact=TRUE]])) {
-    myweek <- 1:nrow(as.matrix(disProgObj$observed))
+  ## week could be undefined in a "disProg" object
+  myweek <- if (is.null(disProgObj[["week",exact=TRUE]])) {
+    seq_len(NROW(disProgObj$observed))
   } else {
-    myweek <- disProgObj$week
+    disProgObj$week
   }
-    
   sts <- new("sts", epoch=myweek, start=disProgObj$start, freq=disProgObj$freq, observed=disProgObj$observed, state = disProgObj$state, map=map, neighbourhood=disProgObj$neighbourhood, populationFrac=disProgObj$populationFrac,alarm=disProgObj$alarm,upperbound=disProgObj$upperbound)
   return(sts)
 }
 
-#The reverse action
+## The reverse action
 sts2disProg <- function(sts) {
   disProgObj <- create.disProg(week=sts@epoch, start=sts@start, freq=sts@freq,
                                observed=sts@observed, state=sts@state, neighbourhood=sts@neighbourhood,

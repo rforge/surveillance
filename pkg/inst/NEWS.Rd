@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.11.1 (2016-03-04)}{
+\section{Changes in surveillance version 1.11.1 (2016-03-14)}{
 
 \subsection{DOCUMENTATION}{
   \itemize{
@@ -21,6 +21,9 @@
   \itemize{
     \item \code{stsplot_spacetime()} now recognizes its \code{opts.col}
     argument.
+
+    \item \code{disProg2sts()} ignored the \code{week} indices of the
+    old \code{"disProg"} object when setting the \code{epoch}.
   }
 }
 
