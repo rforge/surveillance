@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.11.1 (2016-03-14)}{
+\section{Changes in surveillance version 1.11.1 (2016-03-15)}{
 
 \subsection{DOCUMENTATION}{
   \itemize{
@@ -24,6 +24,11 @@
 
     \item \code{disProg2sts()} ignored the \code{week} indices of the
     old \code{"disProg"} object when setting the \code{epoch}.
+
+    \item Conversion from \code{"ts"} to \code{"sts"} using
+    \code{as(ts, "sts")} could set a wrong start time. For instance,
+    \code{as(ts(1:10, start=c(1959,2), frequency=4), "sts")@start} was
+    \code{c(1959,1)}.
   }
 }
 

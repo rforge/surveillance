@@ -2,21 +2,25 @@
 #Conversion between ts objects and sts objects
 ######################################################################
 
-setAs(from="ts", to="sts", def = function (from)  {
-  #Extract date attributes from ts object
-  fromtsp <- tsp(hasTsp(from))
-  
-  #Remove "tsp" attribute and "ts"/"mts" class
-  tsp(from) <- NULL
-  ## "tsp<-"(x,NULL) is documented to also remove "ts" and "mts" classes
-  ## but at least in R 3.2.4, it does not remove "mts"
-  from <- unclass(from)
-  
-  #Create the sts object
-  sts(observed = from,
-      start = c(trunc(fromtsp[1]), abs(fromtsp[1]-trunc(fromtsp[1]))*fromtsp[3]),
-      freq = fromtsp[3])
+### Convert a simple "ts" object to an "sts" object
+
+setAs(from = "ts", to = "sts", def = function (from) {
+    ## Extract frequency and start from the "ts" object
+    freq <- frequency(from)
+    start <- start(from)
+    if (length(start) == 1)
+        stop("could not convert time series start() to (year, index) form")
+    
+    ## Remove "tsp" attribute and "ts"/"mts" class
+    tsp(from) <- NULL
+    ## "tsp<-"(x,NULL) is documented to also remove "ts" and "mts" classes
+    ## but at least in R 3.2.4, it does not remove "mts"
+    from <- unclass(from)
+    
+    ## Create the sts object
+    sts(observed = from, start = start, freq = freq)
 })
+
 
 ### Convert an "sts" object to a simple "ts" object
 
