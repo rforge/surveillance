@@ -4,16 +4,11 @@
 
 setAs(from="ts", to="sts", def = function (from)  {
   #Extract date attributes from ts object
-  fromtsp <- tsp(from)
+  fromtsp <- tsp(hasTsp(from))
   
   #Extract core data of the object
   theData <- unclass(from)
   attr(theData, "tsp") <- NULL
-  
-  #Check that the elemtns are actually counts
-  if (!is.integer(as.vector(from))) {
-      stop("Elements of the ts object need to be integer valued.")
-  }
   
   #Create the sts object
   sts(observed = theData,
