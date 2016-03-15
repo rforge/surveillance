@@ -21,10 +21,7 @@
   \itemize{
     \item \code{stsplot_spacetime()} now recognizes its \code{opts.col}
     argument.
-
-    \item \code{disProg2sts()} ignored the \code{week} indices of the
-    old \code{"disProg"} object when setting the \code{epoch}.
-
+    
     \item Conversion from \code{"ts"} to \code{"sts"} using
     \code{as(ts, "sts")} could set a wrong start time. For instance,
     \code{as(ts(1:10, start=c(1959,2), frequency=4), "sts")@start} was

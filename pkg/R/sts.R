@@ -128,12 +128,9 @@ setMethod("initialize", "sts", init.sts)
 
 ## transform a "disProg" object to the new "sts" class
 disProg2sts <- function(disProgObj, map=NULL) {
-  ## week could be undefined in a "disProg" object
-  myweek <- if (is.null(disProgObj[["week",exact=TRUE]])) {
-    seq_len(NROW(disProgObj$observed))
-  } else {
-    disProgObj$week
-  }
+  ## NOTE: we cannot trust disProgObj$week to be a valid "epoch" specification,
+  ## e.g., the week in data("ha") refers to the week number _within_ a year.
+  myweek <- seq_len(NROW(disProgObj$observed))
   sts <- new("sts", epoch=myweek, start=disProgObj$start, freq=disProgObj$freq, observed=disProgObj$observed, state = disProgObj$state, map=map, neighbourhood=disProgObj$neighbourhood, populationFrac=disProgObj$populationFrac,alarm=disProgObj$alarm,upperbound=disProgObj$upperbound)
   return(sts)
 }
