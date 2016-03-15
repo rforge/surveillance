@@ -155,7 +155,7 @@ if (requireNamespace("maptools")) {
 }
 
 ha.sts
-plot(ha.sts, type = observed ~ 1 | unit)
+plot(ha.sts, type = observed ~ unit, labels = TRUE)
 
 ## convert ts/mts object to sts
 z <- ts(matrix(rpois(300,10), 100, 3), start = c(1961, 1), frequency = 12)
