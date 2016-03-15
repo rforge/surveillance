@@ -79,7 +79,8 @@
       \eqn{(number of regions)^2} describing the neighbourhood structure. It
       may either be a binary adjacency matrix or contain neighbourhood orders.}
     \item{\code{populationFrac}:}{A \code{matrix} of population 
-      fractions (with dimensions \code{dim(observed)}).}
+      fractions or absolute numbers (see \code{multinomialTS} below)
+      with dimensions \code{dim(observed)}.}
     \item{\code{map}:}{Object of class \code{SpatialPolygonsDataFrame}
       providing a shape of the areas which are monitored. }
     \item{\code{control}:}{Object of class \code{list}, this is a
@@ -101,7 +102,7 @@
       \code{observed} using \code{\link{dim}}.}
     \item{observed}{\code{signature(x = "sts")}: extract the \code{observed}
       slot of an \code{sts} object.}
-    \item{population}{\code{signature(x = "sts")}: extract the \code{population}
+    \item{population}{\code{signature(x = "sts")}: extract the \code{populationFrac}
       slot of an \code{sts} object.}
     \item{multinomialTS}{\code{signature(x = "sts")}: extract the
       \code{multinomialTS} slot of an \code{sts} object.}
