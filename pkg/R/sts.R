@@ -376,11 +376,10 @@ setMethod("plot", signature(x="sts", y="missing"),
 })
 
 
-##Show/Print method
-# show
+## define how "sts" objects get printed
+
 setMethod( "show", "sts", function( object ){
-  cat( "-- An object of class sts -- \n" )
-  #cat( "length(week):\t", length(object@epoch),"\n" )
+  cat( "-- An object of class ", class(object), " -- \n", sep = "" )
   if (!object@epochAsDate) {
     cat( "freq:\t\t", object@freq,"\n" )
   } else {
@@ -397,10 +396,6 @@ setMethod( "show", "sts", function( object ){
   n <- 1
   cat("Head of observed:\n")
   print(head(object@observed,n))
-  #cat("Head of state:\n")
-  #print(head(object@state,n))
-  #cat("Head of alarm:\n")
-  #print(head(object@alarm,n))
 
   if (npoly <- length(object@map)) {
       cat("\nmap:\n")
