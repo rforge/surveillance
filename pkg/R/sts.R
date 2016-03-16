@@ -227,7 +227,7 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
     x@state <- as.matrix(apply(x@state, MARGIN=1, sum))>0
     x@alarm <- as.matrix(apply(x@alarm, MARGIN=1, sum))>0
     #There is no clever way to aggregate the upperbounds
-    x@upperbound <- matrix(NA,ncol=ncol(x@alarm),nrow=nrow(x@alarm))
+    x@upperbound <- matrix(NA_real_,ncol=ncol(x@alarm),nrow=nrow(x@alarm))
     x@populationFrac <- as.matrix(apply(x@populationFrac, MARGIN=1, sum))#>0
     x@neighbourhood <- matrix(NA, 1, 1) # consistent with default for new("sts")
   }
