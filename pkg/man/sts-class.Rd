@@ -1,7 +1,7 @@
 \name{sts-class}
 \Rdversion{1.1}
 \docType{class}
-\alias{sts}
+\alias{sts}  % FIXME: document explicitly somewhere
 \alias{sts-class}
 
 % methods to access and replace slots
@@ -77,7 +77,8 @@
     \item{\code{upperbound}:}{Matrix with upper bound values }
     \item{\code{neighbourhood}:}{Symmetric matrix of size
       \eqn{(number of regions)^2} describing the neighbourhood structure. It
-      may either be a binary adjacency matrix or contain neighbourhood orders.}
+      may either be a binary adjacency matrix or contain neighbourhood orders
+      (see the Examples for how to infer the latter from the \code{map}).}
     \item{\code{populationFrac}:}{A \code{matrix} of population 
       fractions or absolute numbers (see \code{multinomialTS} below)
       with dimensions \code{dim(observed)}.}
@@ -100,6 +101,7 @@
   \describe{ 
     \item{dim}{\code{signature(x = "sts")}: extract matrix dimensions of
       \code{observed} using \code{\link{dim}}.}
+    \item{dimnames}{\code{signature(x="sts")}: extract the \code{\link{dimnames}} of the \code{observed} matrix.}
     \item{observed}{\code{signature(x = "sts")}: extract the \code{observed}
       slot of an \code{sts} object.}
     \item{population}{\code{signature(x = "sts")}: extract the \code{populationFrac}
@@ -119,9 +121,9 @@
       returned object is of class \code{Date}.}
     \item{epochInYear}{\code{signature(x = "sts")}: Returns the epoch
       number within the year of the \code{epoch} slot.}
-    \item{dimnames}{\code{signature(x="sts")}: extract the \code{\link{dimnames}} of the \code{observed} matrix.}
     \item{initialize}{\code{signature(x="sts")}: the internal function
       \code{init.sts} is called, which assigns all slots.  }
+    \item{[}{subsetting \code{"sts"} objects, see \code{\link{[,sts-method}}.}
     \item{aggregate}{\code{signature(x="sts")}: see
       \code{\link{aggregate,sts-method}}}
     \item{year}{\code{signature(x = "sts")}:
@@ -138,53 +140,46 @@
       specified using a formula \code{type}.
       See \code{\link{stsplot}} for details.
     }
+    \item{animate}{see \code{\link{animate.sts}}.}
+    \item{coerce}{\code{signature(from="sts", to="ts")} (can also be
+      called via the S3 generic \code{as.ts}) and the reverse
+      \code{signature(from="ts", to="sts")}.}
+    \item{toLatex}{see \code{\link{toLatex,sts-method}}.}
   }
 }
 
-\author{M. \enc{Höhle}{Hoehle}}
-\examples{
-if (requireNamespace("maptools")) {
-    # load disProg-object "ha" and convert to S4-class "sts"
-    data("ha")
-    shpfile <- system.file("shapes/berlin.shp",package="surveillance")
-    ha.sts <- disProg2sts(ha, map=maptools::readShapePoly(shpfile,IDvar="SNAME"))
-} else {
-    data("ha.sts")
-    # is almost identical to the above except that German umlauts
-    # have been replaced in 'ha.sts@map@data$BEZIRK' for compatibility reasons
-}
+\author{Michael \enc{Höhle}{Hoehle} and Sebastian Meyer}
 
-ha.sts
-plot(ha.sts, type = observed ~ unit, labels = TRUE)
+\examples{
+## Counts of measles in the Weser-Ems region of Lower Saxony, Germany, 2001-2002
+data("measlesWeserEms")
+measlesWeserEms
+
+## reconstruct data("measlesWeserEms") from its components
+counts <- observed(measlesWeserEms)
+map <- measlesWeserEms@map
+populationFrac <- population(measlesWeserEms)
+weserems_nbOrder <- neighbourhood(measlesWeserEms)
+## orders of adjacency can also be determined from the map
+if (requireNamespace("spdep")) {
+    stopifnot(identical(weserems_nbOrder,
+                        nbOrder(poly2adjmat(map), maxlag = 10)))
+}
+mymeasles <- sts(counts, start = c(2001, 1), frequency = 52,
+                 population = populationFrac,
+                 neighbourhood = weserems_nbOrder, map = map)
+stopifnot(identical(mymeasles, measlesWeserEms))
 
 ## convert ts/mts object to sts
 z <- ts(matrix(rpois(300,10), 100, 3), start = c(1961, 1), frequency = 12)
 z.sts <- as(z, "sts")
 plot(z.sts)
 
-## conversion to the quasi-standard "xts" class is also possible
-## -> enables interactive time series plots using package "dygraphs"
+## conversion of "sts" objects to the quasi-standard "xts" class is possible
 if (require("xts")) {
     z.xts <- as.xts(z.sts)
     plot(z.xts)
 }
-
-## reconstruct 'measlesWeserEms' from its components
-data("measlesWeserEms")
-measlesWeserEms
-counts <- observed(measlesWeserEms)
-map <- measlesWeserEms@map
-populationFrac <- measlesWeserEms@populationFrac
-weserems_nbOrder <- if(requireNamespace("spdep")) {
-    # determine adjacency orders from the map
-    nbOrder(poly2adjmat(map), maxlag = 10)
-} else {
-    # use the stored neighbourhood structure
-    neighbourhood(measlesWeserEms)
-}
-mymeasles <- sts(observed = counts, start = c(2001, 1), frequency = 52,
-    neighbourhood = weserems_nbOrder, map = map, population = populationFrac)
-stopifnot(identical(mymeasles, measlesWeserEms))
 }
 
 \keyword{classes}
