@@ -233,11 +233,11 @@ The $\mu_0$ model is fitted by a call of the function \verb+estimateGLRNbHook+. 
 estimateGLRNbHook
 @
 
-To include own models in the \verb+estimateGLRNbHook+ function, the code of the function has to be changed. In the following code chunk \verb+estimateGLRNbHook+ is modified so that weights are included in the model.
+To include own models in the \verb+estimateGLRNbHook+ function, the code of the function has to be changed. In the following code chunk \verb+estimateGLRNbHook+ is modified so that weights are included in the model (here always Poisson, ignoring \verb+alpha+).
 
 \begin{small}
 \begin{verbatim}
-estimateGLRPoisHook <- function() {
+estimateGLRNbHook <- function() {
   control <- parent.frame()$control
   p <- parent.frame()$disProgObj$freq
   range <- parent.frame()$range
@@ -256,7 +256,6 @@ estimateGLRPoisHook <- function() {
     formula <- paste(formula,"+cos(2*",s,"*pi/p*t)+ sin(2*",s,"*pi/p*t)",sep="")
   }
   
-
   m <- eval(substitute(glm(form,family=poisson(),data=data,weights=weights),
                        list(form=as.formula(formula))))
   return(list(mod=m,pred=as.numeric(predict(m,newdata=data.frame(t=test),   
