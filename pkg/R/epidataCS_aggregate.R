@@ -5,7 +5,7 @@
 ###
 ### Convert "epidataCS" to the (aggregated) classes "epidata" or "sts"
 ###
-### Copyright (C) 2009-2015 Sebastian Meyer
+### Copyright (C) 2009-2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -160,7 +160,7 @@ epidataCS2sts <- function (object, freq, start,
     }
 
     ## initialize sts object
-    sts(epoch=epoch, freq=freq, start=start,
+    sts(epoch=epoch, frequency=freq, start=start,
         observed=unclass(eventsByCell), neighbourhood=neighbourhood,
         populationFrac=populationFrac, map=tiles, epochAsDate=FALSE)
 }

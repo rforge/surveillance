@@ -1,122 +1,139 @@
-######################################################################
-# Everything belonging to the class sts
-######################################################################
+################################################################################
+### Initialization and other basic methods for the S4 class "sts"
+###
+### Copyright (C) 2007-2014 Michael Hoehle, 2012-2016 Sebastian Meyer
+###
+### This file is part of the R package "surveillance",
+### free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
+################################################################################
 
 
 ######################################################################
-# Initialize function for the surveillance time series objects
-# -- see documentation in RD files
-#
-# Dimnames are taken from the observed matrix.
+# initialize-method -- see ../man/sts-class.Rd for class information
 ######################################################################
 
-#Ensure that all matrix slots have the same dimnames
+#Ensure that all matrix slots have the same dimnames, which are
+#always taken from the observed matrix
 fix.dimnames <- function(x) {
+  dn <- dimnames(x@observed)
   #Make sure all arrays have the same dimnames
   dimnames(x@alarm) <- dimnames(x@state) <- dimnames(x@upperbound) <-
-    dimnames(x@populationFrac) <- dimnames(x@observed)
+    dimnames(x@populationFrac) <- dn
   #Special for neighbourhood
-  dimnames(x@neighbourhood) <- list(colnames(x@observed),colnames(x@observed))
-
+  dimnames(x@neighbourhood) <- dn[c(2L,2L)]
   return(x)
 }
 
-#constructor function
-init.sts <- function(.Object, epoch=seq_len(nrow(observed)), start=c(2000,1), frequency=52, observed, state=0*observed, map=NULL, neighbourhood=NULL, populationFrac=NULL,alarm=NULL,upperbound=NULL, control=NULL,epochAsDate=FALSE,multinomialTS=FALSE) {
+## a user-level constructor function,
+## which calls the standard generator function .sts(),
+## which calls initialize() on the "sts" prototype - see init.sts() below
+## NOTE: using sts() is the preferred approach since surveillance 1.10-0
+## NOTE: NULL arguments are ignored => default slot values
+sts <- function (observed,
+                 start = c(2000, 1), frequency = 52, # prototype values
+                 population = NULL, # an alias for "populationFrac"
+                 ...) # further named arguments representing "sts" slots
+{
+    slots <- list(observed = observed, start = start, freq = frequency, ...)
+    if (!is.null(population)) {
+        if ("populationFrac" %in% names(slots))
+            warning("'population' takes precedence over 'populationFrac'")
+        slots$populationFrac <- population
+    } # else "populationFrac" is a possible element of ...
+    
+    ## call the standard generator function with explicitly set slots
+    isNULL <- vapply(X = slots, FUN = is.null,
+                     FUN.VALUE = FALSE, USE.NAMES = FALSE)
+    do.call(.sts, slots[!isNULL])
+}
 
-  #If used in constructor
-  if(nargs() > 1) {
-    #Name handling  
-    namesObs <-colnames(observed)
-    namesState <- colnames(observed)
-    #Ensure observed, state are on matrix form
+## initialize-method called by new("sts", ...),
+## the long-standing default way of creating "sts" objects.
+## For backward-compatibility, we keep this customized initialize-method,
+## although it would be cleaner to put things into the generator function
+## and use the default initialize-method.
+init.sts <- function(.Object, ..., # also for slots of classes extending "sts"
+                     observed, # use copy constructor if missing(observed)
+                     ## the following default arguments depend on dim(observed)
+                     epoch = seq_len(nTime),
+                     state = matrix(FALSE, nTime, nUnit),
+                     alarm = matrix(NA, nTime, nUnit),
+                     upperbound = matrix(NA_real_, nTime, nUnit),
+                     neighbourhood = matrix(NA, nUnit, nUnit),
+                     populationFrac = matrix(1/nUnit, nTime, nUnit),
+                     ## FIXME: change default to a matrix of NA_real_ ?
+                     ## the map slot needs special treatment (see below)
+                     map = .Object@map # old/prototype value
+                     ## the remaining slots have useful prototype values
+                     ## and are handled as part of ...
+                     ##start = c(2000, 1), freq = 52,
+                     ##epochAsDate = FALSE, multinomialTS = FALSE,
+                     ##control = .Object@control
+                     )
+{
+    if (nargs() < 2) # nothing to do
+        return(.Object)
+    
+    if (missing(observed)) { # use default initialize-method
+        ## such that, e.g., initialize(stsObj, map=newMap) will set a new map
+        ## and copy other slots from stsObj instead of (re-)setting to defaults,
+        ## as well as to support new("stsBP", stsObj, ci=ci, lambda=lambda).
+        ## CAVE: automatic dimension correction of matrix slots is not done.
+        .Object <- callNextMethod()
+        ## Drawback: .Object@map has been forced to "SpatialPolygons"
+        if (!missing(map)) # restore the supplied map
+            .Object@map <- map
+        ## If missing(map), .Object@map = as(stsObj@map, "SpatialPolygons"),
+        ## i.e., data will be lost => map=stsObj@map must be passed explicitly
+        .Object <- fix.dimnames(.Object)
+        return(.Object)
+    }
+    
+    ## Ensure matrix form (auto-conversion is useful for single time series)
     observed <- as.matrix(observed)
+    nUnit <- ncol(observed)
+    nTime <- nrow(observed)
     state <- as.matrix(state)
-  
-    #check number of columns of observed and state
-    nAreas <- ncol(observed)
-    nObs <- nrow(observed)
-    if(ncol(observed) != ncol(state)){
-      #if there is only one state-vector for more than one area, repeat it
-      if(ncol(state)==1) {
-        state <- ts(matrix(rep(state,nAreas),ncol=nAreas,byrow=FALSE),frequency=frequency(observed))
-      ## FIXME @ Michael: 1. why convert 'state' to a "ts" object in this special case but not in general
-      ##                  2. frequency(observed) is 1 unless observed has the "tsp" attribute
-      } else { 
-        stop('wrong dimensions of observed and state')
-      }
+    alarm <- as.matrix(alarm)
+    upperbound <- as.matrix(upperbound)
+    
+    ## clear rownames and set colnames for the matrix of observed counts
+    if (is.null(namesObs <- colnames(observed))){
+        namesObs <- paste0("observed", seq_len(nUnit))
+    }
+    dimnames(observed) <- list(NULL, namesObs)
+    
+    ## if there is only one state-vector for more than one area, repeat it
+    if (nUnit > 1 && ncol(state) == 1 && length(state) == nTime) {
+        state <- rep.int(state, nUnit)
+        dim(state) <- c(nTime, nUnit)
     }
 
-    # check length of epoch
-    stopifnot(length(epoch) == nrow(observed))
-    
-    #check neighbourhood matrix
-    if(!is.null(neighbourhood) && any(dim(neighbourhood) != nAreas)) {
-      stop('wrong dimensions of neighbourhood matrix')
+    ## time-constant population fractions can be provided as a single vector
+    if (is.vector(populationFrac, mode="numeric") &&
+        length(populationFrac) == nUnit) {
+        populationFrac <- matrix(populationFrac, nTime, nUnit, byrow=TRUE)
     }
-    
-    #popFrac
-    if (nAreas==1 && (!multinomialTS)) {
-        populationFrac <- matrix(1,nrow=nObs, ncol=1)
-    } else if (is.null(populationFrac)) {
-        populationFrac <- matrix(1/nAreas,nrow=nObs,ncol=nAreas)
-    } else if (is.vector(populationFrac, mode="numeric") &&
-               length(populationFrac) == nAreas) {
-        populationFrac <- matrix(populationFrac, nObs, nAreas, byrow=TRUE)
-    }
-    
-    #labels for observed and state
-    if(is.null(namesObs)){
-      namesObs <- paste("observed", 1:nAreas, sep="")       
-      namesState <- paste("state", 1:nAreas, sep="")  
-    }
-    
-    dimnames(observed) <- list(NULL,namesObs)
-    dimnames(state) <- list(NULL,namesState)
 
-    if (is.null(neighbourhood))
-      neighbourhood <- matrix(NA,nrow=nAreas,ncol=nAreas)
-    if (is.null(alarm)) 
-      alarm      <- matrix(NA,nrow=nObs,ncol=nAreas)
-    if (is.null(upperbound))
-      upperbound <- matrix(NA,nrow=nObs,ncol=nAreas)
-
-    ##Assign everything else
-    .Object@epoch <- epoch
-    .Object@epochAsDate <- epochAsDate
-    .Object@multinomialTS <- multinomialTS
+    ## we need to set the map manually since the initialize,ANY-method called
+    ## next would coerce a "SpatialPolygonsDataFrame" to "SpatialPolygons"
+    if (!missing(map))
+        .Object@map <- map
     
-    if (length(start) == 2) {
-      .Object@start <- start
-    } else {
-      stop("start must be a vector of length two denoting (year, epoch/week/month/idx)")
-    }
+    ## set all other slots (including for classes extending this class)
+    ## using the default initialize-method
+    .Object <- callNextMethod(.Object, ...,
+                              observed=observed, epoch=epoch,
+                              state=state, alarm=alarm, upperbound=upperbound,
+                              neighbourhood=neighbourhood,
+                              populationFrac=populationFrac)
+    ## this also checks validObject(.Object)
     
-    .Object@freq <- frequency
-    .Object@state <- state
-    .Object@observed <- observed
-    
-    if (length(map) > 0L) {  # i.e., not the empty prototype nor NULL
-      .Object@map <- map  # checkAtAssignment() verifies the class of map
-      ## if a map is provided, it must cover all colnames(observed)
-      if (!all(colnames(observed) %in% row.names(map))) {
-        stop("map is incomplete; check colnames(observed) %in% row.names(map)")
-      }
-    }
-    
-    .Object@neighbourhood <- neighbourhood
-    .Object@populationFrac <- populationFrac
-    .Object@alarm <- alarm
-    .Object@upperbound <- upperbound
-    
-    if (!is.null(control))
-      .Object@control <- control
-    
-    #Make sure all arrays have the same dimnames
+    ## make sure all arrays have the same dimnames
     .Object <- fix.dimnames(.Object)
-  }
-  
-  return(.Object)
+    
+    return(.Object)
 }
 
 setMethod("initialize", "sts", init.sts)
@@ -128,11 +145,17 @@ setMethod("initialize", "sts", init.sts)
 
 ## transform a "disProg" object to the new "sts" class
 disProg2sts <- function(disProgObj, map=NULL) {
+  disProgObj$map <- map
   ## NOTE: we cannot trust disProgObj$week to be a valid "epoch" specification,
   ## e.g., the week in data("ha") refers to the week number _within_ a year.
-  myweek <- seq_len(NROW(disProgObj$observed))
-  sts <- new("sts", epoch=myweek, start=disProgObj$start, freq=disProgObj$freq, observed=disProgObj$observed, state = disProgObj$state, map=map, neighbourhood=disProgObj$neighbourhood, populationFrac=disProgObj$populationFrac,alarm=disProgObj$alarm,upperbound=disProgObj$upperbound)
-  return(sts)
+  ## CAVE: in "disProg" objects, several elements may be missing or NULL,
+  ## and there could be further elements not matching any "sts" slot,
+  ## e.g., in "disProg" objects generated by sim.pointSource()
+  validElements <- names(disProgObj) %in% slotNames("sts") &
+      !vapply(X=disProgObj, FUN=is.null, FUN.VALUE=FALSE, USE.NAMES=FALSE)
+  ## initialize an "sts" object using the valid "disProg" elements
+  stsObj <- do.call(.sts, disProgObj[validElements])
+  return(stsObj)
 }
 
 ## The reverse action
@@ -350,41 +373,6 @@ setMethod("plot", signature(x="sts", y="missing"),
       return(invisible())
     }
   }
-})
-
-
-###Validity checking
-## NOTE: this is effectively not used ATM, but we could include
-##       validObject(.Object) as the last step in init.sts()
-setValidity("sts", function ( object ) {
-  retval <- NULL
-
-  #Check matrix dimensions
-  if (!all( dim(object@observed) == dim(object@state)))
-    retval <- c( retval , " dimension of observed and state has to match")
-  if (!all( dim(object@observed) == dim(object@alarm)))
-    retval <- c( retval , " dimension of observed and alarm has to match")
-  if (!all( dim(object@observed) == dim(object@upperbound)))
-    retval <- c( retval , " dimension of observed and upperbound has to match")
-  if (!all( dim(object@observed) == dim(object@populationFrac)))
-    retval <- c( retval , " dimension of observed and populationFrac has to match")
-  if (!all( rep(dim(object@observed)[2] == dim(object@neighbourhood)))) {
-    retval <- c( retval , " dimension of neighbourhood has to be ncols(observed) x ncols(observed)")
-  }
-
-  #Check colnames
-  if (!all( colnames(object@observed) == colnames(object@state)))
-    retval <- c( retval , " colnames of observed and state have to match")
-  if (!all( colnames(object@observed) == colnames(object@alarm)))
-    retval <- c( retval , " colnames of observed and alarm have to match")
-  if (!all( colnames(object@observed) == colnames(object@upperbound)))
-    retval <- c( retval , " colnames of observed and upperbound have to match")
-  if (!all( colnames(object@observed) == colnames(object@populationFrac)))
-    retval <- c( retval , " colnames of observed and populationFrac have to match")
-  if (!all( colnames(object@observed) == colnames(object@neighbourhood)))
-    retval <- c( retval , " colnames of observed and neighbourhood have to match")
-
-  if (is.null(retval)) TRUE else retval
 })
 
 

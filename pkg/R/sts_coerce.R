@@ -18,7 +18,7 @@ setAs(from = "ts", to = "sts", def = function (from) {
     from <- unclass(from)
     
     ## Create the sts object
-    sts(observed = from, start = start, freq = freq)
+    .sts(observed = from, start = start, freq = freq)
 })
 
 

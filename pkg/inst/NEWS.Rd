@@ -6,7 +6,21 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.11.1 (2016-03-15)}{
+\section{Changes in surveillance version 1.12.0 (2016-03-16)}{
+
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item Overhaul of the \code{"sts"} implementation. This mostly
+    affects package-internal code, which is simpler, cleaner and better
+    tested now.
+    Beyond that, the user-level constructor function \code{sts()} now
+    has explicit arguments for clarity and convenience.
+    For instance, its first argument sets the \code{observed} slot and
+    no longer needs to be named, i.e.,
+    \code{sts(mycounts, start=c(2016,3), frequency=12)}
+    works just like for the classical \code{ts()} function.
+  }
+}
 
 \subsection{DOCUMENTATION}{
   \itemize{
