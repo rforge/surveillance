@@ -26,7 +26,7 @@
   \itemize{
     \item New \code{vignette("twinstim")} based on a recently accepted
     manuscript for the Journal of Statistical Software.
-    \item Fixed typos on various help pages.
+    \item Improved the documentation on various help pages.
     \item The vignettes are again compatible with \R < 3.2.0.
   }
 }

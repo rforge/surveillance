@@ -1,7 +1,7 @@
 \name{sts-class}
 \Rdversion{1.1}
 \docType{class}
-\alias{sts}  % FIXME: document explicitly somewhere
+\alias{sts}
 \alias{sts-class}
 
 % methods to access and replace slots
@@ -41,11 +41,52 @@
 
 \description{
 
-  This is a lightweight S4 class to implement multivariate time
-  series of counts used for public health surveillance data. The class
-  captures the time series data as well as the spatial layout of the
-  regions, where the data originate from.
+  This is a lightweight S4 class to implement (multivariate) time
+  series of counts, typically from public health surveillance.
+  For areal time series, the class can also capture the spatial layout
+  of the regions, where the data originate from.
+  The constructor function \code{sts} can be used to setup an
+  \code{"sts"} object. Conversion of simple time-series objects
+  (of class \code{"\link{ts}"}) is also possible.
+  The slots of the \code{"sts"} class and available methods are
+  described below.
 
+}
+
+\usage{
+sts(observed, start = c(2000, 1), frequency = 52,
+    population = NULL, ...)
+}
+
+\arguments{
+  \item{observed}{a vector (for a single time series) or matrix (one
+    time series per column) of counts. A purely numeric data frame will
+    also do (transformed via \code{as.matrix}). This argument sets the
+    \code{observed} slot, which is the core element of the resulting
+    \code{"sts"} object. It determines the dimensions and colnames for
+    several other slots. The columns (\dQuote{units}) typically
+    correspond to different regions, diseases, or age groups.}
+  \item{start,frequency}{basic characteristics of the time series data
+    just like for simple \code{"\link{ts}"} objects. The (historical)
+    default values correspond to weekly data starting in the first week
+    of 2000.}
+  \item{population}{a vector of length the number of columns in
+    \code{observed} or a matrix of the same dimension as
+    \code{observed}. Especially for multivariate time series, the
+    population numbers (or fractions) underlying the counts in each unit
+    are relevant for visualization and statistical inference. The
+    \code{population} argument is an alias for the corresponding slot
+    \code{populationFrac}. The default \code{NULL} value sets
+    equal population fractions across all units.}
+  \item{\dots}{further named arguments with names corresponding to slot
+    names (see the list below). For instance, the \code{epoch} slot is
+    used to store the observation time, either as an integer sequence
+    (default) or as the numeric representation of \code{Date}s (if also
+    \code{epochAsDate=TRUE}). In the public health surveillance context,
+    the \code{state} slot is used to indicate outbreaks (default:
+    \code{FALSE} for all observations). For areal time series data, the
+    \code{map} and \code{neighbourhood} slots are used to store the
+    spatial structure of the observation region.}
 }
 
 \section{Slots}{
@@ -100,7 +141,7 @@
 \section{Methods}{
   \describe{ 
     \item{dim}{\code{signature(x = "sts")}: extract matrix dimensions of
-      \code{observed} using \code{\link{dim}}.}
+      \code{observed}.}
     \item{dimnames}{\code{signature(x="sts")}: extract the \code{\link{dimnames}} of the \code{observed} matrix.}
     \item{observed}{\code{signature(x = "sts")}: extract the \code{observed}
       slot of an \code{sts} object.}
@@ -151,7 +192,7 @@
 \author{Michael \enc{Höhle}{Hoehle} and Sebastian Meyer}
 
 \examples{
-## Counts of measles in the Weser-Ems region of Lower Saxony, Germany, 2001-2002
+## A typical dataset with weekly counts of measles from several districts
 data("measlesWeserEms")
 measlesWeserEms
 
@@ -175,7 +216,7 @@ z <- ts(matrix(rpois(300,10), 100, 3), start = c(1961, 1), frequency = 12)
 z.sts <- as(z, "sts")
 plot(z.sts)
 
-## conversion of "sts" objects to the quasi-standard "xts" class is possible
+## conversion of "sts" objects to the quasi-standard "xts" class
 if (require("xts")) {
     z.xts <- as.xts(z.sts)
     plot(z.xts)
