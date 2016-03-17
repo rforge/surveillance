@@ -189,7 +189,7 @@ sts2disProg <- function(sts) {
 setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...) {
   
  #Action of aggregation for populationFrac depends on the type 
- binaryTS <- sum( x@populationFrac > 1 ) > 1
+ binaryTS <- sum( x@populationFrac > 1 ) > 1  # FIXME: x@multinomialTS?
 
   #Aggregate time
   if (by == "time") {
@@ -211,9 +211,10 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
     
     x@observed <- as.matrix(aggregate(x@observed,by=list(new),sum)[,-1])
     x@state <- as.matrix(aggregate(x@state,by=list(new),sum)[,-1])>0
-    x@alarm <- as.matrix(aggregate(x@alarm,by=list(new),sum)[,-1])
+    x@alarm <- as.matrix(aggregate(x@alarm,by=list(new),sum)[,-1]) # number of alarms
     x@upperbound <- as.matrix(aggregate(x@upperbound,by=list(new),sum)[,-1])
     x@populationFrac <- as.matrix(aggregate(x@populationFrac,by=list(new),sum)[,-1])
+    ## FIXME: should make clear (warn?) that population is summed over time
 
     #the population fractions need to be recomputed if not a binary ts
     if (!binaryTS) {
@@ -225,11 +226,12 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
     #Aggregate units
     x@observed <- as.matrix(apply(x@observed, MARGIN=1, sum))
     x@state <- as.matrix(apply(x@state, MARGIN=1, sum))>0
-    x@alarm <- as.matrix(apply(x@alarm, MARGIN=1, sum))>0
+    x@alarm <- as.matrix(apply(x@alarm, MARGIN=1, sum))>0 # contrary to counting for by="time"!
     #There is no clever way to aggregate the upperbounds
     x@upperbound <- matrix(NA_real_,ncol=ncol(x@alarm),nrow=nrow(x@alarm))
     x@populationFrac <- as.matrix(apply(x@populationFrac, MARGIN=1, sum))#>0
     x@neighbourhood <- matrix(NA, 1, 1) # consistent with default for new("sts")
+    ## FIXME: x@map will be invalid, remove or unionSpatialPolygons()?
   }
 
   #validObject(x) #just a check
