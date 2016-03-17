@@ -104,7 +104,7 @@ check: build
 ## check with "allExamples" and --run-dontrun
 ## also use --extra-arch to only do runtime tests (no R and Rd code checking)
 check-allExamples: build
-	_R_SURVEILLANCE_ALL_EXAMPLES_=TRUE _R_CHECK_FORCE_SUGGESTS_=FALSE $R CMD check --as-cran --timings --run-dontrun --extra-arch surveillance_${VERSION}.tar.gz
+	_R_SURVEILLANCE_ALL_EXAMPLES_=TRUE _R_CHECK_FORCE_SUGGESTS_=FALSE $R CMD check --timings --run-dontrun --extra-arch surveillance_${VERSION}.tar.gz
 	@$(check-report-timings)
 	@$(check-report-warnings-in-examples)
 
