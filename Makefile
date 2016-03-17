@@ -22,6 +22,7 @@
 ##   25 Aug 2014 (SM): use compact-vignettes=both, i.e., including ghostscript
 ##    7 Jun 2015 (SM): added rule to create the NEWS.html as on CRAN
 ##   12 Jun 2015 (SM): added rule to check with allExamples
+##   17 Mar 2016 (SM): check-allExamples with --run-dontrun and --extra-arch
 ################################################################################
 
 ## Define variable for R which enables the use of alternatives,
@@ -72,20 +73,41 @@ ${SYSDATA}: pkg/sysdata/sysdata.R
 	cd pkg/sysdata; $R CMD BATCH --vanilla --no-timing sysdata.R
 	mv pkg/sysdata/sysdata.rda $@
 
+
+## auxiliary functions ("canned recipes") for check rules
+define CHECK_REPORT_TIMINGS_SCRIPT
+timings <- read.table(file.path('surveillance.Rcheck','surveillance-Ex.timings'), header=TRUE, row.names='name')
+timings <- timings[order(timings[['elapsed']], decreasing=TRUE),]
+cat("Runtimes of examples with elapsed time > 2 seconds:\n\n")
+subset(timings, elapsed > 2)
+endef
+export CHECK_REPORT_TIMINGS_SCRIPT
+define check-report-timings
+echo "$${CHECK_REPORT_TIMINGS_SCRIPT}" | $R --slave --vanilla
+endef
+
+define check-report-warnings-in-examples
+cd surveillance.Rcheck; \
+nwarn=`grep -c "^Warning" surveillance-Ex.Rout`; \
+if [ $$nwarn -gt 0 ]; then echo "\n\tWARNING: $$nwarn" \
+	"warning(s) thrown when running examples,\n" \
+	"\t         see file surveillance.Rcheck/surveillance-Ex.Rout\n"; fi
+endef
+
+## standard --as-cran check
 check: build
 	_R_CHECK_FORCE_SUGGESTS_=FALSE $R CMD check --as-cran --timings surveillance_${VERSION}.tar.gz
 ## further option: --use-gct (for better detection of memory bugs/segfaults)
-	@echo "timings <- read.table(file.path('surveillance.Rcheck','surveillance-Ex.timings'), header=TRUE, row.names='name'); \
-	timings <- timings[order(timings$$elapsed, decreasing=TRUE),'elapsed',drop=FALSE]; \
-	cat(capture.output(subset(timings, elapsed > 1)), sep='\n')" | $R --slave --vanilla
-	@cd surveillance.Rcheck; nwarn=`grep -c "^Warning" surveillance-Ex.Rout`; \
-	if [ $$nwarn -gt 0 ]; then echo "\n\tWARNING: $$nwarn" \
-        "warning(s) thrown when running examples,\n" \
-	"\t         see file surveillance.Rcheck/surveillance-Ex.Rout\n"; fi
+	@$(check-report-timings)
+	@$(check-report-warnings-in-examples)
 
-## check with all examples
-check-allExamples: export _R_SURVEILLANCE_ALL_EXAMPLES_=TRUE
-check-allExamples: check
+## check with "allExamples" and --run-dontrun
+## also use --extra-arch to only do runtime tests (no R and Rd code checking)
+check-allExamples: build
+	_R_SURVEILLANCE_ALL_EXAMPLES_=TRUE _R_CHECK_FORCE_SUGGESTS_=FALSE $R CMD check --as-cran --timings --run-dontrun --extra-arch surveillance_${VERSION}.tar.gz
+	@$(check-report-timings)
+	@$(check-report-warnings-in-examples)
+
 
 install: build
 	$R CMD INSTALL surveillance_${VERSION}.tar.gz
