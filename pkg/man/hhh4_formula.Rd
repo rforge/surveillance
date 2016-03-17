@@ -124,14 +124,15 @@ hhh4(fluMen, control = m)
 # endemic component: random intercepts + trend + S = 3 sine/cosine pairs
 
 data("fluBYBW")
-f.end <- addSeason2formula(f = ~ -1 + ri(type = "iid", corr="all") +
+f.end <- addSeason2formula(f = ~ -1 + ri(type="iid", corr="all") +
                                  I((t-208)/100), S = 3, period = 52)
-wji <- neighbourhood(fluBYBW)/rowSums(neighbourhood(fluBYBW))
-model.B2 <- list(ar = list(f = ~ 1),
-                 ne = list(f = ~ -1 + ri(type = "iid", corr="all"), 
-                           weights = wji),
+cntrl_B2 <- list(ar = list(f = ~ 1),
+                 ne = list(f = ~ -1 + ri(type="iid", corr="all"),
+                           weights = neighbourhood(fluBYBW), normalize = TRUE),
                  end = list(f = f.end, offset = population(fluBYBW)),
                  family = "NegBin1", verbose = TRUE)
-hhh4(fluBYBW, model.B2)
+res_B2 <- hhh4(fluBYBW, model.B2)
+summary(res_B2, idx2Exp=1:2, amplitudeShift=TRUE)
+getMaxEV(res_B2)[1]
 }
 }
