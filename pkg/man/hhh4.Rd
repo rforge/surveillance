@@ -284,109 +284,15 @@ res3_tv <- hhh4(measles, control = modifyList(model3,
 stopifnot(all.equal(res3, res3_tv, ignore = "control"))
 }
 
+
 \dontrun{
-######################################################################
-# Fit the models from the Paul & Held (2011) paper for the influenza data
-# from Bavaria and Baden-Wuerttemberg (this takes some time!)
-# For further documentation see also the vignette.
-######################################################################
-
-data("fluBYBW") 
-
-###############################################################
-## generate formula for temporal and seasonal trends
-f.end <- addSeason2formula(f = ~ -1 + ri(type="iid", corr="all") + 
-                               I((t-208)/100), S=3, period=52)
-
-## details for optimizer
-opt <- list(stop = list(tol=1e-5, niter=200),
-            regression = list(method="nlminb"),
-            variance = list(method="nlminb"))
-
-##########################
-## models 
-# A0
-cntrl_A0 <- list(ar = list(f = ~ -1),
-                 end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt, verbose = 1)
-summary(res_A0 <- hhh4(fluBYBW,cntrl_A0))
-
-# B0
-cntrl_B0 <- list(ar = list(f = ~ 1),
-                 end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt, verbose=1)
-res_B0 <- hhh4(fluBYBW,cntrl_B0)               
- 
-
-# C0
-cntrl_C0 <- list(ar = list(f = ~ -1 + ri(type="iid", corr="all")),
-                 end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt, verbose=1)
-res_C0 <- hhh4(fluBYBW,cntrl_C0)               
-
-
-#A1
-
-# weight matrix w_ji = 1/(No. neighbors of j) if j ~ i, and 0 otherwise
-wji <- neighbourhood(fluBYBW)/rowSums(neighbourhood(fluBYBW))
-
-cntrl_A1 <- list(ar = list(f = ~ -1),
-                 ne = list(f = ~ 1, weights = wji),
-                 end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt, verbose=1)
-res_A1 <- hhh4(fluBYBW,cntrl_A1)               
-
-
-# B1
-cntrl_B1 <- list(ar = list(f = ~ 1),
-                 ne = list(f = ~ 1, weights = wji),
-                 end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt, verbose=1)
-res_B1 <- hhh4(fluBYBW,cntrl_B1)               
-
-
-# C1
-cntrl_C1 <- list(ar = list(f = ~ -1 + ri(type="iid", corr="all")),
-                 ne = list(f = ~ 1, weights = wji),
-                 end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt, verbose=1)
-res_C1 <- hhh4(fluBYBW,cntrl_C1)               
-
-
-#A2
-cntrl_A2 <- list(ar = list(f = ~ -1),
-                 ne = list(f = ~ -1 + ri(type="iid",corr="all"), weights=wji),
-                 end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt, verbose=1)
-res_A2 <- hhh4(fluBYBW,cntrl_A2)               
-
-
-# B2
-cntrl_B2 <- list(ar = list(f = ~ 1),
-                 ne = list(f = ~ -1 + ri(type="iid",corr="all"), weights =wji),
-                 end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt, verbose=1)
-res_B2 <- hhh4(fluBYBW,cntrl_B2)               
-
-# C2
-cntrl_C2 <- list(ar = list(f = ~ -1 + ri(type="iid", corr="all")),
-                 ne = list(f = ~ -1 + ri(type="iid",corr="all"), weights =wji),
-                 end = list(f =f.end, offset = population(fluBYBW)),
-                 family = "NegBin1", optimizer = opt, verbose=1,
-                 start=list(fixed=fixef(res_B0),random=c(rep(0,140),
-                         ranef(res_B0)), sd.corr=c(-.5,res_B0$Sigma.orig,0)))
-res_C2 <- hhh4(fluBYBW,cntrl_C2)               
-
-
-# D
-cntrl_D <- list(ar = list(f = ~ 1),
-                ne = list(f = ~ -1 + ri(type="iid"), weights = wji),
-                end = list(f =addSeason2formula(f = ~ -1 + ri(type="car") + 
-                                             I((t-208)/100), S=3, period=52), 
-                          offset = population(fluBYBW)),
-                family = "NegBin1", optimizer = opt, verbose=1)
-res_D <- hhh4(fluBYBW,cntrl_D)               
-
+### For a more sophisticated multivariate analysis of
+### areal time series of influenza counts - data("fluBYBW") -
+### featuring random effects and predictive model assessement
+### using proper scoring rules, see the (computer-intensive)
+### demo("fluBYBW") script:
+file.show(system.file(file.path("demo", "fluBYBW.R"),
+                      package = "surveillance"))
 }
 }
 

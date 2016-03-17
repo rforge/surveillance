@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.0 (2016-03-16)}{
+\section{Changes in surveillance version 1.12.0 (2016-03-17)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -28,6 +28,11 @@
     manuscript for the Journal of Statistical Software.
     \item Improved the documentation on various help pages.
     \item The vignettes are again compatible with \R < 3.2.0.
+    \item The \code{hhh4()}-based analysis of \code{data("fluBYBW")}
+    has been moved to a separate demo script \file{fluBYBW.R}. Due to
+    the abundance of models and the relatively long runtime, we
+    recommend to open the script in an editor rather than running
+    all the code at once using \code{demo("fluBYBW")}.
   }
 }
 
