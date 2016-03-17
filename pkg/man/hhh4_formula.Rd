@@ -131,7 +131,7 @@ cntrl_B2 <- list(ar = list(f = ~ 1),
                            weights = neighbourhood(fluBYBW), normalize = TRUE),
                  end = list(f = f.end, offset = population(fluBYBW)),
                  family = "NegBin1", verbose = TRUE)
-res_B2 <- hhh4(fluBYBW, model.B2)
+res_B2 <- hhh4(fluBYBW, cntrl_B2)
 summary(res_B2, idx2Exp=1:2, amplitudeShift=TRUE)
 getMaxEV(res_B2)[1]
 }
