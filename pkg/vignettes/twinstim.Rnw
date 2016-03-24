@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{twinstim: An endemic-epidemic modelling framework for spatio-temporal point patterns}
+%\VignetteIndexEntry{twinstim: An endemic-epidemic modeling framework for spatio-temporal point patterns}
 %\VignetteEngine{knitr::knitr}
 %\VignetteDepends{surveillance, lattice, polyclip, memoise, maptools, spdep, colorspace, scales}
 
@@ -36,14 +36,14 @@ if (!COMPUTE) load("twinstim-cache.RData", verbose = TRUE)
 \title{%
   \vspace{-1.5cm}
   \fbox{\vbox{\normalfont\footnotesize
-      This introduction to the \code{twinstim} modelling framework of the
+      This introduction to the \code{twinstim} modeling framework of the
       \proglang{R}~package \pkg{surveillance} is based on a publication in the
       \textit{Journal of Statistical Software} --
       \citet[Section~3]{meyer.etal2014} -- which is the suggested reference
       if you use the \code{twinstim} implementation in your own work.}}\\[1cm]
-  \code{twinstim}: An endemic-epidemic modelling framework for spatio-temporal point patterns}
-\Plaintitle{twinstim: An endemic-epidemic modelling framework for spatio-temporal point patterns}
-\Shorttitle{Endemic-epidemic modelling of spatio-temporal point patterns}
+  \code{twinstim}: An endemic-epidemic modeling framework for spatio-temporal point patterns}
+\Plaintitle{twinstim: An endemic-epidemic modeling framework for spatio-temporal point patterns}
+\Shorttitle{Endemic-epidemic modeling of spatio-temporal point patterns}
 
 \author{Sebastian Meyer\thanks{Author of correspondence: \email{Sebastian.Meyer@ifspm.uzh.ch}}\\University of Zurich \And
         Leonhard Held\\University of Zurich \And
@@ -79,7 +79,7 @@ if (!COMPUTE) load("twinstim-cache.RData", verbose = TRUE)
 
 %% Additional commands
 \newcommand{\class}[1]{\code{#1}}  % could use quotes (JSS does not like them)
-\newcommand{\CRANpkg}[1]{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\newcommand{\CRANpkg}[1]{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 
 %% Reduce the font size of code input and output
 \DefineVerbatimEnvironment{Sinput}{Verbatim}{fontshape=sl, fontsize=\small}
@@ -99,7 +99,7 @@ surveillance data using the endemic-epidemic point process model
 \citet{meyer.held2013}.
 %% (For other types of surveillance data, see
 %% \code{vignette("twinSIR")} and \code{vignette("hhh4\_spacetime")}.)
-We first describe the general modelling approach and then exemplify
+We first describe the general modeling approach and then exemplify
 data handling, model fitting, visualization, and simulation methods
 for time-stamped geo-referenced case reports of invasive meningococcal disease
 (IMD) caused by the two most common bacterial finetypes of meningococci in
@@ -107,11 +107,11 @@ Germany, 2002--2008.
 }
 
 \Keywords{%
-spatio-temporal surveillance data,
+spatio-temporal point pattern,
 endemic-epidemic modeling,
 infectious disease epidemiology,
 self-exciting point process,
-multivariate time series of counts,
+spatial interaction function,
 branching process with immigration}
 
 
@@ -168,7 +168,7 @@ This model constitutes a branching process with immigration.
 Part of the event rate is due to the first, endemic component, which
 reflects sporadic events caused by unobserved sources of infection.
 This background rate of new events
-is modelled by a log-linear predictor
+is modeled by a log-linear predictor
 $\nu_{[\bm{s}][t]}$ incorporating regional and/or time-varying characteristics.
 Here, the space-time index $[\bm{s}][t]$ refers to the region covering $\bm{s}$
 during the period containing $t$ and thus spans a whole spatio-temporal grid on
@@ -192,7 +192,7 @@ to a log-linear predictor~$\eta_j$ associated with event-specific
 characteristics (``marks'') $\bm{m}_j$, which are usually
 attached to the point pattern of events.
 The decay of infection pressure with increasing spatial and temporal
-distance from the infective event is modelled by parametric interaction
+distance from the infective event is modeled by parametric interaction
 functions~$f$ and~$g$, respectively.
 A simple assumption for the time course of infectivity is $g(t) = 1$.
 Alternatives include exponential decay, a step function,
