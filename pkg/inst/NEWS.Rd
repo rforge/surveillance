@@ -1,4 +1,4 @@
-\newcommand{\CRANpkg}{\href{http://CRAN.R-project.org/package=#1}{\pkg{#1}}}
+\newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
 %% some pre-defined commands: \R, \code, \acronym, \url, \file, \pkg
 
 \name{NEWS}
@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.0 (2016-03-17)}{
+\section{Changes in surveillance version 1.12.0 (2016-03-24)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -24,8 +24,17 @@
 
 \subsection{DOCUMENTATION}{
   \itemize{
-    \item New \code{vignette("twinstim")} based on a recently accepted
-    manuscript for the Journal of Statistical Software.
+    \item Several new vignettes illustrate \emph{endemic-epidemic}
+    modeling frameworks for spatio-temporal surveillance data:
+    \describe{
+      \item{\code{vignette("twinstim")}}{describes a spatio-temporal
+        point process regression model.}
+      \item{\code{vignette("twinSIR")}}{describes a multivariate
+        temporal point process regression model.}
+    }
+    These vignettes are based on a recently accepted manuscript
+    for the \emph{Journal of Statistical Software}
+    (Meyer, Held, and \enc{Höhle}{Hoehle}, 2016).
     \item Improved the documentation on various help pages.
     \item The vignettes are again compatible with \R < 3.2.0.
     \item The \code{hhh4()}-based analysis of \code{data("fluBYBW")}
