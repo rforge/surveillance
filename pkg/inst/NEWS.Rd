@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.0 (2016-03-24)}{
+\section{Changes in surveillance version 1.12.0 (2016-03-29)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -31,6 +31,8 @@
         point process regression model.}
       \item{\code{vignette("twinSIR")}}{describes a multivariate
         temporal point process regression model.}
+      \item{\code{vignette("hhh4_spacetime")}}{describes an areal
+        time-series model for infectious disease counts.}
     }
     These vignettes are based on a recently accepted manuscript
     for the \emph{Journal of Statistical Software}
