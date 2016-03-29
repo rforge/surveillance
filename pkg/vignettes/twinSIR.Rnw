@@ -1,6 +1,6 @@
 %\VignetteIndexEntry{twinSIR: Individual-level epidemic modeling for a fixed population with known distances}
 %\VignetteEngine{knitr::knitr}
-%\VignetteDepends{surveillance, quadprog, timereg, survival}
+%\VignetteDepends{surveillance, quadprog}
 
 <<setup, cache = FALSE, include = FALSE, purl = FALSE>>=
 ## purl=FALSE => not included in the tangle'd R script
@@ -188,9 +188,9 @@ to gather all parts of the epidemic component in a single linear predictor.
 Hence, the above model represents a CIF extension of what in
 the context of survival analysis is known as an
 additive-multiplicative hazard
-model~\citep{martinussen_scheike2002}. As a consequence, the
+model~\citep{Martinussen.Scheike2006}. As a consequence, the
 \code{twinSIR} model could in principle be fitted with the \CRANpkg{timereg}
-package~\citep{R:timereg}, which yields estimates for the cumulative
+package, which yields estimates for the cumulative
 hazards. However, \citet{hoehle2009} chooses a more direct inferential
 approach: To ensure that the CIF $\lambda_i(t)$ is non-negative, all
 covariates are encoded such that the components of $\bm{w}_{ij}$ are
@@ -281,8 +281,8 @@ head(hagelloch, n = 5)
 @
 
 The \class{epidata} structure inherits from counting processes as implemented by
-the \class{Surv} class of package \CRANpkg{survival}~\citep{R:survival} and also
-used in \CRANpkg{timereg} \citep{R:timereg}.
+the \class{Surv} class of package \CRANpkg{survival} and also
+used in \CRANpkg{timereg}.
 Specifically, the observation period is split up into consecutive time
 intervals (\code{start}; \code{stop}] of constant conditional intensities.
 As the CIF $\lambda_i(t)$ of Equation~\eqref{eqn:twinSIR} only changes at time points, where
@@ -519,22 +519,18 @@ refer to \code{help("simulate.twinSIR")}.
 
 <<Rbib, include = FALSE, purl = FALSE>>=
 ## create automatic references for R packages
-Rbib0 <- knitr::write_bib(
-    c("survival"),
-    file = NULL, tweak = FALSE, prefix = "R:")
-## "quadprog" and "timereg" need manual author formatting
-Rbib1 <- sapply(c("quadprog", "timereg"), function (pkg) {
+Rbib <- sapply(c("quadprog"), function (pkg) {
     bib <- citation(pkg, auto = TRUE)
     bib$key <- paste("R", pkg, sep=":")
     bib
 }, simplify=FALSE, USE.NAMES=TRUE)
-Rbib1$quadprog$author <- "Berwin A. Turlach"
-Rbib1$quadprog$note <- paste0(Rbib1$quadprog$note,
+## "quadprog" needs manual author formatting
+Rbib$quadprog$author <- "Berwin A. Turlach"
+Rbib$quadprog$note <- paste0(Rbib$quadprog$note,
     ", ported to \\proglang{R} by Andreas Weingessel")
-Rbib1$timereg$author <- "Thomas Scheike"
 ## write to bibfile
 .Rbibfile <- file("twinSIR-R.bib", "w", encoding = "latin1")
-cat(unlist(c(Rbib0, lapply(Rbib1, toBibtex)), use.names = FALSE),
+cat(unlist(lapply(Rbib, toBibtex), use.names = FALSE),
     file = .Rbibfile, sep = "\n")
 close(.Rbibfile)
 @
