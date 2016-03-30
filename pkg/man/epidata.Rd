@@ -18,7 +18,8 @@ Continuous-Time SIR Event History of a Fixed Population
   with some additional attributes.  These objects are the basis for fitting
   spatio-temporal epidemic intensity models with the function
   \code{\link{twinSIR}}.  Their implementation is illustrated in Meyer
-  et al. (2016, Section 4).  Note that the spatial information itself, i.e.
+  et al. (2016, Section 4), see \code{vignette("twinSIR")}.
+  Note that the spatial information itself, i.e.
   the positions of the individuals, is assumed to be constant over time.  
   Besides epidemics following the SIR compartmental model, also data from SI,
   SIRS and SIS epidemics may be supplied.  Inference for the infectious process

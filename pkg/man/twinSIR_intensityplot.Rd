@@ -13,7 +13,8 @@
 intensity, its epidemic proportion or its endemic proportion over time.
 The default \code{plot} method for objects of class \code{"twinSIR"}
 is just a wrapper for the \code{intensityplot} method.
-The implementation is illustrated in Meyer et al. (2016, Section 4).
+The implementation is illustrated in Meyer et al. (2016, Section 4),
+see \code{vignette("twinSIR")}.
 }
 
 \usage{

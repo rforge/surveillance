@@ -12,7 +12,8 @@ epidemics as described in \enc{Höhle}{Hoehle} (2009).  Estimation is driven
 by (penalized) maximum likelihood in the point process frame work.  Optimization 
 (maximization) of the (penalized) likelihood function is performed by means of 
 \code{\link{optim}}.
-The implementation is illustrated in Meyer et al. (2016, Section 4).
+The implementation is illustrated in Meyer et al. (2016, Section 4),
+see \code{vignette("twinSIR")}.
 }
 
 \usage{

@@ -9,7 +9,8 @@
 \description{
   The function plots the fitted temporal or (isotropic) spatial
   interaction function of a \code{twinstim} object.
-  The implementation is illustrated in Meyer et al. (2016, Section 3).
+  The implementation is illustrated in Meyer et al. (2016, Section 3),
+  see \code{vignette("twinstim")}.
 }
 
 \usage{

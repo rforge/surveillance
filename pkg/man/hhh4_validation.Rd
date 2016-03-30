@@ -189,7 +189,7 @@ Michaela Paul and Sebastian Meyer
 }
 
 \seealso{
-\code{vignette("hhh4")} and \code{\link{hhh4}}.
+\code{vignette("hhh4")} and \code{vignette("hhh4_spacetime")}
 }
 
 \examples{
@@ -242,13 +242,13 @@ stopifnot(all.equal(
 with(pred, pit(x = observed, pdistr = "pnbinom", mu = pred, size = exp(psi)))
 
 
-\dontrun{
 ### For a more sophisticated multivariate analysis of
 ### areal time series of influenza counts - data("fluBYBW") -
 ### see the (computer-intensive) demo("fluBYBW") script:
-file.show(system.file(file.path("demo", "fluBYBW.R"),
-                      package = "surveillance"))
-}
+demoscript <- system.file(file.path("demo", "fluBYBW.R"),
+                          package = "surveillance")
+demoscript
+#file.show(demoscript)
 }
 
 \keyword{ts}
