@@ -46,12 +46,14 @@ surveillance-hmm.pdf: surveillance-hmm.tex
 
 .PHONY: check-cache
 check-cache: $(addsuffix .diff,${CACHEFILES})
+	ls -l $^
 
 $(addsuffix .diff,${CACHEFILES}): %.diff: % %.new
 	@echo CHECKING $<.new AGAINST $< ...
 	@${R} --vanilla --slave -e "\
 old <- attach('$<'); \
 new <- attach('$<.new', warn.conflicts = FALSE); \
+all.equal.ahg <- function(target,current,...) {current$time <- target$time; NextMethod()}; \
 equal <- all.equal(old, new); \
 if (isTRUE(equal)) message('OK: $< needs no update') else { \
 message('CAVE: $< MAY NEED TO BE UPDATED\n-> $<.diff'); print(equal) }" > "$@"
