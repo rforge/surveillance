@@ -18,7 +18,7 @@
 }
 
 \usage{
-stsplot_time(x, units=NULL, method=x@control$name, disease=x@control$data,
+stsplot_time(x, units=NULL,
              as.one=FALSE, same.scale=TRUE, par.list=list(), ...)
 
 stsplot_time1(x, k=1, ylim=NULL,
@@ -51,10 +51,6 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
     This argument is especially useful if \code{x} has a lot of units
     which do not fit onto a single page altogether
     (and produce the error message \dQuote{figure margins too large}).}
-  \item{method}{name of the surveillance method to be used in the main
-    title. Currently ignored.}
-  \item{disease}{name of the disease to be used in the main title.
-    Currently ignored.}
   \item{as.one}{logical indicating if all time series should be plotted
     within the same frame. This is currently not implemented
     for the \code{"sts"} class, but see \code{\link{plot.disProg}} and

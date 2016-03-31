@@ -5,7 +5,7 @@
 ###
 ### Time series plot for sts-objects
 ###
-### Copyright (C) 2007-2014 Michael Hoehle, 2013-2015 Sebastian Meyer
+### Copyright (C) 2007-2014 Michael Hoehle, 2013-2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -16,8 +16,8 @@
 ######################################################################
 
 stsplot_time <- function(x, units = NULL,
-                         method=x@control$name, disease=x@control$data,
-                         as.one=FALSE, same.scale=TRUE, par.list=list(), ...)
+                         as.one = FALSE, same.scale = TRUE,
+                         par.list = list(), ...)
 {
   #Extract
   observed <- x@observed
@@ -93,9 +93,6 @@ stsplot_time1 <- function(
   state      <- x@state[,k]
   alarm      <- x@alarm[,k]
   upperbound <- x@upperbound[,k]
-  hasAlarm   <- all(!is.na(alarm))
-  method <-     x@control$name
-  disease <-    x@control$data
   population <- x@populationFrac[,k]
   binaryTS <- x@multinomialTS
 
@@ -108,14 +105,13 @@ stsplot_time1 <- function(
     if (ylab == "No. infected") { ylab <- "Proportion infected" }
   }
   
-   ##### Handle the NULL arguments ######################################
-  if (is.null(main)) {
-    #If no surveillance algorithm has been run
-    if (length(x@control) != 0) {
-#      main = paste("Surveillance using ", as.character(method),sep="")
-        action = switch(class(x), "sts"="surveillance","stsNC"="nowcasting","stsBP"="backprojection")
-        main = paste(action," using ", as.character(method),sep="") 
-    }
+  ##### Handle the NULL arguments ######################################
+  if (is.null(main) && length(x@control) > 0) {
+    #a surveillance algorithm has been run
+    action <- switch(class(x), "sts" = "surveillance",
+                     "stsNC" = "nowcasting","stsBP" = "backprojection")
+    method <- x@control$name
+    main <- paste0(action, " using ", method)
   }
 
   # control where the highest value is
@@ -149,13 +145,13 @@ stsplot_time1 <- function(
     lines(x=xstuff,y=ystuff,type=type,lty=lty[-c(1:2)],col=col[-c(1:2)],lwd=lwd[-c(1:2)],...)
   }
   
-  #Draw outbreak symbols
+  #Draw alarm symbols
   alarmIdx <- which(!is.na(alarm) & (alarm == 1))
   if (length(alarmIdx)>0) {
     matpoints( alarmIdx, rep(-1/40*ylim[2],length(alarmIdx)), pch=alarm.symbol$pch, col=alarm.symbol$col, cex= alarm.symbol$cex, lwd=alarm.symbol$lwd)
   }
   
-  #Draw alarm symbols
+  #Draw outbreak symbols
   stateIdx <- which(state == 1)
   if (length(stateIdx)>0) {
     matpoints( stateIdx, rep(-1/20*ylim[2],length(stateIdx)), pch=outbreak.symbol$pch, col=outbreak.symbol$col,cex = outbreak.symbol$cex,lwd=outbreak.symbol$lwd)
@@ -222,18 +218,15 @@ stsplot_alarm <- function(
   state      <- x@state[,k]
   alarm      <- x@alarm[,k]
   upperbound <- x@upperbound[,k]
-  hasAlarm   <- all(!is.na(alarm))
-  method <-     x@control$name
-  disease <-    x@control$data
   ylim <- c(0.5, ncol(x))
   
   ##### Handle the NULL arguments ######################################
-  if (is.null(main)) {
-    #If no surveillance algorithm has been run
-    if (length(x@control) != 0) {
-     # main = paste("Analysis of ", as.character(disease), " using ",
-      main = paste("Surveillance using ", as.character(method),sep="") 
-    }
+  if (is.null(main) && length(x@control) > 0) {
+    #a surveillance algorithm has been run
+    action <- switch(class(x), "sts" = "surveillance",
+                     "stsNC" = "nowcasting","stsBP" = "backprojection")
+    method <- x@control$name
+    main <- paste0(action, " using ", method)
   }
  
   #Control what axis style is used
