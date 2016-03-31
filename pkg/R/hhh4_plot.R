@@ -5,7 +5,7 @@
 ###
 ### Plot-method(s) for fitted hhh4() models
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2012-2015 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -597,6 +597,9 @@ plotHHH4_season <- function (...,
                 c(list(seasons[[comp]], xlim=xlim, ylim=ylim[[comp]],
                        xlab=xlab, ylab=ylab[[comp]], main=main[[comp]]),
                   matplot.args))
+        if (is.list(refline.args) && !intercept && any(seasons[[comp]] != 1))
+            do.call("abline", modifyList(list(h=1, lty=3, col="grey"),
+                                         refline.args))
         if (match(comp, components) %in% legend)
             do.call("legend", legend.args)
     }

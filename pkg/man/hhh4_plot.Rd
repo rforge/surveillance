@@ -178,9 +178,11 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
     covariates/offsets in the component.}
   \item{matplot.args}{list of line style specifications passed to
     \code{\link{matplot}}, e.g., \code{lty}, \code{lwd}, \code{col}.}
-  \item{refline.args}{list of line style specifications passed to
-    \code{\link{abline}} to draw the reference line in the plot of
-    the dominant eigenvalue, e.g., \code{lty} and \code{col}.}
+  \item{refline.args}{list of line style specifications (e.g.,
+    \code{lty} or \code{col}) passed to \code{\link{abline}} when
+    drawing the reference line (\code{h=1}) in plots of seasonal effects
+    (if \code{intercept=FALSE}) and of the dominant eigenvalue.
+    The reference line is omitted if \code{refline.args} is not a list.}
   \item{which}{a character vector specifying the components of the mean
     for which to produce maps. By default, the overall mean and all
     three components are shown.}

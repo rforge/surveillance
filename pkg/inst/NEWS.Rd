@@ -6,21 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.0 (2016-03-29)}{
-
-\subsection{NEW FEATURES}{
-  \itemize{
-    \item Overhaul of the \code{"sts"} implementation. This mostly
-    affects package-internal code, which is simpler, cleaner and better
-    tested now.
-    Beyond that, the user-level constructor function \code{sts()} now
-    has explicit arguments for clarity and convenience.
-    For instance, its first argument sets the \code{observed} slot and
-    no longer needs to be named, i.e.,
-    \code{sts(mycounts, start=c(2016,3), frequency=12)}
-    works just like for the classical \code{ts()} function.
-  }
-}
+\section{Changes in surveillance version 1.12.0 (2016-03-31)}{
 
 \subsection{DOCUMENTATION}{
   \itemize{
@@ -44,6 +30,28 @@
     the abundance of models and the relatively long runtime, we
     recommend to open the script in an editor rather than running
     all the code at once using \code{demo("fluBYBW")}.
+  }
+}
+
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item Overhaul of the \code{"sts"} implementation. This mostly
+    affects package-internal code, which is simpler, cleaner and better
+    tested now.
+    Beyond that, the user-level constructor function \code{sts()} now
+    has explicit arguments for clarity and convenience.
+    For instance, its first argument sets the \code{observed} slot and
+    no longer needs to be named, i.e.,
+    \code{sts(mycounts, start=c(2016,3), frequency=12)}
+    works just like for the classical \code{ts()} function.
+  }
+}
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item \code{plotHHH4_season()} now by default draws a horizontal
+    reference line at unity if the multiplicative effect of component
+    seasonality is shown (i.e., if \code{intercept=FALSE}).
   }
 }
 
