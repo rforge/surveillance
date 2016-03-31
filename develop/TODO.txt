@@ -167,14 +167,14 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 #======================================================================
 
 #Open
-14/10/2014 incorporate showsim.* function from power-law paper
+14/10/2014 incorporate more showsim.* function from power-law paper
            as plot-methods for arrays of simulated counts returned by
            simulate.hhh4(..., simplify=TRUE)
-31/10/2014 update examples on help pages according to JSS paper
-31/10/2014 update vignette("hhh4") according to JSS paper
 17/11/2014 add checkNeighbourhood(..., strict=TRUE) for integer check
 
 #Done
+March 2015 update examples on help pages according to JSS paper
+March 2015 update vignette("hhh4") according to JSS paper
 16/12/2014 make update.hhh4(..., use.estimates=TRUE) generally useable
 - add documentation for oneStepAhead predictions/scores
 - improve and document plot/predict methods
