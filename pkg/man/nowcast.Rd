@@ -246,7 +246,7 @@ plot(nc.ddcp,legend.opts=NULL,
 lambda <- attr(delayCDF(nc.ddcp)[["bayes.trunc.ddcp"]],"model")$lambda
 showIdx <- seq(which( max(when) == epoch(nc.ddcp))) #seq(ncol(lambda))
 matlines( showIdx,t(lambda)[showIdx,],col="gray",lwd=c(1,2,1),lty=c(2,1,2))
-legend(x="topright",c(expression(lambda(t)),"95% CI"),col="gray",lwd=c(2,1),lty=c(1,2))
+legend(x="topright",c(expression(lambda(t)),"95\% CI"),col="gray",lwd=c(2,1),lty=c(1,2))
 }
 }
 
