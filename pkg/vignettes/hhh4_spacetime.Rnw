@@ -819,7 +819,7 @@ district $i$ in week $t$ equals the associated negative log-likelihood
 contribution. Comparing the mean scores from different models is thus
 essentially a goodness-of-fit assessment:
 <<echo=FALSE>>=
-stopifnot(identical(
+stopifnot(all.equal(
     measlesFit_powerlaw$loglikelihood,
     -sum(scores(oneStepAhead(measlesFit_powerlaw, tp = 1, type = "final"),
                 which = "logs", individual = TRUE))))
