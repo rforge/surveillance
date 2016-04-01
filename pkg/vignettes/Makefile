@@ -53,7 +53,7 @@ $(addsuffix .diff,${CACHEFILES}): %.diff: % %.new
 	@${R} --vanilla --slave -e "\
 old <- attach('$<'); \
 new <- attach('$<.new', warn.conflicts = FALSE); \
-all.equal.ahg <- function(target,current,...) {current$time <- target$time; NextMethod()}; \
+all.equal.ahg <- function(target,current,...) {current$$time <- target$$time; NextMethod()}; \
 equal <- all.equal(old, new); \
 if (isTRUE(equal)) message('OK: $< needs no update') else { \
 message('CAVE: $< MAY NEED TO BE UPDATED\n-> $<.diff'); print(equal) }" > "$@"
