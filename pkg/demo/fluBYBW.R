@@ -177,7 +177,10 @@ compareWithBest <- function(best, whichModels, nPermut=9999, seed=1234){
   return(pVals)
 }
 
-pVals_flu <- compareWithBest(best=6, whichModels=1:10,seed=2059710987)
+pVals_flu <- compareWithBest(best=6, whichModels=1:10,
+                             nPermut=999, # reduced for this demo
+                             seed=2059710987)
 rownames(pVals_flu) <- nam
+colnames(pVals_flu) <- whichScores
 
 print(pVals_flu)
