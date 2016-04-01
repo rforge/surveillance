@@ -336,7 +336,7 @@ export(epidataCS2sts)
 export(epitest)
 S3method(coef, epitest)
 S3method(plot, epitest)
-
+export(getSourceDists)
 
 S3method(nobs, epidataCS)
 S3method("[", epidataCS)

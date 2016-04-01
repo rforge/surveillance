@@ -489,6 +489,7 @@ if (surveillance.options("allExamples"))
   ## estimate a step function for spatial interaction
   m1_fstep <- update(m0, siaf=c(5,10,25,50))
   plot(m1_fstep, "siaf", scaled=FALSE)
+  rug(getSourceDists(imdepi, dimension="space"), ticksize=0.02)
 
   ## estimate a continuously decreasing spatial interaction function, where
   ## likelihood evaluation takes much longer than for (piecewise) constant
