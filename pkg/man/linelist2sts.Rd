@@ -1,7 +1,6 @@
 \encoding{latin1}
 \name{linelist2sts}
 \alias{linelist2sts}
-%Internal functions
 
 \title{
   Convert individual case information based on dates into an aggregated

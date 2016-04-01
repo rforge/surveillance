@@ -2,11 +2,10 @@
 \name{nowcast}
 \alias{nowcast}
 %Internal functions
-\alias{nowcast.fit}
-\alias{dist.median}
-\alias{outside.ci}
-\alias{logS}
-\alias{RPS}
+%\alias{dist.median}
+%\alias{outside.ci}
+%\alias{logS}
+%\alias{RPS}
 
 \title{
   Adjust a univariate time series of counts for observed

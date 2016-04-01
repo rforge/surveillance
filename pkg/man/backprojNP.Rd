@@ -2,9 +2,9 @@
 \name{backprojNP}
 \alias{backprojNP}
 %Internal functions
-\alias{backprojNP.fit}
-\alias{naninf2zero}
-\alias{em.step.becker}
+%\alias{backprojNP.fit}
+%\alias{naninf2zero}
+%\alias{em.step.becker}
 
 \title{
   Non-parametric back-projection of incidence cases to exposure cases
