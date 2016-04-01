@@ -24,7 +24,6 @@
     for the \emph{Journal of Statistical Software}
     (Meyer, Held, and \enc{Höhle}{Hoehle}, 2016).
     \item Improved the documentation on various help pages.
-    \item The vignettes are again compatible with \R < 3.2.0.
     \item The \code{hhh4()}-based analysis of \code{data("fluBYBW")}
     has been moved to a separate demo script \file{fluBYBW.R}. Due to
     the abundance of models and the relatively long runtime, we
@@ -37,7 +36,8 @@
   \itemize{
     \item Overhaul of the \code{"sts"} implementation. This mostly
     affects package-internal code, which is simpler, cleaner and better
-    tested now.
+    tested now, but requires \R >= 3.2.0 (due to \code{callNextMethod()}
+    bugs in older versions of \R).
     Beyond that, the user-level constructor function \code{sts()} now
     has explicit arguments for clarity and convenience.
     For instance, its first argument sets the \code{observed} slot and
