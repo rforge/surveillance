@@ -55,6 +55,10 @@
     \item \code{plotHHH4_season()} now by default draws a horizontal
     reference line at unity if the multiplicative effect of component
     seasonality is shown (i.e., if \code{intercept=FALSE}).
+
+    \item Since \pkg{surveillance} 1.8-0, \code{hhh4()} results are of
+    class \code{"hhh4"} instead of \code{"ah4"} (renamed).
+    Legacy methods for the old class name \code{"ah4"} have been removed.
   }
 }
 

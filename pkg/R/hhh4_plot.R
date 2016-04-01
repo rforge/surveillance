@@ -632,7 +632,7 @@ plotHHH4_season <- function (...,
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 getSeason <- function(x, component = c("end", "ar", "ne"), unit = 1)
 {
-    stopifnot(inherits(x, c("hhh4","ah4")))
+    stopifnot(inherits(x, "hhh4"))
     component <- match.arg(component)
     startseason <- getSeasonStart(x)
     freq <- x$stsObj@freq
@@ -683,7 +683,7 @@ getSeason <- function(x, component = c("end", "ar", "ne"), unit = 1)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 getMaxEV_season <- function (x)
 {
-    stopifnot(inherits(x, c("hhh4","ah4")))
+    stopifnot(inherits(x, "hhh4"))
     nUnits <- x$nUnit
     freq <- x$stsObj@freq
     components <- componentsHHH4(x)
@@ -817,7 +817,7 @@ getHHH4list <- function (..., .names = NA_character_)
 {
     objects <- list(...)
     if (length(objects) == 1L && is.list(objects[[1L]]) &&
-        inherits(objects[[1L]][[1L]], c("hhh4","ah4"))) {
+        inherits(objects[[1L]][[1L]], "hhh4")) {
         ## ... is a single list of fits
         objects <- objects[[1L]]
         if (is.null(names(objects))) names(objects) <- seq_along(objects)
@@ -826,7 +826,7 @@ getHHH4list <- function (..., .names = NA_character_)
             ifelse(nzchar(names(objects)), names(objects), .names)
         }
     }
-    if (!all(sapply(objects, inherits, what=c("hhh4","ah4"))))
+    if (!all(sapply(objects, inherits, what="hhh4")))
         stop("'...' must consist of hhh4()-fits only")
 
     ## check common epoch, start and frequency and append them as attributes

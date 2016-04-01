@@ -5,7 +5,7 @@
 ###
 ### Compute one-step-ahead predictions (means) at a series of time points
 ###
-### Copyright (C) 2011-2012 Michaela Paul, 2012-2015 Sebastian Meyer
+### Copyright (C) 2011-2012 Michaela Paul, 2012-2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -22,7 +22,7 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
                          cores = 1) # if which.start="final", the predictions
                                     # can be computed in parallel
 {
-    stopifnot(inherits(result, c("ah4", "hhh4")))
+    stopifnot(inherits(result, "hhh4"))
     type <- match.arg(type)
     if (type == "rolling" && !is.list(which.start)) {
         ## new in surveillance 1.10-0: if 'which.start' is a list, it is
