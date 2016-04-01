@@ -14,7 +14,7 @@ setAs(from = "ts", to = "sts", def = function (from) {
     ## Remove "tsp" attribute and "ts"/"mts" class
     tsp(from) <- NULL
     ## "tsp<-"(x,NULL) is documented to also remove "ts" and "mts" classes
-    ## but at least in R 3.2.4, it does not remove "mts"
+    ## but in R < 3.3.0, it did not remove "mts" (see PR#16769)
     from <- unclass(from)
     
     ## Create the sts object
