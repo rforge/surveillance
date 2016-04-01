@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.0 (2016-03-31)}{
+\section{Changes in surveillance version 1.12.0 (2016-04-01)}{
 
 \subsection{DOCUMENTATION}{
   \itemize{
@@ -44,6 +44,9 @@
     no longer needs to be named, i.e.,
     \code{sts(mycounts, start=c(2016,3), frequency=12)}
     works just like for the classical \code{ts()} function.
+
+    \item \code{stsplot_time(..., as.one=TRUE)} is now implemented
+    (yielding a simple \code{matplot} of multiple time series).
   }
 }
 

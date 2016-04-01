@@ -12,19 +12,17 @@
 
 
 ######################################################################
-# stsplot_time sets the scene and calls stsplot_time1 for each unit
+# stsplot_time() sets the scene and calls either stsplot_time_as1()
+# or stsplot_time1() for each unit
 ######################################################################
 
 stsplot_time <- function(x, units = NULL,
                          as.one = FALSE, same.scale = TRUE,
                          par.list = list(), ...)
 {
-  #Extract
   observed <- x@observed
-  population <- x@populationFrac
-  binaryTS <- x@multinomialTS
   if (is.null(units)) # plot all units
-      units <- seq_len(ncol(observed))
+    units <- seq_len(ncol(observed))
   nUnits <- length(units)
 
   #graphical parameters
@@ -36,25 +34,28 @@ stsplot_time <- function(x, units = NULL,
     } else {
       par.list$mfrow <- NULL #no mf formatting..
     }
-    oldpar <- par(par.list)
-    on.exit(par(oldpar))
+    if (length(par.list) > 0) {
+      oldpar <- par(par.list)
+      on.exit(par(oldpar))
+    }
   }
   
-  #multivariate time series
-  if(nUnits > 1){
-    if(as.one) { # all areas in one plot
-      stop("this type of plot is currently not implemented")
-    } else {
-      #All plots on same scale? If yes, then check if a scale
-      #is already specified using the ylim argument
+  if (nUnits == 1L) { # a single time-series plot
+    stsplot_time1(x = x, k = units, ...)
+  } else { # multiple time series
+    if (as.one) { # all time series in one plot
+      stsplot_time_as1(x, units = units, ...)
+    } else { # each time series in a separate plot
       args <- list(...)
-      if(same.scale) {
-        if (is.null(args$ylim)) {
-            max <- if (binaryTS) {
-                max(ifelse(population == 0, 0,
-                           pmax(observed,x@upperbound,na.rm=TRUE)/population))
-            } else max(observed,x@upperbound,na.rm=TRUE)
-            args$ylim <- c(-1/20*max, max)
+      if(same.scale) { # compute suitable ylim if not specified
+        if (is.null(args[["ylim"]])) {
+            ymax <- if (x@multinomialTS) {
+                max(0, pmax(observed,x@upperbound,na.rm=TRUE)/x@populationFrac,
+                    na.rm=TRUE)
+            } else {
+                max(observed,x@upperbound,na.rm=TRUE)
+            }
+            args$ylim <- c(-1/20*ymax, ymax)
         }
       } else {
         args$ylim <- NULL
@@ -68,14 +69,54 @@ stsplot_time <- function(x, units = NULL,
         title(main=if (is.character(k)) k else colnames(observed)[k], line=-1)
       }
     }
-  } else {  #univariate time series
-    stsplot_time1(x=x, k=units, ...)
   }
+  
   invisible()
 }
 
 
-### work-horse which produces the time series plot with formatted x-axis
+## a simple matplot of observed counts from all/selected units, with a legend
+
+stsplot_time_as1 <- function (x, units = NULL,
+    type = "l", lty = 1:5, lwd = 1, col = 1:6,
+    epochsAsDate = x@epochAsDate, xaxis.tickFreq = list("%Q"=atChange),
+    xaxis.labelFreq = xaxis.tickFreq, xaxis.labelFormat = "%G\n\n%OQ",
+    xlab = "time", ylab = "No. infected", legend.opts = list(), ...)
+{
+    observed <- x@observed
+    if (x@multinomialTS) {
+        observed <- ifelse(x@populationFrac != 0, observed/x@populationFrac, 0)
+    }
+    if (!is.null(units))
+        observed <- observed[, units, drop = FALSE]
+
+    ## basic plot
+    opar <- par(bty = "n", xaxt = "n")  # a formatted time axis is added below
+    matplot(observed, type = type, lty = lty, lwd = lwd, col = col,
+            xlab = xlab, ylab = ylab, ...)
+    par(opar)
+
+    ## add time axis
+    xaxis.line <- !epochsAsDate || grepl("\n", xaxis.labelFormat)
+    addFormattedXAxis(x = x, epochsAsDate = epochsAsDate,
+        xaxis.tickFreq = xaxis.tickFreq, xaxis.labelFreq = xaxis.labelFreq,
+        xaxis.labelFormat = xaxis.labelFormat)  # line = 1
+
+    ## add legend
+    if (is.list(legend.opts)) {
+        legend.opts <- modifyList(
+            list(x = "top", legend = colnames(observed), lty = lty, lwd = lwd,
+                 col = col, ncol = magic.dim(ncol(observed))[2L],
+                 bty = "n"),
+            legend.opts)
+        do.call("legend", legend.opts)
+    }
+    
+    invisible()
+}
+
+
+### work-horse which produces a single time series plot with formatted x-axis
 
 stsplot_time1 <- function(
     x, k=1, ylim=NULL, axes=TRUE, xaxis.tickFreq=list("%Q"=atChange),
@@ -87,7 +128,8 @@ stsplot_time1 <- function(
     legend.opts=list(),
     dx.upperbound=0L, hookFunc=function(){}, .hookFuncInheritance=function() {}, ...)
 {
-
+  stopifnot(length(k) == 1, is.character(k) || k != 0)
+  
   #Extract slots -- depending on the algorithms: x@control$range
   observed   <- x@observed[,k]
   state      <- x@state[,k]

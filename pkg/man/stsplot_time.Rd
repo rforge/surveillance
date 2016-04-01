@@ -46,15 +46,14 @@ stsplot_alarm(x, lvl=rep(1,nrow(x)), ylim=NULL,
 \arguments{
   \item{x}{an object of class \code{"\linkS4class{sts}"}.}
   \item{units}{optional integer or character vector to select the units (=columns of
-    \code{observed(x)}) to plot. \code{stsplot_time1} is called
-    \code{for (k in units)}. The default is to plot all time series.
-    This argument is especially useful if \code{x} has a lot of units
-    which do not fit onto a single page altogether
-    (and produce the error message \dQuote{figure margins too large}).}
+    \code{observed(x)}) to plot. The default is to plot all time series.
+    If \code{as.one=FALSE}, \code{stsplot_time1} is called
+    \code{for (k in units)} with \code{mfrow} splitting (see \code{par.list}).
+    Note that if there are too many \code{units}, the default \code{mfrow}
+    setting might lead to the error \dQuote{figure margins too large}
+    (meaning that the units do not fit onto a single page).}
   \item{as.one}{logical indicating if all time series should be plotted
-    within the same frame. This is currently not implemented
-    for the \code{"sts"} class, but see \code{\link{plot.disProg}} and
-    \code{\link{sts2disProg}}.}
+    in a single frame (using \code{\link{matplot}}).}
   \item{same.scale}{logical indicating if all time series should be
     plotted with the same \code{ylim}. Default is to do so. Only
     relevant for multivariate plots (\code{ncol(x) > 1}).}
@@ -154,12 +153,19 @@ data("ha.sts")
 print(ha.sts)
 
 plot(ha.sts, type=observed ~ time | unit)  # default multivariate type
-plot(ha.sts, units = c("mitt", "pank"))    # selected units
+plot(ha.sts, units=c("mitt", "pank"))      # selected units
 plot(ha.sts, type=observed ~ time)         # aggregated over all districts
 
 ## Hook function example
 hookFunc <- function() grid(NA,NULL,lwd=1)
 plot(ha.sts, hookFunc=hookFunc)
+
+## another multivariate time series example plotted "as.one"
+data("measlesDE")
+plot(measlesDE, units=1:2, as.one=TRUE, legend.opts=list(cex=0.8))
+## more sophisticated plots are offered by package "xts"
+if (require("xts")) # need version > 0.9.7 for plots of multiple time series
+    plot(as.xts(measlesDE))
 
 ## Use ISO8601 date formatting (see ?strptime) and no legend
 data("salmNewport")
