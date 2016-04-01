@@ -38,12 +38,8 @@ functionTable <- function (class, functions = list(),
         functions[categoryNames], SIMPLIFY = FALSE, USE.NAMES = TRUE)
     
     ## get registered methods and associated generics
-    allmethods <- methods(class = class)  # in R >= 3.2.0, this includes S4
-    allgenerics <- if (getRversion() >= "3.2.0") {
-                       attr(allmethods, "info")$generic
-                   } else {
-                       sub(paste0("\\.",class,"$"), "", c(allmethods))
-                   }
+    allmethods <- methods(class = class)
+    allgenerics <- attr(allmethods, "info")$generic
     genericsList <- lapply(X = knowngenerics, FUN = intersect, allgenerics)
     genericsList$Other <- c(genericsList$Other,
                             setdiff(allgenerics,
@@ -62,12 +58,7 @@ functionTable <- function (class, functions = list(),
                            SIMPLIFY = FALSE, USE.NAMES = TRUE)
     
     ## transform list into a matrix by filling with empty cells
-    categoryLengths <- if (getRversion() >= "3.2.0") {
-                           lengths(functionList, use.names = FALSE)
-                       } else {
-                           vapply(X = functionList, FUN = length,
-                                  FUN.VALUE = 0, USE.NAMES =  FALSE)
-                       }
+    categoryLengths <- lengths(functionList, use.names = FALSE)
     nrows <- max(categoryLengths)
     functionTable <- vapply(X = functionList[categoryLengths > 0L],
                             FUN = function (x)
