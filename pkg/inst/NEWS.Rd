@@ -6,7 +6,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.0 (2016-04-01)}{
+\section{Changes in surveillance version 1.12.0 (2016-04-02)}{
 
 \subsection{DOCUMENTATION}{
   \itemize{
@@ -59,6 +59,10 @@
     \item Since \pkg{surveillance} 1.8-0, \code{hhh4()} results are of
     class \code{"hhh4"} instead of \code{"ah4"} (renamed).
     Legacy methods for the old class name \code{"ah4"} have been removed.
+
+    \item The internal model preparation in \code{twinstim()} is more
+    efficient (the distance matrix of the events is only computed if
+    event sources actually need to be updated).
   }
 }
 
@@ -71,6 +75,13 @@
     \code{as(ts, "sts")} could set a wrong start time. For instance,
     \code{as(ts(1:10, start=c(1959,2), frequency=4), "sts")@start} was
     \code{c(1959,1)}.
+
+    \item \code{algo.twins()} now also accepts \code{"sts"} input and
+    the automatic legend in the first plot of \code{plot.atwins()} works
+    again.
+
+    \item The experimental \code{profile}-method for \code{"twinstim"}
+    objects did not work if embedded \code{twinstim()} fits issued warnings.
   }
 }
 
