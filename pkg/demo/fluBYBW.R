@@ -1,6 +1,6 @@
 ################################################################################
 ### Demo of hhh4() modelling of influenza in Southern Germany - data("fluBYBW")
-### RUNNING THE WHOLE SCRIPT TAKES SEVERAL HOURS!
+### RUNNING THE WHOLE SCRIPT TAKES ~20 MINUTES!
 ###
 ### Copyright (C) 2009-2012 Michaela Paul, 2012-2013,2016 Sebastian Meyer
 ###
@@ -121,9 +121,10 @@ res_D <- hhh4(fluBYBW,cntrl_D)
 
 tp <- nrow(fluBYBW)-2*52
 
-## for this demo: only calculate pseudo-predictions based on the final fit,
-## i.e., avoid the time-consuming sequential refitting at each step
-TYPE <- "final"  # use "rolling" for true one-step-ahead predictions
+## for this demo: only calculate pseudo-predictions based on the final fit
+## to avoid the time-consuming sequential refitting at each step.
+TYPE <- "final"
+## use "rolling" for true one-step-ahead predictions => TAKES ~8 HOURS!
 
 val_A0 <- oneStepAhead(res_A0, tp=tp, type=TYPE)
 val_B0 <- oneStepAhead(res_B0, tp=tp, type=TYPE)
@@ -158,6 +159,9 @@ names(scores_i) <- nam
 rownames(meanScores) <- nam
 
 print(meanScores)
+## Note that the above use of "final" fitted values instead of "rolling"
+## one-step-ahead predictions leads to different mean scores than reported
+## in Paul & Held (2011, Table IV).
 
 
 ## comparison with best model B2 
@@ -177,7 +181,7 @@ compareWithBest <- function(best, whichModels, nPermut=9999, seed=1234){
   return(pVals)
 }
 
-pVals_flu <- compareWithBest(best=6, whichModels=1:10,
+pVals_flu <- compareWithBest(best=9, whichModels=1:10,
                              nPermut=999, # reduced for this demo
                              seed=2059710987)
 rownames(pVals_flu) <- nam
