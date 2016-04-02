@@ -585,7 +585,8 @@ residuals.twinstim <- function (object, ...)
 ######################################################################
 
 profile.twinstim <- function (fitted, profile, alpha = 0.05,
-    control = list(fnscale = -1, factr = 1e1, maxit = 100), do.ltildeprofile=FALSE,...)
+    control = list(fnscale = -1, maxit = 100, trace = 1),
+    do.ltildeprofile=FALSE, ...)
 {
   warning("the profile likelihood implementation is experimental")
   ## the implementation below is not well tested, simply uses optim (ignoring
@@ -609,7 +610,7 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
   ## Control of the optim procedure
   if (is.null(control[["fnscale",exact=TRUE]])) { control$fnscale <- -1 }
   if (is.null(control[["maxit",exact=TRUE]])) { control$maxit <- 100 }
-  if (is.null(control[["trace",exact=TRUE]])) { control$trace <- 2 }
+  if (is.null(control[["trace",exact=TRUE]])) { control$trace <- 1 }
 
 
   ## Estimated normalized likelihood function
@@ -651,7 +652,7 @@ profile.twinstim <- function (fitted, profile, alpha = 0.05,
     resOthers <- tryCatch(
             optim(par=theta.ml[-i], fn = ltildethetaminusi, gr = stildethetaminusi,
                   method = "BFGS", control = control),
-            warning = function(w) print(w), error = function(e) list(value=NA))
+            error = function(e) list(value=NA))
     resOthers$value
   }
 
