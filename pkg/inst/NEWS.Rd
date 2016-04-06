@@ -19,6 +19,8 @@
   }
 }
 
+}
+
 
 
 \section{Changes in surveillance version 1.12.0 (2016-04-02)}{
