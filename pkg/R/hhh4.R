@@ -6,7 +6,7 @@
 ### hhh4 is an extended version of algo.hhh for the sts-class
 ### The function allows the incorporation of random effects and covariates.
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2012-2015 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -89,10 +89,24 @@ hhh4 <- function (stsObj, control = list(
                     cntrl.variance   = control$optimizer$variance,
                     verbose=control$verbose)
 
+  ## extract parameter estimates
   convergence <- myoptim$convergence == 0
-  thetahat <- c(myoptim$fixef, myoptim$ranef)
-  loglik <- myoptim$loglik
+  thetahat <- myoptim$theta
+  if (dimRandomEffects>0) {
+      Sigma.orig <- myoptim$sd.corr
+      Sigma.trans <- getSigmai(head(Sigma.orig,model$nVar),
+                               tail(Sigma.orig,model$nCorr),
+                               model$nVar)
+      dimnames(Sigma.trans) <-
+          rep.int(list(sub("^sd\\.", "",
+                           names(Sigma.orig)[seq_len(model$nVar)])), 2L)
+  } else {
+      Sigma.orig <- Sigma.trans <- NULL
+  }
+
+  ## compute covariance matrices of regression and variance parameters
   cov <- try(solve(myoptim$fisher), silent=TRUE)
+  Sigma.cov <- if(dimRandomEffects>0) try(solve(myoptim$fisherVar), silent=TRUE)
 
   ## check for degenerate fisher info
   if(inherits(cov, "try-error")){ # fisher info is singular
@@ -106,44 +120,23 @@ hhh4 <- function (stsObj, control = list(
   }
   if (!convergence) {
       if (control$verbose) {
-          cat("Penalized loglikelihood =", loglik, "\n")
+          cat("Penalized loglikelihood =", myoptim$loglik, "\n")
           thetastring <- paste(round(thetahat,2), collapse=", ")
           thetastring <- strwrap(thetastring, exdent=10, prefix="\n", initial="")
           cat("theta = (", thetastring, ")\n")
       }
       warning("Results are not reliable!", ADVICEONERROR)
-      res <- myoptim
-      res$convergence <- convergence
-      res$call <- match.call()
-      class(res) <- "hhh4"
-      return(res)
   }
 
-  ## optimization successful, return a full "hhh4" object
-  dimnames(cov) <- list(names(thetahat), names(thetahat))
-  if (dimRandomEffects>0) {
-      Sigma.orig <- myoptim$sd.corr
-      Sigma.cov <- solve(myoptim$fisherVar)
-      dimnames(Sigma.cov) <- list(names(Sigma.orig),names(Sigma.orig))
-      Sigma.trans <- getSigmai(head(Sigma.orig,model$nVar),
-                               tail(Sigma.orig,model$nCorr),
-                               model$nVar)
-      dimnames(Sigma.trans) <-
-          rep.int(list(sub("^sd\\.", "",
-                           names(Sigma.orig)[seq_len(model$nVar)])), 2L)
-  } else {
-      Sigma.orig <- Sigma.cov <- Sigma.trans <- NULL
-  }
-  
-  ## Done
-  result <- list(coefficients=thetahat, se=sqrt(diag(cov)), cov=cov, 
+  ## gather results in a list -> "hhh4" object
+  result <- list(coefficients=thetahat,
+                 se=if (convergence) sqrt(diag(cov)), cov=cov, 
                  Sigma=Sigma.trans,     # estimated covariance matrix of ri's
                  Sigma.orig=Sigma.orig, # variance parameters on original scale
                  Sigma.cov=Sigma.cov,   # covariance matrix of Sigma.orig
                  call=match.call(),
                  dim=c(fixed=dimFixedEffects,random=dimRandomEffects),
-                 loglikelihood=loglik,
-                 margll=marLogLik(Sigma.orig, thetahat, model),
+                 loglikelihood=myoptim$loglik, margll=myoptim$margll,
                  convergence=convergence,
                  fitted.values=meanHHH(thetahat, model, total.only=TRUE),
                  control=control,
@@ -155,8 +148,12 @@ hhh4 <- function (stsObj, control = list(
                  nTime=length(model$subset), nUnit=ncol(stsObj),
                  ## CAVE: nTime is not nrow(stsObj) as usual!
                  runtime=proc.time()-ptm)
+  if (!convergence) {
+      ## add (singular) Fisher information for further investigation
+      result[c("fisher","fisherVar")] <- myoptim[c("fisher","fisherVar")]
+  }
   class(result) <- "hhh4"
-  result
+  return(result)
 }
 
 
@@ -2139,11 +2136,15 @@ fitHHH <- function(theta, sd.corr, model,
   
   ll <- penLogLik(theta=theta,sd.corr=sd.corr,model=model)
   fisher <- penFisher(theta=theta,sd.corr=sd.corr,model=model)
+  dimnames(fisher) <- list(names(theta), names(theta))
+  margll <- marLogLik(sd.corr=sd.corr, theta=theta, model=model)
   fisher.var <- marFisher(sd.corr=sd.corr, theta=theta, model=model,
                           fisher.unpen=fisher.unpen)
+  dimnames(fisher.var) <- list(names(sd.corr), names(sd.corr))
   
-  list(fixef=head(theta,dimFE.d.O), ranef=tail(theta,dimRE), sd.corr=sd.corr,
-       loglik=ll, fisher=fisher, fisherVar=fisher.var,
+  list(theta=theta, sd.corr=sd.corr,
+       loglik=ll, margll=margll,
+       fisher=fisher, fisherVar=fisher.var,
        convergence=convergence, dim=c(fixed=dimFE.d.O,random=dimRE))
 }
 

@@ -1,9 +1,24 @@
-\newcommand{\CRANpkg}{\href{https://CRAN.R-project.org/package=#1}{\pkg{#1}}}
-%% some pre-defined commands: \R, \code, \acronym, \url, \file, \pkg
+%% Some pre-defined commands: \R, \code, \acronym, \url, \file, \pkg
+%% Since R 3.2.0, additional system Rd macros are available,
+%% e.g., \CRANpkg and \doi. See the definitions in the file
+%% file.path(R.home("share"), "Rd", "macros", "system.Rd")
 
 \name{NEWS}
 \title{News for Package 'surveillance'}
 \encoding{latin1}
+
+
+\section{Changes in surveillance version 1.12.1 (2016-04-06)}{
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item Non-convergent \code{hhh4()} fits now obey the structure of
+    standard \code{"hhh4"} objects. In particular, such fits now also
+    contain the \code{control} and \code{stsObj} elements, allowing
+    for model \code{update()}s of non-convergent fits.
+  }
+}
+
 
 
 \section{Changes in surveillance version 1.12.0 (2016-04-02)}{

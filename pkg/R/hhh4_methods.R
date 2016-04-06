@@ -320,7 +320,7 @@ predict.hhh4 <- function(object, newSubset = object$control$subset,
 ## use.estimates: use fitted parameters as new start values
 
 update.hhh4 <- function (object, ..., S = NULL, subset.upper = NULL,
-                         use.estimates = TRUE, evaluate = TRUE)
+                         use.estimates = object$convergence, evaluate = TRUE)
 {
     control <- object$control
 
