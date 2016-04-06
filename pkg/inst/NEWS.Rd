@@ -16,6 +16,10 @@
     standard \code{"hhh4"} objects. In particular, such fits now also
     contain the \code{control} and \code{stsObj} elements, allowing
     for model \code{update()}s of non-convergent fits.
+
+    \item The functions returned by \code{W_powerlaw()} now have the
+    package namespace as their environment to support situations where
+    the package is not attached.
   }
 }
 
