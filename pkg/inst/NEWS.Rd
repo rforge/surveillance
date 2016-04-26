@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.1 (2016-04-06)}{
+\section{Changes in surveillance version 1.12.1 (2016-04-26)}{
 
 \subsection{MINOR CHANGES}{
   \itemize{
@@ -20,6 +20,8 @@
     \item The functions returned by \code{W_powerlaw()} now have the
     package namespace as their environment to support situations where
     the package is not attached.
+
+    \item \code{knox()} warns about symmetric input matrices.
   }
 }
 

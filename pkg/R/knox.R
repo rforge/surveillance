@@ -5,7 +5,7 @@
 ###
 ### Knox test for space-time interaction
 ###
-### Copyright (C) 2015 Sebastian Meyer
+### Copyright (C) 2015-2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -14,6 +14,9 @@
 knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
 {
     stopifnot(length(dt) == length(ds))
+    ## warn if a symmetric matrix is detected
+    if (isSymmetric.matrix(dt) || isSymmetric.matrix(ds))
+        warning("symmetric input matrix detected; use 'lower.tri'?")
 
     ## logical vectors indicating which pairs are close in time and space
     closeInTime <- if (is.logical(dt)) {
