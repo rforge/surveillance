@@ -169,7 +169,8 @@ epitest(model, data, tiles, method = "time", B = 199,
   Model-based testing for space-time interaction using point processes:
   An application to psychiatric hospital admissions in an urban area.
   \emph{Spatial and Spatio-temporal Epidemiology}, \bold{17}, 15-25.
-  \doi{10.1016/j.sste.2016.03.002}. Eprint: \arXiv{1512.09052}.
+  \doi{10.1016/j.sste.2016.03.002}.
+  Eprint: \url{http://arxiv.org/abs/1512.09052}.
 }
 
 \author{
