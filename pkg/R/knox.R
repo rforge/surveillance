@@ -14,7 +14,6 @@
 knox <- function (dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
 {
     stopifnot(length(dt) == length(ds))
-    ## warn if a symmetric matrix is detected
     if (isSymmetric.matrix(dt) || isSymmetric.matrix(ds))
         warning("symmetric input matrix detected; use 'lower.tri'?")
 
