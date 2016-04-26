@@ -15,7 +15,7 @@ with support for parallel computation via \code{\link{plapply}}.
 There is a simple \code{plot}-method showing a \code{\link{truehist}} of
 the simulated null distribution together with the expected and observed
 values.
-This implementation of the Knox test is due to Meyer et al. (2015).
+This implementation of the Knox test is due to Meyer et al. (2016).
 }
 
 \usage{
@@ -129,11 +129,11 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
   The detection of disease clustering and a generalized regression approach.
   \emph{Cancer Research}, \bold{27}, 209-220.
 
-  Meyer, S., Warnke, I., R\enc{ö}{oe}ssler, W. and Held, L. (2015):
+  Meyer, S., Warnke, I., R\enc{ö}{oe}ssler, W. and Held, L. (2016):
   Model-based testing for space-time interaction using point processes:
   An application to psychiatric hospital admissions in an urban area.
-  \emph{Spatial and Spatio-temporal Epidemiology}. In revision.\cr
-  Preprint available at \url{http://arxiv.org/abs/1512.09052}
+  \emph{Spatial and Spatio-temporal Epidemiology}, \bold{17}, 15-25.
+  \doi{10.1016/j.sste.2016.03.002}. Eprint: \arXiv{1512.09052}.
 }
 
 \examples{
