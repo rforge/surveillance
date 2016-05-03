@@ -6,7 +6,7 @@
 ### Data structure "epidata" representing the SIR event history of a fixed
 ### geo-referenced population (e.g., farms, households) for twinSIR() analysis
 ###
-### Copyright (C) 2008-2010, 2012, 2014-2015 Sebastian Meyer
+### Copyright (C) 2008-2010, 2012, 2014-2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -354,7 +354,7 @@ update.epidata <- function (object, f = list(), w = list(), D = dist, ...)
                                  as.character(infectiousIDs),
                                  drop = FALSE] # index by factor levels
                     object[blockidx,names(f)] <- vapply(
-                        X = f, FUN = function (B) rowSums(B(u)),
+                        X = f, FUN = function (B) Matrix::rowSums(B(u)),
                         FUN.VALUE = numeric(length(blockIDs)),
                         USE.NAMES = FALSE)
                 }

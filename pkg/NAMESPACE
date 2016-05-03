@@ -62,7 +62,7 @@ importFrom(MASS, glm.nb)   # for algo.glrnb
 importFrom(MASS, ginv, negative.binomial)
 importFrom(Matrix, Matrix)
 importClassesFrom(Matrix, ddiMatrix)
-importMethodsFrom(Matrix, coerce, diag, forceSymmetric, solve)
+importMethodsFrom(Matrix, coerce, diag, forceSymmetric)
 ## sparse matrix methods provide a significant speed-up in marFisher
 
 
@@ -70,9 +70,6 @@ importMethodsFrom(Matrix, coerce, diag, forceSymmetric, solve)
 
 # for use in computing OSAIC weights by simulation
 #importFrom(quadprog, solve.QP)   # moved to "Suggests"
-
-# for update.epidata() if 'D' is a "Matrix"
-importMethodsFrom(Matrix, rowSums)
 
 
 ### twinstim-specific
