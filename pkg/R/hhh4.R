@@ -958,9 +958,8 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
   lpen <- if (dimRE==0) 0 else { # there are random effects
     ##-.5*(t(randomEffects)%*%Sigma.inv%*%randomEffects)
     ## the following implementation takes ~85% less computing time !
-    -0.5 * crossprod(randomEffects, Sigma.inv) %*% randomEffects
+    -0.5 * c(crossprod(randomEffects, Sigma.inv) %*% randomEffects)
   }
-  lpen <- c(lpen)                       # drop 1x1 matrix dimensions
   
   ## log-likelihood
   ll.units <- .colSums(model$family(Y,mu,psi),
@@ -1525,8 +1524,8 @@ marLogLik <- function(sd.corr, theta, model, fisher.unpen=NULL, verbose=FALSE){
   # where -0.5*log(|Sigma|) = -dim(RE_i)*[Sum(sd_i) -0.5*log(1+corr_i^2)]
   ##lpen <- -0.5*(t(randomEffects)%*%Sigma.inv%*%randomEffects)
   ## the following implementation takes ~85% less computing time !
-  lpen <- -0.5 * crossprod(randomEffects, Sigma.inv) %*% randomEffects
-  loglik.pen <- sum(-dimBlocks*sd) + c(lpen)
+  lpen <- -0.5 * c(crossprod(randomEffects, Sigma.inv) %*% randomEffects)
+  loglik.pen <- sum(-dimBlocks*sd) + lpen
   if(dimCorr >0){
     loglik.pen <- loglik.pen + 0.5*dimBlocks[1]*sum(log(1+corr^2))
   }
@@ -1606,11 +1605,11 @@ marScore <- function(sd.corr, theta, model, fisher.unpen=NULL, verbose=FALSE){
     dS.i <- getSigma(dimSigma=dimVar,dimBlocks=dimBlocks,Sigmai=dSi)
     #dlpen.i <- -0.5* t(randomEffects) %*% dS.i %*% randomEffects
     # ~85% faster implementation using crossprod() avoiding "slow" t():
-    dlpen.i <- -0.5 * crossprod(randomEffects, dS.i) %*% randomEffects
+    dlpen.i <- -0.5 * c(crossprod(randomEffects, dS.i) %*% randomEffects)
     #tr.d1logDetF <- sum(diag(F.inv.RE %*% dS.i))
     tr.d1logDetF <- sum(F.inv.RE * dS.i)   # since dS.i is symmetric
     #<- needs 1/100 (!) of the computation time of sum(diag(F.inv.RE %*% dS.i))
-    marg.score[i] <- d1logDet[i] + c(dlpen.i) - 0.5 * tr.d1logDetF
+    marg.score[i] <- d1logDet[i] + dlpen.i - 0.5 * tr.d1logDetF
   }
   
   return(marg.score)
@@ -1716,7 +1715,7 @@ marFisher <- function(sd.corr, theta, model, fisher.unpen=NULL, verbose=FALSE){
 
       #d2lpen.i <- -0.5* t(randomEffects) %*% dSij %*% randomEffects
       # ~85% faster implementation using crossprod() avoiding "slow" t():
-      d2lpen.i <- -0.5 * crossprod(randomEffects, dSij) %*% randomEffects
+      d2lpen.i <- -0.5 * c(crossprod(randomEffects, dSij) %*% randomEffects)
 
       # compute second derivative of log-determinant of penFisher
       mpart1 <- dS.j %*% F.inv.RE  # 3 times as fast as the other way round
