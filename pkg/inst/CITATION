@@ -31,7 +31,7 @@ bibentry(
 bibentry(
     bibtype = "Article",
     header = "For multivariate hhh4() models *without* random effects, cite:",
-    author = c(authors[c("MP","LH")], person(c("Andr?", "Michael"), "Toschke")),
+    author = c(authors[c("MP","LH")], person(c("André", "Michael"), "Toschke")),
     title = "Multivariate modelling of infectious disease surveillance data",
     journal = "Statistics in Medicine",
     issn = "0277-6715",
@@ -112,7 +112,7 @@ bibentry(
     bibtype = "Article",
     header = "If knox() or epitest() is used, cite:",
     author = c(authors["SM"], person("Ingeborg", "Warnke"),
-               person("Wulf", "R?ssler"), authors["LH"]),
+               person("Wulf", "Rössler"), authors["LH"]),
     title = "Model-based testing for space-time interaction using point processes: An application to psychiatric hospital admissions in an urban area",
     journal = "Spatial and Spatio-temporal Epidemiology",
     issn = "1877-5845",
@@ -182,30 +182,18 @@ bibentry(
 ### JSS papers ###
 ##################
 
-bibentry(bibtype = "Article",
-  title        = "Monitoring Count Time Series in {R}: Aberration Detection in 
-Public Health Surveillance",
-  author       = c(person(given = "Ma\\\"elle",
-                          family = "Salmon"),
-                   person(given = "Dirk",
-                          family = "Schumacher"),
-                   person(given = "Michael",
-                          family = "H\\\"ohle")),
-  journal      = "Journal of Statistical Software",
-  year         = "2016",
-  volume       = "70",
-  number       = "10",
-  pages        = "1--35",
-  doi          = "10.18637/jss.v070.i10",
-  header       = "To cite surveillance in publications use:",
-  textVersion  =
-  paste("Maelle Salmon, Dirk Schumacher, Michael Hoehle (2016).",
-        "Monitoring Count Time Series in R: Aberration Detection in Public 
-Health Surveillance.",
-        "Journal of Statistical Software, 70(10), 1-35.",
-        "doi:10.18637/jss.v070.i10")
+bibentry(
+    bibtype = "Article",
+    header = "As a general software reference for the monitoring functionality, please cite:",
+    author = authors[c("MS", "DS", "MH")],
+    title = "Monitoring Count Time Series in {R}: Aberration Detection in Public Health Surveillance",
+    journal = "Journal of Statistical Software",
+    year = "2016",
+    volume = "70",
+    number = "10",
+    pages = "1--35",
+    doi = "10.18637/jss.v070.i10"
 )
-
 
 bibentry(
     bibtype = "Article",
