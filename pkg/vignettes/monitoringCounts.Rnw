@@ -322,8 +322,11 @@ is especially convenient in situations when little historic information is avail
 Here we shall expand on C1 for which the baseline are the 7 timepoints before the assessed timepoint $t_0$, that is to say
  $\left(y_{t_0-7},\ldots,y_{t_0-1}\right)$. The expected value is the mean of the baseline. The method is based on a statistic called $C_{t_0}$ defined as
 $C_{t_0}= \frac{(y_{t_0}-\bar{y}_{t_0})}{s_{t_0}}$, where $$\bar{y}_{t_0}= \frac{1}{7} \cdot\sum_{i=t_0-7}^{t_0-1} y_i  \textnormal{ and } s_{t_0}^2= \frac{1}{7-1} \cdot\sum_{i=t_0-7}^{t_0-1} \left(y_i - \bar{y}_{t_0}\right)^2.$$ 
-Under the null hypothesis of no outbreak, it is assumed that $C_{t_0} \stackrel{H_0}{\sim} {N}(0,1)$. The upperbound $U_{t_0}$ is defined by the $(1-\alpha)$-quantile of the normal distribution of the disease count $y_t, t \leq t_0$:
- $U_{t_0}= \bar{y}_{t_0} + z_{1-\alpha}s_{t_0}$ where  $z_{1-\alpha}$ is the $(1-\alpha)$-quantile of the standard normal distribution. An alarm is raised if $y_{t_0} > U_{t_0}$.
+Under the null hypothesis of no outbreak, it is assumed that $C_{t_0} \stackrel{H_0}{\sim} {N}(0,1)$. The upperbound $U_{t_0}$ is found by assuming that $y_t$ is normal,
+estimating parameters by plug-in and then taking the $(1-\alpha)$-th
+quantile of this distribution, i.e.  $U_{t_0}= \bar{y}_{t_0} +
+z_{1-\alpha}s_{t_0}$, where $z_{1-\alpha}$ is the
+$(1-\alpha)$-quantile of the standard normal distribution. An alarm is raised if $y_{t_0} > U_{t_0}$.
 
  The output of the algorithm is a \code{sts} object that contains subsets of slots \code{observed}, \code{population} and \code{state} defined by the range of timepoints specified in the input -- 
 \textit{e.g} the last 20 timepoints of the time series,
@@ -1706,7 +1709,7 @@ Combining \pkg{surveillance} with other \proglang{R} packages and programs is ea
 the aberration detection into a comprehensive surveillance system to be used in routine practice. In our opinion, such a surveillance system has to at least support the following process: loading data from local databases, analysing them within \pkg{surveillance} 
 and sending the results of this analysis to the end-user who is typically an epidemiologist in charge of the specific pathogen. This section exemplifies the integration of the package 
 into a whole analysis stack, first through the introduction of a simple workflow from data query to a \code{Sweave}~\citep{sweave} or \pkg{knitr}~\citep{knitr} report of signals, and
- secondly through the presentation of the first version of the more elaborate system in use at the German Robert Koch Institute.
+ secondly through the presentation of the more elaborate system in use at the German Robert Koch Institute.
 
 \subsection{A simple surveillance system}
 Suppose you have a database with surveillance time series but little resources to build a surveillance system encompassing all the above stages. Using \proglang{R} and \code{Sweave} or \code{knitr} for \LaTeX~you can still set up
@@ -1789,7 +1792,7 @@ In the next section, we present a more advanced surveillance system built on the
 \subsection{Automatic detection of outbreaks at the Robert Koch Institute}
 \label{sec:RKI}
 
-The package \pkg{surveillance} was used as a core building block for designing and implementing the first version of the automated outbreak detection system at the RKI in Germany~\citep{Dirk}. The text below describes the system as it was in early 2014.
+The package \pkg{surveillance} was used as a core building block for designing and implementing the automated outbreak detection system at the RKI in Germany~\citep{Dirk}. The text below describes the system as it was in early 2014.
 Due to the Infection Protection Act (IfSG) the RKI daily receives over 1,000 notifiable disease reports. The system analyses about half a million time series per day to identify possible aberrations in the reported number of cases. 
 Structurally, it consists of two components: an analytical process written in \proglang{R} that daily monitors the data and a reporting component that compiles and communicates the results to the epidemiologists.
 
