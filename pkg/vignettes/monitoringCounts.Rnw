@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance}
+%\VignetteIndexEntry{Monitoring count time series in R: Aberration detection in public health surveillance}
 %\VignetteDepends{surveillance, gamlss, INLA, MGLM, ggplot2}
 
 \documentclass[nojss]{jss}
