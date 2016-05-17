@@ -1,7 +1,7 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
 Version: 1.12.1
-Date: 2016-05-11
+Date: 2016-05-17
 Authors@R: c(MH = person("Michael", "Höhle",
                   email = "hoehle@math.su.se",
                   role = c("aut", "ths")),
@@ -37,7 +37,7 @@ Author: Michael Höhle [aut, ths], Sebastian Meyer [aut, cre],
 Maintainer: Sebastian Meyer <Sebastian.Meyer@ifspm.uzh.ch>
 Depends: R (>= 3.2.0), methods, grDevices, graphics, stats, utils, 
         sp (>= 1.0-15), xtable (>= 1.7-0), polyCub (>= 0.4-3)
-Imports: Rcpp (>= 0.11.0), MASS, Matrix, spatstat (>= 1.36-0)
+Imports: Rcpp (>= 0.11.0), MASS, Matrix, nlme, spatstat (>= 1.36-0)
 LinkingTo: Rcpp
 Suggests: parallel, grid, xts, gridExtra, lattice, colorspace, scales, animation,
         msm, spc, 
