@@ -98,8 +98,8 @@ This paper is structured as follows. Section~\ref{sec:1} gives an introduction t
 \section{Getting to know the basics of the package}
 <<SETUP, echo = FALSE,include = FALSE>>=
 options(width=77)
-## create directory for plots
-dir.create("plots", showWarnings=FALSE)
+## create directories for plots and cache
+dir.create(c("plots", "monitoringCounts-cache"), showWarnings=FALSE)
 @ 
 \SweaveOpts{prefix.string=plots/monitoringCounts}
 \label{sec:1}
@@ -720,9 +720,9 @@ control.boda <- list(range=rangeBoda, X=NULL, trend=TRUE,
                      mc.munu=10000, mc.y=1000)
 # boda without covariates: trend + spline + periodic spline
 boda <- boda(cam.sts, control=control.boda)
-save(boda, file = "boda.RData")
+save(boda, file = "monitoringCounts-cache/boda.RData")
 } else {
-  load("boda.RData")
+  load("monitoringCounts-cache/boda.RData")
 }
 @
 
@@ -751,9 +751,9 @@ covarNames <- c(paste("l",1:4,".hum",sep=""),"newyears","christmas",
 control.boda2 <- modifyList(control.boda, 
                             list(X=campyDE[,covarNames],season=FALSE))
 boda.covars <- boda(cam.sts, control=control.boda2)
-save(boda.covars, file = "boda.covars.RData")
+save(boda.covars, file = "monitoringCounts-cache/boda.covars.RData")
 } else {
-  load("boda.covars.RData")
+  load("monitoringCounts-cache/boda.covars.RData")
 }
 @
 
@@ -1277,12 +1277,12 @@ pMarkovChain <- sapply( h.grid, function(h) {
   return(tail(TA$cdf,n=1))
 })
 
-save(pMC, file = "pMC.RData")
-save(pMarkovChain, file = "pMarkovChain.RData")
+save(pMC, file = "monitoringCounts-cache/pMC.RData")
+save(pMarkovChain, file = "monitoringCounts-cache/pMarkovChain.RData")
 
 } else {
-load("pMC.RData")
-load("pMarkovChain.RData")
+load("monitoringCounts-cache/pMC.RData")
+load("monitoringCounts-cache/pMarkovChain.RData")
 }
 @
 
@@ -1491,9 +1491,9 @@ simone.stop <- function(sts, control) {
 if (computeALL) {
   set.seed(1233)
   rlMN <- replicate(nSamples, simone.stop(rotaBB, control=control))
-  save(file="rlsims-multinom.RData", list=c("rlMN"))
+  save(file="monitoringCounts-cache/rlsims-multinom.RData", list=c("rlMN"))
 } else {
-  load(file="rlsims-multinom.RData")
+  load(file="monitoringCounts-cache/rlsims-multinom.RData")
 }
 mean(rlMN)
 @
