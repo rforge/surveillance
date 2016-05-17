@@ -99,7 +99,8 @@ This paper is structured as follows. Section~\ref{sec:1} gives an introduction t
 <<SETUP, echo = FALSE,include = FALSE>>=
 options(width=77)
 ## create directories for plots and cache
-dir.create(c("plots", "monitoringCounts-cache"), showWarnings=FALSE)
+dir.create("plots", showWarnings=FALSE)
+dir.create("monitoringCounts-cache", showWarnings=FALSE)
 @ 
 \SweaveOpts{prefix.string=plots/monitoringCounts}
 \label{sec:1}
