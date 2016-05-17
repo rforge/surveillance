@@ -23,7 +23,6 @@
   \mathbin{\overset{#1}{\kern\z@\resizebox{\wd\mybox}{\ht\mysim}{$\sim$}}}%
 }
 \makeatother
-\usepackage[ansinew]{inputenc} 
 \newcommand{\var}{\operatorname{var}}
 \newcommand{\BetaBin}{\operatorname{BetaBin}}
 \newcommand{\Bin}{\operatorname{Bin}}
@@ -42,7 +41,7 @@
         Michael H\"ohle\\ Stockholm University,\\Robert Koch Institute }
 \title{Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance}
 %% for pretty printing and a nice hypersummary also set:
-\Plainauthor{Ma\"e lle Salmon, Dirk Schumacher, Michael H\"o hle} %% comma-separated
+\Plainauthor{Ma\"elle Salmon, Dirk Schumacher, Michael H\"ohle} %% comma-separated
 % without formatting
 \Shorttitle{\pkg{surveillance}: Aberration detection in \proglang{R}} %% a short title (if necessary)
 
@@ -129,7 +128,6 @@ options(width=77)
 dir.create("plots", showWarnings=FALSE)
 @ 
 \SweaveOpts{prefix.string=plots/monitoringCounts}
-\section[Using surveillance in selected contexts]{Using \pkg{surveillance} in selected contexts}
 \label{sec:1}
 
 The package provides a central S4 data class \code{sts} to capture multivariate or univariate time series. All further methods use objects of this class as an input. 
@@ -203,7 +201,7 @@ alarm.symbol <- list(pch=17, col="red2", cex=2,lwd=3)
 #Define list with arguments to use with do.call("legend", legOpts)
 legOpts <- list(x="topleft",legend=c(expression(U[t])),bty="n",lty=1,lwd=line.lwd,col=alarm.symbol$col,horiz=TRUE,cex=cex.leg)    
 #How should the par of each plot look?
-parOpts <- list(mar=c(6,5,5,5),family="Times")
+par.list <- list(mar=c(6,5,5,5),family="Times")
 #Do this once
 y.max <- 0
 plotOpts <- list(col=stsPlotCol,ylim=c(0,y.max),
@@ -215,7 +213,7 @@ plotOpts <- list(col=stsPlotCol,ylim=c(0,y.max),
                  xaxis.tickFreq=list("%V"=atChange,"%m"=atChange,"%G"=atChange),
                  xaxis.labelFreq=list("%Y"=atMedian), 
                  xaxis.labelFormat="%Y",
-                 par.list=parOpts,hookFunc=hookFunc)
+                 par.list=par.list,hookFunc=hookFunc)
 			 
 @
 <<stsLoad, echo = F,include = F, results=tex>>=
@@ -266,7 +264,7 @@ is a panelled graph with each panel representing the time series of counts of a 
 y.max <- max(observed(salmNewport[,2]),observed(salmNewport[,3]),na.rm=TRUE)
 plotOpts2 <- modifyList(plotOpts,list(x=salmNewport[,2],legend.opts=NULL,ylim=c(0,y.max)),keep.null=TRUE)
 plotOpts2$xaxis.tickFreq <- list("%G"=atChange)
-plotOpts2$parOpts <- list(mar=c(6,5,5,0),family="Times")
+plotOpts2$par.list <- list(mar=c(6,5,5,0),family="Times")
 do.call("plot",plotOpts2)
 
 @
@@ -278,7 +276,7 @@ do.call("plot",plotOpts2)
 # Plot with special function
 plotOpts2 <- modifyList(plotOpts,list(x=salmNewport[,3],legend.opts=NULL,ylim=c(0,y.max)),keep.null=TRUE)
 plotOpts2$xaxis.tickFreq <- list("%G"=atChange)
-plotOpts2$parOpts <- list(mar=c(6,5,5,0),family="Times")
+plotOpts2$par.list <- list(mar=c(6,5,5,0),family="Times")
 do.call("plot",plotOpts2)
 @ 
 \includegraphics[width=9cm]{plots/monitoringCounts-unitPlot2.pdf}
@@ -454,7 +452,6 @@ library(ggplot2)
 library(grid)
 # for rectanges
 widthRectangles <- 10
-library(gridBase)
 # dimensions for the ticks
 heightTick <- 4
 xTicks <- c(15,67,119)
@@ -658,7 +655,7 @@ par(las=1)
 y.max <- max(observed(cam.sts),upperbound(cam.sts),na.rm=TRUE)
 plotOpts3 <- modifyList(plotOpts,list(x=cam.sts,ylab="",legend.opts=NULL,ylim=c(0,y.max),type = observed ~ time),keep.null=TRUE)
 plotOpts3$xaxis.tickFreq <- list("%m"=atChange,"%G"=atChange)
-plotOpts3$parOpts <- list(mar=c(6,5,5,5),family="Times")
+plotOpts3$par.list <- list(mar=c(6,5,5,5),family="Times")
 do.call("plot",plotOpts3)
 par(las=0)
 #mtext(side=2,text="No. of reports",
@@ -832,7 +829,7 @@ far <- farrington(cam.sts,control=control.far)
 #Both farringtonFlexible and algo.bayes uses a one-sided interval just as boda.
 control.far2 <-modifyList(control.far,list(alpha=0.025))
 farflex <- farringtonFlexible(cam.sts,control=control.far2)
-bayes <- bayes(cam.sts,control=control.far2)
+bayes <- suppressWarnings(bayes(cam.sts,control=control.far2))
 @
 
 <<boda4, echo = F, include = F>>=
