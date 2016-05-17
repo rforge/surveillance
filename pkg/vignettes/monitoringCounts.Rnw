@@ -13,9 +13,16 @@
 \author{Ma\"elle Salmon\\Robert Koch Institute \And 
         Dirk Schumacher\\Robert Koch Institute \And
         Michael H\"ohle\\ Stockholm University,\\Robert Koch Institute }
-\title{Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance}
+\title{
+  \vspace{-1.5cm}
+  \fbox{\vbox{\normalfont\footnotesize
+      This vignette corresponds to an article published in the\\
+      \textit{Journal of Statistical Software} 2016;\textbf{70}(10):1--35.
+      \doi{10.18637/jss.v070.i10}.}}\\[1cm]
+  Monitoring Count Time Series in \proglang{R}: Aberration Detection in Public Health Surveillance}
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Ma\"elle Salmon, Dirk Schumacher, Michael H\"ohle} %% comma-separated
+\Plaintitle{Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance}
 % without formatting
 \Shorttitle{\pkg{surveillance}: Aberration detection in \proglang{R}} %% a short title (if necessary)
 
@@ -76,7 +83,7 @@
 
 \section{Introduction}
 \label{sec:0}
-\textbf{The content of this vignette corresponds to the article "Monitoring Count Time Series in \proglang{R}: Aberration Detection in Public Health Surveillance", Journal of Statistical Software, 2016", 70(10), 1-35, doi = \url{10.18637/jss.v070.i10}}.
+
 Nowadays, the fight against infectious diseases does not only require treating patients and setting up measures for prevention but also demands the timely recognition of emerging outbreaks in order to avoid their expansion. Along these lines, health institutions such as hospitals and public health authorities collect and store information about health events -- typically represented as individual case reports containing clinical information, and subject to specific case definitions. Analysing these data is crucial. It enables situational awareness in general and the timely detection of aberrant counts in particular, empowering the prevention of additional disease cases through early interventions. For any specific aggregation of characteristics of events, such as over-the-counter sales of pain medication, new cases of foot-and-mouth disease among cattle, or adults becoming sick with hepatitis C in Germany, data can be represented as time series of counts with days, weeks, months or years as time units of the aggregation. Abnormally high or low values at a given time point can reveal critical issues such as an outbreak of the disease or a malfunction of data transmission. Thus, identifying aberrations in the collected data is decisive, for human as well as for animal health.
 
 In this paper we present the \proglang{R} package \pkg{surveillance} which is available from the Comprehensive \proglang{R} Archive Network (CRAN) at
@@ -87,6 +94,7 @@ The package offers an open-source implementation of state-of-the-art methods for
 The present paper is designed as an extension of two previous articles about the \pkg{surveillance} package published as~\citet{hoehle2007} and~\citet{hoehle_mazick2009}. On the one hand, the paper aims at giving an overview of the new features added to the package since the publication of the two former papers. On the other hand it intends to illustrate how well the \pkg{surveillance} package can support routine practical disease surveillance by presenting the current surveillance system of infectious diseases at the RKI.
 
 This paper is structured as follows. Section~\ref{sec:1} gives an introduction to the data structure used in the package for representing and visualizing univariate or multivariate time series. Furthermore, the structure and use of aberration detection algorithms are explained. Section~\ref{sec:2} leads the reader through different surveillance methods available in the package. Section~\ref{sec:3} describes the integration of such methods in a complete surveillance system as currently in use at the RKI. Finally, a discussion rounds off the work.
+
 \section{Getting to know the basics of the package}
 <<SETUP, echo = FALSE,include = FALSE>>=
 options(width=77)
