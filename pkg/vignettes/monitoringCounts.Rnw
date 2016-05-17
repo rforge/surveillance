@@ -2,38 +2,12 @@
 %\VignetteDepends{surveillance, gamlss, INLA, MGLM, ggplot2}
 
 \documentclass[nojss]{jss}
-%\usepackage{rotating} 
-\usepackage{bm} 
-\usepackage{hyperref}
-\usepackage{amsmath}
-\usepackage{natbib}
-\usepackage{changebar}
-\usepackage{nicefrac}
-\usepackage{tabularx}
-\usepackage{graphicx}
+\usepackage{amsmath,bm}
 \usepackage{subfig}
-\usepackage{url}
-\usepackage{subfloat}
-\makeatletter
-\newcommand{\distas}[1]{\mathbin{\overset{#1}{\kern\z@\sim}}}%
-\newsavebox{\mybox}\newsavebox{\mysim}
-\newcommand{\distras}[1]{%
-  \savebox{\mybox}{\hbox{\kern3pt$\scriptstyle#1$\kern3pt}}%
-  \savebox{\mysim}{\hbox{$\sim$}}%
-  \mathbin{\overset{#1}{\kern\z@\resizebox{\wd\mybox}{\ht\mysim}{$\sim$}}}%
-}
-\makeatother
-\newcommand{\var}{\operatorname{var}}
 \newcommand{\BetaBin}{\operatorname{BetaBin}}
-\newcommand{\Bin}{\operatorname{Bin}}
 \newcommand{\Var}{\operatorname{Var}}
-\newcommand{\cov}{\operatorname{cov}}
 \newcommand{\logit}{\operatorname{logit}}
 \newcommand{\NB}{\operatorname{NB}}
-\newcommand{\MVN}{\operatorname{MVN}}
-\newcommand{\Poisson}{\operatorname{Po}}
-\newcommand{\lengthYear}{\operatorname{lengthYear}}
-\newcommand{\offset}{\operatorname{offset}}
 
 %% almost as usual
 \author{Ma\"elle Salmon\\Robert Koch Institute \And 
@@ -47,7 +21,6 @@
 
 %% an abstract and keywords
 \Abstract{
-
   Public health surveillance aims at lessening disease burden by, e.g.,
   timely recognizing emerging outbreaks in case of infectious diseases. Seen
   from a statistical perspective, this implies the use of appropriate methods
@@ -75,6 +48,7 @@
 \Keywords{\proglang{R}, \texttt{surveillance}, outbreak detection, statistical process control}
 \Plainkeywords{R, surveillance, outbreak detection, statistical process control} %% without formatting
 %% at least one keyword must be supplied
+
 \Address{
   Ma\"{e}lle Salmon, Dirk Schumacher\\
   Department for Infectious Diseases Epidemiology\\
@@ -93,8 +67,11 @@
   E-mail: \email{hoehle@math.su.se}\\
   URL: \url{http://www.math.su.se/~hoehle/}
 }
+
+
 \begin{document}
 \SweaveOpts{concordance=TRUE}
+
 \maketitle
 
 \section*{Introduction}
