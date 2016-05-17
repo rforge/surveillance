@@ -14,7 +14,7 @@
         Dirk Schumacher\\Robert Koch Institute \And
         Michael H\"ohle\\ Stockholm University,\\Robert Koch Institute }
 \title{
-  \vspace{-1.5cm}
+  \vspace{-2.2cm}
   \fbox{\vbox{\normalfont\footnotesize
       This vignette corresponds to an article published in the\\
       \textit{Journal of Statistical Software} 2016;\textbf{70}(10):1--35.
@@ -148,7 +148,7 @@ all.equal(observed(salmNewport),observed(as(as(salmNewport,"ts"),"sts")))
 Using the \texttt{ts} class as intermediate step also allows the conversion between other time series classes, e.g., from packages \pkg{zoo}~\citep{zoo} or \pkg{xts}~\citep{xts}.
 
 
-<<>>=
+<<echo=FALSE>>=
 # Load packages
 library("surveillance")
 library('gamlss')
@@ -239,7 +239,6 @@ is a panelled graph with each panel representing the time series of counts of a 
 y.max <- max(observed(salmNewport[,2]),observed(salmNewport[,3]),na.rm=TRUE)
 plotOpts2 <- modifyList(plotOpts,list(x=salmNewport[,2],legend.opts=NULL,ylim=c(0,y.max)),keep.null=TRUE)
 plotOpts2$xaxis.tickFreq <- list("%G"=atChange)
-plotOpts2$par.list <- list(mar=c(6,5,5,0),family="Times")
 do.call("plot",plotOpts2)
 
 @
@@ -251,7 +250,6 @@ do.call("plot",plotOpts2)
 # Plot with special function
 plotOpts2 <- modifyList(plotOpts,list(x=salmNewport[,3],legend.opts=NULL,ylim=c(0,y.max)),keep.null=TRUE)
 plotOpts2$xaxis.tickFreq <- list("%G"=atChange)
-plotOpts2$par.list <- list(mar=c(6,5,5,0),family="Times")
 do.call("plot",plotOpts2)
 @ 
 \includegraphics[width=9cm]{plots/monitoringCounts-unitPlot2.pdf}
@@ -630,7 +628,6 @@ par(las=1)
 y.max <- max(observed(cam.sts),upperbound(cam.sts),na.rm=TRUE)
 plotOpts3 <- modifyList(plotOpts,list(x=cam.sts,ylab="",legend.opts=NULL,ylim=c(0,y.max),type = observed ~ time),keep.null=TRUE)
 plotOpts3$xaxis.tickFreq <- list("%m"=atChange,"%G"=atChange)
-plotOpts3$par.list <- list(mar=c(6,5,5,5),family="Times")
 do.call("plot",plotOpts3)
 par(las=0)
 #mtext(side=2,text="No. of reports",
@@ -798,7 +795,7 @@ represents the upperbound calculated by the algorithm. Triangles indicate alarms
 \end{figure}
 
 
-<<boda3, echo = F, include = F>>=
+<<boda3, echo = F, include = F, results = hide>>=
 control.far <- list(range=rangeBoda,b=4,w=5,alpha=0.025*2)
 far <- farrington(cam.sts,control=control.far)
 #Both farringtonFlexible and algo.bayes uses a one-sided interval just as boda.
@@ -912,7 +909,7 @@ control = list(range = phase2, c.ARL = 4, theta = log(2), ret = "cases",
                mu0 = list(S = 1, trend = TRUE, refit = FALSE))		 
 salmGlrnb <- glrnb(salmNewportGermany, control = control)
 @
-<<glrnb, echo = F, include = F>>=	
+<<glrnb, echo = F, include = F, results = hide>>=
 # Define phase1 (reference values) and phase2 (monitoring)
 phase1 <- which(isoWeekYear(epoch(salmNewportGermany))$ISOYear<2011)
 phase2 <- in2011
@@ -1041,7 +1038,7 @@ We choose a model with an intercept, a time trend, two harmonic terms and a fact
 each year. The variable \code{epochInPeriod} takes into account the fact that not all years have 52 weeks. 
 
 
-<<catbis, echo = T, include = F>>=								   
+<<catbis, echo = T, include = F, results = hide>>=
 vars <- c( "y", "n", "t", "epochInPeriod", "weekNumber")
 m.bbin <- gamlss(cbind(y, n-y) ~ 1 + t
                  + sin(2 * pi * epochInPeriod) + cos(2 * pi * epochInPeriod) 
@@ -1352,7 +1349,7 @@ plot(rotaBB, xlab = "Time (months)",
  \setkeys{Gin}{height=7cm, width=15cm}
 \begin{figure}
 %Remove this slot as soon as possible and replace it with just ROTAPLOT!!
-<<fig=true, width=7.5, height=3.5>>=
+<<fig=true, width=7.5, height=3.5, echo=FALSE>>=
 par(mar=c(5.1,20.1,4.1,0),family="Times")
 plot(rotaBB,xlab="Time (months)",ylab="",
      col="mediumblue",cex=cex.text,cex.lab=cex.text,cex.axis=cex.text,cex.main=cex.text,
