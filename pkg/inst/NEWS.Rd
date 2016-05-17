@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.1 (2016-05-17)}{
+\section{Changes in surveillance version 1.12.1 (2016-05-18)}{
 
 \subsection{DOCUMENTATION}{
   \itemize{
