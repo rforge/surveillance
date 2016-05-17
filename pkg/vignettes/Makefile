@@ -22,6 +22,8 @@ all: ${VIGNETTES}
 %.pdf: %.tex references.bib
 	${R} --vanilla --slave -e "tools::texi2pdf('$<', clean = TRUE)"
 
+monitoringCounts.pdf: monitoringCounts.bib  # additional dependency
+
 .SECONDARY: ${TEXFILESFROMRNW}  # make shall not remove intermediate tex files
 %.tex: %.Rnw
 	${R} CMD Sweave "$<"
