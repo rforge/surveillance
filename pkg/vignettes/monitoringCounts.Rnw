@@ -89,9 +89,9 @@ Nowadays, the fight against infectious diseases does not only require treating p
 In this paper we present the \proglang{R} package \pkg{surveillance} which is available from the Comprehensive \proglang{R} Archive Network (CRAN) at
 \url{https://CRAN.R-project.org/package=surveillance}. It implements a range of methods for aberration detection in time series of counts and proportions. Statistical algorithms provide an objective and reproducible analysis of the data and allow the automation of time-consuming aspects of the monitoring process. In the recent years, a variety of such tools has flourished in the literature. Reviews of methods for aberration detection in time series of counts can be found in~\citet{Buckeridge2007}~and~\citet{Unkel2012}. However, the great variety of statistical algorithms for aberration detection can be a hurdle to practitioners wishing to find a suitable method for their data. It is our experience that ready-to-use and understandable implementation and the possibility to use the methods in a routine and automatic fashion are the criteria most important to the epidemiologists.
 
-The package offers an open-source implementation of state-of-the-art methods for the prospective detection of outbreaks in count data time series with established methods, as well as the visualization of the analysed time series. With the package, the practitioner can introduce statistical surveillance into routine practice without too much difficulty. As far as we know, the package is now used in several public health institutions in Europe: at the National Public Health Institute of Finland, at the Swedish Institute for Communicable Disease Control, at the French National Reference Centre for Salmonella, and at the Robert Koch Institute (RKI) in Berlin. The use of \pkg{surveillance} at the RKI shall be the focus of this paper. The package also provides many other functions serving epidemic modeling purposes. Such susceptible-infectious-recovered based models and their extensions towards regression based approaches are documented in other works~\citep{held_etal2005,held_etal2006,meyer_etal2012,meyer.etal2014}.
+The package offers an open-source implementation of state-of-the-art methods for the prospective detection of outbreaks in count data time series with established methods, as well as the visualization of the analysed time series. With the package, the practitioner can introduce statistical surveillance into routine practice without too much difficulty. As far as we know, the package is now used in several public health institutions in Europe: at the National Public Health Institute of Finland, at the Swedish Institute for Communicable Disease Control, at the French National Reference Centre for Salmonella, and at the Robert Koch Institute (RKI) in Berlin. The use of \pkg{surveillance} at the RKI shall be the focus of this paper. The package also provides many other functions serving epidemic modeling purposes. Such susceptible-infectious-recovered based models and their extensions towards regression based approaches are documented in other works~\citep{held-etal-2005,held_etal2006,meyer.etal2011,meyer.etal2014}.
 
-The present paper is designed as an extension of two previous articles about the \pkg{surveillance} package published as~\citet{hoehle2007} and~\citet{hoehle_mazick2009}. On the one hand, the paper aims at giving an overview of the new features added to the package since the publication of the two former papers. On the other hand it intends to illustrate how well the \pkg{surveillance} package can support routine practical disease surveillance by presenting the current surveillance system of infectious diseases at the RKI.
+The present paper is designed as an extension of two previous articles about the \pkg{surveillance} package published as~\citet{hoehle-2007} and~\citet{hoehle-mazick-2010}. On the one hand, the paper aims at giving an overview of the new features added to the package since the publication of the two former papers. On the other hand it intends to illustrate how well the \pkg{surveillance} package can support routine practical disease surveillance by presenting the current surveillance system of infectious diseases at the RKI.
 
 This paper is structured as follows. Section~\ref{sec:1} gives an introduction to the data structure used in the package for representing and visualizing univariate or multivariate time series. Furthermore, the structure and use of aberration detection algorithms are explained. Section~\ref{sec:2} leads the reader through different surveillance methods available in the package. Section~\ref{sec:3} describes the integration of such methods in a complete surveillance system as currently in use at the RKI. Finally, a discussion rounds off the work.
 
@@ -137,7 +137,7 @@ matrix. Slot \code{map} is pertinent when units are geographical units, whereas 
 
 \subsubsection[Creation of an object of class sts]{Creation of an object of class \texttt{sts}}
 The creation of a \code{sts} object is straightforward, requiring a call to the function \code{new} together with the slots to be assigned as arguments. The input of data from external files is one possibility for getting the counts 
-as it is described in \citet{hoehle_mazick2009}.
+as it is described in \citet{hoehle-mazick-2010}.
 To exemplify the process we shall use weekly counts of \textit{Salmonella Newport} in Germany loaded using \code{data("salmNewport")}. Alternatively, one can use coercion methods to convert between the \texttt{ts} class and the \texttt{sts} class. Note that this only converts the content of the slot \texttt{observed}, that is,
 
 <<echo=TRUE,eval=FALSE,keep.source=TRUE>>=
@@ -372,11 +372,11 @@ this section presents a set of representative algorithms, which are already in r
 First we describe the Farrington method introduced by~\citet{farrington96} together with the improvements proposed by~\citet{Noufaily2012}.  
 As a Bayesian counterpart to these methods we present the BODA method published by~\citet{Manitz2013} which allows
 the easy integration of covariates. All these methods perform one-timepoint detection in that they detect aberrations only when the count at
-the currently monitored timepoint is above the threshold. Hence, no accumulation of evidence takes place. As an extension, we introduce an implementation of the negative binomial cumulative sum (CUSUM) of~\citet{hoehle_paul2008} that allows the detection
+the currently monitored timepoint is above the threshold. Hence, no accumulation of evidence takes place. As an extension, we introduce an implementation of the negative binomial cumulative sum (CUSUM) of~\citet{hoehle.paul2008} that allows the detection
 of sustained shifts by accumulating evidence over several timepoints. Finally, we present a method suitable for categorical data described in~\citet{hoehle2010} that is also based on cumulative sums.
 
 \subsection{One size fits them all for count data}
-Two implementations of the Farrington method, which is currently \textit{the} method of choice at European public health institutes \citep{hulth_etal2010}, exist in the package. First, the original method as described in \citet{farrington96} is implemented as the function \code{farrington}. Its use was already described in \citet{hoehle_mazick2009}.
+Two implementations of the Farrington method, which is currently \textit{the} method of choice at European public health institutes \citep{hulth_etal2010}, exist in the package. First, the original method as described in \citet{farrington96} is implemented as the function \code{farrington}. Its use was already described in \citet{hoehle-mazick-2010}.
 Now, the newly implemented function \code{farringtonFlexible} supports the use of this \textit{original method} as well as of the \textit{improved method} built on suggestions made by~\citet{Noufaily2012} for improving the specificity without reducing the sensitivity. 
 
 In the function \code{farringtonFlexible} one can choose to use the original method or the improved method by specification of appropriate \code{control} arguments. 
@@ -855,7 +855,7 @@ Nevertheless, the Farrington method only performs one-timepoint detection. In so
 to detect sustained shifts early, e.g., an outbreak could be characterized at first by counts slightly higher than usual 
 in subsequent weeks without each weekly count being flagged by one-timepoint detection methods. Control charts inspired by statistical process control (SPC) 
 e.g., cumulative sums would allow the detection of sustained shifts. Yet they were not tailored to the specific characteristics of surveillance data such as overdispersion or seasonality. 
-The method presented in \citet{hoehle_paul2008} conducts a synthesis of both worlds, i.e., traditional surveillance methods and SPC. The method is implemented in the package as the function
+The method presented in \citet{hoehle.paul2008} conducts a synthesis of both worlds, i.e., traditional surveillance methods and SPC. The method is implemented in the package as the function
 \code{glrnb}, whose use is explained here.
 
 \subsubsection{Definition of the control chart}
@@ -873,7 +873,7 @@ to the one used by~\citet{Noufaily2012}, with reweighting of past outbreaks and 
 The parameters of the \textit{in-control} and \textit{out-of-control} models 
 are respectively given by $\bm{\theta}_0$ and $\bm{\theta}_1$.
 The \textit{out-of-control} mean is defined as a function of the \textit{in-control} mean, either with a multiplicative shift (additive on the log-scale) whose size $\kappa$ can be given as an input 
-or reestimated at each timepoint $t>1$, $\mu_{1,t}=\mu_{0,t}\cdot \exp(\kappa)$, or with an unknown autoregressive component as in \citet{held_etal2005}, $\mu_{1,t}=\mu_{0,t}+\lambda y_{t-1}$
+or reestimated at each timepoint $t>1$, $\mu_{1,t}=\mu_{0,t}\cdot \exp(\kappa)$, or with an unknown autoregressive component as in \citet{held-etal-2005}, $\mu_{1,t}=\mu_{0,t}+\lambda y_{t-1}$
 with unknown $\lambda>0$.
 
 In \code{glrnb}, timepoints are divided into two intervals: phase 1 and phase 2. The \textit{in-control} mean and overdispersion are estimated with a GLM fitted on phase 1 data, whereas surveillance operates on phase 2 data. 
@@ -894,13 +894,13 @@ that will use all data before the beginning of the surveillance range to fit a G
 The choice of the exact \textit{in-control} model depends on the data under surveillance. Performing model selection is a compulsory step in practical applications. Then, one needs to tune the surveillance function itself, for one of the two possible change forms, \code{intercept}~or~\code{epi}.~One~can choose either to set \code{theta} to a given value and thus perform LR instead of GLR. The value of \code{theta} has to be adapted to 
 the specific context in which the algorithm is applied: how big are shifts one wants to detect optimally? Is it better not to specify any and use GLR instead? 
 
-The threshold \texttt{c.ARL} also has to be specified by the user. As explained in \citet{hoehle_mazick2009} one can compute the threshold for
+The threshold \texttt{c.ARL} also has to be specified by the user. As explained in \citet{hoehle-mazick-2010} one can compute the threshold for
 a desired run-length in control through direct Monte Carlo simulation or a Markov chain approximation. Lastly, as mentioned in
-\citet{hoehle_paul2008}, a window-limited approach of surveillance, instead of looking at all the timepoints until the first observation, can make computation faster. 
+\citet{hoehle.paul2008}, a window-limited approach of surveillance, instead of looking at all the timepoints until the first observation, can make computation faster. 
 
 Here we apply \code{glrnb} to the time series of report counts of \textit{Salmonella Newport} in Germany by assuming a known multiplicative shift of factor $2$ and by using the built-in estimator to fit an \textit{in-control} model with one harmonic for 
 seasonality and a trend. This model will be refitted after each alarm, but first we use data from the years before 2011 as reference or \code{phase1}, 
-and the data from 2011 as data to be monitored or \code{phase2}. The threshold \texttt{c.ARL} was chosen to be 4 as we found with the same approach as \citet{hoehle_mazick2009} that it made the probability of a false alarm within one year 
+and the data from 2011 as data to be monitored or \code{phase2}. The threshold \texttt{c.ARL} was chosen to be 4 as we found with the same approach as \citet{hoehle-mazick-2010} that it made the probability of a false alarm within one year 
 smaller than 0.1. Figure~\ref{fig:glrnb}~shows the results of this monitoring.
 
 
@@ -943,7 +943,7 @@ do.call("plot",modifyList(plotOpts,list(x=salmGlrnb,ylim=c(0,y.max))))
 \label{fig:glrnb}
 \end{figure}
 
-The implementation of \code{glrnb} on individual time series was already thoroughly explained in \citet{hoehle_mazick2009}. Our objective in the present document is rather to provide practical tips 
+The implementation of \code{glrnb} on individual time series was already thoroughly explained in \citet{hoehle-mazick-2010}. Our objective in the present document is rather to provide practical tips 
 for the implementation of this function on huge amounts of data in public health surveillance applications. Issues of computational speed become very significant in such a context. Our proposal 
 to reduce the computational burden incurred by this algorithm is 
 to compute the \textit{in-control} model for each time serie (pathogen, subtype, subtype in a given location, etc.) only once a year and to use this estimation for the computation of a threshold for each time series. 
@@ -951,14 +951,14 @@ to compute the \textit{in-control} model for each time serie (pathogen, subtype,
  CUSUM as presented in~\citet{lucas1982fast}) or to let surveillance run with the new \textit{in-control} model during 
  a buffer period and use the resulting CUSUM as an initial value. One could also choose the maximum of these two possible starting values as a starting value.
  During the buffer period alarms would be generated with the old model. Lastly, using GLR is much more computationally intensive than using LR, 
- whereas LR performs reasonably well on shifts different from the one indicated by \code{theta} as seen in the simulation studies of~\citet{hoehle_paul2008}. Our advice would therefore be to use LR with a reasonable predefined \code{theta}. 
+ whereas LR performs reasonably well on shifts different from the one indicated by \code{theta} as seen in the simulation studies of~\citet{hoehle.paul2008}. Our advice would therefore be to use LR with a reasonable predefined \code{theta}. 
  The amount of historical data used each year to update the model, the length of the buffer period and the value of \code{theta} have to be fixed for each specific application, e.g., using simulations and/or 
  discussion with experts.
 
 \subsubsection{Similar methods in the package}
 
 The algorithm \code{glrPois} is the same function as \code{glrnb} but for Poisson distributed data.
-Other CUSUM methods for count data are found in the package: \code{cusum} and \code{rogerson}. Both methods are discussed and compared to \code{glrnb} in  \citet{hoehle_paul2008}.
+Other CUSUM methods for count data are found in the package: \code{cusum} and \code{rogerson}. Both methods are discussed and compared to \code{glrnb} in  \citet{hoehle.paul2008}.
 The package also includes a semi-parametric method \code{outbreakP} that aims at detecting changes from a constant level to a monotonically increasing incidence, for instance the beginning of the influenza season. See Table~\ref{table:ref} for the corresponding references.
 
 \subsection{A method for monitoring categorical data}
@@ -981,7 +981,7 @@ current data using a likelihood ratio detector which compares the likelihood of 
 
 \subsubsection{Categorical CUSUM for binomial models}
 The challenge when performing these steps with categorical data from surveillance systems 
-is finding an appropriate model. Binary GLMs as presented in Chapter~6 of \citet{fahrmeir2013regression} could be a solution but they do not tackle well the inherent overdispersion in the binomial time series. 
+is finding an appropriate model. Binary GLMs as presented in Chapter~6 of \citet{Fahrmeir.etal2013} could be a solution but they do not tackle well the inherent overdispersion in the binomial time series. 
 Of course one could choose a quasi family but these are not proper statistical distributions making many issues such as prediction complicated. A better alternative 
 is offered by the use of \textit{generalized additive models for location, scale and shape} \citep[GAMLSS,][]{Rigby2005},  that support distributions such as the beta-binomial distribution, suitable for overdispersed binary data. With GAMLSS one can model the dependency of the mean -- \textit{location}  -- 
 upon explanatory variables but the regression modeling is also extended to other parameters of the distribution, e.g., scale. Moreover any modelled parameter can be put under surveillance, be it the mean (as in the example later developed) 
@@ -1194,7 +1194,7 @@ text(520, 0.6, "Total number of \n reported cases", pos = 3, xpd = T,cex=cex.tex
 
 
 
-The value for the threshold \code{h} can be determined following the procedures presented in \citet{hoehle_mazick2009} for count data, and as in the code exhibited below. Two methods can be used for 
+The value for the threshold \code{h} can be determined following the procedures presented in \citet{hoehle-mazick-2010} for count data, and as in the code exhibited below. Two methods can be used for 
 determining the probability of a false alarm within a pre-specified number of steps for a given value of the threshold \code{h}: a Monte Carlo method relying on, e.g., 1000 simulations and a Markov Chain approximation of the CUSUM. The former is much more computationally intensive than the latter: 
 with the code below, the Monte Carlo method needed approximately 300 times more time than the Markov Chain method.
 Since both results are close we recommend the Markov Chain approximation for practical use. The Monte Carlo method works by sampling observed values from the estimated 
@@ -1659,13 +1659,13 @@ Function & References \\
 \code{boda} & \citet{Manitz2013}  \\
 \code{bodaDelay} & \citet{Maelle}  \\
 \code{categoricalCUSUM} & \citet{hoehle2010}\\
-\code{cdc}   & \citet{stroup_etal89,farrington2003} \\
+\code{cdc}   & \citet{stroup89,farrington2003} \\
 \code{cusum}  & \citet{rossi_etal99,pierce_schafer86} \\
 \code{earsC} & \citet{SIM:SIM3197} \\
 \code{farrington} & \citet{farrington96} \\
 \code{farringtonFlexible} & \citet{farrington96,Noufaily2012} \\
-\code{glrnb} & \citet{hoehle_paul2008} \\
-\code{glrpois} & \citet{hoehle_paul2008} \\
+\code{glrnb} & \citet{hoehle.paul2008} \\
+\code{glrpois} & \citet{hoehle.paul2008} \\
 \code{outbreakP} & \citet{frisen_etal2009,fri2009} \\
 \code{pairedbinCUSUM} & \citet{Steiner1999} \\
 \code{rki}  & Not available -- unpublished   \\
@@ -1691,7 +1691,7 @@ into a whole analysis stack, first through the introduction of a simple workflow
 \subsection{A simple surveillance system}
 Suppose you have a database with surveillance time series but little resources to build a surveillance system encompassing all the above stages. Using \proglang{R} and \code{Sweave} or \code{knitr} for \LaTeX~you can still set up
  a simple surveillance analysis without having to do everything by hand. You only need to input the data into \proglang{R} and create \code{sts} objects for each time series of interest 
- as explained thoroughly in~\citet{hoehle_mazick2009}. Then, after choosing a surveillance algorithm, say \code{farringtonFlexible}, and 
+ as explained thoroughly in~\citet{hoehle-mazick-2010}. Then, after choosing a surveillance algorithm, say \code{farringtonFlexible}, and 
  feeding it with the appropriate \code{control} argument, you can get a \code{sts} object with upperbounds and alarms for each of your time series of interest over the \code{range} 
  supplied in \code{control}. For defining the range automatically one could use the \proglang{R} function \code{Sys.Date()} to get today's date. 
  These steps can be introduced as a code chunk in a \code{Sweave} or \code{knitr} code that will translate it into a report that you can send to the epidemiologists in charge of the respective pathogen whose cases are monitored. 
@@ -1794,7 +1794,7 @@ routine collected public health surveillance data. Throughout the years it has m
 presented description aimed at showing the potential of the package for aberration derection. Other functions offered by the package for modeling~\citep{meyer.etal2014}, nowcasting~\citep{hoehle-heiden} or
 back-projection of incidence cases~\citep{becker_marschner93} are documented elsewhere and contribute to widening the scope of possible analysis in infectious disease
 epidemiology when using \pkg{surveillance}. Future areas of interest for the package are, e.g., to better take into account the multivariate and hierarchical structure of the data streams analysed. Another important topic is the adjustment for reporting delays when performing the surveillance~\citep{Maelle}. The package can be obtained from CRAN and resources for learning its use are listed in the documentation section of the project
-(\url{https://surveillance.R-Forge.R-project.org/}). As all \proglang{R} packages, \pkg{surveillance} is distributed with a manual describing each function with corresponding examples. The manual, the present article and two previous ones~\citep{hoehle2007, hoehle_mazick2009} form a good basis for getting started with the package. The data and analysis of the present manuscript are accessible as the vignette \texttt{"monitoringCounts.Rnw"} in the package.
+(\url{https://surveillance.R-Forge.R-project.org/}). As all \proglang{R} packages, \pkg{surveillance} is distributed with a manual describing each function with corresponding examples. The manual, the present article and two previous ones~\citep{hoehle-2007, hoehle-mazick-2010} form a good basis for getting started with the package. The data and analysis of the present manuscript are accessible as the vignette \texttt{"monitoringCounts.Rnw"} in the package.
 
 Since all functionality is available just at the cost of learning \proglang{R} we hope that parts of the package can be useful in health facilities around the world. Even though the package is tailored for surveillance in public health contexts, properties such as overdispersion, low counts, presence of past outbreaks, apply to a wide range of count and categorical time series in other surveillance contexts such as financial surveillance~\citep{frisen2008financial}, occupational safety monitoring~\citep{accident} or environmental surveillance~\citep{Radio}.
 
@@ -1812,5 +1812,7 @@ Code contributions to the package are very welcome as well as feedback and sugge
 
 The authors would like to express their gratitude to all contributors to the package, in particular 
 Juliane Manitz, University of G\"{o}ttingen, Germany, for her work on the \texttt{boda} code and Angela Noufaily, The Open University, Milton Keynes, UK, for providing us the code used in her article that we extended for \texttt{farringtonFlexible}. The work of M. Salmon was financed by a PhD grant of the RKI.
-\bibliography{monitoringCounts}
+
+\bibliography{monitoringCounts,references}
+
 \end{document}
