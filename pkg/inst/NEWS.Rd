@@ -10,6 +10,17 @@
 
 \section{Changes in surveillance version 1.12.1 (2016-05-17)}{
 
+\subsection{DOCUMENTATION}{
+  \itemize{
+    \item The new \code{vignette("monitoringCounts")} illustrates the
+    monitoring of count time series in \R with a particular focus on
+    aberration detection in public health surveillance.
+    This vignette corresponds to a recently accepted manuscript
+    for the \emph{Journal of Statistical Software}
+    (Salmon, Schumacher, and \enc{Höhle}{Hoehle}, 2016).
+  }
+}
+  
 \subsection{MINOR CHANGES}{
   \itemize{
     \item Non-convergent \code{hhh4()} fits now obey the structure of
@@ -1733,7 +1744,7 @@
     \itemize{
       \item Support for \code{"twinSIR"} models (with associated
             \code{"epidata"} objects) as described
-            in \cite{Höhle (2009)} has been moved from package
+            in \enc{Höhle}{Hoehle} (2009) has been moved from package
 	    \pkg{RLadyBug} to \pkg{surveillance}.
             That means continuous-time discrete-space \acronym{SIR} models.
       \item Support for \code{"twinstim"} models as described in
@@ -1788,7 +1799,7 @@
   \itemize{
     \item A few minor bug fixes
     \item Small improvements in the C-implementation of the \code{twins()}
-      function by Daniel Sabanés Bové fixing the segmentation fault
+      function by Daniel Saban\enc{é}{e}s Bov\enc{é}{e} fixing the segmentation fault
       issue on 64-bit architectures.
   }
 }
@@ -1857,7 +1868,7 @@
       binomial cusum can be run by calling
            \code{rogerson( x, control(..., distribution="binomial"))}
     \item An experimental implementation of the twins model documented in
-      Held, L., Hofmann, M., Höhle, M. and Schmid V. (2006) A two-component
+      Held, L., Hofmann, M., \enc{Höhle}{Hoehle}, M. and Schmid V. (2006). A two-component
       model for counts of infectious diseases, Biostatistics, 7, pp.
       422--437 is now available as algo.twins.
   }
