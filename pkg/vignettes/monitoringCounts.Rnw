@@ -1,3 +1,6 @@
+%\VignetteIndexEntry{Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance}
+%\VignetteDepends{surveillance, gamlss, INLA, MGLM, ggplot2}
+
 \documentclass[nojss]{jss}
 %\usepackage{rotating} 
 \usepackage{bm} 
@@ -172,7 +175,6 @@ Using the \texttt{ts} class as intermediate step also allows the conversion betw
 <<>>=
 # Load packages
 library("surveillance")
-library('RColorBrewer')
 library('gamlss')
 @
 <<echo=FALSE>>=
@@ -1393,7 +1395,8 @@ numbers. In these plots (not shown) it becomes clear that the absolute numbers i
 
 <<echo=false>>=
 # Select a palette for drawing
-pal <- brewer.pal("Set1",n=ncol(rotaBB))
+pal <- c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00")
+#= RColorBrewer::brewer.pal("Set1",n=ncol(rotaBB))
 
 # Show time series of monthly proportions (matplot does not work with dates)
 plotTS <- function(prop=TRUE) {
