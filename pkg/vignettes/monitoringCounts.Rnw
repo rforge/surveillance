@@ -45,17 +45,6 @@
 % without formatting
 \Shorttitle{\pkg{surveillance}: Aberration detection in \proglang{R}} %% a short title (if necessary)
 
-
-%% almost as usual
-\author{Ma\"elle Salmon\\Robert Koch Institute \And 
-        Dirk Schumacher\\Robert Koch Institute \And
-        Michael H\"ohle\\ Stockholm University,\\Robert Koch Institute }
-\title{Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance}
-%% for pretty printing and a nice hypersummary also set:
-\Plainauthor{Ma\"e lle Salmon, Dirk Schumacher, Michael H\"o hle} %% comma-separated
-% without formatting
-\Shorttitle{\pkg{surveillance}: Aberration detection in \proglang{R}} %% a short title (if necessary)
-
 %% an abstract and keywords
 \Abstract{
 
