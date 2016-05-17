@@ -84,7 +84,7 @@
   automatic aberration detection in a public health surveillance context.
 }
 
-\Keywords{R, \texttt{surveillance}, outbreak detection, statistical process control}
+\Keywords{\proglang{R}, \texttt{surveillance}, outbreak detection, statistical process control}
 \Plainkeywords{R, surveillance, outbreak detection, statistical process control} %% without formatting
 %% at least one keyword must be supplied
 \Address{
@@ -111,7 +111,7 @@
 
 \section*{Introduction}
 \label{sec:0}
-\textbf{The content of this vignette corresponds to the article "Monitoring Count Time Series in {R}: Aberration Detection in Public Health Surveillance", Journal of Statistical Software, 2016", 70(10), 1-35, doi = \url{10.18637/jss.v070.i10}}.
+\textbf{The content of this vignette corresponds to the article "Monitoring Count Time Series in \proglang{R}: Aberration Detection in Public Health Surveillance", Journal of Statistical Software, 2016", 70(10), 1-35, doi = \url{10.18637/jss.v070.i10}}.
 Nowadays, the fight against infectious diseases does not only require treating patients and setting up measures for prevention but also demands the timely recognition of emerging outbreaks in order to avoid their expansion. Along these lines, health institutions such as hospitals and public health authorities collect and store information about health events -- typically represented as individual case reports containing clinical information, and subject to specific case definitions. Analysing these data is crucial. It enables situational awareness in general and the timely detection of aberrant counts in particular, empowering the prevention of additional disease cases through early interventions. For any specific aggregation of characteristics of events, such as over-the-counter sales of pain medication, new cases of foot-and-mouth disease among cattle, or adults becoming sick with hepatitis C in Germany, data can be represented as time series of counts with days, weeks, months or years as time units of the aggregation. Abnormally high or low values at a given time point can reveal critical issues such as an outbreak of the disease or a malfunction of data transmission. Thus, identifying aberrations in the collected data is decisive, for human as well as for animal health.
 
 In this paper we present the \proglang{R} package \pkg{surveillance} which is available from the Comprehensive \proglang{R} Archive Network (CRAN) at
@@ -125,7 +125,10 @@ This paper is structured as follows. Section~\ref{sec:1} gives an introduction t
 \section{Getting to know the basics of the package}
 <<SETUP, echo = FALSE,include = FALSE>>=
 options(width=77)
-@
+## create directory for plots
+dir.create("plots", showWarnings=FALSE)
+@ 
+\SweaveOpts{prefix.string=plots/monitoringCounts}
 \section[Using surveillance in selected contexts]{Using \pkg{surveillance} in selected contexts}
 \label{sec:1}
 
@@ -268,7 +271,7 @@ do.call("plot",plotOpts2)
 
 @
  
-\includegraphics[width=9cm]{monitoringCounts-unitPlot1.pdf}
+\includegraphics[width=9cm]{plots/monitoringCounts-unitPlot1.pdf}
 }\hspace{-3em}%
 \subfloat[]{
 <<unitPlot2, fig=TRUE, echo = FALSE, label=unitPlot2,include = F,results=hide, width=6, height=4.6667>>= 
@@ -278,7 +281,7 @@ plotOpts2$xaxis.tickFreq <- list("%G"=atChange)
 plotOpts2$parOpts <- list(mar=c(6,5,5,0),family="Times")
 do.call("plot",plotOpts2)
 @ 
-\includegraphics[width=9cm]{monitoringCounts-unitPlot2.pdf}
+\includegraphics[width=9cm]{plots/monitoringCounts-unitPlot2.pdf}
 }
 %\hspace*{\fill}%
 \caption{Weekly count of S. Newport in the German federal states (a) Bavaria and (b) Berlin.}
@@ -501,7 +504,7 @@ annotate('text',label=c("A","A","A","B","B"),x = xPeriods,
         y = rep(6,5), size = 8,family="serif",parse=T)  
 @
 
-\includegraphics[width=0.45\textwidth]{monitoringCounts-fPlot1.pdf}
+\includegraphics[width=0.45\textwidth]{plots/monitoringCounts-fPlot1.pdf}
 }
 \qquad
 \subfloat[$\texttt{noPeriods}=3$]{
@@ -516,7 +519,7 @@ p + geom_segment(aes(x = newX, y = yTicksBigStart2, xend = newX, yend = yTicksBi
 annotate('text',label=c("A","A","A","B","B","C","C"),x = xPeriods, 
         y = rep(6,7), size = 8,family="serif",parse=T)  
 @
-\includegraphics[width=0.45\textwidth]{monitoringCounts-fPlot2.pdf}
+\includegraphics[width=0.45\textwidth]{plots/monitoringCounts-fPlot2.pdf}
 }
 
 \caption{Construction of the noPeriods-level factor to account for seasonality, depending on the value of the half-window size $w$ and of the freq of the 
@@ -586,7 +589,7 @@ y.max <- max(observed(salm.farrington),upperbound(salm.farrington),observed(salm
 do.call("plot",modifyList(plotOpts,list(x=salm.farrington,ylim=c(0,y.max))))
 @
  
-\includegraphics[width=9cm]{monitoringCounts-farPlot1.pdf}
+\includegraphics[width=9cm]{plots/monitoringCounts-farPlot1.pdf}
 }
 \hspace{-3em}
 \subfloat[]{
@@ -594,7 +597,7 @@ do.call("plot",modifyList(plotOpts,list(x=salm.farrington,ylim=c(0,y.max))))
 # Plot
 do.call("plot",modifyList(plotOpts,list(x=salm.noufaily,ylim=c(0,y.max))))
 @ 
-\includegraphics[width=9cm]{monitoringCounts-farPlot2.pdf}
+\includegraphics[width=9cm]{plots/monitoringCounts-farPlot2.pdf}
 }
 \caption{S. Newport in Germany in 2011 monitored by (a) the original method and (b) the improved method. 
 For the figure we turned off the option that the threshold is only computed if there were more than 5 cases during the 4 last timepoints including $t_0$.
@@ -1329,7 +1332,7 @@ do.call("plot",plotOpts3)
 
 
  
-\includegraphics[width=9cm]{monitoringCounts-catF.pdf}
+\includegraphics[width=9cm]{plots/monitoringCounts-catF.pdf}
 }
 \hspace{-3em}
 \subfloat[]{
@@ -1344,7 +1347,7 @@ par(family="Times")
 legend(4,0.08,c("Monte Carlo","Markov chain"), lty=1:2,col=1,cex=cex.text,bty="n")
 
 @ 
-\includegraphics[width=9cm]{monitoringCounts-catARL.pdf}
+\includegraphics[width=9cm]{plots/monitoringCounts-catARL.pdf}
 }
 \caption{(a) Results of the monitoring with categoricalCUSUM of the proportion of Salmonella cases that were hospitalized in Germany in Jan 2013 - Jan 2014. (b) 
 Probability of a false alarm within the 56 timepoints of the monitoring as a function of the threshold $h$.}
@@ -1624,7 +1627,7 @@ mtext(side=1,text="Time (weeks)",
 
 
  
-\includegraphics[width=9cm]{monitoringCounts-ctPlot1.pdf}
+\includegraphics[width=9cm]{plots/monitoringCounts-ctPlot1.pdf}
 }
 \hspace{-3em}
 \subfloat[]{
@@ -1638,7 +1641,7 @@ par(family="Times")
 mtext(side=1,text="Time (weeks)",
       las=0,line=3, cex=cex.text)	
 @ 
-\includegraphics[width=9cm]{monitoringCounts-ctPlot2.pdf}
+\includegraphics[width=9cm]{plots/monitoringCounts-ctPlot2.pdf}
 }
 \caption{Categorical CUSUM statistic $C_t$. Once $C_t>\Sexpr{h}$ an alarm is sounded and the statistic is reset. In (a) surveillance uses the multinomial distribution and in (b) surveillance uses the Dirichlet-multinomial distribution.}
 \label{fig:ct}
