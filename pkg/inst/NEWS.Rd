@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.1 (2016-04-26)}{
+\section{Changes in surveillance version 1.12.1 (2016-05-17)}{
 
 \subsection{MINOR CHANGES}{
   \itemize{
@@ -17,11 +17,26 @@
     contain the \code{control} and \code{stsObj} elements, allowing
     for model \code{update()}s of non-convergent fits.
 
+    \item \code{knox()} warns about symmetric input matrices.
+  }
+}
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item The code of \code{boda()} (with \code{samplingMethod="joint"})
+    and \code{bodaDelay()} (with \code{inferenceMethod="INLA"})
+    has been adjusted to a change of arguments of \pkg{INLA}'s
+    \code{inla.posterior.sample} function. Accordingly, the minimum
+    \pkg{INLA} version required to run \code{boda()} and
+    \code{bodaDelay()} is 0.0-1458166556.
+
     \item The functions returned by \code{W_powerlaw()} now have the
     package namespace as their environment to support situations where
     the package is not attached.
 
-    \item \code{knox()} warns about symmetric input matrices.
+    \item Attaching package \CRANpkg{nlme} after \pkg{surveillance} no
+    longer masks \code{"hhh4"}'s \code{ranef}-method. (We now import the
+    \code{fixef} and \code{ranef} generics from \pkg{nlme}.)
   }
 }
 
