@@ -61,7 +61,7 @@ Description: Statistical methods for the modeling and monitoring of time series
         sets, the ability to simulate outbreak data, and to visualize the
         results of the monitoring in a temporal, spatial or spatio-temporal
         fashion. A recent overview of the available monitoring procedures is
-        given by Salmon et al. (2014) <http://arxiv.org/abs/1411.1292>.
+        given by Salmon et al. (2016) <doi:10.18637/jss.v070.i10>.
         For the retrospective analysis of epidemic spread, the package provides
         three endemic-epidemic modeling frameworks with tools for visualization,
         likelihood inference, and simulation. 'hhh4' estimates models for
