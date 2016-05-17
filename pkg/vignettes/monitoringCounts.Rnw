@@ -74,7 +74,7 @@
 
 \maketitle
 
-\section*{Introduction}
+\section{Introduction}
 \label{sec:0}
 \textbf{The content of this vignette corresponds to the article "Monitoring Count Time Series in \proglang{R}: Aberration Detection in Public Health Surveillance", Journal of Statistical Software, 2016", 70(10), 1-35, doi = \url{10.18637/jss.v070.i10}}.
 Nowadays, the fight against infectious diseases does not only require treating patients and setting up measures for prevention but also demands the timely recognition of emerging outbreaks in order to avoid their expansion. Along these lines, health institutions such as hospitals and public health authorities collect and store information about health events -- typically represented as individual case reports containing clinical information, and subject to specific case definitions. Analysing these data is crucial. It enables situational awareness in general and the timely detection of aberrant counts in particular, empowering the prevention of additional disease cases through early interventions. For any specific aggregation of characteristics of events, such as over-the-counter sales of pain medication, new cases of foot-and-mouth disease among cattle, or adults becoming sick with hepatitis C in Germany, data can be represented as time series of counts with days, weeks, months or years as time units of the aggregation. Abnormally high or low values at a given time point can reveal critical issues such as an outbreak of the disease or a malfunction of data transmission. Thus, identifying aberrations in the collected data is decisive, for human as well as for animal health.
