@@ -93,6 +93,9 @@ echo $contents; } ?>
     the <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/inst/NEWS.Rd?view=markup&root=surveillance">NEWS file</a>
     of the current development version.
   </li>
+  <li>2016/05/20 A standard reference describing the monitoring aspects of the package has appeared in the <a href="https://www.jstatsoft.org/article/view/v070i10">Journal of Statistical Software</a>.</li>
+  <li>2016/03/31 Publication <a href="http://www.eurosurveillance.org/ViewArticle.aspx?ArticleId=21426">A system for automated outbreak detection of 
+communicable diseases in Germany</a> describes use of the package as backbone for the German infectious disease monitoring system.</li>	
   <li>2016/01/21 The paper <a href="http://onlinelibrary.wiley.com/doi/10.1111/biom.12194/abstract"><it>Bayesian nowcasting during the STEC O104:H4 outbreak in Germany, 2011</it></a>, which builds on the surveillance package, won the <b>Best 2014 Paper in Biometrics by an IBS member</b> award. The award will be given at the IBC 2016 in Victoria, Canada. 
   <li>2015/12/03 Meyer and Held (2015) incorporate age-structured social contact data in the spatio-temporal <code>hhh4</code> model for stratified, areal time series of infectious disease counts
 <a href="http://arxiv.org/abs/1512.01065">[preprint]</a></li>
