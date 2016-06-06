@@ -6,7 +6,7 @@
 ### Data structure for CONTINUOUS SPATIO-temporal infectious disease case data
 ### and a spatio-temporal grid of endemic covariates
 ###
-### Copyright (C) 2009-2015 Sebastian Meyer
+### Copyright (C) 2009-2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -152,7 +152,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
                  " and tile \"", events$tile[i], "\" in 'stgrid'")
         }
         gridcellsOfEvents[i] <- idx
-        eventSources[[i]] <- determineSources(
+        eventSources[[i]] <- determineSources1(
             i, events$time, removalTimes, eventDists[i,], events$eps.s, events$type, qmatrix
         )
         if (withPB) setTxtProgressBar(pb, i)

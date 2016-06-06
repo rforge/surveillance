@@ -23,6 +23,7 @@
 ##    7 Jun 2015 (SM): added rule to create the NEWS.html as on CRAN
 ##   12 Jun 2015 (SM): added rule to check with allExamples
 ##   17 Mar 2016 (SM): check-allExamples with --run-dontrun and --extra-arch
+##    6 Jun 2016 (SM): Rcpp attributes require an additional build step
 ################################################################################
 
 ## Define variable for R which enables the use of alternatives,
@@ -62,6 +63,7 @@ clean:
 	rm -f pkg/*/.Rhistory
 
 build: ${SYSDATA} #${DESCRIPTION}
+	$R --no-restore --no-save --slave -e "Rcpp::compileAttributes('pkg')"
 	$R CMD build --no-resave-data --compact-vignettes=both pkg
 
 ## update date in DESCRIPTION file

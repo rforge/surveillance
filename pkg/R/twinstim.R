@@ -216,8 +216,8 @@ twinstim <- function (
             eventDists <- as.matrix(dist(eventCoords, method = "euclidean"))
             if (verbose) cat("updating list of potential sources ...\n")
             lapply(seq_len(N), function (i)
-                determineSources(i, eventTimes, removalTimes, eventDists[i,],
-                                 eps.s, eventTypes, qmatrix))
+                determineSources1(i, eventTimes, removalTimes, eventDists[i,],
+                                  eps.s, eventTypes, qmatrix))
         }
         ## calculate sum_{k=1}^K q_{kappa_j,k} for all j = 1:N
         qSum <- unname(rowSums(qmatrix)[eventTypes])   # N-vector
@@ -872,7 +872,7 @@ twinstim <- function (
                 siafInt <- do.call("..siafInt", .siafInt.args) # N-vector
                 gs <- gammapred * siafInt # N-vector
                 sapply(includes, function (i) {
-                    timeSources <- determineSources(i, eventTimes, removalTimes,
+                    timeSources <- determineSources1(i, eventTimes, removalTimes,
                         0, Inf, NULL)
                     nSources <- length(timeSources)
                     if (nSources == 0L) 0 else {
