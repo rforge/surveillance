@@ -8,6 +8,22 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.12.2 (2016-06-06)}{
+
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item Updating the list of potential source events in
+    \code{"epidataCS"} has been implemented in \samp{C++}, which
+    accelerates \code{as.epidataCS()}, \code{permute.epidataCS()} (and
+    therefore \code{epitest()}), and \code{twinstim()} (if only a subset
+    of the data is used).
+  }
+}
+
+}
+
+
+
 \section{Changes in surveillance version 1.12.1 (2016-05-18)}{
 
 \subsection{DOCUMENTATION}{

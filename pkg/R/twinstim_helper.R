@@ -43,13 +43,20 @@ determineSources <- function (eventTimes, eps.t,
                               eventTypes, qmatrix)
 {
     ## check inputs
-    stopifnot(is.vector(eventTimes, mode = "numeric"), is.vector(eps.t, mode = "numeric"),
-              is.matrix(eventCoords), is.numeric(eventCoords), ncol(eventCoords) == 2L,
-              is.vector(eps.s, mode = "numeric"), is.factor(eventTypes),
-              is.matrix(qmatrix), is.logical(qmatrix), nrow(qmatrix) == ncol(qmatrix))
+    stopifnot(is.vector(eventTimes, mode = "numeric"),
+              is.vector(eps.t, mode = "numeric"),
+              is.matrix(eventCoords), is.numeric(eventCoords),
+              ncol(eventCoords) == 2L, is.vector(eps.s, mode = "numeric"),
+              is.matrix(qmatrix), is.logical(qmatrix),
+              nrow(qmatrix) == ncol(qmatrix))
     N <- length(eventTimes)
-    stopifnot(nrow(eventCoords) == N, length(eventTypes) == N,
-              nlevels(eventTypes) <= nrow(qmatrix))
+    stopifnot(nrow(eventCoords) == N, length(eventTypes) == N)
+    if (is.factor(eventTypes)) {
+        stopifnot(nlevels(eventTypes) <= nrow(qmatrix))
+    } else {
+        stopifnot(is.vector(eventTypes, mode = "integer"),
+                  max(eventTypes) <= nrow(qmatrix))
+    }
 
     ## call C++ function (wrapper)
     determineSourcesC(eventTimes = eventTimes, eps_t = rep_len(eps.t, N),
@@ -58,7 +65,7 @@ determineSources <- function (eventTimes, eps.t,
 }
 
 ## determine the .sources for an epidataCS object
-determineSources.epidataCS <- function (object, method = c("R", "C"))
+determineSources.epidataCS <- function (object, method = c("C", "R"))
 {
     method <- match.arg(method)
     if (method == "R") {

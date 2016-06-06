@@ -109,8 +109,7 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     }
 
     # Some basic quantities
-    eventCoords <- coordinates(events)
-    nEvents <- nrow(eventCoords)
+    nEvents <- length(events)
     timeRange <- with(stgrid, c(start[1], stop[length(stop)]))
 
     # Are event times covered by stgrid?
@@ -129,21 +128,10 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     }
     events$tile <- .events.tile
 
-    # Calculate time point of removal, when event is definitely no longer infective
-    removalTimes <- events$time + events$eps.t
-
-    # Calculate distance matrix of events
-    if (verbose) cat("Calculating Euclidean distance matrix of events ...\n")
-    eventDists <- as.matrix(dist(eventCoords, method = "euclidean"))
-    #diag(eventDists) <- Inf   # infinite distance to oneself (no self-infection), not needed
-
     # Map events to corresponding grid cells
-    # Also precalculate possible origins of events (other infected individuals)
-    if (verbose) cat("Mapping events to 'stgrid' cells and",
-                     "determining potential event sources ...\n")
+    if (verbose) cat("Mapping events to 'stgrid' cells ...\n")
     withPB <- verbose && interactive()
     gridcellsOfEvents <- integer(nEvents)
-    eventSources <- vector(nEvents, mode = "list")
     if (withPB) pb <- txtProgressBar(min=0, max=nEvents, initial=0, style=3)
     for (i in seq_len(nEvents)) {
         idx <- gridcellOfEvent(events$time[i], events$tile[i], stgrid)
@@ -152,9 +140,6 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
                  " and tile \"", events$tile[i], "\" in 'stgrid'")
         }
         gridcellsOfEvents[i] <- idx
-        eventSources[[i]] <- determineSources1(
-            i, events$time, removalTimes, eventDists[i,], events$eps.s, events$type, qmatrix
-        )
         if (withPB) setTxtProgressBar(pb, i)
     }
     if (withPB) close(pb)
@@ -177,13 +162,17 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     # Calculate observed infection length = min(T-time, eps.t) for use in log-likelihood
     events$.obsInfLength <- with(events@data, pmin(timeRange[2]-time, eps.t))
 
-    # Attach possible eventSources (infective individuals) to events
-    events$.sources <- eventSources
+    # Determine potential source events (infective individuals) of each event
+    if (verbose) cat("Determining potential event sources ...\n")
+    events$.sources <- determineSources(
+        eventTimes = events$time, eps.t = events$eps.t,
+        eventCoords = coordinates(events), eps.s = events$eps.s,
+        eventTypes = events$type, qmatrix = qmatrix)
 
     # Calculate minimal distance of event locations from the polygonal boundary
     if (verbose) cat("Calculating the events' distances to the boundary ...\n")
     Wowin <- as(W, "owin")              # imported from polyCub
-    events$.bdist <- bdist(eventCoords, Wowin)
+    events$.bdist <- bdist(coordinates(events), Wowin)
 
     # Construct spatial influence regions around events
     if (verbose) cat("Constructing spatial influence regions around events ...\n")
