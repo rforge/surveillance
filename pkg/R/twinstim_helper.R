@@ -73,7 +73,7 @@ determineSources.epidataCS <- function (object, method = c("R", "C"))
         })
     } else {
         determineSources(eventTimes = object$events$time, eps.t = object$events$eps.t,
-                         eventCoords = coordinates(object$events), eps.s = object$events$eps.t,
+                         eventCoords = coordinates(object$events), eps.s = object$events$eps.s,
                          eventTypes = object$events$type, qmatrix = object$qmatrix)
     }
 }
