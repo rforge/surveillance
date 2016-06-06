@@ -12,6 +12,15 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+
+// Euclidean distance of a set of points to a single point (x0, y0)
+NumericVector distsN1(NumericVector x, NumericVector y, double x0, double y0)
+{
+        // hypot(x, y) is not (yet) vectorized by Rcpp sugar
+        return sqrt(pow(x - x0, 2.0) + pow(y - y0, 2.0));
+}
+
+
 // [[Rcpp::export]]
 List determineSourcesC(
         NumericVector eventTimes, NumericVector eps_t,
@@ -35,17 +44,17 @@ List determineSourcesC(
                         (removalTimes >= eventTimes[i]);
                 // "<" not "<=" because CIF is left-continuous.
                 // Also guarantees no self-infection.
-                proximity = sqrt(pow(xcoords-eventCoords(i,0), 2) +
-                                 pow(ycoords-eventCoords(i,1), 2)) <= eps_s;
+                proximity = distsN1(xcoords, ycoords, eventCoords(i,0), eventCoords(i,1)) <= eps_s;
                 typeInfective = qmatrix(_,eventTypes0[i]);
                 //<- logical vector indicating for each type if it could infect type of i
                 matchType = typeInfective[eventTypes0];
 
                 sources[i] = idx[infectivity & proximity & matchType];
         }
-
+        
         return sources;
 }
+
 
 
 // The following R code will be run automatically after compilation by
@@ -72,4 +81,24 @@ microbenchmark(
     determineSourcesC(eventTimes, eps.t, eventCoords, eps.s, as.integer(eventTypes), qmatrix),
     surveillance:::determineSources.epidataCS(imdepi, method = "R"),
     times = 50)
+*/
+
+
+
+/*** This is how tedious the function would look like without Rcpp attributes:
+RcppExport SEXP determineSourcesCSEXP(SEXP eventTimesSEXP, SEXP eps_tSEXP,
+                                      SEXP eventCoordsSEXP, SEXP eps_sSEXP,
+                                      SEXP eventTypesSEXP, SEXP qmatrixSEXP)
+{
+        NumericVector eventTimes(eventTimesSEXP);
+        NumericVector eps_t(eps_tSEXP);
+        NumericMatrix eventCoords(eventCoordsSEXP);
+        NumericVector eps_s(eps_sSEXP);
+        IntegerVector eventTypes(eventTypesSEXP);
+        LogicalMatrix qmatrix(qmatrixSEXP);
+        
+[... insert body of the above determineSourcesC here but replace return statement by ...]
+
+        return wrap(sources);
+}
 */
