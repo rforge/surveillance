@@ -12,11 +12,12 @@
 
 \subsection{NEW FEATURES}{
   \itemize{
-    \item Updating the list of potential source events in
-    \code{"epidataCS"} has been implemented in \samp{C++}, which
-    accelerates \code{as.epidataCS()}, \code{permute.epidataCS()} (and
-    therefore \code{epitest()}), and \code{twinstim()} (if only a subset
-    of the data is used).
+    \item The internal auxiliary function, which determines the sets of
+    potential source events in \code{"epidataCS"} has been implemented
+    in \samp{C++}, which accelerates \code{as.epidataCS()},
+    \code{permute.epidataCS()}, and therefore \code{epitest()}.
+    This is only really relevant for \code{"epidataCS"} with a large
+    number of events (>1000, say).
   }
 }
 
