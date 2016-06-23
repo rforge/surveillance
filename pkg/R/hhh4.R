@@ -125,7 +125,10 @@ hhh4 <- function (stsObj, control = list(
           thetastring <- strwrap(thetastring, exdent=10, prefix="\n", initial="")
           cat("theta = (", thetastring, ")\n")
       }
-      warning("Results are not reliable!", ADVICEONERROR)
+      warning("Results are not reliable!",
+              if (any(splitParams(thetahat, model)$overdisp > 10)) { # FALSE for Poisson
+                  "\n  Overdispersion parameter close to zero; maybe try a Poisson model.\n"
+              } else ADVICEONERROR)
   }
 
   ## gather results in a list -> "hhh4" object

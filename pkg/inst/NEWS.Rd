@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.2 (2016-06-06)}{
+\section{Changes in surveillance version 1.12.2 (2016-06-23)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -18,6 +18,12 @@
     \code{permute.epidataCS()}, and therefore \code{epitest()}.
     This is only really relevant for \code{"epidataCS"} with a large
     number of events (>1000, say).
+
+    \item Negative-binomial \code{hhh4()} models may not converge for
+    non-overdispersed data (try, e.g.,
+    \code{set.seed(1); hhh4(sts(rpois(104, 10)), list(family="NegBin1"))}).
+    The resulting non-convergence warning message now mentions low
+    overdispersion if this is detected. [suggested by Johannes Bracher]
   }
 }
 

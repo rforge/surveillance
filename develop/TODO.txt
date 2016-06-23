@@ -172,6 +172,9 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 17/11/2014 add checkNeighbourhood(..., strict=TRUE) for integer check
 
 #Done
+23/06/2016 fitting NegBin models on non-overdispersed data fails, e.g.:
+           set.seed(1); hhh4(poists <- sts(rpois(104, 5)), list(family="NegBin1")); plot(poists)
+           A more informative warning message hinting on overdisp would be nice
 March 2015 update examples on help pages according to JSS paper
 March 2015 update vignette("hhh4") according to JSS paper
 16/12/2014 make update.hhh4(..., use.estimates=TRUE) generally useable
