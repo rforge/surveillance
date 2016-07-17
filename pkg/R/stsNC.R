@@ -200,7 +200,6 @@ stsNC_plotDelay <- function(nc, rT.truth=NULL, dates=NULL, w=1, modelQuantiles=0
   model_CDF <- delayCDF(nc)
   if (length(model_CDF) > 0) {
     for (methodIdx in seq_len(length(model_CDF))) {
-      browser()
       ##Fetch CDF from model (can be a vector or a matrix)
       theCDF <- delayCDF(nc)[[names(model_CDF)[methodIdx]]]
       if (is.numeric(theCDF)) {
