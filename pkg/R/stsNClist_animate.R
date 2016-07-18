@@ -14,7 +14,7 @@
 
 animate_nowcasts <- function(nowcasts,linelist_truth,
                                method="bayes.trunc.ddcp",
-                               control=list(dRange=NULL,anim.dRange=NULL, plot.dRange=NULL,consistent=FALSE,ylim=NULL,cex.names=0.7,col=c("violetred3","#2171B5","orange","blue","black","greenyellow")),showLambda=TRUE) {
+                               control=list(dRange=NULL,anim.dRange=NULL, plot.dRange=NULL,consistent=FALSE,sys.sleep=1,ylim=NULL,cex.names=0.7,col=c("violetred3","#2171B5","orange","blue","black","greenyellow")),showLambda=TRUE) {
 
   ##Extract the dEventCol and dReportCol from the nowcasts
   dEventCol <- nowcasts[[1]]@control$call$dEventCol
