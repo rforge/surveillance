@@ -25,7 +25,7 @@ animate_nowcasts <- function(nowcasts,linelist_truth,
   validVarInfo <- !is.na(linelist_truth[,dEventCol])
 
   ##Show info about what is being illustrated
-  cat(paste("Total of ",nrow(linelist_truth)," cases in linelist_truth.\nIllustring reporting for ",sum(!is.na(linelist_truth[,dEventCol]))," cases with information on \"",dEventCol,"\"\n",sep=""))
+  message(paste("Total of ",nrow(linelist_truth)," cases in linelist_truth.\nIllustring reporting for ",sum(!is.na(linelist_truth[,dEventCol]))," cases with information on \"",dEventCol,"\"\n",sep=""))
 
   ##Reduce linelist_truth to those who have the appropriate information
   linelist_truth <- linelist_truth[validVarInfo,]
@@ -91,7 +91,7 @@ animate_nowcasts <- function(nowcasts,linelist_truth,
   for (i in idxSet) { ##fix this
     #Set "today"
     curDate <- as.Date(range.dates[i])
-    cat("Animating ",as.character(curDate),"...")
+    message("Animating ",as.character(curDate),"...")
     #Choose all reports available until this "today"
     linelist_truth.avail <- linelist_truth[ linelist_truth[,dReportCol] <= curDate,]
     #If consistency checking is requested remove all entries which
@@ -138,7 +138,7 @@ animate_nowcasts <- function(nowcasts,linelist_truth,
     ##Percentage of possible observations which are available
     sum(observed(sts.nowcast))
     sum(upperbound(sts.nowcast))
-    cat(sprintf("(%.0f%% of total cases in linelist_truth reported)\n",sum(observed(sts.nowcast))/sum(observed(sts.now))*100))
+    message(sprintf("(%.0f%% of total cases in linelist_truth reported)\n",sum(observed(sts.nowcast))/sum(observed(sts.now))*100))
 
     ##Show the true number of counts
     observed(sts) <- matrix(0,nrow=nrow(sts),ncol=1)

@@ -150,7 +150,7 @@ pmfQuantile <- function(prob,q=0.5) {
 ##  modelQuantiles - which model quantiles to show
 ######################################################################
 
-stsNC_plotDelay <- function(nc, rT.truth=NULL, dates=NULL, w=1, modelQuantiles=0.5) {
+stsNC_plotDelay <- function(nc, rT.truth=NULL, dates=NULL, w=1, modelQuantiles=0.5, epochUnit=NULL) {
 
   ##Extract reporting triangle from the nc object
   if (is.null(rT.truth)) {
@@ -161,8 +161,16 @@ stsNC_plotDelay <- function(nc, rT.truth=NULL, dates=NULL, w=1, modelQuantiles=0
     dates <- epoch(nc)
   }
 
+  ##Determine the appropriate unit of the delay
+  if (is.null(epochUnit)) {
+    epochUnit <- switch( as.character(nc@freq),
+                        "12" = "months", "%m" = "months",
+                        "52" =  "weeks", "%V"="weeks",
+                        "%j"="days", "365" = "days")
+  }
+
   ##Determine max delay from reporting triangle.
-  D <- ncol(rT.truth) - 1
+  D <- nc@control$D
   res <- matrix(NA, nrow=length(dates), ncol=D+1)
 
   ##which data variables are actually in rT.truth
@@ -189,44 +197,61 @@ stsNC_plotDelay <- function(nc, rT.truth=NULL, dates=NULL, w=1, modelQuantiles=0
   quants <- sapply(c(0.1,0.5,0.9), quantile)
 
   ##Make a plot (use plot.Dates instead of matplot)
-  plot(dates, quants[,2],xlab="Time of occurence",ylab="delay (days)",ylim=c(0,15),type="l",col=1,lty=c(1),lwd=4)
+  plot(dates, quants[,2],xlab="Time of occurence",ylab=paste0("Delay (",epochUnit,")"),ylim=c(0,15),col=1,lty=c(1),lwd=4,type="n")
+
+  idxFirstTruncObs <- which(dates == (nc@control$now - D))
+  idxNow <- which(dates == nc@control$now)
+  polygon( dates[c(idxFirstTruncObs,idxFirstTruncObs,idxNow,idxNow)], c(-1e99,1e99,1e99,-1e99), col=rgb(0.95,0.95,0.95),lwd=0.001)
+
+  text( dates[round(mean(c(idxNow,idxFirstTruncObs)))], D, "right truncated\n observations",adj=c(0.5,0.5))
+  lines(dates, quants[,2],col=1,lty=c(1),lwd=4)
   matlines(dates, quants[,c(1,3)],type="l",col=1,lty=c(2,3),lwd=c(1,1))
+
+
+
 
   legend_str <- c(expression(q[0.1](T)),expression(q[0.5](T)),expression(q[0.9](T)))
   legend_lty <- c(2,1,3)
   legend_col <- c(1,1,1)
-  legend_lwd <- c(1,4,1)  
+  legend_lwd <- c(1,4,1)
+  ##Which dates have been analysed in the nowcasts
+  dates2show <- attr(reportingTriangle(nc),"t02s")
+  
   ##Loop over all model based estimates
   model_CDF <- delayCDF(nc)
   if (length(model_CDF) > 0) {
     for (methodIdx in seq_len(length(model_CDF))) {
+     ##browser()
       ##Fetch CDF from model (can be a vector or a matrix)
       theCDF <- delayCDF(nc)[[names(model_CDF)[methodIdx]]]
-      if (is.numeric(theCDF)) {
-        theCDF <- matrix(theCDF, ncol=length(theCDF),nrow=length(attr(reportingTriangle(nc),"t02s")),byrow=TRUE)
-      }                       
+      if (!is.matrix(theCDF)) {
+        theCDF <- matrix(theCDF, ncol=length(theCDF),nrow=length(dates2show),byrow=TRUE)
+      }
       cdf <- cbind(0,theCDF)
       pmf <- t(apply(cdf,1,diff))
-      
+
       ##Determine model quantiles
-      quants.model <- matrix(NA, nrow=length(dates),ncol=length(modelQuantiles),dimnames=list(as.character(dates),modelQuantiles))
-      for (t in 1:length(dates)) {
+      quants.model <- matrix(NA, nrow=length(dates2show),ncol=length(modelQuantiles),dimnames=list(as.character(dates2show),modelQuantiles))
+      for (t in 1:length(dates2show)) {
         quants.model[t,] <- sapply(modelQuantiles, function(q) pmfQuantile( pmf[t,],q=q))
       }
-      
+
       ##Make sure the NAs in the beginning agree
       i <- 1
       while (all(is.na(quants[i,]))) {quants.model[i,] <- NA ; i <- i + 1}
-      
-     
+
+
       legend_str <- c(legend_str,substitute(q[0.5]^methodName(T),list(methodName=names(model_CDF)[methodIdx])))
       legend_lty <- c(legend_lty,3+methodIdx)
       legend_col <- c(legend_col,"gray")
       legend_lwd <- c(legend_lwd,2)
-      
-      matlines(dates, quants.model, col=tail(legend_col,n=1),lwd=ifelse(modelQuantiles==0.5,tail(legend_lwd,n=1),1),lty=ifelse(modelQuantiles==0.5,tail(legend_lty,n=1),2))
+
+      ##only estimates up to 'now' are to be shown and which are within
+      ##the moving window of m time points
+      show <- (nc@control$now - dates2show <= nc@control$m)
+      matlines(dates2show[show], quants.model[show,], col=tail(legend_col,n=1),lwd=ifelse(modelQuantiles==0.5,tail(legend_lwd,n=1),1),lty=ifelse(modelQuantiles==0.5,tail(legend_lty,n=1),2))
     }
-    
+
     ##Show lines for breakpoints (if available from the model)
     if ("bayes.trunc.ddcp" %in% names(model_CDF)) {
       ddcp.model <- attr(model_CDF[["bayes.trunc.ddcp"]],"model")
@@ -241,7 +266,7 @@ stsNC_plotDelay <- function(nc, rT.truth=NULL, dates=NULL, w=1, modelQuantiles=0
   ##Make a legend
   ##c(expression(q[0.1](T)),expression(q[0.5](T)),expression(q[0.9](T)),expression(q[0.5]^"ddcp"(T)))
   legend(x="bottomleft",legend_str,lty=legend_lty,col=legend_col,lwd=legend_lwd)
-  
+
   ##Add title
   if (!is.null(nc)) { title(nc@control$now) }
 

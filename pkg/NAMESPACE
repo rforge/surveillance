@@ -179,11 +179,12 @@ export(calibrationTest.default)
 export(dss, logs, rps)  # ses, nses
 
 
-### sts(BP)-specific
+### sts(BP|NC)-specific
 
 export(sts)
 exportClasses(sts, stsBP)
 export(linelist2sts)
+export(animate_nowcasts)
 
 # conversion of "sts" objects
 S3method(as.ts, sts)
