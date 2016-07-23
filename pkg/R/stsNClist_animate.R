@@ -180,16 +180,16 @@ animate_nowcasts <- function(nowcasts,linelist_truth,
     axis(2)
 
     ##Add extra line parts on x-axis
-    axis(1,at=0:1e3,tick=TRUE,lwd.ticks=0,label=rep("",1e3+1))
-    axis(1,at=0:1e3,tick=TRUE,lwd.ticks=1,tcl=-0.2,label=rep("",1e3+1))
+    axis(1,at=0:1e3,tick=TRUE,lwd.ticks=0,labels=rep("",1e3+1))
+    axis(1,at=0:1e3,tick=TRUE,lwd.ticks=1,tcl=-0.2,labels=rep("",1e3+1))
 
     ##Hilight the mondays
     is.monday <- format(range.dates,"%w") == 1
-    axis(1,at=(1:length(range.dates))[is.monday],label=format(range.dates[is.monday],"%a %d %b"),las=2,cex.axis=control$cex.names)
+    axis(1,at=(1:length(range.dates))[is.monday],labels=format(range.dates[is.monday],"%a %d %b"),las=2,cex.axis=control$cex.names)
 
     ##Show month breaks
     dom <- as.numeric(format(range.dates,"%d"))
-    axis(1,at=which(dom==1),label=rep("",sum(dom==1)),tcl=-0.8,lwd=0,lwd.ticks=1)
+    axis(1,at=which(dom==1),labels=rep("",sum(dom==1)),tcl=-0.8,lwd=0,lwd.ticks=1)
 
 
 ####################stop to change
