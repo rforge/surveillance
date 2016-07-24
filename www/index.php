@@ -125,7 +125,7 @@ communicable diseases in Germany</a> describes use of the package as backbone fo
   <li><tt>surveillance</tt> provides the <tt>S4</tt> class data
     structure <tt>"sts"</tt> and a framework for methodological developments
     of change-point algorithms for time series of counts.</li>
-  <li><a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> provide an overall guide to the
+  <li><a href="http://dx.doi.org/10.18637/jss.v070.i10">Salmon et al. (2016)</a> provide an overall guide to the
   monitoring capabilities of <code>surveillance</code>. </li>
 
   <li>Prospective outbreak detection procedures for count data time series:
@@ -250,7 +250,7 @@ communicable diseases in Germany</a> describes use of the package as backbone fo
   <li>Adjusting for occurred-but-not-yet-reported events:
     <ul>
       <li><code>nowcast</code> - Nowcasting using frequentist approaches described in Lawless (1994) as well as more flexible hierarchical Bayes approaches developed in Höhle and an der Heiden (2014).</li>
-      <li><code>bodaDelay</code> - Delay adjusted outbreak detection synthesizing the <code>farringtonFlexible</code> and <code>boda</code> algorithms into a context where the surveillance reports have delays before arriving. See Salmon et al. (2015) for details.</li>
+      <li><code>bodaDelay</code> - Delay adjusted outbreak detection synthesizing the <code>farringtonFlexible</code> and <code>boda</code> algorithms into a context where the surveillance reports have delays before arriving. See Salmon et al. (2016) for details.</li>
     </ul>
   </li>
 </ul>
@@ -290,7 +290,7 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
 
 <blockquote>
     <ul>
-       <li>Two recent manuscripts provide an overview as well as step-by-step instructions on what you can do with the package: <a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> cover prospective monitoring whereas <a href="http://arxiv.org/abs/1411.0416">Meyer, Held and Höhle (2015)</a> cover spatio-temporal modelling.</li>
+       <li>Two recent manuscripts provide an overview as well as step-by-step instructions on what you can do with the package: <a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> cover prospective monitoring whereas <a href="http://arxiv.org/abs/1411.0416">Meyer, Held and Höhle (2015)</a> cover spatio-temporal modelling. The former has now <a href="http://dx.doi.org/10.18637/jss.v070.i10">appeared</a> in the Journal of Statistical Software.</li>
       <li>A good (but slightly outdated) introduction to the outbreak detection part of the package is
 provided in the paper <a
  href="http://dx.doi.org/10.1007/s00180-007-0074-8"><span
@@ -363,7 +363,7 @@ Höhle</a>, Department of Mathematics, Stockholm University, Sweden
 Meyer</a>, Epidemiology, Biostatistics and Prevention Institute, University of
 Zurich, Switzerland</li>
       <li>Michaela Paul (previously: University of Zurich, Switzerland)</li>
-      <li><a href="http://www.normalesup.org/~masalmon/">Ma&eumllle Salmon</a>,
+      <li><a href="http://masalmon.github.io/">Ma&eumllle Salmon</a>,
 	Department for Infectious Disease Epidemiology, Robert Koch Institute,
 	Germany</li>
 
@@ -479,9 +479,9 @@ and has <a href="http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html">s
 <dd>Statistics in Medicine, Vol. 27(29), pp. 6250-6267</dd>
 
 <dt></dt>
-<dd><a href="http://arxiv.org/abs/1411.1292">Salmon, M., Schumacher, D. and Höhle, M. (<b>2014</b>)</a></dd>
+<dd><a href="http://dx.doi.org/10.18637/jss.v070.i10">Salmon, M., Schumacher, D. and Höhle, M. (<b>2016</b>)</a></dd>
 <dd><i>Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance</i></dd>
-<dd>Conditionally accepted for the Journal of Statistical Software</dd>
+<dd>Journal of Statistical Software, 70(10).</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1002/bimj.201400159">Salmon, M., Schumacher, D., Stark, K. and Höhle, M. (<b>2015</b>)</a></dd>
