@@ -30,8 +30,8 @@
 \subsection{MINOR CHANGES}{
   \itemize{
     \item In the \code{animate}-method for \code{"sts"} objects,
-    the default padding of \pkg{lattice} plots is now disabled for the
-    bottom \code{timeplot} to reduce its margins.
+    the default top padding of \pkg{lattice} plots is now disabled for the
+    bottom \code{timeplot} to reduce the space between the panels.
     Furthermore, the new option \code{fill} can be used to make the
     panel of the \code{timeplot} as large as possible.
   }

@@ -118,23 +118,14 @@ stsplot_timeSimple <- function (x, tps = NULL, highlight = integer(0),
         res
     }, simplify=FALSE, USE.NAMES=TRUE)
 
-    par_no_padding <- list(
+    par_no_top_padding <- list(
         layout.heights = list(top.padding = 0,
                               main.key.padding = 0,
-                              key.axis.padding = 0,
-                              axis.xlab.padding = 0,
-                              xlab.key.padding = 0,
-                              key.sub.padding = 0,
-                              bottom.padding = 0),
-        layout.widths = list(left.padding = 0,
-                             key.ylab.padding = 0,
-                             ylab.axis.padding = 0,
-                             axis.key.padding = 0,
-                             right.padding = 0)
+                              key.axis.padding = 0)
     )
     xyplot.args <- modifyList(
         c(list(x=rowSums(observed) ~ tps, type="h", ylab="", xlab="",
-               par.settings = par_no_padding),
+               par.settings = par_no_top_padding),
           styleargs),
         list(...))
     do.call(lattice::xyplot, xyplot.args)
