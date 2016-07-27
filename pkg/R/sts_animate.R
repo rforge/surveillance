@@ -5,7 +5,7 @@
 ###
 ### Animated map (and time series chart) of an sts-object (or matrix of counts)
 ###
-### Copyright (C) 2013-2015 Sebastian Meyer
+### Copyright (C) 2013-2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -18,7 +18,7 @@
 
 animate.sts <- function (object, tps = NULL, cumulative = FALSE,
                          population = NULL, at = 10, ...,
-                         timeplot = list(height = 0.3),
+                         timeplot = list(height = 0.3, fill = FALSE),
                          sleep = 0.5, verbose = interactive(), draw = TRUE)
 {
     if (draw && dev.interactive())
@@ -32,7 +32,8 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
     if (is.list(timeplot)) {
         timeplot <- modifyList(eval(formals()$timeplot), timeplot)
         timeplot_height <- timeplot$height
-        timeplot$height <- NULL         # no parameter of stsplot_timesimple()
+        timeplot_fill <- timeplot$fill
+        timeplot$height <- timeplot$fill <- NULL  # not for stsplot_timeSimple()
         stopifnot(timeplot_height > 0, timeplot_height < 1)
     }
 
@@ -64,8 +65,10 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
             lt <- do.call("stsplot_timeSimple", c(
                 list(x=object, tps=tps, highlight=cti),
                 timeplot))
-            lt$aspect.fill <- FALSE
-            lt$aspect.ratio <- timeplot_height * ls$aspect.ratio
+            if (!timeplot_fill) {
+                lt$aspect.fill <- FALSE
+                lt$aspect.ratio <- timeplot_height * ls$aspect.ratio
+            }
             grobs[[i]] <- gridExtra::arrangeGrob(
                 ls, lt, heights=c(1-timeplot_height, timeplot_height))
             ## alternative using package "gtable":
@@ -115,10 +118,25 @@ stsplot_timeSimple <- function (x, tps = NULL, highlight = integer(0),
         res
     }, simplify=FALSE, USE.NAMES=TRUE)
 
-    xyplot.args <- modifyList(c(list(x=rowSums(observed) ~ tps,
-                                     type="h", ylab="", xlab=""),
-                                styleargs),
-                              list(...))
+    par_no_padding <- list(
+        layout.heights = list(top.padding = 0,
+                              main.key.padding = 0,
+                              key.axis.padding = 0,
+                              axis.xlab.padding = 0,
+                              xlab.key.padding = 0,
+                              key.sub.padding = 0,
+                              bottom.padding = 0),
+        layout.widths = list(left.padding = 0,
+                             key.ylab.padding = 0,
+                             ylab.axis.padding = 0,
+                             axis.key.padding = 0,
+                             right.padding = 0)
+    )
+    xyplot.args <- modifyList(
+        c(list(x=rowSums(observed) ~ tps, type="h", ylab="", xlab="",
+               par.settings = par_no_padding),
+          styleargs),
+        list(...))
     do.call(lattice::xyplot, xyplot.args)
 }
 

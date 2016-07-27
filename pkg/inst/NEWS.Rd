@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.2 (2016-06-23)}{
+\section{Changes in surveillance version 1.12.2 (2016-07-26)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -24,6 +24,16 @@
     \code{set.seed(1); hhh4(sts(rpois(104, 10)), list(family="NegBin1"))}).
     The resulting non-convergence warning message now mentions low
     overdispersion if this is detected. [suggested by Johannes Bracher]
+  }
+}
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item In the \code{animate}-method for \code{"sts"} objects,
+    the default padding of \pkg{lattice} plots is now disabled for the
+    bottom \code{timeplot} to reduce its margins.
+    Furthermore, the new option \code{fill} can be used to make the
+    panel of the \code{timeplot} as large as possible.
   }
 }
 
