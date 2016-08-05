@@ -24,6 +24,12 @@
     \code{set.seed(1); hhh4(sts(rpois(104, 10)), list(family="NegBin1"))}).
     The resulting non-convergence warning message now mentions low
     overdispersion if this is detected. [suggested by Johannes Bracher]
+
+    \item An additional \code{type="delay"} option was added to the
+    \code{plot} method of \code{stsNC} objects. Furthermore, an
+    \code{animate_nowcasts} function allows one to animate a sequence of
+    nowcasts.
+
   }
 }
 
@@ -53,7 +59,7 @@
     (Salmon, Schumacher, and \enc{Höhle}{Hoehle}, 2016).
   }
 }
-  
+
 \subsection{MINOR CHANGES}{
   \itemize{
     \item Non-convergent \code{hhh4()} fits now obey the structure of
@@ -152,7 +158,7 @@
   \itemize{
     \item \code{stsplot_spacetime()} now recognizes its \code{opts.col}
     argument.
-    
+
     \item Conversion from \code{"ts"} to \code{"sts"} using
     \code{as(ts, "sts")} could set a wrong start time. For instance,
     \code{as(ts(1:10, start=c(1959,2), frequency=4), "sts")@start} was
@@ -178,7 +184,7 @@
     \item \code{update.epidata()} can now handle a distance matrix
     \code{D} in the form of a classed \code{"Matrix"}
     (suggested by George Wood).
-    
+
     \item \code{glrnb()} can now handle \code{ret="cases"} for the
     generalized likelihood ratio detector based on the negative binomial
     distribution. It's based on a brute-force search and hence might be
@@ -210,17 +216,17 @@
     generated for the last time point in \code{range}. Furthermore, the
     exact computation in case of returns of the type \code{"value"} for
     the binomial are now checked through an attribute.
-    
+
     \item Fixed bug in the \code{estimateGLRNbHook} function of
     \code{algo.glrnb}, which ignored potential fixed \code{alpha}
     values. If \code{alpha} is fixed this is now taken into consideration
     while fitting the negative binomial function. See revised help files
     for the details.
-    
+
     \item Made a hot-fix such that the \code{algo.quality} function now
     also works for \code{sts} objects and if the \code{state} or
     \code{alarm} slots consists of TRUE/FALSE instead of 0/1.
-    
+
     \item \code{intensity.twinstim()} did not work for non-endemic models.
 
     \item A parallelized \code{epitest()} could fail with a strange
