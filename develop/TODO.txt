@@ -121,9 +121,6 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 ##########
 
 # Feature requests
-- determineSources() should be implemented in C and it should be avoided to
-  compute the whole distance matrix. It is also wasteful to recompute
-  the eventDists for every data permutation during epitest...
 - as.epidataCS: "events" could be provided as an object of class ppx (which
   would include the window "W") or of class STIDF, then transform appropriately
   (but don't change "epidataCS" class definition).
@@ -157,6 +154,9 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
                         twinstim() with all parameters fixed
 11/05/2013 (sebastian): allow for use of rgeos instead of gpclib for polygon operations
 13/02/2014 (sebastian): implement step function support for interaction kernels
+06/06/2016 (sebastian): determineSources() should be implemented in C and it
+  should be avoided to compute the whole distance matrix. It is also wasteful to
+  recompute the eventDists for every data permutation during epitest...
 
 
 #======================================================================
@@ -170,6 +170,8 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
            as plot-methods for arrays of simulated counts returned by
            simulate.hhh4(..., simplify=TRUE)
 17/11/2014 add checkNeighbourhood(..., strict=TRUE) for integer check
+19/09/2016 nicer time axis for plot.hhh4 (maybe use xaxis feature of stsplot_time)
+19/09/2016 hhh4 for binomial data
 
 #Done
 23/06/2016 fitting NegBin models on non-overdispersed data fails, e.g.:
