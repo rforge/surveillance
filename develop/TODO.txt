@@ -28,6 +28,8 @@
 #======================================================================
 
 #Open
+23/09/2016 improve as.data.frame-method, e.g., epochInPeriod is wrong in:
+           as.data.frame(sts(1:10, start=c(2001, 5)))
 
 #Done
 01/04/2016 implement "as.one=TRUE" for stsplot_time (see plot.disProg)
