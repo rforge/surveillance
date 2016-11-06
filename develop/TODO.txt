@@ -94,6 +94,9 @@
 ############
 
 #Open
+06/11/2016 example(profile.twinstim, run.dontrun=TRUE) throws thousands of
+           Warning in as.mask(W, eps = eps, dimyx = dimyx, xy = xy) :
+             pixel size parameter eps > size of window
 04/09/2014 verify that isTRUE(all.equal(residuals(mysim1),
            surveillance:::residuals.twinstim(surveillance:::as.twinstim.simEpidataCS(mysim1))))
 
@@ -210,6 +213,9 @@ March 2015 update vignette("hhh4") according to JSS paper
 #======================================================================
 
 #Open
+06/11/2016 in example(nowcast, run.dontrun=TRUE), rjags::jags.model warns
+           about unused variables "alpha.lambda" and "beta.lambda" in data
+           (unused if ddcp$logLambda != "iidLogGa")
 26/07/2012 Estimation of delay function taking right-censoring into account
 
 #Done
