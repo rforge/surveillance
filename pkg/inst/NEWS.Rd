@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.2 (2016-11-04)}{
+\section{Changes in surveillance version 1.12.2 (2016-11-14)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -40,6 +40,14 @@
     bottom \code{timeplot} to reduce the space between the panels.
     Furthermore, the new option \code{fill} can be used to make the
     panel of the \code{timeplot} as large as possible.
+  }
+}
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item \code{bodaDelay()}: fixed spurious warnings from \code{rnbinom()}.
+    \item \code{vignette("monitoringCounts")}: fixed \code{boda}-related
+    code and cache to obtain same results as in corresponding JSS paper.
   }
 }
 
