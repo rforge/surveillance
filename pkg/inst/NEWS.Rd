@@ -8,6 +8,33 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.12.3 (2016-11-22)}{
+
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item 
+  }
+}
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item \code{hhh4()} guards against the misuse of
+    \code{family = factor("Poisson")} for univariate time series.
+    Previously, this resulted in a negative binomial model by
+    definition, but is now interpreted as \code{family = "Poisson"}
+    (with a warning).
+  }
+}
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item 
+  }
+}
+
+}
+
+
 \section{Changes in surveillance version 1.12.2 (2016-11-14)}{
 
 \subsection{NEW FEATURES}{
