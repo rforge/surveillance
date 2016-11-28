@@ -109,6 +109,9 @@ stsplot_timeSimple <- function (x, tps = NULL, highlight = integer(0),
         observed <- observed[tps,,drop=FALSE]
     }
 
+    if (anyNA(observed))
+        warning("ignoring NA counts in time series plot")
+
     ## build highlight-specific style vectors (col, lwd, ...)
     stopifnot(is.list(inactive), is.list(active))
     stylepars <- intersect(names(inactive), names(active))
@@ -124,7 +127,8 @@ stsplot_timeSimple <- function (x, tps = NULL, highlight = integer(0),
                               key.axis.padding = 0)
     )
     xyplot.args <- modifyList(
-        c(list(x=rowSums(observed) ~ tps, type="h", ylab="", xlab="",
+        c(list(x = rowSums(observed, na.rm = TRUE) ~ tps,
+               type = "h", ylab = "", xlab = "",
                par.settings = par_no_top_padding),
           styleargs),
         list(...))
@@ -146,5 +150,6 @@ stsplot_timeSimple <- function (x, tps = NULL, highlight = integer(0),
                   length(population) == ncol(object))
         observed <- observed / rep(population, each=nrow(observed))
     }
-    range(if (cumulative) c(observed[1L,], colSums(observed)) else observed)
+    range(if (cumulative) c(observed[1L,], colSums(observed)) else observed,
+          na.rm = TRUE)
 }

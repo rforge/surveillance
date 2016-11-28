@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.3 (2016-11-22)}{
+\section{Changes in surveillance version 1.12.3 (2016-11-28)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -28,7 +28,8 @@
 
 \subsection{BUG FIXES}{
   \itemize{
-    \item 
+    \item \code{animate.sts()} now supports objects with missing values
+    (with a warning).
   }
 }
 
