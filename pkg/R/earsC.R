@@ -50,16 +50,29 @@
 ######################################################################
 
 earsC <- function(sts, control = list(range = NULL, method = "C1",
+                                      baseline = 7, minSigma = 0,
                                       alpha = 0.001)) { 
 
 ######################################################################
   #Handle I/O
   ######################################################################
-  
   #If list elements are empty fill them!
+  if (is.null(control[["baseline", exact = TRUE]])) {
+    control$baseline <- 7
+  }
+  
+  if (is.null(control[["minSigma", exact = TRUE]])) {
+    control$minSigma <- 0
+  }
+  baseline <- control$baseline
+  minSigma <- control$minSigma
+  
+  if(minSigma < 0){
+    stop("sminSigma needs to be positive")
+  }
 
   # Method
-  if (is.null(control[["method",exact=TRUE]])) {
+  if (is.null(control[["method", exact = TRUE]])) {
     control$method <- "C1"
   }
   
@@ -100,7 +113,7 @@ earsC <- function(sts, control = list(range = NULL, method = "C1",
  
   
   #Deduce necessary amount of data from method
-  maxLag <- switch(method, C1=7, C2=9, C3=11)
+  maxLag <- switch(method, C1 = 7, C2 = 9, C3 = 11)
   
   # Order range in case it was not given in the right order
   control$range = sort (control$range)
@@ -119,51 +132,55 @@ earsC <- function(sts, control = list(range = NULL, method = "C1",
      ######################################################################
      # Method C1 or C2
      ######################################################################
-     if (method %in% c("C1","C2")) {
+     if(method == "C1"){
+       # construct the matrix for calculations
+       ndx <- as.vector(outer(control$range,
+                              baseline:1, FUN = "-"))
+       refVals <- matrix(observed(sts)[,j][ndx], ncol = baseline)
+       
+       sts@upperbound[control$range, j] <- apply(refVals,1, mean) + 
+         zAlpha * pmax(apply(refVals, 1, sd), minSigma)
+     }
+     
+     if (method == "C2") {
+      # construct the matrix for calculations
+       ndx <- as.vector(outer(control$range,
+                              (baseline + 2):3, FUN = "-"))
+       refVals <- matrix(observed(sts)[,j][ndx], ncol = baseline)
 
-       # Create a matrix with time-lagged vectors
-       refVals <- NULL
-       for (lag in maxLag:(maxLag-6)) {
-         refVals <- cbind(refVals, observed(sts)[(control$range-lag),j])
-       }
-
-       # calculate the upperbound 
-       sts@upperbound[control$range,j] <- apply(refVals,1,mean)+
-        zAlpha*apply(refVals,1,sd)
+       sts@upperbound[control$range, j] <- apply(refVals,1, mean) + 
+         zAlpha * pmax(apply(refVals, 1, sd), minSigma)
      }
           
-     if (method=="C3") {
-       # Create a matrix with time-lagged vectors
-       refVals <- NULL
-       rangeC2 = ((min(control$range) - 2) : max(control$range))
-       for (lag in 9:3) {
-         refVals <- cbind(refVals, observed(sts)[(rangeC2-lag),j])
-       }
+     if (method == "C3") {
+       # refVals <- NULL
+       rangeC2 = ((min(control$range) - 2):max(control$range))
+       ##HB replacing loop:
+       ndx <- as.vector(outer(rangeC2, (baseline + 2):3, FUN = "-"))
+       refVals <- matrix(observed(sts)[,j][ndx], ncol = baseline)
 
-       # Calculate C2
-       C2 <- (observed(sts)[rangeC2,j] - apply(refVals,1,mean)) / apply(refVals,1,sd)
-       # Calculate the upperbound
-       # first calculate the parts of the formula with the maximum of C2 and 0 for     # two time lags.
-       partUpperboundLag2 =  pmax(rep(0,length=length(C2)-2),C2[1:(length(C2)-2)]-1)
-       partUpperboundLag1 =  pmax(rep(0,length=length(C2)-2),C2[2:(length(C2)-1)]-1)
-     
-       sts@upperbound[control$range,j] <- observed(sts)[control$range,j] +
-         apply(as.matrix(refVals[3:length(C2),]),1,sd)*(zAlpha - (partUpperboundLag2 + partUpperboundLag1))
-
-       # Upperbound must be superior to 0 which is not always the case
-       #with this formula
-       sts@upperbound[control$range,j] = pmax(rep(0,length(control$range)),sts@upperbound[control$range,j])     
-     }  # end of loop over j
-   } #end of loop over cols in sts
-
-  #Make sts return object
-  control$name <- paste("EARS_",method,sep="")
+       ##HB using argument 'minSigma' to avoid dividing by zero, huge zscores:
+       C2 <- (observed(sts)[rangeC2, j] - 
+                apply(refVals, 1, mean))/
+         pmax(apply(refVals, 1, sd), minSigma)
+       
+       partUpperboundLag2 <- pmax(rep(0, length = length(C2) - 2), 
+                                  C2[1:(length(C2) - 2)] - 1)
+       
+       partUpperboundLag1 <- pmax(rep(0, length = length(C2) - 2),
+                                  C2[2:(length(C2) - 1)] - 1)
+       ##HB using argument 'minSigma' to avoid alerting threshold that is zero or too small
+       sts@upperbound[control$range, j] <- observed(sts)[control$range, j] +
+         pmax(apply(as.matrix(refVals[3:length(C2), ]),1, sd),minSigma) * 
+         (zAlpha - (partUpperboundLag2 + partUpperboundLag1))
+       sts@upperbound[control$range, j] = pmax(rep(0, length(control$range)), 
+                                               sts@upperbound[control$range, j])
+     }
+   }
+  control$name <- paste("EARS_", method, sep = "")
   control$data <- paste(deparse(substitute(sts)))
   sts@control <- control
-  #Where are the alarms?
-  sts@alarm[control$range,] <- matrix(observed(sts)[control$range,]>upperbound(sts)[control$range,] )
-  
-  #Done
-  return(sts[control$range,])
+  sts@alarm[control$range, ] <- matrix(observed(sts)[control$range, 
+                                                     ] > upperbound(sts)[control$range, ])
+  return(sts[control$range, ])
 }
-

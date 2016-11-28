@@ -24,12 +24,15 @@
     \item{\code{range}}{Specifies the index of all timepoints which
         should be tested. If \code{range} is \code{NULL} the maximum number
         of possible timepoints is used. This number depends on the method chosen.
-        For C1 all timepoints from timepoint 8 can be assessed, for C2 from 
-        timepoint 10 and for C3 from timepoint 12.}
+        For C1 all timepoints from timepoint \code{baseline + 1} can be assessed, for C2 from 
+        timepoint \code{baseline + 3} and for C3 from timepoint \code{baseline + 5}.}
     \item{\code{method}}{String indicating which method to use: \cr 
     "C1" for EARS C1-MILD method, "C2" for EARS C2-MEDIUM method,
     "C3" for EARS C3-HIGH method. By default if \code{method} is  \code{NULL} C1 is chosen.}
-
+\item{\code{baseline}}{how many units to use for calculating the baseline, see details}
+\item{\code{minSigma}}{By default 0. If it is higher than 0, for C1 and
+C2, the quantity zAlpha * minSigma is then the alerting threshold if the
+baseline is zero. Howard Burkom usually uses a value of 0.5 or 1 for sparse data.}
     \item{\code{alpha}}{An approximate (two-sided) \eqn{(1-\alpha)\cdot 100\%} prediction
      interval is calculated. By default if \code{alpha} is \code{NULL} 0.001 is assumed
      for C1 and C2 whereas 0.025 is assumed for C3. These different choices are the one made at the CDC.}
@@ -55,8 +58,8 @@ but is not a CUSUM  (sum over 3 timepoints, not accumulation over a whole range)
 }
 Here is what the function does for each method:
 \enumerate{
-\item For C1 the baseline are the 7 timepoints before the assessed timepoint t,
- t-7 to t-1. The expected value is the mean of the baseline. An approximate
+\item For C1 the baseline are the \code{baseline} (default 7) timepoints before the assessed timepoint t,
+ t-\code{baseline} to t-1. The expected value is the mean of the baseline. An approximate
   (two-sided) \eqn{(1-\alpha)\cdot 100\%} prediction interval is calculated based on the
    assumption that  the difference between the expected value and the observed 
    value divided by the standard derivation of counts over the sliding window,
@@ -64,9 +67,9 @@ Here is what the function does for each method:
     of outbreaks:
 \deqn{C_1(t)= \frac{Y(t)-\bar{Y}_1(t)}{S_1(t)},}
 where
-\deqn{\bar{Y}_1(t)= \frac{1}{7} \sum_{i=t-1}^{t-7} Y(i)}
+\deqn{\bar{Y}_1(t)= \frac{1}{baseline} \sum_{i=t-1}^{t-baseline} Y(i)}
 and
-\deqn{ S^2_1(t)= \frac{1}{6} \sum_{i=t-1}^{t-7} [Y(i) - \bar{Y}_1(i)]^2.}
+\deqn{ S^2_1(t)= \frac{1}{6} \sum_{i=t-1}^{t-baseline} [Y(i) - \bar{Y}_1(i)]^2.}
 Then under the null hypothesis of no outbreak,
  \deqn{C_1(t) \mathcal \sim {N}(0,1)}
 An alarm is raised if \deqn{C_1(t)\ge z_{1-\alpha}}
@@ -76,7 +79,7 @@ reduced normal law. \cr
 The upperbound \eqn{U_1(t)} is then defined by:
  \deqn{U_1(t)= \bar{Y}_1(t) + z_{1-\alpha}S_1(t).}
 \item C2 is very close to C1 apart from a 2-day lag in the baseline definition.
-Indeed for C2 the baseline are 7 timepoints with a 2-day lag before the assessed
+Indeed for C2 the baseline are \code{baseline} (default 7) timepoints with a 2-day lag before the assessed
 timepoint t, t-9 to t-3. The expected value is the mean of the baseline. An approximate
   (two-sided) \eqn{(1-\alpha)\cdot 100\%} prediction interval is calculated based on the
    assumption that  the difference between the expected value and the observed 
@@ -85,7 +88,7 @@ timepoint t, t-9 to t-3. The expected value is the mean of the baseline. An appr
     of outbreaks:
 \deqn{C_2(t)= \frac{Y(t)-\bar{Y}_2(t)}{S_2(t)},} 
 where
-\deqn{\bar{Y}_2(t)= \frac{1}{7} \sum_{i=t-3}^{t-9} Y(i)}
+\deqn{\bar{Y}_2(t)= \frac{1}{baseline} \sum_{i=t-3}^{t-9} Y(i)}
 and
 \deqn{ S^2_2(t)= \frac{1}{6} \sum_{i=t-3}^{t-9} [Y(i) - \bar{Y}_2(i)]^2.}
 Then under the null hypothesis of no outbreak,
@@ -94,8 +97,9 @@ An alarm is raised if \deqn{C_2(t)\ge z_{1-\alpha},}
 with \eqn{z_{1-\alpha}} the \eqn{(1-\alpha)^{th}} quantile of the centered
 reduced normal law. \cr
 
-The upperbound \eqn{U_2(t)} is then defined by:
- \deqn{U_2(t)= \bar{Y}_2(t) + z_{1-\alpha}S_2(t).}
+The upperbound \eqn{U_{2}(t)} is then defined by:
+
+ \eqn{U_{2}(t)= \bar{Y}_{2}(t) + z_{1-\alpha}S_{2}(t).}
  
  \item C3 is quite different from the two other methods but it is based on C2.
  Indeed it uses \eqn{C_2(t)} from timepoint t and the two previous timepoints.
@@ -142,7 +146,7 @@ lines(res3@upperbound,col='red')
 
 }
 
-\author{M. Salmon}
+\author{M. Salmon, H. Burkom}
 \keyword{classif}
 \source{
   Fricker, R.D., Hegler, B.L, and Dunfee, D.A. (2008). Comparing syndromic surveillance detection methods: EARS versus a CUSUM-based methodology,
