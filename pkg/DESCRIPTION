@@ -29,7 +29,7 @@ Authors@R: c(MH = person("Michael", "Höhle",
                     comment = "A few code segments are modified versions of
                                code from base R"))
 Author: Michael Höhle [aut, ths], Sebastian Meyer [aut, cre],
-        Michaela Paul [aut], Leonhard Held [ctb, ths],
+        Michaela Paul [aut], Leonhard Held [ctb, ths], Howard Burkom [ctb],
         Thais Correa [ctb], Mathias Hofmann [ctb], Christian Lang [ctb],
         Juliane Manitz [ctb], Andrea Riebler [ctb], Daniel Sabanés Bové [ctb],
         Maëlle Salmon [ctb], Dirk Schumacher [ctb], Stefan Steiner [ctb],

@@ -15,7 +15,8 @@
 %
 }
 \usage{ earsC(sts, control = list(range = NULL, method = "C1",
-                            alpha = 0.001))
+                                      baseline = 7, minSigma = 0,
+                                      alpha = 0.001)) )
 }
 \arguments{
 \item{sts}{object of class sts (including the \code{observed} and the \code{state} time series) , which is to be monitored.}
