@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.3 (2016-11-28)}{
+\section{Changes in surveillance version 1.12.3 (2016-11-29)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -30,6 +30,14 @@
   \itemize{
     \item \code{animate.sts()} now supports objects with missing values
     (with a warning).
+
+    \item The \code{as.data.frame}-method for the \code{"sts"} class,
+    applied to classical time-index-based \code{"sts"} objects
+    (\code{epochAsDate=FALSE}), ignored a \code{start} epoch different
+    from 1 when computing the \code{epochInPeriod} indexes.
+    Furthermore, the returned \code{epochInPeriod} now is a fraction of
+    \code{freq}, for consistency with the result for objects with
+    \code{epochAsDate=TRUE}.
   }
 }
 
