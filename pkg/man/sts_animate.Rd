@@ -119,7 +119,7 @@ if (require("animation")) {
 ## and change the default format
 animate(measlesWeserEms, tps=12:16, cumulative=FALSE,
         timeplot = list(as.Date = TRUE,
-                        scales = list(x = list(format = "%G/%V"))))
+                        scales = list(x = list(format = "\%G/\%V"))))
 }
 
 \keyword{hplot}
