@@ -52,10 +52,12 @@
     The argument \code{height} gives the relative height of the time
     series plot (default: 0.3), the logical value \code{fill} indicates
     whether to make the panel as big as possible (default: FALSE),
-    and the arguments \code{inactive} and
+    the arguments \code{inactive} and
     \code{active} are lists of graphical parameters (e.g., \code{col})
     determining the appearance of the bars (e.g., default color is grey
-    when inactive and black when active).
+    when inactive and black when active),
+    and the boolean \code{as.Date} determines whether dates should be
+    put on the x-axis (instead of the \code{tps} indexes).
   }
   \item{sleep}{
     time to wait (\code{Sys.sleep}) between subsequent snapshots (only if
@@ -112,6 +114,12 @@ if (require("animation")) {
              ani.width=500, ani.height=600)
     setwd(oldwd)
 }
+
+## how to label the x-axis of the temporal plot with dates
+## and change the default format
+animate(measlesWeserEms, tps=12:16, cumulative=FALSE,
+        timeplot = list(as.Date = TRUE,
+                        scales = list(x = list(format = "%G/%V"))))
 }
 
 \keyword{hplot}

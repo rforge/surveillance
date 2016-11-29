@@ -100,7 +100,8 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
 
 stsplot_timeSimple <- function (x, tps = NULL, highlight = integer(0),
                                 inactive = list(col="gray", lwd=1),
-                                active = list(col=1, lwd=4), ...)
+                                active = list(col=1, lwd=4),
+                                as.Date = x@epochAsDate, ...)
 {
     observed <- if (inherits(x, "sts")) observed(x) else x
     if (is.null(tps)) {
@@ -108,6 +109,7 @@ stsplot_timeSimple <- function (x, tps = NULL, highlight = integer(0),
     } else {
         observed <- observed[tps,,drop=FALSE]
     }
+    epoch <- if (inherits(x, "sts")) epoch(x, as.Date = as.Date)[tps] else tps
 
     if (anyNA(observed))
         warning("ignoring NA counts in time series plot")
@@ -127,7 +129,7 @@ stsplot_timeSimple <- function (x, tps = NULL, highlight = integer(0),
                               key.axis.padding = 0)
     )
     xyplot.args <- modifyList(
-        c(list(x = rowSums(observed, na.rm = TRUE) ~ tps,
+        c(list(x = rowSums(observed, na.rm = TRUE) ~ epoch,
                type = "h", ylab = "", xlab = "",
                par.settings = par_no_top_padding),
           styleargs),
