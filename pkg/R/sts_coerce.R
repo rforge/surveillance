@@ -70,7 +70,7 @@ setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, opti
   #Add a column denoting the number of week
   if (x@epochAsDate) {
     #Convert to date
-    date <- as.Date(x@epoch, origin="1970-01-01")
+    date <- epoch(x)
     epochStr <- switch( as.character(x@freq),
                        "12" = "%m",
                        "52" =  "%V",
@@ -82,7 +82,7 @@ setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, opti
     maxEpoch <- tapply( as.numeric(formatDate(dummyDates, epochStr)), rep(years,each=6), max)
     #Assign this to result
     res$freq <- maxEpoch[pmatch(formatDate(date,"%Y"),names(maxEpoch),duplicates.ok=TRUE)]
-    res$epochInPeriod <- as.numeric(formatDate(date,epochStr)) / res$freq
+    res$epochInPeriod <- epochInYear(x) / res$freq
   } else {
     #Otherwise just replicate the fixed frequency
     res$freq <- x@freq
