@@ -12,7 +12,7 @@
 
 \subsection{NEW FEATURES}{
   \itemize{
-    \item 
+    \item \code{earsC} now has two new arguments thanks to Howard Burkom: the number of past time units to be used in  calculation is now not always 7, it can be chosen in the \code{baseline} parameter. Furthermore, the \code{minSigma} parameter allows to get a threshold in the case of sparse data. When one doesn't give any value for those two parameters, the algorithm works like it used to.
   }
 }
 
