@@ -67,27 +67,23 @@ setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, opti
       colnames(res) <-  c("observed","epoch","state","alarm","upperbound","population")
   }
 
-  #Add a column denoting the number of week
-  if (x@epochAsDate) {
-    #Convert to date
+  #Find out how many epochs there are each year
+  res$freq <- if (x@epochAsDate) {
     date <- epoch(x)
     epochStr <- switch( as.character(x@freq),
                        "12" = "%m",
                        "52" =  "%V",
                        "365" = "%j")
-
-    #Find out how many epochs there are each year
     years <- unique(as.numeric(formatDate(date,"%Y")))
     dummyDates <- as.Date(paste(rep(years,each=6),"-12-",26:31,sep=""))
     maxEpoch <- tapply( as.numeric(formatDate(dummyDates, epochStr)), rep(years,each=6), max)
-    #Assign this to result
-    res$freq <- maxEpoch[pmatch(formatDate(date,"%Y"),names(maxEpoch),duplicates.ok=TRUE)]
-    res$epochInPeriod <- epochInYear(x) / res$freq
-  } else {
-    #Otherwise just replicate the fixed frequency
-    res$freq <- x@freq
-    res$epochInPeriod <- epochInYear(x)
+    maxEpoch[pmatch(formatDate(date,"%Y"),names(maxEpoch),duplicates.ok=TRUE)]
+  } else { # just replicate the fixed frequency
+    x@freq
   }
+
+  #Add a column denoting the epoch fraction within the current year
+  res$epochInPeriod <- epochInYear(x) / res$freq
 
   return(res)
 })
