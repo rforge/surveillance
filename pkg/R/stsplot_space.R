@@ -124,7 +124,7 @@ checkat <- function (at, data) { # "data" should be on the original scale
     } else sort(at) 
     if (any(data >= max(at) | data < min(at), na.rm=TRUE))
         stop("'at' (right-open!) does not cover the data (range: ",
-             paste0(format(range(data)), collapse=" - "), ")")
+             paste0(format(range(data, na.rm=TRUE)), collapse=" - "), ")")
     structure(at, checked=TRUE)
 }
 
