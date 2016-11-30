@@ -28,6 +28,7 @@
 #======================================================================
 
 #Open
+29/11/2016 stsplot_time: add population argument for incidence plots
 
 #Done
 29/11/2016 improve as.data.frame-method, e.g., epochInPeriod is wrong in:
