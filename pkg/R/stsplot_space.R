@@ -123,11 +123,19 @@ checkat <- function (at, data, counts = TRUE) { # "data" should be on the origin
         if (counts) {
             at <- modifyList(list(n=10, data=data), at)
             do.call("getCountIntervals", at)
-        } else { # no special scale for incidence plots
-            ext_data_range <- extendrange(data_range, f=0.07)
-            if (data_range[1] >= 0 & ext_data_range[1] < 0)
-                ext_data_range[1] <- 0
-            pretty(ext_data_range, at[["n"]])
+        } else { # quantile-based scale for incidence plots
+            data_quantiles <- quantile(data, probs=seq(0,1,length.out=at[["n"]]+1),
+                                       na.rm=TRUE)
+            data_quantiles <- round(data_quantiles, 2)
+            ## ensure max(at) > max(data)
+            data_quantiles[length(data_quantiles)] <-
+                data_quantiles[length(data_quantiles)] + 0.01 #*diff(data_range)
+            data_quantiles
+            ## alternative: pretty() scale
+            ## ext_data_range <- extendrange(data_range, f=0.07)
+            ## if (data_range[1] >= 0 & ext_data_range[1] < 0)
+            ##     ext_data_range[1] <- 0
+            ## pretty(ext_data_range, at[["n"]])
         }
     } else sort(at) 
     if (any(data >= max(at) | data < min(at), na.rm=TRUE))
