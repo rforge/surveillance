@@ -93,6 +93,7 @@ echo $contents; } ?>
     the <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/inst/NEWS.Rd?view=markup&root=surveillance">NEWS file</a>
     of the current development version.
   </li>
+  <li>2016/11/30 We arranged a small surveillance hackathon as part of the ESCAIDE 2016 conference in Stockholm, Sweden. One output is a set of <a href="https://surveillancer.github.io/tutorials/">tutorials</a> on how to use the package. Another output is a small <a href="https://dirk.shinyapps.io/surveillance/">shiny app</a> for illustrating parameter choice in surveillance algorithms.</li>
   <li>2016/05/20 A standard reference describing the monitoring aspects of the package has appeared in the <a href="https://www.jstatsoft.org/article/view/v070i10">Journal of Statistical Software</a>.</li>
   <li>2016/03/31 Publication <a href="http://www.eurosurveillance.org/ViewArticle.aspx?ArticleId=21426">A system for automated outbreak detection of 
 communicable diseases in Germany</a> describes use of the package as backbone for the German infectious disease monitoring system.</li>	
