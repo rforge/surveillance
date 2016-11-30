@@ -58,10 +58,10 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
         main <- stsTimeRange2text(x, tps)
 
     ## check/determine color break points 'at'
-    at <- checkat(at, ncases)
+    at <- checkat(at, ncases, counts = is.null(population))
     ## default color palette
     if (is.null(col.regions)) {
-        separate0 <- at[1] == 0 & at[2] <= 1
+        separate0 <- is.null(population) && at[1] == 0 && at[2] <= 1
         col.regions <- c(
             if (separate0) "white",
             hcl.colors(ncolors=length(at)-1-separate0,
@@ -115,16 +115,24 @@ getCumCounts <- function (counts, tps=NULL, nUnits=ncol(counts))
     if (ntps == 1) c(counts) else .colSums(counts, ntps, nUnits)
 }
 
-checkat <- function (at, data) { # "data" should be on the original scale
+checkat <- function (at, data, counts = TRUE) { # "data" should be on the original scale
+    data_range <- range(data, na.rm = TRUE)
     if (isScalar(at))
         at <- list(n=at)
     at <- if (is.list(at)) {
-        at <- modifyList(list(n=10, data=data), at)
-        do.call("getCountIntervals", at)
+        if (counts) {
+            at <- modifyList(list(n=10, data=data), at)
+            do.call("getCountIntervals", at)
+        } else { # no special scale for incidence plots
+            ext_data_range <- extendrange(data_range, f=0.07)
+            if (data_range[1] >= 0 & ext_data_range[1] < 0)
+                ext_data_range[1] <- 0
+            pretty(ext_data_range, at[["n"]])
+        }
     } else sort(at) 
     if (any(data >= max(at) | data < min(at), na.rm=TRUE))
         stop("'at' (right-open!) does not cover the data (range: ",
-             paste0(format(range(data, na.rm=TRUE)), collapse=" - "), ")")
+             paste0(format(data_range), collapse=" - "), ")")
     structure(at, checked=TRUE)
 }
 
