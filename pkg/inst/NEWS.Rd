@@ -37,7 +37,8 @@
 \subsection{BUG FIXES}{
   \itemize{
     \item \code{animate.sts()} now supports objects with missing values
-    (with a warning).
+    (with a warning). Furthermore, the automatic color breaks have been
+    improved for incidence maps, also in \code{stsplot_space()}.
 
     \item The \code{as.data.frame}-method for the \code{"sts"} class,
     applied to classical time-index-based \code{"sts"} objects

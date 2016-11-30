@@ -61,9 +61,8 @@ stsplot_space(x, tps = NULL, map = x@map, population = NULL,
   }
   \item{at}{
     either a number of levels (default: 10) for the categorization
-    (color-coding) of counts, or specific break points to use, or,
-    if \code{is.null(population)}, a
-    named list of a number of levels (\code{"n"}), a transformer
+    (color-coding) of counts/incidence, or specific break points to use, or,
+    a named list of a number of levels (\code{"n"}), a transformer
     (\code{"trafo"}) of class \code{"\link[scales]{trans}"} defined by
     package \pkg{scales}, and optional further arguments for
     \code{\link{pretty}}. The default is the square root transformation

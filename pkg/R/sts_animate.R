@@ -27,7 +27,7 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
 
     ## determine color breaks (checkat() is defined in stsplot_space.R)
     at <- checkat(at, data=.rangeOfDataToPlot(object, tps, cumulative, population),
-                  counts=is.null(population)) # FIXME: need raw data for quantiles
+                  counts=is.null(population))
 
     ## style of the additional temporal plot
     if (is.list(timeplot)) {

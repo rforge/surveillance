@@ -14,7 +14,7 @@
 ## tps: one or more time points. The unit-specific _sum_ of time points "tps" is
 ##      plotted. tps=NULL means cumulation over all time points in x.
 ## at: number of levels for the grouped counts or specific break points to
-##     use, or list(n, data, trafo) passed to getCountIntervals(),
+##     use, or list(n, data, trafo) passed to getPrettyIntervals(),
 ##     where data and trafo are optional.
 ##     CAVE: intervals are closed on the left and open to the right.
 ##     From panel.levelplot: zcol[z >= at[i] & z < at[i + 1]] <- i
@@ -115,28 +115,13 @@ getCumCounts <- function (counts, tps=NULL, nUnits=ncol(counts))
     if (ntps == 1) c(counts) else .colSums(counts, ntps, nUnits)
 }
 
-checkat <- function (at, data, counts = TRUE) { # "data" should be on the original scale
+checkat <- function (at, data, counts = TRUE) { # for non-transformed "data"
     data_range <- range(data, na.rm = TRUE)
     if (isScalar(at))
         at <- list(n=at)
     at <- if (is.list(at)) {
-        if (counts) {
-            at <- modifyList(list(n=10, data=data), at)
-            do.call("getCountIntervals", at)
-        } else { # quantile-based scale for incidence plots
-            data_quantiles <- quantile(data, probs=seq(0,1,length.out=at[["n"]]+1),
-                                       na.rm=TRUE)
-            data_quantiles <- round(data_quantiles, 2)
-            ## ensure max(at) > max(data)
-            data_quantiles[length(data_quantiles)] <-
-                data_quantiles[length(data_quantiles)] + 0.01 #*diff(data_range)
-            data_quantiles
-            ## alternative: pretty() scale
-            ## ext_data_range <- extendrange(data_range, f=0.07)
-            ## if (data_range[1] >= 0 & ext_data_range[1] < 0)
-            ##     ext_data_range[1] <- 0
-            ## pretty(ext_data_range, at[["n"]])
-        }
+        at <- modifyList(list(n=10, data=data, counts=counts), at)
+        do.call("getPrettyIntervals", at)
     } else sort(at) 
     if (any(data >= max(at) | data < min(at), na.rm=TRUE))
         stop("'at' (right-open!) does not cover the data (range: ",
@@ -144,18 +129,21 @@ checkat <- function (at, data, counts = TRUE) { # "data" should be on the origin
     structure(at, checked=TRUE)
 }
 
-getCountIntervals <- function (nInt, data, trafo=scales::sqrt_trans(), ...) {
+getPrettyIntervals <- function (nInt, data, trafo=scales::sqrt_trans(), counts=TRUE, ...) {
     maxcount <- max(data, na.rm=TRUE)
-    if (maxcount < nInt) { # no aggregation of counts necessary
+    if (counts && maxcount < nInt) { # no aggregation of counts necessary
         at <- 0:ceiling(maxcount+sqrt(.Machine$double.eps)) # max(at) > maxcount
     } else {
         at <- if (requireNamespace("scales", quietly=TRUE)) {
             scales::trans_breaks(trafo$trans, trafo$inv, n=nInt+1, ...)(data)
         } else pretty(sqrt(data), n=nInt+1, ...)^2
-        if (at[1] == 0 & at[2] > 1) # we want 0 counts separately ("white")
+        ## { # alternative: quantile-based scale (esp. for incidence plots)
+        ##     quantile(data, probs=seq(0,1,length.out=nInt+1), na.rm=TRUE)
+        ## }
+        if (counts && at[1] == 0 && at[2] > 1) # we want 0 counts separately ("white")
             at <- sort(c(1, at))
-        if (at[length(at)] == maxcount) # ensure max(at) > maxcount
-            at[length(at)] <- at[length(at)] + 1
+        if (at[length(at)] == maxcount) # ensure max(at) > max(data)
+            at[length(at)] <- at[length(at)] + if (counts) 1 else 0.001*diff(range(at))
     }
     at
 }
