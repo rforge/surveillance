@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.3 (2016-11-29)}{
+\section{Changes in surveillance version 1.12.3 (2016-12-01)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -21,6 +21,12 @@
 
     \item \code{animate.sts()} gained support for date labels in the
     bottom \code{timeplot}.
+
+    \item \code{stsplot_space()} and \code{animate.sts()} can now
+    generate incidence maps based on the population information
+    stored in the supplied \code{"sts"} object.
+    Furthermore, \code{animate.sts()} now supports time-varying
+    population numbers.
   }
 }
 

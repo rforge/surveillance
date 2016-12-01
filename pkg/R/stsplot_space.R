@@ -21,8 +21,7 @@
 ##     i.e. at=0:1 will have NA (=also white) for counts=1, thus we have to
 ##     ensure max(at) > max(counts)
 
-stsplot_space <- function (x, tps = NULL, map = x@map,
-                           population = NULL, # nUnits-vector of population counts
+stsplot_space <- function (x, tps = NULL, map = x@map, population = NULL,
                            main = NULL, labels = FALSE,
                            at = 10, col.regions = NULL,
                            colorkey = list(space="bottom", labels=list(at=at)),
@@ -32,20 +31,22 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
                            xlim = bbox(map)[1, ], ylim = bbox(map)[2, ], ...)
 {
     counts <- if (inherits(x, "sts")) observed(x) else x
+    if (is.null(tps))
+        tps <- seq_len(nrow(counts))
     if (length(map) == 0L) stop("no map")
     if (is.null(colnames(counts)))
         stop("need 'colnames(x)' (to be matched against 'row.names(map)')")
     if (!all(colnames(counts) %in% row.names(map)))
         stop("incomplete 'map'; ensure that 'all(colnames(x) %in% row.names(map))'")
-    
+
     ## compute data to plot
     ncases <- getCumCounts(counts, tps)
     total <- sum(ncases)
-    if (!is.null(population)) { # plot prevalence
-        stopifnot(is.vector(population, mode="numeric"),
-                  length(population) == length(ncases))
-        ncases <- ncases / population
-        total <- total / sum(population)
+    if (!is.null(population)) { # divide counts by region-specific population
+        population <- parse_population_argument(population, x)  # pop matrix
+        populationByRegion <- population[tps[1L],] # pop at first time point
+        ncases <- ncases / populationByRegion  # (cumulative) incidence by region
+        total <- total / sum(populationByRegion)
     }
 
     ## add ncases to map@data
@@ -108,11 +109,34 @@ stsplot_space <- function (x, tps = NULL, map = x@map,
 
 ## sum of counts by unit over time points "tps"
 ## the resulting vector has no names
-getCumCounts <- function (counts, tps=NULL, nUnits=ncol(counts))
+getCumCounts <- function (counts, tps)
 {
-    if (!is.null(tps)) counts <- counts[tps,,drop=FALSE]
-    ntps <- nrow(counts)
-    if (ntps == 1) c(counts) else .colSums(counts, ntps, nUnits)
+    ntps <- length(tps)
+    if (ntps == 1) {
+        counts[tps,]
+    } else {
+        .colSums(counts[tps,,drop=FALSE], ntps, ncol(counts))
+    }
+}
+
+parse_population_argument <- function (population, x)
+{
+    if (is.matrix(population)) {
+        if (!identical(dim(population), dim(x)))
+            stop("'dim(population)' does not match the data dimensions")
+    } else if (isScalar(population)) { # a unit, e.g., per 1000 inhabitants
+        if (!inherits(x, "sts"))
+            stop("'", deparse(substitute(x)), "' is no \"sts\" object; ",
+                 "population numbers must be supplied")
+        population <- population(x) / population
+    } else { # region-specific population numbers (as in surveillance <= 1.12.2)
+        stopifnot(is.vector(population, mode = "numeric"))
+        if (length(population) != ncol(x))
+            stop("'length(population)' does not match the number of data columns")
+        population <- rep(population, each = nrow(x))
+        dim(population) <- dim(x)
+    }
+    population
 }
 
 checkat <- function (at, data, counts = TRUE) { # for non-transformed "data"
@@ -152,9 +176,8 @@ stsTime2text <- function (stsObj, tps=TRUE, fmt="%i/%i") {
     sprintf(fmt, year(stsObj)[tps], epochInYear(stsObj)[tps])
 }
 
-stsTimeRange2text <- function (stsObj, tps=NULL, fmt="%i/%i", sep=" - ")
+stsTimeRange2text <- function (stsObj, tps, fmt="%i/%i", sep=" - ")
 {
-    tpsRange <- if (is.null(tps)) c(1, nrow(stsObj)) else range(tps)
-    tpsRangeYW <- stsTime2text(stsObj, tps=tpsRange, fmt=fmt)
+    tpsRangeYW <- stsTime2text(stsObj, tps=range(tps), fmt=fmt)
     paste0(unique(tpsRangeYW), collapse=sep)
 }
