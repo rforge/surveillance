@@ -2,7 +2,8 @@
 \alias{earsC}
 \encoding{latin1}
 
-\title{Surveillance for a count data time series using the EARS C1, C2 or C3 method.}
+\title{Surveillance for a count data time series using the EARS C1, C2
+  or C3 method and its extensions}
 \description{
 %
   The function takes \code{range} values of the surveillance time
@@ -11,7 +12,7 @@
   This is then compared to the observed
   number of counts. If the observation is above a specific quantile of
   the prediction interval, then an alarm is raised.  This method is especially useful
-  for data without many reference values, since it only needs counts from the recent past.
+  for data without many historic values, since it only needs counts from the recent past.
 %
 }
 \usage{
@@ -23,47 +24,51 @@ earsC(sts, control = list(range = NULL, method = "C1",
 \item{sts}{object of class sts (including the \code{observed} and the \code{state} time series) , which is to be monitored.}
 \item{control}{Control object
     \describe{
-    \item{\code{range}}{Specifies the index of all timepoints which
-        should be tested. If \code{range} is \code{NULL} the maximum number
-        of possible timepoints is used. This number depends on the method chosen.
-        For C1 all timepoints from timepoint \code{baseline + 1} can be assessed, for C2 from 
-        timepoint \code{baseline + 3} and for C3 from timepoint \code{baseline + 5}.}
-    \item{\code{method}}{String indicating which method to use: \cr 
-    "C1" for EARS C1-MILD method, "C2" for EARS C2-MEDIUM method,
-    "C3" for EARS C3-HIGH method. By default if \code{method} is  \code{NULL} C1 is chosen.}
-\item{\code{baseline}}{how many units to use for calculating the baseline, see details}
-\item{\code{minSigma}}{By default 0. If it is higher than 0, for C1 and
+    \item{\code{range}}{Specifies the index in the \code{sts} object of
+  all the timepoints which
+        should be monitored. If \code{range} is \code{NULL} the maximum number
+        of possible timepoints is used (this number depends on the method chosen):
+        For C1 all timepoints from the index \code{baseline + 1} can be monitored, for C2 from
+        index \code{baseline + 3} and for C3 the index is \code{baseline + 5}.}
+    \item{\code{method}}{String indicating which method to use: \cr
+    "C1" for EARS C1-MILD method (Default), "C2" for EARS C2-MEDIUM method,
+    "C3" for EARS C3-HIGH method.}
+\item{\code{baseline}}{how many time points to use for calculating the baseline, see details}
+\item{\code{minSigma}}{By default 0. If \code{minSigma} is higher than 0, for C1 and
 C2, the quantity zAlpha * minSigma is then the alerting threshold if the
-baseline is zero. Howard Burkom usually uses a value of 0.5 or 1 for sparse data.}
+baseline is zero. Howard Burkom suggests using a value of 0.5 or 1 for sparse data.}
     \item{\code{alpha}}{An approximate (two-sided) \eqn{(1-\alpha)\cdot 100\%} prediction
-     interval is calculated. By default if \code{alpha} is \code{NULL} 0.001 is assumed
+     interval is calculated. By default if \code{alpha} is \code{NULL}
+  the value 0.001 is assumed
      for C1 and C2 whereas 0.025 is assumed for C3. These different choices are the one made at the CDC.}
         %
       }
     }
 }
 \details{
-  The three methods are different in terms of baseline used for calculation of 
+  The three methods are different in terms of baseline used for calculation of
   the expected value and in terms of method for calculating the expected value:
  \itemize{
- \item in C1 and C2 the expected value is the moving average of counts over 
- the sliding window of the baseline and the prediction interval depends on the 
- standard derivation of counts over this window. They can be considered as
+ \item in C1 and C2 the expected value is the moving average of counts over
+ the sliding window of the baseline and the prediction interval depends on the
+ standard derivation of the observed counts in this window. They can be considered as
  Shewhart control charts with a small sample used for calculations.
- \item in C3 the expected value is based on the sum over 3 timepoints 
- (assessed timepoints and the two previous timepoints) of the discrepancy 
- between observations and predictions, predictions being calculated with C2 method.
-This method shares a common point with CUSUM method 
-(adding discrepancies between predictions and observations over several timepoints) 
+ \item in C3 the expected value is based on the sum over 3 timepoints
+ (assessed timepoints and the two previous timepoints) of the discrepancy
+ between observations and predictions, predictions being calculated with
+  the C2 method.
+This method has similarities with a CUSUM method due to it
+adding discrepancies between predictions and observations over several timepoints,
 but is not a CUSUM  (sum over 3 timepoints, not accumulation over a whole range),
- even if it sometimes presented as such.
+ even if it sometimes is presented as such.
 }
-Here is what the function does for each method:
+Here is what the function does for each method, see the literature
+  sources for further details:
 \enumerate{
 \item For C1 the baseline are the \code{baseline} (default 7) timepoints before the assessed timepoint t,
  t-\code{baseline} to t-1. The expected value is the mean of the baseline. An approximate
   (two-sided) \eqn{(1-\alpha)\cdot 100\%} prediction interval is calculated based on the
-   assumption that  the difference between the expected value and the observed 
+   assumption that  the difference between the expected value and the observed
    value divided by the standard derivation of counts over the sliding window,
     called \eqn{C_1(t)}, follows a standard normal distribution in the absence
     of outbreaks:
@@ -80,19 +85,19 @@ reduced normal law. \cr
 
 The upperbound \eqn{U_1(t)} is then defined by:
  \deqn{U_1(t)= \bar{Y}_1(t) + z_{1-\alpha}S_1(t).}
-\item C2 is very close to C1 apart from a 2-day lag in the baseline definition.
-Indeed for C2 the baseline are \code{baseline} (default 7) timepoints with a 2-day lag before the assessed
-timepoint t, t-9 to t-3. The expected value is the mean of the baseline. An approximate
+\item C2 is very similar to C1 apart from a 2-day lag in the baseline definition.
+In other words the baseline for C2 is \code{baseline} (Default: 7) timepoints with a 2-day lag before the monitored
+timepoint t, i.e. (t-\code{baseline}-2) to t-3. The expected value is the mean of the baseline. An approximate
   (two-sided) \eqn{(1-\alpha)\cdot 100\%} prediction interval is calculated based on the
-   assumption that  the difference between the expected value and the observed 
+   assumption that  the difference between the expected value and the observed
    value divided by the standard derivation of counts over the sliding window,
     called \eqn{C_2(t)}, follows a standard normal distribution in the absence
     of outbreaks:
-\deqn{C_2(t)= \frac{Y(t)-\bar{Y}_2(t)}{S_2(t)},} 
+\deqn{C_2(t)= \frac{Y(t)-\bar{Y}_2(t)}{S_2(t)},}
 where
-\deqn{\bar{Y}_2(t)= \frac{1}{baseline} \sum_{i=t-3}^{t-9} Y(i)}
+\deqn{\bar{Y}_2(t)= \frac{1}{baseline} \sum_{i=t-3}^{t-\code{baseline}-2} Y(i)}
 and
-\deqn{ S^2_2(t)= \frac{1}{6} \sum_{i=t-3}^{t-9} [Y(i) - \bar{Y}_2(i)]^2.}
+\deqn{ S^2_2(t)= \frac{1}{\code{baseline}-1} \sum_{i=t-3}^{t-\code{baseline}-2} [Y(i) - \bar{Y}_2(i)]^2.}
 Then under the null hypothesis of no outbreak,
  \deqn{C_2(t) \mathcal \sim {N}(0,1)}
 An alarm is raised if \deqn{C_2(t)\ge z_{1-\alpha},}
@@ -102,13 +107,13 @@ reduced normal law. \cr
 The upperbound \eqn{U_{2}(t)} is then defined by:
 
  \eqn{U_{2}(t)= \bar{Y}_{2}(t) + z_{1-\alpha}S_{2}(t).}
- 
- \item C3 is quite different from the two other methods but it is based on C2.
+
+ \item C3 is quite different from the two other methods, but it is based on C2.
  Indeed it uses \eqn{C_2(t)} from timepoint t and the two previous timepoints.
- This means the baseline are timepoints t-11 to t-3.
- The statistic \eqn{C_3(t)} is the sum of discrepancies between observations and 
+ This means the baseline consists of the timepoints t-(\code{baseline}+4) to t-3.
+ The statistic \eqn{C_3(t)} is the sum of discrepancies between observations and
  predictions.
-\deqn{C_3(t)= \sum_{i=t}^{t-2} \max(0,C_2(i)-1)} 
+\deqn{C_3(t)= \sum_{i=t}^{t-2} \max(0,C_2(i)-1)}
  Then under the null hypothesis of no outbreak,
  \deqn{C_3(t) \mathcal \sim {N}(0,1)}
 An alarm is raised if \deqn{C_3(t)\ge z_{1-\alpha},}
@@ -130,21 +135,19 @@ The upperbound \eqn{U_3(t)} is then defined by:
 disProgObj <- sim.pointSource(p = 0.99, r = 0.5, length = 208, A = 1,
                               alpha = 1, beta = 0, phi = 0,
                               frequency = 1, state = NULL, K = 1.7)
-stsObj = disProg2sts( disProgObj)
+stsObj <- disProg2sts( disProgObj)
 
 
-#Call function and show result
-res1 <- earsC(stsObj, control = list(range = 20:208,method="C1"))
-plot(res1,legend.opts=list(horiz=TRUE,x="topright"),dx.upperbound=0)
+# Call earsC function and show result
+res1 <- earsC(stsObj, control = list(range = 20:208, method="C1"))
+plot(res1, legend.opts=list(horiz=TRUE, x="topright"))
 
 
-# compare upperbounds depending on alpha
+# Compare C3 upperbounds depending on alpha
 res3 <- earsC(stsObj, control = list(range = 20:208,method="C3",alpha = 0.001))
-plot(res3@upperbound,t='l')
+plot(upperbound(res3), type='l')
 res3 <- earsC(stsObj, control = list(range = 20:208,method="C3"))
-lines(res3@upperbound,col='red')
-
-
+lines(upperbound(res3), col='red')
 
 }
 
@@ -153,5 +156,9 @@ lines(res3@upperbound,col='red')
 \source{
   Fricker, R.D., Hegler, B.L, and Dunfee, D.A. (2008). Comparing syndromic surveillance detection methods: EARS versus a CUSUM-based methodology,
   27:3407-3429, Statistics in medicine.
+
+  Salmon M., Schumacher D., \enc{Höhle}{Hoehle} M. (2016). Monitoring Count Time
+Series in R: Aberration Detection in Public Health Surveillance, Journal
+of Statistical Software 70(10).
 }
 
