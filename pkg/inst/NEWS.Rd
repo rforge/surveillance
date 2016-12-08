@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.3 (2016-12-01)}{
+\section{Changes in surveillance version 1.12.3 (2016-12-08)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -53,6 +53,11 @@
     Furthermore, the returned \code{epochInPeriod} now is a fraction of
     \code{freq}, for consistency with the result for objects with
     \code{epochAsDate=TRUE}.
+
+    \item \code{simulate.hhh4()} did not handle shared overdispersion
+    parameters correctly. The different parameters were simply recycled
+    to the number of units, ignoring the factor specification from the
+    model's \code{family}. [spotted by Johannes Bracher]
   }
 }
 
@@ -241,8 +246,8 @@
 \subsection{NEW FEATURES}{
   \itemize{
     \item \code{update.epidata()} can now handle a distance matrix
-    \code{D} in the form of a classed \code{"Matrix"}
-    (suggested by George Wood).
+    \code{D} in the form of a classed \code{"Matrix"}.
+    [suggested by George Wood]
 
     \item \code{glrnb()} can now handle \code{ret="cases"} for the
     generalized likelihood ratio detector based on the negative binomial
@@ -444,7 +449,7 @@
 
     \item A consistency check in \code{as.epidata.default()} failed for
     SI-type data (and, more generally, for all data which ended with an
-    I-event in the last time block). Spotted by George Wood.
+    I-event in the last time block). [spotted by George Wood]
   }
 }
 
@@ -576,7 +581,7 @@
     (only if \code{W} or \code{tiles}, respectively, contained holes).
 
     \item Non-convergent endemic-only \code{twinstim} models
-    produced an error (spotted by Bing Zhang).
+    produced an error. [spotted by Bing Zhang]
 
     \item The \code{"owin"}-method of \code{intersectPolyCircle} could
     have returned a rectangle-type \code{"owin"} instead of a polygon.

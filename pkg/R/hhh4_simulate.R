@@ -62,7 +62,8 @@ simulate.hhh4 <- function (object, # result from a call to hhh4
     model <- terms.hhh4(object)
     means <- meanHHH(theta, model, subset=subset)
     psi <- splitParams(theta,model)$overdisp
-    #psiByUnit <- if (length(psi) > 0) psi[model$indexPsi]  # FIXME: need to use that
+    if (length(psi) > 1) # "NegBinM" or shared overdispersion parameters
+        psi <- psi[model$indexPsi]
 
     ## weight matrix/array of the ne component
     neweights <- getNEweights(object, coefW(theta))
@@ -130,7 +131,10 @@ simHHH4 <- function(ar,     # lambda_it (nTime x nUnits matrix)
                   isTRUE(all.equal(psi, 0, check.attributes=FALSE))) {
         rpois
     } else {
-        stopifnot(length(psi) %in% c(1, nUnits))
+        if (!length(psi) %in% c(1, nUnits))
+            stop("'length(psi)' must be ",
+                 paste(unique(c(1, nUnits)), collapse = " or "),
+                 " (number of units)")
         psi.inv <- 1/psi   # since R uses different parametrization
         ## draw 'n' samples from NegBin with mean vector 'mean' (length=nUnits)
         ## and overdispersion psi such that Variance = mean + psi*mean^2
