@@ -61,6 +61,8 @@ simulate.hhh4 <- function (object, # result from a call to hhh4
     ## get fitted components nu_it (with offset), phi_it, lambda_it, t in subset
     model <- terms.hhh4(object)
     means <- meanHHH(theta, model, subset=subset)
+    
+    ## extract overdispersion parameters (simHHH4 assumes psi->0 means Poisson)
     psi <- splitParams(theta,model)$overdisp
     if (length(psi) > 1) # "NegBinM" or shared overdispersion parameters
         psi <- psi[model$indexPsi]
@@ -126,24 +128,31 @@ simHHH4 <- function(ar,     # lambda_it (nTime x nUnits matrix)
     nTime <- nrow(end)
     nUnits <- ncol(end)
 
+    ## check and invert psi since rnbinom() uses different parametrization
+    size <- if (length(psi) == 0 ||
+                isTRUE(all.equal(psi, 0, check.attributes=FALSE))) {
+                NULL  # Poisson
+            } else {
+                if (!length(psi) %in% c(1, nUnits))
+                    stop("'length(psi)' must be ",
+                         paste(unique(c(1, nUnits)), collapse = " or "),
+                         " (number of units)")
+                1/psi
+            }
+
     ## simulate from Poisson or NegBin model
-    rdistr <- if (length(psi)==0 ||
-                  isTRUE(all.equal(psi, 0, check.attributes=FALSE))) {
+    rdistr <- if (is.null(size)) {
         rpois
     } else {
-        if (!length(psi) %in% c(1, nUnits))
-            stop("'length(psi)' must be ",
-                 paste(unique(c(1, nUnits)), collapse = " or "),
-                 " (number of units)")
-        psi.inv <- 1/psi   # since R uses different parametrization
-        ## draw 'n' samples from NegBin with mean vector 'mean' (length=nUnits)
-        ## and overdispersion psi such that Variance = mean + psi*mean^2
+        ## unit-specific 'mean's and variance = mean + psi*mean^2
         ## where 'size'=1/psi and length(psi) == 1 or length(mean)
-        function(n, mean) rnbinom(n, mu = mean, size = psi.inv)
+        function(n, mean) rnbinom(n, mu = mean, size = size)
     }
 
     ## if only endemic component -> simulate independently
     if (all(ar + ne == 0)) {
+        if (!is.null(size))
+            size <- matrix(size, nTime, nUnits, byrow = TRUE)
         return(matrix(rdistr(length(end), end), nTime, nUnits))
     }
 
@@ -182,7 +191,7 @@ simHHH4 <- function(ar,     # lambda_it (nTime x nUnits matrix)
 
 checkCoefs <- function (object, coefs, reparamPsi=TRUE)
 {
-    theta <- coef(object, reparamPsi=reparamPsi)  #-> computes 1/exp(logpsi)
+    theta <- coef(object, reparamPsi=reparamPsi)
     if (length(coefs) != length(theta))
         stop(sQuote("coefs"), " must be of length ", length(theta))
     names(coefs) <- names(theta)

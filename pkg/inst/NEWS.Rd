@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.3 (2016-12-08)}{
+\section{Changes in surveillance version 1.12.3 (2016-12-12)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -58,6 +58,10 @@
     parameters correctly. The different parameters were simply recycled
     to the number of units, ignoring the factor specification from the
     model's \code{family}. [spotted by Johannes Bracher]
+
+    \item Simulations from \emph{endemic-only} \code{"hhh4"} models
+    with unit-specific overdispersion parameters used wrong
+    variances. [spotted by Johannes Bracher]
   }
 }
 
