@@ -374,11 +374,14 @@ update.hhh4 <- function (object, ..., S = NULL, subset.upper = NULL,
     }
 
     ## restrict fit to those epochs of control$subset which are <=subset.upper
-    if (isScalar(subset.upper))
-        if (subset.upper > max(control$subset))
+    if (isScalar(subset.upper)) {
+        if (subset.upper > max(control$subset)) # potentially unintended usage
             warning("'subset.upper' is beyond the original subset")
         control$subset <- control$subset[control$subset <= subset.upper]
-
+        if (length(control$subset) == 0)
+            stop("'subset.upper' is smaller than the lower bound ",
+                 "of the original subset")
+    }
 
     ## fit the updated model or just return the modified control list
     if (evaluate) { 
