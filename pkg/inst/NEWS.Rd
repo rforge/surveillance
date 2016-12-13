@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.3 (2016-12-12)}{
+\section{Changes in surveillance version 1.12.3 (2016-12-13)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -62,6 +62,13 @@
     \item Simulations from \emph{endemic-only} \code{"hhh4"} models
     with unit-specific overdispersion parameters used wrong
     variances. [spotted by Johannes Bracher]
+
+    \item \code{oneStepAhead()} predictions of \code{type}
+    \code{"rolling"} (or \code{"first"}) were incorrect for time points
+    \code{tp} (\code{tp[1]}) beyond the originally fitted time range
+    (in that they were based on the original time range only).
+    This usage of \code{oneStepAhead()} was never really supported and
+    is now catched when checking the \code{tp} argument.
   }
 }
 

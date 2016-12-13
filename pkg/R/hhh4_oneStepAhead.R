@@ -37,18 +37,20 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
     model <- result[["terms"]]
     if (is.null(model))
         model <- result$terms <- with(result, interpretControl(control, stsObj))
-    nTime <- model$nTime
-    nUnits <- model$nUnits
+    #nTime <- model$nTime   # = nrow(result$stsObj)
+    nUnits <- model$nUnits # = ncol(result$stsObj)
     dimPsi <- model$nOverdisp
     withPsi <- dimPsi > 0L
     psiIdx <- model$nFE + model$nd + seq_len(dimPsi)
     
     ## check that tp is within the time period of the data
-    maxlag <- if (is.null(result$lags) || all(is.na(result$lags)))
-        1L else max(result$lags, na.rm=TRUE)
-    stopifnot(tp %in% seq.int(maxlag,nTime-1L), length(tp) %in% 1:2)
-    if (length(tp) == 1) tp <- c(tp, max(model$subset)-1)
-    tps <- tp[1]:tp[2]
+    stopifnot(length(tp) %in% 1:2)
+    tpRange <- c(min(model$subset), max(model$subset)-1L) # supported range
+    if (any(tp < tpRange[1L] | tp > tpRange[2L]))
+        stop("the time range defined by 'tp' must be a subset of ",
+             tpRange[1L], ":", tpRange[2L]) # because of how subset.upper works
+    if (length(tp) == 1) tp <- c(tp, tpRange[2L])
+    tps <- tp[1L]:tp[2L]
     ntps <- length(tps)
     observed <- model$response[tps+1,,drop=FALSE]
     rownames(observed) <- tps+1
