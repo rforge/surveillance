@@ -37,7 +37,7 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
     model <- result[["terms"]]
     if (is.null(model))
         model <- result$terms <- with(result, interpretControl(control, stsObj))
-    #nTime <- model$nTime   # = nrow(result$stsObj)
+    nTime <- model$nTime   # = nrow(result$stsObj)
     nUnits <- model$nUnits # = ncol(result$stsObj)
     dimPsi <- model$nOverdisp
     withPsi <- dimPsi > 0L
@@ -46,9 +46,12 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
     ## check that tp is within the time period of the data
     stopifnot(length(tp) %in% 1:2)
     tpRange <- c(min(model$subset), max(model$subset)-1L) # supported range
-    if (any(tp < tpRange[1L] | tp > tpRange[2L]))
+    if (type == "final") { # no re-fitting necessary
+        stopifnot(tp >= 0, tp <= nTime-1L)
+    } else if (any(tp < tpRange[1L] | tp > tpRange[2L])) {
         stop("the time range defined by 'tp' must be a subset of ",
              tpRange[1L], ":", tpRange[2L]) # because of how subset.upper works
+    }
     if (length(tp) == 1) tp <- c(tp, tpRange[2L])
     tps <- tp[1L]:tp[2L]
     ntps <- length(tps)
