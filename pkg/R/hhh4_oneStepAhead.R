@@ -183,7 +183,7 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
 
     ## with shared overdispersion parameters we need to expand psi to ncol(pred)
     if (dimPsi > 1L && dimPsi != nUnits) {
-        psi <- psi[,model$indexPsi]
+        psi <- psi[,model$indexPsi,drop=FALSE]
     }
     
     ## done
