@@ -98,7 +98,8 @@ plotHHH4sims_time(x, average = mean, individual = length(x) == 1,
     a bar for the initial number of cases is added to the plot.
   }
   \item{legend}{
-    a logical or a list of parameters for \code{\link{legend}}.
+    a logical, a character vector (providing names for \code{x}),
+    or a list of parameters for \code{\link{legend}}.
   }
   \item{xlim,ylim}{
     vectors of length 2 determining the axis limits.

@@ -325,7 +325,14 @@ plotHHH4sims_time <- function (
 
     ## add legend
     if (!identical(FALSE, legend)) {
-        legendArgs <- list(x="topright", legend=names(x), bty="n",
+        xnames <- if (is.vector(legend, mode = "character")) {
+            if (length(legend) != length(x))
+                warning("'length(legend)' should be ", length(x))
+            legend
+        } else {
+            names(x)
+        }
+        legendArgs <- list(x="topright", legend=xnames, bty="n",
                            col=col, lwd=matplot.args$lwd, lty=matplot.args$lty)
         if (is.list(legend))
             legendArgs <- modifyList(legendArgs, legend)
