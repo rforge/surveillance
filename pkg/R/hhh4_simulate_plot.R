@@ -174,10 +174,13 @@ plot.hhh4simslist <- function (x, type = c("size", "time"), ...,
 ### simulated final size distribution as boxplots aggregated over all units
 
 plotHHH4sims_size <- function (x, horizontal = TRUE, trafo = NULL,
-                               observed = TRUE, ...)
+                               observed = TRUE, names = base::names(x), ...)
 {
     x <- as.hhh4simslist(x)
-    if (horizontal) x <- rev(x)  # FIXME: ...$names also have to be reverted
+    if (horizontal) {
+        names <- rev(names)
+        x <- rev(x)
+    }
     if (is.null(trafo)) #trafo <- scales::identity_trans()
         trafo <- list(name = "identity", transform = identity)
     if (isTRUE(observed)) observed <- list()
@@ -204,7 +207,8 @@ plotHHH4sims_size <- function (x, horizontal = TRUE, trafo = NULL,
     ## generate boxplots
     boxplot.args <- modifyList(defaultArgs, list(...))
     boxplot.args$horizontal <- horizontal
-    do.call("boxplot", c(list(nsimstrafo), boxplot.args))
+    boxplot.args$names <- names
+    do.call("boxplot", c(list(x=nsimstrafo), boxplot.args))
 
     ## add means
     if (horizontal) {

@@ -27,7 +27,8 @@ as.hhh4simslist(x, ...)
 \method{plot}{hhh4simslist}(x, type = c("size", "time"), ...,
      groups = NULL, par.settings = list())
 
-plotHHH4sims_size(x, horizontal = TRUE, trafo = NULL, observed = TRUE, ...)
+plotHHH4sims_size(x, horizontal = TRUE, trafo = NULL, observed = TRUE,
+                  names = base::names(x), ...)
 
 plotHHH4sims_time(x, average = mean, individual = length(x) == 1,
     conf.level = if (individual) 0.95 else NULL,
@@ -77,6 +78,9 @@ plotHHH4sims_time(x, average = mean, individual = length(x) == 1,
     of the epidemic should be added to the plot.
     Alternatively, a list with graphical parameters can be specified to
     modify the default values.
+  }
+  \item{names}{
+    a character vector of names for \code{x}.
   }
 
   \item{average}{
