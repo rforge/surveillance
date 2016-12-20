@@ -193,7 +193,6 @@ plotHHH4sims_size <- function (x, horizontal = TRUE, trafo = NULL,
     if (trafo$name != "identity")
         fslab <- paste0(fslab, " (", trafo$name, "-scale)")
     defaultArgs <- list(ylab=fslab, yaxt="n", las=1, cex.axis=1, border=1)
-    ## FIXME: why do we need cex.axis and las here? these are par.settings...
     if (horizontal) names(defaultArgs) <- sub("^y", "x", names(defaultArgs))
     ## defaultArgs$mai <- par("mai")
     ## defaultArgs$mai[2] <- max(strwidth(boxplot.args$names, units="inches",
