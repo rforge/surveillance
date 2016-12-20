@@ -164,7 +164,7 @@ print(meanScores)
 ## in Paul & Held (2011, Table IV).
 
 
-## comparison with best model B2 
+## assess statistical significance of score differences
 
 compareWithBest <- function(best, whichModels, nPermut=9999, seed=1234){
   set.seed(seed)
