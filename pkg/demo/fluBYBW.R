@@ -9,6 +9,7 @@
 ### a copy of which is available at http://www.r-project.org/Licenses/.
 ################################################################################
 
+set.seed(1)  # for reproducibility (affects initial values for ri() terms)
 library("surveillance")
 
 ## Weekly counts of influenza in 140 districts of Bavaria and Baden-Wuerttemberg
