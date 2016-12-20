@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.12.3 (2016-12-13)}{
+\section{Changes in surveillance version 1.12.3 (2016-12-20)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -69,6 +69,9 @@
     (in that they were based on the original time range only).
     This usage of \code{oneStepAhead()} was never really supported and
     is now catched when checking the \code{tp} argument.
+
+    \item \code{plot.hhh4simslist()} ignored its \code{par.settings}
+    argument if \code{groups=NULL} (default).
   }
 }
 

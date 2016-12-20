@@ -6,7 +6,7 @@
 ### Plots for an array "hhh4sims" of simulated counts from an "hhh4" model,
 ### or a list thereof as produced by different "hhh4" models (same period!)
 ###
-### Copyright (C) 2013-2015 Sebastian Meyer
+### Copyright (C) 2013-2016 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -132,7 +132,9 @@ aggregate.hhh4simslist <- function (x, units = TRUE, time = FALSE, ..., drop = F
 
 check_groups <- function (groups, units)
 {
-    if (isTRUE(groups)) {
+    if (is.null(groups)) {
+        factor(rep.int("overall", length(units)))
+    } else if (isTRUE(groups)) {
         factor(units, levels = units)
     } else {
         stopifnot(length(groups) == length(units))
@@ -144,27 +146,28 @@ plot.hhh4simslist <- function (x, type = c("size", "time"), ...,
                                groups = NULL, par.settings = list())
 {
     FUN <- paste("plotHHH4sims", match.arg(type), sep = "_")
-    if (is.null(groups))
-        return(do.call(FUN, list(quote(x), ...)))
-
-    ## stratified plots by groups of units
     groups <- check_groups(groups, colnames(attr(x, "stsObserved")))
-    
+    ngroups <- nlevels(groups)
     if (is.list(par.settings)) {
-        par.defaults <- list(mfrow = sort(n2mfrow(nlevels(groups))),
-                             mar = c(4,4,2,0.5)+.1, las = 1)
+        par.defaults <- list(mar = c(4,4,2,0.5)+.1, las = 1)
+        if (ngroups > 1)
+            par.defaults$mfrow <- sort(n2mfrow(ngroups))
         par.settings <- modifyList(par.defaults, par.settings)
         opar <- do.call("par", par.settings)
         on.exit(par(opar))
     }
-    
-    invisible(sapply(
-        X = levels(groups),
-        FUN = function (group) {
-            x_group <- x[, which(group == groups) , ]
-            do.call(FUN, list(quote(x_group), ..., main = group))
-        },
-        simplify = FALSE, USE.NAMES = TRUE))    
+
+    if (ngroups == 1) {
+        do.call(FUN, list(quote(x), ...))
+    } else { # stratified plots by groups of units
+        invisible(sapply(
+            X = levels(groups),
+            FUN = function (group) {
+                x_group <- x[, which(group == groups) , ] # [-method has drop=F
+                do.call(FUN, list(quote(x_group), ..., main = group))
+            },
+            simplify = FALSE, USE.NAMES = TRUE))
+    }
 }
 
 
@@ -174,7 +177,7 @@ plotHHH4sims_size <- function (x, horizontal = TRUE, trafo = NULL,
                                observed = TRUE, ...)
 {
     x <- as.hhh4simslist(x)
-    if (horizontal) x <- rev(x)
+    if (horizontal) x <- rev(x)  # FIXME: ...$names also have to be reverted
     if (is.null(trafo)) #trafo <- scales::identity_trans()
         trafo <- list(name = "identity", transform = identity)
     if (isTRUE(observed)) observed <- list()
@@ -187,6 +190,7 @@ plotHHH4sims_size <- function (x, horizontal = TRUE, trafo = NULL,
     if (trafo$name != "identity")
         fslab <- paste0(fslab, " (", trafo$name, "-scale)")
     defaultArgs <- list(ylab=fslab, yaxt="n", las=1, cex.axis=1, border=1)
+    ## FIXME: why do we need cex.axis and las here? these are par.settings...
     if (horizontal) names(defaultArgs) <- sub("^y", "x", names(defaultArgs))
     ## defaultArgs$mai <- par("mai")
     ## defaultArgs$mai[2] <- max(strwidth(boxplot.args$names, units="inches",
