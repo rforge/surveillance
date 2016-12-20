@@ -59,6 +59,7 @@ VERSION := $(shell $R --vanilla --slave -e 'cat(read.dcf("${DESCRIPTION}", field
 .PHONY: clean build check check-allExamples install manual #${DESCRIPTION}
 
 clean:
+	make -C pkg/demo clean
 	cd pkg/src; rm -f *.o *.so *.dll symbols.rds
 	rm -f pkg/*/.Rhistory
 
