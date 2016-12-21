@@ -146,7 +146,7 @@ plot.hhh4simslist <- function (x, type = c("size", "time"), ...,
                                groups = NULL, par.settings = list())
 {
     FUN <- paste("plotHHH4sims", match.arg(type), sep = "_")
-    groups <- check_groups(groups, colnames(attr(x, "stsObserved")))
+    groups <- check_groups(groups, colnames(attr(x, "stsObserved"), do.NULL=FALSE))
     ngroups <- nlevels(groups)
     if (is.list(par.settings)) {
         par.defaults <- list(mar = c(4,4,2,0.5)+.1, las = 1)
