@@ -8,6 +8,29 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.13.1 (2016-12-21)}{
+
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item 
+  }
+}
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item 
+  }
+}
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item 
+  }
+}
+
+}
+
+
 \section{Changes in surveillance version 1.13.0 (2016-12-20)}{
 
 \subsection{NEW FEATURES}{
