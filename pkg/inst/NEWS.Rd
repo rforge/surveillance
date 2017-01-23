@@ -8,11 +8,13 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.13.1 (2016-12-21)}{
+\section{Changes in surveillance version 1.13.1 (2017-01-23)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
-    \item 
+    \item The \code{calibrationTest()} and \code{pit()} methods for
+    \code{"oneStepAhead"} forecasts gained an argument \code{units}
+    to allow for unit-specific assessments.
   }
 }
 

@@ -8,7 +8,7 @@
 ### Czado, C., Gneiting, T. & Held, L. (2009)
 ### Biometrics 65:1254-1261
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2013-2015 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2013-2015,2017 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -116,9 +116,16 @@ plot.pit <- function (x, main = "", ylab = NULL, ...)
 ## pit-methods for oneStepAhead() predictions and "hhh4" fits
 ## (similar to the scores-methods)
 
-pit.oneStepAhead <- function (x, ...)
+pit.oneStepAhead <- function (x, units = NULL, ...)
 {
-    .pit(x = x$observed, mu = x$pred, size = psi2size.oneStepAhead(x), ...)
+    if (is.null(units)) {
+        .pit(x = x$observed, mu = x$pred, size = psi2size.oneStepAhead(x), ...)
+    } else {
+        .pit(x = x$observed[, units, drop = FALSE],
+             mu = x$pred[, units, drop = FALSE],
+             size = psi2size.oneStepAhead(x)[, units, drop = FALSE],
+             ...)
+    }
 }
 
 pit.hhh4 <- function (x, subset = x$control$subset, units = seq_len(x$nUnit), ...)

@@ -34,9 +34,9 @@ scores(x, ...)
 \method{scores}{hhh4}(x, which = c("logs", "rps", "dss", "ses"),
        subset = x$control$subset, units = seq_len(x$nUnit), sign = FALSE, ...)
 
-\method{calibrationTest}{oneStepAhead}(x, ...)
+\method{calibrationTest}{oneStepAhead}(x, units = NULL, ...)
 
-\method{pit}{oneStepAhead}(x, ...)
+\method{pit}{oneStepAhead}(x, units = NULL, ...)
 \method{pit}{hhh4}(x, subset = x$control$subset, units = seq_len(x$nUnit), ...)
 }
 
@@ -113,7 +113,7 @@ scores(x, ...)
     Defaults to the subset used for fitting the model.}
   \item{units}{integer or character vector indexing the units for which
     the scores (or the PIT histogram) should be computed.
-    By default (\code{NULL}) all units are considered.}
+    By default, all units are considered.}
   \item{sign}{logical indicating if the function should also return
     \code{sign(x-mu)}, i.e., the sign of the difference between
     the observed counts and corresponding predictions.
