@@ -8,7 +8,7 @@
 ### Czado, C., Gneiting, T. & Held, L. (2009)
 ### Biometrics 65:1254-1261
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2014-2015 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2014-2015,2017 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -118,7 +118,7 @@ rps <- function (x, mu, size=NULL, k=40, tolerance=sqrt(.Machine$double.eps)) {
 
 ### apply a set of scoring rules at once
 
-scores.default <- function(x, mu, size,
+scores.default <- function(x, mu, size = NULL,
                            which = c("logs", "rps", "dss", "ses"),
                            sign = FALSE, ...)
 {
