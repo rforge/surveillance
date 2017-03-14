@@ -457,23 +457,27 @@ range(plot(fluFit, type = "maxEV"))
 }
 
 \references{
-  Held, L., \enc{Höhle}{Hoehle}, M., Hofmann, M. (2005):
+  Held, L., \enc{Höhle}{Hoehle}, M. and Hofmann, M. (2005):
     A statistical framework for the analysis of multivariate infectious
     disease surveillance counts.
-    \emph{Statistical Modelling}, \bold{5}, 187--199.
+    \emph{Statistical Modelling}, \bold{5} (3), 187-199.
+    \doi{10.1191/1471082X05st098oa}
     
   Paul, M., Held, L. and Toschke, A. M. (2008):
     Multivariate modelling of infectious disease surveillance data.
-    \emph{Statistics in Medicine}, \bold{27}, 6250--6267.    
+    \emph{Statistics in Medicine}, \bold{27} (29), 6250-6267.
+    \doi{10.1002/sim.4177}
 
   Paul, M. and Held, L. (2011):
     Predictive assessment of a non-linear random effects model for
     multivariate time series of infectious disease counts.
-    \emph{Statistics in Medicine}, \bold{30}, 1118--1136
+    \emph{Statistics in Medicine}, \bold{30} (10), 1118-1136.
+    \doi{10.1002/sim.4177}
 
   Held, L. and Paul, M. (2012):
     Modeling seasonality in space-time infectious disease surveillance data.
-    \emph{Biometrical Journal}, \bold{54}, 824--843
+    \emph{Biometrical Journal}, \bold{54} (6), 824-843.
+    \doi{10.1002/bimj.201200037}
     
   Meyer, S. and Held, L. (2014):
     Power-law models for infectious disease spread.
