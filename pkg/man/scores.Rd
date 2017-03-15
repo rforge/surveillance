@@ -51,8 +51,10 @@ ses(x, mu, size = NULL)
     \code{mu*(1+mu/size)}.
   }
   \item{which}{
-    a character vector specifying which proper scoring rules to apply.
-    By default, all four scores are calculated.
+    a character vector specifying which scoring rules to apply.
+    By default, all four proper scores are calculated.
+    The normalized squared error score (\code{"nses"}) is also available
+    but it is improper and hence not computed by default.
   }
   \item{sign}{
     a logical indicating if the function should also return
