@@ -75,8 +75,15 @@ ses(x, mu, size = NULL)
   }
 }
 
-%% \value{
-%% }
+\value{
+  The scoring functions return the individual scores for the predictions
+  of the observations in \code{x} (maintaining their dimension attributes).
+  
+  The default \code{scores}-method applies the selected (\code{which})
+  scoring functions (and calculates \code{sign(x-mu)}) and returns the
+  results in an array (via \code{\link{simplify2array}}), where the last
+  dimension corresponds to the different scores.
+}
 
 \references{
   Czado, C., Gneiting, T. and Held, L. (2009):
