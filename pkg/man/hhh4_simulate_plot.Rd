@@ -4,20 +4,14 @@
 \alias{plot.hhh4simslist}
 \alias{plotHHH4sims_size}
 \alias{plotHHH4sims_time}
-\alias{scores.hhh4sims}
-\alias{scores.hhh4simslist}
 
 \title{
-Summarize Simulations from \code{"hhh4"} Models
+Plot Simulations from \code{"hhh4"} Models
 }
 
 \description{
 Arrays of simulated counts from \code{\link{simulate.hhh4}} can be
 visualized in various levels of aggregation: final size, time series.
-Furthermore, proper scoring rules can be calculated based on the
-simulated predictive distributions. Be aware, though, that the current
-implementation can only compute univariate scores, i.e., it treats the
-predictions at the various time points as independent.
 }
 
 \usage{
@@ -34,9 +28,6 @@ plotHHH4sims_time(x, average = mean, individual = length(x) == 1,
     conf.level = if (individual) 0.95 else NULL,
     matplot.args = list(), initial.args = list(), legend = length(x) > 1,
     xlim = NULL, ylim = NULL, add = FALSE, ...)
-
-\method{scores}{hhh4sims}(x, which = "rps", units = NULL, ..., drop = TRUE)
-\method{scores}{hhh4simslist}(x, ...)
 }
 
 \arguments{
@@ -112,24 +103,7 @@ plotHHH4sims_time(x, average = mean, individual = length(x) == 1,
     a logical indicating if the (mean) simulated time series should be
     added to an existing plot.
   }
-
-  \item{which}{
-    a character vector indicating which proper scoring rules to compute.
-    By default, only the ranked probability score (\code{"rps"}) is
-    calculated. Other options include \code{"logs"} and \code{"dss"}.
-  }
-  \item{units}{
-    if non-\code{NULL}, an integer or character vector indexing the
-    columns of \code{x} to compute the scores for that subset only.
-  }
-  \item{drop}{
-    a logical indicating if univariate dimensions should be dropped
-    (the default).
-  }
 }
-
-%% \value{
-%% }
 
 \author{
   Sebastian Meyer
@@ -186,13 +160,6 @@ plot(measlesSims)
 
 ## simulated time series
 plot(measlesSims, type = "time", individual = TRUE, ylim = c(0, 80))
-
-## compare proper scoring rules for a specific subset of the regions
-## (CAVE: these are univariate scores for each time point and region,
-##        which do not account for dependence over time)
-measlesScores5 <- scores(measlesSims, which = "rps",
-                         units = substr(colnames(measlesWeserEms), 4, 4) == "5")
-sapply(measlesScores5, mean)
 }
 
 \keyword{hplot}
