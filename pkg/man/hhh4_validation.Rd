@@ -235,6 +235,10 @@ stopifnot(identical(
 ## compute scores of the one-step-ahead predictions
 (sc <- scores(pred, reverse = FALSE))
 
+## the above uses the scores-method for "oneStepAhead" predictions,
+## which is a simple wrapper around the default method:
+scores(x = pred$observed, mu = pred$pred, size = exp(pred$psi))
+
 ## scores with respect to the fitted values are similar
 (scFitted <- scores(result, subset = nrow(salmonella)-(4:0)))
 
