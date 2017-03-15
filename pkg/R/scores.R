@@ -193,5 +193,6 @@ scores.hhh4 <- function (x, which = c("logs","rps","dss","ses"),
         mu = x$fitted.values[match(subset, x$control$subset), units, drop = FALSE],
         size = psi2size.hhh4(x, subset, units),
         which = which, sign = sign)
+    rownames(result) <- subset
     drop(result)
 }

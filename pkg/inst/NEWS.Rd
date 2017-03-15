@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.13.1 (2017-01-23)}{
+\section{Changes in surveillance version 1.13.1 (2017-03-15)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -20,7 +20,8 @@
 
 \subsection{MINOR CHANGES}{
   \itemize{
-    \item 
+    \item \code{scores.hhh4()} sets rownames for consistency with
+    \code{scores.oneStepAhead()}.
   }
 }
 
