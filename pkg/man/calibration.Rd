@@ -95,8 +95,8 @@ set.seed(1)
 y <- rnbinom(length(mu), mu = mu, size = size)
 calibrationTest(y, mu = mu, size = size) # p = 0.99
 calibrationTest(y, mu = mu, size = 1) # p = 4.3e-05
-calibrationTest(y, mu = 1, size = 0.1) # p = 0.6959
-calibrationTest(y, mu = 1, size = 0.1, which = "rps") # p = 0.1286
+calibrationTest(y, mu = 1, size = size) # p = 0.6959
+calibrationTest(y, mu = 1, size = size, which = "rps") # p = 0.1286
 }
 
 \keyword{htest}
