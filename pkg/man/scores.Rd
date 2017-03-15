@@ -1,0 +1,95 @@
+\name{scores}
+\alias{scores}
+\alias{scores.default}
+\alias{logs}
+\alias{rps}
+\alias{dss}
+\alias{ses}
+
+\title{
+  Proper Scoring Rules for Poisson or Negative Binomial Predictions
+}
+
+\description{
+  Proper scoring rules for Poisson or negative binomial predictions
+  of count data are described in Czado et al. (2009).
+  The following scores are implemented:
+  logarithmic score (\code{logs}),
+  ranked probability score (\code{rps}),
+  Dawid-Sebastiani score (\code{dss}),
+  squared error score (\code{ses}).
+}
+
+\usage{
+scores(x, ...)
+
+\method{scores}{default}(x, mu, size = NULL,
+       which = c("logs", "rps", "dss", "ses"),
+       sign = FALSE, ...)
+
+logs(x, mu, size = NULL)
+rps(x, mu, size = NULL, k = 40, tolerance = sqrt(.Machine$double.eps))
+dss(x, mu, size = NULL)
+ses(x, mu, size = NULL)
+}
+
+\arguments{
+  \item{x}{
+    the observed counts.
+    All functions are vectorized and also accept matrices or arrays.
+    Dimensions are preserved.
+  }
+  \item{mu}{
+    the means of the predictive distributions for the
+    observations \code{x}.
+  }
+  \item{size}{
+    either \code{NULL} (default), indicating Poisson predictions with mean
+    \code{mu}, or dispersion parameters of
+    negative binomial forecasts for the observations \code{x},
+    parametrized as in \code{\link{dnbinom}} with variance
+    \code{mu*(1+mu/size)}.
+  }
+  \item{which}{
+    a character vector specifying which proper scoring rules to apply.
+    By default, all four scores are calculated.
+  }
+  \item{sign}{
+    a logical indicating if the function should also return
+    \code{sign(x-mu)}, i.e., the sign of the difference between
+    the observed counts and corresponding predictions.
+  }
+  \item{\dots}{
+    unused (argument of the generic).
+  }
+  \item{k}{
+    scalar argument controlling the finite sum approximation for the
+    \code{rps} with truncation at \code{ceiling(mu + k*sd)}.
+  }
+  \item{tolerance}{
+    absolute tolerance for the finite sum approximation employed in the
+    \code{rps} calculation. A warning is produced if the approximation
+    with \code{k} summands is insufficient for the specified
+    \code{tolerance}. In this case, increase \code{k} for higher
+    precision (or use a larger tolerance).
+  }
+}
+
+%% \value{
+%% }
+
+\references{
+  Czado, C., Gneiting, T. and Held, L. (2009):
+    Predictive model assessment for count data.
+    \emph{Biometrics}, \bold{65} (4), 1254-1261.
+    \doi{10.1111/j.1541-0420.2009.01191.x}
+}
+
+\author{
+  Sebastian Meyer and Michaela Paul
+}
+
+%% \examples{
+%% }
+
+\keyword{univar}
