@@ -101,14 +101,14 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
     scoring rules: logarithmic score (\code{"logs"}), ranked probability
     score (\code{"rps"}), Dawid-Sebastiani score (\code{"dss"}), and
     squared error score (\code{"ses"}). The normalized SES
-    (\code{"nses"}) is also available but it is improper and not
+    (\code{"nses"}) is also available but it is improper and hence not
     computed by default.\cr
     It is possible to name own scoring rules in \code{which}. These
     must be functions of \code{(x, mu, size)}, vectorized in all arguments
     (time x unit matrices) except that \code{size} is \code{NULL}
     in case of a Poisson model.
-    See the supplied scoring rules for guidance, e.g.,
-    \code{\link{logs}} or \code{\link{dss}}.}
+    See the available scoring rules for guidance, e.g., \code{\link{dss}}.
+  }
   \item{subset}{
     subset of time points for which to calculate the scores
     (or test calibration, or produce the PIT histogram, respectively).
