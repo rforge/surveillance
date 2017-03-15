@@ -4,6 +4,7 @@
 \alias{plot.hhh4simslist}
 \alias{plotHHH4sims_size}
 \alias{plotHHH4sims_time}
+\alias{plotHHH4sims_fan}
 
 \title{
 Plot Simulations from \code{"hhh4"} Models
@@ -11,14 +12,15 @@ Plot Simulations from \code{"hhh4"} Models
 
 \description{
 Arrays of simulated counts from \code{\link{simulate.hhh4}} can be
-visualized in various levels of aggregation: final size, time series.
+visualized as final size boxplots, individual or average time series,
+or fan charts (using the \CRANpkg{fanplot} package).
 }
 
 \usage{
 \method{plot}{hhh4sims}(x, ...)
 
 as.hhh4simslist(x, ...)
-\method{plot}{hhh4simslist}(x, type = c("size", "time"), ...,
+\method{plot}{hhh4simslist}(x, type = c("size", "time", "fan"), ...,
      groups = NULL, par.settings = list())
 
 plotHHH4sims_size(x, horizontal = TRUE, trafo = NULL, observed = TRUE,
@@ -27,6 +29,10 @@ plotHHH4sims_size(x, horizontal = TRUE, trafo = NULL, observed = TRUE,
 plotHHH4sims_time(x, average = mean, individual = length(x) == 1,
     conf.level = if (individual) 0.95 else NULL,
     matplot.args = list(), initial.args = list(), legend = length(x) > 1,
+    xlim = NULL, ylim = NULL, add = FALSE, ...)
+
+plotHHH4sims_fan(x, which = 1,
+    fan.args = list(), initial.args = list(), observed.args = list(),
     xlim = NULL, ylim = NULL, add = FALSE, ...)
 }
 
@@ -100,8 +106,22 @@ plotHHH4sims_time(x, average = mean, individual = length(x) == 1,
     vectors of length 2 determining the axis limits.
   }
   \item{add}{
-    a logical indicating if the (mean) simulated time series should be
-    added to an existing plot.
+    a logical indicating if the (mean) simulated time series or the fan
+    chart, respectively, should be added to an existing plot.
+  }
+  \item{which}{
+    a single integer or a character string selecting the simulation in
+    \code{x} for which to produce the fan chart.
+    Defaults to the first simulation.
+  }
+  \item{fan.args}{
+    a list of graphical parameters for the \code{\link[fanplot]{fan}},
+    e.g., to employ a different \code{\link{colorRampPalette}} as
+    \code{fan.col}.
+  }
+  \item{observed.args}{
+    if a list (of graphical parameters for \code{\link{lines}}),
+    the originally observed counts are added to the plot.
   }
 }
 
@@ -125,8 +145,11 @@ salmSims <- simulate(salmFit, nsim = 300, seed = 3, subset = 678 + seq_len(20),
 ## compare final size distribution to observed value
 plot(salmSims)
 
-## simulated time series
+## individual and average simulated time series with a confidence interval
 plot(salmSims, type = "time", main = "2-weeks-ahead simulation")
+
+## fan chart based on the quantiles of the simulated counts at each time point
+plot(salmSims, type = "fan", main = "2-weeks-ahead simulation")
 
 
 ### multivariate example
@@ -160,6 +183,12 @@ plot(measlesSims)
 
 ## simulated time series
 plot(measlesSims, type = "time", individual = TRUE, ylim = c(0, 80))
+
+## fan charts
+opar <- par(mfrow = c(2,1))
+plot(measlesSims, type = "fan", which = 1, ylim = c(0, 80), main = "NegBin")
+plot(measlesSims, type = "fan", which = 2, ylim = c(0, 80), main = "Poisson")
+par(opar)
 }
 
 \keyword{hplot}

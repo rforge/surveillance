@@ -1,7 +1,7 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
 Version: 1.13.1
-Date: 2017-01-23
+Date: 2017-03-15
 Authors@R: c(MH = person("Michael", "Höhle",
                   email = "hoehle@math.su.se",
                   role = c("aut", "ths")),
@@ -44,7 +44,7 @@ Suggests: parallel, grid, xts, gridExtra, lattice, colorspace, scales, animation
         msm, spc, 
         quadprog,
         memoise, polyclip, rgeos, gpclib, maptools, intervals,
-        spdep, numDeriv, maxLik, gsl,
+        spdep, numDeriv, maxLik, gsl, fanplot,
         testthat (>= 0.11.0), coda, splancs, gamlss,
         INLA (>= 0.0-1458166556), runjags, ggplot2, MGLM, knitr
 Description: Statistical methods for the modeling and monitoring of time series

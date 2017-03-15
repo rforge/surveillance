@@ -18,6 +18,10 @@
 
     \item A default \code{scores}-method is now available to compute a
     set of proper scoring rules for Poisson or NegBin predictions.
+
+    \item New plot \code{type = "fan"} for simulations from
+    \code{"hhh4"} models to produce a fan chart using the
+    \CRANpkg{fanplot} package.
   }
 }
 

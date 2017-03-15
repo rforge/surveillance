@@ -6,7 +6,7 @@
 ### Plots for an array "hhh4sims" of simulated counts from an "hhh4" model,
 ### or a list thereof as produced by different "hhh4" models (same period!)
 ###
-### Copyright (C) 2013-2016 Sebastian Meyer
+### Copyright (C) 2013-2017 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -142,7 +142,7 @@ check_groups <- function (groups, units)
     }
 }
 
-plot.hhh4simslist <- function (x, type = c("size", "time"), ...,
+plot.hhh4simslist <- function (x, type = c("size", "time", "fan"), ...,
                                groups = NULL, par.settings = list())
 {
     FUN <- paste("plotHHH4sims", match.arg(type), sep = "_")
@@ -347,4 +347,56 @@ plotHHH4sims_time <- function (
     ## if (length(score) == 1)
     ##     attr(ret, score) <- scorestime
     invisible(ret)
+}
+
+
+### Better for a single model: "fanplot"
+
+plotHHH4sims_fan <- function (x, which = 1,
+    fan.args = list(), initial.args = list(), observed.args = list(),
+    xlim = NULL, ylim = NULL, add = FALSE, ...)
+{
+    x <- as.hhh4simslist(x)[[which]]
+    ytInit <- rowSums(attr(x, "initial"))
+    stsObserved <- attr(x, "stsObserved")
+    ytObs <- rowSums(observed(stsObserved))
+    ytSim <- aggregate.hhh4sims(x, units = TRUE, time = FALSE, drop = TRUE)
+
+    ## axis range
+    if (is.null(xlim) && is.list(initial.args))
+        xlim <- c(1 - length(ytInit) - 0.5, length(ytObs) + 0.5)
+    if (is.null(ylim))
+        ylim <- c(0, max(ytObs, ytSim))
+    
+    ## graphical parameters
+    stopifnot(is.list(fan.args))
+    fan.args <- modifyList(
+        list(data = t(ytSim), ln = NULL),
+        fan.args, keep.null = TRUE)
+    
+    ## initialize empty plot
+    if (!add)
+        plot(stsObserved, type = observed ~ time, xlim = xlim, ylim = ylim, col = NA, ...)
+    
+    ## add fan
+    do.call(fanplot::fan, fan.args)
+    
+    ## add initial counts
+    if (is.list(initial.args)) {
+        initial.args <- modifyList(
+            list(x = seq(to = 0, by = 1, length.out = length(ytInit)),
+                 y = ytInit, type = "p", pch = 19),
+            initial.args)
+        do.call("lines", initial.args)
+    }
+    
+    ## add observed time series data
+    if (is.list(observed.args)) {
+        observed.args <- modifyList(
+            list(x = seq_along(ytObs), y = ytObs, type = "b", lwd = 2),
+            observed.args)
+        do.call("lines", observed.args)
+    }
+    
+    invisible(NULL)
 }
