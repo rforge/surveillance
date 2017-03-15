@@ -15,6 +15,9 @@
     \item The \code{calibrationTest()} and \code{pit()} methods for
     \code{"oneStepAhead"} forecasts gained an argument \code{units}
     to allow for unit-specific assessments.
+
+    \item A default \code{scores}-method is now available to compute a
+    set of proper scoring rules for Poisson or NegBin predictions.
   }
 }
 

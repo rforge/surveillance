@@ -89,7 +89,18 @@ ses(x, mu, size = NULL)
   Sebastian Meyer and Michaela Paul
 }
 
-%% \examples{
-%% }
+\examples{
+mu <- c(0.1, 1, 3, 6, pi, 100)
+size <- 0.1
+set.seed(1)
+y <- rnbinom(length(mu), mu = mu, size = size)
+scores(y, mu = mu, size = size)
+scores(y, mu = mu, size = 1)  # ses ignores the variance
+scores(y, mu = 1, size = size)
+
+## apply a specific scoring rule
+scores(y, mu = mu, size = size, which = "rps")
+rps(y, mu = mu, size = size)
+}
 
 \keyword{univar}

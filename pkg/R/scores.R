@@ -122,19 +122,17 @@ scores.default <- function(x, mu, size = NULL,
                            which = c("logs", "rps", "dss", "ses"),
                            sign = FALSE, ...)
 {
-    ## compute sign of x-mu
-    signXmMu <- if (sign) sign(x-mu) else NULL
-    
-    ## compute individual scores (these are dim(x) matrices)
-    scorelist <- lapply(which, do.call, args = alist(x=x, mu=mu, size=size),
+    ## compute individual scores (these have the same dimensions as x)
+    scorelist <- lapply(X = setNames(nm = which), FUN = do.call,
+                        args = alist(x = x, mu = mu, size = size),
                         envir = environment())
+
+    ## append sign of x-mu
+    if (sign)
+        scorelist <- c(scorelist, list("sign" = sign(x-mu)))
     
-    ## gather individual scores in an array
-    array(c(unlist(scorelist, recursive=FALSE, use.names=FALSE),
-            signXmMu),
-          dim = c(dim(x), length(which) + sign),
-          dimnames = c(dimnames(x),
-              list(c(which, if (sign) "sign"))))
+    ## gather scores in an array
+    simplify2array(scorelist, higher = TRUE)
 }
 
 ### apply scoring rules to a set of oneStepAhead() forecasts
