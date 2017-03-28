@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.13.1 (2017-03-15)}{
+\section{Changes in surveillance version 1.13.1 (2017-03-28)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -34,7 +34,10 @@
 
 \subsection{BUG FIXES}{
   \itemize{
-    \item 
+    \item The \code{"Lambda.const"} matrix returned by
+    \code{getMaxEV_season()} was wrong for models with asymmetric
+    neighbourhood weights. [spotted by Johannes Bracher]\cr
+    Dominant eigenvalues (\code{"maxEV"}) were not affected by this bug.
   }
 }
 
