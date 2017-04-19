@@ -41,7 +41,7 @@
 
 \title{\code{hhh4}: An endemic-epidemic modelling framework for infectious disease counts}
 \author{
-Michaela Paul and Sebastian Meyer\thanks{Author of correspondence: \email{Sebastian.Meyer@ifspm.uzh.ch}}\\
+Michaela Paul and Sebastian Meyer\thanks{Author of correspondence: \email{seb.meyer@fau.de} (new affiliation)}\\
 Epidemiology, Biostatistics and Prevention Institute\\
 University of Zurich, Zurich, Switzerland
 }

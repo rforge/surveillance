@@ -45,7 +45,7 @@ if (!COMPUTE) load("twinstim-cache.RData", verbose = TRUE)
 \Plaintitle{twinstim: An endemic-epidemic modeling framework for spatio-temporal point patterns}
 \Shorttitle{Endemic-epidemic modeling of spatio-temporal point patterns}
 
-\author{Sebastian Meyer\thanks{Author of correspondence: \email{Sebastian.Meyer@ifspm.uzh.ch}}\\University of Zurich \And
+\author{Sebastian Meyer\thanks{Author of correspondence: \email{seb.meyer@fau.de} (new affiliation)}\\University of Zurich \And
         Leonhard Held\\University of Zurich \And
         Michael H\"ohle\\Stockholm University}
 \Plainauthor{Sebastian Meyer, Leonhard Held, Michael H\"ohle}
