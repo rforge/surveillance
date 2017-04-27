@@ -1,7 +1,7 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
 Version: 1.13.1
-Date: 2017-03-15
+Date: 2017-04-28
 Authors@R: c(MH = person("Michael", "Höhle",
                   email = "hoehle@math.su.se",
                   role = c("aut", "ths")),
@@ -76,8 +76,8 @@ Description: Statistical methods for the modeling and monitoring of time series
         e.g., time-stamped geo-referenced surveillance data, as proposed by
         Meyer et al. (2012) <doi:10.1111/j.1541-0420.2011.01684.x>.
         A recent overview of the implemented space-time modeling frameworks
-        for epidemic phenomena is given by Meyer et al. (2015)
-        <http://arxiv.org/abs/1411.0416>.
+        for epidemic phenomena is given by Meyer et al. (2017)
+        <doi:10.18637/jss.v077.i11>.
 License: GPL-2
 URL: http://surveillance.r-forge.r-project.org/
 Additional_repositories: https://www.math.ntnu.no/inla/R/stable

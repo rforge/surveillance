@@ -14,7 +14,7 @@
   in all components; see the Details below.
   A general introduction to the \code{hhh4} modelling approach and its
   implementation is given in the \code{vignette("hhh4")}. Meyer et al
-  (2016, Section 5, available as \code{vignette("hhh4_spacetime")})
+  (2017, Section 5, available as \code{vignette("hhh4_spacetime")})
   describe \code{hhh4} models for areal time series of infectious
   disease counts.
 }
@@ -262,7 +262,7 @@ hhh4(stsObj,
   \code{vignette("hhh4_spacetime")}.
 }
 
-\author{M. Paul, S. Meyer, and L. Held}
+\author{Michaela Paul, Sebastian Meyer, Leonhard Held}
 
 \examples{
 ###########################################################################
@@ -484,10 +484,11 @@ range(plot(fluFit, type = "maxEV"))
     \emph{The Annals of Applied Statistics}, \bold{8} (3), 1612-1639.
     \doi{10.1214/14-AOAS743}
 
-  Meyer, S., Held, L. and H\enc{ö}{oe}hle, M. (2016):
-  Spatio-temporal analysis of epidemic phenomena using the \R package
-  \pkg{surveillance}. \emph{Journal of Statistical Software}. In press.\cr
-  Preprint available at \url{http://arxiv.org/abs/1411.0416}
+  Meyer, S., Held, L. and \enc{Höhle}{Hoehle}, M. (2017):
+    Spatio-temporal analysis of epidemic phenomena using the \R package
+    \pkg{surveillance}.
+    \emph{Journal of Statistical Software}, \bold{77} (11), 1-55.
+    \doi{10.18637/jss.v077.i11}
 }
 
 \keyword{ts}
