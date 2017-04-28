@@ -318,7 +318,7 @@ we established a cubature method which takes
 advantage of the assumed isotropy of spatial interaction
 such that numerical integration remains in only one dimension
 \citep[Supplement~B, Section~2.4]{meyer.held2013}.
-We also \CRANpkg{memoise} \citep{R:memoise} the cubature function during
+We \CRANpkg{memoise} \citep{R:memoise} the cubature function during
 log-likelihood maximization to avoid integration
 for unchanged parameters of~$f$.
 
