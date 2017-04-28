@@ -8,8 +8,20 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.13.1 (2017-03-28)}{
+\section{Changes in surveillance version 1.13.1 (2017-04-28)}{
 
+\subsection{DOCUMENTATION}{
+  \itemize{
+    \item The paper on \dQuote{Spatio-Temporal Analysis of Epidemic
+      Phenomena Using the \R Package \pkg{surveillance}} (by Sebastian
+    Meyer, Leonhard Held, and Michael \enc{Höhle}{Hoehle}) will appear
+    in the upcoming volume of the \emph{Journal of Statistical Software}.
+    The main sections 3 to 5 of the paper are contained in the package
+    as \code{vignette("twinstim")}, \code{vignette("twinSIR")}, and
+    \code{vignette("hhh4_spacetime")}, respectively.
+  }
+}
+  
 \subsection{NEW FEATURES}{
   \itemize{
     \item The \code{calibrationTest()} and \code{pit()} methods for
