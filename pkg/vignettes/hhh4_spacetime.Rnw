@@ -121,7 +121,7 @@ branching process with immigration}
 %%   \renewcommand{\abstractname}{Outline}  % local change
 %%   \begin{abstract}
 %%     We start by describing the general model class in Section~\ref{sec:hhh4:methods}.
-%%     Section~\ref{sec:hhh4:data} introduces the data and the associated \code{S4}-class
+%%     Section~\ref{sec:hhh4:data} introduces the data and the associated \proglang{S}4-class
 %%     \class{sts} (``surveillance time series'').
 %%     In Section~\ref{sec:hhh4:fit}, a simple model for the measles data based on the
 %%     original analysis of \citet{held-etal-2005} is introduced,
@@ -203,7 +203,7 @@ neighborhood graph of the regions \citep{meyer.held2013}.
 %% adjacent to $i$.
 Note that we usually normalize the transmission weights such that
 $\sum_i w_{ji} = 1$, i.e., the $Y_{j,t-1}$ cases are distributed
-among the regions proportionally to the $j$'th row vector of the
+among the regions proportionally to the $j$th row vector of the
 weight matrix $(w_{ji})$.
 
 Likelihood inference for the above multivariate time-series model
@@ -245,7 +245,7 @@ Weser-Ems region of Lower Saxony, Germany, 2001--2002, downloaded from
 and already used as an example in the original \code{hhh4} model proposal
 \citep[Section~3.2]{held-etal-2005}.
 These data are contained in \pkg{surveillance} as
-\code{data("measlesWeserEms")} -- an object of the \code{S4}-class \class{sts}
+\code{data("measlesWeserEms")} -- an object of the \proglang{S}4-class \class{sts}
 (``surveillance time series'') used for data input in \code{hhh4} models and
 briefly introduced below.
 See \citet{hoehle-mazick-2010} and \citet{salmon.etal2014}
@@ -752,7 +752,7 @@ exhibit a relatively low endemic incidence after adjusting for the
 population and susceptible proportion.
 Such districts could be suspected of a larger amount of underreporting.
 
-Note that the extra flexiblility of the random effects model comes at a price. 
+Note that the extra flexibility of the random effects model comes at a price. 
 First, the estimation runtime increases considerably from
 \Sexpr{round(measlesFit_powerlaw[["runtime"]]["elapsed"], 1)} seconds for the
 previous power-law model \code{measlesFit_powerlaw} to 
@@ -847,7 +847,7 @@ t(sapply(measlesScores2, colMeans, dims = 2))
 Thus, the most parsimonious initial model \code{measlesFit_basic}
 gives the best one-week-ahead predictions in terms of overall mean scores.
 Statistical significance of the differences in mean scores can be investigated
-by a \code{permutationTest} for paired data or a paired t-test:
+by a \code{permutationTest} for paired data or a paired $t$-test:
 <<measlesScores_test>>=
 set.seed(321)
 sapply(SCORES, function (score) permutationTest(
@@ -907,7 +907,7 @@ comparable between the models, and there is no evidence of badly dispersed
 predictions. However, the right-hand decay in all histograms suggests that all
 models tend to predict higher counts than observed. This is most likely related
 to the seasonal shift between the years 2001 and 2002. In 2001, the peak of the
-epidemic was in the second quarter, while it already occured in the first
+epidemic was in the second quarter, while it already occurred in the first
 quarter in 2002 (cp.\ Figure~\ref{fig:measlesWeserEms1}).
 
 
