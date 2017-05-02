@@ -79,8 +79,8 @@ Description: Statistical methods for the modeling and monitoring of time series
         for epidemic phenomena is given by Meyer et al. (2017)
         <doi:10.18637/jss.v077.i11>.
 License: GPL-2
-URL: http://surveillance.r-forge.r-project.org/
+URL: http://surveillance.R-Forge.R-project.org/
 Additional_repositories: https://www.math.ntnu.no/inla/R/stable
-BugReports: https://r-forge.r-project.org/tracker/?group_id=45
+BugReports: https://R-Forge.R-project.org/tracker/?group_id=45
 Encoding: latin1
 VignetteBuilder: utils, knitr
