@@ -148,7 +148,7 @@ observations, $Y_{it}$ has a negative binomial distribution with mean
   \mu_{it} = e_{it} \, \nu_{it} + \lambda_{it} \, Y_{i,t-1} +
   \phi_{it} \sum_{j \ne i} w_{ji} \, Y_{j,t-1}
 \end{equation}
-and overdispersion parameters $\psi_i > 0$ such that the conditional
+and overdispersion parameter $\psi_i > 0$ such that the conditional
 variance of $Y_{it}$ is $\mu_{it} (1+\psi_i \mu_{it})$.
 Shared overdispersion parameters, e.g., $\psi_i\equiv\psi$, are supported
 as well as replacing the negative binomial by a Poisson distribution,
