@@ -149,7 +149,9 @@ plot(salmSims)
 plot(salmSims, type = "time", main = "2-weeks-ahead simulation")
 
 ## fan chart based on the quantiles of the simulated counts at each time point
-plot(salmSims, type = "fan", main = "2-weeks-ahead simulation")
+if (requireNamespace("fanplot")) {
+    plot(salmSims, type = "fan", main = "2-weeks-ahead simulation")
+}
 
 
 ### multivariate example
@@ -185,10 +187,12 @@ plot(measlesSims)
 plot(measlesSims, type = "time", individual = TRUE, ylim = c(0, 80))
 
 ## fan charts
-opar <- par(mfrow = c(2,1))
-plot(measlesSims, type = "fan", which = 1, ylim = c(0, 80), main = "NegBin")
-plot(measlesSims, type = "fan", which = 2, ylim = c(0, 80), main = "Poisson")
-par(opar)
+if (requireNamespace("fanplot")) {
+    opar <- par(mfrow = c(2,1))
+    plot(measlesSims, type = "fan", which = 1, ylim = c(0, 80), main = "NegBin")
+    plot(measlesSims, type = "fan", which = 2, ylim = c(0, 80), main = "Poisson")
+    par(opar)
+}
 }
 
 \keyword{hplot}
