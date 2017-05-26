@@ -1,4 +1,22 @@
 ################################################################################
+### Replication code from Meyer et al. (2017, JSS),
+### illustrating the spatio-temporal endemic-epidemic modelling frameworks
+### 'twinstim', 'twinSIR', and 'hhh4'. The full reference is:
+###
+### Meyer, Held, and Hoehle (2017):
+### Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package surveillance.
+### Journal of Statistical Software, 77(11), 1-55.
+### https://doi.org/10.18637/jss.v077.i11
+###
+### Copyright (C) 2017 Sebastian Meyer, Leonhard Held, Michael Hoehle
+###
+### This file is part of the R package "surveillance",
+### free software under the terms of the GNU General Public License, version 2,
+### a copy of which is available at http://www.r-project.org/Licenses/.
+################################################################################
+
+
+################################################################################
 ## Section 3: Spatio-temporal point pattern of infective events
 ################################################################################
 library("surveillance")  # you should also have installed the suggested packages
@@ -101,7 +119,7 @@ imdfit_endemic_sel <- stepComponent(imdfit_endemic, component = "endemic")
 par(mar = c(5, 5, 1, 1), las = 1)
 intensity_endprop <- intensityplot(imdfit_powerlaw, aggregate = "time",
                                    which = "endemic proportion", plot = FALSE)
-intensity_total <- intensityplot(imdfit_powerlaw, aggregate = "time", 
+intensity_total <- intensityplot(imdfit_powerlaw, aggregate = "time",
                                  which = "total", tgrid = 501, lwd = 2,
                                  xlab = "Time [days]", ylab = "Intensity")
 curve(intensity_endprop(x) * intensity_total(x), add = TRUE, col = 2, lwd = 2, n = 501)
