@@ -7,16 +7,17 @@
 ### This is the pure kernel of the Lomax density (the density requires d>1, but
 ### for the siaf specification we only want d to be positive)
 ###
-### Copyright (C) 2013-2014 Sebastian Meyer
+### Copyright (C) 2013-2014,2017 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
 
 
-siaf.powerlaw <- function (nTypes = 1, validpars = NULL)
+siaf.powerlaw <- function (nTypes = 1, validpars = NULL, engine = "R")
 {
     nTypes <- as.integer(nTypes)
     stopifnot(length(nTypes) == 1L, nTypes > 0L)
+    engine <- match.arg(engine, c("C", "R"))
 
     ## for the moment we don't make this type-specific
     if (nTypes != 1) stop("type-specific shapes are not yet implemented")
@@ -38,10 +39,15 @@ siaf.powerlaw <- function (nTypes = 1, validpars = NULL)
     ))
 
     ## numerically integrate f over a polygonal domain
-    F <- function (polydomain, f, logpars, type = NULL, ...)
-        .polyCub.iso(polydomain$bdry, intrfr.powerlaw, logpars, #type,
-                     center=c(0,0), control=list(...))
-    
+    F <- function (polydomain, f, logpars, type = NULL, ...) {}
+    body(F) <- if (engine == "C") {
+        quote(siaf_polyCub_iso(polydomain$bdry, "intrfr.powerlaw",
+                               logpars, list(...)))
+    } else {
+        quote(.polyCub.iso(polydomain$bdry, intrfr.powerlaw, logpars, #type,
+                           center=c(0,0), control=list(...)))
+    }
+
     ## fast integration of f over a circular domain
     Fcircle <- function (r, logpars, type = NULL) {}
     body(Fcircle) <- as.call(c(as.name("{"),

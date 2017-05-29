@@ -8,6 +8,29 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.14.0 (2017-05-29)}{
+
+\subsection{DOCUMENTATION}{
+  \itemize{
+    \item The replication code from Meyer et al. (2017, JSS,
+    \doi{10.18637/jss.v077.i11}) is now included as \code{demo("v77i11")}.
+    It illustrates the spatio-temporal endemic-epidemic modelling
+    frameworks \code{twinstim}, \code{twinSIR}, and \code{hhh4}.
+  }
+}
+
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item Pure C-implementations of integration routines for spatial
+    interaction functions considerably accelerate the estimation of
+    \code{twinstim()} models containing
+    \code{siaf.powerlaw()}.
+  }
+}
+
+}
+
+
 \section{Changes in surveillance version 1.13.1 (2017-04-28)}{
 
 \subsection{DOCUMENTATION}{
