@@ -12,6 +12,7 @@
 #include <R_ext/Rdynload.h>
 
 /* .C calls */
+extern void C_siaf_polyCub1_iso(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 extern void glr_cusum(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 extern void glr_cusum_window(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 extern void glr_epi_window(void *, void *, void *, void *, void *, void *, void *, void *, void *);
@@ -23,25 +24,24 @@ extern void pkolmogorov2x(void *, void *);
 extern void pkstwo(void *, void *, void *);
 extern void SRspacetime(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 extern void twins(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
-extern void twinstim_siaf_polyCub_iso(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 
 /* .Call calls */
 extern SEXP eq3a(SEXP, SEXP, SEXP);
 extern SEXP surveillance_determineSourcesC(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
-    {"glr_cusum",                 (DL_FUNC) &glr_cusum,                 10},
-    {"glr_cusum_window",          (DL_FUNC) &glr_cusum_window,          11},
-    {"glr_epi_window",            (DL_FUNC) &glr_epi_window,             9},
-    {"glr_nbgeneral_window",      (DL_FUNC) &glr_nbgeneral_window,      11},
-    {"glr_nb_window",             (DL_FUNC) &glr_nb_window,             10},
-    {"lr_cusum",                  (DL_FUNC) &lr_cusum,                   9},
-    {"lr_cusum_nb",               (DL_FUNC) &lr_cusum_nb,               10},
-    {"pkolmogorov2x",             (DL_FUNC) &pkolmogorov2x,              2},
-    {"pkstwo",                    (DL_FUNC) &pkstwo,                     3},
-    {"SRspacetime",               (DL_FUNC) &SRspacetime,               13},
-    {"twins",                     (DL_FUNC) &twins,                     16},
-    {"twinstim_siaf_polyCub_iso", (DL_FUNC) &twinstim_siaf_polyCub_iso, 12},
+    {"C_siaf_polyCub1_iso",  (DL_FUNC) &C_siaf_polyCub1_iso,  12},
+    {"glr_cusum",            (DL_FUNC) &glr_cusum,            10},
+    {"glr_cusum_window",     (DL_FUNC) &glr_cusum_window,     11},
+    {"glr_epi_window",       (DL_FUNC) &glr_epi_window,        9},
+    {"glr_nbgeneral_window", (DL_FUNC) &glr_nbgeneral_window, 11},
+    {"glr_nb_window",        (DL_FUNC) &glr_nb_window,        10},
+    {"lr_cusum",             (DL_FUNC) &lr_cusum,              9},
+    {"lr_cusum_nb",          (DL_FUNC) &lr_cusum_nb,          10},
+    {"pkolmogorov2x",        (DL_FUNC) &pkolmogorov2x,         2},
+    {"pkstwo",               (DL_FUNC) &pkstwo,                3},
+    {"SRspacetime",          (DL_FUNC) &SRspacetime,          13},
+    {"twins",                (DL_FUNC) &twins,                16},
     {NULL, NULL, 0}
 };
 

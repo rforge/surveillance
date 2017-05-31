@@ -39,14 +39,7 @@ siaf.powerlaw <- function (nTypes = 1, validpars = NULL, engine = "R")
     ))
 
     ## numerically integrate f over a polygonal domain
-    F <- function (polydomain, f, logpars, type = NULL, ...) {}
-    body(F) <- if (engine == "C") {
-        quote(siaf_polyCub_iso(polydomain$bdry, "intrfr.powerlaw",
-                               logpars, list(...)))
-    } else {
-        quote(.polyCub.iso(polydomain$bdry, intrfr.powerlaw, logpars, #type,
-                           center=c(0,0), control=list(...)))
-    }
+    F <- siaf_F_polyCub_iso(intrfr_name = "intrfr.powerlaw", engine = engine)
 
     ## fast integration of f over a circular domain
     Fcircle <- function (r, logpars, type = NULL) {}
@@ -86,17 +79,11 @@ siaf.powerlaw <- function (nTypes = 1, validpars = NULL, engine = "R")
     ))
 
     ## Numerical integration of 'deriv' over a polygonal domain
-    Deriv <- function (polydomain, deriv, logpars, type = NULL, ...)
-    {
-        res.logsigma <- .polyCub.iso(polydomain$bdry,
-                                     intrfr.powerlaw.dlogsigma, logpars, #type,
-                                     center=c(0,0), control=list(...))
-        res.logd <- .polyCub.iso(polydomain$bdry,
-                                 intrfr.powerlaw.dlogd, logpars, #type,
-                                 center=c(0,0), control=list(...))
-        c(res.logsigma, res.logd)
-    }
+    Deriv <- siaf_Deriv_polyCub_iso(
+        intrfr_names = c("intrfr.powerlaw.dlogsigma", "intrfr.powerlaw.dlogd"),
+        engine = engine)
 
+    ## Simulation function (via polar coordinates)
     simulate <- siaf.simulatePC(intrfr.powerlaw)
     ## if (!is.finite(ub)) normconst <- {
     ##     ## for sampling on [0;Inf] the density is only proper if d > 2
@@ -153,11 +140,11 @@ intrfr.powerlaw.dlogd <- function (R, logpars, types = NULL)
     sigma <- exp(logpars[[1L]])
     d <- exp(logpars[[2L]])
     if (d == 1) {
-        sigma * log(sigma) * (1-log(sigma)/2) - log(R+sigma) * (R+sigma) +
+        sigma * logpars[[1L]] * (1-logpars[[1L]]/2) - log(R+sigma) * (R+sigma) +
             sigma/2 * log(R+sigma)^2 + R
     } else if (d == 2) {
         (-log(R+sigma) * ((R+sigma)*log(R+sigma) + 2*sigma) +
-         (R+sigma)*log(sigma)*(log(sigma)+2) + 2*R) / (R+sigma)
+         (R+sigma)*logpars[[1L]]*(logpars[[1L]]+2) + 2*R) / (R+sigma)
     } else {
         (sigma^(2-d) * (logpars[[1L]]*(-d^2 + 3*d - 2) - 2*d + 3) +
          (R+sigma)^(1-d) * (log(R+sigma)*(d-1)*(d-2) * (R*(d-1) + sigma) +
