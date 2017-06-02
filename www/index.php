@@ -93,12 +93,13 @@ echo $contents; } ?>
     the <a href="https://r-forge.r-project.org/scm/viewvc.php/pkg/inst/NEWS.Rd?view=markup&root=surveillance">NEWS file</a>
     of the current development version.
   </li>
+  <li>2017/05/03 A standard reference describing the spatio-temporal modelling frameworks of the package has appeared in the <a href="https://www.jstatsoft.org/article/view/v077i11">Journal of Statistical Software</a>.</li>
   <li>2016/11/30 We arranged a small surveillance hackathon as part of the ESCAIDE 2016 conference in Stockholm, Sweden. One output is a set of <a href="https://surveillancer.github.io/tutorials/">tutorials</a> on how to use the package. Another output is a small <a href="https://dirk.shinyapps.io/surveillance/">shiny app</a> for illustrating parameter choice in surveillance algorithms.</li>
   <li>2016/05/20 A standard reference describing the monitoring aspects of the package has appeared in the <a href="https://www.jstatsoft.org/article/view/v070i10">Journal of Statistical Software</a>.</li>
   <li>2016/03/31 Publication <a href="http://www.eurosurveillance.org/ViewArticle.aspx?ArticleId=21426">A system for automated outbreak detection of 
 communicable diseases in Germany</a> describes use of the package as backbone for the German infectious disease monitoring system.</li>	
   <li>2016/01/21 The paper <a href="http://onlinelibrary.wiley.com/doi/10.1111/biom.12194/abstract"><it>Bayesian nowcasting during the STEC O104:H4 outbreak in Germany, 2011</it></a>, which builds on the surveillance package, won the <b>Best 2014 Paper in Biometrics by an IBS member</b> award. The award will be given at the IBC 2016 in Victoria, Canada. 
-  <li>2015/12/03 Meyer and Held (2015) incorporate age-structured social contact data in the spatio-temporal <code>hhh4</code> model for stratified, areal time series of infectious disease counts
+  <li>2015/12/03 Working paper on incorporating age-structured social contact data in the spatio-temporal <code>hhh4</code> model for stratified, areal time series of infectious disease counts
 <a href="http://arxiv.org/abs/1512.01065">[preprint]</a></li>
    <li>2015/09/21 ISDS Webinar on 'Aberration Detection in Public Health Surveillance using the R package <code>surveillance</code>'. 
    <a href="https://vimeo.com/140669369">[webinar recording]</a> 
@@ -126,7 +127,7 @@ communicable diseases in Germany</a> describes use of the package as backbone fo
   <li><tt>surveillance</tt> provides the <tt>S4</tt> class data
     structure <tt>"sts"</tt> and a framework for methodological developments
     of change-point algorithms for time series of counts.</li>
-  <li><a href="http://dx.doi.org/10.18637/jss.v070.i10">Salmon et al. (2016)</a> provide an overall guide to the
+  <li><a href="https://doi.org/10.18637/jss.v070.i10">Salmon et al. (2016)</a> provide an overall guide to the
   monitoring capabilities of <code>surveillance</code>. </li>
 
   <li>Prospective outbreak detection procedures for count data time series:
@@ -197,13 +198,13 @@ communicable diseases in Germany</a> describes use of the package as backbone fo
 
 <ul>
 
-  <li><a href="http://arxiv.org/abs/1411.0416">Meyer, Held and Höhle (2015)</a> provide a guide to the
+  <li><a href="https://doi.org/10.18637/jss.v077.i11">Meyer, Held and Höhle (2017)</a> provide a guide to the
   spatio-temporal analysis of epidemic phenomena using the R package <code>surveillance</code>.
   The paper describes three regression approaches to the modelling of spatio-temporal data with epidemic features:
   <ul>
-    <li><code>twinstim</code> for a spatio-temporal point pattern of infective events</li>
-    <li><code>twinSIR</code> for the susceptible-infectious-recovered (SIR) event history of a fixed population</li>
-    <li><code>hhh4</code> for areal time series of counts</li>
+    <li><code>twinstim</code> for a spatio-temporal point pattern of infective events, see also <code>vignette("twinstim", package="surveillance")</code></li>
+    <li><code>twinSIR</code> for the susceptible-infectious-recovered (SIR) event history of a fixed population, see also <code>vignette("twinSIR", package="surveillance")</code></li>
+    <li><code>hhh4</code> for areal time series of counts, see also <code>vignette("hhh4", package="surveillance")</code></li>
   </ul>
   The respective implementations are exemplified by analyses of public health surveillance data on measles and invasive meningococcal disease.
   </li>
@@ -213,7 +214,7 @@ communicable diseases in Germany</a> describes use of the package as backbone fo
       <li><code>algo.hhh</code> - Held et al. (2005) and Paul et al. (2008)</li>
       <li><code>algo.twins</code> - Held et al. (2006)</li>
       <li><code>hhh4</code> - Paul and Held (2011) and Held and Paul (2012)</li>
-      <li>Meyer and Held (2015) extend the <code>hhh4</code> framework to model
+      <li>Meyer and Held (2017) extend the <code>hhh4</code> framework to model
       <em>age-stratified</em>, areal count time series using social contact data.</li>
     </ul>
   </li>
@@ -227,7 +228,7 @@ communicable diseases in Germany</a> describes use of the package as backbone fo
 	Meyer et al. (2012).
 	The <code>"epidataCS"</code> class holds the data, which mainly consist
 	of the observed events and exogenous covariates on a space-time grid.</li>
-      <li><code>epitest</code> - Meyer et al. (2015) propose a global test for space-time interaction
+      <li><code>epitest</code> - Meyer et al. (2016) propose a global test for space-time interaction
         based on the <code>twinstim</code> class of point process models.
         The basic idea is to test for evidence of an epidemic model component
         via a Monte Carlo permutational approach.</li>
@@ -251,7 +252,7 @@ communicable diseases in Germany</a> describes use of the package as backbone fo
   <li>Adjusting for occurred-but-not-yet-reported events:
     <ul>
       <li><code>nowcast</code> - Nowcasting using frequentist approaches described in Lawless (1994) as well as more flexible hierarchical Bayes approaches developed in Höhle and an der Heiden (2014).</li>
-      <li><code>bodaDelay</code> - Delay adjusted outbreak detection synthesizing the <code>farringtonFlexible</code> and <code>boda</code> algorithms into a context where the surveillance reports have delays before arriving. See Salmon et al. (2016) for details.</li>
+      <li><code>bodaDelay</code> - Delay adjusted outbreak detection synthesizing the <code>farringtonFlexible</code> and <code>boda</code> algorithms into a context where the surveillance reports have delays before arriving. See Salmon et al. (2015) for details.</li>
     </ul>
   </li>
 </ul>
@@ -291,7 +292,9 @@ succeed with the additional argument <tt>type="source"</tt> in the above call.
 
 <blockquote>
     <ul>
-       <li>Two recent manuscripts provide an overview as well as step-by-step instructions on what you can do with the package: <a href="http://arxiv.org/abs/1411.1292">Salmon et al. (2014)</a> cover prospective monitoring whereas <a href="http://arxiv.org/abs/1411.0416">Meyer, Held and Höhle (2015)</a> cover spatio-temporal modelling. The former has now <a href="http://dx.doi.org/10.18637/jss.v070.i10">appeared</a> in the Journal of Statistical Software.</li>
+       <li>Two recent manuscripts provide an overview as well as step-by-step instructions on what you can do with the package:
+       <a href="https://doi.org/10.18637/jss.v070.i10">Salmon et al. (2016)</a> cover prospective monitoring, whereas
+       <a href="https://doi.org/10.18637/jss.v077.i11">Meyer, Held and Höhle (2017)</a> cover spatio-temporal modelling.</li>
       <li>A good (but slightly outdated) introduction to the outbreak detection part of the package is
 provided in the paper <a
  href="http://dx.doi.org/10.1007/s00180-007-0074-8"><span
@@ -358,19 +361,19 @@ further preprints.<br>
 <blockquote>
     <ul>
       <li><a href="http://www.math.su.se/%7Ehoehle">Michael
-Höhle</a>, Department of Mathematics, Stockholm University, Sweden
-(Project Admin)</li>
-      <li><a href="http://www.ebpi.uzh.ch/en/aboutus/departments/biostatistics/teambiostats/meyer.html">Sebastian
-Meyer</a>, Epidemiology, Biostatistics and Prevention Institute, University of
-Zurich, Switzerland</li>
+Höhle</a>, Department of Mathematics, Stockholm University, Sweden</li>
+      <li><a href="http://www.imbe.med.uni-erlangen.de/cms/sebastian_meyer.html">Sebastian
+Meyer</a>, Institute of Medical Informatics, Biometry, and Epidemiology,
+Friedrich-Alexander-Universit&auml;t Erlangen-N&uuml;rnberg, Germany</li>
       <li>Michaela Paul (previously: University of Zurich, Switzerland)</li>
-      <li><a href="http://masalmon.github.io/">Ma&eumllle Salmon</a>,
-	Department for Infectious Disease Epidemiology, Robert Koch Institute,
-	Germany</li>
+      <li><a href="http://www.masalmon.eu/">Ma&eumllle Salmon</a>,
+      Center for Research in Environmental Epidemiology (CREAL), Barcelona, Spain</li>
 
-      <li>Contributions by: L. Held, T. Correa, M. Hofmann, C. Lang, J. Manitz,
-      A. Riebler, D. Sabanés Bové, D. Schumacher, S. Steiner, M. Virtanen,
-      W. Wei, V. Wimmer</li>
+      <li>Contributions by:
+      <a href="http://www.ebpi.uzh.ch/en/aboutus/departments/biostatistics/teambiostats/held.html">L. Held</a>,
+      H. Burkom, T. Correa, M. Hofmann, C. Lang, J. Manitz, A. Riebler,
+      D. Sabanés Bové, D. Schumacher, S. Steiner, M. Virtanen, W. Wei,
+      V. Wimmer</li>
     </ul>
   </blockquote>
 
@@ -453,21 +456,23 @@ Center of Health Sciences</a> (MC-Health, 2007-2010)</li>
 <dd>Annals of Applied Statistics, Vol. 8(3), pp. 1612-1639</dd>
 <dd>(The paper is also available from <a href="http://www.zora.uzh.ch/89321/">ZORA</a>
 or as <a href="http://arxiv.org/abs/1308.5115">arXiv:1308.5115</a>,
-and has <a href="http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html">supplementary animations</a>)</dd>
+and has <a href="http://www.biostat.uzh.ch/static/powerlaw">supplementary animations</a>)</dd>
 
 <dt></dt>
-<dd><a href="http://arxiv.org/abs/1512.01065">Meyer, S. and Held, L. (<b>2015</b>)</a></dd>
+<dd><a href="https://doi.org/10.1093/biostatistics/kxw051">Meyer, S. and Held, L. (<b>2017</b>)</a></dd>
 <dd><i>Incorporating social contact data in spatio-temporal models for infectious disease spread</i></dd>
+<dd>Biostatistics, Vol. 18(2), pp. 338-351</dd>
 
 <dt></dt>
-<dd><a href="http://arxiv.org/abs/1411.0416">Meyer, S., Held, L. and Höhle, M. (<b>2015</b>)</a></dd>
+<dd><a href="https://doi.org/10.18637/jss.v077.i11">Meyer, S., Held, L. and Höhle, M. (<b>2017</b>)</a></dd>
 <dd><i>Spatio-Temporal Analysis of Epidemic Phenomena Using the <code>R</code> Package <code>surveillance</code></i></dd>
-<dd>Conditionally accepted for the Journal of Statistical Software</dd>
+<dd>Journal of Statistical Software, Vol. 77(11), pp. 1-55</dd>
 
 <dt></dt>
-<dd><a href="http://arxiv.org/abs/1512.09052">Meyer, S., Warnke, I., Rössler, U. and Held, L. (<b>2015</b>)</a></dd>
+<dd><a href="https://doi.org/10.1016/j.sste.2016.03.002">Meyer, S., Warnke, I., Rössler, U. and Held, L. (<b>2016</b>)</a></dd>
 <dd><i>Model-based testing for space-time interaction using point processes: An application to psychiatric hospital admissions in an urban area</i></dd>
-<dd>Spatial and Spatio-temporal Epidemiology, in revision</dd>
+<dd>Spatial and Spatio-temporal Epidemiology, Vol. 17, pp. 15-25</dd>
+<dd>(The Accepted Author Manuscript is available as <a href="https://arxiv.org/abs/1512.09052">arXiv:1512.09052</a>)</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1002/sim.4177">Paul, M. and Held, L. (<b>2011</b>)</a></dd>
@@ -480,9 +485,9 @@ and has <a href="http://www.biostat.uzh.ch/research/manuscripts/powerlaw.html">s
 <dd>Statistics in Medicine, Vol. 27(29), pp. 6250-6267</dd>
 
 <dt></dt>
-<dd><a href="http://dx.doi.org/10.18637/jss.v070.i10">Salmon, M., Schumacher, D. and Höhle, M. (<b>2016</b>)</a></dd>
+<dd><a href="https://doi.org/10.18637/jss.v070.i10">Salmon, M., Schumacher, D. and Höhle, M. (<b>2016</b>)</a></dd>
 <dd><i>Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance</i></dd>
-<dd>Journal of Statistical Software, 70(10).</dd>
+<dd>Journal of Statistical Software, 70(10), 1-35</dd>
 
 <dt></dt>
 <dd><a href="http://dx.doi.org/10.1002/bimj.201400159">Salmon, M., Schumacher, D., Stark, K. and Höhle, M. (<b>2015</b>)</a></dd>
