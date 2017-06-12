@@ -49,17 +49,6 @@ gpclibCheck <- function (fatal = TRUE)
 ###########################
 
 
-### pretty p-value formatting
-
-formatPval <- function (pv, eps = 1e-4, scientific = FALSE, ...)
-{
-    format1 <- function (p)
-        format.pval(p, digits = if (p < 10*eps) 1 else 2, eps = eps,
-                    nsmall = 2, scientific = scientific, ...)
-    vapply(X = pv, FUN = format1, FUN.VALUE = "", USE.NAMES = TRUE)
-}
-
-
 ### determines multiplicities in a matrix (or data frame)
 ### and returns unique rows with appended column of counts
 
