@@ -458,6 +458,7 @@ S3method(confint, hhh4)
 S3method(residuals, hhh4)
 S3method(predict, hhh4)
 S3method(update, hhh4)
+export(update.hhh4)            # for add-on packages
 S3method(all.equal, hhh4)
 S3method(simulate, hhh4)
 S3method(plot, hhh4)
