@@ -49,13 +49,6 @@ gpclibCheck <- function (fatal = TRUE)
 ###########################
 
 
-### checking if x is scalar, i.e. a numeric vector of length 1.
-
-isScalar <- function (x) {
-    length(x) == 1L && is.vector(x, mode = "numeric")
-}
-
-
 ### pretty p-value formatting
 
 formatPval <- function (pv, eps = 1e-4, scientific = FALSE, ...)
