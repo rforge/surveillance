@@ -24,7 +24,7 @@
     \item Pure C-implementations of integration routines for spatial
     interaction functions considerably accelerate the estimation of
     \code{twinstim()} models containing
-    \code{siaf.powerlaw()} or \code{siaf.student()}.
+    \code{siaf.powerlaw()}, \code{siaf.powerlawL()}, or \code{siaf.student()}.
 
     \item The color palette generating function used by \code{sts}
     plots, \code{hcl.colors}, is now exported.

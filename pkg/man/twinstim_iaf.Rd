@@ -36,7 +36,7 @@ siaf.step(knots, maxRange = Inf, nTypes = 1, validpars = NULL)
 siaf.gaussian(nTypes = 1, logsd = TRUE, density = FALSE,
               F.adaptive = TRUE, effRangeMult = 6, validpars = NULL)
 siaf.powerlaw(nTypes = 1, validpars = NULL, engine = "R")
-siaf.powerlawL(nTypes = 1, validpars = NULL)
+siaf.powerlawL(nTypes = 1, validpars = NULL, engine = "R")
 siaf.student(nTypes = 1, validpars = NULL, engine = "R")
 
 # predefined temporal interaction functions

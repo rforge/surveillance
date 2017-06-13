@@ -90,6 +90,49 @@ static double intrfr_student_dlogd(double R, double *logpars)
     }
 }
 
+// lagged power-law kernel
+static double intrfr_powerlawL_sigmadxplint(double R, double sigma, double d)
+{
+    double twomd = 2.0 - d;
+    double xplint = (twomd == 0.0) ? log(R/sigma) : (pow(R,twomd)-pow(sigma,twomd))/twomd;
+    return pow(sigma,d) * xplint;
+}
+
+static double intrfr_powerlawL(double R, double *logpars)
+{
+    double sigma = exp(logpars[0]);
+    double upper = (R > sigma) ? sigma : R;
+    double res = upper*upper / 2.0;  // integral over x*constant part
+    if (R <= sigma) {
+        return res;
+    } else {
+        return res + intrfr_powerlawL_sigmadxplint(R, sigma, exp(logpars[1]));
+    }
+}
+
+static double intrfr_powerlawL_dlogsigma(double R, double *logpars)
+{
+    double sigma = exp(logpars[0]);
+    if (R <= sigma) {
+        return 0.0;
+    }
+    double d = exp(logpars[1]);
+    return d * intrfr_powerlawL_sigmadxplint(R, sigma, d);
+}
+
+static double intrfr_powerlawL_dlogd(double R, double *logpars)
+{
+    double sigma = exp(logpars[0]);
+    if (R <= sigma) {
+        return 0.0;
+    }
+    double d = exp(logpars[1]);
+    double twomd = 2.0 - d;
+    double sigmadRtwomdd = pow(sigma,d) * pow(R,twomd) * d;
+    return (twomd == 0.0) ? -pow(sigma*log(R/sigma), 2.0) :
+        (sigmadRtwomdd * (-twomd)*log(R/sigma) - d*sigma*sigma + sigmadRtwomdd)/(twomd*twomd);
+}
+
 
 /*** function to be called from R ***/
 
@@ -110,6 +153,9 @@ void C_siaf_polyCub1_iso(
     case 20: intrfr = intrfr_student; break;
     case 21: intrfr = intrfr_student_dlogsigma; break;
     case 22: intrfr = intrfr_student_dlogd; break;
+    case 30: intrfr = intrfr_powerlawL; break;
+    case 31: intrfr = intrfr_powerlawL_dlogsigma; break;
+    case 32: intrfr = intrfr_powerlawL_dlogd; break;        
     }
     double center_x = 0.0;
     double center_y = 0.0;
