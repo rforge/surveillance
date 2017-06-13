@@ -116,6 +116,7 @@ export(checkResidualProcess)       # for twinstim and twinSIR
 export(qlomax)                     # quantile function of the Lomax distribution
 export(plapply)
 export(clapply)
+export(hcl.colors)
 
 # spatial utilities
 export(discpoly)
