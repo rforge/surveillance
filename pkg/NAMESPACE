@@ -492,3 +492,6 @@ export(plotHHH4sims_time)
 export(plotHHH4sims_fan)
 S3method(scores, hhh4sims)
 S3method(scores, hhh4simslist)
+
+## internal functions for use by add-on packages
+export(meanHHH, sizeHHH, decompose.hhh4)
