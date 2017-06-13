@@ -91,5 +91,8 @@ siaf_polyCub1_iso <- function (xypoly, intrfr_code, pars,
 INTRFR_CODE <- c(
     "intrfr.powerlaw" = 10L,
     "intrfr.powerlaw.dlogsigma" = 11L,
-    "intrfr.powerlaw.dlogd" = 12L
+    "intrfr.powerlaw.dlogd" = 12L,
+    "intrfr.student" = 20L,
+    "intrfr.student.dlogsigma" = 21L,
+    "intrfr.student.dlogd" = 22L
 )

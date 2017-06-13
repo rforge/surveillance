@@ -53,7 +53,7 @@ test_that("Lagged power-law implementation agrees with numeric results",
                         tolerance=0.0005, method="midpoint", dimyx=250))
 
 test_that("Student implementation agrees with numerical approximation",
-          myexpectation(siaf.student(),
+          myexpectation(siaf.student(engine = "R"),
                         surveillance:::intrfr.student,
                         list(surveillance:::intrfr.student.dlogsigma,
                              surveillance:::intrfr.student.dlogd),
@@ -99,5 +99,11 @@ expect_equal_CnR <- function (siafgen, pargrid)
 }
 
 test_that("siaf.powerlaw() engines agree", {
-    expect_equal_CnR(siaf.powerlaw, pargrid = cbind(0.5,log(c(0.1,1,2))))
+    expect_equal_CnR(siafgen = siaf.powerlaw,
+                     pargrid = cbind(0.5,log(c(0.1,1,2))))
+})
+
+test_that("siaf.student() engines agree", {
+    expect_equal_CnR(siafgen = siaf.student,
+                     pargrid = cbind(0.5,log(c(0.1,1,2))))
 })

@@ -53,6 +53,43 @@ static double intrfr_powerlaw_dlogd(double R, double *logpars)
     }
 }
 
+// student kernel
+static double intrfr_student(double R, double *logpars)
+{
+    double sigma = exp(logpars[0]);
+    double d = exp(logpars[1]);
+    if (d == 1.0) {
+        return log(R*R+sigma*sigma) / 2.0 - logpars[0];
+    } else {
+        return ( pow(R*R+sigma*sigma,1.0-d) - pow(sigma*sigma,1.0-d) ) / (2.0-2.0*d);
+    }
+}
+
+static double intrfr_student_dlogsigma(double R, double *logpars)
+{
+    double sigma = exp(logpars[0]);
+    double d = exp(logpars[1]);
+    return sigma*sigma * ( pow(R*R+sigma*sigma,-d) - pow(sigma,-2.0*d) );
+}
+
+static double intrfr_student_dlogd_primitive(double x, double sigma, double d)
+{
+    double x2ps2 = x*x + sigma*sigma;
+    double dm1 = d - 1.0;
+    return (d*dm1*log(x2ps2) + d) / (2.0*dm1*dm1 * pow(x2ps2,dm1));
+}
+static double intrfr_student_dlogd(double R, double *logpars)
+{
+    double sigma = exp(logpars[0]);
+    double d = exp(logpars[1]);
+    if (d == 1.0) {
+        return pow(logpars[0], 2.0) - pow(log(R*R+sigma*sigma), 2.0) / 4.0;
+    } else {
+        return intrfr_student_dlogd_primitive(R, sigma, d) -
+            intrfr_student_dlogd_primitive(0.0, sigma, d);
+    }
+}
+
 
 /*** function to be called from R ***/
 
@@ -70,6 +107,9 @@ void C_siaf_polyCub1_iso(
     case 10: intrfr = intrfr_powerlaw; break;
     case 11: intrfr = intrfr_powerlaw_dlogsigma; break;
     case 12: intrfr = intrfr_powerlaw_dlogd; break;
+    case 20: intrfr = intrfr_student; break;
+    case 21: intrfr = intrfr_student_dlogsigma; break;
+    case 22: intrfr = intrfr_student_dlogd; break;
     }
     double center_x = 0.0;
     double center_y = 0.0;
