@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.14.0 (2017-05-29)}{
+\section{Changes in surveillance version 1.14.0 (2017-06-13)}{
 
 \subsection{DOCUMENTATION}{
   \itemize{
@@ -25,6 +25,17 @@
     interaction functions considerably accelerate the estimation of
     \code{twinstim()} models containing
     \code{siaf.powerlaw()}.
+
+    \item The color palette generating function used by \code{sts}
+    plots, \code{hcl.colors}, is now exported.
+    
+    \item The utility function \code{clapply} (\emph{c}onditional
+    \code{lapply}) is now exported.
+
+    \item Some utility functions for \code{hhh4} fits are now exported
+    (\code{update.hhh4}, \code{getNEweights}, \code{coefW}),
+    as well as several internal functions for use by \code{hhh4} add-on
+    packages (\code{meanHHH}, \code{sizeHHH}, \code{decompose.hhh4}).
   }
 }
 
