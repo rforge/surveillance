@@ -525,9 +525,7 @@ Rbib <- sapply(c("quadprog"), function (pkg) {
     bib
 }, simplify=FALSE, USE.NAMES=TRUE)
 ## "quadprog" needs manual author formatting
-Rbib$quadprog$author <- "Berwin A. Turlach"
-Rbib$quadprog$note <- paste0(Rbib$quadprog$note,
-    ", ported to \\proglang{R} by Andreas Weingessel")
+Rbib$quadprog$author <- c("Berwin A. Turlach", "Andreas Weingessel")
 ## write to bibfile
 .Rbibfile <- file("twinSIR-R.bib", "w", encoding = "latin1")
 cat(unlist(lapply(Rbib, toBibtex), use.names = FALSE),
