@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.14.0 (2017-06-13)}{
+\section{Changes in surveillance version 1.14.0 (2017-06-19)}{
 
 \subsection{DOCUMENTATION}{
   \itemize{
@@ -36,6 +36,15 @@
     (\code{update.hhh4}, \code{getNEweights}, \code{coefW}),
     as well as several internal functions for use by \code{hhh4} add-on
     packages (\code{meanHHH}, \code{sizeHHH}, \code{decompose.hhh4}).
+  }
+}
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item \code{twinstim()} now throws an informative error message when
+    trying to fit a purely epidemic model to data containing endemic
+    events (i.e., events without ancestors). The \code{help("twinstim")}
+    exemplifies such a model.
   }
 }
 
