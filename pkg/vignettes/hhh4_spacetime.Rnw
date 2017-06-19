@@ -1,6 +1,6 @@
 %\VignetteIndexEntry{hhh4 (spatio-temporal): Endemic-epidemic modeling of areal count time series}
 %\VignetteEngine{knitr::knitr}
-%\VignetteDepends{surveillance, lattice, spdep, gsl, colorspace, animation, gridExtra, scales}
+%\VignetteDepends{surveillance, lattice, spdep, gsl, colorspace, animation, gridExtra, scales, fanplot}
 
 <<setup, cache = FALSE, include = FALSE, purl = FALSE>>=
 ## purl=FALSE => not included in the tangle'd R script
@@ -1002,10 +1002,9 @@ is below the observed number of \code{sum(observed(measlesWeserEms)[53:104, ])}
 $= \Sexpr{sum(observed(measlesWeserEms)[53:104,])}$ cases in the year 2002.
 Using the \code{plot}-method associated with such \code{hhh4} simulations,
 Figure~\ref{fig:measlesSim_plot_time} shows the weekly number of observed cases
-compared to the long-term forecast:
-<<measlesSim_plot_time, fig.cap="Simulation-based long-term forecast starting from the last week in 2001 (vertical bar on the left), showing the counts aggregated over all districts. The weekly mean of the simulations is represented by dots and the dashed lines correspond to the pointwise 2.5\\% and 97.5\\% quantiles. The actually observed counts are shown in the background.", fig.pos="htb", echo=-1>>=
-par(las = 1, mar = c(4,4,0,0)+.5)
-plot(measlesSim, "time", ylim = c(0, 100))
+compared to the long-term forecast via a \pkg{fanplot} \citep{R:fanplot}:
+<<measlesSim_plot_time, fig.cap="Simulation-based long-term forecast starting from the last week in 2001 (left-hand dot). The plot shows the weekly counts aggregated over all districts. The fan chart represents the 1\\% to 99\\% quantiles of the simulations in each week. The circles correspond to the observed counts.", fig.pos="htb">>=
+plot(measlesSim, "fan", ylim = c(0, 140))
 @ 
 We refer to \code{help("simulate.hhh4")} and \code{help("plot.hhh4sims")}
 for further examples.
@@ -1020,7 +1019,7 @@ for further examples.
 ## create automatic references for R packages
 .Rbibfile <- file("hhh4_spacetime-R.bib", "w", encoding = "latin1")
 knitr::write_bib(
-    c("MASS", "Matrix", "spdep", "colorspace", "scales", "gridExtra", "lattice", "sp", "animation"),
+    c("MASS", "Matrix", "spdep", "colorspace", "scales", "gridExtra", "lattice", "sp", "animation", "fanplot"),
     file = .Rbibfile, tweak = FALSE, prefix = "R:")
 close(.Rbibfile)
 @
