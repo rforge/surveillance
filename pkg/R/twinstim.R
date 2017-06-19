@@ -356,10 +356,16 @@ twinstim <- function (
     ## Alternatively, we could set it to parent.frame().
 
 
-    ### Check that there is at least one parameter
+    ### Stop if model is degenerate
 
-    if (!hash && !hase) {
-        stop("nothing to do: neither endemic nor epidemic parts were specified")
+    if (!hash) {
+        if (hase) {
+            if (nEventsWithoutSources <- sum(lengths(eventSources[includes]) == 0))
+                stop("found ", nEventsWithoutSources, " events without .sources ",
+                     "(impossible in a purely epidemic model)")
+        } else {
+            stop("nothing to do: neither endemic nor epidemic parts were specified")
+        }
     }
 
 
