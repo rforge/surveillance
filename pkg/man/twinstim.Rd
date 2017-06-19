@@ -538,7 +538,7 @@ if (surveillance.options("allExamples"))
   AIC(m_noepi, m0, m1_fstep, m1)   # further improvement
   summary(m1, test.iaf=FALSE)   # nonsense to test H0: log(sigma) = 0
   plot(m1, "siaf", scaled=FALSE)
-  ## alternative: siaf.powerlaw(), usually with eps.s = Inf
+  ## alternative: siaf.powerlaw() with eps.s=Inf, see vignette("twinstim")
 
   ## add epidemic covariates
   m2 <- update(m1, epidemic = ~ 1 + type + agegrp)
