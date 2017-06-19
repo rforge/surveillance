@@ -14,7 +14,7 @@
 ################################################################################
 
 
-siaf.student <- function (nTypes = 1, validpars = NULL, engine = "R")
+siaf.student <- function (nTypes = 1, validpars = NULL, engine = "C")
 {
     nTypes <- as.integer(nTypes)
     stopifnot(length(nTypes) == 1L, nTypes > 0L)
