@@ -459,6 +459,32 @@ summary(R0(m0, trimmed=FALSE))
 ## plot the path of the fitted total intensity
 plot(m0, "total intensity", tgrid=500)
 
+## extract "residual process" integrating over space (takes some seconds)
+if (surveillance.options("allExamples"))
+{
+  res <- residuals(m0)
+  # if the model describes the true CIF well _in the temporal dimension_,
+  # then this residual process should behave like a stationary Poisson
+  # process with intensity 1
+  plot(res, type="l"); abline(h=c(0, length(res)), lty=2)
+  # easier, with CI and serial correlation -> checkResidualProcess()
+  checkResidualProcess(m0)
+}
+
+\dontrun{
+  ## NB: in contrast to using nlminb() optim's BFGS would miss the
+  ##     likelihood maximum wrt the epidemic intercept if starting at -10
+  m0_BFGS <- update(m_noepi, epidemic=~1, start=c("e.(Intercept)"=-10),
+                    optim.args = list(method="BFGS"))
+  format(cbind(nlminb=coef(m0), BFGS=coef(m0_BFGS)), digits=3, scientific=FALSE)
+  m0_BFGS$fisherinfo   # singular Fisher information matrix here
+  m0$fisherinfo
+  logLik(m0_BFGS)
+  logLik(m0)
+  ## nlminb is more powerful since we make use of the analytical fisherinfo
+  ## as estimated by the model during optimization, which optim cannot
+}
+
 
 ### an epidemic-only model?
 ## for a purely epidemic model, all events must have potential source events
@@ -486,30 +512,9 @@ m_epi <- twinstim(epidemic = ~1, data = imdepiC_infeps, t0 = 31, T = 638)
 summary(m_epi)
 
 
-## the remaining examples are more time-consuming
+### full model with interaction functions (time-consuming)
 if (surveillance.options("allExamples"))
 {
-  ## NB: in contrast to using nlminb() optim's BFGS would miss the
-  ##     likelihood maximum wrt the epidemic intercept if starting at -10
-  m0_BFGS <- update(m_noepi, epidemic=~1, start=c("e.(Intercept)"=-10),
-                    optim.args = list(method="BFGS"))
-  format(cbind(nlminb=coef(m0), BFGS=coef(m0_BFGS)), digits=3, scientific=FALSE)
-  m0_BFGS$fisherinfo   # singular Fisher information matrix here
-  m0$fisherinfo
-  logLik(m0_BFGS)
-  logLik(m0)
-  ## nlminb is more powerful since we make use of the analytical fisherinfo
-  ## as estimated by the model during optimization, which optim cannot
-
-  ## extract "residual process" integrating over space (takes some seconds)
-  res <- residuals(m0)
-  # if the model describes the true CIF well _in the temporal dimension_,
-  # then this residual process should behave like a stationary Poisson
-  # process with intensity 1
-  plot(res, type="l"); abline(h=c(0, length(res)), lty=2)
-  # -> use the function checkResidualProcess
-  checkResidualProcess(m0)
-
   ## estimate an exponential temporal decay of infectivity
   m1_tiaf <- update(m0, tiaf=tiaf.exponential())
   plot(m1_tiaf, "tiaf", scaled=FALSE)
@@ -530,9 +535,10 @@ if (surveillance.options("allExamples"))
       optim.args = list(fixed="e.siaf.1"),
       control.siaf = list(F=list(adapt=0.25)) # use adaptive eps=sigma/4
   )
-  AIC(m_noepi, m0, m1)   # further improvement
+  AIC(m_noepi, m0, m1_fstep, m1)   # further improvement
   summary(m1, test.iaf=FALSE)   # nonsense to test H0: log(sigma) = 0
   plot(m1, "siaf", scaled=FALSE)
+  ## alternative: siaf.powerlaw(), usually with eps.s = Inf
 
   ## add epidemic covariates
   m2 <- update(m1, epidemic = ~ 1 + type + agegrp)
