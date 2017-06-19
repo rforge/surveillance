@@ -459,10 +459,13 @@ model extensions.
 
 <<hhh4-methods, echo=FALSE, results="asis", purl=FALSE>>=
 print(xtable(
-    surveillance:::functionTable("hhh4", functions=list(Other="oneStepAhead")),
+    surveillance:::functionTable("hhh4", functions=list(
+        Extract="getNEweights", Other="oneStepAhead"
+        )),
     caption="Generic and \\textit{non-generic} functions applicable to \\class{hhh4} objects.",
     label="tab:methods:hhh4"), include.rownames = FALSE)
 @ 
+\enlargethispage{\baselineskip}
 
 
 \subsection{Covariates}
@@ -665,6 +668,8 @@ district $i$ is determined not only by the districts' neighborhood $o_{ji}$ but
 also by the total amount of neighborhood of district $j$ in the form of
 $\sum_{k\ne j} o_{jk}^{-d}$, which causes some variation of the weights for a
 specific order of adjacency.
+The function \code{getNEweights} can be used to extract the estimated weight
+matrix $(w_{ji})$.
 
 An AIC comparison of the different models for the transmission weights yields:
 <<>>=
