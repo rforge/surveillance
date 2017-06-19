@@ -110,9 +110,11 @@ plotHHH4sims_fan(x, which = 1,
     chart, respectively, should be added to an existing plot.
   }
   \item{which}{
-    a single integer or a character string selecting the simulation in
+    a single integer or a character string selecting the model in
     \code{x} for which to produce the fan chart.
-    Defaults to the first simulation.
+    This is only relevant if \code{x} is a \code{"hhh4simslist"} of
+    simulations from multiple models.
+    Defaults to the first model.
   }
   \item{fan.args}{
     a list of graphical parameters for the \code{\link[fanplot]{fan}},
@@ -146,11 +148,11 @@ salmSims <- simulate(salmFit, nsim = 300, seed = 3, subset = 678 + seq_len(20),
 plot(salmSims)
 
 ## individual and average simulated time series with a confidence interval
-plot(salmSims, type = "time", main = "2-weeks-ahead simulation")
+plot(salmSims, type = "time", main = "20-weeks-ahead simulation")
 
 ## fan chart based on the quantiles of the simulated counts at each time point
 if (requireNamespace("fanplot")) {
-    plot(salmSims, type = "fan", main = "2-weeks-ahead simulation")
+    plot(salmSims, type = "fan", main = "20-weeks-ahead simulation")
 }
 
 
