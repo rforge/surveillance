@@ -459,6 +459,33 @@ summary(R0(m0, trimmed=FALSE))
 ## plot the path of the fitted total intensity
 plot(m0, "total intensity", tgrid=500)
 
+
+### an epidemic-only model?
+## for a purely epidemic model, all events must have potential source events
+## (otherwise the intensity at the observed event would be 0)
+
+## let's focus on the C-type for this example
+imdepiC <- subset(imdepi, type == "C")
+table(summary(imdepiC)$nSources)
+## 106 events have no prior, close events (in terms of eps.s and eps.t)
+try(twinstim(epidemic = ~1, data = imdepiC))  # detects this problem
+## let's assume spatially unbounded interaction
+imdepiC_infeps <- update(imdepiC, eps.s = Inf)
+(s <- summary(imdepiC_infeps))
+table(s$nSources)
+## for 11 events, there is no prior event within eps.t = 30 days
+## (which is certainly true for the first event)
+plot(s$counter, main = "Number of infectious individuals over time (eps.t = 30)")
+rug(imdepiC_infeps$events$time)
+rug(imdepiC_infeps$events$time[s$nSources == 0], col = 2, lwd = 3)
+## An endemic component would catch such events (from unobserved sources),
+## otherwise a longer infectious period would need to be assumed and
+## for the first event to happen, a pre-history is required (e.g., t0 = 31).
+## As an example, we fit the data only until T = 638 (all events have ancestors)
+m_epi <- twinstim(epidemic = ~1, data = imdepiC_infeps, t0 = 31, T = 638)
+summary(m_epi)
+
+
 ## the remaining examples are more time-consuming
 if (surveillance.options("allExamples"))
 {
