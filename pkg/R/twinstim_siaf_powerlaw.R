@@ -71,9 +71,10 @@ siaf.powerlaw <- function (nTypes = 1, validpars = NULL, engine = "R")
         tmp,
         expression(
             sLength <- sqrt(.rowSums(s^2, nrow(s), 2L)),
-            rsigmad <- (sLength+sigma)^d,
-            derivlogsigma <- -d*sigma / rsigmad / (sLength+sigma),
-            derivlogd <- -log(rsigmad) / rsigmad,
+            rsigma <- sLength + sigma,
+            rsigmad <- rsigma^d,
+            derivlogsigma <- -d*sigma / rsigmad / rsigma,
+            derivlogd <- -d*log(rsigma) / rsigmad,
             cbind(derivlogsigma, derivlogd)
             )
     ))
