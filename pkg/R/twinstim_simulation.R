@@ -1244,8 +1244,9 @@ simulate.twinstim <- function (object, nsim = 1, seed = NULL, data, tiles,
                 with(res, list(
                     eventsList=c(structure(events, timeRange = timeRange, runtime = runtime),
                                  vector(nsim-1L, mode="list")),
-                    stgrid=stgrid, W=W, qmatrix=qmatrix, formula=formula,
-                    coefficients=coefficients, npars=npars, call=call
+                    stgrid=stgrid, W=W, qmatrix=qmatrix,
+                    bbox=bbox, formula=formula, coefficients=coefficients,
+                    npars=npars, control.siaf=control.siaf, call=call
                 ))
             } else {
                 c(list(res), vector(nsim-1L, mode="list"))
@@ -1301,7 +1302,7 @@ print.simEpidataCSlist <- function (x, ...)
         x <- unclass(x)
         x$eventsList <- x$eventsList[[i]]
         names(x)[names(x) == "eventsList"] <- "events"
-        x <- append(x, list(timeRange = attr(x$events, "timeRange")), after=4L)
+        x <- append(x, list(timeRange = attr(x$events, "timeRange")), after=5L)
         x$runtime <- attr(x$events, "runtime")
         attr(x$events, "timeRange") <- attr(x$events, "runtime") <- NULL
         class(x) <- c("simEpidataCS", "epidataCS")
