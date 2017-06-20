@@ -57,6 +57,10 @@
     partial derivative wrt the decay parameter \eqn{d}, if \eqn{d}
     was large enough for \eqn{f} to be numerically equal to 0.
     It will now return 0 in this case.
+
+    \item \code{twinstim()} could fail (with an error from
+    \code{duplicated.default}) if the fitted time range was
+    substantially reduced via the \code{T} argument.
   }
 }
 

@@ -301,7 +301,7 @@ twinstim <- function (
                                # for debugging & necessary for intensityplots
         gridBlocks <- mfhGrid[["(BLOCK)"]]
         histIntervals <- data$stgrid[!duplicated.default(
-            data$stgrid$BLOCK, nmax = gridBlocks[length(gridBlocks)]
+            data$stgrid$BLOCK, nmax = data$stgrid$BLOCK[length(data$stgrid$BLOCK)]
         ), c("BLOCK", "start", "stop")] # sorted
         row.names(histIntervals) <- NULL
         histIntervals <- histIntervals[histIntervals$start >= t0 &
