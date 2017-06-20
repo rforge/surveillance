@@ -338,7 +338,7 @@ mysims <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
                    tiles=districtsD, newcoef=c("e.typeC"=-1),
                    t0=31, T=61, simplify=TRUE)
 
-## extract the first realization -> object of class simEpidataCS
+## extract the second realization -> object of class simEpidataCS
 mysim2 <- mysims[[2]]
 summary(mysim2)
 plot(mysim2, aggregate="space")
