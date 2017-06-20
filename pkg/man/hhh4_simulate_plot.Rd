@@ -152,7 +152,8 @@ plot(salmSims, type = "time", main = "20-weeks-ahead simulation")
 
 ## fan chart based on the quantiles of the simulated counts at each time point
 if (requireNamespace("fanplot")) {
-    plot(salmSims, type = "fan", main = "20-weeks-ahead simulation")
+    plot(salmSims, type = "fan", main = "20-weeks-ahead simulation",
+         fan.args = list(ln = 1:9/10))
 }
 
 
