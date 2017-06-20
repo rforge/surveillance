@@ -33,7 +33,7 @@ plotHHH4sims_time(x, average = mean, individual = length(x) == 1,
 
 plotHHH4sims_fan(x, which = 1,
     fan.args = list(), initial.args = list(), observed.args = list(),
-    xlim = NULL, ylim = NULL, add = FALSE, ...)
+    key.args = NULL, xlim = NULL, ylim = NULL, add = FALSE, ...)
 }
 
 \arguments{
@@ -119,11 +119,21 @@ plotHHH4sims_fan(x, which = 1,
   \item{fan.args}{
     a list of graphical parameters for the \code{\link[fanplot]{fan}},
     e.g., to employ a different \code{\link{colorRampPalette}} as
-    \code{fan.col}.
+    \code{fan.col}, or to enable contour lines via \code{ln}.
   }
   \item{observed.args}{
     if a list (of graphical parameters for \code{\link{lines}}),
     the originally observed counts are added to the plot.
+  }
+  \item{key.args}{
+    if a list, a color key (in \code{\link[fanplot]{fan}}'s
+    \code{"boxfan"}-style) is added to the fan chart. The list may
+    include positioning parameters \code{start} (the x-position) and
+    \code{ylim} (the y-range of the color key), \code{space} to modify
+    the width of the boxfan, and \code{rlab} to modify the labels.
+    The color key is disabled by default.
+    An alternative way of labeling the quantiles is via the argument
+    \code{ln} in \code{fan.args}, see the Examples.
   }
 }
 
@@ -192,7 +202,8 @@ plot(measlesSims, type = "time", individual = TRUE, ylim = c(0, 80))
 ## fan charts
 if (requireNamespace("fanplot")) {
     opar <- par(mfrow = c(2,1))
-    plot(measlesSims, type = "fan", which = 1, ylim = c(0, 80), main = "NegBin")
+    plot(measlesSims, type = "fan", which = 1, ylim = c(0, 80), main = "NegBin",
+         key.args = list())
     plot(measlesSims, type = "fan", which = 2, ylim = c(0, 80), main = "Poisson")
     par(opar)
 }

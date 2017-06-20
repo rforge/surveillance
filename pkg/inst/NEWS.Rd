@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.14.0 (2017-06-19)}{
+\section{Changes in surveillance version 1.14.0 (2017-06-20)}{
 
 \subsection{DOCUMENTATION}{
   \itemize{
@@ -36,6 +36,9 @@
     (\code{update.hhh4}, \code{getNEweights}, \code{coefW}),
     as well as several internal functions for use by \code{hhh4} add-on
     packages (\code{meanHHH}, \code{sizeHHH}, \code{decompose.hhh4}).
+
+    \item The \code{"fan"}-type plot function for \code{"hhh4sims"}
+    gained a \code{key.args} argument for an automatic color key.
   }
 }
 
