@@ -24,6 +24,7 @@
 ##   12 Jun 2015 (SM): added rule to check with allExamples
 ##   17 Mar 2016 (SM): check-allExamples with --run-dontrun and --extra-arch
 ##    6 Jun 2016 (SM): Rcpp attributes require an additional build step
+##   21 Jun 2017 (SM): account for R code with roxygen documentation
 ################################################################################
 
 ## Define variable for R which enables the use of alternatives,
@@ -37,7 +38,7 @@ SYSDATA := pkg/R/sysdata.rda
 VERSION := $(shell $R --vanilla --slave -e 'cat(read.dcf("pkg/DESCRIPTION", fields="Version"))')
 
 ## build the package
-build: Rcpp ${SYSDATA}
+build: Rcpp ${SYSDATA} man
 	$R CMD build --no-resave-data --compact-vignettes=both pkg
 
 ## run Rcpp::compileAttributes
@@ -48,6 +49,12 @@ Rcpp:
 ${SYSDATA}: pkg/sysdata/sysdata.R
 	cd pkg/sysdata; $R CMD BATCH --vanilla --no-timing sysdata.R
 	mv pkg/sysdata/sysdata.rda $@
+
+## update roxygen part of the documentation
+## NOTE: roxygenise() is broken in roxygen2 6.0.1, so using devtools::document()
+##       (see https://github.com/klutometis/roxygen/issues/595)
+man:
+	$R --no-restore --no-save --slave -e 'devtools::document("pkg")'
 
 
 ## auxiliary functions ("canned recipes") for check rules
@@ -108,4 +115,4 @@ clean:
 	make -C pkg/vignettes clean
 	rm -f pkg/*/.Rhistory
 
-.PHONY: build Rcpp check check-allExamples install checkUsage manual clean
+.PHONY: build Rcpp man check check-allExamples install checkUsage manual clean
