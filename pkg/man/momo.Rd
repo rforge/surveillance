@@ -1,5 +1,6 @@
 \name{momo}
 \alias{momo}
+\docType{data}
 \encoding{latin1}
 
 \title{Danish 1994-2008 all cause mortality data for six age groups}
@@ -21,13 +22,11 @@
   population size in each of the six age groups.
   These are yearly data obtained from the StatBank Denmark.
 
-  
   The aim of the EuroMOMO project is to develop and strengthen real-time
   monitoring of mortality across Europe; this will enhance the
   management of serious public health risks such as pandemic influenza,
   heat waves and cold snaps. For further details see the homepage of the
   EuroMOMO project. 
-
 }
 \source{
   Department of Epidemiology, Statens Serum Institute, Copenhagen, Denmark

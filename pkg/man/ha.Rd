@@ -1,6 +1,7 @@
 \name{ha}
 \alias{ha}
 \alias{ha.sts}
+\docType{data}
 \title{Hepatitis A in Berlin}
 
 \description{
