@@ -32,44 +32,17 @@ R := R
 
 ## sysdata file
 SYSDATA := pkg/R/sysdata.rda
-DESCRIPTION := pkg/DESCRIPTION
 
 ## package version
-VERSION := $(shell $R --vanilla --slave -e 'cat(read.dcf("${DESCRIPTION}", fields="Version"))')
+VERSION := $(shell $R --vanilla --slave -e 'cat(read.dcf("pkg/DESCRIPTION", fields="Version"))')
 
-## svn revision number
-#REVISION := $(strip $(shell svnversion pkg))
-#<-CAVE: would look like 411M because of modified working copy
-#=> use svn:keywords Rev file property for revision and modify date on build
-#   such that the rev property will be updated too
-
-## Date field of DESCRIPTION file
-#DATE := $(shell date +%F)
-# DESCRIPTION (esp. the Rev property) would not be updated across multiple
-# revisions on the same day => use date _and_ time
-#DATE := $(shell date --rfc-3339=seconds)
-# alternative: svn last changed date (date info would be lagged by one revision)
-#LASTCHANGEDDATE := $(shell svn info pkg | grep "^Last Changed Date:" | \
-#                     grep -E -o "[0-9]{4}-[0-9]{2}-[0-9]{2}")
-# alternative: most recent file modification date (but this includes unversioned
-# files and re-savings of files without actually changing their contents)
-#$(shell find . -printf "%TY-%Tm-%Td\n" | sort -nr | head -n 1)
-
-## phony targets
-.PHONY: clean build check check-allExamples install manual #${DESCRIPTION}
-
-clean:
-	make -C pkg/demo clean
-	cd pkg/src; rm -f *.o *.so *.dll symbols.rds
-	rm -f pkg/*/.Rhistory
-
-build: ${SYSDATA} #${DESCRIPTION}
-	$R --no-restore --no-save --slave -e "Rcpp::compileAttributes('pkg')"
+## build the package
+build: Rcpp ${SYSDATA}
 	$R CMD build --no-resave-data --compact-vignettes=both pkg
 
-## update date in DESCRIPTION file
-# ${DESCRIPTION}:
-# 	sed -i "s/^\(Date:\)[^\r]*/\1 ${DATE}/" $@
+## run Rcpp::compileAttributes
+Rcpp:
+	$R --no-restore --no-save --slave -e "Rcpp::compileAttributes('pkg')"
 
 ## Save internal datasets from pkg/sysdata/ into pkg/R/sysdata.rda
 ${SYSDATA}: pkg/sysdata/sysdata.R
@@ -128,3 +101,10 @@ manual:
 NEWS.html: pkg/inst/NEWS.Rd
 	$R --vanilla --slave -e 'tools::Rd2HTML("$<", out = "$@", stylesheet = "http://cran.r-project.org/web/CRAN_web.css")'
 	[ `uname -s` = "Darwin" ] && open "$@" || xdg-open "$@"
+
+clean:
+	make -C pkg/demo clean
+	cd pkg/src; rm -f *.o *.so *.dll symbols.rds
+	rm -f pkg/*/.Rhistory
+
+.PHONY: build Rcpp check check-allExamples install checkUsage manual clean
