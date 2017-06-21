@@ -105,6 +105,7 @@ NEWS.html: pkg/inst/NEWS.Rd
 clean:
 	make -C pkg/demo clean
 	cd pkg/src; rm -f *.o *.so *.dll symbols.rds
+	make -C pkg/vignettes clean
 	rm -f pkg/*/.Rhistory
 
 .PHONY: build Rcpp check check-allExamples install checkUsage manual clean
