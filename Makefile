@@ -46,7 +46,7 @@ Rcpp:
 	$R --no-restore --no-save --slave -e "Rcpp::compileAttributes('pkg')"
 
 ## Save internal datasets from pkg/sysdata/ into pkg/R/sysdata.rda
-${SYSDATA}: pkg/sysdata/sysdata.R
+${SYSDATA}: pkg/sysdata/sysdata.R pkg/sysdata/REFERENCES
 	cd pkg/sysdata; $R CMD BATCH --vanilla --no-timing sysdata.R
 	mv pkg/sysdata/sysdata.rda $@
 
