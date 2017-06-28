@@ -8,14 +8,15 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.14.0 (2017-06-28)}{
+\section{Changes in surveillance version 1.14.0 (2017-06-29)}{
 
 \subsection{DOCUMENTATION}{
   \itemize{
-    \item The replication code from Meyer et al. (2017, JSS,
-    \doi{10.18637/jss.v077.i11}) is now included as \code{demo("v77i11")}.
-    It illustrates the spatio-temporal endemic-epidemic modelling
-    frameworks \code{twinstim}, \code{twinSIR}, and \code{hhh4}.
+    \item The replication code from Meyer et al. (2017, JSS)
+    is now included as \code{demo("v77i11")}.
+    It exemplifies the spatio-temporal endemic-epidemic modelling
+    frameworks \code{twinstim}, \code{twinSIR}, and \code{hhh4}
+    (see also the corresponding vignettes).
   }
 }
 
