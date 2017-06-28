@@ -438,6 +438,7 @@ S3method(simHHH, ah)
 ## main functions
 export(hhh4)
 export(addSeason2formula)
+export(makeControl)
 export(zetaweights, W_powerlaw)
 export(W_np)
 export(getNEweights, coefW)

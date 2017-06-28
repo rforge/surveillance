@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.14.0 (2017-06-20)}{
+\section{Changes in surveillance version 1.14.0 (2017-06-28)}{
 
 \subsection{DOCUMENTATION}{
   \itemize{
@@ -39,6 +39,9 @@
 
     \item The \code{"fan"}-type plot function for \code{"hhh4sims"}
     gained a \code{key.args} argument for an automatic color key.
+
+    \item New auxiliary function \code{makeControl()}, which may be
+    used to specify a \code{hhh4()} model.
   }
 }
 
