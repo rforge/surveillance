@@ -2,7 +2,7 @@
 ^sysdata
 ^po
 
-^demo/.+\.Rout\.save
+^demo/.+\.save
 
 Makefile
 ^surveillance_[0-9\.-]+\.tar\.gz
