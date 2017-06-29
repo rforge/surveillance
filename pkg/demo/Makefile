@@ -4,9 +4,11 @@
 ## the top-level .Rbuildignore file).
 ## This Makefile requires GNU make.
 ##
-## Copyright (C) 2016  Sebastian Meyer <seb.meyer@fau.de>
+## Copyright (C) 2016-2017 Sebastian Meyer <seb.meyer@fau.de>
+##
 ## This Makefile can be redistributed and/or modified under the terms
-## of the GNU General Public License, version 2 or later.
+## of the GNU General Public License, version 2,
+## a copy of which is available at http://www.R-project.org/Licenses/.
 
 R := R
 DEMOSCRIPTS := $(wildcard *.R)
@@ -15,7 +17,8 @@ ROUTFILES := ${DEMOSCRIPTS:.R=.Rout}
 all : ${ROUTFILES}
 
 %.Rout : %.R
-	LANGUAGE=en ${R} CMD BATCH --vanilla --no-timing $< $@; mv Rplots.pdf ${<:.R=.pdf}
+	LANGUAGE=en ${R} CMD BATCH --vanilla --no-timing $< $@
+	-mv Rplots.pdf ${<:.R=.pdf}
 
 diff : ${ROUTFILES}
 	meld & $(foreach Rout,${ROUTFILES},sleep 2; meld --newtab ${Rout}.save ${Rout} &)
