@@ -10,6 +10,7 @@
 
 #include <math.h>
 #include <polyCubAPI.h>
+#include <R_ext/Error.h>
 
 
 /*** C-implementation of "intrfr" functions ***/
@@ -155,7 +156,8 @@ void C_siaf_polyCub1_iso(
     case 22: intrfr = intrfr_student_dlogd; break;
     case 30: intrfr = intrfr_powerlawL; break;
     case 31: intrfr = intrfr_powerlawL_dlogsigma; break;
-    case 32: intrfr = intrfr_powerlawL_dlogd; break;        
+    case 32: intrfr = intrfr_powerlawL_dlogd; break;
+    default: error("unknown intrfr_code"); break;
     }
     double center_x = 0.0;
     double center_y = 0.0;
