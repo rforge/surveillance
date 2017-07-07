@@ -20,6 +20,8 @@
   }
 }
 
+}
+
 
 \section{Changes in surveillance version 1.14.0 (2017-06-29)}{
 
