@@ -8,6 +8,19 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.14.1 (2017-07-07)}{
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item The C-routines introduced in version 1.14.0 used \code{==}
+    comparisons on parameter values to choose among case-specific
+    formulae (e.g., for \eqn{d==2} in \code{siaf.powerlaw()}).
+    We now employ an absolute tolerance of 1e-7 (which hopefully fixes
+    the failing tests on Solaris).
+  }
+}
+
+
 \section{Changes in surveillance version 1.14.0 (2017-06-29)}{
 
 \subsection{DOCUMENTATION}{
