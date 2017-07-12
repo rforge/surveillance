@@ -43,7 +43,7 @@ twinstim <- function (
     ## Clean the model environment when exiting the function
     on.exit(suppressWarnings(rm(cl, cumCIF, cumCIF.pb, data, doHessian,
         eventsData, finetune, neghess, fisherinfo, fit, fixed,
-        functions, globalEndemicIntercept, h.Intercept, inmfe, initpars,
+        functions, globalEndemicIntercept, inmfe, initpars,
         ll, negll, loglik, msgConvergence, msgNotConverged,
         mfe, mfhEvents, mfhGrid, model, my.na.action, na.action, namesOptimUser,
         namesOptimArgs, nlminbControl, nlminbRes, nlmObjective, nlmControl,
@@ -960,15 +960,30 @@ twinstim <- function (
 
     ### Check initial value for theta
 
-    if (is.null(optim.args[["par"]])) { # set naive defaults
-        h.Intercept <- if (nbeta0 > 0) rep.int(crudebeta0(
+    initpars <- rep(0, npars)
+    names(initpars) <- c(
+        if (nbeta0 > 1L) {
+            paste0("h.type",typeNames)
+        } else if (nbeta0 == 1L) "h.(Intercept)",
+        if (p > 0L) paste("h", colnames(mmhEvents), sep = "."),
+        if (hase) paste("e", colnames(mme), sep = "."),
+        if (hassiafpars) paste("e.siaf", seq_len(nsiafpars), sep="."),
+        if (hastiafpars) paste("e.tiaf", seq_len(ntiafpars), sep=".")
+    )
+
+    ## some naive defaults
+    if (nbeta0 > 0)
+        initpars[seq_len(nbeta0)] <- crudebeta0(
             nEvents = Nin,
             offset.mean = if (is.null(offsetGrid)) 0 else weighted.mean(offsetGrid, ds),
             W.area = sum(ds[gridBlocks==histIntervals[1,"BLOCK"]]),
             period = T-t0, nTypes = nTypes
-            ), nbeta0) else numeric(0L)
-        optim.args$par <- c(h.Intercept, rep.int(0, npars - nbeta0))
-    } else { # check validity of par-specification
+        )
+    if (hassiafpars && "adapt" %in% formalArgs(siaf$F)) # siaf.gaussian with polyCub.midpoint()
+        initpars["e.siaf.1"] <- 5  # FIXME: use some fraction of bbox extent, check logsd
+
+    ## manual par-specification overrides these defaults
+    if (!is.null(optim.args[["par"]])) {
         if (!is.vector(optim.args$par, mode="numeric")) {
             stop("'optim.args$par' must be a numeric vector")
         }
@@ -977,27 +992,18 @@ twinstim <- function (
                                 "length as the number of unknown parameters (%d)"),
                           length(optim.args$par), npars))
         }
+        initpars[] <- optim.args$par
     }
 
-    ## Set names for theta
-    names(optim.args$par) <- c(
-        if (nbeta0 > 1L) {
-            paste0("h.type",typeNames)
-        } else if (nbeta0 == 1L) "h.(Intercept)",
-        if (p > 0L) paste("h", colnames(mmhEvents), sep = "."),
-        if (hase) paste("e", colnames(mme), sep = "."),
-        if (hassiafpars) paste("e.siaf",1:nsiafpars,sep="."),
-        if (hastiafpars) paste("e.tiaf",1:ntiafpars,sep=".")
-    )
-
-    ## values in "start" overwrite initial values given by optim.args$par
+    ## values in "start" overwrite defaults and optim.args$par
     if (!is.null(start)) {
         start <- check_twinstim_start(start)
-        start <- start[names(start) %in% names(optim.args$par)]
-        optim.args$par[names(start)] <- start
+        start <- start[names(start) %in% names(initpars)]
+        initpars[names(start)] <- start
     }
 
-    initpars <- optim.args$par
+    ## update optim.args$par
+    optim.args$par <- initpars
 
 
     ### Fixed parameters during optimization

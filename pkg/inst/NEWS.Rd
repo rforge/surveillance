@@ -8,7 +8,15 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.14.1 (2017-07-07)}{
+\section{Changes in surveillance version 1.14.1 (2017-07-12)}{
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item \code{twinstim(..., siaf = siaf.gaussian())}
+    uses a larger default initial value for the kernel's standard
+    deviation to avoid long-running midpoint cubature in the beginning.
+  }
+}
 
 \subsection{BUG FIXES}{
   \itemize{
