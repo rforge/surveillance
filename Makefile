@@ -25,6 +25,7 @@
 ##   17 Mar 2016 (SM): check-allExamples with --run-dontrun and --extra-arch
 ##    6 Jun 2016 (SM): Rcpp attributes require an additional build step
 ##   21 Jun 2017 (SM): account for R code with roxygen documentation
+##   12 Jul 2017 (SM): "quick" vs. CRAN-versions of build and check rules
 ################################################################################
 
 ## Define variable for R which enables the use of alternatives,
@@ -38,8 +39,11 @@ SYSDATA := pkg/R/sysdata.rda
 VERSION := $(shell $R --vanilla --slave -e 'cat(read.dcf("pkg/DESCRIPTION", fields="Version"))')
 
 ## build the package
+BUILD_COMPACT_VIGNETTES := no
 build: Rcpp ${SYSDATA} man
-	$R CMD build --no-resave-data --compact-vignettes=both pkg
+	$R CMD build --no-resave-data --compact-vignettes=${BUILD_COMPACT_VIGNETTES} pkg
+build-cran: BUILD_COMPACT_VIGNETTES := both
+build-cran: build
 
 ## run Rcpp::compileAttributes
 Rcpp:
@@ -77,9 +81,15 @@ if [ $$nwarn -gt 0 ]; then echo "\n\tWARNING: $$nwarn" \
 	"\t         see file surveillance.Rcheck/surveillance-Ex.Rout\n"; fi
 endef
 
-## standard --as-cran check
+## "quick" check
 check: build
-	_R_CHECK_FORCE_SUGGESTS_=FALSE $R CMD check --as-cran --timings surveillance_${VERSION}.tar.gz
+	_R_CHECK_FORCE_SUGGESTS_=FALSE _R_CHECK_COMPACT_DATA_=FALSE \
+	_R_CHECK_PKG_SIZES_=FALSE _R_CHECK_DOC_SIZES_=FALSE \
+	$R CMD check --no-manual --ignore-vignettes --check-subdirs=no surveillance_${VERSION}.tar.gz
+
+## standard --as-cran check
+check-cran: build-cran
+	$R CMD check --as-cran --timings surveillance_${VERSION}.tar.gz
 ## further option: --use-gct (for better detection of memory bugs/segfaults)
 	@$(check-report-timings)
 	@$(check-report-warnings-in-examples)
@@ -87,7 +97,7 @@ check: build
 ## check with "allExamples" and --run-dontrun
 ## also use --extra-arch to only do runtime tests (no R and Rd code checking)
 check-allExamples: build
-	_R_SURVEILLANCE_ALL_EXAMPLES_=TRUE _R_CHECK_FORCE_SUGGESTS_=FALSE $R CMD check --timings --run-dontrun --extra-arch surveillance_${VERSION}.tar.gz
+	_R_SURVEILLANCE_ALL_EXAMPLES_=TRUE $R CMD check --timings --run-dontrun --extra-arch surveillance_${VERSION}.tar.gz
 	@$(check-report-timings)
 	@$(check-report-warnings-in-examples)
 
@@ -115,4 +125,4 @@ clean:
 	make -C pkg/vignettes clean
 	rm -f pkg/*/.Rhistory
 
-.PHONY: build Rcpp man check check-allExamples install checkUsage manual clean
+.PHONY: build build-cran Rcpp man check check-cran check-allExamples install checkUsage manual clean
