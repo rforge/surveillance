@@ -979,8 +979,14 @@ twinstim <- function (
             W.area = sum(ds[gridBlocks==histIntervals[1,"BLOCK"]]),
             period = T-t0, nTypes = nTypes
         )
-    if (hassiafpars && "adapt" %in% formalArgs(siaf$F)) # siaf.gaussian with polyCub.midpoint()
-        initpars["e.siaf.1"] <- 5  # FIXME: use some fraction of bbox extent, check logsd
+    if (hassiafpars && "adapt" %in% formalArgs(siaf$F)) {
+        ## siaf.gaussian with polyCub.midpoint(), use 10% of bbox diameter as sd
+        ## FIXME: need siaf attribute to identify built-in siafs, also logsd
+        ## FIXME: use these initial values also for F.adaptive=FALSE
+        initpars["e.siaf.1"] <- log(0.1*sqrt(sum(apply(bbox(data$W), 1L, diff.default)^2)))
+        if (identical(body(siaf$F)[[2]], quote(sds <- pars))) # logsd=FALSE
+            initpars["e.siaf.1"] <- exp(initpars["e.siaf.1"])
+    }
 
     ## manual par-specification overrides these defaults
     if (!is.null(optim.args[["par"]])) {
