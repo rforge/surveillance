@@ -33,6 +33,8 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
                            F.adaptive = TRUE, F.method = "SV",
                            effRangeMult = 6, validpars = NULL)
 {
+    if (!logsd || density)
+        .Deprecated(msg = "non-default parametrizations of siaf.gaussian() are deprecated")
     nTypes <- as.integer(nTypes)
     stopifnot(length(nTypes) == 1L, nTypes > 0L)
     if (isScalar(F.adaptive)) {

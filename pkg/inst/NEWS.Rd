@@ -29,6 +29,9 @@
     \item \code{twinstim(..., siaf = siaf.gaussian())}
     uses a larger default initial value for the kernel's standard
     deviation to avoid long-running midpoint cubature in the beginning.
+
+    \item Non-default parametrizations of \code{siaf.gaussian()} are
+    deprecated, i.e., always use \code{logsd=TRUE} and \code{density=FALSE}.
   }
 }
 

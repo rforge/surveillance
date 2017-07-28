@@ -109,17 +109,6 @@ really depend on polyCub?
 
 use compiler::cmpfun on generated functions?
 
-logsd = FALSE -> .Deprecated ??
-data("imdepi")
-m0 <- twinstim(
-   endemic = addSeason2formula(~ offset(log(popdensity)) + I(start/365-3.5),
-                               S=1, period=365, timevar="start"),
-   epidemic = ~1, data = imdepi,
-   start = c("e.(Intercept)"=-18), model = TRUE)
-m1 <- update(m0, siaf = siaf.gaussian(1, logsd=FALSE, validpars = function(pars) pars > 0))
-Fehler in if (optimArgs$control$trace > 0L) cat("(invalid 'siafpars' in loglik)\n") : 
-  Argument hat Länge 0
-
 employ better starting value also for F.adaptive = FALSE
 m1 <- update(m0, siaf = siaf.gaussian(1, F.adaptive=FALSE))
 

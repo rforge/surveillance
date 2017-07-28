@@ -72,21 +72,15 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
     Currently, \code{nTypes > 1} is only implemented for
     \code{siaf.gaussian}, \code{tiaf.step}, and \code{tiaf.exponential}.
   }
-  \item{logsd}{
-    logical indicating if the kernel should be parametrized
-    with the log-standard deviation as the parameter in question to
-    enforce positivity. This is the recommended default and avoids
-    constrained optimisation (L-BFGS-B) or the use of
-    \code{validpars}.\cr
-    The power-law kernels always use the log-scale for their scale and
-    shape parameters.
-  }
-  \item{density}{
-    logical indicating if the density or just its kernel should be used.
-    If \code{density=TRUE}, \code{siaf.gaussian} uses the density of the
-    bivariate, isotropic normal distribution as the spatial interaction
-    function. Otherwise (default), only the kernel of the bivariate
-    normal density is used.
+  \item{logsd,density}{
+    logicals affecting the parametrization of the Gaussian kernel.
+    Settings different from the defaults are deprecated.
+    The default is to use only the kernel of the bivariate, isotropic
+    normal distribution (\code{density=FALSE}, see Details below),
+    parametrized with the log-standard deviation (\code{logsd=TRUE}) to
+    avoid constrained optimisation (L-BFGS-B) or \code{validpars}.\cr
+    The power-law kernels always employ the log-scale for their scale
+    and shape parameters.
   }
   \item{F.adaptive,F.method}{
     If \code{F.adaptive = TRUE}, then an adaptive bandwidth of
