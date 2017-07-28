@@ -5,7 +5,7 @@
 ###
 ### Gaussian spatial interaction function for twinstim's epidemic component
 ###
-### Copyright (C) 2009-2014 Sebastian Meyer
+### Copyright (C) 2009-2014,2017 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -27,10 +27,11 @@
 ##   whole observation region W.
 ## validpars: If logsd = FALSE, you should either use
 ##   constrained optimisation (L-BFGS-B) or set 'validpars' to function (pars)
-##   pars > 0. 
+##   pars > 0.
 
 siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
-                           F.adaptive = TRUE, effRangeMult = 6, validpars = NULL)
+                           F.adaptive = TRUE, F.method = "SV",
+                           effRangeMult = 6, validpars = NULL)
 {
     nTypes <- as.integer(nTypes)
     stopifnot(length(nTypes) == 1L, nTypes > 0L)
@@ -38,16 +39,31 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
         adapt <- F.adaptive
         F.adaptive <- TRUE
     } else adapt <- 0.1
+    if (F.adaptive && !missing(F.method))
+        warning("ignoring 'F.method' since 'F.adaptive=TRUE' (adaptive midpoint cubature)")
 
     f <- function (s, pars, types) {}       # coordinate matrix s, length(types) = 1 or nrow(s)
     F <- if (F.adaptive) {
         as.function(c(alist(polydomain=, f=, pars=, type=),
                       list(adapt=adapt), quote({})))
-    } else siaf.fallback.F
+    } else if (F.method == "iso") {
+        if (!logsd || density)
+            stop("only the default parametrization is implemented for 'F.method=\"iso\"'")
+        if (nTypes > 1L)
+            stop("only the single-type kernel is implemented for 'F.method=\"iso\"'")
+        siaf_F_polyCub_iso(intrfr_name = "intrfr.gaussian", engine = "C")
+    } else {
+        formals(siaf.fallback.F)$method <- F.method
+        siaf.fallback.F
+    }
     Fcircle <- function (r, pars, type) {}  # single radius and type
     effRange <- function (pars) {}
     deriv <- function (s, pars, types) {}   # coordinate matrix s, length(types) = 1 or nrow(s)
-    Deriv <- function (polydomain, deriv, pars, type, nGQ = 20L) {} # single "owin" and type
+    Deriv <- if (F.adaptive || F.method != "iso") {
+        function (polydomain, deriv, pars, type, nGQ = 20L) {} # single "owin" and type
+    } else {
+        siaf_Deriv_polyCub_iso(intrfr_names = "intrfr.gaussian.dlogsigma", engine = "C")
+    }
     simulate <- function (n, pars, type, ub) {} # n=size of the sample,
                                                 # type=single type,
                                                 # ub=upperbound (unused here)
@@ -58,7 +74,7 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
         formals(f)$types <- formals(Fcircle)$type <- formals(deriv)$types <-
             formals(Deriv)$type <- formals(simulate)$type <- 1L
     }
-    
+
     # helper expressions
     tmp1 <- if (logsd) expression(sds <- exp(pars)) else expression(sds <- pars)
     tmp1.1 <- if (nTypes==1L) expression(sd <- sds) else expression(sd <- sds[type])
@@ -87,8 +103,9 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
                 intf
                 )
         ))
+        environment(F) <- getNamespace("surveillance")
     }
-    
+
     # calculate the integral of f over a circular domain around 0
     body(Fcircle) <- as.call(c(as.name("{"),
         tmp1, tmp1.1,
@@ -132,31 +149,33 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
     ))
 
     # integrate 'deriv' over a polygonal domain
-    body(Deriv) <- as.call(c(as.name("{"),
-        ## Determine a = argmax(abs(deriv(c(x,0))))
-        if (density) {
-            expression(a <- 0)          # maximum absolute value is at 0
-        } else {
-            c(tmp1, tmp1.1,
-              expression(
-                  xrange <- polydomain$xrange,           # polydomain is a "owin"
-                  a <- min(max(abs(xrange)), sqrt(2)*sd), # maximum absolute value
-                  if (sum(xrange) < 0) a <- -a # is more of the domain left of 0?
-                  )
-              )
-        },
-        if (nTypes == 1L) {
-            expression(deriv.type <- function (s) deriv(s, pars, 1L)[,1L,drop=TRUE])
-        } else { # d f(s|type_i) / d sigma_{type_j} is 0 for i != j
-            expression(deriv.type <- function (s) deriv(s, pars, type)[,type,drop=TRUE])
-        },
-        expression(int <- polyCub.SV(polydomain, deriv.type, nGQ=nGQ, alpha=a)),
-        if (nTypes == 1L) expression(int) else expression(
-            res <- numeric(length(pars)), # zeros
-            res[type] <- int,
-            res
-            )
-    ))
+    if (F.adaptive || F.method != "iso") {
+        body(Deriv) <- as.call(c(as.name("{"),
+            ## Determine a = argmax(abs(deriv(c(x,0))))
+            if (density) { # maximum absolute value is at 0
+                expression(a <- 0)
+            } else {
+                c(tmp1, tmp1.1,
+                  expression(
+                      xrange <- polydomain$xrange,            # polydomain is a "owin"
+                      a <- min(max(abs(xrange)), sqrt(2)*sd), # maximum absolute value
+                      if (sum(xrange) < 0) a <- -a  # is more of the domain left of 0?
+                  ))
+            },
+            if (nTypes == 1L) {
+                expression(deriv.type <- function (s) deriv(s, pars, 1L)[,1L,drop=TRUE])
+            } else { # d f(s|type_i) / d sigma_{type_j} is 0 for i != j
+                expression(deriv.type <- function (s) deriv(s, pars, type)[,type,drop=TRUE])
+            },
+            expression(int <- polyCub.SV(polydomain, deriv.type, nGQ=nGQ, alpha=a)),
+            if (nTypes == 1L) expression(int) else expression(
+                res <- numeric(length(pars)), # zeros
+                res[type] <- int,
+                res
+                )
+            ))
+        environment(Deriv) <- getNamespace("surveillance")
+    }
 
     ## sampler (does not obey the 'ub' argument!!)
     body(simulate) <- as.call(c(as.name("{"),
@@ -165,9 +184,8 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
     ))
 
     ## set function environments to the global environment
-    environment(f) <- environment(F) <- environment(Fcircle) <-
-        environment(deriv) <- environment(Deriv) <-
-            environment(simulate) <- .GlobalEnv
+    environment(f) <- environment(Fcircle) <-
+        environment(deriv) <- environment(simulate) <- .GlobalEnv
     if (is.function(effRange)) environment(effRange) <- .GlobalEnv
 
     ## return the kernel specification

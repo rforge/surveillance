@@ -31,10 +31,15 @@ myexpectation <- function (siaf, intrfr, intrderivr, pargrid, type = 1, ...)
 
 ### test all pre-defined spatial interaction functions
 
-test_that("Gaussian implementation agrees with numerical approximation",
-          myexpectation(siaf.gaussian(F.adaptive=TRUE),
-                        pargrid=t(log(0.5)),
-                        tolerance=0.0005, method="midpoint", dimyx=250))
+test_that("Gaussian 'F.adaptive' implementation agrees with numerical approximation",
+          myexpectation(siaf.gaussian(F.adaptive=0.01),  # Deriv uses polyCub.SV
+                        pargrid=as.matrix(log(c(0.5, 1, 3))),
+                        tolerance=0.0005, method="midpoint", dimyx=240))
+
+test_that("Gaussian iso-C-implementation agrees with numerical approximation",
+          myexpectation(siaf.gaussian(F.adaptive=FALSE, F.method="iso"),
+                        pargrid=as.matrix(log(c(0.5, 1, 3))),
+                        tolerance=0.0005, method="SV", nGQ=25))
 
 test_that("Power-law implementation agrees with numerical approximation",
           myexpectation(siaf.powerlaw(engine = "R"),

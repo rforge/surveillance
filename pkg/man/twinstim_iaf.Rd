@@ -34,7 +34,8 @@
 siaf.constant()
 siaf.step(knots, maxRange = Inf, nTypes = 1, validpars = NULL)
 siaf.gaussian(nTypes = 1, logsd = TRUE, density = FALSE,
-              F.adaptive = TRUE, effRangeMult = 6, validpars = NULL)
+              F.adaptive = TRUE, F.method = "SV",
+              effRangeMult = 6, validpars = NULL)
 siaf.powerlaw(nTypes = 1, validpars = NULL, engine = "C")
 siaf.powerlawL(nTypes = 1, validpars = NULL, engine = "C")
 siaf.student(nTypes = 1, validpars = NULL, engine = "C")
@@ -87,7 +88,7 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
     function. Otherwise (default), only the kernel of the bivariate
     normal density is used.
   }
-  \item{F.adaptive}{
+  \item{F.adaptive,F.method}{
     If \code{F.adaptive = TRUE}, then an adaptive bandwidth of
     \code{adapt*sd} will be used in the midpoint-cubature
     (\code{\link[polyCub]{polyCub.midpoint}} in package \pkg{polyCub})
@@ -98,11 +99,12 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
     \code{twinstim}, or by a numeric specification of \code{F.adaptive}
     in the constructing call, e.g., \code{F.adaptive = 0.05} to achieve
     higher accuracy.\cr
-    Otherwise, if \code{F.adaptive = FALSE}, a general cubature
-    method (\code{\link[polyCub]{polyCub}}) is returned as \code{siaf$F}
-    component, where the \code{method} and accuracy (\code{eps},
-    \code{dimyx}, or \code{nGQ}, depending on the method) should then be
-    specified in \code{twinstim}'s \code{control.siaf$F} argument.
+    Otherwise, if \code{F.adaptive = FALSE}, the \code{F.method}
+    argument determines which \code{\link[polyCub]{polyCub}} method to
+    use in \code{siaf$F}. The accuracy (controlled via, e.g.,
+    \code{nGQ}, \code{rel.tol}, or \code{eps}, depending on the cubature
+    method) can then be adjusted in \code{twinstim}'s
+    \code{control.siaf$F} argument.
   }
   \item{effRangeMult}{
     determines the effective range for numerical integration
@@ -287,6 +289,9 @@ tiaf.exponential()
 # Type-dependent Gaussian spatial interaction function using an adaptive
 # two-dimensional midpoint-rule to integrate it over polygonal domains
 siaf.gaussian(2, F.adaptive=TRUE)
+
+# Single-type Gaussian spatial interaction function using polyCub.iso
+siaf.gaussian(1, F.adaptive=FALSE, F.method="iso")
 
 # Type-independent power-law kernel
 siaf.powerlaw()

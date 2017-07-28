@@ -139,6 +139,20 @@ static double intrfr_powerlawL_dlogd(double R, double *logpars)
         (sigmadRtwomdd * (-twomd)*log(R/sigma) - d*sigma*sigma + sigmadRtwomdd)/(twomd*twomd);
 }
 
+// Gaussian kernel
+static double intrfr_gaussian(double R, double *logsigma)
+{
+    double sigma2 = exp(2*logsigma[0]);
+    return sigma2 * (1 - exp(-R*R/2/sigma2));
+}
+
+static double intrfr_gaussian_dlogsigma(double R, double *logsigma)
+{
+    double sigma2 = exp(2*logsigma[0]);
+    double R2sigma2 = R*R/2/sigma2;
+    return 2*sigma2 * (1 - (1+R2sigma2)/exp(R2sigma2));
+}
+
 
 /*** function to be called from R ***/
 
@@ -162,6 +176,8 @@ void C_siaf_polyCub1_iso(
     case 30: intrfr = intrfr_powerlawL; break;
     case 31: intrfr = intrfr_powerlawL_dlogsigma; break;
     case 32: intrfr = intrfr_powerlawL_dlogd; break;
+    case 40: intrfr = intrfr_gaussian; break;
+    case 41: intrfr = intrfr_gaussian_dlogsigma; break;
     default: error("unknown intrfr_code"); break;
     }
     double center_x = 0.0;
