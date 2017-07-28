@@ -71,8 +71,9 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
     ## if there is only one type, we set the default type(s) argument to 1
     ## (it is actually unused inside the functions)
     if (nTypes == 1L) {
-        formals(f)$types <- formals(Fcircle)$type <- formals(deriv)$types <-
-            formals(Deriv)$type <- formals(simulate)$type <- 1L
+        formals(f)$types <- formals(F)$type <- formals(Fcircle)$type <-
+            formals(deriv)$types <- formals(Deriv)$type <-
+            formals(simulate)$type <- 1L
     }
 
     # helper expressions
