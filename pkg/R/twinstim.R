@@ -916,7 +916,7 @@ twinstim <- function (
         body(ll) <- as.call(append(as.list(body(ll)),
             as.list(expression(
                 if (hassiafpars && !siaf$validpars(siafpars)) {
-                    if (optimArgs$control$trace > 0L)
+                    if (!isTRUE(optimArgs$control$trace == 0)) # default: NULL
                         cat("(invalid 'siafpars' in loglik)\n")
                     return(-Inf)
                 }
@@ -928,7 +928,7 @@ twinstim <- function (
         body(ll) <- as.call(append(as.list(body(ll)),
             as.list(expression(
                 if (hastiafpars && !tiaf$validpars(tiafpars)) {
-                    if (optimArgs$control$trace > 0L)
+                    if (!isTRUE(optimArgs$control$trace == 0)) # default: NULL
                         cat("(invalid 'tiafpars' in loglik)\n")
                     return(-Inf)
                 }

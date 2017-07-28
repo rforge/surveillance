@@ -8,8 +8,22 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.14.1 (2017-07-12)}{
+\section{Changes in surveillance version 1.15.0 (2017-07-28)}{
 
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item \code{siaf.gaussian()} now also employs a \code{polyCub.iso()}
+    integration routine by default (similar to the powerlaw-type
+    kernels), instead of adaptive midpoint cubature.
+    This increases precision and considerably accelerates estimation of
+    \code{twinstim()} models with a Gaussian spatial interaction
+    function. Models fitted with the new default will likely differ
+    from previous fits, and the numerical difference depends on 
+    the adaptive bandwidth used before (the default \code{adapt=0.1}
+    yielded a rather rough approximation of the integral).
+  }
+}
+  
 \subsection{MINOR CHANGES}{
   \itemize{
     \item \code{twinstim(..., siaf = siaf.gaussian())}
@@ -23,7 +37,7 @@
     \item The C-routines introduced in version 1.14.0 used \code{==}
     comparisons on parameter values to choose among case-specific
     formulae (e.g., for \eqn{d==2} in \code{siaf.powerlaw()}).
-    We now employ an absolute tolerance of 1e-7 (which hopefully fixes
+    We now employ an absolute tolerance of 1e-7 (which should fix
     the failing tests on Solaris).
   }
 }
