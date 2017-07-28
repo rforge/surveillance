@@ -140,23 +140,22 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     a list with elements \code{"F"} and \code{"Deriv"}, which are lists
     of extra arguments passed to the functions \code{siaf$F} and
     \code{siaf$Deriv}, respectively.\cr
-    These arguments mainly determine the accuracy of the numerical
-    cubature rules from package \pkg{polyCub}
-    involved in non-constant \code{siaf} specifications,
-    e.g., the bandwidth of the midpoint rule
+    These arguments control the accuracy of the cubature routines from
+    package \pkg{polyCub} involved in non-constant \code{siaf}
+    specifications, e.g., the bandwidth of the midpoint rule
     \code{\link{polyCub.midpoint}}, the number of Gaussian
     quadrature points for \code{\link{polyCub.SV}}, or the relative
     tolerance of \code{\link{integrate}} in \code{\link{polyCub.iso}}.\cr
-    For instance, \code{\link{siaf.gaussian}()} uses the
+    For instance, \code{\link{siaf.gaussian}(F.adaptive = TRUE)} uses the
     midpoint-cubature \code{\link{polyCub.midpoint}} with an
     adaptive bandwidth of \code{eps=adapt*sd} to numerically integrate the
     kernel \eqn{f(\bold{s})}, and the default \code{adapt} value (0.1)
     can be overwritten by setting \code{control.siaf$F$adapt}.
-    The default integration method for the derivative of \eqn{f(\bold{s})}
-    wrt the kernel parameters is product Gauss cubature
-    \code{\link{polyCub.SV}} with \code{nGQ=20} univariate Gauss
-    quadrature points. This number can be overwritten by setting
-    \code{control.siaf$Deriv$nGQ}.\cr
+    However, \code{siaf.gaussian(F.adaptive = FALSE, F.method = "iso")}
+    as well as \code{\link{siaf.powerlaw}()} and friends use
+    \code{\link{polyCub.iso}} and thus accept control arguments for the
+    standard \code{\link{integrate}} routine (such as \code{rel.tol})
+    via \code{control.siaf$F} and \code{control.siaf$Deriv}.\cr
     This argument list is ignored in the case
     \code{siaf=siaf.constant()} (which is the default if \code{siaf} is
     unspecified).
@@ -524,19 +523,14 @@ if (surveillance.options("allExamples"))
   plot(m1_fstep, "siaf", scaled=FALSE)
   rug(getSourceDists(imdepi, dimension="space"), ticksize=0.02)
 
-  ## estimate a continuously decreasing spatial interaction function, where
-  ## likelihood evaluation takes much longer than for (piecewise) constant
-  ## spatial spread; here we use the kernel of an isotropic bivariate
-  ## Gaussian with a standard deviation of exp(2.8) = 16.4 km for both
-  ## finetypes (fixed to speed up the example)
+  ## estimate a continuously decreasing spatial interaction function,
+  ## here we use the kernel of an isotropic bivariate Gaussian
   m1 <- update(m0,
-      siaf = siaf.gaussian(1, F.adaptive = TRUE),
-      start = c("e.siaf.1" = 2.8), # sigma = exp(2.8) = 16.4 km
-      optim.args = list(fixed="e.siaf.1"),
-      control.siaf = list(F=list(adapt=0.25)) # use adaptive eps=sigma/4
+      siaf = siaf.gaussian(F.adaptive = FALSE, F.method = "iso"),
+      start = c("e.siaf.1" = 4) # initialize sigma = exp(4) = 55 km
   )
   AIC(m_noepi, m0, m1_fstep, m1)   # further improvement
-  summary(m1, test.iaf=FALSE)   # nonsense to test H0: log(sigma) = 0
+  summary(m1)  # e.siaf.1 is log(sigma), so no test for H0: log(sigma) = 0
   plot(m1, "siaf", scaled=FALSE)
   ## alternative: siaf.powerlaw() with eps.s=Inf and untie()d data,
   ##              see vignette("twinstim")
