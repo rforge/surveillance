@@ -140,7 +140,8 @@ siaf.fallback.Deriv <- function (polydomain, deriv, pars, type,
         deriv(s, pars, type)[,paridx,drop=TRUE]
     intderiv1 <- function (paridx)
         polyCub(polydomain, deriv1, method, paridx=paridx, ...)
-    sapply(seq_along(pars), intderiv1)
+    vapply(X = seq_along(pars), FUN = intderiv1,
+           FUN.VALUE = 0, USE.NAMES = FALSE)
 }
 
 
