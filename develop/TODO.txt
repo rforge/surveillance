@@ -101,7 +101,7 @@
 
 type-specific gaussian with iso (need example or test code)
 
-profile siaf.step (now takes longer than siaf.gaussian)
+profile siaf.step (now takes longer than siaf.gaussian) and power-law kernels
 
 don't set siaf/tiaf functions in the global environment (user could redefine exp())
 
@@ -109,8 +109,7 @@ really depend on polyCub?
 
 use compiler::cmpfun on generated functions?
 
-employ better starting value also for F.adaptive = FALSE
-m1 <- update(m0, siaf = siaf.gaussian(1, F.adaptive=FALSE))
+check imdepifit
 
 
 #Fixed

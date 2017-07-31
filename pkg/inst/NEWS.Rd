@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.15.0 (2017-07-28)}{
+\section{Changes in surveillance version 1.15.0 (2017-07-31)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -28,7 +28,7 @@
   \itemize{
     \item \code{twinstim(..., siaf = siaf.gaussian())}
     uses a larger default initial value for the kernel's standard
-    deviation to avoid long-running midpoint cubature in the beginning.
+    deviation (based on the size of the observation region).
 
     \item Non-default parametrizations of \code{siaf.gaussian()} are
     deprecated, i.e., always use \code{logsd=TRUE} and \code{density=FALSE}.
