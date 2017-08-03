@@ -52,7 +52,12 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
     number of parameters to estimate. For identifiability, the step
     function has height 1 in the first interval \eqn{[0,knots_1)}. Note
     that the implementation is right-continuous, i.e., intervals are
-    \eqn{[a,b)}.}
+    \eqn{[a,b)}.\cr
+    An initial choice of knots could be based on quantiles of the
+    observed distances between events and their potential source events.
+    For instance, an identifiable spatial step function could be
+    \code{siaf.step(quantile(\link{getSourceDists}(myepi, "space"), c(1,2,4)/10))},
+    where \code{myepi} is the \code{"epidataCS"} data to be modelled.}
   \item{maxRange}{a scalar larger than any of \code{knots}.
     Per default (\code{maxRange=Inf}), the step function
     never drops to 0 but keeps the last height for any distance larger
