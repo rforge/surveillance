@@ -1,5 +1,5 @@
 
-R version 3.3.3 (2017-03-06) -- "Another Canoe"
+R version 3.4.1 (2017-06-30) -- "Single Candle"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -25,6 +25,8 @@ Type 'q()' to quit R.
 > ### Journal of Statistical Software, 77(11), 1-55.
 > ### https://doi.org/10.18637/jss.v077.i11
 > ###
+> ### Changes to the original replication script are marked with a "#M" comment.
+> ###
 > ### Copyright (C) 2017 Sebastian Meyer, Leonhard Held, Michael Hoehle
 > ###
 > ### This file is part of the R package "surveillance",
@@ -40,7 +42,7 @@ Type 'q()' to quit R.
 Loading required package: sp
 Loading required package: xtable
 Loading required package: polyCub
-This is surveillance 1.13.1. For overview type ‘help(surveillance)’.
+This is surveillance 1.15.0. For overview type ‘help(surveillance)’.
 > 
 > ## 3.2. Data structure: 'epidataCS'
 > data("imdepi", package = "surveillance")
@@ -227,7 +229,9 @@ Log-likelihood: -9579
 
 > 
 > imdfit_Gaussian <- update(imdfit_endemic, epidemic = ~type + agegrp,
-+   siaf = siaf.gaussian(), start = c("e.(Intercept)" = -12.5, "e.siaf.1" = 2.75),
++   siaf = siaf.gaussian(F.adaptive = TRUE),
++   ##M set F.adaptive=TRUE for replication with surveillance >= 1.15.0
++   start = c("e.(Intercept)" = -12.5, "e.siaf.1" = 2.75),
 +   control.siaf = list(F = list(adapt = 0.25), Deriv = list(nGQ = 13)),
 +   cores = 2 * (.Platform$OS.type == "unix"), model = TRUE)
 marked point pattern of 2 types
@@ -267,8 +271,8 @@ Done.
 +              label = "tab:imdfit_Gaussian"),
 +       sanitize.text.function = NULL, sanitize.colnames.function = NULL,
 +       sanitize.rownames.function = function(x) paste0("\\code{", x, "}"))
-% latex table generated in R 3.3.3 by xtable 1.8-2 package
-% Fri May 26 14:41:03 2017
+% latex table generated in R 3.4.1 by xtable 1.8-2 package
+% Wed Aug  9 22:31:48 2017
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -427,7 +431,7 @@ Note: added the 'tau' component to object 'imdfit_powerlaw' for future use.
 > imdsims <- simulate(imdfit_powerlaw, nsim = 30, seed = 1, t0 = 1826, T = 2555,
 +   data = imdepi_untied_infeps, tiles = districtsD)
 
-Time at beginning of simulation: 2017-05-26 14:43:02 
+Time at beginning of simulation: 2017-08-09 22:32:17 
 Simulation 1 / 30 ...
 -------------------------------------------------------------------------------
 
@@ -454,8 +458,8 @@ Preparing simulated events for "epidataCS" ...
 Done.
 
 -------------------------------------------------------------------------------
-Runtime of first simulation: 5.707 seconds
-Estimated finishing time: 2017-05-26 14:45:53 
+Runtime of first simulation: 3.143 seconds
+Estimated finishing time: 2017-08-09 22:33:52 
 
 Simulation  2 / 30 ...	simulated 187 events up to time 2555 
 Simulation  3 / 30 ...	simulated 192 events up to time 2555 
@@ -487,7 +491,7 @@ Simulation 28 / 30 ...	simulated 174 events up to time 2555
 Simulation 29 / 30 ...	simulated 158 events up to time 2555 
 Simulation 30 / 30 ...	simulated 155 events up to time 2555 
 
-Done (2017-05-26 14:46:38).
+Done (2017-08-09 22:34:22).
 > 
 > table(imdsims[[1]]$events$source > 0, exclude = NULL)
 
@@ -803,7 +807,7 @@ update(measlesFit_basic, family = "Poisson")  6 2479.305
 +   nrow = nrow(measlesWeserEms), ncol = ncol(measlesWeserEms), byrow = TRUE)
 > summary(Sprop[1, ])
    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-0.03057 0.04808 0.05808 0.06750 0.08296 0.13980 
+0.03057 0.04808 0.05808 0.06750 0.08296 0.13983 
 > 
 > Soptions <- c("unchanged", "Soffset", "Scovar")
 > SmodelGrid <- expand.grid(end = Soptions, ar = Soptions)
