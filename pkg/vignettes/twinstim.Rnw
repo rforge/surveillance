@@ -308,13 +308,13 @@ Calculation of these integrals is trivial for (piecewise) constant~$f$, but othe
 numerical integration. For this purpose, the \proglang{R}~package
 \CRANpkg{polyCub} \citep{R:polyCub} offers cubature methods for polygonal
 domains as described in \citet[Supplement~B, Section~2]{meyer.held2013}.
-For Gaussian~$f$, we apply a midpoint rule with $\sigma$-adaptive bandwidth
-%% combined with an analytical formula via the $\chi^2$ distribution
-%% if the $6\sigma$-circle around $\bm{s}_i$ is contained in $\bm{R}_i$.
-and use product Gauss cubature \citep{sommariva.vianello2007}
-to approximate the integrals in the score function.
-For the recently implemented power-law kernels,
-we established a cubature method which takes
+% For Gaussian~$f$, we apply a midpoint rule with $\sigma$-adaptive bandwidth
+% %% combined with an analytical formula via the $\chi^2$ distribution
+% %% if the $6\sigma$-circle around $\bm{s}_i$ is contained in $\bm{R}_i$.
+% and use product Gauss cubature \citep{sommariva.vianello2007}
+% to approximate the integrals in the score function.
+% For the recently implemented power-law kernels,
+In particular, we established an efficient cubature method which takes
 advantage of the assumed isotropy of spatial interaction
 such that numerical integration remains in only one dimension
 \citep[Supplement~B, Section~2.4]{meyer.held2013}.
@@ -791,18 +791,15 @@ This model was originally selected by \citet{meyer.etal2011} and can be fitted a
 <<imdfit_Gaussian, results="hide", eval=COMPUTE>>=
 imdfit_Gaussian <- update(imdfit_endemic, epidemic = ~type + agegrp,
   siaf = siaf.gaussian(), start = c("e.(Intercept)" = -12.5, "e.siaf.1" = 2.75),
-  control.siaf = list(F = list(adapt = 0.25), Deriv = list(nGQ = 13)),
   cores = 2 * (.Platform$OS.type == "unix"))
 @ 
 To reduce the runtime of this example, we specified convenient \code{start} values
-for some parameters (others start at 0) and set
-\code{control.siaf} with a rather low number of nodes for the cubature
-of $f(\norm{\bm{s}})$ in the log-likelihood (via the midpoint rule) and
+for some parameters (others start at 0).
+On Unix-alikes, the numerical integrations
+of $f(\norm{\bm{s}})$ in the log-likelihood and
 $\frac{\partial f(\norm{\bm{s}})}{\partial \log\sigma}$
-in the score function (via product Gauss cubature).
-%over the individual influence regions~\eqref{eqn:twinstim:IR}
-On Unix-alikes, these numerical integrations can be performed in parallel 
-using the ``multicore'' functions
+in the score function (note that $\sigma$ is estimated on the log-scale)
+can be performed in parallel using the ``multicore'' functions
 \code{mclapply} \textit{et al.}\ from the base package \pkg{parallel},
 here with \code{cores = 2} processes.
 
@@ -851,13 +848,13 @@ takes an argument \code{newcoef}, which is exemplified in \code{help("R0")}.
 
 <<imdfit_powerlaw, results="hide", eval=COMPUTE, include=FALSE>>=
 imdfit_powerlaw <- update(imdfit_Gaussian, data = imdepi_untied_infeps,
-  siaf = siaf.powerlaw(), control.siaf = NULL,
+  siaf = siaf.powerlaw(),
   start = c("e.(Intercept)" = -6.2, "e.siaf.1" = 1.5, "e.siaf.2" = 0.9))
 @ 
 
 <<imdfit_step4, results="hide", eval=COMPUTE, include=FALSE>>=
 imdfit_step4 <- update(imdfit_Gaussian, data = imdepi_untied_infeps,
-  siaf = siaf.step(exp(1:4 * log(100) / 5), maxRange = 100), control.siaf = NULL,
+  siaf = siaf.step(exp(1:4 * log(100) / 5), maxRange = 100),
   start = c("e.(Intercept)" = -10, setNames(-2:-5, paste0("e.siaf.", 1:4))))
 @
 
