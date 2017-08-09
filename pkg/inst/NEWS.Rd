@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.15.0 (2017-07-31)}{
+\section{Changes in surveillance version 1.15.0 (2017-08-09)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -17,8 +17,10 @@
     kernels), instead of adaptive midpoint cubature.
     This increases precision and considerably accelerates estimation of
     \code{twinstim()} models with a Gaussian spatial interaction
-    function. Models fitted with the new default will likely differ
-    from previous fits, and the numerical difference depends on 
+    function. Models fitted with the new default
+    (\code{F.adaptive=FALSE, F.method="iso"})
+    will likely differ from previous fits (\code{F.adaptive=TRUE}),
+    and the numerical difference depends on 
     the adaptive bandwidth used before (the default \code{adapt=0.1}
     yielded a rather rough approximation of the integral).
   }
