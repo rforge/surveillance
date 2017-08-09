@@ -34,7 +34,7 @@
 siaf.constant()
 siaf.step(knots, maxRange = Inf, nTypes = 1, validpars = NULL)
 siaf.gaussian(nTypes = 1, logsd = TRUE, density = FALSE,
-              F.adaptive = TRUE, F.method = "SV",
+              F.adaptive = FALSE, F.method = "iso",
               effRangeMult = 6, validpars = NULL)
 siaf.powerlaw(nTypes = 1, validpars = NULL, engine = "C")
 siaf.powerlawL(nTypes = 1, validpars = NULL, engine = "C")
@@ -75,7 +75,8 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
     event types of the epidemic, in which case every type has its own
     (log-)scale or (log-)shape, respectively.\cr
     Currently, \code{nTypes > 1} is only implemented for
-    \code{siaf.gaussian}, \code{tiaf.step}, and \code{tiaf.exponential}.
+    \code{siaf.gaussian(F.adaptive = TRUE)},
+    \code{tiaf.step}, and \code{tiaf.exponential}.
   }
   \item{logsd,density}{
     logicals affecting the parametrization of the Gaussian kernel.
@@ -171,10 +172,12 @@ tiaf.exponential(nTypes = 1, validpars = NULL)
       If \code{nTypes=1} (single-type epidemic or type-invariant
       \code{siaf} in multi-type epidemic), then
       \eqn{\sigma_\kappa = \sigma} for all types \eqn{\kappa}.
-      If \code{density=TRUE}, then the kernel formula above is
+      If \code{density=TRUE} (deprecated), then the kernel formula above is
       additionally divided by \eqn{2 \pi \sigma_\kappa^2}, yielding the
       density of the bivariate, isotropic Gaussian distribution with
       zero mean and covariance matrix \eqn{\sigma_\kappa^2 I_2}.
+      The standard deviation is optimized on the log-scale
+      (\code{logsd = TRUE}, not doing so is deprecated).
     }
     \item{\code{siaf.powerlaw}:}{
       \eqn{f(s) = (||s|| + \sigma)^{-d}},\cr
@@ -289,8 +292,8 @@ tiaf.exponential()
 # two-dimensional midpoint-rule to integrate it over polygonal domains
 siaf.gaussian(2, F.adaptive=TRUE)
 
-# Single-type Gaussian spatial interaction function using polyCub.iso
-siaf.gaussian(1, F.adaptive=FALSE, F.method="iso")
+# Single-type Gaussian spatial interaction function (using polyCub.iso)
+siaf.gaussian()
 
 # Type-independent power-law kernel
 siaf.powerlaw()

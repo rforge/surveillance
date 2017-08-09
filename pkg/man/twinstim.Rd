@@ -151,7 +151,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
     adaptive bandwidth of \code{eps=adapt*sd} to numerically integrate the
     kernel \eqn{f(\bold{s})}, and the default \code{adapt} value (0.1)
     can be overwritten by setting \code{control.siaf$F$adapt}.
-    However, \code{siaf.gaussian(F.adaptive = FALSE, F.method = "iso")}
+    However, the default version \code{siaf.gaussian()}
     as well as \code{\link{siaf.powerlaw}()} and friends use
     \code{\link{polyCub.iso}} and thus accept control arguments for the
     standard \code{\link{integrate}} routine (such as \code{rel.tol})
@@ -526,7 +526,7 @@ if (surveillance.options("allExamples"))
   ## estimate a continuously decreasing spatial interaction function,
   ## here we use the kernel of an isotropic bivariate Gaussian
   m1 <- update(m0,
-      siaf = siaf.gaussian(F.adaptive = FALSE, F.method = "iso"),
+      siaf = siaf.gaussian(),
       start = c("e.siaf.1" = 4) # initialize sigma = exp(4) = 55 km
   )
   AIC(m_noepi, m0, m1_fstep, m1)   # further improvement

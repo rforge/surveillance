@@ -30,7 +30,7 @@
 ##   pars > 0.
 
 siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
-                           F.adaptive = TRUE, F.method = "SV",
+                           F.adaptive = FALSE, F.method = "iso",
                            effRangeMult = 6, validpars = NULL)
 {
     if (!logsd || density)

@@ -100,11 +100,11 @@
              pixel size parameter eps > size of window
 
 
-siaf.gaussian: make iso cubature the default
+naive starting value for e.(Intercept) based on simpleR0 = 0.1 or so
 
 check imdepifit
 
-type-specific gaussian with iso (need example or test code)
+type-specific iso-kernels (need example or test code)
 
 implement siaf.powerlaw2 parametrization (1+x/sigma)^-d
 
