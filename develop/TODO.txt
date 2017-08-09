@@ -99,17 +99,23 @@
            Warning in as.mask(W, eps = eps, dimyx = dimyx, xy = xy) :
              pixel size parameter eps > size of window
 
-type-specific gaussian with iso (need example or test code)
 
-profile siaf.step (now takes longer than siaf.gaussian) and power-law kernels
-
-don't set siaf/tiaf functions in the global environment (user could redefine exp())
-
-really depend on polyCub?
-
-use compiler::cmpfun on generated functions?
+siaf.gaussian: make iso cubature the default
 
 check imdepifit
+
+type-specific gaussian with iso (need example or test code)
+
+implement siaf.powerlaw2 parametrization (1+x/sigma)^-d
+
+implement siaf.powerlaw(scale = 1), i.e. with value of sigma fixed
+
+profiling:
+- siaf.step (now takes longer than siaf.gaussian) and power-law kernels
+- don't set siaf/tiaf functions in the global environment (user could redefine exp())
+- use compiler::cmpfun on generated functions?
+
+really depend on polyCub?
 
 
 #Fixed
