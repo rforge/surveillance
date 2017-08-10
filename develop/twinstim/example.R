@@ -133,9 +133,14 @@ curve(true_scaled_siaf(x), lwd = 3, add = TRUE)
 fit1PL <- update(fit0PL, siaf = siaf.student())
 plot(fit1PL, "siaf", add = TRUE, col.estimate = 4)
 
-fit2PL <- update(fit0PL, siaf = siaf.gaussian())
-plot(fit2PL, "siaf", add = TRUE, col.estimate = 3)
+fit2PL <- update(fit0PL, siaf = siaf.powerlawL())
+plot(fit2PL, "siaf", add = TRUE, col.estimate = 2)
+
+fit3PL <- update(fit0PL, siaf = siaf.gaussian())
+plot(fit3PL, "siaf", add = TRUE, col.estimate = 3)
 
 knots <- quantile(getSourceDists(myepiPL, "space"), c(1,2,4,8,16)/100)
-fit3PL <- update(fit0PL, siaf = siaf.step(knots), use.estimates = FALSE)
-plot(fit3PL, "siaf", add = TRUE, col.estimate = 5)
+fit4PL <- update(fit0PL, siaf = siaf.step(knots), use.estimates = FALSE)
+plot(fit4PL, "siaf", add = TRUE, col.estimate = 5)
+
+AIC(fit0PL, fit1PL, fit2PL, fit3PL, fit4PL)
