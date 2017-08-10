@@ -439,7 +439,7 @@ pchisq(2*c(logLik(m_noepi_type)-logLik(m_noepi)), df=1, lower.tail=FALSE)
 ### assuming uniform dispersal in time and space up to a distance of
 ### eps.s = 200 km and eps.t = 30 days (see summary(imdepi))
 
-m0 <- update(m_noepi, epidemic=~1, start=c("e.(Intercept)"=-18), model=TRUE)
+m0 <- update(m_noepi, epidemic=~1, model=TRUE)
 
 ## summarize the model fit
 s <- summary(m0, correlation = TRUE, symbolic.cor = TRUE)
@@ -472,9 +472,8 @@ if (surveillance.options("allExamples"))
 
 \dontrun{
   ## NB: in contrast to using nlminb() optim's BFGS would miss the
-  ##     likelihood maximum wrt the epidemic intercept if starting at -10
-  m0_BFGS <- update(m_noepi, epidemic=~1, start=c("e.(Intercept)"=-10),
-                    optim.args = list(method="BFGS"))
+  ##     likelihood maximum wrt the epidemic intercept
+  m0_BFGS <- update(m_noepi, epidemic=~1, optim.args = list(method="BFGS"))
   format(cbind(nlminb=coef(m0), BFGS=coef(m0_BFGS)), digits=3, scientific=FALSE)
   m0_BFGS$fisherinfo   # singular Fisher information matrix here
   m0$fisherinfo
@@ -519,18 +518,18 @@ if (surveillance.options("allExamples"))
   plot(m1_tiaf, "tiaf", scaled=FALSE)
 
   ## estimate a step function for spatial interaction
-  m1_fstep <- update(m0, siaf=c(5,10,25,50))
+  summary(sourceDists <- getSourceDists(imdepi, "space"))
+  (knots <- quantile(sourceDists, c(5,10,20,40)/100))
+  m1_fstep <- update(m0, siaf=knots)
   plot(m1_fstep, "siaf", scaled=FALSE)
-  rug(getSourceDists(imdepi, dimension="space"), ticksize=0.02)
+  rug(sourceDists, ticksize=0.02)
 
   ## estimate a continuously decreasing spatial interaction function,
   ## here we use the kernel of an isotropic bivariate Gaussian
-  m1 <- update(m0,
-      siaf = siaf.gaussian(),
-      start = c("e.siaf.1" = 4) # initialize sigma = exp(4) = 55 km
-  )
-  AIC(m_noepi, m0, m1_fstep, m1)   # further improvement
-  summary(m1)  # e.siaf.1 is log(sigma), so no test for H0: log(sigma) = 0
+  m1 <- update(m0, siaf = siaf.gaussian())
+  AIC(m_noepi, m0, m1_fstep, m1)
+  summary(m1)  # e.siaf.1 is log(sigma), no test for H0: log(sigma) = 0
+  exp(confint(m1, "e.siaf.1"))  # a confidence interval for sigma
   plot(m1, "siaf", scaled=FALSE)
   ## alternative: siaf.powerlaw() with eps.s=Inf and untie()d data,
   ##              see vignette("twinstim")
