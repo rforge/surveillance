@@ -99,6 +99,9 @@
            Warning in as.mask(W, eps = eps, dimyx = dimyx, xy = xy) :
              pixel size parameter eps > size of window
 
+in twinstim vignette, drop manual start values for imdfit_Gaussian,
+maybe also for powerlaw and step kernel?
+
 check imdepifit
 
 type-specific iso-kernels (need example or test code)
