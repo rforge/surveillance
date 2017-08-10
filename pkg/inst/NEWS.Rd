@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.15.0 (2017-08-09)}{
+\section{Changes in surveillance version 1.15.0 (2017-08-10)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -34,6 +34,9 @@
 
     \item Non-default parametrizations of \code{siaf.gaussian()} are
     deprecated, i.e., always use \code{logsd=TRUE} and \code{density=FALSE}.
+
+    \item \code{twinstim()} uses a smaller default initial value for the
+    epidemic intercept, which usually allows for faster convergence.
   }
 }
 

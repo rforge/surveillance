@@ -979,6 +979,8 @@ twinstim <- function (
             W.area = sum(ds[gridBlocks==histIntervals[1,"BLOCK"]]),
             period = T-t0, nTypes = nTypes
         )
+    if (hase && "e.(Intercept)" %in% names(initpars) && epilink == "log")
+        initpars["e.(Intercept)"] <- -9  # suitable value depends on [st]iafInt
     if (hassiafpars && identical(body(siaf$f)[[2L]], quote(sds <- exp(pars)))) {
         ## "detect" siaf.gaussian => use 10% of bbox diameter as initial sd
         initpars["e.siaf.1"] <- round(log(0.1*sqrt(sum(apply(bbox(data$W), 1L, diff.default)^2))))

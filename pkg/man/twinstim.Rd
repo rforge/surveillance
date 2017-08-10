@@ -168,10 +168,10 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
 
     Initial values for the parameters may be given as list element
     \code{par} in the order \code{(endemic, epidemic, siaf, tiaf)}.
-    If no initial values are provided, a crude estimate for the endemic
-    intercept will be used (see the Examples),
-    but just zeroes for the remaining parameters.
-    However, any initial values given in the \code{start} argument
+    If no initial values are provided, crude estimates will be used for
+    the endemic intercept and the Gaussian kernel, -9 for the epidemic
+    intercept, and zeroes for the remaining parameters.
+    Any initial values given in the \code{start} argument
     take precedence over those in \code{par}.
     
     Note that \code{optim} receives the negative log-likelihood for 
