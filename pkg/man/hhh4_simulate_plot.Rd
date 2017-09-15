@@ -179,9 +179,11 @@ measlesModel <- list(
     family = "NegBin1", subset = 2:52,
     data = list(pop = population(measlesWeserEms)))
 measlesFit1 <- hhh4(measlesWeserEms, control = measlesModel)
+
+## use a Poisson distribution instead (just for comparison)
 measlesFit2 <- update(measlesFit1, family = "Poisson")
 
-## simulate realizations from this model during the second year
+## simulate realizations from these models during the second year
 measlesSims <- lapply(X = list(NegBin = measlesFit1, Poisson = measlesFit2),
                       FUN = simulate, nsim = 50, seed = 1, subset = 53:104,
                       y.start = observed(measlesWeserEms)[52,])
