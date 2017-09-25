@@ -219,3 +219,28 @@ psi2size.oneStepAhead <- function (object)
     dimnames(size) <- list(rownames(object$psi), colnames(object$pred))
     size
 }
+
+## confidence intervals for one-step-ahead predictions
+confint.oneStepAhead <- function (object, parm, level = 0.95, ...)
+{
+    levels <- (1+c(-1,1)*level)/2
+    names(levels) <- paste(format(100*levels, trim=TRUE, scientific=FALSE, digits=3), "%")
+    size <- psi2size.oneStepAhead(object)
+    cis <- if (is.null(size)) {
+        vapply(X = levels, FUN = qpois, FUN.VALUE = object$pred,
+               lambda = object$pred)
+    } else {
+        vapply(X = levels, FUN = qnbinom, FUN.VALUE = object$pred,
+               mu = object$pred, size = size)
+    }
+    ## one tp, one unit -> c(lower, upper)
+    ## otherwise, 'cis' has dimensions ntps x nUnit x 2
+    ## if nUnit==1, we return an ntps x 2 matrix, otherwise an array
+    if (is.vector(cis)) {
+        cis <- t(cis)
+        rownames(cis) <- rownames(object$pred)
+        cis
+    } else if (dim(cis)[2L] == 1L) {
+        drop(cis)
+    } else cis
+}

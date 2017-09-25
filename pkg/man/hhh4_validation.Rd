@@ -1,5 +1,6 @@
 \name{hhh4_validation}
 \alias{oneStepAhead}
+\alias{confint.oneStepAhead}
 \alias{scores.oneStepAhead}
 \alias{scores.hhh4}
 \alias{calibrationTest.oneStepAhead}
@@ -26,6 +27,8 @@
 oneStepAhead(result, tp, type = c("rolling", "first", "final"),
              which.start = c("current", "final"),
              keep.estimates = FALSE, verbose = TRUE, cores = 1)
+
+\method{confint}{oneStepAhead}(object, parm, level = 0.95, ...)
 
 ## assessment of "oneStepAhead" predictions
 \method{scores}{oneStepAhead}(x, which = c("logs", "rps", "dss", "ses"),
@@ -95,6 +98,10 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
     Note that parallelization is not possible in the default setting
     \code{type="rolling"} and \code{which.start="current"} (use
     \code{which.start="final"} for this to work).}
+
+  \item{object}{an object of class \code{"oneStepAhead"}.}
+  \item{parm}{unused (argument of the generic).}
+  \item{level}{required confidence level of the prediction interval.}
   
   \item{x}{an object of class \code{"oneStepAhead"} or \code{"hhh4"}.}
   \item{which}{character vector determining which scores to compute.
@@ -128,7 +135,7 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
   \item{reverse}{logical indicating if the rows (time points) should be
     reversed in the result (historical default for the
     \code{oneStepAhead}-method).}
-  \item{\dots}{Unused by the \code{scores}-methods.\cr
+  \item{\dots}{Unused by the \code{confint} and \code{scores} methods.\cr
     For the \code{calibrationTest}-method, further arguments are passed
     to \code{\link{calibrationTest.default}}, e.g., \code{which} to
     select a scoring rule.\cr
@@ -160,6 +167,9 @@ If \code{keep.estimates=TRUE}, there are the following additional elements:
 \item{logliks}{matrix with columns \code{"loglikelihood"} and
   \code{"margll"} with their obvious meanings.}
 
+The \code{confint}-method computes confidence intervals for the
+one-step-ahead predictions. If there is only on unit, it returns a
+tp x 2 matrix, otherwise a tp x unit x 2 array.
 
 The function \code{scores} computes the scoring rules specified in the
 argument \code{which}.
@@ -217,6 +227,7 @@ result <- hhh4(salmonella, model)
 pred <- oneStepAhead(result, nrow(salmonella)-5, type="rolling",
                      which.start="final", verbose=FALSE)
 pred
+confint(pred)
 
 \dontshow{
 ## test equivalence of parallelized version

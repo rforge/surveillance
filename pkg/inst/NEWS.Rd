@@ -23,6 +23,8 @@
     and the numerical difference depends on 
     the adaptive bandwidth used before (the default \code{adapt=0.1}
     yielded a rather rough approximation of the integral).
+
+    \item \code{confint()} for \code{"oneStepAhead"} predictions.
   }
 }
   
