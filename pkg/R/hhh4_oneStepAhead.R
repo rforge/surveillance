@@ -5,7 +5,7 @@
 ###
 ### Compute one-step-ahead predictions (means) at a series of time points
 ###
-### Copyright (C) 2011-2012 Michaela Paul, 2012-2016 Sebastian Meyer
+### Copyright (C) 2011-2012 Michaela Paul, 2012-2017 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -36,24 +36,26 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
     ## get model terms
     model <- result[["terms"]]
     if (is.null(model))
-        model <- result$terms <- with(result, interpretControl(control, stsObj))
+        model <- result$terms <- terms(result)
     nTime <- model$nTime   # = nrow(result$stsObj)
     nUnits <- model$nUnits # = ncol(result$stsObj)
     dimPsi <- model$nOverdisp
     withPsi <- dimPsi > 0L
     psiIdx <- model$nFE + model$nd + seq_len(dimPsi)
-    
+
     ## check that tp is within the time period of the data
-    stopifnot(length(tp) %in% 1:2)
-    tpRange <- c(min(model$subset), max(model$subset)-1L) # supported range
-    if (type == "final") { # no re-fitting necessary
-        stopifnot(tp >= 0, tp <= nTime-1L)
-    } else if (any(tp < tpRange[1L] | tp > tpRange[2L])) {
+    stopifnot(length(tp) %in% 1:2, tp >= 0)
+    tpRange <- c(model$subset[1L], nTime-1L) # supported range
+    if (any(tp > tpRange[2L]) || (type != "final" && any(tp < tpRange[1L]))) {
         stop("the time range defined by 'tp' must be a subset of ",
-             tpRange[1L], ":", tpRange[2L]) # because of how subset.upper works
+             tpRange[1L], ":", tpRange[2L])
     }
-    if (length(tp) == 1) tp <- c(tp, tpRange[2L])
-    tps <- tp[1L]:tp[2L]
+    if (length(tp) == 1) {
+        tp <- c(tp, max(model$subset)-1L)  # historical default
+        if (tp[1L] > tp[2L])  # probably unintended
+            stop("'tp' larger than the default upper limit (", tp[2L], ")")
+    }
+    tps <- tp[1L]:tp[2L]  # this function actually works if tp[1] > tp[2]
     ntps <- length(tps)
     observed <- model$response[tps+1,,drop=FALSE]
     rownames(observed) <- tps+1
@@ -63,7 +65,7 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
     result$control$verbose <- max(0, verbose - (ntps>1))
     if (type != "rolling" && verbose > 1L) verbose <- 1L
     do_pb <- verbose == 1L && interactive()
-    
+
     ## initial fit
     fit <- if (type == "first") {
         if (do_pb)
@@ -137,7 +139,7 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
             Sigma.orig[] <- .extractFromList("Sigma.orig")
             logliks[] <- .extractFromList("logliks")
         }
-        
+
     } else { ## sequential one-step ahead predictions
 
         if (do_pb) pb <- txtProgressBar(min=0, max=ntps, initial=0, style=3)
@@ -145,7 +147,7 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
             if (verbose > 1L) {
                 cat("\nOne-step-ahead prediction @ t =", tps[i], "...\n")
             } else if (do_pb) setTxtProgressBar(pb, i)
-            
+
             if (type == "rolling") { # update fit
                 fit.old <- fit # backup
                 start <- if (is.list(which.start)) {
@@ -166,7 +168,7 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
             }
 
             res <- getPreds(fit, tps[i])
-            
+
             ## gather results
             pred[i,] <- res$pred
             if (withPsi)
@@ -185,7 +187,7 @@ oneStepAhead <- function(result, # hhh4-object (i.e. a hhh4 model fit)
     if (dimPsi > 1L && dimPsi != nUnits) {
         psi <- psi[,model$indexPsi,drop=FALSE]
     }
-    
+
     ## done
     res <- c(list(pred = pred, observed = observed,
            psi = if (withPsi) psi else NULL,
@@ -213,7 +215,7 @@ psi2size.oneStepAhead <- function (object)
         size <- rep.int(size, dimpred[2L])
         dim(size) <- dimpred
     }
-    
+
     dimnames(size) <- list(rownames(object$psi), colnames(object$pred))
     size
 }

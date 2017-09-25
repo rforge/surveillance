@@ -43,14 +43,16 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
 
 \arguments{
   \item{result}{fitted \code{\link{hhh4}} model (class \code{"hhh4"}).}
-  \item{tp}{numeric vector of length 1 or 2.
-    One-step-ahead predictions are computed from time points 
-    \code{tp[1]}, \ldots, \code{tp[2]} (yielding predictions for time
-    points \code{tp[1]+1}, ...), where
-    \code{tp[2]} defaults to the penultimate time point of
-    \code{result$control$subset}.
+  \item{tp}{
+    numeric vector of length 2 specifying the time range in
+    which to compute one-step-ahead predictions (for the time points
+    \code{tp[1]+1}, \ldots, \code{tp[2]+1}).
+    If a single time index is specified, it is interpreted as
+    \code{tp[1]}, and \code{tp[2]} is set to the penultimate time point
+    of \code{result$control$subset}.
   }
-  \item{type}{The default \code{"rolling"} procedure sequentially 
+  \item{type}{
+    The default \code{"rolling"} procedure sequentially 
     refits the model up to each time point in \code{tp} and computes
     the one-step-ahead predictions for the respective next time point.
     The alternative \code{type}s are no true one-step-ahead predictions

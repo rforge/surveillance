@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.15.0 (2017-08-10)}{
+\section{Changes in surveillance version 1.15.0 (2017-09-25)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -37,6 +37,10 @@
 
     \item \code{twinstim()} uses a smaller default initial value for the
     epidemic intercept, which usually allows for faster convergence.
+
+    \item \code{update.hhh4()} now allows \code{subset.upper} values
+    beyond the originally fitted time range (but still within the time
+    range of the underlying \code{"sts"} object).
   }
 }
 
