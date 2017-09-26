@@ -291,8 +291,8 @@ fanplot <- function (quantiles, probs, observed = NULL, start = 1,
     ## graphical parameters
     stopifnot(is.list(fan.args))
     fan.args <- modifyList(
-        list(data = t(quantiles), probs = probs, start = start,
-             fan.col = heat.colors, ln = NULL),
+        list(data = t(quantiles), data.type = "values", probs = probs,
+             start = start, fan.col = heat.colors, ln = NULL),
         fan.args, keep.null = TRUE)
 
     ## initialize empty plot
