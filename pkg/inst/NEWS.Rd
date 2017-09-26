@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.15.0 (2017-09-25)}{
+\section{Changes in surveillance version 1.15.0 (2017-09-26)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -24,7 +24,8 @@
     the adaptive bandwidth used before (the default \code{adapt=0.1}
     yielded a rather rough approximation of the integral).
 
-    \item \code{confint()} for \code{"oneStepAhead"} predictions.
+    \item Added \code{quantile()}, \code{confint()}, and \code{plot()}
+    methods for \code{"oneStepAhead"} predictions.
   }
 }
   

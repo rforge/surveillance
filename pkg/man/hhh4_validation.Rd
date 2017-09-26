@@ -1,6 +1,8 @@
 \name{hhh4_validation}
 \alias{oneStepAhead}
+\alias{quantile.oneStepAhead}
 \alias{confint.oneStepAhead}
+\alias{plot.oneStepAhead}
 \alias{scores.oneStepAhead}
 \alias{scores.hhh4}
 \alias{calibrationTest.oneStepAhead}
@@ -11,7 +13,9 @@
 \title{Predictive Model Assessment for \code{hhh4} Models}
 \description{
   The function \code{oneStepAhead} computes successive one-step-ahead
-  predictions for a (random effects) HHH model fitted by \code{\link{hhh4}}. 
+  predictions for a (random effects) HHH model fitted by \code{\link{hhh4}}.
+  These can be inspected using the \code{quantile}, \code{confint} or
+  \code{plot} methods.
   The associated \code{\link{scores}}-method computes a number of (strictly) proper
   scoring rules based on such one-step-ahead predictions;
   see Paul and Held (2011) for details.
@@ -28,7 +32,11 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
              which.start = c("current", "final"),
              keep.estimates = FALSE, verbose = TRUE, cores = 1)
 
+\method{quantile}{oneStepAhead}(x, probs = c(2.5, 10, 50, 90, 97.5)/100, ...)
 \method{confint}{oneStepAhead}(object, parm, level = 0.95, ...)
+\method{plot}{oneStepAhead}(x, unit = 1, probs = 1:99/100,
+     fan.args = list(), observed.args = list(), key.args = NULL,
+     add = FALSE, ...)
 
 ## assessment of "oneStepAhead" predictions
 \method{scores}{oneStepAhead}(x, which = c("logs", "rps", "dss", "ses"),
@@ -65,9 +73,8 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
     subsequent predictions, whereas
     \code{"final"} will just use \code{result} to calculate these.
     The latter case thus gives nothing else than a subset of
-    \code{result$fitted.values}.
-    %% if the \code{tp}'s are part of the
-    %% fitted subset \code{result$control$subset}.
+    \code{result$fitted.values} if the \code{tp}'s are part of the
+    fitted subset \code{result$control$subset}.
   }
   \item{which.start}{
     Which initial parameter values should be used when successively
@@ -102,6 +109,31 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
   \item{object}{an object of class \code{"oneStepAhead"}.}
   \item{parm}{unused (argument of the generic).}
   \item{level}{required confidence level of the prediction interval.}
+  \item{probs}{numeric vector of probabilities with values in [0,1].}
+  \item{unit}{single integer or character selecting a unit for which to
+    produce the plot.}
+  \item{fan.args}{
+    a list of graphical parameters for the \code{\link[fanplot]{fan}},
+    e.g., to employ a different \code{\link{colorRampPalette}} as
+    \code{fan.col}, or to enable contour lines via \code{ln}.
+  }
+  \item{observed.args}{
+    if a list (of graphical parameters for \code{\link{lines}}),
+    the originally observed counts are added to the plot.
+  }
+  \item{key.args}{
+    if a list, a color key (in \code{\link[fanplot]{fan}}'s
+    \code{"boxfan"}-style) is added to the fan chart. The list may
+    include positioning parameters \code{start} (the x-position) and
+    \code{ylim} (the y-range of the color key), \code{space} to modify
+    the width of the boxfan, and \code{rlab} to modify the labels.
+    The color key is disabled by default.
+    An alternative way of labeling the quantiles is via the argument
+    \code{ln} in \code{fan.args}.
+  }
+  \item{add}{
+    a logical indicating if the fan chart should be added to an existing plot.
+  }
   
   \item{x}{an object of class \code{"oneStepAhead"} or \code{"hhh4"}.}
   \item{which}{character vector determining which scores to compute.
@@ -167,9 +199,11 @@ If \code{keep.estimates=TRUE}, there are the following additional elements:
 \item{logliks}{matrix with columns \code{"loglikelihood"} and
   \code{"margll"} with their obvious meanings.}
 
-The \code{confint}-method computes confidence intervals for the
-one-step-ahead predictions. If there is only on unit, it returns a
-tp x 2 matrix, otherwise a tp x unit x 2 array.
+The \code{quantile}-method computes quantiles of the one-step-ahead
+forecasts. If there is only one unit, it returns a tp x prob matrix,
+otherwise a tp x unit x prob array.
+The \code{confint}-method is a convenient wrapper with \code{probs} set
+according to the required confidence level.
 
 The function \code{scores} computes the scoring rules specified in the
 argument \code{which}.
@@ -227,7 +261,14 @@ result <- hhh4(salmonella, model)
 pred <- oneStepAhead(result, nrow(salmonella)-5, type="rolling",
                      which.start="final", verbose=FALSE)
 pred
+quantile(pred)
 confint(pred)
+
+## simple plot of the 95% one-week-ahead prediction interval
+plot(pred, probs = c(2.5,97.5)/100)
+## add point forecasts
+lines(x = as.integer(rownames(pred$pred)), y = pred$pred,
+      type = "b", col = "orange", lwd = 2, pch = 19)
 
 \dontshow{
 ## test equivalence of parallelized version

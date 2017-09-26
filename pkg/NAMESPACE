@@ -472,7 +472,9 @@ export(plotHHH4_fitted, plotHHH4_fitted1,
        plotHHH4_maps, plotHHH4_ri,
        plotHHH4_neweights)
 
+S3method(quantile, oneStepAhead)
 S3method(confint, oneStepAhead)
+S3method(plot, oneStepAhead)
 S3method(scores, default)
 S3method(scores, hhh4)
 S3method(scores, oneStepAhead)
