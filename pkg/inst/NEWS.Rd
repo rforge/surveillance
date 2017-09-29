@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.15.0 (2017-09-26)}{
+\section{Changes in surveillance version 1.15.0 (2017-09-29)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -44,6 +44,11 @@
     \item \code{update.hhh4()} now allows \code{subset.upper} values
     beyond the originally fitted time range (but still within the time
     range of the underlying \code{"sts"} object).
+
+    \item \code{scores.oneStepAhead()} by default reverses the ordering
+    of the time points. This awkward behaviour will change in the next
+    version, so the method now warns if the default \code{reverse=TRUE}
+    is used without explicit specification.
   }
 }
 

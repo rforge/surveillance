@@ -165,8 +165,8 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
     \code{units} should be returned. By default (\code{FALSE}), the
     individual scores are averaged over all \code{units}.}
   \item{reverse}{logical indicating if the rows (time points) should be
-    reversed in the result (historical default for the
-    \code{oneStepAhead}-method).}
+    reversed in the result. The akward historical default is to do so for the
+    \code{oneStepAhead}-method). This will change with the next version.}
   \item{\dots}{Unused by the \code{confint} and \code{scores} methods.\cr
     For the \code{calibrationTest}-method, further arguments are passed
     to \code{\link{calibrationTest.default}}, e.g., \code{which} to
@@ -216,6 +216,7 @@ Otherwise, the result is a matrix with \code{nrow(pred)} rows and
 first dimension is dropped in both cases.
 CAVE: For historical reasons, \code{scores.oneStepAhead} by default
 \code{reverse}s the order of the rows (time points)!
+This will change in the next version.
 The \code{hhh4}-method of \code{scores} does not reverse rows.
 
 
