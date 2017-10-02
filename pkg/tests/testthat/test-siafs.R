@@ -73,10 +73,8 @@ test_that("Step kernel implementation agrees with numerical approximation",
 
 ## ## plot the polygon on which F and Deriv are tested (to choose parameters)
 ## showsiaf <- function (siaf, pars) {
-##     data("letterR", package="spatstat", envir=environment())
-##     poly <- spatstat::shift.owin(letterR, -c(3,2))
-##     plotpolyf(poly, siaf$f, pars, print.args=list(split=c(1,1,2,1), more=TRUE))
-##     plotpolyf(poly, function (...) siaf$deriv(...)[,1], pars, print.args=list(split=c(2,1,2,1)))
+##     plotpolyf(spatstat.data::letterR, siaf$f, pars, print.args=list(split=c(1,1,2,1), more=TRUE))
+##     plotpolyf(spatstat.data::letterR, function (...) siaf$deriv(...)[,1], pars, print.args=list(split=c(2,1,2,1)))
 ## }
 ## showsiaf(siaf.student(), c(0.5,-0.5))
 
@@ -85,7 +83,7 @@ test_that("Step kernel implementation agrees with numerical approximation",
 
 expect_equal_CnR <- function (siafgen, pargrid)
 {
-    polydomain <- spatstat::shift.owin(spatstat::letterR, -c(3,2))
+    polydomain <- spatstat::shift.owin(spatstat.data::letterR, -c(3,2))
     siafR <- siafgen(engine = "R")
     siafC <- siafgen(engine = "C")
     ## check F
