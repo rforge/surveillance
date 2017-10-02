@@ -114,9 +114,11 @@ siaf.constant <- function ()
 siaf.fallback.F <- function (polydomain, f, pars, type, method = "SV", ...)
 {
     if (identical(method,"SV")) {
-        polyCub.SV(polydomain, f, pars, type, alpha=0, ...) # since max at origin
+        polyCub.SV(polyregion = polydomain, f = f, pars, type,
+                   alpha = 0, ...) # since max at origin
     } else {
-        polyCub(polydomain, f, method, pars, type, ...)
+        polyCub(polyregion = polydomain, f = f, method = method,
+                pars, type, ...)
     }
 }
 
@@ -139,7 +141,8 @@ siaf.fallback.Deriv <- function (polydomain, deriv, pars, type,
     deriv1 <- function (s, paridx)
         deriv(s, pars, type)[,paridx,drop=TRUE]
     intderiv1 <- function (paridx)
-        polyCub(polydomain, deriv1, method, paridx=paridx, ...)
+        polyCub(polyregion = polydomain, f = deriv1, method = method,
+                paridx = paridx, ...)
     vapply(X = seq_along(pars), FUN = intderiv1,
            FUN.VALUE = 0, USE.NAMES = FALSE)
 }
@@ -270,7 +273,8 @@ checksiaf.F <- function (F, f, pargrid, type=1, method="SV", ...)
     poly <- shift.owin(letterR, -c(3,2))
     res <- t(apply(pargrid, 1, function (pars) {
         given <- F(poly, f, pars, type)
-        num <- siaf.fallback.F(poly, f, pars, type, method=method, ...)
+        num <- siaf.fallback.F(polydomain = poly, f = f, pars = pars,
+                               type = type, method = method, ...)
         c(given, num)
     }))
     colnames(res) <- c("F", method)
@@ -283,9 +287,10 @@ checksiaf.Fcircle <- function (Fcircle, f, pargrid, type=1,
     pargrid <- pargrid[rep(1:nrow(pargrid), each=length(rs)),,drop=FALSE]
     rpargrid <- cbind(rs, pargrid, deparse.level=0)
     res <- t(apply(rpargrid, 1, function (x) {
-        c(ana = Fcircle(x[1], x[-1], type),
-          num = siaf.fallback.F(discpoly(c(0,0), x[1], npoly=128, class="owin"),
-                                f, x[-1], type, method=method, ...))
+        disc <- discpoly(c(0,0), x[1L], npoly = 128, class = "owin")
+        c(ana = Fcircle(x[1L], x[-1L], type),
+          num = siaf.fallback.F(polydomain = disc, f = f, pars = x[-1L],
+                                type = type, method = method, ...))
     }))
     res
 }
@@ -309,7 +314,8 @@ checksiaf.Deriv <- function (Deriv, deriv, pargrid, type=1, method="SV", ...)
     poly <- shift.owin(letterR, -c(3,2))
     res <- t(apply(pargrid, 1, function (pars) {
         given <- Deriv(poly, deriv, pars, type)
-        num <- siaf.fallback.Deriv(poly, deriv, pars, type, method=method, ...)
+        num <- siaf.fallback.Deriv(polydomain = poly, deriv = deriv, pars = pars,
+                                   type = type, method = method, ...)
         c(given, num)
     }))
     paridxs <- seq_len(ncol(pargrid))
