@@ -199,16 +199,3 @@ bibentry(
     pages = "1--55",
     doi = "10.18637/jss.v077.i11"
 )
-
-
-################################
-### basic software reference ###
-################################
-
-{
-    softwareRef <- citation(auto = meta)
-    softwareRef$key <- "R:surveillance"
-    softwareRef$header <- paste("To cite the software package",
-                                sQuote("surveillance"), "itself, use:")
-    softwareRef
-}
