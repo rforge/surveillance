@@ -25,6 +25,19 @@ REFERENCES <- readCitationFile(
     meta = packageDescription("pkg", lib.loc = "../..")
 )
 
+## a simple polygonal "owin" (with hole) for testing, obtained as
+## spatstat::owin(poly = rapply(
+##     spatstat::shift.owin(spatstat.data::letterR, -c(3,2))$bdry,
+##     round, digits = 1, how = "replace"))
+LETTERR <- spatstat::owin(poly = list(
+    list(x = c(0.9, 0.8, 0.7, 0.5, 0.4, 0.5, 0.7, 0.8, 0.8, 0.7, 0.7, 0.5,
+               0.3, -1, -1, -0.3, -0.3, -0.1, 0, 0.3, 0.9),
+         y = c(-1.3, -1, -0.7, -0.3, -0.2, -0.1, 0.1, 0.3, 0.5, 0.8, 1,
+               1.2, 1.3, 1.3, -1.3, -1.3, -0.3, -0.3, -0.5, -1.3, -1.4)),
+    list(x = c(-0.4, -0.4, 0, 0.1, 0.2, 0.1, 0.1, 0),
+         y = c(0.2, 0.7, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2))
+    ))
+
 
 ### Save to sysdata.rda
 

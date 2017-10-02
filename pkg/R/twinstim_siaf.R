@@ -268,10 +268,9 @@ checksiaf <- function (siaf, pargrid, type = 1, tolerance = 1e-5,
 
 checksiaf.F <- function (F, f, pargrid, type=1, method="SV", ...)
 {
-    poly <- shift.owin(spatstat.data::letterR, -c(3,2))
     res <- t(apply(pargrid, 1, function (pars) {
-        given <- F(poly, f, pars, type)
-        num <- siaf.fallback.F(polydomain = poly, f = f, pars = pars,
+        given <- F(LETTERR, f, pars, type)
+        num <- siaf.fallback.F(polydomain = LETTERR, f = f, pars = pars,
                                type = type, method = method, ...)
         c(given, num)
     }))
@@ -307,10 +306,9 @@ checksiaf.deriv <- function (deriv, f, pargrid, type=1, rmax=100)
 
 checksiaf.Deriv <- function (Deriv, deriv, pargrid, type=1, method="SV", ...)
 {
-    poly <- shift.owin(spatstat.data::letterR, -c(3,2))
     res <- t(apply(pargrid, 1, function (pars) {
-        given <- Deriv(poly, deriv, pars, type)
-        num <- siaf.fallback.Deriv(polydomain = poly, deriv = deriv, pars = pars,
+        given <- Deriv(LETTERR, deriv, pars, type)
+        num <- siaf.fallback.Deriv(polydomain = LETTERR, deriv = deriv, pars = pars,
                                    type = type, method = method, ...)
         c(given, num)
     }))
