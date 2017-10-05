@@ -164,7 +164,7 @@ scores.oneStepAhead <- function (x, which = c("logs","rps","dss","ses"),
     if (reverse) {
         result <- result[nrow(result):1L,,,drop=FALSE]
         if (missing(reverse))
-            warning("The time ordering is reversed in the result (historical default).\n",
+            warning("Time points are reversed in the result (historical default).\n",
                     "  Note that this will change with the next version of \"surveillance\".\n",
                     "  Set the 'reverse' argument explicitly to avoid this warning.")
     }
