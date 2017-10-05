@@ -69,7 +69,7 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
 
 \note{
   The Poisson approximation works well if the proportions of close
-  pairs in both time and space are small (Kulldorf and Hjalmars,
+  pairs in both time and space are small (Kulldorff and Hjalmars,
   1999), otherwise the Monte Carlo permutation approach is
   recommended.
 }

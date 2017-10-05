@@ -165,7 +165,7 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
     \code{units} should be returned. By default (\code{FALSE}), the
     individual scores are averaged over all \code{units}.}
   \item{reverse}{logical indicating if the rows (time points) should be
-    reversed in the result. The akward historical default is to do so for the
+    reversed in the result. The awkward historical default is to do so for the
     \code{oneStepAhead}-method). This will change with the next version.}
   \item{\dots}{Unused by the \code{confint} and \code{scores} methods.\cr
     For the \code{calibrationTest}-method, further arguments are passed
