@@ -320,8 +320,7 @@ spatio-temporal conditional intensity models to epidemic data.
 }
 
 \examples{
-data("imdepi")
-data("imdepifit")
+data("imdepi", "imdepifit")
 
 ## load borders of Germany's districts (originally obtained from the
 ## Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, Germany,
@@ -343,7 +342,8 @@ mysims <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
         mysim_from_list <- mysims[[1]]
         mysim_single <- eval("[[<-"(attr(mysims, "call"), "nsim", 1))
         mysim_from_list$runtime <- mysim_single$runtime <- NULL
-        stopifnot(all.equal(mysim_single, mysim_from_list, check.attributes = FALSE))
+        stopifnot(all.equal(mysim_single, mysim_from_list,
+                            check.attributes = FALSE))
     })
 }
 
@@ -387,8 +387,10 @@ invisible(lapply(csums_simulated, plotcsums,
 }
 
 
-if (surveillance.options("allExamples")) {
-### 'nsim' simulations of 'nm2add' months beyond the observed period:
+\dontrun{
+
+### Experimental code to generate 'nsim' simulations of 'nm2add' months
+### beyond the observed time period:
 nm2add <- 24
 nsim <- 5
 ### With these settings, simulations will take about 30 seconds.
@@ -431,6 +433,7 @@ for (i in seq_along(simsext$eventsList))
          cumulative=list(offset=c(table(imdepi$events$type)), maxat=330, axis=FALSE),
          border=NA, density=0)  # no histogram
 abline(v=origT, lty=2, lwd=2)
+
 }
 }
 
