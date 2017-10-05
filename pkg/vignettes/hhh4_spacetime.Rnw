@@ -7,7 +7,7 @@
 knitr::opts_chunk$set(echo = TRUE, tidy = FALSE, results = 'markup',
                       fig.path='plots/hhh4_spacetime-', fig.width = 8, fig.height = 4.5,
                       fig.align = "center", fig.scap = NA, out.width = NULL,
-                      cache = FALSE, error = FALSE, message = FALSE)
+                      cache = FALSE, error = FALSE, warning = FALSE, message = FALSE)
 knitr::render_sweave()             # use Sweave environments
 knitr::set_header(highlight = '')  # no \usepackage{Sweave} (part of jss class)
 ## R settings
@@ -1012,7 +1012,7 @@ We refer to \code{help("simulate.hhh4")} and \code{help("plot.hhh4sims")}
 for further examples.
 
 
-
+\pagebreak[2]
 %--------------
 % BIBLIOGRAPHY
 %--------------
