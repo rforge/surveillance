@@ -99,7 +99,7 @@
            Warning in as.mask(W, eps = eps, dimyx = dimyx, xy = xy) :
              pixel size parameter eps > size of window
 
-check imdepifit
+reproduce imdepifit as an example
 
 type-specific iso-kernels (need example or test code)
 
@@ -113,6 +113,8 @@ profiling:
 - use compiler::cmpfun on generated functions?
 
 really depend on polyCub?
+
+check bdist and ringAreas implementation with new spatstat
 
 
 #Fixed
@@ -195,6 +197,7 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 17/11/2014 add checkNeighbourhood(..., strict=TRUE) for integer check
 19/09/2016 nicer time axis for plot.hhh4 (maybe use xaxis feature of stsplot_time)
 19/09/2016 hhh4 for binomial data
+05/10/2017 scores.oneStepAhead: change to reverse=FALSE, remove warnings
 
 #Done
 23/06/2016 fitting NegBin models on non-overdispersed data fails, e.g.:
