@@ -1,6 +1,6 @@
 ################################################################################
-### Author: Sebastian Meyer [sebastian *.* meyer *a*t* ifspm *.* uzh *.* ch]
-### Time-stamp: <[imdepifit.R] by SM Don 22/05/2014 14:37 (CEST)>
+### Author: Sebastian Meyer [seb *.* meyer *a*t* fau *.* de]
+### Time-stamp: <[imdepifit.R] 2017-10-05 16:27 (CEST) by SM>
 ### Project: reproduce data(imdepifit)
 ################################################################################
 
@@ -13,9 +13,9 @@ data("imdepi")
 myimdepifit <- twinstim(
     endemic = addSeason2formula(~ offset(log(popdensity)) + I(start/365-3.5),
                                 S=1, period=365, timevar="start"),
-    epidemic = ~ type + agegrp, siaf = siaf.gaussian(),
+    epidemic = ~ type + agegrp, siaf = siaf.gaussian(F.adaptive=TRUE),
     data = imdepi, subset = !is.na(agegrp),
-    control.siaf = list(F=list(adapt=0.25), Deriv=list(nGQ=13)), 
+    control.siaf = list(F=list(adapt=0.25), Deriv=list(nGQ=13)),
     optim.args = list(par = c(-20, 0, 0.2, 0.3, -12, -1, 0, 0, 3)),
     model = FALSE, cumCIF = FALSE
 )
