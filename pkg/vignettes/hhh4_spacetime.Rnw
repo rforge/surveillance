@@ -1,6 +1,6 @@
 %\VignetteIndexEntry{hhh4 (spatio-temporal): Endemic-epidemic modeling of areal count time series}
 %\VignetteEngine{knitr::knitr}
-%\VignetteDepends{surveillance, lattice, spdep, gsl, colorspace, animation, gridExtra, scales, fanplot}
+%\VignetteDepends{surveillance, lattice, spdep, gsl, colorspace, animation, gridExtra, scales, fanplot, hhh4contacts}
 
 <<setup, cache = FALSE, include = FALSE, purl = FALSE>>=
 ## purl=FALSE => not included in the tangle'd R script
@@ -967,7 +967,10 @@ A useful epidemic model should therefore be additionally stratified by age group
 and take the inherent contact structure into account.
 How this extension can be incorporated in the spatio-temporal endemic-epidemic
 modeling framework \class{hhh4} has recently been investigated by
-\citet{meyer.held2015}.
+\citet{meyer.held2015}. The associated \pkg{hhh4contacts} package
+\citep{R:hhh4contacts} contains a demo script to exemplify this modeling
+approach with surveillance data on norovirus gastroenteritis and an
+age-structured contact matrix.
 
 
 
@@ -1018,7 +1021,7 @@ for further examples.
 ## create automatic references for R packages
 .Rbibfile <- file("hhh4_spacetime-R.bib", "w", encoding = "latin1")
 knitr::write_bib(
-    c("MASS", "Matrix", "spdep", "colorspace", "scales", "gridExtra", "lattice", "sp", "animation", "fanplot"),
+    c("MASS", "Matrix", "spdep", "colorspace", "scales", "gridExtra", "lattice", "sp", "animation", "fanplot", "hhh4contacts"),
     file = .Rbibfile, tweak = FALSE, prefix = "R:")
 close(.Rbibfile)
 @
