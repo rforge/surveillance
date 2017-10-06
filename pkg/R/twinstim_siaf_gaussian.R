@@ -95,6 +95,7 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
         expression(fvals <- exp(-sLengthSquared/2/sdss^2)),
         if (density) expression(fvals / (2*pi*sdss^2)) else expression(fvals)
     ))
+    environment(f) <- baseenv()
 
     # numerically integrate f over a polygonal domain
     if (F.adaptive) {
@@ -116,6 +117,7 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
         if (!density) expression(val <- val * 2*pi*sd^2),
         expression(val)
     ))
+    environment(Fcircle) <- getNamespace("stats")
 
     # effective integration range of f as a function of sd
     if (isScalar(effRangeMult)) {
@@ -123,6 +125,7 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
             tmp1,
             substitute(effRangeMult*sds)
         ))
+        environment(effRange) <- baseenv()
     } else effRange <- NULL
 
     # derivative of f wrt pars
@@ -150,6 +153,7 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
         derivexpr,
         expression(deriv)
     ))
+    environment(deriv) <- baseenv()
 
     # integrate 'deriv' over a polygonal domain
     if (F.adaptive || F.method != "iso") {
@@ -183,13 +187,9 @@ siaf.gaussian <- function (nTypes = 1, logsd = TRUE, density = FALSE,
     ## sampler (does not obey the 'ub' argument!!)
     body(simulate) <- as.call(c(as.name("{"),
         tmp1, tmp1.1,
-        expression(matrix(stats::rnorm(2*n, mean=0, sd=sd), nrow=n, ncol=2L))
+        expression(matrix(rnorm(2*n, mean=0, sd=sd), nrow=n, ncol=2L))
     ))
-
-    ## set function environments to the global environment
-    environment(f) <- environment(Fcircle) <-
-        environment(deriv) <- environment(simulate) <- .GlobalEnv
-    if (is.function(effRange)) environment(effRange) <- .GlobalEnv
+    environment(simulate) <- getNamespace("stats")
 
     ## return the kernel specification
     list(f=f, F=F, Fcircle=Fcircle, effRange=effRange, deriv=deriv, Deriv=Deriv,
