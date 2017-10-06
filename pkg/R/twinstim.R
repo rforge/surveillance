@@ -1007,6 +1007,11 @@ twinstim <- function (
         initpars[names(start)] <- start
     }
 
+    ## warn if initial intercept is negative when the identity link is used
+    if (epilink == "identity" && "e.(Intercept)" %in% names(initpars) &&
+        initpars["e.(Intercept)"] < 0)
+        warning("identity link and negative start value for \"e.(Intercept)\"")
+
     ## update optim.args$par
     optim.args$par <- initpars
 
