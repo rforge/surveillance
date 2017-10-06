@@ -116,7 +116,7 @@ aggregate.hhh4simslist <- function (x, units = TRUE, time = FALSE, ..., drop = F
 {
     if (drop || time) { # unclass(x) to use default "[["-method in lapply
         lapply(X = unclass(x), FUN = aggregate.hhh4sims,
-               units = units, time = time,..., drop = TRUE)
+               units = units, time = time, ..., drop = TRUE)
     } else {
         as.hhh4simslist.list(
             lapply(X = x, FUN = aggregate.hhh4sims,
