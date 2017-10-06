@@ -5,7 +5,7 @@
 ###
 ### Exponential temporal interaction function g(t) = exp(-alpha*t)
 ###
-### Copyright (C) 2009-2014 Sebastian Meyer
+### Copyright (C) 2009-2014,2017 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -21,7 +21,7 @@ tiaf.exponential <- function (nTypes = 1, validpars = NULL)
 {
     nTypes <- as.integer(nTypes)
     stopifnot(length(nTypes) == 1L, nTypes > 0L)
-    
+
     ## function definitions for nTypes = 1 (length(alpha) == 1)
     g <- function (t, alpha, types) {
         exp(-alpha*t)
@@ -63,9 +63,9 @@ tiaf.exponential <- function (nTypes = 1, validpars = NULL)
         })
     }
 
-    ## set function environments to the global environment
+    ## functions only need the base environment
     environment(g) <- environment(G) <-
-        environment(deriv) <- environment(Deriv) <- .GlobalEnv
+        environment(deriv) <- environment(Deriv) <- baseenv()
 
     ## return the kernel specification
     list(g=g, G=G, deriv=deriv, Deriv=Deriv, npars=nTypes, validpars=validpars)
