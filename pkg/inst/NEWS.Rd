@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.15.0 (2017-09-29)}{
+\section{Changes in surveillance version 1.15.0 (2017-10-06)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -26,6 +26,11 @@
 
     \item Added \code{quantile()}, \code{confint()}, and \code{plot()}
     methods for \code{"oneStepAhead"} predictions.
+
+    \item Exported the function \code{simEndemicEvents()} to simulate a
+    spatio-temporal point pattern from an endemic-only
+    \code{"twinstim"}; faster than via the general
+    \code{simulate.twinstim()} method.
   }
 }
   
@@ -49,6 +54,9 @@
     of the time points. This awkward behaviour will change in the next
     version, so the method now warns if the default \code{reverse=TRUE}
     is used without explicit specification.
+
+    \item Minor improvements in the documentation and some vignettes:
+    corrected typos, simplified example code, documented some methods.
   }
 }
 
@@ -59,6 +67,10 @@
     formulae (e.g., for \eqn{d==2} in \code{siaf.powerlaw()}).
     We now employ an absolute tolerance of 1e-7 (which should fix
     the failing tests on Solaris).
+
+    \item Interaction functions for \code{twinstim()}, such as
+    \code{siaf.powerlaw()} or \code{tiaf.exponential()}, no longer live in
+    the global environment as this risks using masked base functions.
   }
 }
 
