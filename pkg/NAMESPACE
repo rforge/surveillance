@@ -381,6 +381,7 @@ S3method(extractAIC, twinstim)
 S3method(nobs, twinstim)
 S3method(simulate, twinstim)
 export(simulate.twinstim)               # for convenience
+export(simEndemicEvents)
 S3method(R0, twinstim)
 export(simpleR0)
 S3method(residuals, twinstim)

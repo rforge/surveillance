@@ -311,12 +311,15 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 }
 
 \seealso{
+The function \code{\link{simEndemicEvents}} is a faster alternative
+for endemic-only models, only returning a
+\code{"\linkS4class{SpatialPointsDataFrame}"} of simulated events.
+  
 The \code{\link{plot.epidataCS}} and \code{\link{animate.epidataCS}}
 methods for plotting and animating continuous-space epidemic data,
-respectively, which also work for simulated epidemics (by inheritance).
-
-Function \code{\link{twinstim}} for fitting
-spatio-temporal conditional intensity models to epidemic data.
+respectively, also work for simulated epidemics (by inheritance),
+and \code{\link{twinstim}} can be used to fit
+spatio-temporal conditional intensity models also to simulated data.
 }
 
 \examples{
@@ -348,6 +351,7 @@ mysims <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
 }
 
 ## extract the second realization -> object of class simEpidataCS
+mysims
 mysim2 <- mysims[[2]]
 summary(mysim2)
 plot(mysim2, aggregate="space")

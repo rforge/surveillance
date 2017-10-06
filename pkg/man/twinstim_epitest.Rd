@@ -61,7 +61,7 @@ epitest(model, data, tiles, method = "time", B = 199,
       \item{\code{"simulate"}:}{
         obtain the null distribution of the test statistic by
         simulations from the endemic-only model
-        (using \code{\link{simulate.twinstim}}).
+        (using \code{\link{simEndemicEvents}}).
       }
     }
   }

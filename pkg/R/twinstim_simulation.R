@@ -1010,6 +1010,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 simEndemicEvents <- function (object, tiles)
 {
     ## check arguments
+    stopifnot(inherits(object, "twinstim"))
     if (is.null(modelenv <- environment(object)))
         stop("no model environment -- re-fit or update() with 'model=TRUE'")
     tileLevels <- levels(modelenv$gridTiles)
