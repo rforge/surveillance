@@ -99,24 +99,6 @@
            Warning in as.mask(W, eps = eps, dimyx = dimyx, xy = xy) :
              pixel size parameter eps > size of window
 
-reproduce imdepifit as an example
-
-type-specific iso-kernels (need example or test code)
-
-implement siaf.powerlaw2 parametrization (1+x/sigma)^-d
-
-implement siaf.powerlaw(scale = 1), i.e. with value of sigma fixed
-
-profiling:
-- siaf.step (now takes longer than siaf.gaussian) and power-law kernels
-- don't set siaf/tiaf functions in the global environment (user could redefine exp())
-- use compiler::cmpfun on generated functions?
-
-really depend on polyCub?
-
-check bdist and ringAreas implementation with new spatstat
-
-
 #Fixed
 29/07/2010>> Summary/print fuer twinstim Objekte, die mit do.call
              erzeugt worden sind scheint nicht zu funktionieren.
@@ -138,14 +120,26 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
       	   does not work. -> seems to work now after a bunch of bug fixes
 20/06/2017 ensure that isTRUE(all.equal(residuals(mysim2),
            surveillance:::residuals.twinstim(surveillance:::as.twinstim.simEpidataCS(mysim2))))
-
+06/10/2017 don't set siaf/tiaf functions in the global environment (possible masking)
 
 
 ##########
 # Features
 ##########
 
-# Feature requests
+- do we really need to attach polyCub?
+
+profiling:
+- siaf.step (now takes longer than siaf.gaussian) and power-law kernels
+- check bdist and ringAreas implementation with current spatstat
+- use compiler::cmpfun on generated functions?
+
+- type-specific iso-kernels (need example or test code)
+
+- implement siaf.powerlaw2 parametrization (1+x/sigma)^-d
+
+- implement siaf.powerlaw(scale = 1), i.e. with value of sigma fixed
+
 - as.epidataCS: "events" could be provided as an object of class ppx (which
   would include the window "W") or of class STIDF, then transform appropriately
   (but don't change "epidataCS" class definition).

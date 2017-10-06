@@ -37,6 +37,7 @@ siaf.powerlaw <- function (nTypes = 1, validpars = NULL, engine = "C")
         expression(sLength <- sqrt(.rowSums(s^2, nrow(s), 2L))),
         expression((sLength+sigma)^-d)
     ))
+    environment(f) <- baseenv()
 
     ## numerically integrate f over a polygonal domain
     F <- siaf_F_polyCub_iso(intrfr_name = "intrfr.powerlaw", engine = engine)
@@ -64,6 +65,7 @@ siaf.powerlaw <- function (nTypes = 1, validpars = NULL, engine = "C")
             basevolume + pi * intfinvsq
             )
     ))
+    environment(Fcircle) <- baseenv()
 
     ## derivative of f wrt logpars
     deriv <- function (s, logpars, types = NULL) {}
@@ -78,6 +80,7 @@ siaf.powerlaw <- function (nTypes = 1, validpars = NULL, engine = "C")
             cbind(derivlogsigma, derivlogd)
             )
     ))
+    environment(deriv) <- baseenv()
 
     ## Numerical integration of 'deriv' over a polygonal domain
     Deriv <- siaf_Deriv_polyCub_iso(
@@ -91,12 +94,7 @@ siaf.powerlaw <- function (nTypes = 1, validpars = NULL, engine = "C")
     ##     if (d <= 2) stop("improper density for d<=2, 'ub' must be finite")
     ##     1/(sigma^(d-2) * (d-2)*(d-1)) # = intrfr.powerlaw(Inf)
     ## }
-
-    ## set function environments to the global environment
-    environment(f) <- environment(Fcircle) <- environment(deriv) <- .GlobalEnv
-    ## in F, Deriv, and simulate we need access to the intrfr-functions
-    environment(F) <- environment(Deriv) <- environment(simulate) <-
-        getNamespace("surveillance")
+    environment(simulate) <- getNamespace("surveillance")
 
     ## return the kernel specification
     list(f=f, F=F, Fcircle=Fcircle, deriv=deriv, Deriv=Deriv,
