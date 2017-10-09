@@ -1,13 +1,14 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
-Version: 1.15.0
-Date: 2017-10-06
+Version: 1.15.0.9000
 Authors@R: c(MH = person("Michael", "Höhle",
                   email = "hoehle@math.su.se",
-                  role = c("aut", "ths")),
+                  role = c("aut", "ths"),
+                  comment = c(ORCID = "0000-0002-0423-6702")),
              SM = person("Sebastian", "Meyer",
                   email = "seb.meyer@fau.de",
-                  role = c("aut", "cre")),
+                  role = c("aut", "cre"),
+                  comment = c(ORCID = "0000-0002-1791-9449")),
              MP = person("Michaela", "Paul", role = "aut"),
              LH = person("Leonhard", "Held",
                   email = "Leonhard.Held@uzh.ch",
