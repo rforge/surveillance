@@ -10,6 +10,14 @@
 
 \section{Changes in surveillance version 1.15.0.9000 (UNRELEASED)}{
 
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item The \code{as.data.frame()} method for \code{"sts"} objects
+    gained a \code{tidy} argument, which enables conversion to the
+    long data format.
+  }
+}
+
 \subsection{BUG FIXES}{
   \itemize{
     \item \code{aggregate(stsObj, by = "unit")} no longer results in
