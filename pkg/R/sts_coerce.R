@@ -83,7 +83,7 @@ setMethod("as.data.frame", signature(x = "sts"),
                        "365" = "%j")
     years <- unique(as.numeric(formatDate(date,"%Y")))
     dummyDates <- as.Date(paste(rep(years,each=6),"-12-",26:31,sep=""))
-    maxEpoch <- tapply( as.numeric(formatDate(dummyDates, epochStr)), rep(years,each=6), max)
+    maxEpoch <- c(tapply(as.numeric(formatDate(dummyDates, epochStr)), rep(years,each=6), max))
     maxEpoch[pmatch(formatDate(date,"%Y"),names(maxEpoch),duplicates.ok=TRUE)]
   } else { # just replicate the fixed frequency
     x@freq
