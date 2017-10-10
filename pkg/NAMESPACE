@@ -198,6 +198,7 @@ exportMethods(toLatex)
 exportMethods(dim, dimnames, epochInYear, year)
 exportMethods(aggregate)
 exportMethods(as.data.frame)
+export(tidy.sts)
 
 # methods for accessing/replacing slots of an sts object (cf. AllGeneric.R)
 exportMethods(epoch,observed,alarms,upperbound,population,control,multinomialTS,neighbourhood)

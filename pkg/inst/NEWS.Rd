@@ -14,7 +14,7 @@
   \itemize{
     \item The \code{as.data.frame()} method for \code{"sts"} objects
     gained a \code{tidy} argument, which enables conversion to the
-    long data format.
+    long data format and is also available as function \code{tidy.sts()}.
   }
 }
 
