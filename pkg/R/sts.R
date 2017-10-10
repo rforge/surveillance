@@ -1,7 +1,7 @@
 ################################################################################
 ### Initialization and other basic methods for the S4 class "sts"
 ###
-### Copyright (C) 2007-2014 Michael Hoehle, 2012-2016 Sebastian Meyer
+### Copyright (C) 2007-2014 Michael Hoehle, 2012-2017 Sebastian Meyer
 ###
 ### This file is part of the R package "surveillance",
 ### free software under the terms of the GNU General Public License, version 2,
@@ -225,7 +225,7 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
     }
   }
   if (by == "unit") {
-    #Aggregate units (FIXME: this currently results in NULL colnames!)
+    #Aggregate units
     x@observed <- as.matrix(apply(x@observed, MARGIN=1, sum))
     x@state <- as.matrix(apply(x@state, MARGIN=1, sum))>0
     x@alarm <- as.matrix(apply(x@alarm, MARGIN=1, sum))>0 # contrary to counting for by="time"!
@@ -233,6 +233,9 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
     x@upperbound <- matrix(NA_real_,ncol=ncol(x@alarm),nrow=nrow(x@alarm))
     x@populationFrac <- as.matrix(apply(x@populationFrac, MARGIN=1, sum))#>0
     x@neighbourhood <- matrix(NA, 1, 1) # consistent with default for new("sts")
+    ## we have lost colnames
+    colnames(x@observed) <- "overall"
+    x <- fix.dimnames(x)
     ## FIXME: x@map will be invalid, remove or unionSpatialPolygons()?
   }
 

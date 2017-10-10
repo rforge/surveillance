@@ -25,8 +25,8 @@
     validity = function (object) {
         dimObserved <- dim(object@observed)
         namesObserved <- colnames(object@observed)
-        ## CAVE: NULL colnames are uncommon but possible,
-        ##       e.g., after aggregate(object, by="unit")
+        ## FIXME: disallow NULL colnames?
+        ## In surveillance <= 1.15.0, aggregate(by="unit") produced NULL colnames
         errors <- c(
             if (!isScalar(object@freq) || object@freq <= 0)
                 "'freq' must be a single positive number",
@@ -51,7 +51,6 @@
             if (length(object@map) > 0 && # i.e., not the empty prototype
                 !all(namesObserved %in% row.names(object@map)))
                 "'map' is incomplete; ensure that all(colnames(observed) %in% row.names(map))",
-            ## FIXME: invalidate objects with a map but NULL colnames?
             ## check booleans
             if (length(object@epochAsDate) != 1 || is.na(object@epochAsDate))
                 "'epochAsDate' must be either TRUE or FALSE",

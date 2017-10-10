@@ -8,6 +8,18 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.15.0.9000 (UNRELEASED)}{
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item \code{aggregate(stsObj, by = "unit")} no longer results in
+    empty colnames (set to \code{"overall"}).
+  }
+}
+
+}
+  
+
 \section{Changes in surveillance version 1.15.0 (2017-10-06)}{
 
 \subsection{NEW FEATURES}{
