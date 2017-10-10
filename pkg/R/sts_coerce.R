@@ -55,8 +55,6 @@ as.xts.sts <- function (x, order.by = epoch(x, as.Date = TRUE), ...)
 
 setMethod("as.data.frame", signature(x = "sts"),
           function(x, row.names = NULL, optional = FALSE, as.Date = x@epochAsDate, ...) {
-  namesObs <- colnames(x@observed)
-
   #Convert object to data frame and give names
   res <- data.frame("observed" = x@observed,
                     "epoch" = epoch(x, as.Date = as.Date),
@@ -66,8 +64,9 @@ setMethod("as.data.frame", signature(x = "sts"),
                     "population" = x@populationFrac,
                     check.names = FALSE)
 
-  names(res) <- if (length(namesObs) > 1) {
-    ## names from data.frame() above are actually already as intended
+  names(res) <- if (ncol(x) > 1) {
+    ## names from data.frame() above should already be as intended
+    namesObs <- colnames(x@observed, do.NULL = FALSE, prefix = "observed")
     c(paste0("observed.", namesObs), "epoch",
       paste0("state.", namesObs), paste0("alarm.", namesObs),
       paste0("upperbound.", namesObs), paste0("population.", namesObs))
