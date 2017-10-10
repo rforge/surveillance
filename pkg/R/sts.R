@@ -240,7 +240,8 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
     ## we have lost colnames
     colnames(x@observed) <- "overall"
     x <- fix.dimnames(x)
-    ## FIXME: x@map will be invalid, remove or unionSpatialPolygons()?
+    ## drop the map (set to empty prototype)
+    x@map <- new(getSlots("sts")[["map"]])
   }
 
   #validObject(x) #just a check

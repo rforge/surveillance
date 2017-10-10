@@ -14,6 +14,7 @@
   \itemize{
     \item \code{aggregate(stsObj, by = "unit")} no longer results in
     empty colnames (set to \code{"overall"}).
+    The obsolete map is dropped.
   }
 }
 
