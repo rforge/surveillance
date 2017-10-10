@@ -15,9 +15,6 @@
 
 \usage{
 tidy.sts(x, ...)
-
-## is the same as
-as.data.frame(x, tidy = TRUE)
 }
 
 \arguments{
@@ -37,6 +34,8 @@ as.data.frame(x, tidy = TRUE)
 data("momo")
 momodat <- tidy.sts(momo)
 head(momodat)
+
+## tidy.sts(stsObj) is the same as as.data.frame(stsObj, tidy = TRUE)
 stopifnot(identical(as.data.frame(momo, tidy = TRUE), momodat))
 }
 
