@@ -53,18 +53,26 @@ as.xts.sts <- function (x, order.by = epoch(x, as.Date = TRUE), ...)
 #               to freq (e.g. used for regression model)
 ######################################################################
 
-setMethod("as.data.frame", signature(x="sts"), function(x,row.names = NULL, optional = FALSE, as.Date=x@epochAsDate, ...) {
-  #Convert object to data frame and give names
-  res <- data.frame("observed"=x@observed, "epoch"=epoch(x,as.Date=as.Date), "state"=x@state, "alarm"=x@alarm,"upperbound"=x@upperbound,"population"=x@populationFrac)
+setMethod("as.data.frame", signature(x = "sts"),
+          function(x, row.names = NULL, optional = FALSE, as.Date = x@epochAsDate, ...) {
+  namesObs <- colnames(x@observed)
 
-  if (ncol(x) > 1) {
-    colnames(res) <-  c(paste("observed.",colnames(x@observed),sep=""),"epoch",
-                        paste("state.",colnames(x@observed),sep=""),
-                        paste("alarm.",colnames(x@observed),sep=""),
-                        paste("upperbound.",colnames(x@upperbound),sep=""),
-                        paste("population.",colnames(x@observed),sep=""))
+  #Convert object to data frame and give names
+  res <- data.frame("observed" = x@observed,
+                    "epoch" = epoch(x, as.Date = as.Date),
+                    "state" = x@state,
+                    "alarm" = x@alarm,
+                    "upperbound" = x@upperbound,
+                    "population" = x@populationFrac,
+                    check.names = FALSE)
+
+  names(res) <- if (length(namesObs) > 1) {
+    ## names from data.frame() above are actually already as intended
+    c(paste0("observed.", namesObs), "epoch",
+      paste0("state.", namesObs), paste0("alarm.", namesObs),
+      paste0("upperbound.", namesObs), paste0("population.", namesObs))
   } else {
-      colnames(res) <-  c("observed","epoch","state","alarm","upperbound","population")
+    c("observed", "epoch", "state", "alarm", "upperbound", "population")
   }
 
   #Find out how many epochs there are each year
