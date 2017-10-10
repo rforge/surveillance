@@ -188,6 +188,8 @@ sts2disProg <- function(sts) {
 
 setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...) {
 
+ by <- match.arg(by, choices = c("time", "unit"))
+
  ## Action of aggregation for populationFrac depends on the type
  binaryTS <- sum( x@populationFrac > 1 ) > 1  # FIXME @ Michael: why not any()?
  ## NOTE: we cannot rely on x@multinomialTS since this is not necessarily set
@@ -224,6 +226,8 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
       x@populationFrac <-x@populationFrac/sums
     }
   }
+
+  #Aggregate units
   if (by == "unit") {
     #Aggregate units
     x@observed <- as.matrix(apply(x@observed, MARGIN=1, sum))
