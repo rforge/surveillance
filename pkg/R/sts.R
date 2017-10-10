@@ -188,8 +188,10 @@ sts2disProg <- function(sts) {
 
 setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...) {
 
- #Action of aggregation for populationFrac depends on the type
- binaryTS <- sum( x@populationFrac > 1 ) > 1  # FIXME: x@multinomialTS?
+ ## Action of aggregation for populationFrac depends on the type
+ binaryTS <- sum( x@populationFrac > 1 ) > 1  # FIXME @ Michael: why not any()?
+ ## NOTE: we cannot rely on x@multinomialTS since this is not necessarily set
+ ##       if population(x) contains absolute numbers
 
   #Aggregate time
   if (by == "time") {
@@ -214,7 +216,7 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
     x@alarm <- as.matrix(aggregate(x@alarm,by=list(new),sum)[,-1]) # number of alarms
     x@upperbound <- as.matrix(aggregate(x@upperbound,by=list(new),sum)[,-1])
     x@populationFrac <- as.matrix(aggregate(x@populationFrac,by=list(new),sum)[,-1])
-    ## FIXME: should make clear (warn?) that population is summed over time
+    ## CAVE: summing population (fractions) over time might not be intended
 
     #the population fractions need to be recomputed if not a binary ts
     if (!binaryTS) {
@@ -285,7 +287,7 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
 
   x@populationFrac <- x@populationFrac[i,j,drop=FALSE]
   #If not binary TS the populationFrac is normed
-  binaryTS <- sum( x@populationFrac > 1 ) > 1 # FIXME @ Michael: x@multinomialTS
+  binaryTS <- sum( x@populationFrac > 1 ) > 1 # FIXME @ Michael: why not any()?
   if (!binaryTS) {
     x@populationFrac <- x@populationFrac / apply(x@populationFrac,MARGIN=1,sum)
    }
