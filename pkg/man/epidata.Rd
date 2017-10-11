@@ -13,7 +13,7 @@ Continuous-Time SIR Event History of a Fixed Population
 
 \description{
   The function \code{as.epidata} is used to generate objects
-  of \code{\link{class}} \code{"epidata"}.  Objects of this class are
+  of class \code{"epidata"}.  Objects of this class are
   specific data frames containing the event history of an epidemic together
   with some additional attributes.  These objects are the basis for fitting
   spatio-temporal epidemic intensity models with the function
@@ -22,8 +22,7 @@ Continuous-Time SIR Event History of a Fixed Population
   Note that the spatial information itself, i.e.
   the positions of the individuals, is assumed to be constant over time.  
   Besides epidemics following the SIR compartmental model, also data from SI,
-  SIRS and SIS epidemics may be supplied.  Inference for the infectious process
-  works as usual and simulation of such epidemics is also possible.
+  SIRS and SIS epidemics may be supplied.
 }
 
 \usage{
@@ -57,7 +56,8 @@ as.epidata(data, ...)
     For the default method, \code{data} can be a \code{\link{matrix}} or
     a \code{\link{data.frame}}.
     It must contain the observed event history in a form similar to 
-    \code{Surv(, type="counting")} with additional information (variables) along 
+    \code{Surv(, type="counting")} in package \pkg{survival},
+    with additional information (variables) along 
     the process.  Rows will be sorted automatically during conversion.
     The observation period is split up into \emph{consecutive}
     intervals of constant state - thus constant infection intensities.

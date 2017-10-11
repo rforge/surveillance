@@ -291,6 +291,9 @@ objects of class \code{"twinSIR"}.
 }
 
 \examples{
+# see vignette("twinSIR") for an example with a real data set
+
+# here is an artificial event history
 data("fooepidata")
 summary(fooepidata)
 
