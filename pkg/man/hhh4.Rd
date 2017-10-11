@@ -374,16 +374,6 @@ plot(measlesFit2, units = NULL, hide0s = TRUE)
 ## including vaccination coverage as a covariate,
 ## spatial power-law weights, and random intercepts.
 
-\dontshow{
-## check that neighbourhood weights array yields same result
-.neweights <- array(neighbourhood(measlesWeserEms),
-                   dim = c(rep(ncol(measlesWeserEms),2),nrow(measlesWeserEms)),
-                   dimnames = c(dimnames(neighbourhood(measlesWeserEms)), list(NULL)))
-measlesFit3_tv <- update(measlesFit3, ne = list(weights = .neweights),
-                         use.estimates = FALSE)
-stopifnot(all.equal(measlesFit3, measlesFit3_tv, ignore = "control"))
-}
-
 
 \dontrun{
 ### last but not least, a more sophisticated (and time-consuming)
