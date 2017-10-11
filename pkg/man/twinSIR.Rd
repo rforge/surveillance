@@ -26,7 +26,7 @@ twinSIR(formula, data, weights, subset,
   \item{formula}{
     an object of class \code{"\link{formula}"} (or one that can be coerced to
     that class): a symbolic description of the intensity model to be estimated.  
-    The details of model specification are given under Details.
+    The details of the model specification are given below.
   }
   \item{data}{
     an object inheriting from class \code{"\link{epidata}"}.
@@ -64,14 +64,12 @@ twinSIR(formula, data, weights, subset,
     \enc{Höhle}{Hoehle}, 2009).
   }
   \item{penalty}{
-    either a single number denoting the order of the difference used to
-    penalize  
+    either a single number denoting the order of the difference used to penalize
     the log-baseline coefficients (defaults to 1), or a more specific penalty
     matrix \eqn{K} for the parameter sub-vector \eqn{\beta}. In case of
     non-equidistant knots -- usually the case when using quantile based
-    knot locations -- a 1st order differences penalty matrix as in
-    Fahrmeir and Lang (2001) is available. For non-equidistant knots
-    higher orders than one are not implemented.  
+    knot locations -- only a 1st order differences penalty matrix as in
+    Fahrmeir and Lang (2001) is implemented.
   }
   \item{optim.args}{
     a list with arguments passed to the \code{\link{optim}} function.
@@ -144,7 +142,7 @@ twinSIR(formula, data, weights, subset,
   some variables marked as being endemic by the special function
   \code{\link{cox}}.  The left hand side of the formula is empty and will be
   set internally to \code{cbind(start, stop, event)}, which is similar to
-  \code{Surv(start, stop, event, type="counting")}.
+  \code{Surv(start, stop, event, type="counting")} in package \pkg{survival}.
   
   Basically, the additive-multiplicative model for the infection intensity
   \eqn{\lambda_i(t)} for individual \eqn{i} is
@@ -202,22 +200,20 @@ twinSIR(formula, data, weights, subset,
     marginal likelihood for the smoothing parameter is numerically
     optimized.  
   }
-  Depending on the data convergence might take a couple of iterations.
+  Depending on the data, convergence might take a couple of iterations.
 
   
   Note also that it is unwise to include endemic covariates with huge values,
-  as they affect the intensities on the exponential scale after having been
-  multiplied by the parameter vector \eqn{\beta}. With big covariates the
+  as they affect the intensities on the exponential scale (after
+  multiplication by the parameter vector \eqn{\beta}).
+  With large covariate values, the
   \code{optim} method "L-BFGS-B" will likely terminate due to an infinite 
   log-likelihood or score function in some iteration.
-
-  
 }
 
 \value{
-  \code{twinSIR} returns an object of \code{\link{class}}
-  \code{"twinSIR"}.  An object of this class is a list containing the
-  following components:
+  \code{twinSIR} returns an object of class
+  \code{"twinSIR"}, which is a list containing the following components:
   
   \item{coefficients}{a named vector of coefficients.}
   \item{loglik}{the maximum of the (penalized) log-likelihood function.}
