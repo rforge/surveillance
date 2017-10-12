@@ -23,6 +23,16 @@
     \item \code{aggregate(stsObj, by = "unit")} no longer results in
     empty colnames (set to \code{"overall"}).
     The obsolete map is dropped.
+
+    \item The \code{subset} argument of \code{twinSIR()} was partially
+    ignored:
+    \itemize{
+      \item If \code{nIntervals = 1}, the model \code{summary()}
+      reported the total number of events.
+      \item Automatic \code{knots}, model \code{residuals()}, as well as
+      the rug in \code{intensityplot()} were computed from the whole set
+      of event times.
+    }
   }
 }
 

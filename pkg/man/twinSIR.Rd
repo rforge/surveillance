@@ -44,8 +44,10 @@ twinSIR(formula, data, weights, subset,
   \item{knots}{
     numeric vector or \code{NULL} (the default).  Specification of the knots,
     where we suppose a step of the log-baseline.  With the current 
-    implementation, these must be existing \code{"stop"} time points in 
-    \code{subset(data, atRiskY == 1)}.  The intervals of constant log-baseline 
+    implementation, these must be existing \code{"stop"} time points in the
+    selected \code{subset} of the \code{data}, which is always
+    restricted to \code{atRiskY == 1} rows.
+    The intervals of constant log-baseline 
     hazard rate then are \eqn{(minTime;knots_1]}, \eqn{(knots_1;knots_2]},
     \ldots, \eqn{(knots_K;maxTime]}.
     By default, the \code{knots} are automatically chosen at the quantiles of
@@ -320,11 +322,26 @@ fit3 <- twinSIR(~ B1 + B2 + cox(z2), data = fooepidata, nIntervals = 9,
         par=c(coef(fit1)[1:2], rep(coef(fit1)[3],9), coef(fit1)[4])))
 fit3
 summary(fit3)
-# plot of the 9 log-baseline levels
-plot(x=fit3$intervals, y=coef(fit3)[c(3,3:11)], type="S")
 
-### -> for more sophisticated intensity plots, see 'plot.twinSIR'
-plot(fit3)
+# plot the estimated log-baseline levels
+plot(x=fit2$intervals, y=coef(fit2)[c(3,3:5)], type="S", xlim=c(0,10))
+lines(x=fit3$intervals, y=coef(fit3)[c(3,3:11)], type="S", col=2)
+legend("right", legend=c("unpenalized 3", "penalized 9"), lty=1, col=1:2, bty="n")
+
+## -> see help('plot.twinSIR') for intensity plots
+
+## special use case: fit the model to a subset of the events only,
+## while preserving epidemic contributions from the remainder
+## (maybe some buffer area nodes)
+fit_subset <- twinSIR(~ B1 + B2 + cox(z2), data = fooepidata, subset = z1 == 1)
+summary(fit_subset)
+
+\dontshow{
+    ## the eventTimes attribute was wrong in surveillance <= 1.15.0
+    stopifnot(
+        length(residuals(fit_subset)) == sum(fit_subset$model$survs$event)
+    )
+}
 }
 
 \keyword{models}
