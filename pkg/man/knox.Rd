@@ -108,7 +108,7 @@ knox(dt, ds, eps.t, eps.s, simulate.p.value = TRUE, B = 999, ...)
 }
 
 \seealso{
-  The function \code{\link[ade4]{mantel.randtest}} in package \pkg{ade4}
+  The function \code{mantel.randtest} in package \pkg{ade4}
   implements Mantel's (1967) space-time interaction test, i.e., using
   the Pearson correlation between the spatial and temporal distances of
   all event pairs as the test statistic, and assessing statistical
