@@ -19,7 +19,9 @@ poly2adjmat(SpP, ..., zero.policy = TRUE)
 
 \arguments{
   \item{SpP}{an object inheriting from \code{"\linkS4class{SpatialPolygons}"}.}
-  \item{\dots}{arguments passed to \code{\link[spdep]{poly2nb}}.}
+  \item{\dots}{arguments passed to \code{\link[spdep]{poly2nb}}.
+    Its \code{snap} argument might be particularly useful to handle maps
+    with sliver polygons.}
   \item{zero.policy}{logical indicating if islands are allowed, see
     \code{\link[spdep]{nb2mat}}.}
 }
