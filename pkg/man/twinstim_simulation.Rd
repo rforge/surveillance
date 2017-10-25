@@ -279,13 +279,13 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
 \note{
   The more detailed the polygons in \code{tiles} are the slower is
-  the algorithm. Often it can be advantageous to sacrifice some shape
-  detail for speed by reducing polygon complexity using, e.g., the
-  Douglas and Peucker (1973) reduction method available at
-  \url{MapShaper.org} (Harrower and Bloch, 2006) or as function
-  \code{\link[maptools]{thinnedSpatialPoly}} in package \pkg{maptools},
-  or by passing via \pkg{spatstat}'s
-  \code{\link[spatstat]{simplify.owin}} procedure.
+  the algorithm. You are advised to sacrifice some shape
+  details for speed by reducing the polygon complexity,
+  for example via \code{\link[rmapshaper]{ms_simplify}} from
+  the \CRANpkg{rmapshaper} package.
+  Alternative tools are provided by the packages \CRANpkg{maptools}
+  (\code{\link[maptools]{thinnedSpatialPoly}}) and \CRANpkg{spatstat}
+  (\code{\link[spatstat]{simplify.owin}}).
 }
 
 \references{
