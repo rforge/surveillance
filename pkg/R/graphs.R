@@ -6,7 +6,7 @@
 ### Functions concerning graphs: neighbourhood order, adjacency matrix
 ### These are wrappers around functionality from package "spdep" by Roger Bivand
 ###
-### Copyright (C) 2009-2013 Sebastian Meyer
+### Copyright (C) 2009-2013,2017 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -27,7 +27,7 @@ nbOrder <- function (neighbourhood, maxlag = 1)
     neighbourhood <- neighbourhood == 1           # convert to binary matrix
     nregions <- nrow(neighbourhood)
     maxlag <- as.integer(min(maxlag, nregions-1)) # upper bound of nb order
-    
+
     if (maxlag == 1L) {
         storage.mode(neighbourhood) <- "integer"
         return(neighbourhood)
@@ -69,7 +69,8 @@ nbOrder <- function (neighbourhood, maxlag = 1)
     ## message about maximum neighbour order by region
     maxlagbyrow <- apply(nbmat, 1, max)
     message("Note: range of maximum neighbour order by region is ",
-            paste(range(maxlagbyrow), collapse="-"))
+            paste0(range(maxlagbyrow), collapse="-"),
+            if (max(maxlagbyrow) == maxlag) " ('maxlag' reached)")
 
     ## Done
     nbmat
