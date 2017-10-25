@@ -236,14 +236,11 @@ to public health authorities give rise to spatio-temporal data,
 which are usually made available in the form of aggregated counts by region and period.
 The Robert Koch Institute (RKI) in Germany, for example, maintains a database of
 cases of notifiable diseases, which can be queried via the
-\emph{SurvStat@RKI}\footnote{\url{https://survstat.rki.de}}
-online service.
+\emph{SurvStat@RKI} online service (\url{https://survstat.rki.de}).
 To exemplify area-level \code{hhh4} models in the remainder of this manuscript,
 we use weekly counts of measles infections by district in the
 Weser-Ems region of Lower Saxony, Germany, 2001--2002, downloaded from
-\emph{SurvStat@RKI} (as of Annual Report 2005)
-and already used as an example in the original \code{hhh4} model proposal
-\citep[Section~3.2]{held-etal-2005}.
+\emph{SurvStat@RKI} (as of Annual Report 2005).
 These data are contained in \pkg{surveillance} as
 \code{data("measlesWeserEms")} -- an object of the \proglang{S}4-class \class{sts}
 (``surveillance time series'') used for data input in \code{hhh4} models and
@@ -260,11 +257,15 @@ $I$ units. In our example, the latter consists of the adjacency
 orders~$o_{ji}$ between the districts.
 A map of the districts in the form of a \code{SpatialPolygons} object (defined
 by the \CRANpkg{sp} package of \citealp{R:sp}) can be used to
-derive the matrix of adjacency orders automatically using the functions
+derive the matrix of adjacency orders automatically\footnote{
+  Visual inspection of the result is recommended, e.g., via labelling the
+  districts in the map with the number of identified first-order neighbors
+  (the crucial \code{poly2adjmat} step).
+} using the functions
 \code{poly2adjmat} and \code{nbOrder},
 which wrap functionality of package \CRANpkg{spdep} \citep{R:spdep}:
 <<measlesWeserEms_neighbourhood>>=
-weserems_nbOrder <- nbOrder(poly2adjmat(map), maxlag = 10)
+weserems_nbOrder <- nbOrder(poly2adjmat(map), maxlag = Inf)
 @
 Given the aforementioned ingredients, the \class{sts} object
 \code{measlesWeserEms} has been constructed as follows:
@@ -276,7 +277,7 @@ Here, \code{start} and \code{frequency} have the same meaning as for classical
 time-series objects of class \class{ts}, i.e., (year, sample number) of the
 first observation and the number of observations per year.
 Note that \code{data("measlesWeserEms")} constitutes a corrected version of
-\code{data("measles.weser")} originally analyzed by \citet{held-etal-2005}.
+\code{data("measles.weser")} originally analyzed by \citet[Section~3.2]{held-etal-2005}.
 Differences are documented on the associated help page.
 
 We can visualize such \class{sts} data in four ways:
@@ -845,7 +846,7 @@ measlesPreds2 <- lapply(mget(models2compare), oneStepAhead,
   tp = tp, type = "rolling", which.start = "final")
 @
 
-Figure~\ref{fig:measlesPreds2_plot} shows a \pkg{fanplot} \citep{R:fanplot} of
+Figure~\ref{fig:measlesPreds2_plot} shows \CRANpkg{fanplot}s \citep{R:fanplot} of
 the sequential one-week-ahead forecasts from the random effects models for the
 same districts as in Figure~\ref{fig:measlesFitted_ri}:
 <<measlesPreds2_plot, fig.cap = "Fan charts of rolling one-week-ahead forecasts during the second quarter of 2002, as produced by the random effects model \\code{measlesFit\\_ri}, for the six most affected districts.", out.width="\\linewidth", echo=-1>>=
@@ -967,7 +968,7 @@ A useful epidemic model should therefore be additionally stratified by age group
 and take the inherent contact structure into account.
 How this extension can be incorporated in the spatio-temporal endemic-epidemic
 modeling framework \class{hhh4} has recently been investigated by
-\citet{meyer.held2015}. The associated \pkg{hhh4contacts} package
+\citet{meyer.held2015}. The associated \CRANpkg{hhh4contacts} package
 \citep{R:hhh4contacts} contains a demo script to exemplify this modeling
 approach with surveillance data on norovirus gastroenteritis and an
 age-structured contact matrix.
