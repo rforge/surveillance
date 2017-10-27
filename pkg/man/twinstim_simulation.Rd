@@ -326,7 +326,7 @@ spatio-temporal conditional intensity models also to simulated data.
 data("imdepi", "imdepifit")
 
 ## load borders of Germany's districts (originally obtained from the
-## Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, Germany,
+## Bundesamt fuer Kartographie und Geodaesie, Frankfurt am Main, Germany,
 ## www.geodatenzentrum.de), simplified by the "modified Visvalingam"
 ## algorithm (level=6.6\%) using MapShaper.org (v. 0.1.17):
 load(system.file("shapes", "districtsD.RData", package="surveillance"))
