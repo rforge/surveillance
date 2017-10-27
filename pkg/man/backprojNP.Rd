@@ -166,8 +166,8 @@ backprojNP(sts, incu.pmf,
 
   Associations of Age and Sex on Clinical Outcome and Incubation Period
   of Shiga toxin-producing Escherichia coli O104:H4 Infections, 2011
-  (2013), Werber D, King LA, Müller L, Follin P, Buchholz U, Bernard H,
-  Rosner BM, Ethelberg S, de Valk H, Höhle M, American Journal of
+  (2013), Werber D, King LA, \enc{Müller}{Mueller} L, Follin P, Buchholz U, Bernard H,
+  Rosner BM, Ethelberg S, de Valk H, \enc{Höhle}{Hoehle} M, American Journal of
   Epidemiology, 178(6):984-992.
 }
 

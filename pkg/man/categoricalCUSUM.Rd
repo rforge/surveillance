@@ -66,9 +66,9 @@ categoricalCUSUM(stsObj,control = list(range=NULL,h=5,pi0=NULL,
   etc. slots trimmed to the \code{control$range} indices.
 }
 \references{
-  Höhle, M. (2010):
+  \enc{Höhle}{Hoehle}, M. (2010):
   Online Change-Point Detection in Categorical Time Series.
-  Book chapter in T. Kneib and G. Tutz (Eds.), Statistical
+  In: T. Kneib and G. Tutz (Eds.), Statistical
   Modelling and Regression Structures, Physica-Verlag.
 
   Salmon, M., Schumacher, D. and \enc{Höhle}{Hoehle}, M. (2016):
