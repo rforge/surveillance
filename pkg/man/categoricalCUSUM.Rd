@@ -125,8 +125,8 @@ if (require("gamlss")) {
   # redundant, but generalizes easier to k>2 categories.
   ######################################################################
 
-  abattoir2 <- new("sts",epoch=1:nrow(abattoir), start=c(2006,1),freq=52,
-    observed=cbind(abattoir@observed,abattoir@populationFrac -abattoir@observed),
+  abattoir2 <- sts(epoch=1:nrow(abattoir), start=c(2006,1), freq=52,
+    observed=cbind(abattoir@observed, abattoir@populationFrac-abattoir@observed),
     populationFrac=cbind(abattoir@populationFrac,abattoir@populationFrac),
     state=matrix(0,nrow=nrow(abattoir),ncol=2),
     multinomialTS=TRUE)
