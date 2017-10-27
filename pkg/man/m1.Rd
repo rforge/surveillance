@@ -49,7 +49,7 @@
 }
 \source{
   Robert Koch-Institut: SurvStat:
-  \url{http://www3.rki.de/SurvStat};
+  \url{https://survstat.rki.de/};
   m1 and m3 were queried on 10 November 2004. The rest during September 2004.
 }
 \seealso{\code{\link{readData}}}
