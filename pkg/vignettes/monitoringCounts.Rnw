@@ -611,9 +611,8 @@ humidity on the occurrence of weekly reported campylobacter cases in Germany.
 <<campyDE, fig=FALSE, echo = FALSE, label=campyDE,include = F,results=tex>>=
 # Load data and create \code{sts}-object
 data("campyDE")
-cam.sts <- new("sts",epoch=as.numeric(campyDE$date),
-               observed=campyDE$case,  state=campyDE$state,
-               epochAsDate=TRUE)
+cam.sts <- sts(epoch=as.numeric(campyDE$date), epochAsDate=TRUE,
+               observed=campyDE$case, state=campyDE$state)
 par(las=1)
 # Plot
 y.max <- max(observed(cam.sts),upperbound(cam.sts),na.rm=TRUE)
@@ -650,9 +649,8 @@ axis(side=4, at=seq(0,2500,by=500),labels=seq(0,50,by=10),las=1,cex.lab=cex.text
 
 <<campyDElongVersion, eval=FALSE, fig=FALSE, echo = TRUE, label=campyDElongVersion,include = TRUE,results=tex,keep.source=TRUE>>=
 data("campyDE")
-cam.sts <- new("sts", epoch = as.numeric(campyDE$date),
-               observed = campyDE$case, state = campyDE$state,
-               epochAsDate = TRUE)
+cam.sts <- sts(epoch = as.numeric(campyDE$date), epochAsDate = TRUE,
+               observed = campyDE$case, state = campyDE$state)
 plot(cam.sts, legend = NULL, xlab = "time [weeks]", ylab = "No. reported",
      col = "gray", cex = 2, cex.axis = 2, cex.lab = 2)
 lines(campyDE$hum * 50, col = "darkblue", lwd = 2)
@@ -808,8 +806,8 @@ combineSTS <- function(stsList) {
    alarm <- cbind(alarm,alarms(stsList[[i]]))
  }
  colnames(observed) <- colnames(alarm) <- names(stsList)
- res <- new("sts", epoch=as.numeric(epoch),
-            observed=observed, alarm=alarm,epochAsDate=TRUE)
+ res <- sts(epoch=as.numeric(epoch), epochAsDate=TRUE,
+            observed=observed, alarm=alarm)
  return(res)
 }
 @
@@ -1085,7 +1083,7 @@ observedHosp <- cbind(observed(salmHospitalized),
                       population(salmHospitalized) -
 					  observed(salmHospitalized))
 nrowHosp <- nrow(salmHospitalized)
-salmHospitalized.multi <- new("sts", freq = 52, start = c(2004, 1),
+salmHospitalized.multi <- sts(freq = 52, start = c(2004, 1),
                               epoch = as.numeric(epoch(salmHospitalized)),
                               epochAsDate = TRUE,
                               observed = observedHosp,
@@ -1097,7 +1095,7 @@ salmHospitalized.multi <- new("sts", freq = 52, start = c(2004, 1),
 # Create the \code{sts}-object with the counts for the 2 categories
 population <- population(salmHospitalized)
 observed <- observed(salmHospitalized)
-salmHospitalized.multi <- new("sts", freq=52, start=c(2004,1),
+salmHospitalized.multi <- sts(freq=52, start=c(2004,1),
                               epoch = as.numeric(epoch(salmHospitalized)),
                               epochAsDate=TRUE,
                               observed = cbind(observed,
