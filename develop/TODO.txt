@@ -28,7 +28,8 @@
 #======================================================================
 
 #Open
-29/11/2016 stsplot_time: add population argument for incidence plots
+29/11/2016 autoplot.sts(), i.e., ggplot2 variant (via tidy.sts),
+           including population argument for incidence plots
 
 #Done
 29/11/2016 improve as.data.frame-method, e.g., epochInPeriod is wrong in:
@@ -125,7 +126,7 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 # Features
 ##########
 
-- do we really need to attach polyCub?
+- replace as(W, "owin") by explicitly imported as.owin.SpatialPolygons()
 
 profiling:
 - siaf.step (now takes longer than siaf.gaussian) and power-law kernels

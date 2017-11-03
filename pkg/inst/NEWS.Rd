@@ -18,6 +18,13 @@
   }
 }
 
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item Package \CRANpkg{polyCub} is no longer automatically attached
+    (just imported).
+  }
+}
+
 \subsection{BUG FIXES}{
   \itemize{
     \item \code{aggregate(stsObj, by = "unit")} no longer results in
