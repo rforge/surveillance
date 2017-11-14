@@ -40,6 +40,11 @@
       the rug in \code{intensityplot()} were computed from the whole set
       of event times.
     }
+
+    \item The \code{as.epidata.data.frame()} converter did not actually
+    allow for latent periods (via \code{tE.col}). This is now possible
+    but considered experimental (methods for \code{"epidata"} currently
+    ignore latent periods).
   }
 }
 

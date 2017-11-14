@@ -33,7 +33,7 @@ as.epidata(data, ...)
            f = list(), w = list(), D = dist, keep.cols = TRUE, ...)
 \method{as.epidata}{default}(data, id.col, start.col, stop.col,
            atRiskY.col, event.col, Revent.col, coords.cols,
-           f = list(), w = list(), D = dist, ...)
+           f = list(), w = list(), D = dist, .latent = FALSE, ...)
 
 \method{print}{epidata}(x, ...)
 \method{[}{epidata}(x, i, j, drop)
@@ -87,7 +87,12 @@ as.epidata(data, ...)
     SIR, SEI, or SI data. \code{NA} entries mean that the respective
     event has not (yet) occurred. Note that \code{is.na(tE)} implies
     \code{is.na(tI)} and \code{is.na(tR)}, and \code{is.na(tI)} implies
-    \code{is.na(tR)} (and this is checked for the provided data).
+    \code{is.na(tR)} (and this is checked for the provided data).\cr
+    CAVE: Support for latent periods (\code{tE.col}) is currently
+    experimental. Inference using \code{twinSIR()} works, but the methods
+    for \code{"epidata"} (e.g., \code{summary} and \code{plot}) will
+    ignore the latent periods and assume tE = tI. There is also no
+    support for latent periods in \code{\link{simulate.twinSIR}}.
   }
   \item{id.col}{
     single numeric or character index of the \code{id} column in \code{data}.
@@ -199,6 +204,12 @@ as.epidata(data, ...)
     time-constant individual-specific covariates.
     Alternatively, \code{keep.cols} can be a numeric or character vector
     indexing columns of \code{data} to keep.
+  }
+  \item{.latent}{
+    (internal) logical indicating whether to allow for latent periods
+    (EXPERIMENTAL). Otherwise (default), the function verifies that an
+    event (i.e., switching to the I state) only happens when the
+    respective individual is at risk (i.e., in the S state).
   }
   \item{x,object}{
     an object of class \code{"epidata"}.
