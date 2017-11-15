@@ -88,11 +88,7 @@ as.epidata(data, ...)
     event has not (yet) occurred. Note that \code{is.na(tE)} implies
     \code{is.na(tI)} and \code{is.na(tR)}, and \code{is.na(tI)} implies
     \code{is.na(tR)} (and this is checked for the provided data).\cr
-    CAVE: Support for latent periods (\code{tE.col}) is currently
-    experimental. Inference using \code{twinSIR()} works, but the methods
-    for \code{"epidata"} (e.g., \code{summary} and \code{plot}) will
-    ignore the latent periods and assume tE = tI. There is also no
-    support for latent periods in \code{\link{simulate.twinSIR}}.
+    CAVE: Support for latent periods (\code{tE.col}) is experimental!
   }
   \item{id.col}{
     single numeric or character index of the \code{id} column in \code{data}.
