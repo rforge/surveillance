@@ -57,6 +57,10 @@
            Individuals with atRiskY=0 in the first block are considered
 	   initially infective...
 
+15/11/2017 The methods for "epidata" (e.g., summary and plot) ignore latent
+    periods and assume tE = tI. Also no support for latent periods in
+    simulate.twinSIR. twinSIR would also require amendments...
+
 #Fixed
 25/03/2011 intensityPlot in twinSIR does not work if there are initially
            infectious individuals (as in the hagelloch data)
