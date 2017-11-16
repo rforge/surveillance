@@ -15,6 +15,10 @@
     \item The \code{as.data.frame()} method for \code{"sts"} objects
     gained a \code{tidy} argument, which enables conversion to the
     long data format and is also available as function \code{tidy.sts()}.
+
+    \item \code{as.epidata.data.frame()} gained an argument
+    \code{max.time} to specify the end of the observation period (which
+    by default coincides with the last observed event).
   }
 }
 

@@ -32,7 +32,8 @@
 
 as.epidata.data.frame <- function (data, t0, tE.col, tI.col, tR.col,
                                    id.col, coords.cols, f = list(), w = list(),
-                                   D = dist, keep.cols = TRUE, ...)
+                                   D = dist, max.time = NULL,
+                                   keep.cols = TRUE, ...)
 {
     if (missing(t0)) {
         return(NextMethod("as.epidata"))  # as.epidata.default
@@ -50,6 +51,13 @@ as.epidata.data.frame <- function (data, t0, tE.col, tI.col, tR.col,
         }
     }
 
+    ## parse max.time
+    if (is.null(max.time) || is.na(max.time)) { # max(stop) is at last event
+        max.time <- NA_real_
+    } else {
+        stopifnot(max.time > t0)
+    }
+
     ## parse id column
     id <- factor(data[[id.col]]) # removes unused levels
     stopifnot(!anyDuplicated(id), !is.na(id))
@@ -57,6 +65,7 @@ as.epidata.data.frame <- function (data, t0, tE.col, tI.col, tR.col,
 
     ## make time relative to t0
     subtract_t0 <- function (x) as.numeric(x - t0)
+    max.time <- subtract_t0(max.time)
     tI <- subtract_t0(data[[tI.col]])
     tE <- if (missing(tE.col)) tI else subtract_t0(data[[tE.col]])
     tR <- if (missing(tR.col)) rep.int(NA_real_, N) else subtract_t0(data[[tR.col]])
@@ -70,8 +79,15 @@ as.epidata.data.frame <- function (data, t0, tE.col, tI.col, tR.col,
              paste0(id[.wrongsequence], collapse = ", "))
     }
 
+    ## ignore events after max.time
+    if (!is.na(max.time)) {
+        is.na(tE) <- tE > max.time
+        is.na(tI) <- tI > max.time
+        is.na(tR) <- tR > max.time
+    }
+
     ## vector of stop times
-    stopTimes <- c(tE, tI, tR)
+    stopTimes <- c(tE, tI, tR, max.time)
     stopTimes <- stopTimes[!is.na(stopTimes) & stopTimes > 0]
     stopTimes <- sort.int(unique.default(stopTimes), decreasing = FALSE)
     nBlocks <- length(stopTimes)

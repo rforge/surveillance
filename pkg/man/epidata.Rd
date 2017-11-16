@@ -30,7 +30,8 @@ as.epidata(data, ...)
 
 \method{as.epidata}{data.frame}(data, t0,
            tE.col, tI.col, tR.col, id.col, coords.cols,
-           f = list(), w = list(), D = dist, keep.cols = TRUE, ...)
+           f = list(), w = list(), D = dist,
+           max.time = NULL, keep.cols = TRUE, ...)
 \method{as.epidata}{default}(data, id.col, start.col, stop.col,
            atRiskY.col, event.col, Revent.col, coords.cols,
            f = list(), w = list(), D = dist, .latent = FALSE, ...)
@@ -73,11 +74,13 @@ as.epidata(data, ...)
     rule follows the point process characteristic that there are no
     concurrent events (infections or removals).
   }
-  \item{t0}{
-    start time of the observation period. Will be subtracted
-    from the time columns \code{tE.col}, \code{tI.col}, \code{tR.col}.
+  \item{t0,max.time}{
+    observation period. In the resulting \code{"epidata"}, the time
+    scale will be relative to the start time \code{t0}.
     Individuals that have already been removed prior to \code{t0}, i.e.,
     rows with \code{tR <= t0}, will be dropped.
+    The end of the observation period (\code{max.time}) will by default
+    (\code{NULL}, or if \code{NA}) coincide with the last observed event.
   }
   \item{tE.col, tI.col, tR.col}{
     single numeric or character indexes of the time columns in
