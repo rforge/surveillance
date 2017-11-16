@@ -713,7 +713,7 @@ summary.epidata <- function (object, ...)
         time.I = rep(NA_real_, n-size), time.R = rep(NA_real_, n-size),
         time.S = rep(NA_real_, n-size), row.names = NULL, check.names = FALSE)
     byID_all <- rbind(byID_everInfected,
-                      byID_neverInfected[seq_along(byID_everInfected)])
+                      byID_neverInfected[names(byID_everInfected)])
     byID <- byID_all[order(byID_all[["id"]]),]
     rownames(byID) <- NULL
 
