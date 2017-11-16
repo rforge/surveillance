@@ -325,6 +325,11 @@ twinSIR <- function (formula, data, weights, subset,
   ##<- equals attr(data, "eventTimes") if missing(subset)
   attr(survs, "timeRange") <- timeRange
 
+  ## Check that we have events
+  if (length(attr(survs, "eventTimes")) == 0)
+      warning("no events in data",
+              if (!missing(subset)) " (subject to 'subset')")
+
   ## Check specified baseline intervals
   if (is.null(knots) && isScalar(nIntervals)) {
     knots <- if (nIntervals == 1) {
