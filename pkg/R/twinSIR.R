@@ -174,7 +174,7 @@
 
   # Build the optional variation process (Martinussen & Scheike, p64)
   fisherinfo <- matrix(0, nrow=px+pz, ncol=px+pz)
-  for (i in 1:nrow(dloglambda)) {
+  for (i in seq_len(nrow(dloglambda))) {
     x <- dloglambda[i,,drop=FALSE]  # single-ROW matrix
     fisherinfo <- fisherinfo + crossprod(x) # t(x) %*% x
   }
@@ -420,7 +420,7 @@ twinSIR <- function (formula, data, weights, subset,
         #Use Fahrmeir & Lang (2001), p.206
         invdelta <- 1/diff(intervals) * mean(diff(intervals))
         #Use Fahrmeir & Lang (2001), p.206
-        for (i in 1:(nIntervals)) {
+        for (i in seq_len(nIntervals)) {
           idx2 <- cbind(j=c(-1,1) + i, deltaidx=i+c(-1,0),fac=c(-1,-1))
           idx2 <- idx2[idx2[,"j"] > 0 & idx2[,"j"] <= nIntervals,,drop=FALSE]
           #Off diagonal elements
