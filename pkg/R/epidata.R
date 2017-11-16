@@ -682,7 +682,11 @@ summary.epidata <- function (object, ...)
             .res <- reshape(eventTable, direction = "wide", timevar = "type",
                            idvar = "id")
             attr(.res, "reshapeWide") <- NULL
-            .res
+            if ("time.I" %in% names(.res)) {
+                .res
+            } else { # degenerate case: only R (and S) events in data
+                cbind(.res[1L], "time.I" = NA_real_, .res[-1L])
+            }
         } else {
             rowsPerId <- table(eventTable[["id"]])
             modulo3 <- rowsPerId %% 3
