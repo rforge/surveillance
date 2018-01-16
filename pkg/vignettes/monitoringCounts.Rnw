@@ -1805,3 +1805,12 @@ Juliane Manitz, University of G\"{o}ttingen, Germany, for her work on the \textt
 \bibliography{monitoringCounts,references}
 
 \end{document}
+
+
+
+<<echo = FALSE, include = FALSE>>=
+## MGLM 0.0.9 defines its own standardGeneric("AIC"), which masks stats::AIC ...
+## This strangely carries over to other vignettes during R CMD build, where,
+## e.g., the default AIC method is not found. We thus need to detach MGLM here.
+unloadNamespace("MGLM")
+@
