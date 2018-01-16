@@ -1434,7 +1434,7 @@ Based on this, the \textit{in-control} and \textit{out-of-control} proportions a
 <<echo=TRUE,eval=FALSE>>=
 m1 <- m0
 
-m1$coefficients[1, ] <- m0$coefficients[1, ] + log(7)
+m1@coefficients[1, ] <- m0@coefficients[1, ] + log(7)
 
 pi0 <- t(predict(m0, newdata = X[phase2, ])[, reorder])
 pi1 <- t(predict(m1, newdata = X[phase2,])[, reorder])
@@ -1442,7 +1442,7 @@ pi1 <- t(predict(m1, newdata = X[phase2,])[, reorder])
 <<echo=FALSE>>=
 m1 <- m0
 # Out-of control model: shift in all intercept coeffs
-m1$coefficients[1,] <- m0$coefficients[1,] + log(2)
+m1@coefficients[1,] <- m0@coefficients[1,] + log(2)
 # Proportion over time for phase2 based on fitted model (re-order back)
 pi0 <- t(predict(m0, newdata=X[phase2,])[,reorder])
 pi1 <-  t(predict(m1, newdata=X[phase2,])[,reorder])
@@ -1507,7 +1507,7 @@ The Dirichlet distribution is the multicategorical equivalent of the beta-binomi
 m0.dm <- MGLMreg(as.matrix(rotaBB.df[phase1, 1:5]) ~ -1 + X[phase1, ],
                 dist = "DM")
 
-c(m0$AIC, m0.dm$AIC)
+c(m0@AIC, m0.dm@AIC)
 @
 Hence, the above estimated false alarm probability might be too low for the actual monitoring problem, because the variation in the time series is larger than implied by the multinomial. Hence, it appears prudent to repeat the analysis using the more flexible  Dirichlet-multinomial model. This is straightforward with \code{categoricalCUSUM} once the \textit{out-of-control} proportions are specified in terms of the model. Such a specification is, however, hampered by the fact that the two models use different parametrizations.
 
@@ -1525,7 +1525,7 @@ alpha0 <- exp(X[phase2,] %*% m0.dm$coefficients)
 alpha1 <- exp(X[phase2,] %*% m1.dm$coefficients)
 
 dfun <- function(y, size, mu, log = FALSE) {
-	dLog <- ddirm(t(y), t(mu))
+	dLog <- ddirmn(t(y), t(mu))
 	if (log) { return(dLog) } else { return(exp(dLog)) }
 }
 
@@ -1539,16 +1539,16 @@ surv.dm <- categoricalCUSUM(rotaBB, control = control)
 # Change intercept in the first class (for DM all 5 classes are modeled)
 delta <- 2
 m1.dm <- m0.dm
-m1.dm$coefficients[1,] <- m0.dm$coefficients[1,] +
+m1.dm@coefficients[1,] <- m0.dm@coefficients[1,] +
                            c(-delta,rep(delta/4,4))
 # Calculate the alphas of the multinomial-Dirichlet in the two cases
-alpha0 <- exp(X[phase2,] %*% m0.dm$coefficients)
-alpha1 <- exp(X[phase2,] %*% m1.dm$coefficients)
+alpha0 <- exp(X[phase2,] %*% m0.dm@coefficients)
+alpha1 <- exp(X[phase2,] %*% m1.dm@coefficients)
 
 # Use alpha vector as mu magnitude
 # (not possible to compute it from mu and size)
 dfun <- function(y, size, mu, log=FALSE) {
-	dLog <- ddirm(t(y), t(mu))
+	dLog <- ddirmn(t(y), t(mu))
 	if (log) { return(dLog) } else {return(exp(dLog))}
 }
 

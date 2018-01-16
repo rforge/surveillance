@@ -26,6 +26,9 @@
   \itemize{
     \item Package \CRANpkg{polyCub} is no longer automatically attached
     (just imported).
+
+    \item Some code in \code{vignette("monitoringCounts")} has been
+    adjusted to work with the new version of \CRANpkg{MGLM} (0.0.9).
   }
 }
 
