@@ -5,7 +5,7 @@
 ###
 ### Standard methods for hhh4-fits
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2012-2017 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2018 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -579,6 +579,11 @@ neOffsetArray <- function (object, pars = coefW(object),
 ## compare two hhh4 fits ignoring at least the "runtime" and "call" elements
 all.equal.hhh4 <- function (target, current, ..., ignore = NULL)
 {
+    if (!inherits(target, "hhh4"))
+        return("'target' is not a \"hhh4\" object")
+    if (!inherits(current, "hhh4"))
+        return("'current' is not a \"hhh4\" object")
+
     ignore <- unique.default(c(ignore, "runtime", "call"))
     target[ignore] <- current[ignore] <- list(NULL)
     NextMethod("all.equal")

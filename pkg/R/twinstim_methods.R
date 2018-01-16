@@ -6,7 +6,7 @@
 ### Methods for objects of class "twinstim", specifically:
 ### vcov, logLik, print, summary, plot, R0, residuals, update, terms, all.equal
 ###
-### Copyright (C) 2009-2017 Sebastian Meyer
+### Copyright (C) 2009-2018 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -823,6 +823,11 @@ terms.twinstim <- function (x, component=c("endemic", "epidemic"), ...)
 ## just like all.equal.hhh4()
 all.equal.twinstim <- function (target, current, ..., ignore = NULL)
 {
+    if (!inherits(target, "twinstim"))
+        return("'target' is not a \"twinstim\" object")
+    if (!inherits(current, "twinstim"))
+        return("'current' is not a \"twinstim\" object")
+
     ignore <- unique.default(c(ignore, "runtime", "call"))
     target[ignore] <- current[ignore] <- list(NULL)
     NextMethod("all.equal")

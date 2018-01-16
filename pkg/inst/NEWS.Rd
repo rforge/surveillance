@@ -49,6 +49,9 @@
     allow for latent periods (via \code{tE.col}). This is now possible
     but considered experimental (methods for \code{"epidata"} currently
     ignore latent periods).
+
+    \item The \code{all.equal()} methods for \code{"hhh4"} and
+    \code{"twinstim"} objects now first check for the correct classes.
   }
 }
 
