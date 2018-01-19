@@ -23,10 +23,10 @@ autoplot.sts <- function (object, units = NULL, as.one = FALSE,
 
     p <- ggplot2::ggplot(
         data = data,
-        mapping = ggplot2::aes(x = date, y = observed, group = unit)
+        mapping = ggplot2::aes_(x = ~date, y = ~observed, group = ~unit)
     )
     if (as.one) {
-        p <- p + ggplot2::geom_line(ggplot2::aes(colour = unit))
+        p <- p + ggplot2::geom_line(ggplot2::aes_(colour = ~unit))
     } else {
         p <- p + ggplot2::geom_bar(stat = "identity") +
             ggplot2::facet_wrap(~unit, scales = scales, drop = TRUE)
