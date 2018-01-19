@@ -26,7 +26,7 @@ autoplot.sts <- function (object, units = NULL, as.one = FALSE,
         mapping = ggplot2::aes(x = date, y = observed, group = unit)
     )
     if (as.one) {
-        p <- p + ggplot2::geom_line(aes(colour = unit))
+        p <- p + ggplot2::geom_line(ggplot2::aes(colour = unit))
     } else {
         p <- p + ggplot2::geom_bar(stat = "identity") +
             ggplot2::facet_wrap(~unit, scales = scales, drop = TRUE)
