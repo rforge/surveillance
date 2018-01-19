@@ -85,8 +85,6 @@ export(marks)                           # we define an epidataCS-method
 importFrom(spatstat, multiplicity)
 export(multiplicity)                    # we define a Spatial-method
 
-## Note: we depend on instead of import package polyCub to avoid "::" references
-##       in some of the siaf.* generators which create functions in .GlobalEnv
 importFrom(polyCub, polyCub, .polyCub.iso, polyCub.SV, polyCub.midpoint, xylist)
 importMethodsFrom(polyCub, coerce)
 
