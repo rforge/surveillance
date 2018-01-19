@@ -1,7 +1,7 @@
 ################################################################################
-### Wrapper function for fanplot::fan
+### Wrapper function for fanplot::fan()
 ###
-### Copyright (C) 2017 Sebastian Meyer
+### Copyright (C) 2017-2018 Sebastian Meyer
 ###
 ### This file is part of the R package "surveillance",
 ### free software under the terms of the GNU General Public License, version 2,
@@ -11,7 +11,7 @@
 ## quantiles: time x prob, observed: vector
 fanplot <- function (quantiles, probs, observed = NULL, start = 1,
     fan.args = list(), observed.args = list(), key.args = NULL,
-    xlim = NULL, ylim = NULL, xlab = "time", ylab = "No. infected",
+    xlim = NULL, ylim = NULL, xlab = "Time", ylab = "No. infected",
     add = FALSE, ...)
 {
     stopifnot(is.matrix(quantiles), length(probs) == ncol(quantiles),
