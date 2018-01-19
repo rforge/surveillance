@@ -211,6 +211,7 @@ export(stsplot_time, stsplot_time1, stsplot_alarm)
 export(addFormattedXAxis, atChange, at2ndChange, atMedian) #for time axis formatting
 export(stsplot_spacetime) # old implementation of (animated) map
 S3method(animate, sts)    # S3-method for an S4 class, see ?Methods
+export(autoplot.sts)
 
 # outbreak detection algorithms (sts-interfaces)
 export(wrap.algo, farrington, bayes, rki, cusum, glrpois, glrnb, outbreakP, boda) # FIXME: rogerson, hmm ??
