@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.15.0.9000 (UNRELEASED)}{
+\section{Changes in surveillance version 1.16.0 (UNRELEASED)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -21,15 +21,24 @@
     by default coincides with the last observed event).
 
     \item The now exported function \code{fanplot()} wraps
-    \CRANpkg{fanplot}\code{::fan()}.
+    \CRANpkg{fanplot}\code{::fan()}. It is used by
+    \code{plot.oneStepAhead()} and \code{plot.hhh4sims()}, which now
+    have an option to add the point forecasts to the fan as well.
+  }
+}
+
+\subsection{MAJOR CHANGES}{
+  \itemize{
+    \item Package \CRANpkg{polyCub} is no longer automatically attached
+    (just imported).
+
+    \item \code{scores.oneStepAhead()} no longer reverses the ordering
+    of the time points by default, as announced in 1.15.0.
   }
 }
 
 \subsection{MINOR CHANGES}{
   \itemize{
-    \item Package \CRANpkg{polyCub} is no longer automatically attached
-    (just imported).
-
     \item Some code in \code{vignette("monitoringCounts")} has been
     adjusted to work with the new version of \CRANpkg{MGLM} (0.0.9).
   }

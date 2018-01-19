@@ -190,14 +190,16 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
            as plot-methods for arrays of simulated counts returned by
            simulate.hhh4(..., simplify=TRUE)
 17/11/2014 add checkNeighbourhood(..., strict=TRUE) for integer check
-19/09/2016 nicer time axis for plot.hhh4 (maybe use xaxis feature of stsplot_time)
 19/09/2016 hhh4 for binomial data
-05/10/2017 scores.oneStepAhead: change to reverse=FALSE, remove warnings
 18/10/2017 plotHHH4_season: add options for groups and confidence intervals (from hhh4contacts)
 18/10/2017 implement [.hhh4sims (from [.hhh4simslist)
 25/10/2017 use scoringRules package, especially for scores.hhh4sims (logs)
+19/01/2018 scores.oneStepAhead: remove the message concerning 'reverse'
 
 #Done
+19/01/2018 scores.oneStepAhead: change to reverse=FALSE, remove warnings
+19/01/2018 plotHHH4sims_fan should make use of fanplot()
+19/09/2016 nicer time axis for plot.hhh4 (maybe use xaxis feature of stsplot_time)
 23/06/2016 fitting NegBin models on non-overdispersed data fails, e.g.:
            set.seed(1); hhh4(poists <- sts(rpois(104, 5)), list(family="NegBin1")); plot(poists)
            A more informative warning message hinting on overdisp would be nice

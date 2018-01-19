@@ -8,7 +8,7 @@
 ### Czado, C., Gneiting, T. & Held, L. (2009)
 ### Biometrics 65:1254-1261
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2014-2015,2017 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2014-2015,2017-2018 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -135,12 +135,12 @@ scores.default <- function(x, mu, size = NULL,
     simplify2array(scorelist, higher = TRUE)
 }
 
+
 ### apply scoring rules to a set of oneStepAhead() forecasts
-## CAVE: returns scores in reversed order, i.e. for time points n, n-1, n-2, ...
 
 scores.oneStepAhead <- function (x, which = c("logs","rps","dss","ses"),
                                  units = NULL, sign = FALSE, individual = FALSE,
-                                 reverse = TRUE, ...)
+                                 reverse = FALSE, ...)
 {
     y <- x$observed  # observed counts during the prediction window
     mu <- x$pred     # predicted counts (same dim as y)
@@ -163,10 +163,9 @@ scores.oneStepAhead <- function (x, which = c("logs","rps","dss","ses"),
     ## reverse order of the time points (historically)
     if (reverse) {
         result <- result[nrow(result):1L,,,drop=FALSE]
-        if (missing(reverse))
-            warning("Time points are reversed in the result (historical default).\n",
-                    "  Note that this will change with the next version of \"surveillance\".\n",
-                    "  Set the 'reverse' argument explicitly to avoid this warning.")
+    } else if (missing(reverse)) {
+        message("Note: surveillance 1.16.0 no longer reverses the time points by default.\n",
+                "  Set the 'reverse' argument explicitly to avoid this message.")
     }
 
     ## average over units if requested

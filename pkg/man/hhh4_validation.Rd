@@ -40,7 +40,7 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
 
 ## assessment of "oneStepAhead" predictions
 \method{scores}{oneStepAhead}(x, which = c("logs", "rps", "dss", "ses"),
-       units = NULL, sign = FALSE, individual = FALSE, reverse = TRUE, ...)
+       units = NULL, sign = FALSE, individual = FALSE, reverse = FALSE, ...)
 \method{calibrationTest}{oneStepAhead}(x, units = NULL, ...)
 \method{pit}{oneStepAhead}(x, units = NULL, ...)
 
@@ -165,8 +165,9 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
     \code{units} should be returned. By default (\code{FALSE}), the
     individual scores are averaged over all \code{units}.}
   \item{reverse}{logical indicating if the rows (time points) should be
-    reversed in the result. The awkward historical default is to do so for the
-    \code{oneStepAhead}-method). This will change with the next version.}
+    reversed in the result. The long-standing but awkward default was to
+    do so for the \code{oneStepAhead}-method. This has changed in
+    version 1.16.0, so time points are no longer reversed by default.}
   \item{\dots}{Unused by the \code{confint} and \code{scores} methods.\cr
     For the \code{calibrationTest}-method, further arguments are passed
     to \code{\link{calibrationTest.default}}, e.g., \code{which} to
@@ -214,10 +215,6 @@ result is an array of dimensions
 Otherwise, the result is a matrix with \code{nrow(pred)} rows and
 \code{5+sign} columns. If there is only one predicted time point, the
 first dimension is dropped in both cases.
-CAVE: For historical reasons, \code{scores.oneStepAhead} by default
-\code{reverse}s the order of the rows (time points)!
-This will change in the next version.
-The \code{hhh4}-method of \code{scores} does not reverse rows.
 
 
 The \code{\link{calibrationTest}}- and \code{\link{pit}}-methods are
@@ -287,7 +284,7 @@ stopifnot(identical(
 
 
 ## compute scores of the one-step-ahead predictions
-(sc <- scores(pred, reverse = FALSE))
+(sc <- scores(pred))
 
 ## the above uses the scores-method for "oneStepAhead" predictions,
 ## which is a simple wrapper around the default method:
@@ -300,8 +297,7 @@ scores(x = pred$observed, mu = pred$pred, size = exp(pred$psi))
 ## test that scFitted is equivalent to scores(oneStepAhead(..., type = "final"))
 stopifnot(all.equal(
     scFitted,
-    scores(oneStepAhead(result, nrow(salmonella)-5, type="final", verbose=FALSE),
-           reverse = FALSE),
+    scores(oneStepAhead(result, nrow(salmonella)-5, type="final", verbose=FALSE)),
     check.attributes = FALSE))
 }
 
