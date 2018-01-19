@@ -117,6 +117,7 @@ export(qlomax)                     # quantile function of the Lomax distribution
 export(plapply)
 export(clapply)
 export(hcl.colors)
+export(fanplot)
 
 # spatial utilities
 export(discpoly)

@@ -198,6 +198,7 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 18/10/2017 plotHHH4_season: add options for groups and confidence intervals (from hhh4contacts)
 18/10/2017 implement [.hhh4sims (from [.hhh4simslist)
 25/10/2017 use scoringRules package, especially for scores.hhh4sims (logs)
+19/01/2018 plotHHH4sims_fan should make use of fanplot()
 
 #Done
 23/06/2016 fitting NegBin models on non-overdispersed data fails, e.g.:

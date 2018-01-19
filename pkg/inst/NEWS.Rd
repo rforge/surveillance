@@ -19,6 +19,9 @@
     \item \code{as.epidata.data.frame()} gained an argument
     \code{max.time} to specify the end of the observation period (which
     by default coincides with the last observed event).
+
+    \item The now exported function \code{fanplot()} wraps
+    \CRANpkg{fanplot}\code{::fan()}.
   }
 }
 
