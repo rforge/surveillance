@@ -5,14 +5,14 @@
 \description{
 The \code{fanplot()} function in \pkg{surveillance} wraps functionality of
 the dedicated \CRANpkg{fanplot} package, employing a different default style
-and optionally adding observed values.
+and optionally adding point predictions and observed values.
 }
 
 \usage{
-fanplot(quantiles, probs, observed = NULL, start = 1,
-        fan.args = list(), observed.args = list(), key.args = NULL,
-        xlim = NULL, ylim = NULL, xlab = "Time", ylab = "No. infected",
-        add = FALSE, ...)
+fanplot(quantiles, probs, means = NULL, observed = NULL, start = 1,
+        fan.args = list(), means.args = list(), observed.args = list(),
+        key.args = NULL, xlim = NULL, ylim = NULL,
+        xlab = "Time", ylab = "No. infected", add = FALSE, ...)
 }
 
 \arguments{
@@ -21,6 +21,9 @@ fanplot(quantiles, probs, observed = NULL, start = 1,
   }
   \item{probs}{
     numeric vector of probabilities with values between 0 and 1.
+  }
+  \item{means}{
+    (optional) numeric vector of point forecasts.
   }
   \item{observed}{
     (optional) numeric vector of observed values.
@@ -32,6 +35,11 @@ fanplot(quantiles, probs, observed = NULL, start = 1,
     a list of graphical parameters for the \code{\link[fanplot]{fan}},
     e.g., to employ a different \code{\link{colorRampPalette}} as
     \code{fan.col}, or to enable contour lines via \code{ln}.
+  }
+  \item{means.args}{
+    a list of graphical parameters for \code{\link{lines}}
+    to modify the plotting style of the \code{means}.
+    The default is a white line within the fan.
   }
   \item{observed.args}{
     a list of graphical parameters for \code{\link{lines}}
@@ -79,17 +87,17 @@ fanplot(quantiles, probs, observed = NULL, start = 1,
 ## artificial data example to illustrate the graphical options
 if (requireNamespace("fanplot")) {
     means <- c(18, 19, 20, 25, 26, 35, 34, 25, 19)
-    y <- rnorm(length(means), means, sd = 3)
-    quantiles <- sapply(1:99/100, qnorm, means, 3^seq(1,2,length.out=length(means)))
+    y <- rlnorm(length(means), log(means), 0.5)
+    quantiles <- sapply(1:99/100, qlnorm, log(means), seq(.5,.8,length.out=length(means)))
     
-    ## default style with an added key
-    fanplot(quantiles = quantiles, probs = 1:99/100, observed = y,
-            key.args = list(start = 1, space = .3, ylim = c(30,50)))
+    ## default style with added point predictions and color key
+    fanplot(quantiles = quantiles, probs = 1:99/100, means = means,
+            observed = y, key.args = list(start = 1, space = .3))
     
-    ## with contour lines instead of a key and different colors
+    ## with contour lines instead of a key, and different colors
+    pal <- colorRampPalette(c("darkgreen", "gray93"))
     fanplot(quantiles = quantiles, probs = 1:99/100, observed = y,
-            fan.args = list(fan.col = colorRampPalette(c("darkgreen", "gray93")),
-                            ln = c(5,10,25,50,75,90,95)/100),
+            fan.args = list(fan.col = pal, ln = c(5,10,25,50,75,90,95)/100),
             observed.args = list(type = "b", pch = 19))
 }
 }

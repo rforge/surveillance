@@ -8,13 +8,13 @@
 ### a copy of which is available at http://www.r-project.org/Licenses/.
 ################################################################################
 
-## quantiles: time x prob, observed: vector
-fanplot <- function (quantiles, probs, observed = NULL, start = 1,
-    fan.args = list(), observed.args = list(), key.args = NULL,
-    xlim = NULL, ylim = NULL, xlab = "Time", ylab = "No. infected",
-    add = FALSE, ...)
+fanplot <- function (quantiles, probs, means = NULL, observed = NULL,
+    start = 1, fan.args = list(), means.args = list(), observed.args = list(),
+    key.args = NULL, xlim = NULL, ylim = NULL,
+    xlab = "Time", ylab = "No. infected", add = FALSE, ...)
 {
     stopifnot(is.matrix(quantiles), length(probs) == ncol(quantiles),
+              is.null(means) || length(means) == nrow(quantiles),
               is.null(observed) || length(observed) == nrow(quantiles),
               isScalar(start))
 
@@ -38,10 +38,20 @@ fanplot <- function (quantiles, probs, observed = NULL, start = 1,
     ## add fan
     do.call(fanplot::fan, fan.args)
 
+    ## add point predictions
+    if (!is.null(means) && is.list(means.args)) {
+        means.args <- modifyList(
+            list(x = seq_along(means) + (start-1), y = means,
+                 type = "l", lwd = 2, col = "white"),
+            means.args)
+        do.call("lines", means.args)
+    }
+
     ## add observed time series
     if (!is.null(observed) && is.list(observed.args)) {
         observed.args <- modifyList(
-            list(x = seq_along(observed) + (start-1), y = observed, type = "b", lwd = 2),
+            list(x = seq_along(observed) + (start-1), y = observed,
+                 type = "b", lwd = 2),
             observed.args)
         do.call("lines", observed.args)
     }
