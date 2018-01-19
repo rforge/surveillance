@@ -193,10 +193,10 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 19/09/2016 hhh4 for binomial data
 18/10/2017 plotHHH4_season: add options for groups and confidence intervals (from hhh4contacts)
 18/10/2017 implement [.hhh4sims (from [.hhh4simslist)
-25/10/2017 use scoringRules package, especially for scores.hhh4sims (logs)
 19/01/2018 scores.oneStepAhead: remove the message concerning 'reverse'
 
 #Done
+19/01/2018 refer to scoringRules package, especially for scores.hhh4sims (logs)
 19/01/2018 scores.oneStepAhead: change to reverse=FALSE, remove warnings
 19/01/2018 plotHHH4sims_fan should make use of fanplot()
 19/09/2016 nicer time axis for plot.hhh4 (maybe use xaxis feature of stsplot_time)
