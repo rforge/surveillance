@@ -44,6 +44,9 @@
   \itemize{
     \item Some code in \code{vignette("monitoringCounts")} has been
     adjusted to work with the new version of \CRANpkg{MGLM} (0.0.9).
+
+    \item Added a \code{[}-method for the \code{"hhh4sims"} class to
+    retain the attributes when subsetting simulations.
   }
 }
 
