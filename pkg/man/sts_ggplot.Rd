@@ -47,7 +47,7 @@ autoplot.sts(object, population = FALSE, units = NULL,
 }
 
 \examples{
-if (requireNamespace("ggplot2")) {
+if (require("ggplot2")) {
     data("measlesDE")
     plot(measlesDE)
     autoplot.sts(measlesDE)
