@@ -8,7 +8,8 @@
 ### a copy of which is available at http://www.r-project.org/Licenses/.
 ################################################################################
 
-autoplot.sts <- function (object, units = NULL, as.one = FALSE,
+autoplot.sts <- function (object, population = FALSE,
+                          units = NULL, as.one = FALSE,
                           scales = "fixed", ...)
 {
     stopifnot(is(object, "sts"))
@@ -21,6 +22,10 @@ autoplot.sts <- function (object, units = NULL, as.one = FALSE,
         data <- subset(data, unit %in% units)
     }
 
+    ## scale counts by population
+    if (doInc <- isScalar(population) || isTRUE(population))
+        data$observed <- data$observed / (data$population / population)
+
     p <- ggplot2::ggplot(
         data = data,
         mapping = ggplot2::aes_(x = ~date, y = ~observed, group = ~unit)
@@ -31,5 +36,5 @@ autoplot.sts <- function (object, units = NULL, as.one = FALSE,
         p <- p + ggplot2::geom_bar(stat = "identity") +
             ggplot2::facet_wrap(~unit, scales = scales, drop = TRUE)
     }
-    p + ggplot2::labs(x = "Time", y = "No. infected")
+    p + ggplot2::labs(x = "Time", y = if(doInc) "Incidence" else "No. infected")
 }

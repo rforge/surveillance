@@ -9,10 +9,20 @@
   \code{\link{tidy.sts}}.
 }
 \usage{
-autoplot.sts(object, units = NULL, as.one = FALSE, scales = "fixed", ...)
+autoplot.sts(object, population = FALSE, units = NULL,
+             as.one = FALSE, scales = "fixed", ...)
 }
 \arguments{
   \item{object}{an object of class \code{"\linkS4class{sts}"}.}
+  \item{population}{logical indicating whether \code{observed(object)}
+    should be divided by \code{population(object)}.
+    The \code{population} argument can also be a scalar,
+    which is used to scale the denominator \code{population(object)},
+    i.e., \code{observed(object)} is divided by
+    \code{population(object) / population}.
+    For instance, if \code{population(object)} contains raw population
+    numbers, \code{population = 1000} could be used to plot the
+    incidence per 1000 inhabitants.}
   \item{units}{optional integer or character vector to select the units
     (=columns of \code{object}) to plot. The default (\code{NULL}) is
     to plot all time series.}
@@ -41,6 +51,11 @@ if (requireNamespace("ggplot2")) {
     data("measlesDE")
     plot(measlesDE)
     autoplot.sts(measlesDE)
+    
+    ## weekly incidence: population(measlesDE) gives population fractions,
+    ## which we need to multiply by the total population
+    autoplot.sts(measlesDE, population = 1000000/82314906) +
+        ylab("Weekly incidence [per 1 000 000 inhabitants]")
 }
 }
 

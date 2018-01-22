@@ -28,9 +28,9 @@
 #======================================================================
 
 #Open
-19/01/2018 autoplot.sts(): add population argument for incidence plots
 
 #Done
+22/01/2018 autoplot.sts(): add population argument for incidence plots
 19/01/2018 autoplot.sts(), i.e., ggplot2 variant (via tidy.sts)
 29/11/2016 improve as.data.frame-method, e.g., epochInPeriod is wrong in:
            as.data.frame(sts(1:10, start=c(2001, 5)))
