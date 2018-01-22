@@ -43,7 +43,9 @@ test_that("neighbourhood weights array yields the same results", {
     ## NOTE: variance estimates are different because of fixed powerlaw
     expect_equal(measlesFit_Warray, measlesFit,
                  ignore = c("control", "coefficients", "se", "cov", "dim"))
-    expect_equal(coef(measlesFit_Warray), coef(measlesFit)[names(coef(measlesFit_Warray))])
+    expect_equal(coef(measlesFit_Warray),
+                 coef(measlesFit)[names(coef(measlesFit_Warray))],
+                 tolerance = 1e-6)  # triggered by 64-bit win-builder
 })
 
 test_that("score vector and Fisher info agree with numerical approximations", {
