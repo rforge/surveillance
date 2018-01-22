@@ -29,8 +29,8 @@ Authors@R: c(MH = person("Michael", "Höhle",
              person("R Core Team", role = "ctb",
                     comment = "A few code segments are modified versions of
                                code from base R"))
-Author: Michael Höhle [aut, ths] (0000-0002-0423-6702),
-        Sebastian Meyer [aut, cre] (0000-0002-1791-9449),
+Author: Michael Höhle [aut, ths] (<https://orcid.org/0000-0002-0423-6702>),
+        Sebastian Meyer [aut, cre] (<https://orcid.org/0000-0002-1791-9449>),
         Michaela Paul [aut], Leonhard Held [ctb, ths], Howard Burkom [ctb],
         Thais Correa [ctb], Mathias Hofmann [ctb], Christian Lang [ctb],
         Juliane Manitz [ctb], Andrea Riebler [ctb], Daniel Sabanés Bové [ctb],
