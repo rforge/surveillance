@@ -27,6 +27,10 @@
     \CRANpkg{fanplot}\code{::fan()}. It is used by
     \code{plot.oneStepAhead()} and \code{plot.hhh4sims()}, which now
     have an option to add the point forecasts to the fan as well.
+
+    \item \code{plotHHH4_fitted()} (and \code{plotHHH4_fitted1()})
+    gained an option \code{total} to sum the fitted components over all
+    units.
   }
 }
 
