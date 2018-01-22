@@ -19,7 +19,7 @@ autoplot.sts <- function (object, population = FALSE,
     if (!is.null(units)) {
         ## ensure that 'units' are labels, not indices
         units <- unname(setNames(nm = levels(data$unit))[units])
-        data <- subset(data, unit %in% units)
+        data <- data[data$unit %in% units, , drop=FALSE]
     }
 
     ## scale counts by population
