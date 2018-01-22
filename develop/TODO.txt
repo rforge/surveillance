@@ -190,12 +190,11 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
            as plot-methods for arrays of simulated counts returned by
            simulate.hhh4(..., simplify=TRUE)
 17/11/2014 add checkNeighbourhood(..., strict=TRUE) for integer check
-19/09/2016 hhh4 for binomial data
 18/10/2017 plotHHH4_season: add options for groups and confidence intervals (from hhh4contacts)
-18/10/2017 implement [.hhh4sims (from [.hhh4simslist)
 19/01/2018 scores.oneStepAhead: remove the message concerning 'reverse'
 
 #Done
+22/01/2018 implement [.hhh4sims (from [.hhh4simslist)
 19/01/2018 refer to scoringRules package, especially for scores.hhh4sims (logs)
 19/01/2018 scores.oneStepAhead: change to reverse=FALSE, remove warnings
 19/01/2018 plotHHH4sims_fan should make use of fanplot()

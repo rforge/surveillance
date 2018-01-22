@@ -81,21 +81,14 @@ as.hhh4simslist.hhh4simslist <- function (x, ...) x
         return(xx)
     }
 
-    ## case 2: subset simulations
+    ## case 2: subset simulations, i.e., index individual arrays
     cl <- sys.call()
     cl[[1L]] <- as.name("[")
     cl[[2L]] <- quote(x)
     cl$drop <- drop
     subseti <- as.function(c(alist(x=), cl), envir = parent.frame())
-    x[] <- lapply(X = x, subseti)
-    if (!missing(i))
-        attr(x, "stsObserved") <- attr(x, "stsObserved")[i,]
-    if (!missing(j)) {
-        attr(x, "stsObserved") <- suppressMessages(attr(x, "stsObserved")[, j])
-        is.na(attr(x, "stsObserved")@neighbourhood) <- TRUE
-        attr(x, "initial") <- attr(x, "initial")[, j, drop = FALSE]
-    }
-    x
+    x[] <- lapply(X = unclass(x), subseti)  # unclass to use default [[
+    subset_hhh4sims_attributes(x, i, j)
 }
 
 ## select a specific "hhh4sims" from the list of simulations
