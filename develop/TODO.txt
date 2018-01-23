@@ -100,7 +100,7 @@
 ############
 
 #Open
-
+23/01/2018 misaligned address errors from ASAN/UBSAN checking
 
 #Fixed
 29/07/2010>> Summary/print fuer twinstim Objekte, die mit do.call
