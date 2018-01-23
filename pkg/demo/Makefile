@@ -18,7 +18,7 @@ all : ${ROUTFILES}
 
 %.Rout : %.R
 	LANGUAGE=en ${R} CMD BATCH --vanilla --no-timing $< $@
-	-mv Rplots.pdf ${<:.R=.pdf}
+	@if [ -f Rplots.pdf ]; then mv Rplots.pdf ${<:.R=.pdf}; fi
 
 diff : ${ROUTFILES}
 	meld & $(foreach Rout,${ROUTFILES},sleep 2; meld --newtab ${Rout}.save ${Rout} &)
