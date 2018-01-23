@@ -35,8 +35,7 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
 \method{quantile}{oneStepAhead}(x, probs = c(2.5, 10, 50, 90, 97.5)/100, ...)
 \method{confint}{oneStepAhead}(object, parm, level = 0.95, ...)
 \method{plot}{oneStepAhead}(x, unit = 1, probs = 1:99/100,
-     fan.args = list(), observed.args = list(), key.args = NULL,
-     add = FALSE, ...)
+     start = NULL, means.args = NULL, ...)
 
 ## assessment of "oneStepAhead" predictions
 \method{scores}{oneStepAhead}(x, which = c("logs", "rps", "dss", "ses"),
@@ -112,27 +111,13 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
   \item{probs}{numeric vector of probabilities with values in [0,1].}
   \item{unit}{single integer or character selecting a unit for which to
     produce the plot.}
-  \item{fan.args}{
-    a list of graphical parameters for the \code{\link[fanplot]{fan}},
-    e.g., to employ a different \code{\link{colorRampPalette}} as
-    \code{fan.col}, or to enable contour lines via \code{ln}.
+  \item{start}{
+    x-coordinate of the first prediction. If \code{start=NULL}
+    (default), this is derived from \code{x}.
   }
-  \item{observed.args}{
+  \item{means.args}{
     if a list (of graphical parameters for \code{\link{lines}}),
-    the originally observed counts are added to the plot.
-  }
-  \item{key.args}{
-    if a list, a color key (in \code{\link[fanplot]{fan}}'s
-    \code{"boxfan"}-style) is added to the fan chart. The list may
-    include positioning parameters \code{start} (the x-position) and
-    \code{ylim} (the y-range of the color key), \code{space} to modify
-    the width of the boxfan, and \code{rlab} to modify the labels.
-    The color key is disabled by default.
-    An alternative way of labeling the quantiles is via the argument
-    \code{ln} in \code{fan.args}.
-  }
-  \item{add}{
-    a logical indicating if the fan chart should be added to an existing plot.
+    the point predictions (from \code{x$pred}) are added to the plot.
   }
   
   \item{x}{an object of class \code{"oneStepAhead"} or \code{"hhh4"}.}
@@ -168,7 +153,12 @@ oneStepAhead(result, tp, type = c("rolling", "first", "final"),
     reversed in the result. The long-standing but awkward default was to
     do so for the \code{oneStepAhead}-method. This has changed in
     version 1.16.0, so time points are no longer reversed by default.}
-  \item{\dots}{Unused by the \code{confint} and \code{scores} methods.\cr
+  \item{\dots}{Unused by the \code{quantile}, \code{confint} and
+    \code{scores} methods.\cr
+    The \code{plot}-method passes further arguments to the
+    \code{\link{fanplot}} function, e.g., \code{fan.args},
+    \code{observed.args}, and \code{key.args} can be used to modify the
+    plotting style.\cr
     For the \code{calibrationTest}-method, further arguments are passed
     to \code{\link{calibrationTest.default}}, e.g., \code{which} to
     select a scoring rule.\cr
@@ -263,10 +253,8 @@ quantile(pred)
 confint(pred)
 
 ## simple plot of the 95% one-week-ahead prediction interval
-plot(pred, probs = c(2.5,97.5)/100)
-## add point forecasts
-lines(x = as.integer(rownames(pred$pred)), y = pred$pred,
-      type = "b", col = "orange", lwd = 2, pch = 19)
+## and point forecasts
+plot(pred, probs = c(2.5,97.5)/100, means.args = list())
 
 \dontshow{
 ## test equivalence of parallelized version

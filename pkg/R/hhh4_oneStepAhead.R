@@ -1,7 +1,7 @@
 ################################################################################
 ### Compute one-step-ahead predictions at a series of time points
 ###
-### Copyright (C) 2011-2012 Michaela Paul, 2012-2017 Sebastian Meyer
+### Copyright (C) 2011-2012 Michaela Paul, 2012-2018 Sebastian Meyer
 ###
 ### This file is part of the R package "surveillance",
 ### free software under the terms of the GNU General Public License, version 2,
@@ -253,21 +253,21 @@ confint.oneStepAhead <- function (object, parm, level = 0.95, ...)
 
 ## simple plot of one-step-ahead forecasts
 plot.oneStepAhead <- function (x, unit = 1, probs = 1:99/100,
-    fan.args = list(), observed.args = list(), key.args = NULL,
-    add = FALSE, ...)
+                               start = NULL, means.args = NULL, ...)
 {
     stopifnot(length(unit) == 1, length(probs) > 1)
 
     ## select unit
     obs <- x$observed[,unit]
+    ms <- x$pred[,unit]
     qs <- quantile.oneStepAhead(x, probs = probs)
     if (!is.matrix(qs))  # multi-unit predictions
         qs <- matrix(qs[,unit,], dim(qs)[1L], dim(qs)[3L],
                      dimnames = dimnames(qs)[c(1L,3L)])
 
     ## produce fanplot
-    fanplot(quantiles = qs, probs = probs, observed = obs,
-            start = as.integer(rownames(qs)[1L]),
-            fan.args = fan.args, observed.args = observed.args,
-            key.args = key.args, add = add, ...)
+    if (is.null(start))
+        start <- as.integer(rownames(qs)[1L])
+    fanplot(quantiles = qs, probs = probs, means = ms,
+            observed = obs, start = start, means.args = means.args, ...)
 }
