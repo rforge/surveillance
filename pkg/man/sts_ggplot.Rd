@@ -48,13 +48,14 @@ autoplot.sts(object, population = FALSE, units = NULL,
 
 \examples{
 if (require("ggplot2")) {
+    ## compare traditional plot() with ggplot2-based autoplot()
     data("measlesDE")
     plot(measlesDE)
-    autoplot.sts(measlesDE)
+    autoplot(measlesDE)
     
     ## weekly incidence: population(measlesDE) gives population fractions,
     ## which we need to multiply by the total population
-    autoplot.sts(measlesDE, population = 1000000/82314906) +
+    autoplot(measlesDE, population = 1000000/82314906) +
         ylab("Weekly incidence [per 1 000 000 inhabitants]")
 }
 }
