@@ -1,11 +1,13 @@
 
-R version 3.4.1 (2017-06-30) -- "Single Candle"
+R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -25,9 +27,9 @@ Type 'q()' to quit R.
 > ### Journal of Statistical Software, 77(11), 1-55.
 > ### https://doi.org/10.18637/jss.v077.i11
 > ###
-> ### Changes to the original replication script are marked with a "#M" comment.
+> ### Changes to the original replication script are marked with a "##M" comment.
 > ###
-> ### Copyright (C) 2017 Sebastian Meyer, Leonhard Held, Michael Hoehle
+> ### Copyright (C) 2017-2018 Sebastian Meyer, Leonhard Held, Michael Hoehle
 > ###
 > ### This file is part of the R package "surveillance",
 > ### free software under the terms of the GNU General Public License, version 2,
@@ -41,8 +43,7 @@ Type 'q()' to quit R.
 > library("surveillance")  # you should also have installed the suggested packages
 Loading required package: sp
 Loading required package: xtable
-Loading required package: polyCub
-This is surveillance 1.15.0. For overview type ‘help(surveillance)’.
+This is surveillance 1.16.0. For overview type ‘help(surveillance)’.
 > 
 > ## 3.2. Data structure: 'epidataCS'
 > data("imdepi", package = "surveillance")
@@ -271,8 +272,8 @@ Done.
 +              label = "tab:imdfit_Gaussian"),
 +       sanitize.text.function = NULL, sanitize.colnames.function = NULL,
 +       sanitize.rownames.function = function(x) paste0("\\code{", x, "}"))
-% latex table generated in R 3.4.1 by xtable 1.8-2 package
-% Wed Aug  9 22:31:48 2017
+% latex table generated in R 3.4.3 by xtable 1.8-2 package
+% Tue Jan 23 12:16:25 2018
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -431,7 +432,7 @@ Note: added the 'tau' component to object 'imdfit_powerlaw' for future use.
 > imdsims <- simulate(imdfit_powerlaw, nsim = 30, seed = 1, t0 = 1826, T = 2555,
 +   data = imdepi_untied_infeps, tiles = districtsD)
 
-Time at beginning of simulation: 2017-08-09 22:32:17 
+Time at beginning of simulation: 2018-01-23 12:16:52 
 Simulation 1 / 30 ...
 -------------------------------------------------------------------------------
 
@@ -458,8 +459,8 @@ Preparing simulated events for "epidataCS" ...
 Done.
 
 -------------------------------------------------------------------------------
-Runtime of first simulation: 3.143 seconds
-Estimated finishing time: 2017-08-09 22:33:52 
+Runtime of first simulation: 2.928 seconds
+Estimated finishing time: 2018-01-23 12:18:20 
 
 Simulation  2 / 30 ...	simulated 187 events up to time 2555 
 Simulation  3 / 30 ...	simulated 192 events up to time 2555 
@@ -491,7 +492,7 @@ Simulation 28 / 30 ...	simulated 174 events up to time 2555
 Simulation 29 / 30 ...	simulated 158 events up to time 2555 
 Simulation 30 / 30 ...	simulated 155 events up to time 2555 
 
-Done (2017-08-09 22:34:22).
+Done (2018-01-23 12:18:39).
 > 
 > table(imdsims[[1]]$events$source > 0, exclude = NULL)
 
@@ -950,9 +951,12 @@ Number of time points:  103
 +     measlesFit_powerlaw$loglikelihood,
 +     -sum(scores(oneStepAhead(measlesFit_powerlaw, tp = 1, type = "final"),
 +                 which = "logs", individual = TRUE))))
+Note: surveillance 1.16.0 no longer reverses the time points by default.
+  Set the 'reverse' argument explicitly to avoid this message.
 > 
 > SCORES <- c("logs", "rps", "dss", "ses")
-> measlesScores1 <- lapply(measlesPreds1, scores, which = SCORES, individual = TRUE)
+> measlesScores1 <- lapply(measlesPreds1, scores, which = SCORES, individual = TRUE,
++                          reverse = TRUE)  ##M for replication with surveillance >= 1.16.0
 > t(sapply(measlesScores1, colMeans, dims = 2))
                         logs       rps      dss      ses
 measlesFit_basic    1.088505 0.7357836 1.291088 5.289318
@@ -969,12 +973,12 @@ One-step-ahead prediction @ t = 68 ...
 One-step-ahead prediction @ t = 69 ...
 One-step-ahead prediction @ t = 70 ...
 One-step-ahead prediction @ t = 71 ...
-One-step-ahead prediction @ t = 72 ...
 One-step-ahead prediction @ t = 73 ...
-One-step-ahead prediction @ t = 74 ...
+One-step-ahead prediction @ t = 72 ...
 One-step-ahead prediction @ t = 75 ...
-One-step-ahead prediction @ t = 76 ...
+One-step-ahead prediction @ t = 74 ...
 One-step-ahead prediction @ t = 77 ...
+One-step-ahead prediction @ t = 76 ...
 One-step-ahead prediction @ t = 65 ...
 One-step-ahead prediction @ t = 66 ...
 One-step-ahead prediction @ t = 67 ...
@@ -1001,7 +1005,8 @@ One-step-ahead prediction @ t = 73 ...
 One-step-ahead prediction @ t = 76 ...
 One-step-ahead prediction @ t = 75 ...
 One-step-ahead prediction @ t = 77 ...
-> measlesScores2 <- lapply(measlesPreds2, scores, which = SCORES, individual = TRUE)
+> measlesScores2 <- lapply(measlesPreds2, scores, which = SCORES, individual = TRUE,
++                          reverse = TRUE)  ##M for replication with surveillance >= 1.16.0
 > t(sapply(measlesScores2, colMeans, dims = 2))
                         logs       rps      dss      ses
 measlesFit_basic    1.102458 0.7477739 1.339070 5.403861

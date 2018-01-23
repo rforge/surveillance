@@ -1,11 +1,13 @@
 
-R version 3.3.3 (2017-03-06) -- "Another Canoe"
+R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -19,7 +21,7 @@ Type 'q()' to quit R.
 > ### Demo of hhh4() modelling of influenza in Southern Germany - data("fluBYBW")
 > ### RUNNING THE WHOLE SCRIPT TAKES ~20 MINUTES!
 > ###
-> ### Copyright (C) 2009-2012 Michaela Paul, 2012-2013,2016,2017 Sebastian Meyer
+> ### Copyright (C) 2009-2012 Michaela Paul, 2012-2013,2016-2018 Sebastian Meyer
 > ###
 > ### This file is part of the R package "surveillance",
 > ### free software under the terms of the GNU General Public License, version 2,
@@ -30,8 +32,7 @@ Type 'q()' to quit R.
 > library("surveillance")
 Loading required package: sp
 Loading required package: xtable
-Loading required package: polyCub
-This is surveillance 1.14.0. For overview type ‘help(surveillance)’.
+This is surveillance 1.16.0. For overview type ‘help(surveillance)’.
 > 
 > ## Weekly counts of influenza in 140 districts of Bavaria and Baden-Wuerttemberg
 > data("fluBYBW")
@@ -56,7 +57,7 @@ This is surveillance 1.14.0. For overview type ‘help(surveillance)’.
 +                  end = list(f =f.end, offset = population(fluBYBW)),
 +                  family = "NegBin1", optimizer = opt, verbose = 1)
 > summary(res_A0 <- hhh4(fluBYBW,cntrl_A0))
-2017-06-29 17:19:05 : Iterative optimization of regression & variance parameters 
+2018-01-23 12:03:20 : Iterative optimization of regression & variance parameters 
 
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 1.398065 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 0.5920769 
@@ -85,7 +86,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 2.164732e-05
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 1.329361e-06 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 3.91111e-06 
 
-2017-06-29 17:19:18 : Optimization converged 
+2018-01-23 12:03:35 : Optimization converged 
 
 
 Call: 
@@ -119,7 +120,7 @@ Number of time points:  415
 +                  end = list(f =f.end, offset = population(fluBYBW)),
 +                  family = "NegBin1", optimizer = opt, verbose=1)
 > res_B0 <- hhh4(fluBYBW,cntrl_B0)
-2017-06-29 17:19:19 : Iterative optimization of regression & variance parameters 
+2018-01-23 12:03:36 : Iterative optimization of regression & variance parameters 
 
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 1.23659 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 0.1947993 
@@ -148,7 +149,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 2.860836e-05
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 5.156372e-06 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 7.596714e-06 
 
-2017-06-29 17:19:33 : Optimization converged 
+2018-01-23 12:03:49 : Optimization converged 
 
 > 
 > 
@@ -157,7 +158,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 7.596714e-06
 +                  end = list(f =f.end, offset = population(fluBYBW)),
 +                  family = "NegBin1", optimizer = opt, verbose=1)
 > res_C0 <- hhh4(fluBYBW,cntrl_C0)
-2017-06-29 17:19:33 : Iterative optimization of regression & variance parameters 
+2018-01-23 12:03:50 : Iterative optimization of regression & variance parameters 
 
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 1.231761 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 0.5633588 
@@ -303,7 +304,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 1.020066e-05
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 2.618865e-06 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 8.455856e-06 
 
-2017-06-29 17:20:58 : Optimization converged 
+2018-01-23 12:05:20 : Optimization converged 
 
 > 
 > 
@@ -317,7 +318,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 8.455856e-06
 +                  end = list(f =f.end, offset = population(fluBYBW)),
 +                  family = "NegBin1", optimizer = opt, verbose=1)
 > res_A1 <- hhh4(fluBYBW,cntrl_A1)
-2017-06-29 17:20:59 : Iterative optimization of regression & variance parameters 
+2018-01-23 12:05:21 : Iterative optimization of regression & variance parameters 
 
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 1.298182 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 0.7436168 
@@ -355,7 +356,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 2.840253e-05
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 9.811354e-07 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 8.088731e-06 
 
-2017-06-29 17:21:15 : Optimization converged 
+2018-01-23 12:05:39 : Optimization converged 
 
 > 
 > 
@@ -365,7 +366,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 8.088731e-06
 +                  end = list(f =f.end, offset = population(fluBYBW)),
 +                  family = "NegBin1", optimizer = opt, verbose=1)
 > res_B1 <- hhh4(fluBYBW,cntrl_B1)
-2017-06-29 17:21:15 : Iterative optimization of regression & variance parameters 
+2018-01-23 12:05:40 : Iterative optimization of regression & variance parameters 
 
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 1.202573 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 0.3802928 
@@ -403,7 +404,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 2.701112e-05
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 2.815559e-06 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 9.222879e-06 
 
-2017-06-29 17:21:33 : Optimization converged 
+2018-01-23 12:05:59 : Optimization converged 
 
 > 
 > 
@@ -413,7 +414,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 9.222879e-06
 +                  end = list(f =f.end, offset = population(fluBYBW)),
 +                  family = "NegBin1", optimizer = opt, verbose=1)
 > res_C1 <- hhh4(fluBYBW,cntrl_C1)
-2017-06-29 17:21:34 : Iterative optimization of regression & variance parameters 
+2018-01-23 12:06:00 : Iterative optimization of regression & variance parameters 
 
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 1.194615 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 0.4526604 
@@ -538,7 +539,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 1.143698e-05
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 2.733408e-06 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 9.178885e-06 
 
-2017-06-29 17:22:49 : Optimization converged 
+2018-01-23 12:07:15 : Optimization converged 
 
 > 
 > 
@@ -548,7 +549,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 9.178885e-06
 +                  end = list(f =f.end, offset = population(fluBYBW)),
 +                  family = "NegBin1", optimizer = opt, verbose=1)
 > res_A2 <- hhh4(fluBYBW,cntrl_A2)
-2017-06-29 17:22:50 : Iterative optimization of regression & variance parameters 
+2018-01-23 12:07:15 : Iterative optimization of regression & variance parameters 
 
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 1.251645 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 0.8592892 
@@ -592,7 +593,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 1.363194e-05
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 4.194977e-06 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 6.431034e-06 
 
-2017-06-29 17:23:20 : Optimization converged 
+2018-01-23 12:07:44 : Optimization converged 
 
 > 
 > 
@@ -602,7 +603,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 6.431034e-06
 +                  end = list(f =f.end, offset = population(fluBYBW)),
 +                  family = "NegBin1", optimizer = opt, verbose=1)
 > res_B2 <- hhh4(fluBYBW,cntrl_B2)
-2017-06-29 17:23:20 : Iterative optimization of regression & variance parameters 
+2018-01-23 12:07:44 : Iterative optimization of regression & variance parameters 
 
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 1.173903 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 0.6870453 
@@ -670,7 +671,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 1.368982e-05
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 3.806755e-06 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 8.828701e-06 
 
-2017-06-29 17:24:09 : Optimization converged 
+2018-01-23 12:08:29 : Optimization converged 
 
 > 
 > # C2
@@ -681,7 +682,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 8.828701e-06
 +                  start=list(fixed=fixef(res_B0),random=c(rep(0,140),
 +                          ranef(res_B0)), sd.corr=c(-.5,res_B0$Sigma.orig,0)))
 > res_C2 <- hhh4(fluBYBW,cntrl_C2)
-2017-06-29 17:24:09 : Iterative optimization of regression & variance parameters 
+2018-01-23 12:08:30 : Iterative optimization of regression & variance parameters 
 
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 0.8240727 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 0.6394624 
@@ -788,7 +789,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 1.114056e-05
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 7.208845e-06 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 8.612701e-06 
 
-2017-06-29 17:27:35 : Optimization converged 
+2018-01-23 12:12:21 : Optimization converged 
 
 > 
 > 
@@ -800,7 +801,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 8.612701e-06
 +                           offset = population(fluBYBW)),
 +                 family = "NegBin1", optimizer = opt, verbose=1)
 > res_D <- hhh4(fluBYBW,cntrl_D)
-2017-06-29 17:27:37 : Iterative optimization of regression & variance parameters 
+2018-01-23 12:12:23 : Iterative optimization of regression & variance parameters 
 
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 1.161519 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 0.713547 
@@ -865,7 +866,7 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 1.10125e-05
 Update of regression parameters:  max|x_0 - x_1| / max|x_0| = 2.115249e-06 
 Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 5.915878e-06 
 
-2017-06-29 17:30:28 : Optimization converged 
+2018-01-23 12:15:20 : Optimization converged 
 
 > 
 > 
@@ -907,7 +908,8 @@ Update of variance parameters:  max|x_0 - x_1| / max|x_0| = 5.915878e-06
 > scores_i <- vector(mode="list", length=length(vals))
 > meanScores <- NULL
 > for(i in seq_along(vals)){
-+   sc <- scores(get(vals[i]), which=whichScores, individual=TRUE)
++   sc <- scores(get(vals[i]), which=whichScores, individual=TRUE, reverse=TRUE)
++   ## reverse=TRUE => same permutation test results as in surveillance < 1.16.0
 +   scores_i[[i]] <- sc
 +   meanScores <- rbind(meanScores,colMeans(sc, dims=2))
 + }
