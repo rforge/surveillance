@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.16.0 (UNRELEASED)}{
+\section{Changes in surveillance version 1.16.0 (2018-01-24)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -34,10 +34,10 @@
   }
 }
 
-\subsection{MAJOR CHANGES}{
+\subsection{SIGNIFICANT CHANGES}{
   \itemize{
     \item Package \CRANpkg{polyCub} is no longer automatically attached
-    (just imported).
+    (only imported).
 
     \item \code{scores.oneStepAhead()} no longer reverses the ordering
     of the time points by default, as announced in 1.15.0.
