@@ -4,7 +4,7 @@
 ## the top-level .Rbuildignore file).
 ## This Makefile requires GNU make.
 ##
-## Copyright (C) 2016-2017 Sebastian Meyer <seb.meyer@fau.de>
+## Copyright (C) 2016-2018 Sebastian Meyer <seb.meyer@fau.de>
 ##
 ## This Makefile can be redistributed and/or modified under the terms
 ## of the GNU General Public License, version 2,
