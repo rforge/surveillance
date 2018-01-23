@@ -1,6 +1,6 @@
 %\VignetteIndexEntry{hhh4 (spatio-temporal): Endemic-epidemic modeling of areal count time series}
 %\VignetteEngine{knitr::knitr}
-%\VignetteDepends{surveillance, lattice, spdep, gsl, colorspace, animation, gridExtra, scales, rmapshaper, fanplot, hhh4contacts}
+%\VignetteDepends{surveillance, lattice, spdep, gsl, colorspace, ggplot2, animation, gridExtra, scales, rmapshaper, fanplot, hhh4contacts}
 
 <<setup, cache = FALSE, include = FALSE, purl = FALSE>>=
 ## purl=FALSE => not included in the tangle'd R script
@@ -306,10 +306,14 @@ The spatial plot in Figure~\ref{fig:measlesWeserEms2} is a tweaked \code{spplot}
 $\sqrt{}$-equidistant cut points handled by package \CRANpkg{scales}
 \citep{R:scales}.
 
-The default plot \code{type} is \code{observed ~ time | unit}, which shows
-the district-specific time series (Figure~\ref{fig:measlesWeserEms15}):
-<<measlesWeserEms15, fig.cap=paste("Count time series of the", sum(colSums(observed(measlesWeserEms))>0), "affected districts."), out.width="\\linewidth", fig.width=10, fig.height=6, fig.pos="!h">>=
+The default plot \code{type} is \code{observed ~ time | unit} and displays
+the district-specific time series. Here we show the output of the
+equivalent \code{autoplot}-method (Figure~\ref{fig:measlesWeserEms15}),
+which is based on \CRANpkg{ggplot2} \citep{R:ggplot2}:
+<<measlesWeserEms15, fig.cap=paste("Count time series of the", sum(colSums(observed(measlesWeserEms))>0), "affected districts."), out.width="\\linewidth", fig.width=10, fig.height=6, fig.pos="!h", eval=-1>>=
 plot(measlesWeserEms, units = which(colSums(observed(measlesWeserEms)) > 0))
+library("ggplot2")
+autoplot(measlesWeserEms, units = which(colSums(observed(measlesWeserEms)) > 0))
 @
 The districts
 \Sexpr{paste0(paste0(row.names(measlesWeserEms@map), " (", measlesWeserEms@map[["GEN"]], ")")[colSums(observed(measlesWeserEms)) == 0], collapse = " and ")}
@@ -1028,7 +1032,7 @@ for further examples.
 ## create automatic references for R packages
 .Rbibfile <- file("hhh4_spacetime-R.bib", "w", encoding = "latin1")
 knitr::write_bib(
-    c("MASS", "Matrix", "spdep", "colorspace", "scales", "gridExtra", "lattice", "sp", "animation", "rmapshaper", "fanplot", "hhh4contacts"),
+    c("MASS", "Matrix", "spdep", "colorspace", "scales", "gridExtra", "lattice", "sp", "ggplot2", "animation", "rmapshaper", "fanplot", "hhh4contacts"),
     file = .Rbibfile, tweak = FALSE, prefix = "R:")
 close(.Rbibfile)
 @
