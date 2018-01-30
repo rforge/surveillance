@@ -112,8 +112,9 @@ checkUsage: install
 	    suppressUndefined=FALSE, suppressPartialMatchArgs=FALSE)" \
 	| $R --slave --no-save --no-restore
 
+## we need to run Rd2pdf inside pkg such that \packageTitle finds DESCRIPTION
 manual:	
-	$R CMD Rd2pdf --batch --force --output=manual.pdf pkg
+	cd pkg; $R CMD Rd2pdf --batch --force --output=../manual.pdf .
 
 NEWS.html: pkg/inst/NEWS.Rd
 	$R --vanilla --slave -e 'tools::Rd2HTML("$<", out = "$@", stylesheet = "http://cran.r-project.org/web/CRAN_web.css")'
