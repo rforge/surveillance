@@ -1,3 +1,4 @@
+\encoding{latin1}
 \name{plot.hhh4}
 \alias{plot.hhh4}
 \alias{plotHHH4_fitted}

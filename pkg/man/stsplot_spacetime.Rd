@@ -1,3 +1,4 @@
+\encoding{latin1}
 \name{stsplot_spacetime}
 \alias{stsplot_spacetime}
 \title{
