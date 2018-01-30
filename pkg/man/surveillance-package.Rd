@@ -109,7 +109,9 @@
   Relevant references are listed in \code{surveillance:::REFERENCES},
   and \code{citation(package="surveillance")} gives the two main software
   references for the modeling (Meyer et al., 2017) and the monitoring
-  (Salmon et al., 2016) functionalities.
+  (Salmon et al., 2016) functionalities:
+
+  \Sexpr[stage=build,results=Rd]{paste0(tools::toRd(citation("surveillance")), collapse = "\n\n")}
   
   If you use the \pkg{surveillance} package in your own
   work, please do cite the corresponding publications.
