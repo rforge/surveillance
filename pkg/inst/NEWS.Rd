@@ -8,6 +8,18 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.16.0.9000 (UNRELEASED)}{
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item \code{autoplot.sts()} now sets the calling environment as
+    the \code{plot_env} of the result.
+  }
+}
+  
+}
+
+
 \section{Changes in surveillance version 1.16.0 (2018-01-24)}{
 
 \subsection{NEW FEATURES}{
