@@ -6,7 +6,7 @@
 ### Data structure for CONTINUOUS SPATIO-temporal infectious disease case data
 ### and a spatio-temporal grid of endemic covariates
 ###
-### Copyright (C) 2009-2017 Sebastian Meyer
+### Copyright (C) 2009-2018 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -248,7 +248,7 @@ check_events <- function (events, dropTypes = TRUE, verbose = TRUE)
     if (verbose) cat("\tChecking event times for ties ...\n")
     timeIsDuplicated <- duplicated(events$time)
     if (any(timeIsDuplicated)) {
-        duplicatedTimes <- unique(events$time[timeIsDuplicated])
+        duplicatedTimes <- sort.int(unique(events$time[timeIsDuplicated]))
         warning("detected non-unique event times: ",
                 "concurrent events at time ",
                 if (length(duplicatedTimes) == 1L) "point " else "points\n",
