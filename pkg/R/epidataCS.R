@@ -399,7 +399,7 @@ check_W_area <- function (W, area.other, other, tolerance = 0.001)
 
 
 
-### CHECK FUNCTION FOR tiles ARGUMENT IN as.epidataCS
+### CHECK FUNCTION FOR tiles ARGUMENT IN simEpidataCS()
 
 check_tiles <- function (tiles, levels,
                          events = NULL, areas.stgrid = NULL, W = NULL,
@@ -460,7 +460,7 @@ check_tiles_events <- function (tiles, events)
             which(eventtiles != as.character(events$tile)),
             which_not_in_tiles)
         if (length(which_disagree))
-            message("'over(events, tiles)' disagrees with 'events$tile': ",
+            message("'over(events, tiles)' disagrees with 'events$tile' for events ",
                     paste0("\"", eventIDs[which_disagree], "\"", collapse=", "))
     }
     invisible()
