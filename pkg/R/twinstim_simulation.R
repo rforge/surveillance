@@ -291,7 +291,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
             # actually, the process might be endemic offset-only, which I don't care about ATM
         }
         if (Nout == 0L) {
-            stop("missing 'events' pre-history (no endemic component)")
+            stop("missing 'events' prehistory (no endemic component)")
         }
     }
 
@@ -329,7 +329,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         structure(mmhEvents, offset = model.offset(mfhEvents))
     }
 
-    # actually, we don't need the endemic model matrix for the pre-history events at all
+    # actually, we don't need the endemic model matrix for the prehistory events at all
     # this is just to test consistence with 'beta' and for the names of 'beta'
     mmh <- buildmmh(eventData[0L,])
     if (ncol(mmh) != p) {

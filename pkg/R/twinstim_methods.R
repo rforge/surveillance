@@ -65,7 +65,7 @@ extractAIC.twinstim <- function (fit, scale, k = 2, ...)
     c(edf = edf, AIC = -2 * c(loglik) + penalty)
 }
 
-## Number of events (excluding the pre-history)
+## Number of events (excluding the prehistory)
 nobs.twinstim <- function (object, ...) length(object$fitted)
 
 ## print-method

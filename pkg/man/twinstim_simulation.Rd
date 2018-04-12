@@ -335,7 +335,7 @@ plot(stateD, add=TRUE, border=2, lwd=2)
 # 'stateD' was obtained as 'rgeos::gUnaryUnion(districtsD)'
 
 ## simulate 2 realizations (during a VERY short period -- for speed)
-## considering events from data(imdepi) before t=31 as pre-history
+## considering events from data(imdepi) before t=31 as prehistory
 mysims <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
                    tiles=districtsD, newcoef=c("e.typeC"=-1),
                    t0=31, T=61, simplify=TRUE)

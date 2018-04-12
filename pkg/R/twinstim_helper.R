@@ -128,7 +128,7 @@ gridcellOfEvent <- function (t, tilename, stgrid)
     ## sorted by BLOCK and tile (tile varying first), specifically there must be
     ## all levels(stgrid$tile) in every BLOCK in that order;
     ## this structure is guaranteed by check_stgrid()
-    if (t <= stgrid$start[1L]) return(NA_integer_)  # pre-history event
+    if (t <= stgrid$start[1L]) return(NA_integer_)  # prehistory event
     blockstart <- match(TRUE, stgrid$stop >= t)     # NA if t is beyond
     idx <- blockstart + match(tilename, levels(stgrid$tile)) - 1L
     return(idx)
