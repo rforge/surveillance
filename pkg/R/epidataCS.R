@@ -251,10 +251,10 @@ check_events <- function (events, dropTypes = TRUE, verbose = TRUE)
     timeIsDuplicated <- duplicated(events$time)
     if (any(timeIsDuplicated)) {
         duplicatedTimes <- sort.int(unique(events$time[timeIsDuplicated]))
-        warning("detected non-unique event times: ",
-                "concurrent events at time ",
-                if (length(duplicatedTimes) == 1L) "point " else "points\n",
-                paste(duplicatedTimes, collapse = ", "))
+        warning("detected concurrent events at ", length(duplicatedTimes),
+                " time point", if (length(duplicatedTimes) > 1L) "s", ": ",
+                paste(head(duplicatedTimes, 6L), collapse = ", "),
+                if (length(duplicatedTimes) > 6L) ", ...")
     }
 
     # Sort events chronologically
