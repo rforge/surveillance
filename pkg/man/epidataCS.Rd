@@ -236,7 +236,7 @@ getSourceDists(object, dimension = c("space", "time"))
     The added auxiliary columns are:
     \describe{
       \item{\code{.obsInfLength}}{observed length of the infectious period
-	(being part [0,T]), i.e. \code{pmin(T-time, eps.t)}.}
+	(possibly truncated at \code{T}), i.e., \code{pmin(T-time, eps.t)}.}
       \item{\code{.sources}}{a list of numeric vectors of potential sources of
         infection (wrt the interaction ranges eps.s and eps.t) for each
         event. Row numbers are used as index.}
