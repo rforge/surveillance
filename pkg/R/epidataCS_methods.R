@@ -6,7 +6,7 @@
 ### Standard S3-methods for "epidataCS" objects, which represent
 ### CONTINUOUS SPATIO-temporal infectious disease case data
 ###
-### Copyright (C) 2009-2015,2017 Sebastian Meyer
+### Copyright (C) 2009-2015,2017-2018 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -270,7 +270,10 @@ print.epidataCS <- function (x, n = 6L, digits = getOption("digits"), ...)
     cat("Types of events: ")
     str(levels(x$events$type), give.attr = FALSE, give.head = FALSE,
         width = getOption("width") - 17L)
-    cat("Overall number of events:", nEvents <- nobs(x), "\n\n")
+    cat("Overall number of events:", nEvents <- nobs(x))
+    if (npre <- sum(x$events$time <= x$stgrid$start[1L]))
+        cat(" (prehistory: ", npre, ")", sep = "")
+    cat("\n\n")
 
     visibleCols <- grep("^\\..+", names(x$events@data), invert = TRUE)
     if (nEvents == 0L) { # not handled by [,SpatialPointsDataFrame-method
@@ -338,9 +341,10 @@ print.summary.epidataCS <- function (x, ...)
 {
     print.epidataCS_header(timeRange = x$timeRange, bbox = x$bbox,
                            nBlocks = x$nBlocks, nTiles = length(x$tileTable))
-    cat("Overall number of events:", x$nEvents,
-        if (x$nTypes==1) "(single type)" else paste0("(",x$nTypes," types)"),
-        "\n")
+    cat("Overall number of events: ", x$nEvents, " (",
+        if (x$nTypes==1) "single type" else paste(x$nTypes, "types"),
+        if (npre <- sum(x$eventTimes <= x$timeRange[1L]))
+            paste(", prehistory:", npre), ")\n", sep = "")
 
     cat("\nSummary of event marks and number of potential sources:\n")
     print(summary(cbind(x$eventMarks, "|.sources|"=x$nSources)), ...)
