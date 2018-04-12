@@ -7,7 +7,7 @@
 ### class "twinstim". The function basically uses Ogata's modified thinning
 ### algorithm (cf. Daley & Vere-Jones, 2003, Algorithm 7.5.V.).
 ###
-### Copyright (C) 2010-2017 Sebastian Meyer
+### Copyright (C) 2010-2018 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -91,6 +91,10 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     	unionSpatialPolygons(tiles)
     } else check_W(W)  # does as(W, "SpatialPolygons")
 
+    if (!.skipChecks) {
+        cat("Checking 'tiles' ...\n")
+        ## we always check 'tiles', but quietly in the simulate-method
+    }
     tileLevels <- levels(stgrid$tile)
     tiles <- check_tiles(tiles, tileLevels,
                          areas.stgrid = stgrid[["area"]][seq_along(tileLevels)],
