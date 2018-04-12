@@ -64,9 +64,10 @@ getSourceDists(object, dimension = c("space", "time"))
       \item{time}{time point of event. Will be converted to a numeric
         variable by \code{as.numeric}. There should be no concurrent
         events (but see \code{\link{untie}} for an ex post adjustment)
-        and the event times must be covered by \code{stgrid}, 
-        i.e. belong to the time interval \eqn{(t_0,T]}, where \eqn{t_0}
-        is \code{min(stgrid$start)} and \code{T} is described below.}
+        and there cannot be events beyond \code{stgrid}
+        (i.e., \code{time<=T} is required). Events at or before time
+        \eqn{t_0} = \code{min(stgrid$start)} are allowed and form the
+        prehistory of the process.}
       \item{tile}{the spatial region (tile) where the event is located.
       This links to the tiles of \code{stgrid}.}
       \item{type}{optional type of event in a marked \code{twinstim}
@@ -119,7 +120,7 @@ getSourceDists(object, dimension = c("space", "time"))
     The remaining columns are endemic covariates.
     Note that the column name \code{"BLOCK"} is reserved
     (a column which will be added automatically for indexing the time
-    intervals of \code{stgrid}).  
+    intervals of \code{stgrid}).
   }
 
   \item{W}{

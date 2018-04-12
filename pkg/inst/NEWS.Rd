@@ -14,6 +14,8 @@
   \itemize{
     \item \code{autoplot.sts()} now sets the calling environment as
     the \code{plot_env} of the result.
+
+    \item \code{as.epidataCS()} finally allows for prehistory events.
   }
 }
   

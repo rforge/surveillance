@@ -106,12 +106,18 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     nEvents <- length(events)
     timeRange <- with(stgrid, c(start[1], stop[length(stop)]))
 
-    # Are event times covered by stgrid?
-    if (verbose) cat("Checking if all events are covered by 'stgrid' ...\n")
-    ## FIXME: what about pre-history events? don't need stgrid-data for them
-    if (events$time[1L] <= timeRange[1L] || events$time[nEvents] > timeRange[2L]) {
-        stop("event times are not covered by 'stgrid': must be in (",
-             timeRange[1L],",",timeRange[2L],"]")
+    # Are events covered by stgrid?
+    if (verbose) {
+        cat("Checking if all events are covered by 'stgrid' ...\n")
+        ## surveillance > 1.16.0: prehistory events are allowed => BLOCK is NA
+        if (events$time[1L] <= timeRange[1L]) {
+            cat("  Note: ", sum(events$time <= timeRange[1L]),
+                " prehistory events (time <= ", timeRange[1L], ")\n", sep = "")
+        }
+    }
+    if (events$time[nEvents] > timeRange[2L]) {
+        stop("found ", sum(events$time > timeRange[2L]),
+             " events beyond 'stgrid' (time > ", timeRange[2L], ")")
     }
 
     # Are all events$tile references really part of the stgrid?
@@ -123,17 +129,13 @@ as.epidataCS <- function (events, stgrid, W, qmatrix = diag(nTypes),
     events$tile <- .events.tile
 
     # Map events to corresponding grid cells
+    ## FIXME: could use plapply() but then also need a .parallel argument
     if (verbose) cat("Mapping events to 'stgrid' cells ...\n")
     withPB <- verbose && interactive()
     gridcellsOfEvents <- integer(nEvents)
     if (withPB) pb <- txtProgressBar(min=0, max=nEvents, initial=0, style=3)
     for (i in seq_len(nEvents)) {
-        idx <- gridcellOfEvent(events$time[i], events$tile[i], stgrid)
-        if (is.na(idx)) {
-            stop("could not find information for time point ", events$time[i],
-                 " and tile \"", events$tile[i], "\" in 'stgrid'")
-        }
-        gridcellsOfEvents[i] <- idx
+        gridcellsOfEvents[i] <- gridcellOfEvent(events$time[i], events$tile[i], stgrid)
         if (withPB) setTxtProgressBar(pb, i)
     }
     if (withPB) close(pb)
@@ -503,6 +505,7 @@ check_tiles_areas <- function (areas.tiles, areas.stgrid, tolerance = 0.05)
         )
 
     eventCoords <- coordinates(events)
+    ## FIXME: could use plapply() but then also need a .parallel argument
     res <- mapply(
         function (x, y, eps, bdist) {
             center <- c(x,y)
