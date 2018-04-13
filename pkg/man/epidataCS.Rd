@@ -374,31 +374,34 @@ subset(imdepi, type=="B")   # only consider event type B
 ### reconstruct the "imdepi" object from its components
 ###
 
-## events
-events <- marks(imdepi)
-coordinates(events) <- c("x", "y")  # promote to a "SpatialPointsDataFrame"
-proj4string(events) <- proj4string(imdepi$events)       # ETRS89 projection
-summary(events)
-
-## endemic covariates
-head(stgrid <- imdepi$stgrid[,-1])
-
-## (Simplified) observation region (as "SpatialPolygons")
+## observation region
 load(system.file("shapes", "districtsD.RData", package="surveillance"),
      verbose = TRUE)
+summary(stateD)
+
+## events
+data(imdepi)
+events <- marks(imdepi)  # data frame with coordinate columns
+coordinates(events) <- c("x", "y")  # promote to a "SpatialPointsDataFrame"
+#proj4string(events) <- proj4string(stateD)  # ETRS89 projection
+events@proj4string <- stateD@proj4string  # exact copy (avoid CRS reformatting)
+summary(events)
 
 ## plot observation region with events
 plot(stateD, axes=TRUE); title(xlab="x [km]", ylab="y [km]")
 points(events, pch=unclass(events$type), cex=0.5, col=unclass(events$type))
 legend("topright", legend=levels(events$type), title="Type", pch=1:2, col=1:2)
 
+## space-time grid with endemic covariates
+head(stgrid <- imdepi$stgrid[,-1])
+
 ## reconstruct the "imdepi" object from its components
 myimdepi <- as.epidataCS(events = events, stgrid = stgrid,
                          W = stateD, qmatrix = diag(2), nCircle2Poly = 16)
 ## -> equal to 'imdepi' as long as the internal structures of the embedded
 ##    classes ("owin", "SpatialPolygons", ...), and the calculation of the
-##    influence regions by "polyclip" do not change:
-##all.equal(imdepi, myimdepi, tolerance=1E-6)
+##    influence regions by "polyclip" have not changed:
+##all.equal(imdepi, myimdepi)
 }
 
 \keyword{spatial}
