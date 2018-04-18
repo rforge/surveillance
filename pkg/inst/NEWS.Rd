@@ -17,6 +17,9 @@
 
     \item \code{as.epidataCS()} construction finally allows for
     prehistory events (long supported by \code{twinstim()}).
+
+    \item The \code{summary()} for SI[R]S-type \code{"epidata"} failed
+    if there were initially infectious individuals.
   }
 }
   
