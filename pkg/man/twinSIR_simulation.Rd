@@ -294,7 +294,10 @@ epi <- simEpidata(
     ##remPeriod = function(ids) rexp(length(ids), rate=0.1), end = 30   # -> SIRS
 )
 
-# Plot the numbers of susceptible, infectious and removed individuals
+## extract event times by id
+head(summary(epi)$byID)
+
+## Plot the numbers of susceptible, infectious and removed individuals
 plot(epi)
 
 

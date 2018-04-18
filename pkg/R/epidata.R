@@ -683,7 +683,7 @@ summary.epidata <- function (object, ...)
                            idvar = "id")
             attr(.res, "reshapeWide") <- NULL
             if ("time.I" %in% names(.res)) {
-                .res
+                .res[c("id", "time.I", "time.R")]  # ensure natural order
             } else { # degenerate case: only R (and S) events in data
                 cbind(.res[1L], "time.I" = NA_real_, .res[-1L])
             }
