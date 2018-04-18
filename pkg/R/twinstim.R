@@ -6,7 +6,7 @@
 ### Maximum Likelihood inference for the two-component spatio-temporal intensity
 ### model described in Meyer et al (2012), DOI: 10.1111/j.1541-0420.2011.01684.x
 ###
-### Copyright (C) 2009-2017 Sebastian Meyer
+### Copyright (C) 2009-2018 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -335,7 +335,7 @@ twinstim <- function (
         if (nbeta0 == 1L) { # global intercept
             hEventsExpr <- call("+", quote(beta0), hEventsExpr)
         } else if (nbeta0 > 1L) { # type-specific intercept
-            hEventsExpr <- call("+", quote(beta0[eventTypes]), hEventsExpr)
+            hEventsExpr <- call("+", quote(beta0[eventTypes[includes]]), hEventsExpr)
         }
         if (!is.null(offsetEvents))
             hEventsExpr <- call("+", quote(offsetEvents), hEventsExpr)
@@ -687,12 +687,12 @@ twinstim <- function (
                 sEventsSum - unname(sInt)
             }) else if (nbeta0 > 1L) local({ # type-specific intercepts
                 ind <- sapply(seq_len(nTypes),
-                              function (type) eventTypes == type,
-                              simplify=TRUE, USE.NAMES=FALSE) # logical N x nTypes matrix
+                              function (type) eventTypes[includes] == type,
+                              simplify=TRUE, USE.NAMES=FALSE) # logical Nin x nTypes matrix
                 sEvents <- if (hase) {
                         ind * hEvents / lambdaEvents
                     } else ind
-                sEventsSum <- .colSums(sEvents, N, nTypes)
+                sEventsSum <- .colSums(sEvents, Nin, nTypes)
                 sInt <- exp(beta0) * .hIntTW(beta)
                 sEventsSum - unname(sInt)
             }) else numeric(0L) # i.e. nbeta0 == 0L
@@ -789,8 +789,8 @@ twinstim <- function (
         hScoreEvents <- if (hash) {
             scoreEvents_beta0 <- if (nbeta0 > 1L) local({ # type-specific intercepts
                 ind <- sapply(seq_len(nTypes),
-                              function (type) eventTypes == type,
-                              simplify=TRUE, USE.NAMES=FALSE) # logical N x nTypes matrix
+                              function (type) eventTypes[includes] == type,
+                              simplify=TRUE, USE.NAMES=FALSE) # logical Nin x nTypes matrix
                 if (hase) {
                     ind * hEvents / lambdaEvents
                 } else ind
