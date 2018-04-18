@@ -15,8 +15,10 @@
     \item \code{autoplot.sts()} now sets the calling environment as
     the \code{plot_env} of the result.
 
-    \item \code{as.epidataCS()} construction finally allows for
-    prehistory events (long supported by \code{twinstim()}).
+    \item Several \code{twinstim}-related functions finally allow for
+    prehistory events (long supported by \code{twinstim()} itself):
+    \code{as.epidataCS()}, \code{glm_epidataCS()},
+    \code{as.epidata.epidataCS()}.
 
     \item The \code{summary()} for SI[R]S-type \code{"epidata"} failed
     if there were initially infectious individuals.
