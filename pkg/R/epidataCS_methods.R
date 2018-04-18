@@ -12,7 +12,7 @@
 ################################################################################
 
 
-### Number of events
+### Number of events (including prehistory)
 
 nobs.epidataCS <- function (object, ...) length(object$events)
 
