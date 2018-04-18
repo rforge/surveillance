@@ -130,13 +130,12 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     not well defined and simulation cannot proceed.
   }
   \item{t0}{
-    \code{events} having occurred during (-Inf;\code{t0}] are regarded as part of the
-    prehistory \eqn{H_0} of the process. The time point \code{t0} must be an element
-    of \code{stgrid$start}. For \code{simEpidataCS}, by default, and
-    also if \code{t0=NULL}, it is the earliest time point of the
-    spatio-temporal grid \code{stgrid}. For the \code{simulate.twinstim}
-    method, \code{NULL} means to use the same time range as for the
-    fitting of the \code{"twinstim"} \code{object}.
+    \code{events} having occurred during (-Inf;\code{t0}] are regarded
+    as part of the prehistory \eqn{H_0} of the process.
+    For \code{simEpidataCS}, by default and also if \code{t0=NULL},
+    the beginning of \code{stgrid} is used as \code{t0}.
+    For the \code{simulate.twinstim} method, \code{NULL} means to use
+    the fitted time range of the \code{"twinstim"} \code{object}.
   }
   \item{T, nEvents}{
     simulate a maximum of \code{nEvents} events up to time \code{T},
