@@ -202,6 +202,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     if (Nout > 0L) {
         check_tiles_events(tiles, events)
         eventCoords <- coordinates(events)
+        rownames(eventCoords) <- NULL  # to avoid duplicates ("" for new events)
+                                       # which disturb the final SpatialPointsDataFrame()
         eventData <- events@data
         ## check presence of unpredictable marks
         if (length(.idx <- which(!unpredMarks %in% names(eventData)))) {
