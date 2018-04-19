@@ -117,10 +117,10 @@ load(system.file("shapes", "districtsD.RData", package="surveillance"))
 imdsts <- epidataCS2sts(imdepi, freq = 12, start = c(2002, 1),
                         neighbourhood = NULL, # not needed here
                         tiles = districtsD)
-\dontshow{
-stopifnot(isTRUE(all.equal(colSums(imdsts@observed),
-                           c(table(imdepi$events$tile)))))
-}
+
+## check the overall number of events by district
+stopifnot(all.equal(colSums(observed(imdsts)),
+                    c(table(imdepi$events$tile))))
 
 ## compare plots of monthly number of cases
 opar <- par(mfrow = c(2, 1))
@@ -134,7 +134,7 @@ plot(imdsts, type = observed ~ unit)
 
 ## also test conversion to an SIS event history ("epidata") of the "tiles"
 if (requireNamespace("intervals")) {
-    imdepi_short <- subset(imdepi, time < 50)
+    imdepi_short <- subset(imdepi, time < 50)  # to reduce the runtime
     imdepi_short$stgrid <- subset(imdepi_short$stgrid, start < 50)
     imdepidata <- as.epidata(imdepi_short,
                              tileCentroids = coordinates(districtsD))
