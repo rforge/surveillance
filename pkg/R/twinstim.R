@@ -80,7 +80,7 @@ twinstim <- function (
         if (is.na(justBeforet0)) justBeforet0 <- length(data$stgrid$start)   # t0 was too big
         if (justBeforet0 == 0L) justBeforet0 <- 1L   # t0 was too small
         t0 <- data$stgrid$start[justBeforet0]
-        message("replaced 't0' by the value ", t0,
+        warning("replaced 't0' by the value ", t0,
                 " (must be a 'start' time of 'data$stgrid')")
     }
     if (!T %in% data$stgrid$stop) {
@@ -88,7 +88,7 @@ twinstim <- function (
         # if 'T' is beyond the time range covered by 'data$stgrid'
         if (is.na(justAfterT)) justAfterT <- length(data$stgrid$stop)   # T was too big
         T <- data$stgrid$stop[justAfterT]
-        message("replaced 'T' by the value ", T,
+        warning("replaced 'T' by the value ", T,
                 " (must be a 'stop' time of 'data$stgrid')")
     }
 
