@@ -44,6 +44,7 @@ if (!COMPUTE) load("twinstim-cache.RData", verbose = TRUE)
 
 
 \documentclass[nojss,nofooter,article]{jss}
+\usepackage[latin1]{inputenc} % Rnw is ASCII, but automatic package bib isn't
 
 \title{%
   \vspace{-1.5cm}
