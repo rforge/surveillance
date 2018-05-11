@@ -11,6 +11,7 @@
 ### $Date$
 ################################################################################
 
-qlomax <- function (p, scale, shape)
+qlomax <- function (p, scale, shape) {
+    .Deprecated("VGAM::qlomax", package = "surveillance")
     scale * ((1-p)^(-1/shape) - 1)
-
+}

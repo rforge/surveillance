@@ -24,7 +24,12 @@
     if there were initially infectious individuals.
   }
 }
-  
+
+\subsection{DEPRECATED AND DEFUNCT}{
+  \itemize{
+    \item Several functions have been deprecated and may be removed in
+    future versions of \pkg{surveillance}: \code{qlomax}.
+  }
 }
 
 
