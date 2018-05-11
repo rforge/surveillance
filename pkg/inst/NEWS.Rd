@@ -29,9 +29,9 @@
   \itemize{
     \item Several ancient functions have been deprecated and may be
     removed in future versions of \pkg{surveillance}: \code{qlomax()},
-    \code{readData()}, \code{toFileDisProg()},
-    \code{compMatrix.writeTable()}, \code{test()}, \code{testSim()},
-    \code{makePlot()}.
+    \code{readData()}, \code{toFileDisProg()}, \code{correct53to52()},
+    \code{enlargeData()}, \code{compMatrix.writeTable()},
+    \code{test()}, \code{testSim()}, \code{makePlot()}.
   }
 }
 

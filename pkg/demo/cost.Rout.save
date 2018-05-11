@@ -1,11 +1,13 @@
 
-R version 3.3.3 (2017-03-06) -- "Another Canoe"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R version 3.4.4 (2018-03-15) -- "Someone to Lean On"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -23,13 +25,12 @@ Type 'q()' to quit R.
 > 
 > 
 > ###################################################
-> ### chunk number 1: 
+> ### chunk number 1:
 > ###################################################
 > library("surveillance")
 Loading required package: sp
 Loading required package: xtable
-Loading required package: polyCub
-This is surveillance 1.14.0. For overview type ‘help(surveillance)’.
+This is surveillance 1.16.0. For overview type ‘help(surveillance)’.
 > options(width=70)
 > options("prompt"="R> ")
 R> set.seed(1234)
@@ -56,7 +57,7 @@ R> plot(aggregate(ha),main="Hepatitis A in Berlin 2001-2006")
 R> 
 R> 
 R> ###################################################
-R> ### chunk number 3: 
+R> ### chunk number 3:
 R> ###################################################
 R> opendevice(file="figs/002.pdf")
 R> data("ha")
@@ -67,16 +68,16 @@ pdf
 R> 
 R> 
 R> ###################################################
-R> ### chunk number 4: 
+R> ### chunk number 4:
 R> ###################################################
-R> sps <- sim.pointSource(p = 0.99, r = 0.5, length = 400, 
-+      A = 1, alpha = 1, beta = 0, phi = 0, frequency = 1, 
+R> sps <- sim.pointSource(p = 0.99, r = 0.5, length = 400,
++      A = 1, alpha = 1, beta = 0, phi = 0, frequency = 1,
 +      state = NULL, K = 1.7)
 R> plot(sps,xaxis.years=FALSE)
 R> 
 R> 
 R> ###################################################
-R> ### chunk number 5: 
+R> ### chunk number 5:
 R> ###################################################
 R> opendevice(file="figs/003.pdf")
 R> plot(sps,xaxis.years=FALSE,legend.opts=list(x="topleft"))
@@ -93,7 +94,7 @@ R> ## plot(ha.b662, firstweek=1, startyear = 2005)
 R> 
 R> 
 R> ###################################################
-R> ### chunk number 7: 
+R> ### chunk number 7:
 R> ###################################################
 R> ha.b662 <- algo.bayes(aggregate(ha), control = list(range = 209:290, b = 2, w = 6, alpha = 0.01))
 R> plot(ha.b662, firstweek=1, startyear = 2005)
@@ -113,7 +114,7 @@ R> ## sps.farrington <- algo.farrington(sps, control = cntrl)
 R> 
 R> 
 R> ###################################################
-R> ### chunk number 9: 
+R> ### chunk number 9:
 R> ###################################################
 R> cntrl <- list(range = 300:400, m = 1, w = 3, b = 5, alpha = 0.01)
 R> sps.cdc <- algo.cdc(sps, control = cntrl)
@@ -121,7 +122,7 @@ R> sps.farrington <- algo.farrington(sps, control = cntrl)
 R> 
 R> 
 R> ###################################################
-R> ### chunk number 10: 
+R> ### chunk number 10:
 R> ###################################################
 R> opendevice(file="figs/farringtoncdc.pdf")
 R> par(mfcol = c(1, 2),cex=0.8)
@@ -140,7 +141,7 @@ R> ## ha.cusum <- algo.cusum(aggregate(ha),control=list(k=kh$k,h=kh$h,m="glm",tr
 R> 
 R> 
 R> ###################################################
-R> ### chunk number 12: 
+R> ### chunk number 12:
 R> ###################################################
 R> opendevice(file="figs/hacusum.pdf")
 R> kh <- find.kh(ARLa=500,ARLr=7)
@@ -156,7 +157,7 @@ R> beta <- coef(ha.cusum$control$m.glm)
 R> 
 R> 
 R> ###################################################
-R> ### chunk number 13: 
+R> ### chunk number 13:
 R> ###################################################
 R> print(algo.quality(ha.b662))
      TP FP TN FN Sens Spec dist mlag
@@ -164,9 +165,9 @@ R> print(algo.quality(ha.b662))
 R> 
 R> 
 R> ###################################################
-R> ### chunk number 14: 
+R> ### chunk number 14:
 R> ###################################################
-R> #This chunk contains stuff the reader should not see, but which is necessary 
+R> #This chunk contains stuff the reader should not see, but which is necessary
 R> #for the visual block to work.
 R> control = list(
 +   list(funcName = "rki1"),
@@ -186,14 +187,20 @@ R> data("k1")
 R> range = (2*4*52) +  1:length(k1$observed)
 R> aparv.control <- lapply(control,function(cntrl) { cntrl$range=range;return(cntrl)})
 R> 
+R> #Auxiliary function to enlarge data
+R> enlargeData <- function(disProgObj, range = 1:156, times = 1){
++   disProgObj$observed <- c(rep(disProgObj$observed[range], times), disProgObj$observed)
++   disProgObj$state <- c(rep(disProgObj$state[range], times), disProgObj$state)
++   return(disProgObj)
++ }
+R> 
 R> #Outbreaks
-R> outbrks <- c("m1", "m2", "m3", "m4", "m5", "q1_nrwh", "q2", 
+R> outbrks <- c("m1", "m2", "m3", "m4", "m5", "q1_nrwh", "q2",
 +               "s1", "s2", "s3", "k1", "n1", "n2", "h1_nrwrp")
 R> 
 R> #Load and enlarge data.
 R> outbrks <- lapply(outbrks,function(name) {
-+   #Load with data
-+   eval(substitute(data(name),list(name=name)))
++   data(list=name)
 +   enlargeData(get(name),range=1:(4*52),times=2)
 + })
 R> 
@@ -211,9 +218,9 @@ R> ## #Apply function to one
 R> ## surv.one <- function(outbrk) {
 R> ##   algo.compare(algo.call(outbrk,control=aparv.control))
 R> ## }
-R> ## 
+R> ##
 R> ## algo.summary(lapply(outbrks, surv.one))
-R> ## 
+R> ##
 R> 
 R> 
 R> ###################################################
@@ -322,7 +329,7 @@ There were 50 or more warnings (use warnings() to see the first 50)
 R> 
 R> 
 R> ###################################################
-R> ### chunk number 17: 
+R> ### chunk number 17:
 R> ###################################################
 R> print(res,digits=3)
                    TP  FP   TN  FN  sens  spec  dist mlag
@@ -350,7 +357,7 @@ R> ##                                 neighbourhood= "matrix",
 R> ##                                 populationFrac= "matrix",
 R> ##                                 map = "SpatialPolygonsDataFrame",
 R> ##                                 control = "list"))
-R> ## 
+R> ##
 R> 
 R> 
 R> ###################################################
@@ -359,11 +366,11 @@ R> ###################################################
 R> ## shp <- system.file("shapes/berlin.shp",package="surveillance")
 R> ## ha <- disProg2sts(ha, map=maptools::readShapePoly(shp,IDvar="SNAME"))
 R> ## plot(ha,type=observed ~ 1 | unit)
-R> ## 
+R> ##
 R> 
 R> 
 R> ###################################################
-R> ### chunk number 20: 
+R> ### chunk number 20:
 R> ###################################################
 R> opendevice(file="figs/ha-1unit.pdf",width=7,height=7)
 R> par(mar=c(0,0,0,0))
@@ -388,7 +395,7 @@ R> ## plot(ha4.cusum,type=observed ~ time | unit)
 R> 
 R> 
 R> ###################################################
-R> ### chunk number 22: 
+R> ### chunk number 22:
 R> ###################################################
 R> opendevice(file="figs/ha-timeunit.pdf",width=7,height=5)
 R> ha4 <- aggregate(ha[,c("pank","mitt","frkr","scho","chwi","neuk")],nfreq=13)
@@ -408,6 +415,6 @@ R>
 R> 
 R> ## finally switch back to original working directory
 R> message("Note: selected figures have been saved in ", getwd(), "/figs")
-Note: selected figures have been saved in /tmp/Rtmp6GRqhQ/figs
+Note: selected figures have been saved in /tmp/RtmplJgpIm/figs
 R> setwd(OWD)
 R> 

@@ -82,6 +82,7 @@ toFileDisProg <- function(disProgObj, toFile){
 
 
 correct53to52 <- function(disProgObj, firstweek = 1){
+    .Deprecated(package = "surveillance")
 
         if(firstweek > length(disProgObj$observed)){
                 stop("firstweek doesn't exist")
@@ -140,6 +141,7 @@ correct53to52 <- function(disProgObj, firstweek = 1){
 ###################################################
 
 enlargeData <- function(disProgObj, range = 1:156, times = 1){
+    .Deprecated(package = "surveillance")
 
         # enlarge observed
         disProgObj$observed <- c(rep(disProgObj$observed[range], times), disProgObj$observed)
@@ -148,6 +150,3 @@ enlargeData <- function(disProgObj, range = 1:156, times = 1){
 
         return(disProgObj)
 }
-
-
-

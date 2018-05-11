@@ -474,14 +474,20 @@ range = (2*4*52) +  1:length(k1$observed)
 control <- lapply(control,function(cntrl) {
   cntrl$range=range;return(cntrl)})
 
+#Auxiliary function to enlarge data
+enlargeData <- function(disProgObj, range = 1:156, times = 1){
+  disProgObj$observed <- c(rep(disProgObj$observed[range], times), disProgObj$observed)
+  disProgObj$state <- c(rep(disProgObj$state[range], times), disProgObj$state)
+  return(disProgObj)
+}
+
 #Outbreaks
 outbrks <- c("m1", "m2", "m3", "m4", "m5", "q1_nrwh", "q2",
              "s1", "s2", "s3", "k1", "n1", "n2", "h1_nrwrp")
 
 #Load and enlarge data.
 outbrks <- lapply(outbrks,function(name) {
-  #Load with data
-  eval(substitute(data(name),list(name=name)))
+  data(list=name)
   enlargeData(get(name),range=1:(4*52),times=2)
 })
 
