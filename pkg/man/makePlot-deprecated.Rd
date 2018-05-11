@@ -27,6 +27,8 @@ makePlot(outputpath, data = "k1", method = "rki1",
 }
 \author{M. \enc{Höhle}{Hoehle}, A. Riebler, C. Lang}
 \examples{
+\dontrun{
 makePlot("./", "k1", "rki2", "RKI 2", "Kryptosporidiose")
+}
 }
 \keyword{misc}
