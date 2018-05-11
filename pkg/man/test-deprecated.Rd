@@ -1,4 +1,4 @@
-\name{test}
+\name{test-deprecated}
 \alias{test}
 \encoding{latin1}
 \title{Print xtable for several diseases and the summary}

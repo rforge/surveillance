@@ -27,8 +27,11 @@
 
 \subsection{DEPRECATED AND DEFUNCT}{
   \itemize{
-    \item Several functions have been deprecated and may be removed in
-    future versions of \pkg{surveillance}: \code{qlomax}.
+    \item Several ancient functions have been deprecated and may be
+    removed in future versions of \pkg{surveillance}: \code{qlomax()},
+    \code{"disProg"}-related utilities (\code{readData()},
+    \code{toFileDisProg()}), as well as \code{compMatrix.writeTable()},
+    \code{test()}, \code{testSim()}, \code{makePlot()}.
   }
 }
 

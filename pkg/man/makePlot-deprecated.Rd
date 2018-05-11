@@ -1,4 +1,4 @@
-\name{makePlot}
+\name{makePlot-deprecated}
 \alias{makePlot}
 \encoding{latin1}
 \title{Plot Generation}
