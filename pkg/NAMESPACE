@@ -230,7 +230,6 @@ export(sts_observation)
 export(create.disProg, readData, toFileDisProg)
 S3method(print, disProg)
 S3method(plot, disProg)
-S3method(plot, disProg.one)
 S3method(aggregate, disProg)
 
 export(sim.pointSource, sim.seasonalNoise)
