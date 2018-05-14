@@ -263,7 +263,6 @@ export(algo.farrington.assign.weights,
 
 S3method(plot, atwins)
 S3method(plot, survRes)
-S3method(plot, survRes.one)
 S3method(print, algoQV)
 S3method(xtable, algoQV)
 
