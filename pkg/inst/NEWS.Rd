@@ -1924,7 +1924,6 @@
     \code{twinstim}.
     \item Simulation from the Lomax kernel is now correct (via polar
     coordinates).
-    \item Fixed \code{modifyListcall()} to also work with updated \code{NULL} arguments.
     \item Fixed wrong Fisher information entry for the overdispersion
     parameter in \code{hhh4}-models.
     \item Fixed wrong entries in penalized Fisher information wrt the
