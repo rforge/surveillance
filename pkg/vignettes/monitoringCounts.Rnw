@@ -1705,8 +1705,8 @@ results <- farringtonFlexible(salmNewport[, c("Baden.Wuerttemberg",
                                              "North.Rhine.Westphalia")],
                   control = algoParameters)
 
-start <- isoWeekYear(epoch(salmNewport)[range(range)[1]])
-end <- isoWeekYear(epoch(salmNewport)[range(range)[2]])
+start <- isoWeekYear(epoch(salmNewport)[range(rangeAnalysis)[1]])
+end <- isoWeekYear(epoch(salmNewport)[range(rangeAnalysis)[2]])
 caption <- paste("Results of the analysis of reported S. Newport
                  counts in two German federal states for the weeks W-",
                  start$ISOWeek, "-", start$ISOYear, " - W-", end$ISOWeek,
