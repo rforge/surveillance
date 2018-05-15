@@ -85,7 +85,7 @@
   (invisibly) a list of the \code{length(tps)} sequential plot objects
   of class \code{"\code{\link[gtable]{gtable}}"}
   (if the the \code{timeplot} is active) or of class
-  \code{"\code{\link[=trellis.object]{trellis}"}
+  \code{"\code{\link[lattice:trellis.object]{trellis}"}
   (otherwise).
 }
 
