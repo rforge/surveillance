@@ -1707,12 +1707,11 @@ results <- farringtonFlexible(salmNewport[, c("Baden.Wuerttemberg",
 
 start <- isoWeekYear(epoch(salmNewport)[range(rangeAnalysis)[1]])
 end <- isoWeekYear(epoch(salmNewport)[range(rangeAnalysis)[2]])
-caption <- paste("Results of the analysis of reported S. Newport
-                 counts in two German federal states for the weeks W-",
-                 start$ISOWeek, " ", start$ISOYear, " - W-", end$ISOWeek,
-                 " ", end$ISOYear, " performed on ", Sys.Date(),
-                 ". Bold upperbounds (thresholds) indicate weeks with alarms.",
-                 sep="")
+caption <- paste0("Results of the analysis of reported S. Newport ",
+                  "counts in two German federal states for the weeks ",
+                  start$ISOYear, "-W", start$ISOWeek, " to ",
+                  end$ISOYear, "-W", end$ISOWeek,
+                  ". Bold upperbounds (thresholds) indicate weeks with alarms.")
 toLatex(results, caption = caption)
 @
 <<testLabel, echo = FALSE, results = tex>>=
@@ -1736,12 +1735,11 @@ results <- farringtonFlexible(salmNewport[,c("Baden.Wuerttemberg",
 # Export the results as a tex table
 start <- isoWeekYear(epoch(salmNewport)[range(rangeAnalysis)[1]])
 end <- isoWeekYear(epoch(salmNewport)[range(rangeAnalysis)[2]])
-caption <- paste("Results of the analysis of reported S. Newport
-                 counts in two German federal states for the weeks W-",
-                 start$ISOWeek," ",start$ISOYear," - W-",end$ISOWeek,
-                 " ",end$ISOYear," performed on ",Sys.Date(),
-                 ". Bold upperbounds (thresholds) indicate weeks with alarms.",
-                 sep="")
+caption <- paste0("Results of the analysis of reported S. Newport ",
+                  "counts in two German federal states for the weeks ",
+                  start$ISOYear, "-W", start$ISOWeek, " to ",
+                  end$ISOYear, "-W", end$ISOWeek, #" performed on ", Sys.Date(),
+                  ". Bold upperbounds (thresholds) indicate weeks with alarms.")
 toLatex(results, table.placement="h", size = "normalsize",
         sanitize.text.function = identity,
         NA.string = "-",include.rownames=FALSE,
