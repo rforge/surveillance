@@ -395,28 +395,27 @@ To compare the results of several algorithms on a single time series
 we declare a list of control objects -- each containing the name and
 settings of the algorithm we want to apply to the data.
 <<CONTROL>>=
-control = list(
-  list(funcName = "rki1"),
-  list(funcName = "rki2"),
-  list(funcName = "rki3"),
-  list(funcName = "bayes1"),
-  list(funcName = "bayes2"),
-  list(funcName = "bayes3"),
-  list(funcName = "cdc",alpha=0.05),
-  list(funcName = "farrington",alpha=0.05))
-control <- lapply(control,function(ctrl) {
-  ctrl$range <- 300:400;return(ctrl)})
+control <- list(
+  list(funcName = "rki1"), list(funcName = "rki2"),
+  list(funcName = "rki3"), list(funcName = "bayes1"),
+  list(funcName = "bayes2"), list(funcName = "bayes3"),
+  list(funcName = "cdc", alpha=0.05),
+  list(funcName = "farrington", alpha=0.05)
+)
+control <- lapply(control, function(ctrl) {
+  ctrl$range <- 300:400; return(ctrl)
+})
 @
 %
 In the above, \texttt{rki1}, \texttt{rki2} and \texttt{rki3} are three
 methods with reference values $R_\text{rki1}(6,6,0)$,
-$R_\text{rki2}(6,6,1)$ and $R_\text{rki3}(4,0,2)$ all called with
-$\alpha=0.05$. The methods \texttt{bayes1}-\texttt{bayes3} is the
-Bayesian algorithm using the same setup of reference values. The CDC
-Method is special, since it operates on aggregated four-week blocks.
-To make everything comparable a common $\alpha=0.05$ level is used for
-all algorithms. All algorithms in \texttt{control} are applied to
-\texttt{sts} using:
+$R_\text{rki2}(6,6,1)$ and $R_\text{rki3}(4,0,2)$, all called with
+$\alpha=0.05$. The \texttt{bayes*} methods use the
+Bayesian algorithm with the same setup of reference values. The CDC
+method is special since it operates on aggregated four-week blocks.
+To make everything comparable, a common $\alpha=0.05$ level is used for
+all algorithms.
+All algorithms in \texttt{control} are applied to \texttt{sts} using:
 <<echo=T,eval=F>>=
 algo.compare(algo.call(sts, control = control))
 @
@@ -476,8 +475,10 @@ control <- lapply(control,function(cntrl) {
 
 #Auxiliary function to enlarge data
 enlargeData <- function(disProgObj, range = 1:156, times = 1){
-  disProgObj$observed <- c(rep(disProgObj$observed[range], times), disProgObj$observed)
-  disProgObj$state <- c(rep(disProgObj$state[range], times), disProgObj$state)
+  disProgObj$observed <- c(rep(disProgObj$observed[range], times),
+                           disProgObj$observed)
+  disProgObj$state <- c(rep(disProgObj$state[range], times),
+                        disProgObj$state)
   return(disProgObj)
 }
 
