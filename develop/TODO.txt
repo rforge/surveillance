@@ -130,6 +130,8 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 # Features
 ##########
 
+- maybe eventually use accelerated bdist.points() with spatstat (> 1.55-1)
+
 - type-specific iso-kernels (need example or test code)
 
 - implement siaf.powerlaw2 parametrization (1+x/sigma)^-d
