@@ -134,7 +134,8 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 
 - type-specific iso-kernels (need example or test code)
 
-- implement siaf.powerlaw2 parametrization (1+x/sigma)^-d
+- maybe re-evaluate siaf.lomax(density=FALSE), i.e., f(x) = (1+x/sigma)^-d
+  and similary f(x) = (1+x^2/sigma^2)^-d as alternative student parametrization
 
 - implement siaf.powerlaw(scale = 1), i.e. with value of sigma fixed
 
