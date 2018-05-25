@@ -13,6 +13,7 @@
 \alias{print.summary.epidataCS}
 \alias{as.stepfun.epidataCS}
 \alias{getSourceDists}
+\alias{coerce,epidataCS,SpatialPointsDataFrame-method}
 
 \title{
   Continuous Space-Time Marked Point Patterns with Grid-Based Covariates
@@ -210,12 +211,12 @@ getSourceDists(object, dimension = c("space", "time"))
   \code{"epidataCS"}, which is the data structure required for
   \code{\link{twinstim}} models.
 
-  The extraction method for class \code{"epidataCS"}
+  The \code{[}-method for class \code{"epidataCS"}
   ensures that the subsetted object will be valid, for instance, it
   updates the auxiliary list of potential transmission paths stored
-  in the object. This \code{[}-method is also the basis for the
-  \code{subset.epidataCS}-method, which is implemented similar to the
-  \code{\link{subset.data.frame}}-method.
+  in the object. The \code{[}-method is used in
+  \code{subset.epidataCS}, which is implemented similar to
+  \code{\link{subset.data.frame}}.
   
   The \code{print} method for \code{"epidataCS"} prints some metadata
   of the epidemic, e.g., the observation period, the dimensions of the
@@ -326,10 +327,13 @@ getSourceDists(object, dimension = c("space", "time"))
   There is also an \code{\link[=update.epidataCS]{update}} method for the
   \code{"epidataCS"} class.
 
-  Models for \code{"epidataCS"} can be fitted with \code{\link{twinstim}}.
-  It is also possible to convert the data to \code{\link{epidata}}
-  objects (discrete space) for analysis with \code{\link{twinSIR}}
-  (see \code{\link{as.epidata.epidataCS}}).
+  To re-extract the \code{events} point pattern from \code{"epidataCS"},
+  use \code{as(object, "SpatialPointsDataFrame")}.
+
+  It is possible to convert an \code{"epidataCS"} point pattern to
+  an \code{"\link{epidata}"} object (\code{\link{as.epidata.epidataCS}}),
+  or to aggregate the events into an \code{"\linkS4class{sts}"} object
+  (\code{\link{epidataCS2sts}}).
 }
 
 \examples{
@@ -371,7 +375,7 @@ subset(imdepi, type=="B")   # only consider event type B
 
 
 ###
-### reconstruct the "imdepi" object from its components
+### reconstruct the "imdepi" object
 ###
 
 ## observation region
@@ -379,12 +383,19 @@ load(system.file("shapes", "districtsD.RData", package="surveillance"),
      verbose = TRUE)
 summary(stateD)
 
-## events
+## extract point pattern of events from the "imdepi" data
 data(imdepi)
 events <- marks(imdepi)  # data frame with coordinate columns
 coordinates(events) <- c("x", "y")  # promote to a "SpatialPointsDataFrame"
-#proj4string(events) <- proj4string(stateD)  # ETRS89 projection
+#proj4string(events) <- proj4string(stateD)
 events@proj4string <- stateD@proj4string  # exact copy (avoid CRS reformatting)
+
+## or, much simpler, use the corresponding coerce-method
+\dontshow{
+events@coords.nrs <- numeric(0L)
+stopifnot(all.equal(as(imdepi, "SpatialPointsDataFrame"), events))
+}
+events <- as(imdepi, "SpatialPointsDataFrame")
 summary(events)
 
 ## plot observation region with events
@@ -398,10 +409,12 @@ head(stgrid <- imdepi$stgrid[,-1])
 ## reconstruct the "imdepi" object from its components
 myimdepi <- as.epidataCS(events = events, stgrid = stgrid,
                          W = stateD, qmatrix = diag(2), nCircle2Poly = 16)
-## -> equal to 'imdepi' as long as the internal structures of the embedded
-##    classes ("owin", "SpatialPolygons", ...), and the calculation of the
-##    influence regions by "polyclip" have not changed:
-##all.equal(imdepi, myimdepi)
+\dontrun{
+## This reconstructed object is equal to 'imdepi' as long as the internal
+## structures of the embedded classes ("owin", "SpatialPolygons", ...), and
+## the calculation of the influence regions by "polyclip" have not changed:
+stopifnot(all.equal(imdepi, myimdepi))
+}
 }
 
 \keyword{spatial}

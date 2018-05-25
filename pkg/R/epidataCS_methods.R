@@ -193,6 +193,18 @@ marks.epidataCS <- function (x, coords = TRUE, ...)
     }
 }
 
+## extract the events point pattern
+as.SpatialPointsDataFrame.epidataCS <- function (from)
+{
+    stopifnot(inherits(from, "epidataCS"))
+    events <- from$events
+    events@data <- marks.epidataCS(from, coords = FALSE)
+    events
+}
+setOldClass("epidataCS")
+setAs(from = "epidataCS", to = "SpatialPointsDataFrame",
+      def = as.SpatialPointsDataFrame.epidataCS)
+
 
 
 ### permute event times and/or locations holding remaining columns fixed
