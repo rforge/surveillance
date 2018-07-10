@@ -485,8 +485,8 @@ createLambda <- function (object)
 ## extract exppreds multiplied with offsets
 ## note: theta = coef(object) would also work since psi is not involved here
 get_exppreds_with_offsets <- function (object,
-                                       theta = object$coefficients,
-                                       subset = seq_len(nrow(object$stsObj)))
+                                       subset = seq_len(nrow(object$stsObj)),
+                                       theta = object$coefficients)
 {
     model <- terms.hhh4(object)
     means <- meanHHH(theta, model, subset = subset)
