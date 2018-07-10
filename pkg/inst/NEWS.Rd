@@ -12,8 +12,9 @@
 
 \subsection{BUG FIXES}{
   \itemize{
-    \item \code{simulate.hhh4()} ignored offsets in the epidemic components.
-    [spotted by Johannes Bracher]
+    \item Offsets in the epidemic components were ignored by
+    \code{simulate.hhh4()} [spotted by Johannes Bracher] as well as
+    in dominant eigenvalues (\dQuote{maxEV}).
   }
 }
 

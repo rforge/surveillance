@@ -452,8 +452,7 @@ createLambda <- function (object)
         return(Lambda)
     }
 
-    meanHHH <- meanHHH(object$coefficients, terms(object),
-                       subset=seq_len(nTime))
+    exppreds <- get_exppreds_with_offsets(object)
 
     W <- getNEweights(object)
     Wt <- if (is.null(W)) {
@@ -469,18 +468,35 @@ createLambda <- function (object)
         type <- "diagonal"
         function (t) {
             stopifnot(isScalar(t) && t > 0 && t <= nTime)
-            diag(meanHHH$ar.exppred[t,], nUnit, nUnit)
+            diag(exppreds$ar[t,], nUnit, nUnit)
         }
     } else {
         function (t) {
             stopifnot(isScalar(t) && t > 0 && t <= nTime)
-            Lambda <- meanHHH$ne.exppred[t,] * t(Wt(t))
-            diag(Lambda) <- diag(Lambda) + meanHHH$ar.exppred[t,]
+            Lambda <- exppreds$ne[t,] * t(Wt(t))
+            diag(Lambda) <- diag(Lambda) + exppreds$ar[t,]
             Lambda
         }
     }
     attr(Lambda, "type") <- type
     Lambda
+}
+
+## extract exppreds multiplied with offsets
+## note: theta = coef(object) would also work since psi is not involved here
+get_exppreds_with_offsets <- function (object,
+                                       theta = object$coefficients,
+                                       subset = seq_len(nrow(object$stsObj)))
+{
+    model <- terms.hhh4(object)
+    means <- meanHHH(theta, model, subset = subset)
+    res <- sapply(X = c("ar", "ne", "end"), FUN = function (comp) {
+        exppred <- means[[paste0(comp, ".exppred")]]
+        offset <- object$control[[comp]]$offset
+        if (length(offset) > 1) offset <- offset[subset,,drop=FALSE]
+        exppred * offset
+    }, simplify = FALSE, USE.NAMES = TRUE)
+    res
 }
 
 ## determine the dominant eigenvalue of the Lambda matrix
