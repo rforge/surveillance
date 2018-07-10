@@ -58,7 +58,7 @@ simulate.hhh4 <- function (object, # result from a call to hhh4
             stop("need 'y.start' values for lag=", maxlag, " initial time points")
     }
 
-    ## get fitted components nu_it (with offset), phi_it, lambda_it, t in subset
+    ## get fitted components nu_it, phi_it, lambda_it, t in subset
     model <- terms.hhh4(object)
     means <- meanHHH(theta, model, subset=subset)
 
@@ -71,12 +71,15 @@ simulate.hhh4 <- function (object, # result from a call to hhh4
     neweights <- getNEweights(object, coefW(theta))
 
     ## set predictor to zero if not included ('components' argument)
+    ## otherwise multiply with component-specific offset
     stopifnot(length(components) > 0, components %in% c("ar", "ne", "end"))
     getComp <- function (comp) {
-        sel <- if (comp == "end") "endemic" else paste(comp, "exppred", sep=".")
-        res <- means[[sel]]
-        if (!comp %in% components) res[] <- 0
-        res
+        exppred <- means[[paste0(comp, ".exppred")]]
+        if (!comp %in% components)
+            return("[<-"(exppred, value = 0))
+        offset <- object$control[[comp]]$offset
+        if (length(offset) > 1) offset <- offset[subset,,drop=FALSE]
+        exppred * offset
     }
     ar <- getComp("ar")
     ne <- getComp("ne")

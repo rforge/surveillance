@@ -8,6 +8,18 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.16.1.9000 (2018-07-10)}{
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item \code{simulate.hhh4()} ignored offsets in the epidemic components.
+    [spotted by Johannes Bracher]
+  }
+}
+
+}
+
+
 \section{Changes in surveillance version 1.16.1 (2018-05-28)}{
 
 \subsection{BUG FIXES}{
