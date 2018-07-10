@@ -58,11 +58,11 @@ simulate.hhh4 <- function (object, # result from a call to hhh4
             stop("need 'y.start' values for lag=", maxlag, " initial time points")
     }
 
-    ## get fitted components nu_it, phi_it, lambda_it, t in subset
-    model <- terms.hhh4(object)
-    means <- meanHHH(theta, model, subset=subset)
+    ## get fitted exppreds nu_it, phi_it, lambda_it (incl. offsets, t in subset)
+    exppreds <- get_exppreds_with_offsets(object, subset = subset, theta = theta)
 
     ## extract overdispersion parameters (simHHH4 assumes psi->0 means Poisson)
+    model <- terms.hhh4(object)
     psi <- splitParams(theta,model)$overdisp
     if (length(psi) > 1) # "NegBinM" or shared overdispersion parameters
         psi <- psi[model$indexPsi]
@@ -71,15 +71,10 @@ simulate.hhh4 <- function (object, # result from a call to hhh4
     neweights <- getNEweights(object, coefW(theta))
 
     ## set predictor to zero if not included ('components' argument)
-    ## otherwise multiply with component-specific offset
     stopifnot(length(components) > 0, components %in% c("ar", "ne", "end"))
     getComp <- function (comp) {
-        exppred <- means[[paste0(comp, ".exppred")]]
-        if (!comp %in% components)
-            return("[<-"(exppred, value = 0))
-        offset <- object$control[[comp]]$offset
-        if (length(offset) > 1) offset <- offset[subset,,drop=FALSE]
-        exppred * offset
+        exppred <- exppreds[[comp]]
+        if (comp %in% components) exppred else "[<-"(exppred, value = 0)
     }
     ar <- getComp("ar")
     ne <- getComp("ne")
