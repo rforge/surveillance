@@ -8,7 +8,17 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.16.1.9000 (2018-07-10)}{
+\section{Changes in surveillance version 1.16.2 (2018-07-17)}{
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item \code{"epidataCS"} generation now (again) employs
+    \CRANpkg{spatstat}'s \code{bdist.points()}, which has been
+    accelerated in version 1.56-0. If you use the
+    \code{twinstim()}-related modelling part of \pkg{surveillance}, you
+    are thus advised to update your \pkg{spatstat} installation.
+  }
+}
 
 \subsection{BUG FIXES}{
   \itemize{

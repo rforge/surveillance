@@ -102,7 +102,6 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
 
     ## Transform W to class "owin"
     Wowin <- as(W, "owin")
-    Wedges <- edges(Wowin, check = FALSE)
     maxExtentOfW <- diameter.owin(Wowin)
 
 
@@ -461,7 +460,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         eventTypes <- as.integer(eventData$type)
         eps.s <- eventData$eps.s
         # distance to the border (required for siafInt below, and for epidataCS)
-        bdist <- bdist(eventCoords, Wedges)
+        bdist <- bdist(eventCoords, Wowin)
         # spatial influence regions of the events
         influenceRegion <- if (nrow(eventCoords) > 0L) .influenceRegions(
             events = SpatialPointsDataFrame(
