@@ -16,6 +16,8 @@
   The Bayesian Outbreak Detection Algorithm (\code{boda}) is due to
   Manitz and \enc{Höhle}{Hoehle} (2013) and its implementation is
   illustrated in Salmon et al. (2016).
+  However, \code{boda} should be considered as an experiment, see the
+  Warning section below!
 }
 
 \usage{
