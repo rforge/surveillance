@@ -693,7 +693,7 @@ seasonality and a simple linear trend.
 
 rangeBoda <- which(epoch(cam.sts) >= as.Date("2007-01-01"))
 control.boda <- list(range = rangeBoda, X = NULL, trend = TRUE,
-                     season = TRUE, prior = "iid", alpha = 0.025,
+                     season = TRUE, prior = "rw1", alpha = 0.025,
                      mc.munu = 10000, mc.y = 1000,
                      samplingMethod = "marginals")
 boda <- boda(cam.sts, control = control.boda)
