@@ -739,9 +739,20 @@ if (computeALL) {
 
 We plot \code{boda.covars} in Figure~\ref{fig:b} and compare the output of the two boda calls with the output of
 \code{farrington},  \code{farringtonFlexible} and \code{bayes} in
-Figure~\ref{fig:alarmplot}. Note 2018-07-19: We currently have to use the argument `prior = "iid"` in both calls of the `boda` function, because the procedure crashes when using the newest version of the INLA software crashes with argument `prior = "rw1"`. This means results in this vignette deviate from the results reported in the JSS paper - in particular we do not get any alarms when using the boda procedure with covariates. We are looking into the problem.
+Figure~\ref{fig:alarmplot}.
 
-
+\fbox{\vbox{
+Note (2018-07-19):
+We currently have to use the argument \code{prior = "iid"} in both calls
+of the \code{boda} function, because the procedure crashes when using
+recent versions of \pkg{INLA} (\code{>= 17.06.20}) with argument
+\code{prior = "rw1"}.
+%(the original results were produced using version 0.0-1458166556,
+%and version 0.0-1485844051 from 2017-01-31 also works)
+This means results in this vignette deviate from the results reported in
+the JSS paper -- in particular we do not get any alarms when using the
+\code{boda} procedure with covariates. We are looking into the problem.
+}}
 
 <<alarmplot2, fig=FALSE, echo = TRUE, eval=FALSE, label=alarmplot2,include = F,results=tex>>=
 cam.surv <- combineSTS(list(boda.covars=boda.covars,boda=boda,bayes=bayes,
