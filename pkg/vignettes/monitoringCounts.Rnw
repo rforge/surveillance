@@ -699,7 +699,7 @@ control.boda <- list(range = rangeBoda, X = NULL, trend = TRUE,
 boda <- boda(cam.sts, control = control.boda)
 @
 
-<<boda, echo = F, include = F, message = F>>=
+<<boda, echo = F, include = F, results = hide>>=
 if (computeALL) {
 library("INLA")
 ##hoehle 2018-07-18: changed code to use NICELOOKINGboda, but that's iid. Reason:
@@ -728,7 +728,7 @@ control.boda2 <- modifyList(control.boda,
                             list(X = campyDE[, covarNames], season = FALSE))
 boda.covars <- boda(cam.sts, control = control.boda2)
 @
-<<boda2, echo = F, include = F, message = F>>=
+<<boda2, echo = F, include = F, results = hide>>=
 if (computeALL) {
 <<NICELOOKINGboda2>>
   save(file = "monitoringCounts-cache/boda.covars.RData",list=c("boda.covars","covarNames", "control.boda2"))
@@ -1230,7 +1230,7 @@ pMarkovChain <- sapply( h.grid, function(h) {
   return(tail(TA$cdf, n = 1))
 })
 @
-<<cath, echo = F, include = F, message = F>>=
+<<cath, echo = F, include = F, results = hide>>=
 # Values of the threshold to be investigated
 h.grid <- seq(1,10,by=0.5)
 
