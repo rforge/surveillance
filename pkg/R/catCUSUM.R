@@ -49,7 +49,6 @@ catcusum.LLRcompute <- function(y, pi0, pi1, h, dfun, n, calc.at=TRUE,...) {
       } else {
         #Compute the value at by trying all values betweeen 0 and n_t. If
         #no alarm, then we know the value for an alarm must be larger than y_t
-        browser()
         if (S[t+1]>h) {
           ay <- rbind(seq(0,y[1,t],by=1),n[t]-seq(0,y[1,t],by=1))
         } else {
