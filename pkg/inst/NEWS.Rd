@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.16.2 (2018-07-17)}{
+\section{Changes in surveillance version 1.16.2 (2018-07-19)}{
 
 \subsection{MINOR CHANGES}{
   \itemize{
@@ -17,6 +17,10 @@
     accelerated in version 1.56-0. If you use the
     \code{twinstim()}-related modelling part of \pkg{surveillance}, you
     are thus advised to update your \pkg{spatstat} installation.
+
+    \item Updated the \code{boda()} examples in
+    \code{vignette("monitoringCounts")} to also work with recent
+    versions of \pkg{INLA}.
   }
 }
 
