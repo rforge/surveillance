@@ -18,15 +18,15 @@
     \code{twinstim()}-related modelling part of \pkg{surveillance}, you
     are thus advised to update your \pkg{spatstat} installation.
 
-    \item Updated the \code{boda()} examples in
-    \code{vignette("monitoringCounts")} to also work with recent
-    versions of \pkg{INLA}.
+    \item The \code{boda()} examples in
+    \code{vignette("monitoringCounts")} have been updated to also work
+    with recent versions of \pkg{INLA}.
   }
 }
 
 \subsection{BUG FIXES}{
   \itemize{
-    \item Offsets in the epidemic components were ignored by
+    \item Offsets in \code{hhh4}'s epidemic components were ignored by
     \code{simulate.hhh4()} [spotted by Johannes Bracher] as well as
     in dominant eigenvalues (\dQuote{maxEV}).
   }
