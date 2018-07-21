@@ -8,10 +8,14 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.16.2 (2018-07-19)}{
+\section{Changes in surveillance version 1.16.2 (2018-07-23)}{
 
 \subsection{MINOR CHANGES}{
   \itemize{
+    \item \code{autoplot.sts()} gained a \code{width} argument to adjust
+    the bar width, which now defaults to 7 for weekly time series
+    (previously was 90\% of that so there were gaps between the bars).
+    
     \item \code{"epidataCS"} generation now (again) employs
     \CRANpkg{spatstat}'s \code{bdist.points()}, which has been
     accelerated in version 1.56-0. If you use the
