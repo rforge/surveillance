@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.16.2 (2018-07-23)}{
+\section{Changes in surveillance version 1.16.2 (2018-07-24)}{
 
 \subsection{MINOR CHANGES}{
   \itemize{
@@ -33,6 +33,9 @@
     \item Offsets in \code{hhh4}'s epidemic components were ignored by
     \code{simulate.hhh4()} [spotted by Johannes Bracher] as well as
     in dominant eigenvalues (\dQuote{maxEV}).
+
+    \item The color key in \code{fanplot()} is no longer distorted by
+    \code{log="y"}.
   }
 }
 
