@@ -1,7 +1,7 @@
 ################################################################################
 ### Initialization and other basic methods for the S4 class "sts"
 ###
-### Copyright (C) 2007-2014 Michael Hoehle, 2012-2017 Sebastian Meyer
+### Copyright (C) 2007-2014 Michael Hoehle, 2012-2018 Sebastian Meyer
 ###
 ### This file is part of the R package "surveillance",
 ### free software under the terms of the GNU General Public License, version 2,
@@ -285,8 +285,8 @@ setMethod("year", "sts", function(x,...) {
 
 setMethod("[", "sts", function(x, i, j, ..., drop) {
   #default value for i and j
-  if(missing(i)) {i <- min(1,nrow(x@observed)):nrow(x@observed)}
-  if(missing(j)) {j <- min(1,ncol(x@observed)):ncol(x@observed)}
+  if(missing(i)) i <- seq_len(nrow(x@observed))
+  if(missing(j)) j <- seq_len(ncol(x@observed))
 
   x@epoch <- x@epoch[i]
   x@observed <- x@observed[i,j,drop=FALSE]
@@ -297,7 +297,7 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   #If not binary TS the populationFrac is normed
   binaryTS <- sum( x@populationFrac > 1 ) > 1 # FIXME @ Michael: why not any()?
   if (!binaryTS) {
-    x@populationFrac <- x@populationFrac / apply(x@populationFrac,MARGIN=1,sum)
+    x@populationFrac <- x@populationFrac / rowSums(x@populationFrac)
    }
   x@upperbound <- x@upperbound[i,j,drop=FALSE]
 
