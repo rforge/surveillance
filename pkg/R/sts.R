@@ -309,8 +309,9 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   }
   x@neighbourhood <- x@neighbourhood[j,j,drop=FALSE]
 
-  #Fix the corresponding start entry. it can either be a vector of
-  #logicals or a specific index. Needs to work in both cases.
+  #Fix the "start" and "epoch" entries
+  if (any(i != 0)) {  # skip the special cases i=integer(0) or i=0 or i=FALSE
+  #i can either be a vector of logicals or integers. Needs to work for both.
   #Note: This code does not work if we have week 53s!
   if (is.logical(i)) {
     i.min <- which.max(i) #first TRUE entry
@@ -324,6 +325,7 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   x@start <- c(start.year,start.sampleNo)
   ## If !epochAsDate, we also have to update epoch since it is relative to start
   if (!x@epochAsDate) x@epoch <- x@epoch - i.min + 1
+  }
 
   ## Note: We do not automatically subset the map according to j, since
   ##       identical(row.names(map), colnames(observed))
