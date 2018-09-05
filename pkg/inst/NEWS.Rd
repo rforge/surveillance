@@ -8,6 +8,21 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.16.2.9000}{
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item Using negative indices to exclude time points from an
+    \code{"sts"} object (e.g., \code{x[-1,]}) is now supported and
+    equivalent to the corresponding subset expression of retained
+    indexes (\code{x[2:nrow(x),]}) in resetting the \code{start} and
+    \code{epoch} slots. [reported by Johannes Bracher]
+  }
+}
+
+}
+
+
 \section{Changes in surveillance version 1.16.2 (2018-07-24)}{
 
 \subsection{MINOR CHANGES}{

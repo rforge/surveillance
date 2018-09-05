@@ -1,16 +1,28 @@
-\name{[,sts-methods}
+\name{[,sts-method}
 \docType{methods}
-\title{Extraction and Subsetting of \code{"sts"} Objects}
+\title{Subsetting \code{"sts"} Objects}
 \alias{[,sts-method}
 \alias{[,sts,ANY,ANY,ANY-method}
 \description{
-  \code{"["}-methods, i.e., extraction or subsetting of the
-  \code{"\linkS4class{sts}"} class in package \pkg{surveillance}.
+  The \code{"["}-method extracts parts of an
+  \code{"\linkS4class{sts}"} object
+  using row (time) and column (unit) indices.
+}
+\details{
+  Column indices work as usual when indexing matrices,
+  so may select units by name, position or a vector of booleans.
+  Row indices can only be integer or logical. The \code{start} and
+  \code{epoch} slots of the time series are adjusted accordingly.
+  
+  A warning is issued if an irregular integer sequence is used to
+  extract rows, e.g., \code{x[c(1,2,4),]}, which could destroy the
+  structure of the time series (\code{freq}).
+  
+  \code{NA} indices are not supported, negative indices are.
 
-  Note that \code{[<-} methods (i.e. subassignments) are
-  currently not supported.
+  The formal \code{drop} argument is ignored (always \code{FALSE}).
 
-  The \code{drop} argument is always \code{FALSE}.
+  Note that a \code{[<-} method (i.e., subassignment) is not implemented.
 }
 
 \examples{

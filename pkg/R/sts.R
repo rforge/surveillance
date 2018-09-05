@@ -280,13 +280,32 @@ setMethod("year", "sts", function(x,...) {
 
 
 #####################################################################
-#[-method for accessing the observed, alarm, etc. objects
+#[-method for truncating the time series and/or selecting units
 #####################################################################
 
 setMethod("[", "sts", function(x, i, j, ..., drop) {
-  #default value for i and j
-  if(missing(i)) i <- seq_len(nrow(x@observed))
-  if(missing(j)) j <- seq_len(ncol(x@observed))
+  nTimeOriginal <- nrow(x@observed)
+  if (missing(i)) { # set default value
+    i <- seq_len(nTimeOriginal)
+  } else if (anyNA(i)) {
+    stop("missing row index values are not supported")
+  } else if (is.logical(i)) { # convert to integer index
+    i <- which(rep_len(i, nTimeOriginal))
+  } else if (is.character(i)) {
+    stop("character row indices are not supported")
+  } else if (any(i < 0)) { # convert to (positive) indices
+    if (any(i > 0)) stop("only 0's may be mixed with negative subscripts")
+    i <- setdiff(seq_len(nTimeOriginal), -i)
+  } else if (any(i0 <- i == 0)) { # drop 0's (for the diff check below)
+    i <- i[!i0]
+  }
+  ## if(missing(j)) j <- seq_len(ncol(x@observed))   # redundant
+  if (!missing(j) && anyNA(j))
+    stop("missing column index values are not supported")
+
+  ## check if i is a regular integer sequence (not invalidating freq)
+  if (any(diff(i) != 1))
+    warning("irregular row index could invalidate \"freq\"")
 
   x@epoch <- x@epoch[i]
   x@observed <- x@observed[i,j,drop=FALSE]
@@ -309,22 +328,20 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   }
   x@neighbourhood <- x@neighbourhood[j,j,drop=FALSE]
 
-  #Fix the "start" and "epoch" entries
-  if (any(i != 0)) {  # skip the special cases i=integer(0) or i=0 or i=FALSE
-  #i can either be a vector of logicals or integers. Needs to work for both.
+  #Fix the "start" and "epoch" entries (if necessary)
+  if (any(i != 0) && i[1] != 1) {
   #Note: This code does not work if we have week 53s!
-  if (is.logical(i)) {
-    i.min <- which.max(i) #first TRUE entry
-  } else {
-    i.min <- min(i)
-  }
+  i.min <- min(i)  # in regular use, this should actually be i[1]
   start <- x@start
   new.sampleNo <- start[2] + i.min - 1
   start.year <- start[1] + (new.sampleNo - 1) %/% x@freq
   start.sampleNo <- (new.sampleNo - 1) %% x@freq + 1
   x@start <- c(start.year,start.sampleNo)
-  ## If !epochAsDate, we also have to update epoch since it is relative to start
-  if (!x@epochAsDate) x@epoch <- x@epoch - i.min + 1
+  if (!x@epochAsDate) {
+    ## we also have to update epoch since it is relative to start
+    ## and actually it should always equal 1:nrow(observed)
+    x@epoch <- x@epoch - i.min + 1L
+  }
   }
 
   ## Note: We do not automatically subset the map according to j, since
