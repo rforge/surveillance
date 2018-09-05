@@ -330,18 +330,17 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
 
   #Fix the "start" and "epoch" entries (if necessary)
   if (any(i != 0) && i[1] != 1) {
-  #Note: This code does not work if we have week 53s!
-  i.min <- min(i)  # in regular use, this should actually be i[1]
-  start <- x@start
-  new.sampleNo <- start[2] + i.min - 1
-  start.year <- start[1] + (new.sampleNo - 1) %/% x@freq
-  start.sampleNo <- (new.sampleNo - 1) %% x@freq + 1
-  x@start <- c(start.year,start.sampleNo)
-  if (!x@epochAsDate) {
-    ## we also have to update epoch since it is relative to start
-    ## and actually it should always equal 1:nrow(observed)
-    x@epoch <- x@epoch - i.min + 1L
-  }
+    #Note: This code does not work if we have week 53s!
+    i.min <- min(i)  # in regular use, this should actually be i[1]
+    new.sampleNo <- x@start[2] + i.min - 1
+    start.year <- x@start[1] + (new.sampleNo - 1) %/% x@freq
+    start.sampleNo <- (new.sampleNo - 1) %% x@freq + 1
+    x@start <- c(start.year, start.sampleNo)
+    if (!x@epochAsDate) {
+      ## we also have to update epoch since it is relative to start
+      ## and actually it should always equal 1:nrow(observed)
+      x@epoch <- x@epoch - i.min + 1L
+    }
   }
 
   ## Note: We do not automatically subset the map according to j, since
