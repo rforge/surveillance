@@ -633,7 +633,7 @@ algo.farrington.threshold.farrington <- function(predFit,predSeFit,phi,
 
 	# probability associated to the observed value as quantile
         # hoehle 2018-09-12: fixed p-value bug detected by Laure Merdrignac - y doesn't need to be transformed
-        q <- pnorm( y, mean=mu0^exponent, sd=se,lower.tail=FALSE)
+        q <- pnorm( y^(exponent), mean=mu0^exponent, sd=se,lower.tail=FALSE)
 
 
 	# calculate score

@@ -228,7 +228,7 @@ algo.farrington.threshold <- function(pred,phi,alpha=0.01,skewness.transform="no
 
   #Compute quantiles of the predictive distribution based on the
   #normal approximation on the transformed scale
-  q <- pnorm( y, mean=mu0^exponent, sd=se)
+  q <- pnorm( y^(exponent) , mean=mu0^exponent, sd=se)
   m <- qnorm(0.5, mean=mu0^exponent, sd=se)^(1/exponent)
 
   #Return lower and upper bounds
