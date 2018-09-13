@@ -1,7 +1,7 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
 Version: 1.16.2.9000
-Date: 2018-07-30
+Date: 2018-09-13
 Authors@R: c(MH = person("Michael", "Höhle",
                   email = "hoehle@math.su.se",
                   role = c("aut", "ths"),
@@ -86,5 +86,3 @@ URL: http://surveillance.R-Forge.R-project.org/
 Additional_repositories: https://inla.r-inla-download.org/R/stable/
 Encoding: latin1
 VignetteBuilder: utils, knitr
-Roxygen: list(roclets = "rd")
-RoxygenNote: 6.0.1

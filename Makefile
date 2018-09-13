@@ -26,6 +26,7 @@
 ##    6 Jun 2016 (SM): Rcpp attributes require an additional build step
 ##   21 Jun 2017 (SM): account for R code with roxygen documentation
 ##   12 Jul 2017 (SM): "quick" vs. CRAN-versions of build and check rules
+##   13 Sep 2018 (SM): drop roxygen (no longer supports latin1 packages)
 ################################################################################
 
 ## Define variable for R which enables the use of alternatives,
@@ -40,7 +41,7 @@ VERSION := $(shell $R --vanilla --slave -e 'cat(read.dcf("pkg/DESCRIPTION", fiel
 
 ## build the package
 BUILD_COMPACT_VIGNETTES := no
-build: Rcpp ${SYSDATA} man
+build: Rcpp ${SYSDATA}
 	$R CMD build --no-resave-data --compact-vignettes=${BUILD_COMPACT_VIGNETTES} pkg
 build-cran: BUILD_COMPACT_VIGNETTES := both
 build-cran: build
@@ -53,12 +54,6 @@ Rcpp:
 ${SYSDATA}: pkg/sysdata/sysdata.R pkg/sysdata/REFERENCES
 	cd pkg/sysdata; $R CMD BATCH --vanilla --no-timing sysdata.R
 	mv pkg/sysdata/sysdata.rda $@
-
-## update roxygen part of the documentation
-## NOTE: roxygenise() is broken in roxygen2 6.0.1, so using devtools::document()
-##       (see https://github.com/klutometis/roxygen/issues/595)
-man:
-	$R --no-restore --no-save --slave -e 'devtools::document("pkg")'
 
 
 ## auxiliary functions ("canned recipes") for check rules
@@ -126,4 +121,4 @@ clean:
 	make -C pkg/vignettes clean
 	rm -f pkg/*/.Rhistory
 
-.PHONY: build build-cran Rcpp man check check-cran check-allExamples install checkUsage manual clean
+.PHONY: build build-cran Rcpp check check-cran check-allExamples install checkUsage manual clean
