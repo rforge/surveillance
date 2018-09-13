@@ -384,13 +384,13 @@ In the example below, \code{control1} corresponds to the use of the original met
 # Control slot for the original method
 control1 <-  list(range=in2011,noPeriods=1,
                   b=4,w=3,weightsThreshold=1,pastWeeksNotIncluded=3,
-                  pThresholdTrend=0.05,thresholdMethod="delta",alpha=0.05,
-				  limit54=c(0,50))
+                  pThresholdTrend=0.05,thresholdMethod="delta",
+				  limit54=c(0,50))  # for the figure
 # Control slot for the improved method
 control2 <- list(range=in2011,noPeriods=10,
                  b=4,w=3,weightsThreshold=2.58,pastWeeksNotIncluded=26,
-                 pThresholdTrend=1,thresholdMethod="nbPlugin",alpha=0.05,
-				 limit54=c(0,50))
+                 pThresholdTrend=1,thresholdMethod="nbPlugin",
+				  limit54=c(0,50))  # for the figure
 @
 <<farHead, echo = T, include = F, eval=F>>=
 control1 <- list(range = in2011, noPeriods = 1,
