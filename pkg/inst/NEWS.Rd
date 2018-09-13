@@ -18,8 +18,8 @@
     indexes (\code{x[2:nrow(x),]}) in resetting the \code{start} and
     \code{epoch} slots. [reported by Johannes Bracher]
 
-    \item The p-values returned by \code{farringtonFlexible()} were
-    wrong for the default approach, where \code{thresholdMethod="delta"}
+    \item The supplementary p-values returned by \code{farringtonFlexible()}
+    were wrong for the default approach, where \code{thresholdMethod="delta"}
     (i.e., the original Farrington method) and a power transformation
     was applied to the data (\code{powertrans != "none"}).
     [reported by Lore Merdrignac]
