@@ -310,6 +310,7 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   x@alarm <- x@alarm[i,j,drop=FALSE]
 
   x@populationFrac <- x@populationFrac[i,j,drop=FALSE]
+  ## FIXME: could condition updating fractions on !missing(j)
   binaryTS <- sum( x@populationFrac > 1 ) > 1 # FIXME @ Michael: why not any()?
   if (!binaryTS) { # population fractions need to be recomputed
     x@populationFrac <- x@populationFrac / rowSums(x@populationFrac)
