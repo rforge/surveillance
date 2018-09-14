@@ -23,7 +23,11 @@ epidataCS2sts(object, freq, start, neighbourhood,
 
 \arguments{
   \item{object, data}{an object of class \code{"\link{epidataCS}"}.}
-  \item{freq,start}{see the description of the \code{"\linkS4class{sts}"} class.}
+  \item{freq,start}{
+    see the description of the \code{"\linkS4class{sts}"} class.
+    The \code{start} specification should reflect the beginning of
+    \code{object$stgrid}, i.e., the start of the first time interval.
+  }
   \item{neighbourhood}{
     binary adjacency or neighbourhood-order matrix of the regions
     (\code{tiles}). If missing but \code{tiles} is given, a binary

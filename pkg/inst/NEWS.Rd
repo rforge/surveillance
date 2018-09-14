@@ -23,6 +23,11 @@
     (i.e., the original Farrington method) and a power transformation
     was applied to the data (\code{powertrans != "none"}).
     [reported by Lore Merdrignac]
+
+    \item \code{epidataCS2sts()} no longer transfers the
+    \code{stgrid$BLOCK} indices to the \code{epoch} slot of the
+    resulting \code{"sts"} object (to avoid \code{epoch[1] != 1}
+    scenarios).
   }
 }
 
