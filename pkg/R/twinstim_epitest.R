@@ -89,6 +89,11 @@ epitest <- function (model, data, tiles, method = "time", B = 199,
         warning("epidemic covariate effects might not be identifiable for null data",
                 immediate. = TRUE)
     }
+    if (!is.finite(STATISTIC_R0)) {
+        warning("observed 'simpleR0' test statistic is infinite; ",
+                "maybe specify 'eps.*'",  # or use D-based p.value ...
+                immediate. = TRUE)
+    }
 
     ## define a function which generates data under the null
     generateNullData <- if (method == "simulate") {
