@@ -155,6 +155,9 @@ epitest(model, data, tiles, method = "time", B = 199,
   under the null hypothesis of no space-time interaction.
   Estimating a rich epidemic \code{model} based on permuted data
   will most likely result in singular convergence.
+  A similar issue might arise when the model employs parametric
+  interaction functions, in which case \code{fixed=TRUE} can be used.
+  For further details see Meyer et al. (2016).
   
   The test statistic is the reproduction number \code{\link{simpleR0}}.
   A likelihood ratio test of the supplied epidemic model against
