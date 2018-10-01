@@ -7,9 +7,9 @@
 Makefile
 ^surveillance_[0-9\.-]+\.tar\.gz
 ^surveillance-Ex\.R
-twins.log
-twins.log.acc
-twins.log2
+twins\.log
+twins\.log\.acc
+twins\.log2
 
 ^auto
 
