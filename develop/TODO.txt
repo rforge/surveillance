@@ -220,9 +220,10 @@ March 2015 update vignette("hhh4") according to JSS paper
 
 - Problem plot if populationFrac=proportion
 
+13/09/2018 inconsistent defaults (for b, alpha and pastWeeksNotIncluded)
+           in algo.farrington() and farringtonFlexible()
 14/09/2018 pairedbinCUSUM does not update epoch and control slots
 14/09/2018 pairedbinCUSUM and categoricalCUSUM should use [.sts
-
 
 #======================================================================
 #======================================================================
