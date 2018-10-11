@@ -188,7 +188,10 @@ export(animate_nowcasts)
 
 # conversion of "sts" objects
 S3method(as.ts, sts)
-export(as.xts.sts)  # no registered S3-method since we only suggest "xts"
+export(as.xts.sts)
+if(getRversion() >= "3.6.0") {  # delayed registration
+    S3method(xts::as.xts, sts)
+}
 
 # generics for sts class defined in sts.R
 exportMethods("[", plot)
@@ -211,6 +214,9 @@ export(addFormattedXAxis, atChange, at2ndChange, atMedian) #for time axis format
 export(stsplot_spacetime) # old implementation of (animated) map
 S3method(animate, sts)    # S3-method for an S4 class, see ?Methods
 export(autoplot.sts)
+if(getRversion() >= "3.6.0") {  # delayed registration
+    S3method(ggplot2::autoplot, sts)
+}
 
 # outbreak detection algorithms (sts-interfaces)
 export(wrap.algo, farrington, bayes, rki, cusum, glrpois, glrnb, outbreakP, boda) # FIXME: rogerson, hmm ??

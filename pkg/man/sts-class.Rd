@@ -216,8 +216,8 @@ z.sts <- as(z, "sts")
 plot(z.sts)
 
 ## conversion of "sts" objects to the quasi-standard "xts" class
-if (requireNamespace("xts")) {
-    z.xts <- as.xts.sts(z.sts)
+if (require("xts")) {
+    z.xts <- as.xts(z.sts)
     plot(z.xts)
 }
 }
