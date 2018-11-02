@@ -1,6 +1,5 @@
 ^develop
 ^sysdata
-^po
 
 ^demo/.+\.save
 
