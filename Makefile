@@ -27,6 +27,7 @@
 ##   21 Jun 2017 (SM): account for R code with roxygen documentation
 ##   12 Jul 2017 (SM): "quick" vs. CRAN-versions of build and check rules
 ##   13 Sep 2018 (SM): drop roxygen (no longer supports latin1 packages)
+##   02 Nov 2018 (SM): add pkgdown recipe
 ################################################################################
 
 ## Define variable for R which enables the use of alternatives,
@@ -115,10 +116,15 @@ NEWS.html: pkg/inst/NEWS.Rd
 	$R --vanilla --slave -e 'tools::Rd2HTML("$<", out = "$@", stylesheet = "http://cran.r-project.org/web/CRAN_web.css")'
 	[ `uname -s` = "Darwin" ] && open "$@" || xdg-open "$@"
 
+www: 
+	cd pkg; $R --slave --no-save --no-restore -e \
+	  "pkgdown::build_site(examples = FALSE, document = FALSE, lazy = TRUE)"
+
+
 clean:
 	make -C pkg/demo clean
 	cd pkg/src; rm -f *.o *.so *.dll symbols.rds
 	make -C pkg/vignettes clean
 	rm -f pkg/*/.Rhistory
 
-.PHONY: build build-cran Rcpp check check-cran check-allExamples install checkUsage manual clean
+.PHONY: build build-cran Rcpp check check-cran check-allExamples install checkUsage manual www clean

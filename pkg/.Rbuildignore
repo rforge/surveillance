@@ -2,5 +2,6 @@
 ^sysdata$
 ^demo/.+\.save$
 Makefile
+^_pkgdown\.yml$
 ^surveillance_[0-9\.-]+\.tar\.gz$
 ^vignettes/.+\.tex$
