@@ -5,7 +5,7 @@
 ###
 ### Parametric power-law specification for neighbourhood weights in hhh4()
 ###
-### Copyright (C) 2012-2016 Sebastian Meyer
+### Copyright (C) 2012-2016,2018 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -54,7 +54,7 @@ W_powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
         ## specifying 'maxlag' in zetaweights is actually optional since it has
         ## the default value max(nbmat). however, repeatedly asking for this
         ## maximum would be really inefficient.
-    } else stopifnot(isScalar(maxlag))
+    } else stopifnot(isScalar(maxlag), maxlag > 1)
 
     ## main function which returns the weight matrix
     weights.call <- call("zetaweights",
@@ -66,7 +66,7 @@ W_powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
         body(weights) <- as.call(append(as.list(body(weights)),
                                         quote(d <- exp(d)), after=1))
     }
-    
+
     ## construct derivatives with respect to "d" (or log(d), respectively)
     dweights <- d2weights <- as.function(c(alist(d=, nbmat=, ...=), quote({})),
                                          envir=getNamespace("surveillance"))
@@ -81,7 +81,7 @@ W_powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
         expression(
             # Wraw == 0 means o = 0 (diagonal) or o > maxlag  =>  deriv = 0
             is.na(Wraw) <- Wraw == 0,  # set to NA since we will take the log
-            logo <- -log(Wraw)/d       # = log(nbmat) with NA's at Wraw == 0 
+            logo <- -log(Wraw)/d       # = log(nbmat) with NA's at Wraw == 0
             ),
         if (normalize) quote(W <- Wraw / norm) else quote(W <- Wraw)
         )
