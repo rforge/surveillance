@@ -66,9 +66,9 @@ W_np(maxlag, to0 = TRUE, normalize = TRUE,
   \code{\link{nbOrder}} to determine the matrix of neighbourhood orders
   from a binary adjacency matrix.
   
-  \code{\link{siaf.powerlaw}}, and \code{\link{siaf.step}} for modelling
-  distance decay as power law or step function in 
-  \code{\link{twinstim}} space-time point process models.
+  \code{\link{getNEweights}} and \code{\link{coefW}} to extract the
+  estimated neighbourhood weight matrix and coefficients from an
+  \code{hhh4} model.
 }
 
 \examples{
