@@ -989,6 +989,32 @@ since the \code{update}-method has a corresponding argument \code{S}.
 The plots of \code{type = "season"} and \code{type = "maxEV"} for \class{hhh4} fits
 can visualize the estimated component seasonality.
 
+Performing model selection and interpreting seasonality or other covariate
+effects across \emph{three} different model components may become quiet
+complicated. Power-law weights actually enable a more parsimonious model
+formulation, where the autoregressive and neighbourhood components are
+merged into a single epidemic component:
+\begin{equation}
+  \mu_{it} = e_{it} \, \nu_{it} +
+  \phi_{it} \sum_{j} (o_{ji} + 1)^{-d} \, Y_{j,t-1} \:.
+\end{equation}
+With only two predictors left, model selection and interpretation is
+simpler, and model extensions are more straightforward, for example
+stratification by age group \citep{meyer.held2015} as mentioned further
+below.
+To fit such a two-component model, the autoregressive component has to be
+excluded (\code{ar = list(f = ~ -1)}) and power-law weights have to be
+modified to start from adjacency order~0 (via
+\code{W_powerlaw(..., from0 = TRUE)}).
+<<measlesFit_powerlaw2, include = FALSE>>=
+## a simplified model which includes the autoregression in the power law
+measlesFit_powerlaw2 <- update(measlesFit_powerlaw,
+  ar = list(f = ~ -1),
+  ne = list(weights = W_powerlaw(maxlag = 5, from0 = TRUE)))
+AIC(measlesFit_powerlaw, measlesFit_powerlaw2)
+## simpler is really worse; probably needs random effects
+@
+
 All of our models for the measles surveillance data incorporated an
 epidemic effect of the counts from the local district and its neighbors.
 Without further notice, we thereby assumed a lag equal to the observation

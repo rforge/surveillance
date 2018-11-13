@@ -10,6 +10,15 @@
 
 \section{Changes in surveillance version 1.16.2.9000}{
 
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item \code{W_powerlaw(..., from0 = TRUE)} enables more parsimonious
+    \code{hhh4} models, where the autoregressive effect is included in
+    the power-law of the spatio-temporal component (see
+    \code{vignette("hhh4_spacetime")}).
+  }
+}
+
 \subsection{BUG FIXES}{
   \itemize{
     \item Using negative indices to exclude time points from an
