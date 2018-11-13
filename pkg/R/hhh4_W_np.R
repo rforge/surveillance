@@ -5,7 +5,7 @@
 ###
 ### Non-parametric specification of neighbourhood weights in hhh4()
 ###
-### Copyright (C) 2014 Sebastian Meyer
+### Copyright (C) 2014,2018 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -16,37 +16,43 @@
 ### for identifiability:
 ### - first order is fixed to weight=1
 ### - usually maxlag < max(nborder) (since only few pairs with highest orders),
-###   and to0 indicates which weight is assumed for orders > maxlag, either zero
-###   or the same as for order 'maxlag'
+###   and 'truncate' indicates if there should be zero weight for orders above
+###   'maxlag' (default), or the same as for order 'maxlag'
 
-W_np <- function (maxlag, to0 = TRUE, normalize = TRUE,
-                  initial = log(zetaweights(2:maxlag)))
+W_np <- function (maxlag, truncate = TRUE, normalize = TRUE,
+                  initial = log(zetaweights(2:maxlag)),
+                  to0 = truncate)  # 'to0' has been renamed to 'truncate'
 {
     if (missing(maxlag)) {
         stop("'maxlag' must be specified (usually < max. neighbourhood order)")
     } else stopifnot(isScalar(maxlag), maxlag > 1) # at least one parameter
 
+    if (!missing(to0)) {
+        .Deprecated(msg = "argument 'to0' has been renamed; use 'truncate'")
+        truncate <- to0
+    }
+
     ## auxiliary expression used in 'dw' and 'd2w' below
-    indicatormatrixExpr <- if (to0) {
+    indicatormatrixExpr <- if (truncate) {
         quote(nbmat==nbOrder)
     } else {
         quote(if(nbOrder==1L+npars) nbmat>=nbOrder else nbmat==nbOrder)
     }
-    
+
     ## weights as a function of parameters and a matrix of neighbourhood orders
     w <- function (logweights, nbmat, ...) {}
     body(w) <- substitute(
     {
         weights <- exp(logweights)
-        npars <- length(weights)        # only used if 'to0=FALSE' and in derivs
+        npars <- length(weights)
         W <- c(0,1,weights)[1L+nbmat]
         ## repeat last coefficient for higher orders without separate estimate
-        W[is.na(W)] <- .HOWEIGHT        # substituted according to 'to0'
+        W[is.na(W)] <- .HOWEIGHT        # substituted depending on 'truncate'
         dim(W) <- dimW <- dim(nbmat)    # nUnits x nUnits
         dimnames(W) <- dimnames(nbmat)
-        .RETVAL                         # substituted according to 'normalize'
+        .RETVAL                         # substituted depending on 'normalize'
     }, list(
-        .HOWEIGHT = if (to0) 0 else quote(weights[npars]),
+        .HOWEIGHT = if (truncate) 0 else quote(weights[npars]),
         .RETVAL = if (normalize)
         quote(W / (norm <- .rowSums(W, dimW[1L], dimW[2L]))) else quote(W)
         ))
@@ -85,7 +91,7 @@ W_np <- function (maxlag, to0 = TRUE, normalize = TRUE,
         }, list(.INDICATORMATRIX = indicatormatrixExpr))
     }
 
-    
+
     ## result of d2w must be a list of matrices of length npars*(npars+1L)/2L
     if (normalize) {
         d2w <- .w

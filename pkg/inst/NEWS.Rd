@@ -19,6 +19,13 @@
   }
 }
 
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item \code{W_np()}'s argument \code{to0} has been renamed to
+    \code{truncate}. The old name still works but is deprecated.
+  }
+}
+
 \subsection{BUG FIXES}{
   \itemize{
     \item Using negative indices to exclude time points from an

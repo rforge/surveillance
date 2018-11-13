@@ -23,8 +23,8 @@
 W_powerlaw(maxlag, normalize = TRUE,
            log = FALSE, initial = if (log) 0 else 1, from0 = FALSE)
 
-W_np(maxlag, to0 = TRUE, normalize = TRUE,
-     initial = log(zetaweights(2:maxlag)))
+W_np(maxlag, truncate = TRUE, normalize = TRUE,
+     initial = log(zetaweights(2:maxlag)), to0 = truncate)
 }
 
 \arguments{
@@ -32,11 +32,12 @@ W_np(maxlag, to0 = TRUE, normalize = TRUE,
     adjacency. If spatial dependence is not to be truncated at some
     high order, \code{maxlag} should be set to the maximum adjacency
     order in the network of regions.}
-  \item{to0}{\code{W_np} represents order-specific log-weights up to
-    order \code{maxlag}. Higher orders are by default (\code{to0=TRUE})
-    assumed to have 0 weight as for \code{W_powerlaw}. Alternatively,
-    \code{to0=FALSE} requests that the weight at order \code{maxlag}
-    should be carried forward to higher orders.}
+  \item{truncate,to0}{\code{W_np} represents order-specific log-weights up to
+    order \code{maxlag}. Higher orders are by default (\code{truncate=TRUE})
+    assumed to have zero weight (similar to \code{W_powerlaw}).
+    Alternatively, \code{truncate=FALSE} requests that the weight at
+    order \code{maxlag} should be carried forward to higher orders.
+    \code{truncate} has previously been called \code{to0} (deprecated).}
   \item{normalize}{logical indicating if the weights should be normalized
     such that the rows of the weight matrix sum to 1 (default).
     Note that normalization does not work with islands, i.e., regions
