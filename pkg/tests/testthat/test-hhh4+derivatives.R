@@ -94,3 +94,20 @@ test_that("automatic and manual normalization are equivalent", {
     expect_equal(measlesFit, measlesFit2, ignore = "control",
                  tolerance = 1e-6) # increased to pass on 32-bit Windows
 })
+
+test_that("W_powerlaw(..., from0 = TRUE) equals old manual approach", {
+    measlesModel2 <- modifyList(measlesModel, list(
+        ar = list(f = ~ -1),
+        ne = list(weights = W_powerlaw(maxlag = 5, from0 = TRUE))
+        ))
+    measlesFit2 <- hhh4(measlesWeserEms, measlesModel2)
+    ## manual approach
+    measlesWeserEms2 <- measlesWeserEms
+    neighbourhood(measlesWeserEms2) <- neighbourhood(measlesWeserEms2) + 1L
+    measlesModel2_manual <- modifyList(measlesModel2, list(
+        ne = list(weights = W_powerlaw(maxlag = 5 + 1))
+        ))
+    measlesFit2_manual <- hhh4(measlesWeserEms2, measlesModel2_manual)
+    expect_equal(measlesFit2, measlesFit2_manual,
+                 ignore = c("control", "stsObj"))
+})

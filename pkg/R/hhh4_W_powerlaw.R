@@ -47,18 +47,22 @@ zetaweights <- function (nbmat, d = 1, maxlag = max(nbmat), normalize = FALSE)
 ## and with (row-)normalization we have    w_ji = o_ji^-d / sum_k o_jk^-d
 
 W_powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
-                        initial = if (log) 0 else 1)
+                        initial = if (log) 0 else 1, from0 = FALSE)
 {
     if (missing(maxlag)) {
         stop("'maxlag' must be specified (e.g. maximum neighbourhood order)")
         ## specifying 'maxlag' in zetaweights is actually optional since it has
         ## the default value max(nbmat). however, repeatedly asking for this
         ## maximum would be really inefficient.
-    } else stopifnot(isScalar(maxlag), maxlag > 1)
+    } else {
+        stopifnot(isScalar(maxlag), maxlag > 1)
+        if (from0) maxlag <- maxlag + 1L
+    }
 
     ## main function which returns the weight matrix
     weights.call <- call("zetaweights",
-                         quote(nbmat), quote(d), maxlag, normalize)
+                         if (from0) quote(nbmat + 1L) else quote(nbmat),
+                         quote(d), maxlag, normalize)
     weights <- as.function(c(alist(d=, nbmat=, ...=), call("{", weights.call)),
                            envir=getNamespace("surveillance"))
     if (log) { # the parameter d is interpreted on log-scale
