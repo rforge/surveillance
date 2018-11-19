@@ -141,7 +141,7 @@ The creation of a \code{sts} object is straightforward, requiring a call to the 
 as it is described in \citet{hoehle-mazick-2010}.
 To exemplify the process we shall use weekly counts of \textit{Salmonella Newport} in Germany loaded using \code{data("salmNewport")}. Alternatively, one can use coercion methods to convert between the \texttt{ts} class and the \texttt{sts} class. Note that this only converts the content of the slot \texttt{observed}, that is,
 
-<<echo=TRUE,eval=FALSE,keep.source=TRUE>>=
+<<echo=TRUE,eval=FALSE>>=
 all.equal(observed(salmNewport),observed(as(as(salmNewport,"ts"),"sts")))
 @
 
@@ -309,7 +309,7 @@ and with the slots \code{upperbound} and \code{alarm} filled by the output of th
 Information relative to the \code{range} of data to be monitored
 and to the parameters of the algorithm, such as \code{alpha} for \code{earsC}, has to be formulated in the slot \code{control}.
 This information is also stored in the slot \code{control} of the returned \code{sts} object for later inspection.
-<<EARS, echo = T,include = F,numeric.dollar=F,results=hide,keep.source=TRUE>>=
+<<EARS, echo = T,include = F,numeric.dollar=F,results=hide>>=
 in2011 <- which(isoWeekYear(epoch(salmNewport))$ISOYear == 2011)
 salmNewportGermany <- aggregate(salmNewport, by = "unit")
 control <- list(range = in2011, method = "C1", alpha = 0.05)
@@ -532,7 +532,7 @@ The original method is widely used in public health surveillance~\citep{hulth_et
  that it does not need to be fine-tuned for each specific pathogen. It is hence easy to implement it for scanning data for many different pathogens. Furthermore, it does tackle classical issues of surveillance data: overdispersion, presence of past outbreaks that are reweighted,
 seasonality that is taken into account differently in the two methods.
 An example of use of the function is shown in Figure~\ref{fig:newportFar} with the code below.
-<<oldVsNewprep, echo = T, include = F,keep.source=TRUE>>=
+<<oldVsNewprep, echo = T, include = F>>=
 salm.farrington <- farringtonFlexible(salmNewportGermany, control1)
 salm.noufaily <- farringtonFlexible(salmNewportGermany, control2)
 @
@@ -647,7 +647,7 @@ axis(side=4, at=seq(0,2500,by=500),labels=seq(0,50,by=10),las=1,cex.lab=cex.text
 \label{fig:campyDE}
 \end{figure}
 
-<<campyDElongVersion, eval=FALSE, fig=FALSE, echo = TRUE, label=campyDElongVersion,include = TRUE,results=tex,keep.source=TRUE>>=
+<<campyDElongVersion, eval=FALSE, fig=FALSE, echo = TRUE, label=campyDElongVersion,include = TRUE,results=tex>>=
 data("campyDE")
 cam.sts <- sts(epoch = as.numeric(campyDE$date), epochAsDate = TRUE,
                observed = campyDE$case, state = campyDE$state)
@@ -897,7 +897,7 @@ and the data from 2011 as data to be monitored or \code{phase2}. The threshold \
 smaller than 0.1. Figure~\ref{fig:glrnb}~shows the results of this monitoring.
 
 
-<<glrnblongVersion, echo = T, eval =F, include = F,keep.source=TRUE>>=
+<<glrnblongVersion, echo = T, eval =F, include = F>>=
 phase1 <- which(isoWeekYear(epoch(salmNewportGermany))$ISOYear < 2011)
 phase2 <- in2011
 control = list(range = phase2, c.ARL = 4, theta = log(2), ret = "cases",
@@ -982,7 +982,7 @@ or the time trend in the linear predictor of the mean. This very flexible modeli
 
 As an example we consider the time series of the weekly number of hospitalized cases among all \textit{Salmonella} cases in Germany in Jan 2004--Jan 2014, depicted in
 Figure~\ref{fig:cat1}. We use 2004--2012 data to estimate the \textit{in-control} parameters and then perform surveillance on the data from 2013 and early 2014. We start by preprocessing the data.
-<<catlongVersion, eval = FALSE, echo = T, include = F,keep.source=TRUE>>=
+<<catlongVersion, eval = FALSE, echo = T, include = F>>=
 data("salmHospitalized")
 isoWeekYearData <- isoWeekYear(epoch(salmHospitalized))
 
@@ -1080,66 +1080,36 @@ Note that the \code{categoricalCUSUM} function is constructed to operate on the 
 which have as columns the number of cases in each category at each timepoint, \textit{i.e.}, each row of the observed slot contains the elements
 $(y_{t1},...,y_{tk})$.
 
-<<cat2bislongVersion, eval = FALSE, echo = T, include = F,keep.source=TRUE>>=
-populationHosp <- cbind(population(salmHospitalized),
-                        population(salmHospitalized))
-observedHosp <- cbind(observed(salmHospitalized),
-                      population(salmHospitalized) -
-					  observed(salmHospitalized))
-nrowHosp <- nrow(salmHospitalized)
-salmHospitalized.multi <- sts(freq = 52, start = c(2004, 1),
-                              epoch = as.numeric(epoch(salmHospitalized)),
-                              epochAsDate = TRUE,
-                              observed = observedHosp,
-                              populationFrac = populationHosp,
-                              state = matrix(0, nrow = nrowHosp, ncol = 2),
-                              multinomialTS = TRUE)
+<<cat2bis>>=
+populationHosp <- cbind(
+  population(salmHospitalized),
+  population(salmHospitalized))
+observedHosp <- cbind(
+  observed(salmHospitalized),
+  population(salmHospitalized) - observed(salmHospitalized))
+salmHospitalized.multi <- sts(
+  freq = 52, start = c(2004, 1),
+  epoch = as.numeric(epoch(salmHospitalized)), epochAsDate = TRUE,
+  observed = observedHosp, populationFrac = populationHosp,
+  state = matrix(0, nrow = nrow(salmHospitalized), ncol = 2),
+  multinomialTS = TRUE)
 @
-<<cat2bis, echo = F, include = F>>=
-# Create the \code{sts}-object with the counts for the 2 categories
-population <- population(salmHospitalized)
-observed <- observed(salmHospitalized)
-salmHospitalized.multi <- sts(freq=52, start=c(2004,1),
-                              epoch = as.numeric(epoch(salmHospitalized)),
-                              epochAsDate=TRUE,
-                              observed = cbind(observed,
-                                               population-observed),
-                              populationFrac = cbind(population,
-                                                     population),
-                              state=matrix(0, nrow=nrow(salmHospitalized),
-                                           ncol = 2),
-                              multinomialTS=TRUE)
-@
-Furthermore, one needs to define a wrapper for the distribution function in order to have a argument named \code{"mu"} in the function.
 
-<<cat2terdisplay, eval = FALSE, echo = T, include = F>>=
+Furthermore, one needs to define a wrapper for the distribution function in order to have an argument named \code{"mu"} in the function.
+
+<<cat2ter>>=
 dBB.cusum <- function(y, mu, sigma, size, log = FALSE) {
-	 return(dBB(if (is.matrix(y)) y[1,] else y,
-				if (is.matrix(y)) mu[1,] else mu,
-				sigma = sigma, bd = size, log = log))
-}
-@
-<<cat2ter, echo = F, include = F>>=
-# Function to use as dfun in the categoricalCUSUM
-dBB.cusum <- function(y, mu, sigma, size, log = FALSE) {
- return(dBB( if (is.matrix(y)) y[1,] else y, if (is.matrix(y)) mu[1,] else mu,
- sigma = sigma, bd = size, log = log))
+  dBB(if (is.matrix(y)) y[1,] else y,
+      if (is.matrix(y)) mu[1,] else mu,
+      sigma = sigma, bd = size, log = log)
 }
 @
 
 After these preliminary steps, the monitoring can be performed.
 
-<<cat3display, eval = FALSE, echo = T, include = F>>=
+<<cat3>>=
 controlCat <- list(range = phase2, h = 2, pi0 = pi0m, pi1 = pi1m,
-                ret = "cases", dfun = dBB.cusum)
-salmHospitalizedCat <- categoricalCUSUM(salmHospitalized.multi,
-                                        control = controlCat,
-                                        sigma = exp(m.bbin$sigma.coef))
-@
-<<cat3, echo = F, include = F>>=
-# Monitoring
-controlCat <- list(range = phase2,h = 2,pi0 = pi0m, pi1 = pi1m, ret = "cases",
-dfun = dBB.cusum)
+                   ret = "cases", dfun = dBB.cusum)
 salmHospitalizedCat <- categoricalCUSUM(salmHospitalized.multi,
                                         control = controlCat,
                                         sigma = exp(m.bbin$sigma.coef))
