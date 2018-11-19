@@ -169,16 +169,27 @@ sts(observed, start = c(2000, 1), frequency = 52,
     \item{year}{\code{signature(x = "sts")}:
       extracts the corresponding year of each observation of \code{x}}
     \item{as.data.frame}{\code{signature(x = "sts")}:
-      converts the \code{observed}, \code{epoch}, \code{state} and
-      \code{alarm} slots of \code{x} into a data frame with column names
-      matching the colnames of the respective slots. Useful when one wants
-      to fit a model based on the object}
+      the default \code{as.data.frame} call will collect the following
+      slots into a data frame: \code{observed}, \code{epoch},
+      \code{state}, \code{alarm}, \code{upperbound}, and
+      \code{populationFrac}. Additional columns will be created for
+      \code{freq} (potentially varying by year if \code{x@epochAsDate}
+      is \code{TRUE}) and \code{epochInPeriod} (the epoch fraction
+      within the current year).\cr
+      Calling the \code{as.data.frame} method with the argument
+      \code{tidy = TRUE} will return \code{\link{tidy.sts}(x)},
+      which reshapes multivariate \code{sts} objects to the
+      \dQuote{long} format (one row per epoch and observational unit).
+      The tidy format is particularly useful for standard regression
+      models and customized plotting.}
     \item{plot}{\code{signature(x="sts",y="missing")}: this method is
       the entry point to a collection of plot variants. It is also
       the successor of the \code{\link{plot.disProg}} and 
       \code{\link{plot.survRes}} functions. The type of plot is
       specified using a formula \code{type}.
       See \code{\link{stsplot}} for details.
+      A \CRANpkg{ggplot2} variant of the standard time-series-type plot
+      is provided via the \code{\link{autoplot.sts}} method.
     }
     \item{animate}{see \code{\link{animate.sts}}.}
     \item{coerce}{\code{signature(from="sts", to="ts")} (can also be
