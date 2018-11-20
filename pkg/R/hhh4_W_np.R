@@ -14,13 +14,13 @@
 ### non-parametric estimation of weight function, i.e., provide each
 ### neighbourhood order up to 'maxlag' with its own (unconstrained) weight
 ### for identifiability:
-### - lowest order is fixed to weight=1
+### - first order is fixed to weight=1
 ### - usually maxlag < max(nborder) (since only few pairs with highest orders),
 ###   and 'truncate' indicates if there should be zero weight for orders above
 ###   'maxlag' (default), or the same as for order 'maxlag'
 
 W_np <- function (maxlag, truncate = TRUE, normalize = TRUE,
-                  initial = log(zetaweights(2:(maxlag+from0))), from0 = FALSE,
+                  initial = log(zetaweights(2:maxlag)),
                   to0 = truncate)  # 'to0' has been renamed to 'truncate'
 {
     if (missing(maxlag)) {
