@@ -43,8 +43,9 @@ zetaweights <- function (nbmat, d = 1, maxlag = max(nbmat), normalize = FALSE)
 
 ### powerlaw weights
 ## in the non-truncated case, i.e. maxlag = max(nbmat),
-## the raw powerlaw weights are defined as w_ji = o_ji^-d,
+## the raw powerlaw weights are defined as w_ji = o_ji^-d, o_ji >= 1
 ## and with (row-)normalization we have    w_ji = o_ji^-d / sum_k o_jk^-d
+## from0 = TRUE results in a power-law for o_ji >= 0: w(o) = (o + 1)^-d
 
 W_powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
                         initial = if (log) 0 else 1, from0 = FALSE)
@@ -55,7 +56,7 @@ W_powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
         ## the default value max(nbmat). however, repeatedly asking for this
         ## maximum would be really inefficient.
     } else {
-        stopifnot(isScalar(maxlag), maxlag > 1)
+        stopifnot(isScalar(maxlag), maxlag >= 2 - from0)
         if (from0) maxlag <- maxlag + 1L
     }
 

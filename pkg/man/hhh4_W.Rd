@@ -28,10 +28,11 @@ W_np(maxlag, truncate = TRUE, normalize = TRUE,
 }
 
 \arguments{
-  \item{maxlag}{a single integer (> 1) specifying a limiting order of
+  \item{maxlag}{a single integer specifying a limiting order of
     adjacency. If spatial dependence is not to be truncated at some
     high order, \code{maxlag} should be set to the maximum adjacency
-    order in the network of regions.}
+    order in the network of regions. The smallest possible value for
+    \code{maxlag} is 2 if \code{from0=FALSE} and 1 otherwise.}
   \item{truncate,to0}{\code{W_np} represents order-specific log-weights up to
     order \code{maxlag}. Higher orders are by default (\code{truncate=TRUE})
     assumed to have zero weight (similar to \code{W_powerlaw}).
