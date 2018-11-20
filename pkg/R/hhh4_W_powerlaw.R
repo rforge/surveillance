@@ -59,6 +59,7 @@ W_powerlaw <- function (maxlag, normalize = TRUE, log = FALSE,
         stopifnot(isScalar(maxlag), maxlag >= 2 - from0)
         if (from0) maxlag <- maxlag + 1L
     }
+    stopifnot(isScalar(initial))
 
     ## main function which returns the weight matrix
     weights.call <- call("zetaweights",
