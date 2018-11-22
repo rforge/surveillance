@@ -1,7 +1,7 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
 Version: 1.16.2.9000
-Date: 2018-09-13
+Date: 2018-11-22
 Authors@R: c(MH = person("Michael", "Höhle",
                   email = "hoehle@math.su.se",
                   role = c("aut", "ths"),
@@ -68,13 +68,13 @@ Description: Statistical methods for the modeling and monitoring of time series
         given by Salmon et al. (2016) <doi:10.18637/jss.v070.i10>.
         For the retrospective analysis of epidemic spread, the package provides
         three endemic-epidemic modeling frameworks with tools for visualization,
-        likelihood inference, and simulation. 'hhh4' estimates models for
+        likelihood inference, and simulation. hhh4() estimates models for
         (multivariate) count time series following Paul and Held (2011)
         <doi:10.1002/sim.4177> and Meyer and Held (2014) <doi:10.1214/14-AOAS743>.
-        'twinSIR' models the susceptible-infectious-recovered (SIR) event
+        twinSIR() models the susceptible-infectious-recovered (SIR) event
         history of a fixed population, e.g, epidemics across farms or networks,
         as a multivariate point process as proposed by Höhle (2009)
-        <doi:10.1002/bimj.200900050>. 'twinstim' estimates self-exciting point
+        <doi:10.1002/bimj.200900050>. twinstim() estimates self-exciting point
         process models for a spatio-temporal point pattern of infective events,
         e.g., time-stamped geo-referenced surveillance data, as proposed by
         Meyer et al. (2012) <doi:10.1111/j.1541-0420.2011.01684.x>.
