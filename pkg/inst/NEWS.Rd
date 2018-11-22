@@ -13,9 +13,10 @@
 \subsection{NEW FEATURES}{
   \itemize{
     \item \code{W_powerlaw(..., from0 = TRUE)} enables more parsimonious
-    \code{hhh4} models, where the autoregressive effect is included in
-    the power-law of the spatio-temporal component (see
-    \code{vignette("hhh4_spacetime")}).
+    \code{hhh4} models in that the power-law weights are modified to
+    include the autoregressive (0-distance) case (see
+    \code{vignette("hhh4_spacetime")}). The unstructured distance
+    weights \code{W_np()} gained \code{from0} support as well.
   }
 }
 

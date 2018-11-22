@@ -14,9 +14,11 @@
   where \eqn{o_{ji}}{o_ji} (\eqn{=o_{ij}}{=o_ij}) is the adjacency order
   between regions \eqn{i} and \eqn{j},
   and the decay parameter \eqn{d} is to be estimated.
-  In the nonparametric formulation, \code{maxlag-1} order-specific
-  log-weights are to be estimated (the first-order weight is always
-  fixed to 1 for identifiability).
+  In the nonparametric formulation, unconstrained log-weights will be
+  estimated for each of the adjacency orders \code{2:maxlag} (the
+  first-order weight is fixed to 1 for identifiability).
+  Both weight functions can be modified to include a 0-distance weight,
+  which enables \code{hhh4} models without a separate autoregressive component.
 }
 
 \usage{
@@ -24,7 +26,7 @@ W_powerlaw(maxlag, normalize = TRUE,
            log = FALSE, initial = if (log) 0 else 1, from0 = FALSE)
 
 W_np(maxlag, truncate = TRUE, normalize = TRUE,
-     initial = log(zetaweights(2:maxlag)), to0 = truncate)
+     initial = log(zetaweights(2:maxlag)), from0 = FALSE, to0 = truncate)
 }
 
 \arguments{
@@ -46,13 +48,17 @@ W_np(maxlag, truncate = TRUE, normalize = TRUE,
   \item{log}{logical indicating if the decay parameter \eqn{d} should be
     estimated on the log-scale to ensure positivity.}
   \item{initial}{initial value of the parameter vector.}
-  \item{from0}{logical indicating if the power law should be based on
-    \eqn{(o_{ji} + 1)}{(o_ji + 1)} (thus start at adjacency order 0)
-    such that \eqn{w_{jj} = 1}{w_jj = 1}, which means that the
-    neighbourhood component will include an autoregressive effect
-    (Meyer and Held, 2017). Note that the corresponding \code{hhh4}
-    model should then exclude a separate autoregressive component
-    (\code{control$ar$f = ~ -1}).}
+  \item{from0}{logical indicating if these parametric weights should
+    include the 0-distance (autoregressive) case. In the default setting
+    (\code{from0 = FALSE}), adjacency order 0 has zero weight, which is
+    suitable for \code{hhh4} models with a separate autoregressive
+    component. With \code{from0 = TRUE} (Meyer and Held, 2017), the
+    power law is based on \eqn{(o_{ji} + 1)}{(o_ji + 1)}, and
+    nonparametric weights are estimated for adjacency orders
+    \code{1:maxlag}, respectively, where the 0-distance weight is
+    \eqn{w_{jj} = 1}{w_jj = 1} (without normalization). Note that
+    the corresponding \code{hhh4} model should then exclude a separate
+    autoregressive component (\code{control$ar$f = ~ -1}).}
 }
 
 \value{
@@ -128,8 +134,7 @@ plot(measlesFit, type = "neweights", xlab = "adjacency order")
 plot(measlesFit, total = TRUE)
 ## little contribution from neighbouring districts
 
-## simpler model with a merged epidemic component including both
-## predominant local (AR) as well as distant (NE) transmission
+## simpler model with autoregressive effects captured by the ne component
 measlesModel2 <- list(
     ne = list(f = ~ 1, weights = W_powerlaw(maxlag=5, from0=TRUE)),
     end = list(f = addSeason2formula(~-1 + ri(), S=1, period=52)),
@@ -143,7 +148,7 @@ plot(measlesFit2, type = "neweights", exclude = NULL, xlab = "adjacency order")
 ## (one could also try a purely autoregressive model)
 plot(measlesFit2, total = TRUE,
      legend.args = list(legend = c("epidemic", "endemic")))
-## almost the same fit as with separate AR and NE effects
+## almost the same RMSE as with separate AR and NE effects
 sqrt(mean(residuals(measlesFit, "response")^2))
 sqrt(mean(residuals(measlesFit2, "response")^2))
 }

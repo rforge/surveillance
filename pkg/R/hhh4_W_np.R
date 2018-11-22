@@ -12,20 +12,25 @@
 
 
 ### non-parametric estimation of weight function, i.e., provide each
-### neighbourhood order up to 'maxlag' with its own (unconstrained) weight
-### for identifiability:
-### - first order is fixed to weight=1
+### neighbourhood order (including 0 if from0=TRUE) up to 'maxlag' with its
+### own (unconstrained) weight. For identifiability:
+### - lowest order is fixed to weight=1
 ### - usually maxlag < max(nborder) (since only few pairs with highest orders),
 ###   and 'truncate' indicates if there should be zero weight for orders above
 ###   'maxlag' (default), or the same as for order 'maxlag'
+### Thus, if from0, the parameters refer to lags 1:maxlag, otherwise 2:maxlag
 
 W_np <- function (maxlag, truncate = TRUE, normalize = TRUE,
-                  initial = log(zetaweights(2:maxlag)),
+                  initial = log(zetaweights(2:(maxlag+from0))), from0 = FALSE,
                   to0 = truncate)  # 'to0' has been renamed to 'truncate'
 {
     if (missing(maxlag)) {
         stop("'maxlag' must be specified (usually < max. neighbourhood order)")
-    } else stopifnot(isScalar(maxlag), maxlag > 1) # at least one parameter
+    } else {
+        stopifnot(isScalar(maxlag), maxlag >= 2 - from0) # at least one parameter
+    }
+    stopifnot(is.vector(initial, mode = "numeric"),
+              length(initial) == maxlag + from0 - 1)
 
     if (!missing(to0)) {
         .Deprecated(msg = "argument 'to0' has been renamed; use 'truncate'")
@@ -36,22 +41,27 @@ W_np <- function (maxlag, truncate = TRUE, normalize = TRUE,
     indicatormatrixExpr <- if (truncate) {
         quote(nbmat==nbOrder)
     } else {
-        quote(if(nbOrder==1L+npars) nbmat>=nbOrder else nbmat==nbOrder)
+        if (from0) { # maxlag = npars
+            quote(if(nbOrder==npars) nbmat>=nbOrder else nbmat==nbOrder)
+        } else { # maxlag = 1 + npars
+            quote(if(nbOrder==1L+npars) nbmat>=nbOrder else nbmat==nbOrder)
+        }
     }
 
     ## weights as a function of parameters and a matrix of neighbourhood orders
     w <- function (logweights, nbmat, ...) {}
     body(w) <- substitute(
     {
-        weights <- exp(logweights)
+        weights <- exp(logweights)      # values for orders (2-from0):maxlag
         npars <- length(weights)
-        W <- c(0,1,weights)[1L+nbmat]
+        W <- .WEIGHTS[1L+nbmat]         # substituted depending on 'from0'
         ## repeat last coefficient for higher orders without separate estimate
         W[is.na(W)] <- .HOWEIGHT        # substituted depending on 'truncate'
         dim(W) <- dimW <- dim(nbmat)    # nUnits x nUnits
         dimnames(W) <- dimnames(nbmat)
         .RETVAL                         # substituted depending on 'normalize'
     }, list(
+        .WEIGHTS = if (from0) quote(c(1, weights)) else quote(c(0, 1, weights)),
         .HOWEIGHT = if (truncate) 0 else quote(weights[npars]),
         .RETVAL = if (normalize)
         quote(W / (norm <- .rowSums(W, dimW[1L], dimW[2L]))) else quote(W)
@@ -73,10 +83,10 @@ W_np <- function (maxlag, truncate = TRUE, normalize = TRUE,
                     ind <- .INDICATORMATRIX
                     (ind - Wnorm*.rowSums(ind,dimW[1L],dimW[2L])) * weight/norm
                 },
-                mapply(FUN, 1L+seq_len(npars), weights,
-                       SIMPLIFY=FALSE, USE.NAMES=FALSE)
-                ),
-            list(.INDICATORMATRIX = indicatormatrixExpr)
+                mapply(FUN, .LAGS, weights, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+            ),
+            list(.INDICATORMATRIX = indicatormatrixExpr,
+                 .LAGS = if (from0) quote(seq_len(npars)) else quote(1L + seq_len(npars)))
             ))))
     } else {
         dw <- function (logweights, nbmat, ...) {}
@@ -86,9 +96,10 @@ W_np <- function (maxlag, truncate = TRUE, normalize = TRUE,
             npars <- length(weights)
             FUN <- function (nbOrder, weight)
                 weight * (.INDICATORMATRIX)
-            mapply(FUN, 1L+seq_len(npars), weights,
-                   SIMPLIFY=FALSE, USE.NAMES=FALSE)
-        }, list(.INDICATORMATRIX = indicatormatrixExpr))
+            mapply(FUN, .LAGS, weights, SIMPLIFY=FALSE, USE.NAMES=FALSE)
+        },
+        list(.INDICATORMATRIX = indicatormatrixExpr,
+             .LAGS = if (from0) quote(seq_len(npars)) else quote(1L + seq_len(npars))))
     }
 
 
@@ -98,7 +109,7 @@ W_np <- function (maxlag, truncate = TRUE, normalize = TRUE,
         body(d2w) <- as.call(c(as.list(body(d2w)), eval(substitute(
             expression(
                 seqnpars <- seq_len(npars),
-                inds <- lapply(1L+seqnpars, function (nbOrder) {
+                inds <- lapply(.LAGS, function (nbOrder) {
                     ind <- .INDICATORMATRIX
                     indrs <- .rowSums(ind, dimW[1L], dimW[2L])
                     list(indterm = ind - Wnorm * indrs,
@@ -121,11 +132,12 @@ W_np <- function (maxlag, truncate = TRUE, normalize = TRUE,
                        k[lowertri], l[lowertri], # inds[k[lowertri]], inds[l[lowertri]],
                        SIMPLIFY=FALSE, USE.NAMES=FALSE)
                 ),
-            list(.INDICATORMATRIX = indicatormatrixExpr)
+            list(.INDICATORMATRIX = indicatormatrixExpr,
+                 .LAGS = if (from0) quote(seqnpars) else quote(1L + seqnpars))
             ))))
     } else { # for k=k', second derivative = first derivative, otherwise 0
         d2w <- dw
-        if (maxlag > 2) { # i.e. npars > 1
+        if (length(initial) > 1) {
             ## add assignment for the return value of dw
             body(d2w)[[length(body(d2w))]] <-
                 substitute(dW <- x, list(x=body(d2w)[[length(body(d2w))]]))
