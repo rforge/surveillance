@@ -22,11 +22,12 @@
 }
 
 \usage{
-W_powerlaw(maxlag, normalize = TRUE,
-           log = FALSE, initial = if (log) 0 else 1, from0 = FALSE)
+W_powerlaw(maxlag, normalize = TRUE, log = FALSE,
+           initial = if (log) 0 else 1, from0 = FALSE)
 
 W_np(maxlag, truncate = TRUE, normalize = TRUE,
-     initial = log(zetaweights(2:maxlag)), from0 = FALSE, to0 = truncate)
+     initial = log(zetaweights(2:(maxlag+from0))),
+     from0 = FALSE, to0 = truncate)
 }
 
 \arguments{
