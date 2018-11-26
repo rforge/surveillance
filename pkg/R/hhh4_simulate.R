@@ -39,6 +39,7 @@ simulate.hhh4 <- function (object, # result from a call to hhh4
 
     cl <- match.call()
     theta <- if (missing(coefs)) coefs else checkCoefs(object, coefs)
+    stopifnot(subset >= 1, subset <= nrow(object$stsObj))
 
     ## lags
     lag.ar <- object$control$ar$lag
