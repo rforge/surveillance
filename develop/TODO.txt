@@ -193,6 +193,7 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 18/10/2017 plotHHH4_season: add options for groups and confidence intervals (from hhh4contacts)
 19/01/2018 scores.oneStepAhead: remove the message concerning 'reverse'
 20/11/2018 clarify ranef description in vignette("hhh4_spacetime")
+26/11/2018 illustrate oneStepAhead and simulate beyond sts (with missing observed)
 
 #Done
 22/01/2018 implement [.hhh4sims (from [.hhh4simslist)
