@@ -200,33 +200,9 @@ farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
     ######################################################################
     # Initialize the necessary vectors
     ######################################################################
-    # Vector for score
-    score <- matrix(data = 0, nrow = length(control$range), ncol = ncol(sts))
-    sts@control$score <- score
-
-    # Vector for time trend
-    trend <- matrix(data = 0, nrow = length(control$range), ncol = ncol(sts))
-
-
-    # Vector for predictive distribution
-    pvalue <- matrix(data = 0, nrow = length(control$range), ncol = ncol(sts))
-    sts@control$pvalue <- pvalue
-
-    # Vector for expected count
-    expected <- matrix(data = 0, nrow = length(control$range), ncol = ncol(sts))
-    sts@control$expected <- expected
-
-    # Vector for mu0 (prediction from glm)
-    mu0Vector <- matrix(data = 0, nrow = length(control$range), ncol = ncol(sts))
-    sts@control$mu0Vector <- mu0Vector
-
-    # Vector for overdispersion phi (from glm)
-    phiVector <- matrix(data = 0, nrow = length(control$range), ncol = ncol(sts))
-    sts@control$phiVector <- phiVector
-
-    # Vector for time trend (from glm)
-    trendVector <- matrix(data = 0, nrow = length(control$range), ncol = ncol(sts))
-    sts@control$trendVector <- trendVector
+    score <- trend <- pvalue <- expected <-
+        mu0Vector <- phiVector <- trendVector <-
+            matrix(data = 0, nrow = length(control$range), ncol = ncol(sts))
 
     # Define objects
     n <- control$b*(2*control$w+1)
@@ -376,26 +352,15 @@ farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
 				}
 			}
         }#done looping over all time points
-    } #end of loop over cols in sts.
-    # Add information about score
-    sts@control$score[,j]     <- score[,j]
-    # Add information about trend
-    sts@control$trend[,j]     <- trend[,j]
+    } #end of loop over cols in sts
 
-    #Add information about predictive distribution
-    sts@control$pvalue[,j]     <- pvalue[,j]
-
-    # Add information about expected value
-    sts@control$expected[,j] <- expected[,j]
-
-    # Add information about mean of the negbin distribution of the observation
-    sts@control$mu0Vector[,j] <- mu0Vector[,j]
-
-    # Add information about overdispersion
-    sts@control$phiVector[,j] <- phiVector[,j]
-
-    # Add information about time trend
-    sts@control$trendVector[,j] <- trendVector[,j]
+    sts@control$score <- score
+    sts@control$pvalue <- pvalue
+    sts@control$expected <- expected
+    sts@control$mu0Vector <- mu0Vector
+    sts@control$phiVector <- phiVector
+    sts@control$trendVector <- trendVector
+    sts@control$trend <- trend
 
     #Done
     return(sts[control$range,])

@@ -29,6 +29,11 @@
 
 \subsection{BUG FIXES}{
   \itemize{
+    \item For \code{farringtonFlexible()} with multivariate time series,
+    only the last unit had stored the additional control items
+    (exceedence scores, p-values, ...), all others were 0.
+    [reported by Johannes Bracher]
+    
     \item Using negative indices to exclude time points from an
     \code{"sts"} object (e.g., \code{x[-1,]}) is now supported and
     equivalent to the corresponding subset expression of retained
