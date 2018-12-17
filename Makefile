@@ -116,6 +116,9 @@ NEWS.html: pkg/inst/NEWS.Rd
 	$R --vanilla --slave -e 'tools::Rd2HTML("$<", out = "$@", stylesheet = "http://cran.r-project.org/web/CRAN_web.css")'
 	[ `uname -s` = "Darwin" ] && open "$@" || xdg-open "$@"
 
+NEWS_generated_from_HTML.md: NEWS.html
+	pandoc -f html-native_spans -t markdown -o "$@" "$<"
+
 www: 
 	cd pkg; $R --slave --no-save --no-restore -e \
 	  "pkgdown::build_site(examples = FALSE, document = FALSE, lazy = TRUE)"
