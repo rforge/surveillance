@@ -13,10 +13,10 @@
 
 #Open
 14/05/2018 remove deprecated functions
-25/07/2018 format.Date(x, "%V") and "%G" work on Windows since R 3.1.0,
-           so the isoWeekYear() helper function is no longer necessary
 
 #Done
+12/02/2019 format.Date(x, "%V") and "%G" work on Windows since R 3.1.0,
+           so the isoWeekYear() helper function is no longer necessary
 21/04/2011 incorporate a NAMESPACE :) (as of R 2.14.0 this is obligatory)
 19/06/2012 move vignettes into a vignettes directory or create .Rinstignore
            (as of R 2.14.0 the preferred location for vignette sources is
