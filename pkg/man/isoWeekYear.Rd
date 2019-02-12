@@ -32,6 +32,9 @@ isoWeekYear(Y, M, D)
 \examples{
 dates <- as.Date(c("2002-12-31","2003-01-01","2003-01-06"))
 isoWeekYear(dates)
+
+## the same using numeric inputs:
+isoWeekYear(Y = c(2002, 2003, 2003), M = c(12, 1, 1), D = c(31, 1, 6))
 }
 
 \keyword{chron}
