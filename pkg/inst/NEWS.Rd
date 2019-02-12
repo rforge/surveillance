@@ -50,6 +50,8 @@
     \code{stgrid$BLOCK} indices to the \code{epoch} slot of the
     resulting \code{"sts"} object (to avoid \code{epoch[1] != 1}
     scenarios).
+
+    \item \code{sts_creation()} hard-coded \code{start = c(2006, 1)}.
   }
 }
 

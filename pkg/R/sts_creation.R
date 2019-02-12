@@ -9,7 +9,6 @@ sts_creation <- function(theta,beta,gamma1,gamma2,m,overdispersion,dates,
                          densityDelay)
 {
   lengthT <- length(dates)
-  firstDate=dates[1]
   # Baseline
   observed <- rep(NA,lengthT)
   upperbound <- rep(NA,lengthT)
@@ -77,9 +76,8 @@ sts_creation <- function(theta,beta,gamma1,gamma2,m,overdispersion,dates,
     }
   }
   # Create the sts
-  firstYear <- isoWeekYear(as.Date(firstDate,origin="1970-01-01"))$ISOYear
-  firstWeek <- isoWeekYear(as.Date(firstDate,origin="1970-01-01"))$ISOWeek
-  newSts <- new("sts", epoch = as.numeric(dates), start = c(2006, 1), upperbound = as.matrix(upperbound),
+  start <- unlist(isoWeekYear(dates[1]), use.names = FALSE)
+  newSts <- new("sts", epoch = as.numeric(dates), start = start, upperbound = as.matrix(upperbound),
                 freq = 52, observed = observed, state = as.matrix(state), epochAsDate = TRUE)
   newSts@control$reportingTriangle$n <- n
   return(newSts)
