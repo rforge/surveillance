@@ -80,7 +80,7 @@ Michael \enc{Höhle}{Hoehle}
 }
 
 \seealso{
-  \code{\link{seq.Date}}, \code{\link{strptime}}, \code{\link{isoWeekYear}}
+  \code{\link{seq.Date}}, \code{\link{strptime}}, \code{\link{formatDate}}
 }
 
 \examples{
