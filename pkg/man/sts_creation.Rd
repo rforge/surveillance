@@ -42,15 +42,15 @@ m <- 1
 # Dates
 firstDate <- "2006-01-01"
 lengthT=350
-dates <- as.Date(firstDate,origin='1970-01-01') + 7 * 0:(lengthT - 1)
+dates <- as.Date(firstDate) + 7 * 0:(lengthT - 1)
 # Maximal delay in weeks
 D=10
 # Dates and sizes of the outbreaks
-datesOutbreak <- c(as.Date("2008-03-30"),as.Date("2011-09-25",origin="1970-01-01"))
+datesOutbreak <- as.Date(c("2008-03-30","2011-09-25"))
 sizesOutbreak <- c(2,5)
 # Delay distribution
 data("salmAllOnset")
-in2011 <- which(format(epoch(salmAllOnset), "\%G") == 2011)
+in2011 <- which(isoWeekYear(epoch(salmAllOnset))$ISOYear == 2011)
 rT2011 <- salmAllOnset@control$reportingTriangle$n[in2011,]
 densityDelay <- apply(rT2011,2,sum, na.rm=TRUE)/sum(rT2011, na.rm=TRUE)
 # alpha for the upperbound
