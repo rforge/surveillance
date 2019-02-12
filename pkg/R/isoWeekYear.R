@@ -29,20 +29,19 @@ isoWeekYear <- function(Y, M, D)
 
 
 ######################################################################
-# Not very beautiful function implementing a platform independent
-# format.Date function. See format.Date, which for the %V and %G
-# format strings does not work on windows.
-# Added format string %Q for formatting of the quarter (1-4) the month
-# belongs to.
+# An extension of format.Date with additional formatting strings
+# - "%Q" / "%OQ" for the quarter (1-4 / I-IV) the month belongs to
+# - "%q" days within quarter
+# If these formats are not used, base format() is called.
 #
 # Params:
-#  x - An object of type Date to be converted.
-# format - A character string. Note that only "%V and %G" are
-#          processed on Windows. Otherwise the call is sent to format.Date
+# x - An object of type Date to be converted.
+# format - A character string.
 ######################################################################
 
 #Small helper function - vectorized gsub, but disregarding names of x
-gsub2 <- function(pattern, replacement, x) {
+gsub2 <- function(pattern, replacement, x)
+{
     len <- length(x)
     mapply(FUN = gsub,
            pattern = rep_len(as.character(pattern), len),
@@ -52,46 +51,47 @@ gsub2 <- function(pattern, replacement, x) {
            SIMPLIFY = TRUE, USE.NAMES = FALSE)
 }
 
-#More general version also handling a mix of several formats
-formatDate <- function(x, format) {
+formatDate <- function(x, format)
+{
   ##Anything to do?
   if (!grepl( "%G|%V|%Q|%OQ|%q", format)) { #nope
     return(format(x,format))
   }
 
-    #Replicate string.
-    formatStr <- rep_len(format,length(x))
+  ##Replicate string
+  formatStr <- rep_len(format,length(x))
 
-    ##If days within quarter requested (this is kind of slow)
-    if (grepl("%q",format)) {
-      ##Loop over vectors of dates
-      dateOfQuarter <- sapply(x, function(date) {
-        ##Month number in quarter
-        modQ <- (as.numeric(format(date,"%m"))-1) %% 3
-        dateInMonth <- seq(date,length.out=2,by=paste0("-",modQ," month"))[2]
-        ##Move to first of month
-        return(dateInMonth - as.numeric(format(dateInMonth,"%d")) + 1)
-      })
-      dayInQuarter <- as.numeric(x - dateOfQuarter) + 1
-      formatStr <- gsub2("%q",as.character(dayInQuarter),formatStr)
-    }
+  ##If days within quarter requested (this is kind of slow)
+  if (grepl("%q",format)) {
+    ##Loop over vectors of dates
+    dateOfQuarter <- sapply(x, function(date) {
+      ##Month number in quarter
+      modQ <- (as.numeric(format(date,"%m"))-1) %% 3
+      dateInMonth <- seq(date,length.out=2,by=paste0("-",modQ," month"))[2]
+      ##Move to first of month
+      return(dateInMonth - as.numeric(format(dateInMonth,"%d")) + 1)
+    })
+    dayInQuarter <- as.numeric(x - dateOfQuarter) + 1
+    formatStr <- gsub2("%q",as.character(dayInQuarter),formatStr)
+  }
 
-    if (grepl("%Q|%OQ",format)) {
-      Q <- (as.numeric(format(x,"%m"))-1) %/% 3 + 1 #quarter
-      formatStr <- gsub2("%Q",as.character(Q),formatStr)
-      formatStr <- gsub2("%OQ",as.roman(Q),formatStr)
-    }
+  if (grepl("%Q|%OQ",format)) {
+    Q <- (as.numeric(format(x,"%m"))-1) %/% 3 + 1 #quarter
+    formatStr <- gsub2("%Q",as.character(Q),formatStr)
+    formatStr <- gsub2("%OQ",as.roman(Q),formatStr)
+  }
 
-    if (.Platform$OS.type == "windows") {
-      ##Year/week
-      isoYear <- isoWeekYear(x)$ISOYear
-      isoWeek <- sprintf("%.2d",isoWeekYear(x)$ISOWeek)
-      formatStr <- gsub2("%G",isoYear,formatStr)
-      formatStr <- gsub2("%V",isoWeek,formatStr)
-    }
+  if (.Platform$OS.type == "windows") {
+    ##Year/week
+    isoYear <- isoWeekYear(x)$ISOYear
+    isoWeek <- sprintf("%.2d",isoWeekYear(x)$ISOWeek)
+    formatStr <- gsub2("%G",isoYear,formatStr)
+    formatStr <- gsub2("%V",isoWeek,formatStr)
+  }
 
-    ##The rest of the formatting - works normally as defined by strptime
-    res <- character(length(x))
-    for (i in 1:length(x)) { res[i] <- format(x[i],formatStr[i])}
-    return(res)
+  ##The rest of the formatting - works normally as defined by strptime
+  res <- character(length(x))
+  for (i in 1:length(x))
+    res[i] <- format(x[i],formatStr[i])
+  return(res)
 }
