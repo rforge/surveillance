@@ -265,10 +265,10 @@ setMethod("epochInYear", "sts", function(x,...) {
   }
 })
 
-#Extract the corresponding year for each observation using
+#Extract the corresponding year for each observation
 setMethod("year", "sts", function(x,...) {
   if (x@epochAsDate) {
-    as.numeric(strftime(epoch(x), "%G"))
+    as.numeric(strftime(epoch(x), if (x@freq == 52) "%G" else "%Y"))
   } else {
     ((x@epoch-1 + x@start[2]-1) + (x@freq*x@start[1])) %/% x@freq
   }

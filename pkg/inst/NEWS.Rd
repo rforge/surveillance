@@ -57,6 +57,11 @@
     the \code{as.data.frame()} method computed \code{freq} by
     \code{"%Y"}-year instead of by \code{"%G"}-year, which was
     inconsistent with the \code{epochInPeriod} variable.
+
+    \item For \emph{non}-weekly \code{"sts"} data with \code{epochAsDate=TRUE},
+    \code{year()} as well as the \code{year} column of the
+    \code{tidy.sts()} output corresponded to the ISO week-based year.
+    It now gives the calendar year.
   }
 }
 
