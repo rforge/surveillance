@@ -1,7 +1,7 @@
 ################################################################################
 ### Conversion between "ts" and "sts", and from "sts" to "data.frame"
 ###
-### Copyright (C) 2014 Michael Hoehle, 2015-2017 Sebastian Meyer
+### Copyright (C) 2014 Michael Hoehle, 2015-2017,2019 Sebastian Meyer
 ###
 ### This file is part of the R package "surveillance",
 ### free software under the terms of the GNU General Public License, version 2,
