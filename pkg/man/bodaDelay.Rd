@@ -68,15 +68,14 @@ data("stsNewport")
 salm.Normal <- list()
 salmDelayAsym <- list()
 for (week in 43:45){
-  listWeeks <- as.Date(row.names(stsNewport@control$reportingTriangle$n), origin="1970-01-01")
+  listWeeks <- as.Date(row.names(stsNewport@control$reportingTriangle$n))
   dateObs <- listWeeks[isoWeekYear(listWeeks)$ISOYear==2011 &
                        isoWeekYear(listWeeks)$ISOWeek==week]
   stsC <- sts_observation(stsNewport,
                           dateObservation=dateObs,
                           cut=TRUE)
-  inWeeks <- which(formatDate(epoch(stsC), "\%G") == 2011 & 
-                     isoWeekYear(as.Date(epoch(stsC)))$ISOWeek>=40 & 
-                     isoWeekYear(as.Date(epoch(stsC)))$ISOWeek<=48)
+  inWeeks <- with(isoWeekYear(epoch(stsC)),
+                  ISOYear == 2011 & ISOWeek >= 40 & ISOWeek <= 48)
   
   rangeTest <- inWeeks
   alpha <- 0.07
