@@ -1,21 +1,12 @@
 \name{isoWeekYear}
 \alias{isoWeekYear}
-\alias{formatDate}  % FIXME: missing usage entry
 
-\title{Find ISO week and ISO year of Date objects}
+\title{Find ISO Week and Year of Date Objects}
 \description{
   The function \code{isoWeekYear} extracts the year and week of a
-  \code{Date} according to the ISO 8601 specification. It simply
+  \code{\link{Date}} according to the ISO 8601 specification. It simply
   calls \code{\link{strftime}} with format strings \code{"\%G"}
   and \code{"\%V"}, respectively.
-
-  A small internal wrapper for \code{format.Date} (called
-  \code{formatDate}) thus directs all calls having one of these format
-  strings to this function, if the \code{.Platform$OS.type}
-  information reveals a Windows system. The function also provides three
-  additional \code{strptime} formatting strings: "\%Q" (the quarter of a
-  date as a numeric), "\%OQ" (the quarter of a date in roman) and "\%q"
-  (day within the quarter). These are, e.g., used by \code{linelist2sts}.
 }
 \usage{
 isoWeekYear(Y, M, D)
