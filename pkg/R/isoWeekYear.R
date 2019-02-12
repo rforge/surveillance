@@ -54,7 +54,7 @@ gsub2 <- function(pattern, replacement, x)
 formatDate <- function(x, format)
 {
   ##Anything to do?
-  if (!grepl( "%G|%V|%Q|%OQ|%q", format)) { #nope
+  if (!grepl("%Q|%OQ|%q", format)) { #nope
     return(format(x,format))
   }
 
@@ -79,14 +79,6 @@ formatDate <- function(x, format)
     Q <- (as.numeric(format(x,"%m"))-1) %/% 3 + 1 #quarter
     formatStr <- gsub2("%Q",as.character(Q),formatStr)
     formatStr <- gsub2("%OQ",as.roman(Q),formatStr)
-  }
-
-  if (.Platform$OS.type == "windows") {
-    ##Year/week
-    isoYear <- isoWeekYear(x)$ISOYear
-    isoWeek <- sprintf("%.2d",isoWeekYear(x)$ISOWeek)
-    formatStr <- gsub2("%G",isoYear,formatStr)
-    formatStr <- gsub2("%V",isoWeek,formatStr)
   }
 
   ##The rest of the formatting - works normally as defined by strptime
