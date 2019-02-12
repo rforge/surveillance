@@ -107,7 +107,7 @@ export(formatPval)       # yapf -- yet another p-value formatter
 export(anscombe.residuals)
 export(magic.dim, primeFactors, bestCombination)   # similar to n2mfrow
 export(isoWeekYear) #extract ISO 8601 date
-export(formatDate)  #ISO 8601 compatible %G and %V format( ) function.
+export(formatDate)  #format.Date + %Q and %q formatting strings
 export(refvalIdxByDate)
 export(ks.plot.unif)
 export(checkResidualProcess)       # for twinstim and twinSIR
