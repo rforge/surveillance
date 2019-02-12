@@ -52,6 +52,11 @@
     scenarios).
 
     \item \code{sts_creation()} hard-coded \code{start = c(2006, 1)}.
+
+    \item For weekly \code{"sts"} data with \code{epochAsDate=TRUE},
+    the \code{as.data.frame()} method computed \code{freq} by
+    \code{"%Y"}-year instead of by \code{"%G"}-year, which was
+    inconsistent with the \code{epochInPeriod} variable.
   }
 }
 

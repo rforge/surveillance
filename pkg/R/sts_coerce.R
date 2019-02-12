@@ -79,15 +79,14 @@ setMethod("as.data.frame", signature(x = "sts"),
 
   #Find out how many epochs there are each year
   res$freq <- if (x@epochAsDate) {
-    date <- epoch(x)
-    epochStr <- switch( as.character(x@freq),
-                       "12" = "%m",
-                       "52" =  "%V",
-                       "365" = "%j")
-    years <- unique(as.numeric(formatDate(date,"%Y")))
-    dummyDates <- as.Date(paste(rep(years,each=6),"-12-",26:31,sep=""))
-    maxEpoch <- c(tapply(as.numeric(formatDate(dummyDates, epochStr)), rep(years,each=6), max))
-    maxEpoch[pmatch(formatDate(date,"%Y"),names(maxEpoch),duplicates.ok=TRUE)]
+    year <- strftime(epoch(x), if (x@freq == 52) "%G" else "%Y")
+    epochStr <- switch(as.character(x@freq),
+                       "12" = "%m", "52" = "%V", "365" = "%j")
+    maxEpoch <- vapply(X = unique(year), FUN = function (Y) {
+        dummyDates <- as.Date(paste0(Y, "-12-", 26:31))
+        max(as.numeric(strftime(dummyDates, epochStr)))
+    }, FUN.VALUE = 0, USE.NAMES = TRUE)
+    maxEpoch[year]
   } else { # just replicate the fixed frequency
     x@freq
   }
