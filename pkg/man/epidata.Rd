@@ -93,6 +93,7 @@ as.epidata(data, ...)
     \code{is.na(tI)} and \code{is.na(tR)}, and \code{is.na(tI)} implies
     \code{is.na(tR)} (and this is checked for the provided data).\cr
     CAVE: Support for latent periods (\code{tE.col}) is experimental!
+          \code{\link{twinSIR}} cannot handle them anyway.
   }
   \item{id.col}{
     single numeric or character index of the \code{id} column in \code{data}.
