@@ -55,7 +55,7 @@
 
     \item For weekly \code{"sts"} data with \code{epochAsDate=TRUE},
     the \code{as.data.frame()} method computed \code{freq} by
-    \code{"%Y"}-year instead of by \code{"%G"}-year, which was
+    \code{"\%Y"}-year instead of by \code{"\%G"}-year, which was
     inconsistent with the \code{epochInPeriod} variable.
 
     \item For \emph{non}-weekly \code{"sts"} data with \code{epochAsDate=TRUE},
