@@ -18,12 +18,12 @@
   (day within the quarter). These are, e.g., used by \code{linelist2sts}.
 }
 \usage{
-isoWeekYear(Y, M=NULL, D=NULL)
+isoWeekYear(Y, M, D)
 }
 \arguments{
-  \item{Y}{Date object (POSIX) or the year. Can be a vector.}
-  \item{M}{month, \code{NULL} if Y is a Date object)}
-  \item{D}{day, \code{NULL} if Y is a Date object)}
+  \item{Y}{year(s) or a Date/POSIXt object. Can be a vector.}
+  \item{M}{month(s), only used if \code{Y} is not a Date/POSIXt object.}
+  \item{D}{day(s), only used if \code{Y} is not a Date/POSIXt object.}
 }
 \value{
   A list with entries \code{ISOYear} and \code{ISOWeek} containing the

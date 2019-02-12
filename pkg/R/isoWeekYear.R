@@ -16,7 +16,7 @@
 ######################################################################
 
 
-isoWeekYear <- function(Y, M=NULL, D=NULL)
+isoWeekYear <- function(Y, M, D)
 {
   if (!inherits(Y, c("Date", "POSIXt")))
     Y <- strptime(paste(Y,M,D,sep="-"),"%Y-%m-%d")
