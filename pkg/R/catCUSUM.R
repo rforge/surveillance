@@ -224,7 +224,8 @@ categoricalCUSUM <- function(stsObj,
     start.sampleNo <- (new.sampleNo - 1) %% stsObj@freq + 1
     stsObj@start <- c(start.year,start.sampleNo)
   } else {
-    stsObj@start <- c(isoWeekYear(epoch(stsObj)[1])$ISOYear,isoWeekYear(epoch(stsObj)[1])$ISOWeek)
+    ISO <- isoWeekYear(epoch(stsObj)[1])
+    stsObj@start <- c(ISO$ISOYear,ISO$ISOWeek)
   }
 
   #Ensure dimnames in the new object ## THIS NEEDS TO BE FIXED!
