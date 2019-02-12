@@ -1,7 +1,7 @@
 ################################################################################
 ### Initialization and other basic methods for the S4 class "sts"
 ###
-### Copyright (C) 2007-2014 Michael Hoehle, 2012-2018 Sebastian Meyer
+### Copyright (C) 2007-2014 Michael Hoehle, 2012-2019 Sebastian Meyer
 ###
 ### This file is part of the R package "surveillance",
 ### free software under the terms of the GNU General Public License, version 2,
@@ -256,20 +256,19 @@ setMethod("dimnames", "sts", function (x) dimnames(x@observed))
 
 #Extract which observation within year we have
 setMethod("epochInYear", "sts", function(x,...) {
-  #Strptime format strings available as:
-  #http://www.opengroup.org/onlinepubs/009695399/functions/strptime.html
   if (x@epochAsDate) {
-    epochStr <- switch( as.character(x@freq), "12" = "%m","52" =  "%V","365" = "%j")
-    return(as.numeric(formatDate(epoch(x),epochStr)))
+    epochStr <- switch(as.character(x@freq),
+                       "12" = "%m", "52" = "%V", "365" = "%j")
+    as.numeric(strftime(epoch(x), epochStr))
   } else {
-    return( (x@epoch-1 + x@start[2]-1) %% x@freq + 1)
+    (x@epoch-1 + x@start[2]-1) %% x@freq + 1
   }
 })
 
 #Extract the corresponding year for each observation using
 setMethod("year", "sts", function(x,...) {
   if (x@epochAsDate) {
-    return(as.numeric(formatDate(epoch(x),"%G")))
+    as.numeric(strftime(epoch(x), "%G"))
   } else {
     ((x@epoch-1 + x@start[2]-1) + (x@freq*x@start[1])) %/% x@freq
   }
