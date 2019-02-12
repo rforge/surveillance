@@ -50,7 +50,7 @@ datesOutbreak <- c(as.Date("2008-03-30"),as.Date("2011-09-25",origin="1970-01-01
 sizesOutbreak <- c(2,5)
 # Delay distribution
 data("salmAllOnset")
-in2011 <- which(formatDate(epoch(salmAllOnset), "\%G") == 2011)
+in2011 <- which(format(epoch(salmAllOnset), "\%G") == 2011)
 rT2011 <- salmAllOnset@control$reportingTriangle$n[in2011,]
 densityDelay <- apply(rT2011,2,sum, na.rm=TRUE)/sum(rT2011, na.rm=TRUE)
 # alpha for the upperbound
