@@ -270,8 +270,6 @@ S3method(plot, survRes)
 S3method(print, algoQV)
 S3method(xtable, algoQV)
 
-export(test)   # FIXME: remove these test functions? -> Demo?
-
 
 ### conversion between old disProg and new sts classes
 
