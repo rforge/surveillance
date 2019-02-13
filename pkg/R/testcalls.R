@@ -25,25 +25,6 @@ test <- function(data = c("k1", "m5"), range = 157:339){
 
 
 ###################################################
-### chunk number 2:
-###################################################
-
-testSim <- function(p = 0.99, r = 0.01, length = 400, A = 1, alpha = 1, beta = 0,
-                                phi = 0, frequency = 1, state = NULL, K, range = 200:400){
-  .Deprecated(package = "surveillance")
-        disProgObj <- sim.pointSource(p, r, length, A, alpha, beta,
-                                phi, frequency, state, K)
-        survResults <- algo.call(disProgObj, control = list(list(funcName = "rki1", range = range)))
-        res <- algo.compare(survResults)
-        plot(survResults[[1]], "RKI 1", "Simulation")
-        print(compMatrix.writeTable(res))
-
-}
-
-
-
-
-###################################################
 ### chunk number 3:
 ###################################################
 
