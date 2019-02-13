@@ -68,7 +68,7 @@
 \subsection{DEPRECATED AND DEFUNCT}{
   \itemize{
     \item Several ancient functions deprecated in 1.16.1 are now
-    defunct: \code{testSim()}.
+    defunct: \code{makePlot()}, \code{testSim()}.
   }
 }
 
