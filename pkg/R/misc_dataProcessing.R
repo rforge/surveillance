@@ -47,28 +47,6 @@ readData <- function(abb,week53to52=TRUE,sysPath=TRUE){
 
 
 ###################################################
-### chunk number 2:
-###################################################
-
-toFileDisProg <- function(disProgObj, toFile){
-    .Deprecated(package = "surveillance")
-
-        length <- length(disProgObj$observed)
-
-        writeMatrix <- matrix(0, length, 3)
-        dimnames(writeMatrix) <- list(c(), c("week", "observed", "state"))
-
-        writeMatrix[,"week"] <- 1:length
-        writeMatrix[,"observed"] <- disProgObj$observed
-        writeMatrix[,"state"] <- disProgObj$state
-
-        write.table(writeMatrix, toFile, row.names = FALSE, sep = "\t")
-}
-
-
-
-
-###################################################
 ### chunk number 3:
 ###################################################
 

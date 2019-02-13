@@ -3,7 +3,6 @@
 \alias{surveillance-deprecated}
 \alias{qlomax}
 \alias{readData}
-\alias{toFileDisProg}
 \alias{compMatrix.writeTable}
 \description{
   The functions listed here are provided for compatibility
@@ -14,7 +13,6 @@
 qlomax(p, scale, shape)
 
 readData(abb, week53to52=TRUE, sysPath=TRUE)
-toFileDisProg(disProgObj, toFile)
 
 compMatrix.writeTable(compMatrix)
 }
@@ -27,8 +25,6 @@ compMatrix.writeTable(compMatrix)
   \item{week53to52}{Boolean indicating whether to convert RKI 53 Weeks System to 52 weeks a year.}
   \item{sysPath}{Boolean, if \code{TRUE} then R automatically looks in
     the extdata directory of the \pkg{surveillance} installation.}
-  \item{disProgObj}{The disProgObj to save in file.}
-  \item{toFile}{The path and filename of the file to save.}
   
   \item{compMatrix}{Matrix which includes quality values for every
     surveillance system (from \code{\link{algo.compare}} or
