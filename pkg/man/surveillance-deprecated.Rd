@@ -3,7 +3,6 @@
 \alias{surveillance-deprecated}
 \alias{qlomax}
 \alias{readData}
-\alias{compMatrix.writeTable}
 \description{
   The functions listed here are provided for compatibility
   with older versions of \pkg{surveillance} only,
@@ -13,8 +12,6 @@
 qlomax(p, scale, shape)
 
 readData(abb, week53to52=TRUE, sysPath=TRUE)
-
-compMatrix.writeTable(compMatrix)
 }
 \arguments{
   \item{p}{vector of probabilities.}
@@ -25,12 +22,8 @@ compMatrix.writeTable(compMatrix)
   \item{week53to52}{Boolean indicating whether to convert RKI 53 Weeks System to 52 weeks a year.}
   \item{sysPath}{Boolean, if \code{TRUE} then R automatically looks in
     the extdata directory of the \pkg{surveillance} installation.}
-  
-  \item{compMatrix}{Matrix which includes quality values for every
-    surveillance system (from \code{\link{algo.compare}} or
-    \code{\link{algo.summary}}).}
 }
 \seealso{
-  \code{\link{Deprecated}}, \code{\link{Defunct}}
+  \code{\link{Deprecated}}
 }
 \keyword{misc}

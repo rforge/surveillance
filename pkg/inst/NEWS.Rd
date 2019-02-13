@@ -68,7 +68,8 @@
 \subsection{DEPRECATED AND DEFUNCT}{
   \itemize{
     \item Several ancient functions deprecated in 1.16.1 are now
-    defunct: \code{makePlot()}, \code{test()}, \code{testSim()},
+    defunct: \code{compMatrix.writeTable()},
+    \code{makePlot()}, \code{test()}, \code{testSim()},
     \code{toFileDisProg()}.
   }
 }
