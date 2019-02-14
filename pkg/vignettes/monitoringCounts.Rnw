@@ -638,13 +638,13 @@ axis(side=4, at=seq(0,2500,by=500),labels=seq(0,50,by=10),las=1,cex.lab=cex.text
 \label{fig:campyDE}
 \end{figure}
 
-<<campyDElongVersion, eval=FALSE, fig=FALSE, echo = TRUE, label=campyDElongVersion,include = TRUE,results=tex>>=
+<<campyDElongVersion, eval=FALSE, echo=TRUE>>=
 data("campyDE")
 cam.sts <- sts(epoch = as.numeric(campyDE$date), epochAsDate = TRUE,
                observed = campyDE$case, state = campyDE$state)
-plot(cam.sts, legend = NULL, xlab = "time [weeks]", ylab = "No. reported",
-     col = "gray", cex = 2, cex.axis = 2, cex.lab = 2)
-lines(campyDE$hum * 50, col = "darkblue", lwd = 2)
+plot(cam.sts, col = "mediumblue")
+lines(campyDE$hum * 50, col = "white", lwd = 2)
+axis(4, at = seq(0, 2500, by = 500), labels = seq(0, 50, by = 10))
 @
 
 The corresponding plot of the weekly time series is shown in
