@@ -1425,7 +1425,7 @@ pi1 <-  t(predict(m1, newdata=X[phase2,])[,reorder])
 For applying the \code{categoricalCUSUM} function one needs to define a compatible wrapper function for the multinomial as in the binomial example.
 
 With $\bm{\pi}^0$ and $\bm{\pi}^1$ in place one only needs to define a wrapper function, which defines the PMF of the sampling distribution -- in this case the multinomial -- in a \code{categoricalCUSUM} compatible way.
-<<CATCUSUM,echo=false,eval=true>>=
+<<CATCUSUM>>=
 dfun <- function(y, size, mu, log = FALSE) {
 	return(dmultinom(x = y, size = size, prob = mu, log = log))
 }
@@ -1461,11 +1461,6 @@ alarmDates <- epoch(surv)[which(alarms(surv)[,1]==1)]
 format(alarmDates,"%b %Y")
 @
 
-
-With $\bm{\pi}^0$ and $\bm{\pi}^1$ in place one only needs to define a wrapper function, which defines the PMF of the sampling distribution -- in this case the multinomial -- in a \code{categoricalCUSUM} compatible way.
-<<echo=TRUE,eval=FALSE>>=
-<<CATCUSUM>>
-@
 
 The resulting CUSUM statistic $C_t$ as a function of time is shown in Figure~\ref{fig:ct}(a). The first time an aberration is detected is July 2009. Using 10000 Monte Carlo simulations we estimate that with the chosen threshold $h=2$ the probability for a false alarm within the 60 time points of \code{phase2} is 0.02.
 
