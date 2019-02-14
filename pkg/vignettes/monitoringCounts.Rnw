@@ -1456,7 +1456,7 @@ rlMN <- replicate(nSamples, simone.stop(rotaBB, control=control))
 mean(rlMN)  # 0.5002
 @
 
-<<>>=
+<<echo=false, eval=false>>=
 alarmDates <- epoch(surv)[which(alarms(surv)[,1]==1)]
 format(alarmDates,"%b %Y")
 @
