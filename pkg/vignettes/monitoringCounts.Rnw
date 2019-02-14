@@ -222,7 +222,7 @@ For example, to get ticks at all weeks corresponding to the first week in a mont
 
 <<eval=FALSE,echo=TRUE>>=
 plot(salmNewport, type = observed ~ time,
-     xaxis.tickFreq = list("%V" = atChange, "%m" = atChange, "%G" = atChange),
+     xaxis.tickFreq = list("%m" = atChange, "%G" = atChange),
      xaxis.labelFreq = list("%Y" = atMedian), xaxis.labelFormat = "%Y")
 @
 which is shown in Figure~\ref{fig:Newport}. Here, the \code{atChange} and \code{atMedian} functions are small helper functions and the  respective tick lengths are controlled by the \pkg{surveillance} specific option \code{surveillance.options("stsTickFactors")}. Actually \code{sts} objects
