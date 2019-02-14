@@ -1,5 +1,46 @@
 library(surveillance)
 
+# 'readData' reads the data of a specified disease of several years
+#            and generates a state chain using the bulletin knowledge
+#
+# Parameter:
+#   abb : abbreviation of the disease
+#   week53to52: Boolean indicating whether to convert RKI 53 Weeks System to 52 weeks a year
+readData <- function(abb,week53to52=TRUE,sysPath=FALSE){
+  #Read depending on which path is requested
+  if (sysPath) {
+    if (packageVersion("surveillance") > "1.16.2")
+      stop("the package no longer contains these txt files")
+    #Prepend the systempath/data to the filename
+    #hoehle 2012-07-24 - this does not work when package is not
+    #installed. Use extdata as recommended in the file package structure.
+    file <- file.path(path.package('surveillance'),'extdata',paste(abb,".txt",sep=""))
+  } else {
+    file <- file.path("data", paste(abb,".txt",sep=""))
+  }
+
+  # read the data from four years and write it to a table
+  #file <- paste( dataPath, abb , ".txt" , sep="" )
+  fileTable <- read.table( file=file, header=TRUE )
+  observed <- fileTable$observed
+  state <- fileTable$state
+
+  result = list(observed=observed, state=state)
+
+  class(result) = "disProg" # for disease progress
+
+  #Convert to 52 week system...
+  if (week53to52) {
+    result <- correct53to52(result)
+  }
+
+  result$freq <- 52
+  result$start <- c(2001,1)
+
+  return(result)
+}
+
+
 outbrks <- c("m1", "m2", "m3", "m4", "m5", "q1_nrwh", "q2", 
               "s1", "s2", "s3", "k1", "n1", "n2", "h1_nrwrp")
 
@@ -7,10 +48,14 @@ outbrks <- c("m1", "m2", "m3", "m4", "m5", "q1_nrwh", "q2",
 convert <- function(name) {
   e <- substitute(Objname <- readData(name,week53to52=TRUE),list(Objname=name))
   eval(e)
-  save(list=name,file=paste("z:/Surveillance/surveillance/data/",name,".RData",sep=""))
+  save(list=name,file=paste("../data/",name,".RData",sep=""))
 }
 
 sapply(outbrks,convert)
+
+
+# --
+
 
 #Ordinary function but now with matrix args
 correct53to52 <- function(disProgObj, firstweek = 1){
@@ -63,8 +108,7 @@ correct53to52 <- function(disProgObj, firstweek = 1){
 
 
 #Do hepa
-file <- paste(Sys.getenv("HOME"),"Surveillance/surveillance/develop/hepAmale.txt",sep="")
-hepMale <- as.matrix(read.table(file,header=TRUE,skip=1))
+hepMale <- as.matrix(read.table("hepAmale.txt",header=TRUE,skip=1))
 state <- matrix(0,dim(hepMale)[1],dim(hepMale)[2]-3)
 state[291:294,] <- 1
 hepa <- create.disProg(week=hepMale[,1],observed=hepMale[,-c(1,2,3)],state=state)
@@ -72,52 +116,19 @@ hepa <- correct53to52(hepa)
 
 ha.berlin <- hepa
 ha <- hepa#aggregate(hepa)
-save(list=c("ha"),file=paste(Sys.getenv("HOME"),"Surveillance/package/surveillance/data/ha.RData",sep=""))
-save(list=c("ha.berlin"),file=paste(Sys.getenv("HOME"),"/Surveillance/surveillance/data/hepa.berlin.RData",sep=""))
+save(list=c("ha"),file="../data/ha.RData")
+save(list=c("ha.berlin"),file="../data/hepa.berlin.RData")
 
 #
 data(ha)
 ha.berlin <- aggregate(ha)
-save(list=c("ha.berlin"),file=paste(Sys.getenv("HOME"),"/Surveillance/surveillance/trunk/data/ha.berlin.RData",sep=""))
+save(list=c("ha.berlin"),file="../data/ha.berlin.RData")
 
-#load(file="z:/Surveillance/package/surveillance/data/hepa.RData")
+#load(file="../data/hepa.RData")
 
 
 ##The salmonella hadar cases
 x <- scan("shadar.txt",quiet=TRUE)
 shadar <- create.disProg(1:length(x), x, rep(0,length(x)))
 
-save(list=c("shadar"),file=paste(Sys.getenv("HOME"),"Surveillance/surveillance/data/shadar.RData",sep=""))
-
-
-##########################
-# Add freq argument to the disProg object
-
-outbrks <- c("m1", "m2", "m3", "m4", "m5", "q1_nrwh", "q2", 
-              "s1", "s2", "s3", "k1", "n1", "n2", "h1_nrwrp")
-
-add.freq <- function(name) {
-  #Put "name" into x
-  e1 <- substitute(data(name),list(name=name))
-  eval(e1)
-  e2 <- gsub("\"","",deparse(substitute(x <- name,list(name=name))))
-  write(e2,file="/tmp/foobar")
-  eval(parse(file="/tmp/foobar"))
-
-  #Add freq attribute
-  if (class(x) == "disProg") {
-    #x$freq <- 52
-    x$start <- c(2001,1)
-
-    
-    #Save as data
-    eval(substitute(Objname <- x,list(Objname=name)))
-    save(list=name,file=paste(Sys.getenv("HOME"),"/Surveillance/surveillance/trunk/data/",name,".RData",sep=""))
-  }
-  invisible()
-}
-
-#Additional data
-outbrks <- c(outbrks,"ha","measels.weser","meningo.age","shadar")
-#Convert
-sapply(outbrks,add.freq)
+save(list=c("shadar"),file="../data/shadar.RData")

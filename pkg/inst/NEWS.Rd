@@ -70,6 +70,7 @@
     \item Several ancient functions deprecated in 1.16.1 are now
     defunct: \code{compMatrix.writeTable()},
     \code{makePlot()}, \code{test()}, \code{testSim()},
+    \code{readData()} (the raw txt files have been removed as well),
     \code{toFileDisProg()}.
   }
 }

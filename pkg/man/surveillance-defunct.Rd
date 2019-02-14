@@ -3,6 +3,7 @@
 \title{Defunct Functions in Package \pkg{surveillance}}
 \alias{compMatrix.writeTable}
 \alias{makePlot}
+\alias{readData}
 \alias{test}
 \alias{testSim}
 \alias{toFileDisProg}
@@ -14,6 +15,7 @@
 compMatrix.writeTable(compMatrix)
 makePlot(outputpath, data = "k1", method = "rki1",
          name, disease, range = 157:339)
+readData(abb, week53to52=TRUE, sysPath=TRUE)
 test(data = c("k1", "m5"), range = 157:339)
 testSim(p = 0.99, r = 0.01, length = 400, A = 1, alpha = 1,
         beta = 0, phi = 0, frequency = 1, state = NULL, K, 
@@ -25,6 +27,8 @@ toFileDisProg(disProgObj, toFile)
   (it did nothing more than generating an \code{\link{xtable}} of its input).
   
   The ancient test function \code{makePlot} is no longer used,
+  nor is function \code{readData} (the datasets are still available
+  via \code{data(\link{m1})} etc).
   \code{test} calls of outbreak detection algorithms applied to the old
   SurvStat datasets can be found in \code{vignette("surveillance")},
   and \code{testSim} is provided as an example

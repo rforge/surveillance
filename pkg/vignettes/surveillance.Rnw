@@ -152,11 +152,6 @@ For example the object \texttt{k1} describes Kryptosporidosis
 surveillance data for the German federal state Baden-W\"{u}rttemberg
 2001-2005. The peak in 2001 is due to an outbreak of Kryptosporidosis
 among a group of army-soldiers in boot-camp~\citep{bulletin3901}.
-%% In \surveillance\ the \texttt{readData} function is used to bring the
-%% time series on \texttt{disProg} form. The SurvStat@RKI database
-%% uses a 53 weeks a
-%% year format; therefore a conversion with \texttt{correct53to52} is
-%% necessary.
 
 <<fig=T>>=
 data(k1)

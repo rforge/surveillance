@@ -233,7 +233,7 @@ export(sts_observation)
 
 ### disProg-specific
 
-export(create.disProg, readData)
+export(create.disProg)
 S3method(print, disProg)
 S3method(plot, disProg)
 S3method(aggregate, disProg)
