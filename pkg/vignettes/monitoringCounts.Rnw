@@ -728,9 +728,9 @@ if (computeALL) {
 }
 @
 
-We plot \code{boda.covars} in Figure~\ref{fig:b} and compare the output of the two boda calls with the output of
+We plot \code{boda.covars} in Figure~\ref{fig:b} and compare the alarms of the two \code{boda} calls with
 \code{farrington},  \code{farringtonFlexible} and \code{bayes} in
-Figure~\ref{fig:alarmplot}.
+Figure~\ref{fig:alarmplot} (plot \code{type = alarm ~ time}).
 
 \fbox{\vbox{
 Note (2018-07-19):
@@ -744,12 +744,6 @@ This means results in this vignette deviate from the results reported in
 the JSS paper -- in particular we do not get any alarms when using the
 \code{boda} procedure with covariates. We are looking into the problem.
 }}
-
-<<alarmplot2, fig=FALSE, echo = TRUE, eval=FALSE, label=alarmplot2,include = F,results=tex>>=
-cam.surv <- combineSTS(list(boda.covars=boda.covars,boda=boda,bayes=bayes,
-                            farrington=far,farringtonFlexible=farflex))
-plot(cam.surv,type = alarm ~ time)
-@
 
 Note here that the \code{bayes}
 procedure is not really useful as the adjustment for seasonality only works
