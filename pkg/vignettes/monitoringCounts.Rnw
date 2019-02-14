@@ -1434,7 +1434,7 @@ control <- list(range = seq(nrow(rotaBB))[phase2], h = h, pi0 = pi0,
 				pi1 = pi1, ret = "value", dfun = dfun)
 surv <- categoricalCUSUM(rotaBB,control=control)
 @
-<<CATCUSUMMC,echo=false,eval=true>>=
+<<CATCUSUMMC,echo=false,eval=false>>=
 #Number of MC samples
 nSamples <- 1e4
 
@@ -1451,14 +1451,9 @@ simone.stop <- function(sts, control) {
   return(any(alarms(one.surv)[,1]>0))
 }
 
-if (computeALL) {
-  set.seed(1233)
-  rlMN <- replicate(nSamples, simone.stop(rotaBB, control=control))
-  save(file="monitoringCounts-cache/rlsims-multinom.RData", list=c("rlMN"))
-} else {
-  load(file="monitoringCounts-cache/rlsims-multinom.RData")
-}
-mean(rlMN)
+set.seed(1233)
+rlMN <- replicate(nSamples, simone.stop(rotaBB, control=control))
+mean(rlMN)  # 0.5002
 @
 
 <<>>=
