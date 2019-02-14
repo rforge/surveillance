@@ -380,19 +380,7 @@ Now, the newly implemented function \code{farringtonFlexible} supports the use o
 In the function \code{farringtonFlexible} one can choose to use the original method or the improved method by specification of appropriate \code{control} arguments.
 Which variant of the algorithm is to be used is determined by the contents of the \code{control} slot.
 In the example below, \code{control1} corresponds to the use of the original method and \code{control2} indicates the options for the improved method.
-<<farHead, echo = F, include = F>>=
-# Control slot for the original method
-control1 <-  list(range=in2011,noPeriods=1,
-                  b=4,w=3,weightsThreshold=1,pastWeeksNotIncluded=3,
-                  pThresholdTrend=0.05,thresholdMethod="delta",
-				  limit54=c(0,50))  # for the figure
-# Control slot for the improved method
-control2 <- list(range=in2011,noPeriods=10,
-                 b=4,w=3,weightsThreshold=2.58,pastWeeksNotIncluded=26,
-                 pThresholdTrend=1,thresholdMethod="nbPlugin",
-				  limit54=c(0,50))  # for the figure
-@
-<<farHead, echo = T, include = F, eval=F>>=
+<<farHead>>=
 control1 <- list(range = in2011, noPeriods = 1,
                  b = 4, w = 3, weightsThreshold = 1,
                  pastWeeksNotIncluded = 3, pThresholdTrend = 0.05,
@@ -402,6 +390,9 @@ control2 <- list(range = in2011, noPeriods = 10,
                  pastWeeksNotIncluded = 26, pThresholdTrend = 1,
                  thresholdMethod = "nbPlugin")
 @
+<<echo=F>>=
+control1$limit54 <- control2$limit54 <- c(0,50)  # for the figure
+@ 
 
 In both cases the steps of the algorithm are the same. In a first step, an overdispersed Poisson generalized linear model with log link is fitted to the reference data $\bm{y}_{t_0} \subseteq \left\{
 y_t\>;\> t\leq t_0\right\}$, where $\E(y_t)=\mu_t$  with $\log \mu_t = \alpha + \beta t$ and $\Var(y_t)=\phi\cdot\mu_t$ and where $\phi\geq1$ is ensured.
