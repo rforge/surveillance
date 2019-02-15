@@ -677,7 +677,7 @@ Below we illustrate the use
 of \code{boda} to monitor the campylobacteriosis time series from 2007.
 In the first case we include in the model for $\log\left(\mu_t\right)$ penalized splines for trend and
 seasonality and a simple linear trend.
-<<NICELOOKINGboda,eval=FALSE,echo=TRUE>>=
+<<boda,eval=FALSE,echo=TRUE>>=
 
 rangeBoda <- which(epoch(cam.sts) >= as.Date("2007-01-01"))
 control.boda <- list(range = rangeBoda, X = NULL, trend = TRUE,
@@ -687,13 +687,14 @@ control.boda <- list(range = rangeBoda, X = NULL, trend = TRUE,
 boda <- boda(cam.sts, control = control.boda)
 @
 
-<<boda, echo = F, include = F, results = hide>>=
+<<boda-cache, echo = FALSE>>=
 if (computeALL) {
 library("INLA")
 ##hoehle 2018-07-18: changed code to use NICELOOKINGboda, but that's iid. Reason:
 ##The option 'rw1' currently crashes INLA.
-<<NICELOOKINGboda>>
-save(file = "monitoringCounts-cache/boda.RData",list=c("boda","control.boda","rangeBoda"))
+<<boda>>
+save(list = c("boda", "control.boda", "rangeBoda"),
+     file = "monitoringCounts-cache/boda.RData")
 } else {
   load("monitoringCounts-cache/boda.RData")
 }
@@ -703,23 +704,24 @@ In the second case we instead use only penalized and linear trend components, an
 furthermore, include as covariates lags 1--4 of the absolute humidity as well
 as zero-one indicators for $t_0$ belonging to the last two weeks
 (\code{christmas}) or first two weeks (\code{newyears}) of the year,
-respectively. The later two variables are needed, because there is a
+respectively. These covariates shall account for
 systematically changed reporting behavior at the turn of the year (c.f.\ Figure~\ref{fig:campyDE}). Finally, \code{O104period} is an indicator variable on
 whether the reporting week belongs to the W21--W30 2011 period of increased awareness
 during the O104:H4 STEC outbreak. No additional correction for past outbreaks is
 made.
 
-<<NICELOOKINGboda2,eval=FALSE,echo=TRUE>>=
+<<boda2,eval=FALSE,echo=TRUE>>=
 covarNames <- c("l1.hum", "l2.hum", "l3.hum", "l4.hum",
                 "newyears", "christmas", "O104period")
 control.boda2 <- modifyList(control.boda,
                             list(X = campyDE[, covarNames], season = FALSE))
 boda.covars <- boda(cam.sts, control = control.boda2)
 @
-<<boda2, echo = F, include = F, results = hide>>=
+<<boda2-cache, echo = FALSE>>=
 if (computeALL) {
-<<NICELOOKINGboda2>>
-  save(file = "monitoringCounts-cache/boda.covars.RData",list=c("boda.covars","covarNames", "control.boda2"))
+<<boda2>>
+save(list = c("boda.covars", "covarNames", "control.boda2"),
+     file = "monitoringCounts-cache/boda.covars.RData")
 } else {
   load("monitoringCounts-cache/boda.covars.RData")
 }
