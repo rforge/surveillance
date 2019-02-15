@@ -198,19 +198,15 @@ plotOpts <- list(col=stsPlotCol,ylim=c(0,y.max),
 
 @
 
-<<NewportstsPlot, fig=FALSE, echo = FALSE, label=NewportPlot,include = F,results=tex, width=7.5, height=3.5>>=
-# Plot
+ \setkeys{Gin}{height=7cm, width=15cm}
+\begin{figure}
+\begin{center}
+<<NewportPlot,fig=TRUE, width=10, height=4.66667, echo=FALSE>>=
 y.max <- max(aggregate(salmNewport,by="unit")@observed,na.rm=TRUE)
 plotOpts2 <- modifyList(plotOpts,list(x=salmNewport,legend.opts=NULL,ylim=c(0,y.max),type = observed ~ time),keep.null=TRUE)
 plotOpts2$par.list <- list(mar=c(6,5,0,5),family="Times")
 plotOpts2$xaxis.tickFreq <- list("%m"=atChange,"%G"=atChange)
 do.call("plot",plotOpts2)
-@
- \setkeys{Gin}{height=7cm, width=15cm}
-\begin{figure}
-\begin{center}
-<<label=NewportPlot,fig=TRUE, width=10, height=4.66667, echo=FALSE>>=
-<<NewportPlot>>
 @
 \end{center}
 \vspace{-1cm}
@@ -237,24 +233,23 @@ is a panelled graph with each panel representing the time series of counts of a 
 %\hspace*{\fill}%
 \hspace{-1em}
 \subfloat[]{
-<<unitPlot1, fig=TRUE, echo = FALSE, label=unitPlot1,include = F,results=hide, width=6, height=4.6667>>=
+
+<<unitPlot1, fig=TRUE, echo = FALSE, results=hide, width=6, height=4.6667>>=
 y.max <- max(observed(salmNewport[,2]),observed(salmNewport[,3]),na.rm=TRUE)
 plotOpts2 <- modifyList(plotOpts,list(x=salmNewport[,2],legend.opts=NULL,ylim=c(0,y.max)),keep.null=TRUE)
 plotOpts2$xaxis.tickFreq <- list("%G"=atChange)
 do.call("plot",plotOpts2)
-
 @
 
-\includegraphics[width=9cm]{plots/monitoringCounts-unitPlot1.pdf}
 }\hspace{-3em}%
 \subfloat[]{
-<<unitPlot2, fig=TRUE, echo = FALSE, label=unitPlot2,include = F,results=hide, width=6, height=4.6667>>=
-# Plot with special function
+
+<<unitPlot2, fig=TRUE, echo = FALSE, results=hide, width=6, height=4.6667>>=
 plotOpts2 <- modifyList(plotOpts,list(x=salmNewport[,3],legend.opts=NULL,ylim=c(0,y.max)),keep.null=TRUE)
 plotOpts2$xaxis.tickFreq <- list("%G"=atChange)
 do.call("plot",plotOpts2)
 @
-\includegraphics[width=9cm]{plots/monitoringCounts-unitPlot2.pdf}
+
 }
 %\hspace*{\fill}%
 \caption{Weekly count of S. Newport in the German federal states (a) Bavaria and (b) Berlin.}
@@ -319,7 +314,7 @@ control <- list(range = in2011, method = "C1", alpha = 0.05)
 surv <- earsC(salmNewportGermany, control = control)
 plot(surv)
 @
-<<EARSPlot, fig=FALSE, echo = FALSE, label=EARSPlot,include = F,results=hide>>=
+<<EARSPlot, echo = FALSE, eval = FALSE>>=
 # Range for the monitoring
 in2011 <- which(isoWeekYear(epoch(salmNewport))$ISOYear==2011)
 # Aggregate counts over Germany
@@ -338,7 +333,7 @@ do.call("plot",modifyList(plotOpts,list(x=surv,ylim=c(0,y.max)),keep.null=TRUE))
 \begin{figure}
 \begin{center}
 
-<<label=EARSPlot,fig=TRUE, width=10, height=4.666667, echo=FALSE>>=
+<<EARSPlot,fig=TRUE, width=10, height=4.666667, echo=FALSE>>=
 <<EARSPlot>>
 @
 \end{center}
@@ -538,21 +533,20 @@ salm.noufaily <- farringtonFlexible(salmNewportGermany, control2)
 \hspace{-1em}
 %\begin{center}
 \subfloat[]{
-<<farPlot1, fig=TRUE, echo = FALSE, label=farPlot1,include = F,results=hide, width=6, height=4.6667>>=
-# Plot
+
+<<farPlot1, fig=TRUE, echo = FALSE, results=hide, width=6, height=4.6667>>=
 y.max <- max(observed(salm.farrington),upperbound(salm.farrington),observed(salm.noufaily),upperbound(salm.noufaily),na.rm=TRUE)
 do.call("plot",modifyList(plotOpts,list(x=salm.farrington,ylim=c(0,y.max))))
 @
 
-\includegraphics[width=9cm]{plots/monitoringCounts-farPlot1.pdf}
 }
 \hspace{-3em}
 \subfloat[]{
-<<farPlot2, fig=TRUE, echo = FALSE, label=farPlot2,include = F,results=hide, width=6, height=4.6667>>=
-# Plot
+
+<<farPlot2, fig=TRUE, echo = FALSE, results=hide, width=6, height=4.6667>>=
 do.call("plot",modifyList(plotOpts,list(x=salm.noufaily,ylim=c(0,y.max))))
 @
-\includegraphics[width=9cm]{plots/monitoringCounts-farPlot2.pdf}
+
 }
 \caption{S. Newport in Germany in 2011 monitored by (a) the original method and (b) the improved method.
 For the figure we turned off the option that the threshold is only computed if there were more than 5 cases during the 4 last timepoints including $t_0$.
@@ -602,7 +596,7 @@ As an example,
 \citet{Manitz2013} studied the influence of absolute
 humidity on the occurrence of weekly reported campylobacter cases in Germany.
 
-<<campyDE, fig=FALSE, echo = FALSE, label=campyDE,include = F,results=tex>>=
+<<campyDE, echo = FALSE, eval = FALSE>>=
 # Load data and create \code{sts}-object
 data("campyDE")
 cam.sts <- sts(epoch=as.numeric(campyDE$date), epochAsDate=TRUE,
@@ -631,7 +625,7 @@ axis(side=4, at=seq(0,2500,by=500),labels=seq(0,50,by=10),las=1,cex.lab=cex.text
 \begin{figure}
 \begin{center}
 
-<<label=campyDE,fig=TRUE, width=10, height=4.6667, echo=FALSE>>=
+<<campyDE,fig=TRUE, width=10, height=4.6667, echo=FALSE>>=
 <<campyDE>>
 
 @
@@ -756,19 +750,14 @@ similar to the original procedure, but the improved reweighting and trend
 inclusion produces fewer alarms.
 
 The \code{boda} method is to be seen as a step towards more Bayesian thinking in aberration detection. However, besides its time demands for a detailed modeling, the speed of the procedure is also prohibitive as regards routine application. As a response~\citet{Maelle} introduce a method which has two advantages: it allows to adjust outbreak detection for reporting delays and includes an approximate inference method much faster than the INLA inference method. However, its linear predictor is more in the style of~\citet{Noufaily2012} not allowing for additional covariates or penalized options for the intercept.
-<<bPlot, fig=FALSE, echo = FALSE, label=bPlot,include = F,results=hide>>=
-# Plot with special function
+ \setkeys{Gin}{height=7cm, width=15cm}
+\begin{figure}
+\begin{center}
+<<bPlot,fig=TRUE, width=10, height=4.6667, echo=FALSE>>=
 y.max <- max(observed(boda.covars),upperbound(boda.covars),na.rm=TRUE)
 plotOpts2 <- modifyList(plotOpts,list(x=boda.covars,ylim=c(0,y.max)),keep.null=TRUE)
 plotOpts2$xaxis.tickFreq <- list("%m"=atChange,"%G"=atChange)
 do.call("plot",plotOpts2)
-@
- \setkeys{Gin}{height=7cm, width=15cm}
-\begin{figure}
-\begin{center}
-
-<<label=bPlot,fig=TRUE, width=10, height=4.6667, echo=FALSE>>=
-<<bPlot>>
 @
 \end{center}
 \vspace{-1cm}
@@ -804,7 +793,7 @@ combineSTS <- function(stsList) {
 }
 @
 
-<<alarmplot, fig=FALSE, echo = FALSE, label=alarmplot,include = F,results=tex,width=8,height=3.5>>=
+<<alarmplot, echo = FALSE, eval = FALSE>>=
 # Make an artifical object containing two columns - one with the boda output
 # and one with the farrington output
 
@@ -821,7 +810,7 @@ plot(cam.surv,type = alarm ~ time,lvl=rep(1,ncol(cam.surv)),
 \begin{figure}
 \begin{center}
 
-<<label=alarmplot,fig=TRUE, width=8, height=3.5, echo=FALSE>>=
+<<alarmplot,fig=TRUE, width=8, height=3.5, echo=FALSE>>=
 <<alarmplot>>
 
 @
@@ -884,43 +873,24 @@ seasonality and a trend. This model will be refitted after each alarm, but first
 and the data from 2011 as data to be monitored or \code{phase2}. The threshold \texttt{c.ARL} was chosen to be 4 as we found with the same approach as \citet{hoehle-mazick-2010} that it made the probability of a false alarm within one year
 smaller than 0.1. Figure~\ref{fig:glrnb}~shows the results of this monitoring.
 
-
-<<glrnblongVersion, echo = T, eval =F, include = F>>=
+<<glrnb>>=
 phase1 <- which(isoWeekYear(epoch(salmNewportGermany))$ISOYear < 2011)
 phase2 <- in2011
-control = list(range = phase2, c.ARL = 4, theta = log(2), ret = "cases",
-               mu0 = list(S = 1, trend = TRUE, refit = FALSE))
+control <- list(range = phase2, c.ARL = 4, theta = log(2), ret = "cases",
+                mu0 = list(S = 1, trend = TRUE, refit = FALSE))
 salmGlrnb <- glrnb(salmNewportGermany, control = control)
 @
-<<glrnb, echo = F, include = F, results = hide>>=
-# Define phase1 (reference values) and phase2 (monitoring)
-phase1 <- which(isoWeekYear(epoch(salmNewportGermany))$ISOYear<2011)
-phase2 <- in2011
-# Choose the options for monitoring
-control=list(range=phase2,mu0=list(
-                                S=1,
-								trend=TRUE,
-								refit=FALSE),c.ARL = 4,
-             theta=log(2),ret="cases")
-# Perform monitoring with glrnb
-salmGlrnb <- glrnb(salmNewportGermany,control=control)
-@
-<<glrnbPlot, fig=FALSE, echo = FALSE, label=glrnbPlot,include = F,results=hide>>=
-# Plot
-y.max <- max(observed(salmGlrnb),upperbound(salmGlrnb),na.rm=TRUE)
-do.call("plot",modifyList(plotOpts,list(x=salmGlrnb,ylim=c(0,y.max))))
-@
+
  \setkeys{Gin}{height=7cm, width=15cm}
 \begin{figure}
 \begin{center}
-
-<<label=glrnbPlot,fig=TRUE, width=10, height=4.6667, echo=FALSE>>=
-<<glrnbPlot>>
-
+<<glrnbPlot,fig=TRUE, width=10, height=4.6667, echo=FALSE>>=
+y.max <- max(observed(salmGlrnb),upperbound(salmGlrnb),na.rm=TRUE)
+do.call("plot",modifyList(plotOpts,list(x=salmGlrnb,ylim=c(0,y.max))))
 @
 \end{center}
 \vspace{-1cm}
-\caption{S. Newport in Germany in 2011 monitored by the \code{glrnb} function. }
+\caption{S. Newport in Germany in 2011 monitored by the \texttt{glrnb} function.}
 \label{fig:glrnb}
 \end{figure}
 
@@ -1110,7 +1080,7 @@ The one in 2014 corresponds to the usual peak of the beginning of the year, whic
 weekdays of the holidays were particularly worker-friendly so that sick notes were even less needed.
 
 
-<<catPlot1, fig=FALSE, echo = FALSE, label=catPlot1,include = F,results=hide>>=
+<<catPlot1, echo = FALSE, eval = FALSE>>=
 y.max <- max(observed(salmHospitalized)/population(salmHospitalized),upperbound(salmHospitalized)/population(salmHospitalized),na.rm=TRUE)
 plotOpts2 <- modifyList(plotOpts,list(x=salmHospitalized,legend.opts=NULL,ylab="",ylim=c(0,y.max)),keep.null=TRUE)
 plotOpts2$xaxis.tickFreq <- list("%G"=atChange,"%m"=atChange)
@@ -1130,7 +1100,7 @@ text(520, 0.6, "Total number of \n reported cases", pos = 3, xpd = T,cex=cex.tex
 \begin{figure}
 \begin{center}
 
-<<label=catPlot1,fig=TRUE, width=10, height=4.6667, echo=FALSE>>=
+<<catPlot1,fig=TRUE, width=10, height=4.6667, echo=FALSE>>=
 <<catPlot1>>
 
 @
@@ -1139,10 +1109,6 @@ text(520, 0.6, "Total number of \n reported cases", pos = 3, xpd = T,cex=cex.tex
 \caption{Weekly proportion of Salmonella cases that were hospitalized in Germany 2004-2014. In addition the corresponding number of reported cases is shown as a light curve.}
 \label{fig:cat1}
 \end{figure}
-<<catPlot, fig=FALSE, echo = FALSE, label=catPlot,include = F,results=hide>>=
-
-@
-
 
 
 The value for the threshold \code{h} can be determined following the procedures presented in \citet{hoehle-mazick-2010} for count data, and as in the code exhibited below. Two methods can be used for
@@ -1243,22 +1209,18 @@ load("monitoringCounts-cache/pMarkovChain.RData")
 \hspace{-1em}
 \subfloat[]{
 
-<<catF, fig=TRUE, echo = FALSE, label=catF,include = F,results=hide, width=6, height=4.6667>>=
+<<catF, fig=TRUE, echo = FALSE, results=hide, width=6, height=4.6667>>=
 y.max <- max(observed(salmHospitalizedCat[,1])/population(salmHospitalizedCat[,1]),upperbound(salmHospitalizedCat[,1])/population(salmHospitalizedCat[,1]),na.rm=TRUE)
 plotOpts3 <- modifyList(plotOpts,list(x=salmHospitalizedCat[,1],ylab="Proportion",ylim=c(0,y.max)))
 plotOpts3$legend.opts <- list(x="top",bty="n",legend=c(expression(U[t])),lty=1,lwd=line.lwd,col=alarm.symbol$col,horiz=TRUE,cex=cex.leg)
 do.call("plot",plotOpts3)
-
-
 @
 
-
-
-\includegraphics[width=9cm]{plots/monitoringCounts-catF.pdf}
 }
 \hspace{-3em}
 \subfloat[]{
-<<catARL, fig=TRUE, echo = FALSE, label=catARL,include = F,results=hide, width=6, height=4.6667>>=
+
+<<catARL, fig=TRUE, echo = FALSE, results=hide, width=6, height=4.6667>>=
 par(mar=c(6,5,5,5),family="Times")
 matplot(h.grid, cbind(pMC,pMarkovChain),type="l",ylab=expression(P(T[A] <= 56 * "|" * tau * "=" * infinity)),xlab="Threshold h",col=1,cex=cex.text,
 cex.axis =cex.text,cex.lab=cex.text)
@@ -1267,11 +1229,10 @@ lines(range(h.grid),rep(prob,2),lty=5,lwd=2)
 axis(2,at=prob,las=1,cex.axis=0.7,labels=FALSE)
 par(family="Times")
 legend(4,0.08,c("Monte Carlo","Markov chain"), lty=1:2,col=1,cex=cex.text,bty="n")
-
 @
-\includegraphics[width=9cm]{plots/monitoringCounts-catARL.pdf}
+
 }
-\caption{(a) Results of the monitoring with categoricalCUSUM of the proportion of Salmonella cases that were hospitalized in Germany in Jan 2013 - Jan 2014. (b)
+\caption{(a) Results of the monitoring with categorical CUSUM of the proportion of Salmonella cases that were hospitalized in Germany in Jan 2013 - Jan 2014. (b)
 Probability of a false alarm within the 56 timepoints of the monitoring as a function of the threshold $h$.}
 \label{fig:catDouble}
 
@@ -1522,7 +1483,7 @@ matlines(alpha1/rowSums(alpha1),type="l",lwd=1,lty=2)
 \hspace{-1em}
 \subfloat[]{
 
-<<ctPlot1, fig=TRUE, echo = FALSE, label=ctPlot1,include = F,results=hide, width=6, height=4.6667>>=
+<<ctPlot1, fig=TRUE, echo = FALSE, results=hide, width=6, height=4.6667>>=
 surv@observed[,1] <- 0
 surv@multinomialTS <- FALSE
 surv.dm@observed[,1] <- 0
@@ -1537,13 +1498,11 @@ mtext(side=1,text="Time (weeks)",
       las=0,line=3, cex=cex.text)
 @
 
-
-
-\includegraphics[width=9cm]{plots/monitoringCounts-ctPlot1.pdf}
 }
 \hspace{-3em}
 \subfloat[]{
-<<ctPlot2, fig=TRUE, echo = FALSE, label=ctPlot2,include = F,results=hide, width=6, height=4.6667>>=
+
+<<ctPlot2, fig=TRUE, echo = FALSE, results=hide, width=6, height=4.6667>>=
 plotOpts3 <- modifyList(plotOpts,list(x=surv.dm[,1],ylim=c(0,y.max),ylab=expression(C[t]),xlab=""))
 plotOpts3$legend.opts <- list(x="topleft",bty="n",legend="R",lty=1,lwd=line.lwd,col=alarm.symbol$col,horiz=TRUE,cex=cex.text)
 y.max <- max(observed(surv.dm[,1]),upperbound(surv.dm[,1]),observed(surv[,1]),upperbound(surv[,1]),na.rm=TRUE)
@@ -1553,7 +1512,7 @@ par(family="Times")
 mtext(side=1,text="Time (weeks)",
       las=0,line=3, cex=cex.text)
 @
-\includegraphics[width=9cm]{plots/monitoringCounts-ctPlot2.pdf}
+
 }
 \caption{Categorical CUSUM statistic $C_t$. Once $C_t>\Sexpr{h}$ an alarm is sounded and the statistic is reset. In (a) surveillance uses the multinomial distribution and in (b) surveillance uses the Dirichlet-multinomial distribution.}
 \label{fig:ct}
