@@ -1,4 +1,63 @@
-library(surveillance)
+# 'correct53to52' sums up and cuts a value from a splited last and first week of a year
+#
+# Parameter:
+#       disProgObj - object of class disProgObj (including the observed and the state chain)
+#       firstweek: the number of the first week in a year, default = 1
+# ouput:
+#       the new disProgObj (corrected to 52 weeks instead of 53 weeks a year)
+
+correct53to52 <- function(disProgObj, firstweek = 1){
+
+        if(firstweek > length(disProgObj$observed)){
+                stop("firstweek doesn't exist")
+        }
+
+        observed <- disProgObj$observed
+        state <- disProgObj$state
+
+        if(length(state) != length(observed)){
+                stop("state and observed don't have the same length")
+        }
+
+        # do not cut, if observed is too short
+        length = length(observed[firstweek:length(observed)])
+
+        if(length > 53){
+
+                lastyear <- floor((length-1)/53)
+                # sum case numbers of double weeks up
+                for(i in 1:lastyear){
+                        # last week of year i (-i+1 because the array now is shorter)
+                        last <- firstweek + i * 52
+                        # first week in year i+1
+                        firstnew <- last + 1
+                        observed[firstnew]  <- observed[last]  + observed[firstnew]
+                        # delete double weeks
+                        observed <- observed[-c(last)]
+
+                        # with state
+                        state[firstnew]  <- state[last]  + state[firstnew]
+                        # delete double weeks
+                        state <- state[-c(last)]
+                }
+        }
+
+        # correct also the first week, if it doesn't is the beginning
+        if(firstweek > 1){
+                observed[firstweek] <- observed[firstweek] + observed[firstweek-1]
+                observed <- observed[-c(firstweek-1)]
+                state[firstweek] <- state[firstweek] + state[firstweek-1]
+                state <- state[-c(firstweek-1)]
+        }
+
+        # correct all 2 to 1
+        state[state==2] <- 1
+
+        disProgObj$observed <- observed
+        disProgObj$state <- state
+
+        return(disProgObj)
+}
 
 # 'readData' reads the data of a specified disease of several years
 #            and generates a state chain using the bulletin knowledge
@@ -41,7 +100,7 @@ readData <- function(abb,week53to52=TRUE,sysPath=FALSE){
 }
 
 
-outbrks <- c("m1", "m2", "m3", "m4", "m5", "q1_nrwh", "q2", 
+outbrks <- c("m1", "m2", "m3", "m4", "m5", "q1_nrwh", "q2",
               "s1", "s2", "s3", "k1", "n1", "n2", "h1_nrwrp")
 
 #Convert all RKI data to 52 week objects
@@ -56,6 +115,7 @@ sapply(outbrks,convert)
 
 # --
 
+library("surveillance")
 
 #Ordinary function but now with matrix args
 correct53to52 <- function(disProgObj, firstweek = 1){
@@ -67,7 +127,7 @@ correct53to52 <- function(disProgObj, firstweek = 1){
         observed <- disProgObj$observed
         state <- disProgObj$state
         week <- disProgObj$week
-        
+
         if(dim(state)[1] != dim(observed)[1]){
                 stop("state and observed don't have the same length")
         }
@@ -96,7 +156,7 @@ correct53to52 <- function(disProgObj, firstweek = 1){
                 }
         }
 
-        
+
         # correct all 2 to 1
         state[state==2] <- 1
 
@@ -114,17 +174,12 @@ state[291:294,] <- 1
 hepa <- create.disProg(week=hepMale[,1],observed=hepMale[,-c(1,2,3)],state=state)
 hepa <- correct53to52(hepa)
 
-ha.berlin <- hepa
-ha <- hepa#aggregate(hepa)
+ha <- hepa
 save(list=c("ha"),file="../data/ha.RData")
-save(list=c("ha.berlin"),file="../data/hepa.berlin.RData")
 
-#
-data(ha)
-ha.berlin <- aggregate(ha)
-save(list=c("ha.berlin"),file="../data/ha.berlin.RData")
-
-#load(file="../data/hepa.RData")
+## data(ha, package = "surveillance")
+## ha.berlin <- aggregate(ha)
+## save(list=c("ha.berlin"),file="../data/ha.berlin.RData")
 
 
 ##The salmonella hadar cases

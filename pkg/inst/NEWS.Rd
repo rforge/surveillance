@@ -71,7 +71,7 @@
     defunct: \code{compMatrix.writeTable()},
     \code{makePlot()}, \code{test()}, \code{testSim()},
     \code{readData()} (the raw txt files have been removed as well),
-    \code{toFileDisProg()}.
+    \code{correct53to52()}, \code{toFileDisProg()}.
   }
 }
 

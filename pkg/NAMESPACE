@@ -240,7 +240,7 @@ S3method(aggregate, disProg)
 
 export(sim.pointSource, sim.seasonalNoise)
 export(LRCUSUM.runlength, arlCusum, find.kh, findH, hValues, findK)
-export(correct53to52, enlargeData)
+export(enlargeData)
 export(estimateGLRNbHook)
 export(algo.compare, algo.quality, algo.summary)
 
