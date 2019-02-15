@@ -1227,7 +1227,7 @@ Hence, our interest is in prospectively detecting a possible age-shift. Since th
 the monitoring at that time point. We do so by fitting a multinomial logit-model containing a trend as well as one harmonic wave and use the age group 0--4 years as reference category,
 to the data from the years 2002-2008. Different \proglang{R} packages implement such type of modeling, but we shall use the \pkg{MGLM} package~\citep{MGLM}, because it also offers the fitting of extended multinomial regression models allowing for extra dispersion.
 
-<<echo=TRUE,eval=FALSE>>=
+<<>>=
 rotaBB.df <- as.data.frame(rotaBB)
 
 X <- with(rotaBB.df, cbind(intercept = 1, epoch,
@@ -1237,33 +1237,14 @@ X <- with(rotaBB.df, cbind(intercept = 1, epoch,
 phase1 <- epoch(rotaBB) < as.Date("2009-01-01")
 phase2 <- !phase1
 
-order <- c(2:5, 1); reorder <- c(5, 1:4)
-
 library("MGLM")
+## MGLMreg automatically takes the last class as ref so we reorder
+order <- c(2:5, 1); reorder <- c(5, 1:4)
 m0 <- MGLMreg(as.matrix(rotaBB.df[phase1, order]) ~ -1 + X[phase1, ],
               dist = "MN")
 @
-<<echo=FALSE>>=
-# Convert sts object to data.frame useful for regression modelling
-rotaBB.df <- as.data.frame(rotaBB)
-
-# Create matrix
-X <- with(rotaBB.df,cbind(intercept=1,epoch,
-          sin1=sin(2*pi*epochInPeriod),cos1=cos(2*pi*epochInPeriod)))
-
-# Fit model to 2002-2009 data
-phase1 <- epoch(rotaBB) < as.Date("2009-01-01")
-phase2 <- !phase1
-
-# MGLMreg automatically takes the last class as ref so we reorder
-order <- c(2:5, 1); reorder <- c(5, 1:4)
-
-# Fit multinomial logit model (i.e. dist="MN") to phase1 data
-library("MGLM")
-m0 <- MGLMreg(as.matrix(rotaBB.df[phase1,order])~ -1 + X[phase1,], dist="MN")
-@
 <<>>=
-# Set threshold and option object
+## Set threshold
 h <- 2
 @
 As described in \citet{hoehle2010} we can try to detect a specific shift in the intercept coefficients of the model. For example, a multiplicative shift of factor 7 in the example below, in the odds of each of the four age categories against the reference category is modelled by changing the intercept value of each category.
