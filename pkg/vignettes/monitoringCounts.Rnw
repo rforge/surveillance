@@ -220,7 +220,7 @@ do.call("plot",plotOpts2)
 \subsubsection[Basic manipulation of objects of the class sts]{Basic manipulation of objects of the class \texttt{sts}}
 This time series above is represented as a multivariate \code{sts} object whose dimensions correspond
 to the 16 German federal states. Values are weekly counts so \code{freq = 52}.
- Weeks are here handled as \code{Date} objects by setting \code{epochAsDate} to \code{TRUE}. One can thus for instance get the weekday of the date by calling \code{weekdays(salmNewport)}. Furthermore, one can use the function \code{format} (and the package specific platform independent version \code{dateFormat}) to obtain \code{strftime} compatible formatting of the epochs. Another advantage of using \code{Date} objects is that the plot functions have been re-written for better management of ticks and labelling of the x-axis based on \code{strftime} compatible conversion specifications.
+ Weeks are here handled as \code{Date} objects by setting \code{epochAsDate} to \code{TRUE}. One can thus for instance get the weekday of the date by calling \code{weekdays(epoch(salmNewport))}. Furthermore, one can use the function \code{format} (and the package specific platform independent version \code{dateFormat}) to obtain \code{strftime} compatible formatting of the epochs. Another advantage of using \code{Date} objects is that the plot functions have been re-written for better management of ticks and labelling of the x-axis based on \code{strftime} compatible conversion specifications.
 For example, to get ticks at all weeks corresponding to the first week in a month as well as all weeks corresponding to the first in a year while placing labels consisting of the year at the median index per year:
 
 <<eval=FALSE,echo=TRUE>>=
