@@ -1462,8 +1462,7 @@ Suppose you have a database with surveillance time series but little resources t
  Below is an example of a short code segment showing the analysis of the \textit{S. Newport} weekly counts of cases in the German federal states Baden-W\"{u}rttemberg and North Rhine-Westphalia
 with the improved method implemented in \code{farringtonFlexible}. The package provides a \code{toLatex} method for \code{sts} objects that produces a table with the observed number of counts and upperbound for each column in
 \code{observed}, where alarms can be highlighted by for instance bold text. The resulting table is shown in Table~\ref{tableResults}.
-<<NICELOOKING,eval=FALSE,echo=TRUE>>=
-data("salmNewport")
+<<>>=
 today <- which(epoch(salmNewport) == as.Date("2013-12-23"))
 rangeAnalysis <- (today - 4):today
 in2013 <- which(isoWeekYear(epoch(salmNewport))$ISOYear == 2013)
@@ -1477,8 +1476,10 @@ algoParameters <- list(range = rangeAnalysis, noPeriods = 10,
 
 results <- farringtonFlexible(salmNewport[, c("Baden.Wuerttemberg",
                                              "North.Rhine.Westphalia")],
-                  control = algoParameters)
+                              control = algoParameters)
+@
 
+<<results = tex>>=
 start <- isoWeekYear(epoch(salmNewport)[min(rangeAnalysis)])
 end <- isoWeekYear(epoch(salmNewport)[max(rangeAnalysis)])
 caption <- paste0("Results of the analysis of reported S. Newport ",
@@ -1486,41 +1487,9 @@ caption <- paste0("Results of the analysis of reported S. Newport ",
                   start$ISOYear, "-W", start$ISOWeek, " to ",
                   end$ISOYear, "-W", end$ISOWeek,
                   ". Bold red counts indicate weeks with alarms.")
-toLatex(results, caption = caption)
-@
-<<testLabel, echo = FALSE, results = tex>>=
-# In this example the sts-object already exists.
-# Supply the code with the date of a Monday and look for the
-# corresponding index in the sts-object
-today <- which(epoch(salmNewport)==as.Date("2013-12-23"))
-# The analysis will be performed for the given week
-# and the 4 previous ones
-rangeAnalysis <- (today-4):today
-in2013 <- which(isoWeekYear(epoch(salmNewport))$ISOYear==2013)
-# Control argument for using the improved method
-control2 <- list(range=rangeAnalysis,noPeriods=10,populationBool=FALSE,
-                 b=4,w=3,weightsThreshold=2.58,pastWeeksNotIncluded=26,
-                 pThresholdTrend=1,thresholdMethod="nbPlugin",alpha=0.05,
-                 limit54=c(0,50))
-# Run farringtonFlexible
-results <- farringtonFlexible(salmNewport[,c("Baden.Wuerttemberg",
-                                             "North.Rhine.Westphalia")],
-                  control=control2)
-# Export the results as a tex table
-start <- isoWeekYear(epoch(salmNewport)[min(rangeAnalysis)])
-end <- isoWeekYear(epoch(salmNewport)[max(rangeAnalysis)])
-caption <- paste0("Results of the analysis of reported S. Newport ",
-                  "counts in two German federal states for the weeks ",
-                  start$ISOYear, "-W", start$ISOWeek, " to ",
-                  end$ISOYear, "-W", end$ISOWeek, #" performed on ", Sys.Date(),
-                  ". Bold red counts indicate weeks with alarms.")
-toLatex(results, table.placement="h", size = "normalsize",
-        sanitize.text.function = identity,
-        NA.string = "-",include.rownames=FALSE,
-		columnLabels = c("Year","Week","Baden-Wuerttemberg","Threshold","North-Rhine-Westphalen","Threshold"),
-		alarmPrefix = "\\textbf{\\textcolor{red}{",
-        alarmSuffix = "}}",
-        caption=caption,label="tableResults")
+toLatex(results, caption = caption, label = "tableResults",
+        ubColumnLabel = "Threshold", include.rownames = FALSE,
+        sanitize.text.function = identity)
 @
 
 The advantage of this approach is that it can be made automatic. The downside of such a system is that the report is not interactive, for instance one cannot click on the cases and get the linelist. Nevertheless, this is a workable solution in
