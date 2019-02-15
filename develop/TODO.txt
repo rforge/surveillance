@@ -12,9 +12,10 @@
 #======================================================================
 
 #Open
-14/05/2018 remove deprecated functions
+
 
 #Done
+15/02/2019 remove deprecated functions
 12/02/2019 format.Date(x, "%V") and "%G" work on Windows since R 3.1.0,
            so the isoWeekYear() helper function is no longer necessary
 21/04/2011 incorporate a NAMESPACE :) (as of R 2.14.0 this is obligatory)
