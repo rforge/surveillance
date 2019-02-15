@@ -1181,20 +1181,13 @@ than GLM we could also aim at detecting a change in the time trend included in t
 
 \subsubsection{Categorical CUSUM for multinomial models}
 
-<<eval=TRUE,echo=FALSE>>=
-
-# data("rotaBB")
-data("rotaBB")
-
-@
 In order to illustrate the use of \code{categoricalCUSUM} for more than two classes we analyse the monthly number of rotavirus cases in the federal state Brandenburg during 2002-2013 and which are stratified into the five age-groups 00-04, 05-09, 10-14, 15-69, 70+ years. In 2006 two rotavirus vaccines were introduced, which
 are administered in children at the age of 4--6 months. Since then,
 coverage of these vaccination has steadily increased and interest is to detect possible age-shifts in the distribution of cases.
 
-<<ROTAPLOT,eval=FALSE,echo=TRUE>>=
+<<ROTAPLOT,fig=FALSE>>=
 data("rotaBB")
-plot(rotaBB, xlab = "Time (months)",
-     ylab = "Proportion of reported cases")
+plot(rotaBB)
 @
 
  \setkeys{Gin}{height=7cm, width=15cm}
