@@ -147,12 +147,12 @@ To exemplify the process we shall use weekly counts of \textit{Salmonella Newpor
 <<echo=FALSE>>=
 data("salmNewport")
 @
-<<echo=TRUE,eval=FALSE>>=
+<<test-sts2ts2sts, echo=TRUE, eval=FALSE>>=
 all.equal(observed(salmNewport),observed(as(as(salmNewport,"ts"),"sts")))
 @
 <<echo=FALSE>>=
 stopifnot(
-all.equal(observed(salmNewport),observed(as(as(salmNewport,"ts"),"sts")))
+<<test-sts2ts2sts>>
 )
 @
 
