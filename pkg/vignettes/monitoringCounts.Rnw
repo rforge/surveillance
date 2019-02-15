@@ -307,34 +307,19 @@ and with the slots \code{upperbound} and \code{alarm} filled by the output of th
 Information relative to the \code{range} of data to be monitored
 and to the parameters of the algorithm, such as \code{alpha} for \code{earsC}, has to be formulated in the slot \code{control}.
 This information is also stored in the slot \code{control} of the returned \code{sts} object for later inspection.
-<<EARS, echo = T,include = F,numeric.dollar=F,results=hide>>=
+<<EARS, fig = FALSE>>=
 in2011 <- which(isoWeekYear(epoch(salmNewport))$ISOYear == 2011)
 salmNewportGermany <- aggregate(salmNewport, by = "unit")
 control <- list(range = in2011, method = "C1", alpha = 0.05)
 surv <- earsC(salmNewportGermany, control = control)
 plot(surv)
 @
-<<EARSPlot, echo = FALSE, eval = FALSE>>=
-# Range for the monitoring
-in2011 <- which(isoWeekYear(epoch(salmNewport))$ISOYear==2011)
-# Aggregate counts over Germany
-salmNewportGermany <- aggregate(salmNewport,by="unit")
-# Choose parameters
-control <- list(range = in2011, method="C1", alpha=0.05)
-# Apply earsC function
-surv <- earsC(salmNewportGermany, control=control)
-# Plot the results
-#plot(surv)
-# Plot
-y.max <- max(observed(surv),upperbound(surv),na.rm=TRUE)
-do.call("plot",modifyList(plotOpts,list(x=surv,ylim=c(0,y.max)),keep.null=TRUE))
-@
  \setkeys{Gin}{height=7cm, width=15cm}
 \begin{figure}
 \begin{center}
-
 <<EARSPlot,fig=TRUE, width=10, height=4.666667, echo=FALSE>>=
-<<EARSPlot>>
+y.max <- max(observed(surv),upperbound(surv),na.rm=TRUE)
+do.call("plot",modifyList(plotOpts,list(x=surv,ylim=c(0,y.max)),keep.null=TRUE))
 @
 \end{center}
 \vspace{-1cm}
