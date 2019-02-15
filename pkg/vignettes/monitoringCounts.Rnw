@@ -1302,10 +1302,9 @@ The resulting CUSUM statistic $C_t$ as a function of time is shown in Figure~\re
 As the above example shows, the LR based categorical CUSUM is rather flexible in handling any type of multivariate GLM modeling to specify the \textit{in-control} and \textit{out-of-control} proportions. However, it requires a direction of the change to be specified -- for which detection is optimal. One sensitive part of such monitoring is the fit of the multinomial distribution to a multivariate time series of proportions, which usually exhibit extra dispersion when compared to the multinomial. For example comparing the AIC between the multinomial logit-model and a Dirichlet-multinomial model with $\alpha_{ti} = \exp(\bm{x}_t^\top\bm{\beta})$~\citep{MGLM} shows that overdispersion is present.
 The Dirichlet distribution is the multicategorical equivalent of the beta-binomial distribution. We exemplify its use in the code below.
 
-<<echo=TRUE,results=verbatim>>=
+<<>>=
 m0.dm <- MGLMreg(as.matrix(rotaBB.df[phase1, 1:5]) ~ -1 + X[phase1, ],
                 dist = "DM")
-
 c(m0@AIC, m0.dm@AIC)
 @
 Hence, the above estimated false alarm probability might be too low for the actual monitoring problem, because the variation in the time series is larger than implied by the multinomial. Hence, it appears prudent to repeat the analysis using the more flexible  Dirichlet-multinomial model. This is straightforward with \code{categoricalCUSUM} once the \textit{out-of-control} proportions are specified in terms of the model. Such a specification is, however, hampered by the fact that the two models use different parametrizations.
@@ -1313,19 +1312,19 @@ Hence, the above estimated false alarm probability might be too low for the actu
 For performing monitoring in this new setting we first need to calculate the $\alpha$'s of the multinomial-Dirichlet for the \textit{in-control} and \textit{out-of-control}
 distributions.
 
-
-<<echo=TRUE,eval=FALSE>>=
+<<>>=
+## Change intercept in the first class (for DM all 5 classes are modeled)
 delta <- 2
 m1.dm <- m0.dm
-m1.dm$coefficients[1, ] <- m0.dm$coefficients[1, ] +
+m1.dm@coefficients[1, ] <- m0.dm@coefficients[1, ] +
                            c(-delta, rep(delta/4, 4))
 
-alpha0 <- exp(X[phase2,] %*% m0.dm$coefficients)
-alpha1 <- exp(X[phase2,] %*% m1.dm$coefficients)
+alpha0 <- exp(X[phase2,] %*% m0.dm@coefficients)
+alpha1 <- exp(X[phase2,] %*% m1.dm@coefficients)
 
 dfun <- function(y, size, mu, log = FALSE) {
-	dLog <- ddirmn(t(y), t(mu))
-	if (log) { return(dLog) } else { return(exp(dLog)) }
+  dLog <- ddirmn(t(y), t(mu))
+  if (log) dLog else exp(dLog)
 }
 
 h <- 2
@@ -1334,30 +1333,8 @@ control <- list(range = seq(nrow(rotaBB))[phase2], h = h,
                 ret = "value", dfun = dfun)
 surv.dm <- categoricalCUSUM(rotaBB, control = control)
 @
-<<echo=FALSE>>=
-# Change intercept in the first class (for DM all 5 classes are modeled)
-delta <- 2
-m1.dm <- m0.dm
-m1.dm@coefficients[1,] <- m0.dm@coefficients[1,] +
-                           c(-delta,rep(delta/4,4))
-# Calculate the alphas of the multinomial-Dirichlet in the two cases
-alpha0 <- exp(X[phase2,] %*% m0.dm@coefficients)
-alpha1 <- exp(X[phase2,] %*% m1.dm@coefficients)
 
-# Use alpha vector as mu magnitude
-# (not possible to compute it from mu and size)
-dfun <- function(y, size, mu, log=FALSE) {
-	dLog <- ddirmn(t(y), t(mu))
-	if (log) { return(dLog) } else {return(exp(dLog))}
-}
-
-# Threshold
-h <- 2
-control <- list(range=seq(nrow(rotaBB))[phase2],h=h,pi0=t(alpha0),
-                pi1=t(alpha1), ret="value",dfun=dfun)
-surv.dm <- categoricalCUSUM(rotaBB,control=control)
-@
-<<eval=FALSE>>=
+<<echo=FALSE,eval=FALSE>>=
 matplot(alpha0/rowSums(alpha0),type="l",lwd=3,lty=1,ylim=c(0,1))
 matlines(alpha1/rowSums(alpha1),type="l",lwd=1,lty=2)
 @
