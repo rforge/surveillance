@@ -678,7 +678,7 @@ of \code{boda} to monitor the campylobacteriosis time series from 2007.
 In the first case we include in the model for $\log\left(\mu_t\right)$ penalized splines for trend and
 seasonality and a simple linear trend.
 <<boda,eval=FALSE,echo=TRUE>>=
-
+library("INLA")
 rangeBoda <- which(epoch(cam.sts) >= as.Date("2007-01-01"))
 control.boda <- list(range = rangeBoda, X = NULL, trend = TRUE,
                      season = TRUE, prior = "iid", alpha = 0.025,
@@ -689,7 +689,6 @@ boda <- boda(cam.sts, control = control.boda)
 
 <<boda-cache, echo = FALSE>>=
 if (computeALL) {
-library("INLA")
 ##hoehle 2018-07-18: changed code to use NICELOOKINGboda, but that's iid. Reason:
 ##The option 'rw1' currently crashes INLA.
 <<boda>>
