@@ -1024,7 +1024,6 @@ salmHospitalized.multi <- sts(
   freq = 52, start = c(2004, 1),
   epoch = as.numeric(epoch(salmHospitalized)), epochAsDate = TRUE,
   observed = observedHosp, population = populationHosp,
-  state = matrix(0, nrow = nrow(salmHospitalized), ncol = 2),
   multinomialTS = TRUE)
 @
 
