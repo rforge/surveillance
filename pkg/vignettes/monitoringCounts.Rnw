@@ -219,7 +219,7 @@ to the 16 German federal states. Values are weekly counts so \code{freq = 52}.
  Weeks are here handled as \code{Date} objects by setting \code{epochAsDate} to \code{TRUE}. One can thus for instance get the weekday of the date by calling \code{weekdays(epoch(salmNewport))}. Furthermore, one can use the function \code{format} (and the package specific platform independent version \code{dateFormat}) to obtain \code{strftime} compatible formatting of the epochs. Another advantage of using \code{Date} objects is that the plot functions have been re-written for better management of ticks and labelling of the x-axis based on \code{strftime} compatible conversion specifications.
 For example, to get ticks at all weeks corresponding to the first week in a month as well as all weeks corresponding to the first in a year while placing labels consisting of the year at the median index per year:
 
-<<eval=FALSE,echo=TRUE>>=
+<<fig=FALSE>>=
 plot(salmNewport, type = observed ~ time,
      xaxis.tickFreq = list("%m" = atChange, "%G" = atChange),
      xaxis.labelFreq = list("%Y" = atMedian), xaxis.labelFormat = "%Y")
@@ -620,7 +620,7 @@ axis(side=4, at=seq(0,2500,by=500),labels=seq(0,50,by=10),las=1,cex.lab=cex.text
 \label{fig:campyDE}
 \end{figure}
 
-<<campyDElongVersion, eval=FALSE, echo=TRUE>>=
+<<campyDE-simple, fig=FALSE>>=
 data("campyDE")
 cam.sts <- sts(epoch = as.numeric(campyDE$date), epochAsDate = TRUE,
                observed = campyDE$case, state = campyDE$state)
