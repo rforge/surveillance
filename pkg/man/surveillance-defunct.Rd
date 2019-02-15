@@ -3,6 +3,7 @@
 \title{Defunct Functions in Package \pkg{surveillance}}
 \alias{compMatrix.writeTable}
 \alias{correct53to52}
+\alias{enlargeData}
 \alias{makePlot}
 \alias{readData}
 \alias{test}
@@ -15,6 +16,7 @@
 ## Defunct in surveillance 1.17.0
 compMatrix.writeTable(compMatrix)
 correct53to52(disProgObj, firstweek = 1)
+enlargeData(disProgObj, range = 1:156, times = 1)
 makePlot(outputpath, data = "k1", method = "rki1",
          name, disease, range = 157:339)
 readData(abb, week53to52=TRUE, sysPath=TRUE)
@@ -30,8 +32,10 @@ toFileDisProg(disProgObj, toFile)
   
   The ancient test function \code{makePlot} is no longer used,
   nor are functions \code{readData} (the datasets are still available
-  via \code{data(\link{m1})} etc) and \code{correct53to52} (which only
-  worked for old \code{"disProg"} objects with non-matrix elements).
+  via \code{data(\link{m1})} etc) and \code{correct53to52} /
+  \code{enlargeData} (which both only worked for old \code{"disProg"}
+  objects with non-matrix elements). \code{enlargeData} is still
+  exemplified in the old \code{vignette("surveillance")}.
   \code{test} calls of outbreak detection algorithms applied to the old
   SurvStat datasets can be found in \code{vignette("surveillance")},
   and \code{testSim} is provided as an example
