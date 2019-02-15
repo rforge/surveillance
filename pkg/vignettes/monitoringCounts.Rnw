@@ -101,6 +101,9 @@ options(width=77)
 ## create directories for plots and cache
 dir.create("plots", showWarnings=FALSE)
 dir.create("monitoringCounts-cache", showWarnings=FALSE)
+## load packages
+library('surveillance')
+library('gamlss')
 @
 \SweaveOpts{prefix.string=plots/monitoringCounts}
 \label{sec:1}
@@ -141,18 +144,21 @@ The creation of a \code{sts} object is straightforward, requiring a call to the 
 as it is described in \citet{hoehle-mazick-2010}.
 To exemplify the process we shall use weekly counts of \textit{Salmonella Newport} in Germany loaded using \code{data("salmNewport")}. Alternatively, one can use coercion methods to convert between the \texttt{ts} class and the \texttt{sts} class. Note that this only converts the content of the slot \texttt{observed}, that is,
 
+<<echo=FALSE>>=
+data("salmNewport")
+@
 <<echo=TRUE,eval=FALSE>>=
 all.equal(observed(salmNewport),observed(as(as(salmNewport,"ts"),"sts")))
+@
+<<echo=FALSE>>=
+stopifnot(
+all.equal(observed(salmNewport),observed(as(as(salmNewport,"ts"),"sts")))
+)
 @
 
 Using the \texttt{ts} class as intermediate step also allows the conversion between other time series classes, e.g., from packages \pkg{zoo}~\citep{zoo} or \pkg{xts}~\citep{xts}.
 
 
-<<echo=FALSE>>=
-# Load packages
-library("surveillance")
-library('gamlss')
-@
 <<echo=FALSE>>=
 # This code is the one used for the Salmon et al. (2016) JSS article.
 # Using this code all examples from the article can be reproduced.
@@ -191,10 +197,7 @@ plotOpts <- list(col=stsPlotCol,ylim=c(0,y.max),
                  par.list=par.list,hookFunc=hookFunc)
 
 @
-<<stsLoad, echo = F,include = F, results=tex>>=
-# Load data
-data("salmNewport")
-@
+
 <<NewportstsPlot, fig=FALSE, echo = FALSE, label=NewportPlot,include = F,results=tex, width=7.5, height=3.5>>=
 # Plot
 y.max <- max(aggregate(salmNewport,by="unit")@observed,na.rm=TRUE)
@@ -392,7 +395,7 @@ control2 <- list(range = in2011, noPeriods = 10,
 @
 <<echo=F>>=
 control1$limit54 <- control2$limit54 <- c(0,50)  # for the figure
-@ 
+@
 
 In both cases the steps of the algorithm are the same. In a first step, an overdispersed Poisson generalized linear model with log link is fitted to the reference data $\bm{y}_{t_0} \subseteq \left\{
 y_t\>;\> t\leq t_0\right\}$, where $\E(y_t)=\mu_t$  with $\log \mu_t = \alpha + \beta t$ and $\Var(y_t)=\phi\cdot\mu_t$ and where $\phi\geq1$ is ensured.
