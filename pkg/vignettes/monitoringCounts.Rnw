@@ -978,7 +978,7 @@ We choose a model with an intercept, a time trend, two harmonic terms and a fact
 each year. The variable \code{epochInPeriod} takes into account the fact that not all years have 52 weeks.
 
 
-<<catbis, echo = T, include = F, results = hide>>=
+<<catbis, results = hide>>=
 vars <- c( "y", "n", "t", "epochInPeriod", "weekNumber")
 m.bbin <- gamlss(cbind(y, n-y) ~ 1 + t
                  + sin(2 * pi * epochInPeriod) + cos(2 * pi * epochInPeriod)
@@ -999,7 +999,7 @@ with $\bm{\theta}_0$ and $\bm{\theta}_1$ being the vector in- and \textit{out-of
 We set the parameters of the \code{categoricalCUSUM} to optimally detect a doubling of the odds in 2013 and 2014, i.e., $R=2$. Furthermore, we for now set the threshold of the CUSUM at $h=2$.
 We use the GAMLSS to predict the mean of the \textit{in-control} and \textit{out-of-control} distributions and store them into matrices with two columns among which the second one represents the reference category.
 
-<<cat2longVersion, eval = FALSE, echo = T, include = F>>=
+<<cat2>>=
 R <- 2
 h <- 2
 pi0 <- predict(m.bbin, newdata = salmHospitalized.df[phase2, vars],
@@ -1008,19 +1008,7 @@ pi1 <- plogis(qlogis(pi0) + log(R))
 pi0m <- rbind(pi0, 1 - pi0)
 pi1m <- rbind(pi1, 1 - pi1)
 @
-<<cat2, echo = F, include = F>>=
-# CUSUM parameters
-R <- 2 #detect a doubling of the odds for a salmHospitalized being positive
-h <- 2 #threshold of the cusum
-# Compute \textit{in-control} and out of control mean
-pi0 <- predict(m.bbin,newdata=salmHospitalized.df[phase2,vars],
-               type="response")
-pi1 <- plogis(qlogis(pi0) + log(R))
-# Create matrix with in control and out of control proportions.
-# Categories are D=1 and D=0, where the latter is the reference category
-pi0m <- rbind(pi0, 1-pi0)
-pi1m <- rbind(pi1, 1-pi1)
-@
+
 Note that the \code{categoricalCUSUM} function is constructed to operate on the observed slot of \code{sts}-objects
 which have as columns the number of cases in each category at each timepoint, \textit{i.e.}, each row of the observed slot contains the elements
 $(y_{t1},...,y_{tk})$.
