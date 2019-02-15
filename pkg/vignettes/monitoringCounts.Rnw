@@ -1098,79 +1098,41 @@ One first has to set the values of the threshold to be investigated and to prepa
 performed with a fixed seed value for the sake of reproducibility. Afterwards, we tested the Markov Chain approximation using the function \code{LRCUSUM.runlength} over the same grid
 of values for the threshold.
 
-<<NICELOOKING,eval=FALSE,echo=TRUE>>=
+<<>>=
 h.grid <- seq(1, 10, by = 0.5)
+@
 
+<<cath,eval=FALSE,echo=TRUE>>=
 simone <- function(sts, h) {
   y <- rBB(length(phase2), mu = pi0m[1, , drop = FALSE],
-			 bd = population(sts)[phase2, ],
-	         sigma = exp(m.bbin$sigma.coef))
+           bd = population(sts)[phase2, ], sigma = exp(m.bbin$sigma.coef))
   observed(sts)[phase2, ] <- cbind(y, population(sts)[phase2, 1] - y)
-  one.surv <- categoricalCUSUM(sts, modifyList(controlCat, list(h = h)),
-	                           sigma = exp(m.bbin$sigma.coef))
+  one.surv <- categoricalCUSUM(sts,
+                               control = modifyList(controlCat, list(h = h)),
+                               sigma = exp(m.bbin$sigma.coef))
   return(any(alarms(one.surv)[, 1]))
 }
 set.seed(123)
-
 nSims <- 1000
-
 pMC <- sapply(h.grid, function(h) {
-	mean(replicate(nSims, simone(salmHospitalized.multi, h)))
+  mean(replicate(nSims, simone(salmHospitalized.multi, h)))
 })
 
-pMarkovChain <- sapply( h.grid, function(h) {
-  TA <- LRCUSUM.runlength(mu = pi0m[1,, drop = FALSE],
-                          mu0 = pi0m[1,, drop = FALSE],
-                          mu1 = pi1m[1,, drop = FALSE],
+pMarkovChain <- sapply(h.grid, function(h) {
+  TA <- LRCUSUM.runlength(mu = pi0m[1,,drop = FALSE],
+                          mu0 = pi0m[1,,drop = FALSE],
+                          mu1 = pi1m[1,,drop = FALSE],
                           n = population(salmHospitalized.multi)[phase2, ],
                           h = h, dfun = dBB.cusum,
                           sigma = exp(m.bbin$sigma.coef))
   return(tail(TA$cdf, n = 1))
 })
 @
-<<cath, echo = F, include = F, results = hide>>=
-# Values of the threshold to be investigated
-h.grid <- seq(1,10,by=0.5)
-
-# Prepare function for simulations
- simone <- function(sts, h) {
-# Draw observed values from the \textit{in-control} distribution
-  y <- rBB(length(phase2), mu=pi0m[1,,drop=FALSE],
-           bd=population(sts)[phase2,],
-		   sigma=exp(m.bbin$sigma.coef))
-  observed(sts)[phase2,] <- cbind(y,population(sts)[phase2,1] - y)
-# Perform monitoring
-  one.surv <- categoricalCUSUM(sts, control=modifyList(controlCat, list(h=h)),
-                               sigma=exp(m.bbin$sigma.coef))
-# Return 1 if there was at least one alarm
-  return(any(alarms(one.surv)[,1]))
-}
-# Set random seed for reproducibility
-set.seed(123)
+<<cath-cache, echo = F>>=
 if (computeALL) {
-# Number of simulations
-nSims=1000
-# Simulations over the possible h values
-pMC <- sapply(h.grid, function(h) {
-  h <- h
-  mean(replicate(nSims, simone(salmHospitalized.multi,h)))
-})
-# Distribution function to be used by LRCUSUM.runlength
-dBB.rl <- function(y, mu, sigma, size, log = FALSE) {
-  dBB(y, mu = mu, sigma = sigma, bd = size, log = log)
-}
-# Markov Chain approximation over h.grid
-pMarkovChain <- sapply( h.grid, function(h) {
-  TA <- LRCUSUM.runlength(mu=pi0m[1,,drop=FALSE], mu0=pi0m[1,,drop=FALSE],
-                         mu1=pi1m[1,,drop=FALSE],
-                         n=population(salmHospitalized.multi)[phase2,],
-                         h=h, dfun=dBB.rl, sigma=exp(m.bbin$sigma.coef))
-  return(tail(TA$cdf,n=1))
-})
-
+<<cath>>
 save(pMC, file = "monitoringCounts-cache/pMC.RData")
 save(pMarkovChain, file = "monitoringCounts-cache/pMarkovChain.RData")
-
 } else {
 load("monitoringCounts-cache/pMC.RData")
 load("monitoringCounts-cache/pMarkovChain.RData")
