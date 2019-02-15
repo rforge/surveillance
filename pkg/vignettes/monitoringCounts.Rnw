@@ -1247,24 +1247,16 @@ m0 <- MGLMreg(as.matrix(rotaBB.df[phase1, order]) ~ -1 + X[phase1, ],
 ## Set threshold
 h <- 2
 @
-As described in \citet{hoehle2010} we can try to detect a specific shift in the intercept coefficients of the model. For example, a multiplicative shift of factor 7 in the example below, in the odds of each of the four age categories against the reference category is modelled by changing the intercept value of each category.
+As described in \citet{hoehle2010} we can try to detect a specific shift in the intercept coefficients of the model. For example, a multiplicative shift of factor 2 in the example below, in the odds of each of the four age categories against the reference category is modelled by changing the intercept value of each category.
 Based on this, the \textit{in-control} and \textit{out-of-control} proportions are easily computed using the \code{predict} function for \code{MGLMreg} objects.
 
-<<echo=TRUE,eval=FALSE>>=
+<<>>=
 m1 <- m0
 
-m1@coefficients[1, ] <- m0@coefficients[1, ] + log(7)
+m1@coefficients[1, ] <- m0@coefficients[1, ] + log(2)
 
 pi0 <- t(predict(m0, newdata = X[phase2, ])[, reorder])
-pi1 <- t(predict(m1, newdata = X[phase2,])[, reorder])
-@
-<<echo=FALSE>>=
-m1 <- m0
-# Out-of control model: shift in all intercept coeffs
-m1@coefficients[1,] <- m0@coefficients[1,] + log(2)
-# Proportion over time for phase2 based on fitted model (re-order back)
-pi0 <- t(predict(m0, newdata=X[phase2,])[,reorder])
-pi1 <-  t(predict(m1, newdata=X[phase2,])[,reorder])
+pi1 <- t(predict(m1, newdata = X[phase2, ])[, reorder])
 @
 
 For applying the \code{categoricalCUSUM} function one needs to define a compatible wrapper function for the multinomial as in the binomial example.
