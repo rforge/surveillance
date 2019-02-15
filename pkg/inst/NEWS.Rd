@@ -62,6 +62,9 @@
     \code{year()} as well as the \code{year} column of the
     \code{tidy.sts()} output corresponded to the ISO week-based year.
     It now gives the calendar year.
+
+    \item In \code{vignette("monitoringCounts")}: several
+    inconsistencies between code and output have been fixed.
   }
 }
 
