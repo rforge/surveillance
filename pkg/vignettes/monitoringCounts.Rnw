@@ -940,36 +940,23 @@ or the time trend in the linear predictor of the mean. This very flexible modeli
 
 As an example we consider the time series of the weekly number of hospitalized cases among all \textit{Salmonella} cases in Germany in Jan 2004--Jan 2014, depicted in
 Figure~\ref{fig:cat1}. We use 2004--2012 data to estimate the \textit{in-control} parameters and then perform surveillance on the data from 2013 and early 2014. We start by preprocessing the data.
-<<catlongVersion, eval = FALSE, echo = T, include = F>>=
+
+<<cat>>=
 data("salmHospitalized")
 isoWeekYearData <- isoWeekYear(epoch(salmHospitalized))
 
 dataBefore2013 <- which(isoWeekYearData$ISOYear < 2013)
 data2013 <- which(isoWeekYearData$ISOYear == 2013)
 dataEarly2014 <- which(isoWeekYearData$ISOYear == 2014
-                      & isoWeekYearData$ISOWeek <= 4)
+                       & isoWeekYearData$ISOWeek <= 4)
 
 phase1 <- dataBefore2013
 phase2 <- c(data2013, dataEarly2014)
 
-weekNumbers <- isoWeekYearData$ISOWeek
-salmHospitalized.df <- cbind(as.data.frame(salmHospitalized), weekNumbers)
-colnames(salmHospitalized.df) <- c("y", "t", "state", "alarm", "upperbound","n",
-                                   "freq", "epochInPeriod", "weekNumber")
-@
-<<cat, echo = F, include = F>>=
-# Load data
-data("salmHospitalized")
-# Define reference data and data under monitoring
-phase1 <- which(isoWeekYear(epoch(salmHospitalized))$ISOYear<2013)
-phase2 <- c(which(isoWeekYear(epoch(salmHospitalized))$ISOYear==2013),
-            which(isoWeekYear(epoch(salmHospitalized))$ISOYear==2014
-                  &isoWeekYear(epoch(salmHospitalized))$ISOWeek<=4))
-# Prepare data for fitting the model
-weekNumber <-  isoWeekYear(epoch(salmHospitalized))$ISOWeek
-salmHospitalized.df <- cbind(as.data.frame(salmHospitalized),weekNumber)
-colnames(salmHospitalized.df) <- c("y","t","state","alarm","upperbound","n","freq",
-                                   "epochInPeriod","weekNumber")
+salmHospitalized.df <- cbind(as.data.frame(salmHospitalized),
+                             weekNumber = isoWeekYearData$ISOWeek)
+names(salmHospitalized.df) <- c("y", "t", "state", "alarm", "upperbound", "n",
+                                "freq", "epochInPeriod", "weekNumber")
 @
 
 We assume that the number of hospitalized cases follows a beta-binomial distribution, i.e.,
