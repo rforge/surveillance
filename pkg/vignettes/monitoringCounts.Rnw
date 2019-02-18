@@ -140,7 +140,7 @@ matrix. Slot \code{map} is pertinent when units are geographical units, whereas 
  Finally, if monitoring has been performed on the data the information on its control arguments and its results are stored in \code{control}, \code{upperbound} and \code{alarm} presented in Section~\ref{sec:howto}.
 
 \subsubsection[Creation of an object of class sts]{Creation of an object of class \texttt{sts}}
-The creation of a \code{sts} object is straightforward, requiring a call to the function \code{new} together with the slots to be assigned as arguments. The input of data from external files is one possibility for getting the counts
+The creation of an \code{sts} object is straightforward, requiring a call of the constructor function \code{sts} together with the slots to be assigned as arguments. The input of data from external files is one possibility for getting the counts
 as it is described in \citet{hoehle-mazick-2010}.
 To exemplify the process we shall use weekly counts of \textit{Salmonella Newport} in Germany loaded using \code{data("salmNewport")}. Alternatively, one can use coercion methods to convert between the \texttt{ts} class and the \texttt{sts} class. Note that this only converts the content of the slot \texttt{observed}, that is,
 
