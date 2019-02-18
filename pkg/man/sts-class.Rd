@@ -54,7 +54,7 @@
 
 \usage{
 sts(observed, start = c(2000, 1), frequency = 52,
-    population = NULL, ...)
+    epoch = NULL, population = NULL, ...)
 }
 
 \arguments{
@@ -69,6 +69,8 @@ sts(observed, start = c(2000, 1), frequency = 52,
     just like for simple \code{"\link{ts}"} objects. The (historical)
     default values correspond to weekly data starting in the first week
     of 2000.}
+  \item{epoch}{observation times, either as an integer sequence (default)
+    or as a \code{Date} vector.}
   \item{population}{a vector of length the number of columns in
     \code{observed} or a matrix of the same dimension as
     \code{observed}. Especially for multivariate time series, the
@@ -78,10 +80,7 @@ sts(observed, start = c(2000, 1), frequency = 52,
     \code{populationFrac}. The default \code{NULL} value sets
     equal population fractions across all units.}
   \item{\dots}{further named arguments with names corresponding to slot
-    names (see the list below). For instance, the \code{epoch} slot is
-    used to store the observation time, either as an integer sequence
-    (default) or as the numeric representation of \code{Date}s (if also
-    \code{epochAsDate=TRUE}). In the public health surveillance context,
+    names (see the list below). For instance, in the public health surveillance context,
     the \code{state} slot is used to indicate outbreaks (default:
     \code{FALSE} for all observations). For areal time series data, the
     \code{map} and \code{neighbourhood} slots are used to store the
@@ -90,16 +89,12 @@ sts(observed, start = c(2000, 1), frequency = 52,
 
 \section{Slots}{
   \describe{
-    \item{\code{epoch}:}{Object of class \code{numeric} or specifying
-      the time of observation. In old versions of the package this used to
-      be the week numbers. However, depending on
-      the \code{freq} argument, it can now be day or month as
-      well. Furthermore, if \code{epochAsDate=TRUE} then 
-      it is the \code{as.numeric} representation of \code{Date} objects
-      giving the exact date of the observation. Note: This slot used to be
-      called \code{week} in earlier versions of the package, but has now been
-      renamed to reflect the greater 
-      flexibility in the choice of observation time.}
+    \item{\code{epoch}:}{a numeric vector specifying
+      the time of observation, typically a week index. Depending on
+      the \code{freq} slot, it could also index days or months.
+      Furthermore, if \code{epochAsDate=TRUE} then \code{epoch}
+      is the integer representation of \code{\link{Date}}s
+      giving the exact date of the observation.}
     \item{\code{freq}:}{If weekly data \code{freq} corresponds to 52, in
       case of monthly data \code{freq} is 12.}
     \item{\code{start}:}{vector of length two denoting the year and the
@@ -126,11 +121,9 @@ sts(observed, start = c(2000, 1), frequency = 52,
       providing a shape of the areas which are monitored. }
     \item{\code{control}:}{Object of class \code{list}, this is a
       rather free data type to be returned by the surveillance algorithms. }
-    \item{\code{epochAsDate}:}{Object of class \code{"logical"} stating
-      whether to use a ISO 8601 representation of the \code{epoch} slot using
-      the \code{Date} class (\code{epochAsDate=TRUE}) or just to
-      interpret the epochs as numerics (\code{epochAsDate=FALSE}).}
-    \item{\code{multinomialTS}:}{Object of class \code{"logical"}
+    \item{\code{epochAsDate}:}{a boolean indicating
+      if the \code{epoch} slot corresponds to \code{Date}s.}
+    \item{\code{multinomialTS}:}{a boolean
       stating whether to interpret the object as \code{observed} out of
       \code{population}, i.e. a multinomial interpretation instead of a
       count interpretation.}

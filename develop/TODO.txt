@@ -34,10 +34,11 @@
 #======================================================================
 
 #Open
-15/02/2019 add 'epoch=NULL' argument to sts() constructor and allow for
-           Date input, triggering epochAsDate=TRUE
+
 
 #Done
+18/02/2019 add 'epoch=NULL' argument to sts() constructor and allow for
+           Date input, triggering epochAsDate=TRUE
 18/02/2019 revise binaryTS condition in aggregate.sts and [.sts
            maybe condition on rowSums(populationFrac)==1 originally
 22/01/2018 autoplot.sts(): add population argument for incidence plots

@@ -17,6 +17,9 @@
     include the autoregressive (0-distance) case (see
     \code{vignette("hhh4_spacetime")}). The unstructured distance
     weights \code{W_np()} gained \code{from0} support as well.
+
+    \item \code{sts()} creation can now handle \code{epoch} arguments of
+    class \code{Date} directly.
   }
 }
 

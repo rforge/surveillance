@@ -32,15 +32,23 @@ fix.dimnames <- function(x) {
 ## NOTE: NULL arguments are ignored => default slot values
 sts <- function (observed,
                  start = c(2000, 1), frequency = 52, # prototype values
+                 epoch = NULL, # defaults to 1:nrow(observed), can be Date
                  population = NULL, # an alias for "populationFrac"
                  ...) # further named arguments representing "sts" slots
 {
-    slots <- list(observed = observed, start = start, freq = frequency, ...)
+    slots <- list(observed = observed, start = start, freq = frequency,
+                  epoch = epoch, ...)
+
     if (!is.null(population)) {
         if ("populationFrac" %in% names(slots))
             warning("'population' takes precedence over 'populationFrac'")
         slots$populationFrac <- population
     } # else "populationFrac" is a possible element of ...
+
+    if (inherits(epoch, "Date")) {
+        slots$epoch <- as.integer(epoch)
+        slots$epochAsDate <- TRUE
+    }
 
     ## call the standard generator function with explicitly set slots
     isNULL <- vapply(X = slots, FUN = is.null,
