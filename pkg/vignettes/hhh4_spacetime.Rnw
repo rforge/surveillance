@@ -762,12 +762,12 @@ writeLines(tail(head(capture.output({
 The summary now contains an extra section with the
 estimated variance components $\sigma_\lambda^2$, $\sigma_\phi^2$, and
 $\sigma_\nu^2$.
-We did not assume correlation between the three random intercepts, but this is
+We did not assume correlation between the three random effects, but this is
 possible by specifying \code{ri(corr = "all")} in the component formulae.
 The implementation also supports a conditional autoregressive
 formulation for spatially correlated intercepts via
 \code{ri(type = "car")}.
-The estimated random effects can be extracted by the
+The estimated deviations from the means can be extracted by the
 \code{ranef}-method:
 <<>>=
 head(ranef(measlesFit_ri, tomatrix = TRUE), n = 3)
