@@ -163,22 +163,22 @@ pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2
     control$range <- 1:nrow(observed(stsObj))
   }
   if(is.null(control[["theta0",exact=TRUE]])) { 
-    stop("Error: No specification of in-control parameters theta0!")
+    stop("no specification of in-control parameters theta0")
   }
   if(is.null(control[["theta1",exact=TRUE]])) { 
-    stop("Error: No specification of out-of-control parameters theta1!")
+    stop("no specification of out-of-control parameters theta1")
   }
   if(is.null(control[["h1",exact=TRUE]])) { 
-    stop("Error: No specification of primary threshold h1 for first series.")
+    stop("no specification of primary threshold h1 for first series")
   }
   if(is.null(control[["h2",exact=TRUE]])) { 
-    stop("Error: No specification of primary threshold h2 for 2nd series.")
+    stop("no specification of primary threshold h2 for 2nd series")
   }
   if(is.null(control[["h11",exact=TRUE]])) { 
-    stop("Error: No specification of secondary limit h11 for 1st series.")
+    stop("no specification of secondary limit h11 for 1st series")
   }
   if(is.null(control[["h22",exact=TRUE]])) { 
-    stop("Error: No specification of secondary limit h11 for 2nd series.")
+    stop("no specification of secondary limit h11 for 2nd series")
   }
 
   #Extract the important parts from the arguments
@@ -193,7 +193,7 @@ pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2
   
   #Semantic checks.
   if (ncol(y) != 2) {
-    stop("Error: The number of columns in the sts object needs to be two.")
+    stop("the number of columns in the sts object needs to be two")
   }
 
   #Reserve space for the results. Contrary to the categorical CUSUM
