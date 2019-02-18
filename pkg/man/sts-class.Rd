@@ -104,7 +104,7 @@ sts(observed, start = c(2000, 1), frequency = 52,
       each region. The colnames of the matrix should match the ID values of
       the shapes in the \code{map} slot.}
     \item{\code{state}:}{Matrix with the same dimension as \code{observed}
-      containing booleans whether at the specific time point there was an
+      containing Booleans whether at the specific time point there was an
       outbreak in the region}
     \item{\code{alarm}:}{Matrix with the same dimension as
       \code{observed} specifying whether an outbreak detection algorithm
@@ -121,9 +121,9 @@ sts(observed, start = c(2000, 1), frequency = 52,
       providing a shape of the areas which are monitored. }
     \item{\code{control}:}{Object of class \code{list}, this is a
       rather free data type to be returned by the surveillance algorithms. }
-    \item{\code{epochAsDate}:}{a boolean indicating
+    \item{\code{epochAsDate}:}{a Boolean indicating
       if the \code{epoch} slot corresponds to \code{Date}s.}
-    \item{\code{multinomialTS}:}{a boolean
+    \item{\code{multinomialTS}:}{a Boolean
       stating whether to interpret the object as \code{observed} out of
       \code{population}, i.e. a multinomial interpretation instead of a
       count interpretation.}
