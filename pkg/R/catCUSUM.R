@@ -123,10 +123,11 @@ categoricalCUSUM <- function(stsObj,
   if (is.numeric(control[["range",exact=TRUE]])) {
     range <- control$range
   } else {
-    stop("the range needs to be a vector indices")
+    stop("the range needs to be an index vector")
   }
-
-  y <- t(stsObj@observed[range,,drop=FALSE])
+  stsObj <- stsObj[range,]
+  
+  y <- t(stsObj@observed)
   pi0 <- control[["pi0",exact=TRUE]]
   pi1 <- control[["pi1",exact=TRUE]]
   dfun <- control[["dfun",exact=TRUE]]
@@ -135,7 +136,7 @@ categoricalCUSUM <- function(stsObj,
   ##can't be deduced from the observed y, because only (c-1) columns
   ##are reported so using: n <- apply(y, 2, sum) is wrong!
   ##Assumption: all populationFrac's contain n_t and we can take just one
-  n <- stsObj@populationFrac[range,1,drop=TRUE]
+  n <- stsObj@populationFrac[,1]
 
   ##Semantic checks
   if ( ((ncol(y) != ncol(pi0)) | (ncol(pi0) != ncol(pi1))) |
@@ -149,7 +150,7 @@ categoricalCUSUM <- function(stsObj,
     stop("length of n has to be equal to number of columns in y")
   }
   ##Check if all n entries are the same
-  if (!all(apply(stsObj@populationFrac[range,],1,function(x) all.equal(as.numeric(x),rev(as.numeric(x)))))) {
+  if (!all(apply(stsObj@populationFrac,1,function(x) all.equal(as.numeric(x),rev(as.numeric(x)))))) {
     stop("all entries for n have to be the same in populationFrac")
   }
 
@@ -207,26 +208,10 @@ categoricalCUSUM <- function(stsObj,
   control$name <- "categoricalCUSUM"
   control$data <- NULL #not supported anymore
 
-  #New direct calculations on the sts object
-  stsObj@observed <- stsObj@observed[control$range,,drop=FALSE]
-  stsObj@epoch <- stsObj@epoch[control$range,drop=FALSE]
-  stsObj@state <- stsObj@state[control$range,,drop=FALSE]
-  stsObj@populationFrac <- stsObj@populationFrac[control$range,,drop=FALSE]
+  #store results in the sts object
   stsObj@alarm <- alarm
   stsObj@upperbound <- upperbound
   stsObj@control <- control
-
-  #Fix the corresponding start entry
-  if (stsObj@epochAsDate==FALSE){
-    start <- stsObj@start
-    new.sampleNo <- start[2] + min(control$range) - 1
-    start.year <- start[1] + (new.sampleNo - 1) %/% stsObj@freq
-    start.sampleNo <- (new.sampleNo - 1) %% stsObj@freq + 1
-    stsObj@start <- c(start.year,start.sampleNo)
-  } else {
-    ISO <- isoWeekYear(epoch(stsObj)[1])
-    stsObj@start <- c(ISO$ISOYear,ISO$ISOWeek)
-  }
 
   #Ensure dimnames in the new object ## THIS NEEDS TO BE FIXED!
   #stsObj <- fix.dimnames(stsObj)
