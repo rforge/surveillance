@@ -39,11 +39,10 @@ wrap.algo <- function(sts, algo, control,
     if (!is.null(survRes.k)) {
       sts@alarm[control$range,k] <- survRes.k$alarm
       sts@upperbound[control$range,k] <- survRes.k$upperbound
-
-      #Control object needs only to be set once
-      sts@control <- survRes.k$control
     }
   }
+  #Control object needs only to be set once
+  sts@control <- survRes.k$control
 
   #Reduce sts object to only those obervations in range
   sts@observed <- sts@observed[control$range,,drop=FALSE]
