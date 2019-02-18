@@ -79,6 +79,9 @@
     \item \code{pairedbinCUSUM()} did not properly subset the \code{sts}
     object if a \code{range} was specified and forgot to store the
     \code{control} arguments in the result.
+
+    \item \code{wrap.algo()} now aborts if the monitored range is
+    not supplied as a numeric vector.
   }
 }
 
