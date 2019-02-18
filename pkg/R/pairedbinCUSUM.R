@@ -159,37 +159,37 @@ pairedbinCUSUM.LLRcompute <- function(x,theta0, theta1, h1,h2,h11,h22) {
 
 pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2,h11,h22)) {
    # Set the default values if not yet set
-  if(is.null(control[["range",exact=TRUE]])) { 
+  if(is.null(control[["range"]])) { 
     control$range <- 1:nrow(observed(stsObj))
   }
-  if(is.null(control[["theta0",exact=TRUE]])) { 
+  if(is.null(control[["theta0"]])) { 
     stop("no specification of in-control parameters theta0")
   }
-  if(is.null(control[["theta1",exact=TRUE]])) { 
+  if(is.null(control[["theta1"]])) { 
     stop("no specification of out-of-control parameters theta1")
   }
-  if(is.null(control[["h1",exact=TRUE]])) { 
+  if(is.null(control[["h1"]])) { 
     stop("no specification of primary threshold h1 for first series")
   }
-  if(is.null(control[["h2",exact=TRUE]])) { 
+  if(is.null(control[["h2"]])) { 
     stop("no specification of primary threshold h2 for 2nd series")
   }
-  if(is.null(control[["h11",exact=TRUE]])) { 
+  if(is.null(control[["h11"]])) { 
     stop("no specification of secondary limit h11 for 1st series")
   }
-  if(is.null(control[["h22",exact=TRUE]])) { 
+  if(is.null(control[["h22"]])) { 
     stop("no specification of secondary limit h11 for 2nd series")
   }
 
   #Extract the important parts from the arguments
   range <- control$range
   y <- stsObj@observed[range,,drop=FALSE]
-  theta0 <- control[["theta0",exact=TRUE]]
-  theta1 <- control[["theta1",exact=TRUE]]
-  h1 <- control[["h1",exact=TRUE]]
-  h2 <- control[["h2",exact=TRUE]]
-  h11 <- control[["h11",exact=TRUE]]
-  h22 <- control[["h22",exact=TRUE]]
+  theta0 <- control[["theta0"]]
+  theta1 <- control[["theta1"]]
+  h1 <- control[["h1"]]
+  h2 <- control[["h2"]]
+  h11 <- control[["h11"]]
+  h22 <- control[["h22"]]
   
   #Semantic checks.
   if (ncol(y) != 2) {
