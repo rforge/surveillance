@@ -104,23 +104,23 @@ categoricalCUSUM <- function(stsObj,
                                  pi0=NULL, pi1=NULL, dfun=NULL, ret=c("cases","value")),...) {
 
   ##Set the default values if not yet set
-  if(is.null(control[["pi0",exact=TRUE]])) {
+  if(is.null(control[["pi0"]])) {
     stop("no specification of in-control proportion vector pi0")
   }
-  if(is.null(control[["pi1",exact=TRUE]])) {
+  if(is.null(control[["pi1"]])) {
     stop("no specification of out-of-control proportion vector pi1")
   }
-  if(is.null(control[["dfun",exact=TRUE]])) {
+  if(is.null(control[["dfun"]])) {
     stop("no specification of the distribution to use, e.g. dbinom, dmultinom or similar")
   }
 
-  if(is.null(control[["h",exact=TRUE]]))
+  if(is.null(control[["h"]]))
     control$h <- 5
-  if(is.null(control[["ret",exact=TRUE]]))
+  if(is.null(control[["ret"]]))
   	control$ret <- "value"
 
   ##Extract the important parts from the arguments
-  if (is.numeric(control[["range",exact=TRUE]])) {
+  if (is.numeric(control[["range"]])) {
     range <- control$range
   } else {
     stop("the range needs to be an index vector")
@@ -128,9 +128,9 @@ categoricalCUSUM <- function(stsObj,
   stsObj <- stsObj[range,]
   
   y <- t(stsObj@observed)
-  pi0 <- control[["pi0",exact=TRUE]]
-  pi1 <- control[["pi1",exact=TRUE]]
-  dfun <- control[["dfun",exact=TRUE]]
+  pi0 <- control[["pi0"]]
+  pi1 <- control[["pi1"]]
+  dfun <- control[["dfun"]]
   control$ret <- match.arg(control$ret, c("value","cases"))
   ##Total number of objects that are investigated. Note this
   ##can't be deduced from the observed y, because only (c-1) columns
