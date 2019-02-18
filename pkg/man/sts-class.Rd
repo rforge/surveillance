@@ -70,7 +70,8 @@ sts(observed, start = c(2000, 1), frequency = 52,
     default values correspond to weekly data starting in the first week
     of 2000.}
   \item{epoch}{observation times, either as an integer sequence (default)
-    or as a \code{Date} vector.}
+    or as a \code{Date} vector (in which case \code{epochAsDate} is
+    automatically set to \code{TRUE}).}
   \item{population}{a vector of length the number of columns in
     \code{observed} or a matrix of the same dimension as
     \code{observed}. Especially for multivariate time series, the
