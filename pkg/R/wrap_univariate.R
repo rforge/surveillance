@@ -16,11 +16,10 @@ wrap.algo <- function(sts, algo, control,
                       verbose=TRUE,...) {
   #Number of time series
   nAreas <- ncol(sts@observed)
-  nTimePoints <- nrow(sts@observed)
 
-  #Create alarm matrix having same size as sts
-  sts@alarm <- matrix(NA,ncol=nAreas,nrow=nTimePoints,dimnames=dimnames(sts@observed))
-  sts@upperbound <- matrix(NA_real_,ncol=nAreas,nrow=nTimePoints,dimnames=dimnames(sts@observed))
+  #Set old alarms and upperbounds to NA
+  sts@alarm[] <- NA
+  sts@upperbound[] <- NA_real_
 
   #Loop over all regions
   for (k in 1:nAreas) {
