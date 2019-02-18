@@ -109,8 +109,7 @@ library('gamlss')
 \label{sec:1}
 
 The package provides a central S4 data class \code{sts} to capture multivariate or univariate time series. All further methods use objects of this class as an input.
-Therefore we first describe how to use the \code{sts} class and then,
-as all monitoring methods of the package conform to the same syntax, a typical call of a function for aberration detection will be presented. Furthermore, the visualization of time series and of the results of their monitoring is depicted.
+Therefore we first describe the \code{sts} class and then show the typical usage of a function for aberration detection, including visualization. All monitoring methods of the package conform to the same syntax.
 
 \subsection{How to store time series and related information}
 
@@ -148,7 +147,8 @@ To exemplify the process we shall use weekly counts of \textit{Salmonella Newpor
 data("salmNewport")
 @
 <<test-sts2ts2sts, echo=TRUE, eval=FALSE>>=
-all.equal(observed(salmNewport),observed(as(as(salmNewport,"ts"),"sts")))
+all.equal(observed(salmNewport),
+          observed(as(as(salmNewport, "ts"), "sts")))
 @
 <<echo=FALSE>>=
 stopifnot(
