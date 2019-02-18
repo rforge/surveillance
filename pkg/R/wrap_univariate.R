@@ -14,6 +14,8 @@
 wrap.algo <- function(sts, algo, control,
                       control.hook=function(k, control) return(control),
                       verbose=TRUE,...) {
+  stopifnot(is.vector(control[["range"]], mode = "numeric"))
+  
   #Number of time series
   nAreas <- ncol(sts@observed)
 
