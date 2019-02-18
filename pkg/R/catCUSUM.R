@@ -105,13 +105,13 @@ categoricalCUSUM <- function(stsObj,
 
   ##Set the default values if not yet set
   if(is.null(control[["pi0",exact=TRUE]])) {
-    stop("Error: No specification of in-control proportion vector pi0!")
+    stop("no specification of in-control proportion vector pi0")
   }
   if(is.null(control[["pi1",exact=TRUE]])) {
-    stop("Error: No specification of out-of-control proportion vector pi1!")
+    stop("no specification of out-of-control proportion vector pi1")
   }
   if(is.null(control[["dfun",exact=TRUE]])) {
-    stop("Error: No specification of the distribution to use, e.g. dbinom, dmultinom or similar!")
+    stop("no specification of the distribution to use, e.g. dbinom, dmultinom or similar")
   }
 
   if(is.null(control[["h",exact=TRUE]]))
@@ -123,7 +123,7 @@ categoricalCUSUM <- function(stsObj,
   if (is.numeric(control[["range",exact=TRUE]])) {
     range <- control$range
   } else {
-    stop("The range needs to be a vector indices.")
+    stop("the range needs to be a vector indices")
   }
 
   y <- t(stsObj@observed[range,,drop=FALSE])
@@ -140,17 +140,17 @@ categoricalCUSUM <- function(stsObj,
   ##Semantic checks
   if ( ((ncol(y) != ncol(pi0)) | (ncol(pi0) != ncol(pi1))) |
       ((nrow(y) != nrow(pi0)) | (nrow(pi0) != nrow(pi1)))) {
-    stop("Error: dimensions of y, pi0 and pi1 have to match")
+    stop("dimensions of y, pi0 and pi1 have to match")
   }
   if ((control$ret == "cases") & nrow(pi0) != 2) {
-    stop("Cases can only be returned in case k=2.")
+    stop("cases can only be returned in case k=2")
   }
   if (length(n) != ncol(y)) {
-    stop("Error: Length of n has to be equal to number of columns in y.")
+    stop("length of n has to be equal to number of columns in y")
   }
   ##Check if all n entries are the same
   if (!all(apply(stsObj@populationFrac[range,],1,function(x) all.equal(as.numeric(x),rev(as.numeric(x)))))) {
-    stop("Error: All entries for n have to be the same in populationFrac")
+    stop("all entries for n have to be the same in populationFrac")
   }
 
   ##Reserve space for the results
