@@ -342,6 +342,11 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
       ## and actually it should always equal 1:nrow(observed)
       x@epoch <- x@epoch - i.min + 1L
     }
+    ## if (x@epochAsDate && x@freq == 52) {
+    ##   ## FIXME: should we derive start from the first date?
+    ##   ISO <- isoWeekYear(as.Date(x@epoch[1], origin = "1970-01-01"))
+    ##   x@start <- c(ISO$ISOYear, ISO$ISOWeek)
+    ## }
   }
 
   ## Note: We do not automatically subset the map according to j, since
