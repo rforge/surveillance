@@ -65,6 +65,12 @@
 
     \item In \code{vignette("monitoringCounts")}: several
     inconsistencies between code and output have been fixed.
+
+    \item \code{aggregate()}ing an \code{"sts"} object over time now
+    recomputes fractions from the cumulated population values if and
+    only if this is no \code{multinomialTS} and already contains
+    population fractions. The \code{aggregate}-method previously
+    failed to do so in some cases.
   }
 }
 

@@ -212,15 +212,12 @@ setMethod("aggregate", signature(x="sts"), function(x,by="time",nfreq="all",...)
     x@state <- as.matrix(aggregate(x@state,by=list(new),sum)[,-1])>0
     x@alarm <- as.matrix(aggregate(x@alarm,by=list(new),sum)[,-1]) # number of alarms
     x@upperbound <- as.matrix(aggregate(x@upperbound,by=list(new),sum)[,-1])
-    x@populationFrac <- as.matrix(aggregate(x@populationFrac,by=list(new),sum)[,-1])
-    ## CAVE: summing population (fractions) over time might not be intended
 
-    ## Action of aggregation for populationFrac depends on the type
-    binaryTS <- sum( x@populationFrac > 1 ) > 1  # FIXME @ Michael: why not any()?
-    ## NOTE: we cannot rely on x@multinomialTS since this is not necessarily set
-    ##       if population(x) contains absolute numbers
-    if (!binaryTS) { # population fractions need to be recomputed
-      x@populationFrac <-x@populationFrac / rowSums(x@populationFrac)
+    ## summing population (fractions) over time
+    had_fractions <- !x@multinomialTS && all(rowSums(x@populationFrac) == 1)
+    x@populationFrac <- as.matrix(aggregate(x@populationFrac,by=list(new),sum)[,-1])
+    if (isTRUE(had_fractions)) { # population fractions need to be recomputed
+      x@populationFrac <- x@populationFrac / rowSums(x@populationFrac)
     }
   }
 
