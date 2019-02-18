@@ -17,7 +17,6 @@ wrap.algo <- function(sts, algo, control,
   #Number of time series
   nAreas <- ncol(sts@observed)
   nTimePoints <- nrow(sts@observed)
-  nAlarm <- length(control$range)
 
   #Create alarm matrix having same size as sts
   sts@alarm <- matrix(NA,ncol=nAreas,nrow=nTimePoints,dimnames=dimnames(sts@observed))
