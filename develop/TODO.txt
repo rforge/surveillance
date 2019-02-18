@@ -34,12 +34,12 @@
 #======================================================================
 
 #Open
-14/09/2018 revise binaryTS condition in aggregate.sts and [.sts
-           maybe condition on rowSums(populationFrac)==1 originally
 15/02/2019 add 'epoch=NULL' argument to sts() constructor and allow for
            Date input, triggering epochAsDate=TRUE
 
 #Done
+18/02/2019 revise binaryTS condition in aggregate.sts and [.sts
+           maybe condition on rowSums(populationFrac)==1 originally
 22/01/2018 autoplot.sts(): add population argument for incidence plots
 19/01/2018 autoplot.sts(), i.e., ggplot2 variant (via tidy.sts)
 29/11/2016 improve as.data.frame-method, e.g., epochInPeriod is wrong in:

@@ -13,6 +13,10 @@
   so may select units by name, position or a vector of booleans.
   Row indices can only be integer or logical. The \code{start} and
   \code{epoch} slots of the time series are adjusted accordingly.
+
+  When subsetting columns, population fractions are recomputed if and
+  only if \code{x} is no \code{multinomialTS} and already contains
+  population fractions.
   
   A warning is issued if an irregular integer sequence is used to
   extract rows, e.g., \code{x[c(1,2,4),]}, which could destroy the

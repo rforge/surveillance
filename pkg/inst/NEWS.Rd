@@ -69,8 +69,9 @@
     \item \code{aggregate()}ing an \code{"sts"} object over time now
     recomputes fractions from the cumulated population values if and
     only if this is no \code{multinomialTS} and already contains
-    population fractions. The \code{aggregate}-method previously
-    failed to do so in some cases.
+    population fractions. The same rule holds when subsetting units of
+    an \code{"sts"} object. The \code{aggregate}-method previously
+    failed to recompute fractions in some cases.
   }
 }
 

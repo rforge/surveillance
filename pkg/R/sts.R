@@ -305,10 +305,10 @@ setMethod("[", "sts", function(x, i, j, ..., drop) {
   x@state <- x@state[i,j,drop=FALSE]
   x@alarm <- x@alarm[i,j,drop=FALSE]
 
+  recompute_fractions <- !missing(j) && !x@multinomialTS &&
+      all(rowSums(x@populationFrac) == 1)
   x@populationFrac <- x@populationFrac[i,j,drop=FALSE]
-  ## FIXME: could condition updating fractions on !missing(j)
-  binaryTS <- sum( x@populationFrac > 1 ) > 1 # FIXME @ Michael: why not any()?
-  if (!binaryTS) { # population fractions need to be recomputed
+  if (isTRUE(recompute_fractions)) {
     x@populationFrac <- x@populationFrac / rowSums(x@populationFrac)
    }
   x@upperbound <- x@upperbound[i,j,drop=FALSE]
