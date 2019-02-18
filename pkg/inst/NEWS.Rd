@@ -75,6 +75,10 @@
     population fractions. The same rule holds when subsetting units of
     an \code{"sts"} object. The \code{aggregate}-method previously
     failed to recompute fractions in some cases.
+
+    \item \code{pairedbinCUSUM()} did not properly subset the \code{sts}
+    object if a \code{range} was specified and forgot to store the
+    \code{control} arguments in the result.
   }
 }
 

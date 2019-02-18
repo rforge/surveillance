@@ -161,6 +161,8 @@ pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2
    # Set the default values if not yet set
   if(is.null(control[["range"]])) { 
     control$range <- 1:nrow(observed(stsObj))
+  } else { # subset stsObj
+    stsObj <- stsObj[control[["range"]], ]
   }
   if(is.null(control[["theta0"]])) { 
     stop("no specification of in-control parameters theta0")
@@ -182,8 +184,8 @@ pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2
   }
 
   #Extract the important parts from the arguments
-  range <- control$range
-  y <- stsObj@observed[range,,drop=FALSE]
+  y <- stsObj@observed
+  nTime <- nrow(y)
   theta0 <- control[["theta0"]]
   theta1 <- control[["theta1"]]
   h1 <- control[["h1"]]
@@ -198,19 +200,18 @@ pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2
 
   #Reserve space for the results. Contrary to the categorical CUSUM
   #method, each ROW represents a series.
-  alarm <- matrix(data = 0, nrow = length(range), ncol = ncol(y))
-  upperbound <- matrix(data = 0, nrow = length(range), ncol = ncol(y))
+  alarm <- matrix(data = FALSE, nrow = nTime, ncol = 2)
+  upperbound <- matrix(data = 0, nrow = nTime, ncol = 2)
   
   #Setup counters for the progress
   doneidx <- 0
   N <- 1
   noofalarms <- 0
-  noOfTimePoints <- length(range)
 
   #######################################################
   #Loop as long as we are not through the entire sequence
   #######################################################
-  while (doneidx < noOfTimePoints) {
+  while (doneidx < nTime) {
      #Run paired binary CUSUM until the next alarm
     res <- pairedbinCUSUM.LLRcompute(x=y, theta0=theta0, theta1=theta1, h1=h1, h2=h2, h11=h11, h22=h22)
   
@@ -239,21 +240,11 @@ pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2
   control$name <- "pairedbinCUSUM"
   control$data <- NULL #not supported anymore
 
-  #New direct calculations on the sts object
-  stsObj@observed <- stsObj@observed[control$range,,drop=FALSE]
-  stsObj@state <- stsObj@state[control$range,,drop=FALSE]
-  stsObj@populationFrac <- stsObj@populationFrac[control$range,,drop=FALSE]
+  #write results to stsObj
   stsObj@alarm <- alarm
   stsObj@upperbound <- upperbound
-
-  #Fix the corresponding start entry
-  start <- stsObj@start
-  new.sampleNo <- start[2] + min(control$range) - 1
-  start.year <- start[1] + (new.sampleNo - 1) %/% stsObj@freq 
-  start.sampleNo <- (new.sampleNo - 1) %% stsObj@freq + 1
-  stsObj@start <- c(start.year,start.sampleNo)
+  stsObj@control <- control
 
   #Done
   return(stsObj)
 }
-
