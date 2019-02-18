@@ -245,6 +245,9 @@ pairedbinCUSUM <- function(stsObj, control = list(range=NULL,theta0,theta1,h1,h2
   stsObj@upperbound <- upperbound
   stsObj@control <- control
 
+  #Ensure dimnames in the new object
+  stsObj <- fix.dimnames(stsObj)
+
   #Done
   return(stsObj)
 }

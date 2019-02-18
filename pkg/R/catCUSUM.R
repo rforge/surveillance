@@ -213,8 +213,8 @@ categoricalCUSUM <- function(stsObj,
   stsObj@upperbound <- upperbound
   stsObj@control <- control
 
-  #Ensure dimnames in the new object ## THIS NEEDS TO BE FIXED!
-  #stsObj <- fix.dimnames(stsObj)
+  #Ensure dimnames in the new object
+  stsObj <- fix.dimnames(stsObj)
 
   #Done
   return(stsObj)
