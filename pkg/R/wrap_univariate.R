@@ -20,7 +20,7 @@ wrap.algo <- function(sts, algo, control,
 
   #Create alarm matrix having same size as sts
   sts@alarm <- matrix(NA,ncol=nAreas,nrow=nTimePoints,dimnames=dimnames(sts@observed))
-  sts@upperbound <- matrix(NA,ncol=nAreas,nrow=nTimePoints,dimnames=dimnames(sts@observed))
+  sts@upperbound <- matrix(NA_real_,ncol=nAreas,nrow=nTimePoints,dimnames=dimnames(sts@observed))
 
   #Loop over all regions
   for (k in 1:nAreas) {
