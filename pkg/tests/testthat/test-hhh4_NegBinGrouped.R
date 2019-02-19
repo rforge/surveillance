@@ -63,8 +63,13 @@ test_that("\"NegBinM\" fit is invariant to the ordering of the overdispersion pa
 })
 
 test_that("random intercepts can be extracted", {
-    ris <- ranef(fluFitM, tomatrix = TRUE)
-    expect_equal(colnames(ris), "end.ri(iid)")  # failed in surveillance <= 1.16.2
+    ris <- ranef(fluFitM, intercept = TRUE)
+    expect_equal(dimnames(ris), list(colnames(fluBWsub), "end.ri(iid)"))
+    ## compute endemic predictor at t = 0 (i.e., subset = 1)
+    end.exppred.t0 <- meanHHH(theta = fluFitM$coefficients,
+                              model = terms(fluFitM), subset = 1)$end.exppred
+    expect_equal(exp(ris + fluFitM$coefficients["end.cos(2 * pi * t/52)"]),
+                 t(end.exppred.t0), check.attributes = FALSE)
 })
 
 
