@@ -326,15 +326,16 @@ if (requireNamespace("gridExtra"))
          main=c("Total","Endemic","Within district","From other districts"))
 
 ## estimated random intercepts of the endemic component
-fixef(measlesFit)["end.ri(iid)"]  # the mean of the intercepts (log-scale)
-ranef(measlesFit)  # zero-mean deviations around the above mean
+fixef(measlesFit)["end.ri(iid)"]     # global intercept (log-scale)
+ranef(measlesFit)                    # zero-mean deviations
 ranef(measlesFit, intercept = TRUE)  # the sum of the above
-(.mult <- exp(ranef(measlesFit)))  # district-specific multiplicative effects
+exp(ranef(measlesFit))               # multiplicative effects
 plot(measlesFit, type="ri", component="end",
+     at=seq(-3, 3, length.out=17), col.regions=cm.colors(100),
      main="deviations around the endemic intercept (log-scale)")
-plot(measlesFit, type="ri", component="end", log=FALSE,
-     main="multiplicative effects",
-     at=scales::log_breaks(10)(.mult), labels=list(font=3, labels="GEN"))
+plot(measlesFit, type="ri", component="end",
+     log=FALSE, col.regions=cm.colors(10),
+     main="multiplicative effects", labels=list(font=3, labels="GEN"))
 
 ## neighbourhood weights as a function of neighbourhood order
 plot(measlesFit, type="neweights")  # boring, model has no "ne" component

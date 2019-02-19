@@ -361,7 +361,6 @@ plotHHH4_ri <- function (x, component, log = TRUE,
     map <- as(x$stsObj@map, "SpatialPolygonsDataFrame")
     if (length(map) == 0L) stop("'x$stsObj' has no map")
     map$ranef <- ranefmatrix[,comp][row.names(map)]
-    if (!log) map$ranef <- exp(map$ranef)
 
     if (is.list(gpar.missing) && any(is.na(map$ranef))) {
         sp.layout <- c(sp.layout,
@@ -372,8 +371,19 @@ plotHHH4_ri <- function (x, component, log = TRUE,
         sp.layout <- c(sp.layout, list(layout.labels))
     }
 
-    spplot(map[!is.na(map$ranef),], zcol = "ranef",
-           sp.layout = sp.layout, ...)
+    if (isTRUE(log)) {
+        spplot(map[!is.na(map$ranef),], zcol = "ranef",
+               sp.layout = sp.layout, ...)
+    } else {
+        map$ranef <- exp(map$ranef)
+        n <- if (identical(log, FALSE)) 10 else log
+        at <- scales::log_breaks(n = n)(map$ranef)
+        colorkey <- list(at = log(at),
+                         labels = list(at = log(at), labels = at))
+        spplot(map[!is.na(map$ranef),], zcol = "ranef",
+               sp.layout = sp.layout, ...,
+               at = at, colorkey = colorkey)
+    }
 }
 
 
