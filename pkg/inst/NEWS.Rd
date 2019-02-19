@@ -20,6 +20,11 @@
 
     \item \code{sts()} creation can now handle \code{epoch} arguments of
     class \code{Date} directly.
+
+    \item The \code{ranef()}-method for \code{"hhh4"} fits gained a
+    logical argument \code{intercept} to extract the unit-specific
+    intercepts of the log-linear predictors instead of the default
+    zero-mean deviations around the fixed intercepts.
   }
 }
 

@@ -5,7 +5,7 @@
 ###
 ### Standard methods for hhh4-fits
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2012-2018 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2019 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -249,11 +249,12 @@ fixef.hhh4 <- function (object,...)
     } else NULL
 }
 
-ranef.hhh4 <- function (object, tomatrix = FALSE, ...)
+ranef.hhh4 <- function (object, tomatrix = FALSE, intercept = FALSE, ...)
 {
     if (object$dim[2L] > 0){
         ranefvec <- tail(coef.hhh4(object, ...), object$dim[2L])
     } else return(NULL)
+    if (intercept) tomatrix <- TRUE
     if (!tomatrix) return(ranefvec)
 
     ## transform to a nUnits x c matrix (c %in% 1:3)
@@ -268,6 +269,12 @@ ranef.hhh4 <- function (object, tomatrix = FALSE, ...)
         Z %m% RE
     })
     rownames(mat) <- colnames(model$response)
+
+    if (intercept) {
+        FE <- object$coefficients[colnames(mat)]
+        mat <- t(t(mat) + FE)
+    }
+
     return(mat)
 }
 
