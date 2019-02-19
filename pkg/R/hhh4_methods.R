@@ -261,7 +261,7 @@ ranef.hhh4 <- function (object, tomatrix = FALSE, intercept = FALSE, ...)
     model <- terms.hhh4(object)
     idxRE <- model$indexRE
     idxs <- unique(idxRE)
-    names(idxs) <- model$namesFE[idxs]
+    names(idxs) <- model$namesFE[match(idxs, model$indexFE)]
     mat <- sapply(idxs, function (idx) {
         RE <- ranefvec[idxRE==idx]
         Z <- model$terms["Z.intercept",][[idx]]

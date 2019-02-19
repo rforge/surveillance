@@ -90,6 +90,9 @@
 
     \item \code{wrap.algo()} now aborts if the monitored range is
     not supplied as a numeric vector.
+
+    \item The \code{ranef()} matrix extracted from fitted \code{"hhh4"}
+    models could have wrong column names.
   }
 }
 
