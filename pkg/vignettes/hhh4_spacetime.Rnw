@@ -767,19 +767,20 @@ possible by specifying \code{ri(corr = "all")} in the component formulae.
 The implementation also supports a conditional autoregressive
 formulation for spatially correlated intercepts via
 \code{ri(type = "car")}.
-The estimated deviations from the means can be extracted by the
-\code{ranef}-method:
+
+The estimated district-specific deviations
+$\alpha_i^{(\cdot)} - \alpha^{(\cdot)}$
+can be extracted by the \code{ranef}-method:
 <<>>=
 head(ranef(measlesFit_ri, tomatrix = TRUE), n = 3)
 @
-They can also be visualized in a map by the plot \code{type = "ri"}
+We visualize the \code{exp}-transformed values (multiplicative effects)
+on component-specific maps using the plot \code{type = "ri"}
 (Figure~\ref{fig:measlesFit_ri_map}):
-<<measlesFit_ri_map, out.width="0.31\\linewidth", fig.width=3.5, fig.height=3.7, fig.pos="htb", fig.cap="Maps of the estimated random intercepts.", fig.subcap=c("Autoregressive $\\alpha_i^{(\\lambda)}$", "Spatio-temporal $\\alpha_i^{(\\phi)}$", "Endemic $\\alpha_i^{(\\nu)}$"), echo=-1>>=
-stopifnot(ranef(measlesFit_ri) > -1.6, ranef(measlesFit_ri) < 1.6)
+<<measlesFit_ri_map, out.width="0.31\\linewidth", fig.width=3.5, fig.height=3.7, fig.pos="htb", fig.cap="Estimated multiplicative effects on the three components.", fig.subcap=c("Autoregressive", "Spatio-temporal", "Endemic")>>=
 for (comp in c("ar", "ne", "end")) {
-  print(plot(measlesFit_ri, type = "ri", component = comp,
-    col.regions = cm.colors(14), labels = list(cex = 0.6),
-    at = seq(-1.6, 1.6, length.out = 15)))
+  print(plot(measlesFit_ri, type = "ri", component = comp, log = FALSE,
+    col.regions = cm.colors(100), labels = list(cex = 0.6)))
 }
 @
 
