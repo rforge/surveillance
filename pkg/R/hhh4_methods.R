@@ -261,14 +261,16 @@ ranef.hhh4 <- function (object, tomatrix = FALSE, intercept = FALSE, ...)
     model <- terms.hhh4(object)
     idxRE <- model$indexRE
     idxs <- unique(idxRE)
-    names(idxs) <- model$namesFE[match(idxs, model$indexFE)]
-    mat <- sapply(idxs, function (idx) {
+    mat <- vapply(X = idxs, FUN = function (idx) {
         RE <- ranefvec[idxRE==idx]
         Z <- model$terms["Z.intercept",][[idx]]
         "%m%" <- get(model$terms["mult",][[idx]])
-        Z %m% RE
-    })
-    rownames(mat) <- colnames(model$response)
+        c(Z %m% RE)
+    }, FUN.VALUE = numeric(model$nUnits), USE.NAMES = FALSE)
+    dimnames(mat) <- list(
+        colnames(model$response),
+        model$namesFE[match(idxs, model$indexFE)]
+    )
 
     if (intercept) {
         FE <- object$coefficients[colnames(mat)]
