@@ -5,7 +5,7 @@
 ###
 ### Plot-method(s) for fitted hhh4() models
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2012-2018 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2019 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -346,7 +346,8 @@ plotHHH4_maps <- function (x,
 ### Map of estimated random intercepts of a specific component
 ###
 
-plotHHH4_ri <- function (x, component, labels = FALSE, sp.layout = NULL,
+plotHHH4_ri <- function (x, component, log = TRUE,
+                         labels = FALSE, sp.layout = NULL,
                          gpar.missing = list(col="darkgrey", lty=2, lwd=2),
                          ...)
 {
@@ -360,6 +361,7 @@ plotHHH4_ri <- function (x, component, labels = FALSE, sp.layout = NULL,
     map <- as(x$stsObj@map, "SpatialPolygonsDataFrame")
     if (length(map) == 0L) stop("'x$stsObj' has no map")
     map$ranef <- ranefmatrix[,comp][row.names(map)]
+    if (!log) map$ranef <- exp(map$ranef)
 
     if (is.list(gpar.missing) && any(is.na(map$ranef))) {
         sp.layout <- c(sp.layout,

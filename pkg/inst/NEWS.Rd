@@ -25,6 +25,9 @@
     logical argument \code{intercept} to extract the unit-specific
     intercepts of the log-linear predictors instead of the default
     zero-mean deviations around the fixed intercepts.
+    The corresponding \code{plot} method (\code{type="ri"}) gained an
+    argument \code{log}: if set to \code{FALSE} random effects are
+    \code{exp}-transformed and thus show multiplicative effects.
   }
 }
 

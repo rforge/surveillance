@@ -70,7 +70,7 @@ plotHHH4_maps(x, which = c("mean", "endemic", "epi.own", "epi.neighbours"),
               labels = FALSE, sp.layout = NULL, ...,
               map = x$stsObj@map, meanHHH = NULL)
 
-plotHHH4_ri(x, component, labels = FALSE, sp.layout = NULL,
+plotHHH4_ri(x, component, log = TRUE, labels = FALSE, sp.layout = NULL,
             gpar.missing = list(col = "darkgrey", lty = 2, lwd = 2),
             ...)
 
@@ -175,12 +175,20 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
     A seasonality plot of the epidemic dominant eigenvalue
     is also available by including \code{"maxEV"} in \code{components},
     but it only supports models without epidemic covariates/offsets.}
-  \item{intercept}{logical indicating whether to plot seasonality as a
-    multiplicative effect on the respective component (the default
-    \code{intercept=FALSE}), or additionally multiplied by the
-    corresponding intercept (\code{intercept=TRUE}). The latter only
+  \item{intercept}{logical indicating whether to include the global
+    intercept. For \code{plotHHH4_season}, the default (\code{FALSE})
+    means to plot seasonality as a multiplicative effect on the
+    respective component. Multiplication by the intercept only
     makes sense if there are no further (non-centered)
-    covariates/offsets in the component.}
+    covariates/offsets in the component.
+    %% For \code{plotHHH4_ri}, the historical default is to display
+    %% deviations around the corresponding global intercept on the
+    %% \code{log}-scale of the linear predictor.
+  }
+  \item{log}{logical indicating whether to show random effects on the
+    log scale of the linear predictors (defaults to \code{TRUE}).
+    Setting \code{log=FALSE} shows multiplicative effects on the
+    respective components.}
   \item{matplot.args}{list of line style specifications passed to
     \code{\link{matplot}}, e.g., \code{lty}, \code{lwd}, \code{col}.}
   \item{refline.args}{list of line style specifications (e.g.,
@@ -317,8 +325,16 @@ if (requireNamespace("gridExtra"))
     plot(measlesFit, type="maps", labels=list(cex=0.6),
          main=c("Total","Endemic","Within district","From other districts"))
 
-## random intercepts of the endemic component
-plot(measlesFit, type="ri", component="end", labels=list(font=3, labels="GEN"))
+## estimated random intercepts of the endemic component
+fixef(measlesFit)["end.ri(iid)"]  # the mean of the intercepts (log-scale)
+ranef(measlesFit)  # zero-mean deviations around the above mean
+ranef(measlesFit, intercept = TRUE)  # the sum of the above
+(.mult <- exp(ranef(measlesFit)))  # district-specific multiplicative effects
+plot(measlesFit, type="ri", component="end",
+     main="deviations around the endemic intercept (log-scale)")
+plot(measlesFit, type="ri", component="end", log=FALSE,
+     main="multiplicative effects",
+     at=scales::log_breaks(10)(.mult), labels=list(font=3, labels="GEN"))
 
 ## neighbourhood weights as a function of neighbourhood order
 plot(measlesFit, type="neweights")  # boring, model has no "ne" component
