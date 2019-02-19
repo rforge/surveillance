@@ -292,12 +292,15 @@ measlesFit <- hhh4(measlesWeserEms, measlesModel)
 ## fitted values for a single unit
 plot(measlesFit, units=2)
 
+## sum fitted components over all units
+plot(measlesFit, total=TRUE)
+
 ## 'xaxis' option for a nicely formatted time axis
 ## default tick locations and labels:
-plot(measlesFit, units=2, xaxis=list(epochsAsDate=TRUE, line=1))
+plot(measlesFit, total=TRUE, xaxis=list(epochsAsDate=TRUE, line=1))
 ## an alternative with monthly ticks:
 oopts <- surveillance.options(stsTickFactors = c("\%m"=0.75, "\%Y" = 1.5))
-plot(measlesFit, units=2, xaxis=list(epochsAsDate=TRUE,
+plot(measlesFit, total=TRUE, xaxis=list(epochsAsDate=TRUE,
     xaxis.tickFreq=list("\%m"=atChange, "\%Y"=atChange),
     xaxis.labelFreq=list("\%Y"=atMedian), xaxis.labelFormat="\%Y"))
 surveillance.options(oopts)
@@ -330,9 +333,6 @@ plot(measlesFit, units=bigunits,
 
 ## plot completely decomposed mean structure (useless without 'ne' component)
 plot(measlesFit, units=bigunits, col=rainbow(measlesFit$nUnit), decompose=TRUE)
-
-## sum fitted components over all units
-plot(measlesFit, total=TRUE)
 }
 
 \keyword{hplot}
