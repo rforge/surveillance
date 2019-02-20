@@ -840,15 +840,15 @@ more sophisticated techniques presented in the next section.
 \subsection{Predictive model assessment}
 
 \citet{paul-held-2011} suggest to evaluate one-step-ahead forecasts from
-competing models by proper scoring rules for count data \citep{czado-etal-2009}.
+competing models using proper scoring rules for count data \citep{czado-etal-2009}.
 These scores measure the discrepancy between the predictive distribution $P$
 from a fitted model and the later observed value $y$.
 A well-known example is the squared error score (``ses'') $(y-\mu_P)^2$,
-which is usually averaged over a suitable set of forecasts to obtain the mean
-squared error. More elaborate scoring rules such as the logarithmic score
-(``logs'') or the ranked probability score (``rps'') take into account the whole
-predictive distribution to assess calibration and sharpness simultaneously.
-The so-called Dawid-Sebastiani score (``dss'') is another option.
+which is usually averaged over a set of forecasts to obtain the mean
+squared error. The Dawid-Sebastiani score (``dss'') additionally evaluates
+sharpness. The logarithmic score (``logs'') and the ranked probability
+score (``rps'') assess the whole predictive distribution with respect to
+calibration and sharpness.
 Lower scores correspond to better predictions.
 
 In the \class{hhh4} framework, predictive model assessment is made available by
