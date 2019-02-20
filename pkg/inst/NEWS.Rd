@@ -96,6 +96,9 @@
 
     \item The \code{ranef()} matrix extracted from fitted \code{"hhh4"}
     models could have wrong column names.
+
+    \item \code{animate} for \code{"epidata"} failed if
+    \code{time.spacing} was an integer value.
   }
 }
 
