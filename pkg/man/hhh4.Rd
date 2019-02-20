@@ -443,8 +443,7 @@ plot(fluFit, type = "maps", prop = TRUE)
 gridExtra::grid.arrange(
     grobs = lapply(c("ar", "ne", "end"), function (comp)
         plot(fluFit, type = "ri", component = comp, main = comp,
-             at = seq(-2.6, 2.6, length.out = 15),
-             col.regions = cm.colors(14))),
+             exp = TRUE, sub = "multiplicative effect")),
     nrow = 1, ncol = 3)
 
 plot(fluFit, type = "neweights", xlab = "adjacency order")
