@@ -28,6 +28,7 @@
     The corresponding \code{plot} method (\code{type="ri"}) gained an
     argument \code{exp}: if set to \code{TRUE} random effects are
     \code{exp}-transformed and thus show multiplicative effects.
+    [These changes are based on feedback by Tim Pollington.]
   }
 }
 
@@ -38,6 +39,11 @@
 
     \item \code{plotHHH4_ri()} now uses \code{cm.colors(100)} as
     \code{col.regions}, and 0-centered color breaks by default.
+
+    \item The help pages of \code{twinSIR()} and related functions now
+    give examples based on \code{data("hagelloch")} instead of using the
+    toy dataset \code{data("fooepidata")}. The latter is now obsolete and
+    will be removed in future versions of the package.
   }
 }
 
