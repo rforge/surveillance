@@ -310,35 +310,43 @@ Function \code{\link{simEpidata}} for the simulation of epidemic data.
 }
 
 \examples{
-# see help("hagelloch") for an example with a real data set
+data("hagelloch")   # see help("hagelloch") for a description
+head(hagelloch.df)
 
-# here is an artificial event history
-data("foodata")
-str(foodata)
+## convert the original data frame to an "epidata" event history
+myEpi <- as.epidata(hagelloch.df, t0 = 0,
+                    tI.col = "tI", tR.col = "tR", id.col = "PN",
+                    coords.cols = c("x.loc", "y.loc"),
+                    keep.cols = c("SEX", "AGE", "CL"))
+\dontshow{
+## test consistency with default method
+evHist <- as.data.frame(myEpi)[,-1]
+myEpi2 <- as.epidata(
+    evHist, id.col = 1, start.col = "start", stop.col = "stop",
+    atRiskY.col = "atRiskY", event.col = "event", Revent.col = "Revent",
+    coords.cols = c("x.loc", "y.loc")
+)
+stopifnot(identical(myEpi, myEpi2))
+}
 
-# convert the data to an object of class "epidata",
-# also generating some epidemic covariates
-myEpidata <- as.epidata(foodata,
-  id.col = 1, start.col = "start", stop.col = "stop",
-  atRiskY.col = "atrisk", event.col = "infected", Revent.col = "removed",
-  coords.cols = c("x","y"),
-  f = list(B1 = function(u) u <= 1, B2 = function(u) u > 1))
+str(myEpi)
+head(as.data.frame(myEpi))  # "epidata" has event history format
+summary(myEpi)              # see 'summary.epidata'
+plot(myEpi)                 # see 'plot.epidata' and also 'animate.epidata'
 
-# this is how data("fooepidata") has been generated
-data("fooepidata")
-stopifnot(all.equal(myEpidata, fooepidata))
-
-# add covariate-based weight for the force of infection, e.g.,
-# to model an increased force if i and j have the same value in z1
-myEpidata2 <- update(fooepidata,
-                     w = list(samez1 = function(z1.i, z1.j) z1.i == z1.j))
-
-str(fooepidata)
-subset(fooepidata, BLOCK == 1)
-
-summary(fooepidata)          # see 'summary.epidata'
-plot(fooepidata)             # see 'plot.epidata' and also 'animate.epidata'
-stateplot(fooepidata, "15")  # see 'stateplot'
+## add distance indicators and covariates for a "twinSIR" model
+myEpi <- update(myEpi,
+    f = list(
+        household    = function(u) u == 0,
+        nothousehold = function(u) u > 0
+    ),
+    w = list(
+        c1 = function (CL.i, CL.j) CL.i == "1st class" & CL.j == CL.i,
+        c2 = function (CL.i, CL.j) CL.i == "2nd class" & CL.j == CL.i
+    )
+)
+## this is now identical to the prepared hagelloch "epidata"
+stopifnot(identical(myEpi, hagelloch))
 }
 
 \keyword{spatial}

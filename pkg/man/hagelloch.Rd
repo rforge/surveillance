@@ -108,28 +108,9 @@ data("hagelloch")
 data("hagelloch")
 
 head(hagelloch.df)   # original data documented in Oesterle (1992)
-head(as.data.frame(hagelloch))   # derived "epidata" object
+head(as.data.frame(hagelloch))   # "epidata" event history format
 
-
-### How the "epidata" 'hagelloch' was created from 'hagelloch.df'
-
-stopifnot(all.equal(hagelloch,
-  as.epidata(
-    hagelloch.df, t0 = 0, tI.col = "tI", tR.col = "tR",
-    id.col = "PN", coords.cols = c("x.loc", "y.loc"),
-    f = list(
-        household    = function(u) u == 0,
-        nothousehold = function(u) u > 0
-    ),
-    w = list(
-        c1 = function (CL.i, CL.j) CL.i == "1st class" & CL.j == CL.i,
-        c2 = function (CL.i, CL.j) CL.i == "2nd class" & CL.j == CL.i
-    ),
-    keep.cols = c("SEX", "AGE", "CL"))
-))
-
-## the 'f' and 'w' variables could also be created or updated later,
-## e.g., hagelloch <- update(hagelloch, f = list(...))
+## see help("as.epidata") for how 'hagelloch' was created from 'hagelloch.df'
 
 
 ### Basic plots produced from hagelloch.df
@@ -147,8 +128,8 @@ hist(as.numeric(hagelloch.df$tI), xlab="Time (days)", ylab="Cases", main="")
 ### "epidata" summary and plot methods
 
 (s <- summary(hagelloch))
-plot(s)
 head(s$byID)
+plot(s)
 
 \dontrun{
   # Show a dynamic illustration of the spread of the infection
