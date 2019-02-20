@@ -26,7 +26,7 @@
     intercepts of the log-linear predictors instead of the default
     zero-mean deviations around the fixed intercepts.
     The corresponding \code{plot} method (\code{type="ri"}) gained an
-    argument \code{log}: if set to \code{FALSE} random effects are
+    argument \code{exp}: if set to \code{TRUE} random effects are
     \code{exp}-transformed and thus show multiplicative effects.
   }
 }
@@ -35,6 +35,9 @@
   \itemize{
     \item \code{W_np()}'s argument \code{to0} has been renamed to
     \code{truncate}. The old name still works but is deprecated.
+
+    \item \code{plotHHH4_ri()} now uses \code{cm.colors(100)} as
+    \code{col.regions}, and 0-centered color breaks by default.
   }
 }
 

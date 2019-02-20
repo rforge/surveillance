@@ -779,8 +779,8 @@ on component-specific maps using the plot \code{type = "ri"}
 (Figure~\ref{fig:measlesFit_ri_map}):
 <<measlesFit_ri_map, out.width="0.31\\linewidth", fig.width=3.5, fig.height=3.7, fig.pos="htb", fig.cap="Estimated multiplicative effects on the three components.", fig.subcap=c("Autoregressive", "Spatio-temporal", "Endemic")>>=
 for (comp in c("ar", "ne", "end")) {
-  print(plot(measlesFit_ri, type = "ri", component = comp, log = FALSE,
-    col.regions = cm.colors(100), labels = list(cex = 0.6)))
+  print(plot(measlesFit_ri, type = "ri", component = comp, exp = TRUE,
+    labels = list(cex = 0.6)))
 }
 @
 

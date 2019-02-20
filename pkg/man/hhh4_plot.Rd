@@ -70,7 +70,9 @@ plotHHH4_maps(x, which = c("mean", "endemic", "epi.own", "epi.neighbours"),
               labels = FALSE, sp.layout = NULL, ...,
               map = x$stsObj@map, meanHHH = NULL)
 
-plotHHH4_ri(x, component, log = TRUE, labels = FALSE, sp.layout = NULL,
+plotHHH4_ri(x, component, exp = FALSE,
+            at = list(n = 10), col.regions = cm.colors(100),
+            colorkey = TRUE, labels = FALSE, sp.layout = NULL,
             gpar.missing = list(col = "darkgrey", lty = 2, lwd = 2),
             ...)
 
@@ -180,15 +182,16 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
     means to plot seasonality as a multiplicative effect on the
     respective component. Multiplication by the intercept only
     makes sense if there are no further (non-centered)
-    covariates/offsets in the component.
-    %% For \code{plotHHH4_ri}, the historical default is to display
-    %% deviations around the corresponding global intercept on the
-    %% \code{log}-scale of the linear predictor.
-  }
-  \item{log}{logical indicating whether to show random effects on the
-    log scale of the linear predictors (defaults to \code{TRUE}).
-    Setting \code{log=FALSE} shows multiplicative effects on the
-    respective components.}
+    covariates/offsets in the component.}
+  \item{exp}{logical indicating whether to \code{exp}-transform random
+    effects to show multiplicative effects on the respective components.
+    The default is \code{FALSE}.}
+  \item{at}{a numeric vector of breaks for the color levels (see
+    \code{\link[lattice]{levelplot}}), or a list specifying the number
+    of breaks \code{n} (default: 10) and their \code{range} (default:
+    range of the random effects, extended to be symmetric around 0,
+    or around 1 if \code{exp=TRUE}). If \code{exp=TRUE}, the breaks are
+    generated using \code{scales::\link[scales]{log_breaks}}.}
   \item{matplot.args}{list of line style specifications passed to
     \code{\link{matplot}}, e.g., \code{lty}, \code{lwd}, \code{col}.}
   \item{refline.args}{list of line style specifications (e.g.,
@@ -207,6 +210,9 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
     and a separate scale for the map showing the overall mean.}
   \item{col.regions}{a vector of colors used to encode the fitted
     component means (see \code{\link[lattice]{levelplot}}).}
+  \item{colorkey}{a Boolean indicating whether to draw the color key.
+    Alternatively, a list specifying how to draw it, see
+    \code{\link[lattice]{levelplot}}.}
   \item{map}{an object inheriting from \code{"\linkS4class{SpatialPolygons}"}
     with \code{row.names} covering \code{colnames(x)}.}
   \item{component}{component for which to plot the estimated
@@ -327,14 +333,12 @@ if (requireNamespace("gridExtra"))
 
 ## estimated random intercepts of the endemic component
 fixef(measlesFit)["end.ri(iid)"]     # global intercept (log-scale)
-ranef(measlesFit)                    # zero-mean deviations
-ranef(measlesFit, intercept = TRUE)  # the sum of the above
+ranef(measlesFit, tomatrix = TRUE)   # zero-mean deviations
+ranef(measlesFit, intercept = TRUE)  # sum of the above
 exp(ranef(measlesFit))               # multiplicative effects
 plot(measlesFit, type="ri", component="end",
-     at=seq(-3, 3, length.out=17), col.regions=cm.colors(100),
      main="deviations around the endemic intercept (log-scale)")
-plot(measlesFit, type="ri", component="end",
-     log=FALSE, col.regions=cm.colors(10),
+plot(measlesFit, type="ri", component="end", exp=TRUE,
      main="multiplicative effects", labels=list(font=3, labels="GEN"))
 
 ## neighbourhood weights as a function of neighbourhood order

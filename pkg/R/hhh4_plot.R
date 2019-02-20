@@ -346,8 +346,9 @@ plotHHH4_maps <- function (x,
 ### Map of estimated random intercepts of a specific component
 ###
 
-plotHHH4_ri <- function (x, component, log = TRUE,
-                         labels = FALSE, sp.layout = NULL,
+plotHHH4_ri <- function (x, component, exp = FALSE,
+                         at = list(n = 10), col.regions = cm.colors(100),
+                         colorkey = TRUE, labels = FALSE, sp.layout = NULL,
                          gpar.missing = list(col="darkgrey", lty=2, lwd=2),
                          ...)
 {
@@ -361,6 +362,24 @@ plotHHH4_ri <- function (x, component, log = TRUE,
     map <- as(x$stsObj@map, "SpatialPolygonsDataFrame")
     if (length(map) == 0L) stop("'x$stsObj' has no map")
     map$ranef <- ranefmatrix[,comp][row.names(map)]
+    .range <- c(-1, 1) * max(abs(map$ranef), na.rm = TRUE)  # 0-centered
+    if (exp) {
+        map$ranef <- exp(map$ranef)
+        .range <- exp(.range)
+    }
+
+    if (is.list(at)) {
+        at <- modifyList(list(n = 10, range = .range), at)
+        at <- if (exp) {
+            stopifnot(at$range[1] > 0)
+            scales::log_breaks(n = at$n)(at$range)
+        } else {
+            seq(at$range[1L], at$range[2L], length.out = at$n)
+        }
+        if (exp && isTRUE(colorkey))
+            colorkey <- list(at = log(at),
+                             labels = list(at = log(at), labels = at))
+    }
 
     if (is.list(gpar.missing) && any(is.na(map$ranef))) {
         sp.layout <- c(sp.layout,
@@ -371,19 +390,9 @@ plotHHH4_ri <- function (x, component, log = TRUE,
         sp.layout <- c(sp.layout, list(layout.labels))
     }
 
-    if (isTRUE(log)) {
-        spplot(map[!is.na(map$ranef),], zcol = "ranef",
-               sp.layout = sp.layout, ...)
-    } else {
-        map$ranef <- exp(map$ranef)
-        n <- if (identical(log, FALSE)) 10 else log
-        at <- scales::log_breaks(n = n)(map$ranef)
-        colorkey <- list(at = log(at),
-                         labels = list(at = log(at), labels = at))
-        spplot(map[!is.na(map$ranef),], zcol = "ranef",
-               sp.layout = sp.layout, ...,
-               at = at, colorkey = colorkey)
-    }
+    spplot(map[!is.na(map$ranef),], zcol = "ranef",
+           sp.layout = sp.layout, col.regions = col.regions,
+           at = at, colorkey = colorkey, ...)
 }
 
 
