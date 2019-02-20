@@ -346,7 +346,7 @@ myEpi <- update(myEpi,
     )
 )
 ## this is now identical to the prepared hagelloch "epidata"
-stopifnot(identical(myEpi, hagelloch))
+stopifnot(all.equal(myEpi, hagelloch))
 }
 
 \keyword{spatial}
