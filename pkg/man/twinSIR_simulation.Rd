@@ -301,40 +301,42 @@ head(summary(epi)$byID)
 plot(epi)
 
 
-## load data of an artificial epidemic
-data("fooepidata")
-summary(fooepidata)
-plot(fooepidata)
+## load the 1861 Hagelloch measles epidemic
+data("hagelloch")
+summary(hagelloch)
+plot(hagelloch)
+
+## fit a simplistic twinSIR model
+fit <- twinSIR(~ household, data = hagelloch)
+
+## simulate a new epidemic from the above model
+## with simulation period = observation period, and
+# a) with observed infPeriods:
+simfitepi1 <- simulate(fit, data = hagelloch)
+plot(simfitepi1)
+# b) with new infPeriods (simuluated from the Exp(0.1) distribution):
+simfitepi2 <- simulate(fit, data = hagelloch,
+    infPeriod = function(ids) rexp(length(ids), rate = 0.1))
+plot(simfitepi2)
+intensityplot(simfitepi2)
+
 
 if (surveillance.options("allExamples"))
 {
-  ## simulate a new evolution of the epidemic
+  ## simulate from a different model with manually specified parameters
   set.seed(1)
-  simepi <- simEpidata(cbind(start, stop) ~ cox(z1) + cox(z1):cox(z2),
-      data = fooepidata, 
-      beta = c(1,0.5), h0 = -7, alpha = c(B2 = 0.01, B1 = 0.005),
-      f = list(B1 = function(u) u <= 1, B2 = function(u) u > 1),
-      infPeriod = function(ids) rexp(length(ids), rate=0.2), trace = FALSE)
+  simepi <- simEpidata(~ cox(AGE), data = hagelloch,
+      beta = c(0.1), h0 = -4, alpha = c(household = 0.05),
+      f = list(household = function(u) u == 0),
+      infPeriod = function(ids) rexp(length(ids), rate=1/8))
   summary(simepi)
   plot(simepi)
   intensityplot(simepi)
+
+  ## see if we correctly estimate the parameters
+  fitsim <- twinSIR(~ cox(AGE) + household, data = hagelloch)
+  cbind(est = coef(fitsim), confint(fitsim), true = c(0.05, -4, 0.1))
 }
-
-## load a model fitted to the 'fooepidata' epidemic
-data("foofit")
-foofit
-
-## simulate a new epidemic using the model and parameter estimates of 'foofit'
-## and set simulation period = observation period
-# a) with observed infPeriods (i.e. fixed length 3 days):
-simfitepi1 <- simulate(foofit, data=fooepidata)
-plot(simfitepi1)
-# b) with new infPeriods (simuluated from the Exp(0.3) distribution):
-simfitepi2 <- simulate(foofit, data=fooepidata,
-                       infPeriod=function(ids) rexp(length(ids), rate=0.3))
-plot(simfitepi2)
-intensityplot(simfitepi2, which="total", aggregate=FALSE,
-              col=rgb(0,0,0,alpha=0.1))
 }
 
 \keyword{datagen}
