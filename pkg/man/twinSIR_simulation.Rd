@@ -335,7 +335,7 @@ if (surveillance.options("allExamples"))
 
   ## see if we correctly estimate the parameters
   fitsim <- twinSIR(~ cox(AGE) + household, data = hagelloch)
-  cbind(est = coef(fitsim), confint(fitsim), true = c(0.05, -4, 0.1))
+  cbind(true = c(0.05, -4, 0.1), est = coef(fitsim), confint(fitsim))
 }
 }
 
