@@ -128,6 +128,9 @@ stopifnot(all.equal(hagelloch,
     keep.cols = c("SEX", "AGE", "CL"))
 ))
 
+## the 'f' and 'w' variables could also be created or updated later,
+## e.g., hagelloch <- update(hagelloch, f = list(...))
+
 
 ### Basic plots produced from hagelloch.df
 
@@ -141,15 +144,16 @@ plot(hagelloch.df, xlab="x [m]", ylab="x [m]", pch=15, axes=TRUE,
 hist(as.numeric(hagelloch.df$tI), xlab="Time (days)", ylab="Cases", main="")
 
 
-### SIR model information for population & individuals
+### "epidata" summary and plot methods
 
 (s <- summary(hagelloch))
-plot(s, col=c("green","red","darkgray"))
-stateplot(s, id=c("187"))
+plot(s)
+head(s$byID)
 
 \dontrun{
   # Show a dynamic illustration of the spread of the infection
-  animate(hagelloch,time.spacing=0.1,legend.opts=list(x="topleft"),sleep=1/100)
+  animate(hagelloch, time.spacing=0.1, sleep=1/100,
+          legend.opts=list(x="topleft"))
 }
 }
 
