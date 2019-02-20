@@ -774,8 +774,9 @@ can be extracted by the \code{ranef}-method:
 <<>>=
 head(ranef(measlesFit_ri, tomatrix = TRUE), n = 3)
 @
-We visualize the \code{exp}-transformed values (multiplicative effects)
-on component-specific maps using the plot \code{type = "ri"}
+The \code{exp}-transformed deviations correspond to district-specific
+multiplicative effects on the model components, which can be visualized
+via the plot \code{type = "ri"}
 (Figure~\ref{fig:measlesFit_ri_map}):
 <<measlesFit_ri_map, out.width="0.31\\linewidth", fig.width=3.5, fig.height=3.7, fig.pos="htb", fig.cap="Estimated multiplicative effects on the three components.", fig.subcap=c("Autoregressive", "Spatio-temporal", "Endemic")>>=
 for (comp in c("ar", "ne", "end")) {
@@ -785,29 +786,25 @@ for (comp in c("ar", "ne", "end")) {
 @
 
 For the autoregressive component in Figure~\ref{fig:measlesFit_ri_map1}, we see
-a pronounced heterogeneity between the three western districts in blue and the
+a pronounced heterogeneity between the three western districts in pink and the
 remaining districts. These three districts have been affected by large local
 outbreaks and are also the ones with the highest overall numbers of cases.
 In contrast, the city of Oldenburg (03403) is estimated with a relatively low
-autoregressive factor $\lambda_i = \exp(\alpha^{(\lambda)} + \alpha_i^{(\lambda)}) =
-\Sexpr{exp(fixef(measlesFit_ri)[1]+ranef(measlesFit_ri, tomatrix=TRUE)["03403",1])}$,
-but it seems to import more cases from other districts than explained by its
+autoregressive coefficient: $\lambda_i = \exp(\alpha_i^{(\lambda)})$
+can be extracted using the \code{intercept} argument as
+<<>>=
+exp(ranef(measlesFit_ri, intercept = TRUE)["03403", "ar.ri(iid)"])
+@
+However, this district seems to import more cases from other districts than explained by its
 population (Figure~\ref{fig:measlesFit_ri_map2}).
 In Figure~\ref{fig:measlesFit_ri_map3}, the two districts without any reported
-measles cases (03401 and 03405) appear in dark pink, which means that they
+measles cases (03401 and 03405) appear in strong cyan, which means that they
 exhibit a relatively low endemic incidence after adjusting for the
 population and susceptible proportion.
 Such districts could be suspected of a larger amount of underreporting.
 
-Note that the extra flexibility of the random effects model comes at a price.
-First, the estimation runtime increases considerably from
-\Sexpr{round(measlesFit_powerlaw[["runtime"]]["elapsed"], 1)} seconds for the
-previous power-law model \code{measlesFit_powerlaw} to
-\Sexpr{round(measlesFit_ri[["runtime"]]["elapsed"], 1)} seconds with additional
-random effects. Furthermore, we no longer obtain AIC values in the model
-summary, since random effects invalidate simple AIC-based model comparisons.
-Of course we can plot the fitted values (Figure~\ref{fig:measlesFitted_ri})
-and visually compare their quality
+We can plot the fitted values (Figure~\ref{fig:measlesFitted_ri})
+and compare the plot
 with the initial fit shown in Figure~\ref{fig:measlesFitted_basic}:
 <<measlesFitted_ri, out.width="\\linewidth", fig.pos="htb", fig.cap="Fitted components in the random effects model \\code{measlesFit\\_ri} for the five districts with more than 50 cases as well as summed over all districts. Compare to Figure~\\ref{fig:measlesFitted_basic}.">>=
 par(mfrow = c(2,3), mar = c(3, 5, 2, 1), las = 1)
@@ -818,7 +815,9 @@ plot(measlesFit_ri, type = "fitted", total = TRUE,
 @
 For some of these districts, a great amount of cases is now explained via transmission from
 neighboring regions while others are mainly influenced by the local
-autoregression. Note that the decomposition of the estimated mean by district
+autoregression.
+
+The decomposition of the estimated mean by district
 can also be seen from the related plot \code{type = "maps"}
 (Figure~\ref{fig:measlesFitted_maps}):
 <<measlesFitted_maps, fig.cap="Maps of the fitted component proportions averaged over all weeks.", fig.pos="hbt", fig.width=10, fig.height=3.7, out.width="0.93\\linewidth">>=
@@ -827,7 +826,14 @@ plot(measlesFit_ri, type = "maps",
   prop = TRUE, labels = list(cex = 0.6))
 @
 
-However, for quantitative comparisons of model performance we have to resort to
+The extra flexibility of the random effects model comes at a price.
+First, the runtime of the estimation increases considerably from
+\Sexpr{round(measlesFit_powerlaw[["runtime"]]["elapsed"], 1)} seconds for the
+previous power-law model \code{measlesFit_powerlaw} to
+\Sexpr{round(measlesFit_ri[["runtime"]]["elapsed"], 1)} seconds with
+random effects. Furthermore, we no longer obtain AIC values,
+since random effects invalidate simple AIC-based model comparisons.
+For quantitative comparisons of model performance we have to resort to
 more sophisticated techniques presented in the next section.
 
 
