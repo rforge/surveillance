@@ -120,17 +120,17 @@ Warning: monthly data containing the last day of each month as date should be an
 }
 \value{
 An object of class \code{sts} with the slots \code{upperbound} and \code{alarm} filled by appropriate output of the algorithm.
-The slot \code{control} is the usual list but with more items all of length \code{length(range)}:
+The \code{control} slot of the input \code{sts} is amended with the
+following matrix elements, all with \code{length(range)} rows:
 \describe{
-\item{trend}{ is a vector of Booleans indicating whether a time trend was fitted for this time point.}
-\item{trendVector}{ is a vector giving the coefficient of the time trend in the GLM for this time point. If no trend was fitted it is equal to NA.}
-\item{pvalue}{ is a vector giving the probability of observing a value at least equal to the observation under the null hypothesis .}
-\item{expected}{is a vector giving the expectation of the predictive distribution for each timepoint. 
+\item{trend}{Booleans indicating whether a time trend was fitted for this time point.}
+\item{trendVector}{coefficient of the time trend in the GLM for this time point. If no trend was fitted it is equal to NA.}
+\item{pvalue}{probability of observing a value at least equal to the observation under the null hypothesis .}
+\item{expected}{expectation of the predictive distribution for each timepoint. 
 It is only reported if the conditions for raising an alarm are met (enough cases).}
-\item{mu0Vector}{ is a vector giving what is inputed in the negative binomial distribution to get the upperbound as a quantile 
+\item{mu0Vector}{input for the negative binomial distribution to get the upperbound as a quantile 
 (either a plug-in from the GLM or a quantile from the asymptotic normal distribution of the estimator)}
-\item{phiVector}{ is a vector giving the overdispersion of the GLM at each timepoint.}
-
+\item{phiVector}{overdispersion of the GLM at each timepoint.}
 }
 }
 
