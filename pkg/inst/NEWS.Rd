@@ -84,10 +84,12 @@
     [reported by Johannes Bracher]
 
     \item The supplementary p-values returned by \code{farringtonFlexible()}
-    were wrong for the default approach, where \code{thresholdMethod="delta"}
-    (i.e., the original Farrington method) and a power transformation
-    was applied to the data (\code{powertrans != "none"}).
-    [reported by Lore Merdrignac]
+    in \code{control$pvalue} were wrong for the default approach,
+    where \code{thresholdMethod="delta"} (the original Farrington method)
+    and a power transformation was applied to the data
+    (\code{powertrans != "none"}). Similarly, \code{algo.farrington()}
+    returned wrong predictive probabilities in \code{control$pd[,1]} if
+    a power transformation was used. [reported by Lore Merdrignac]
 
     \item The \code{control} argument list of \code{algo.farrington()}
     as stated in the formal function definition was incomplete
