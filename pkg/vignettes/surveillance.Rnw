@@ -44,7 +44,6 @@ Germany }
 library("surveillance")
 options(SweaveHooks=list(fig=function() par(mar=c(4,4,2,0)+.5)))
 options(width=70)
-set.seed(1234)
 
 ## create directory for plots
 dir.create("plots", showWarnings=FALSE)
@@ -215,10 +214,13 @@ simulate such a point-source epidemic; the result is an object of class
 \verb+disProg+.
 
 \label{ex:sts}
-<<fig=T>>=
+<<>>=
+set.seed(1234)
 sts <- sim.pointSource(p = 0.99, r = 0.5, length = 400,
                        A = 1, alpha = 1, beta = 0, phi = 0,
                        frequency = 1, state = NULL, K = 1.7)
+@ 
+<<fig=T>>=
 plot(sts)
 @
 
