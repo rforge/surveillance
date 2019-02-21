@@ -228,9 +228,6 @@ March 2015 update vignette("hhh4") according to JSS paper
 
 - Problem plot if populationFrac=proportion
 
-13/09/2018 inconsistent defaults (for b, alpha and pastWeeksNotIncluded)
-           in algo.farrington() and farringtonFlexible()
-
 
 #======================================================================
 #======================================================================
@@ -245,10 +242,7 @@ March 2015 update vignette("hhh4") according to JSS paper
 #======================================================================
 #======================================================================
 
-#Open
 06/11/2016 in example(nowcast, run.dontrun=TRUE), rjags::jags.model warns
            about unused variables "alpha.lambda" and "beta.lambda" in data
            (unused if ddcp$logLambda != "iidLogGa")
 26/07/2012 Estimation of delay function taking right-censoring into account
-
-#Done
