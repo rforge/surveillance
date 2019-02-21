@@ -44,6 +44,10 @@
     give examples based on \code{data("hagelloch")} instead of using the
     toy dataset \code{data("fooepidata")}. The latter is now obsolete and
     will be removed in future versions of the package.
+
+    \item The elements of the \code{control} list stored in the result
+    of \code{algo.farrington()} are now consistently ordered as in the
+    default \code{control} argument.
   }
 }
 
