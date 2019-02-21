@@ -2,7 +2,7 @@
 \alias{algo.farrington}
 \encoding{latin1}
 
-\title{Surveillance for a count data time series using the Farrington method.}
+\title{Surveillance for Count Time Series Using the Farrington method}
 \description{
   The function takes \code{range} values of the surveillance time
   series \code{disProgObj} and for each time point uses a GLM to
@@ -113,7 +113,13 @@ stopifnot(upperbound(sts1) == upperbound(sts2))
 }
 }
 \author{M. \enc{Höhle}{Hoehle}}
-\seealso{\code{\link{algo.farrington.fitGLM}},\code{\link{algo.farrington.threshold}}}
+\seealso{
+  \code{\link{algo.farrington.fitGLM}},
+  \code{\link{algo.farrington.threshold}}
+
+  An improved Farrington algorithm is available as function
+  \code{\link{farringtonFlexible}}.
+}
 \keyword{classif}
 \references{
   A statistical algorithm for the early detection of outbreaks of
