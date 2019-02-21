@@ -69,7 +69,7 @@ farringtonFlexible <- function(sts, control = list(
     fitFun = "algo.farrington.fitGLM.flexible", # which function to use?
     populationOffset = FALSE, # use a population offset in the model?
     noPeriods = 1,            # how many periods between windows around reference weeks?
-    pastWeeksNotIncluded = w, # how many past weeks not to take into account?
+    pastWeeksNotIncluded = NULL, # how many past weeks not to take into account?
     thresholdMethod = "delta" # which method for calculating the threshold?
     )) {
 
@@ -100,13 +100,7 @@ farringtonFlexible <- function(sts, control = list(
     # Fix missing control options
     ######################################################################
 
-    defaultControl <- formals()$control  # list call (unevaluated)
-    ## temporary assign 'w' to resolve default for 'pastWeeksNotIncluded'
-    defaultControl <- local({
-        if (is.null(w <- control$w)) # w is unspecified in the call
-            w <- eval(defaultControl$w)
-        eval(defaultControl)
-    })
+    defaultControl <- eval(formals()$control)
     control <- modifyList(defaultControl, control, keep.null = TRUE)
 
     if (is.null(control$range)) {
@@ -116,6 +110,11 @@ farringtonFlexible <- function(sts, control = list(
 
     # Use factors in the model? Depends on noPeriods, no input from the user.
     control$factorsBool <- control$noPeriods != 1
+
+    # How many past weeks not to take into account?
+    if (is.null(control$pastWeeksNotIncluded)) {
+        control$pastWeeksNotIncluded <- control$w
+    }
 
     # there is only one fitFun at the moment
     control$fitFun <- match.arg(control$fitFun,

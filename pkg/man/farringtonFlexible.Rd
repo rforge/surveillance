@@ -22,7 +22,7 @@ farringtonFlexible(sts, control = list(
     limit54 = c(5,4), powertrans = "2/3",
     fitFun = "algo.farrington.fitGLM.flexible",
     populationOffset = FALSE,
-    noPeriods = 1, pastWeeksNotIncluded = w,
+    noPeriods = 1, pastWeeksNotIncluded = NULL,
     thresholdMethod = "delta"))
 }
 \arguments{
@@ -73,7 +73,7 @@ farringtonFlexible(sts, control = list(
     equal to 1 no factor variable is created, the set of reference values is defined as in
     Farrington et al (1996).}
     \item{\code{pastWeeksNotIncluded}}{Number of past weeks to ignore in the calculation.
-      The (historical) default is to use the value of \code{control$w}.
+      The default (\code{NULL}) means to use the value of \code{control$w}.
       Setting \code{pastWeeksNotIncluded=26} might be preferable
       (Noufaily et al., 2012).}
     \item{\code{thresholdMethod}}{Method to be used to derive the upperbound.
