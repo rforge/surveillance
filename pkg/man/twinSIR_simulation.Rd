@@ -310,32 +310,33 @@ plot(hagelloch)
 fit <- twinSIR(~ household, data = hagelloch)
 
 ## simulate a new epidemic from the above model
-## with simulation period = observation period, and
-# a) with observed infPeriods:
-simfitepi1 <- simulate(fit, data = hagelloch)
-plot(simfitepi1)
-# b) with new infPeriods (simuluated from the Exp(0.1) distribution):
-simfitepi2 <- simulate(fit, data = hagelloch,
-    infPeriod = function(ids) rexp(length(ids), rate = 0.1))
-plot(simfitepi2)
-intensityplot(simfitepi2)
+## with simulation period = observation period, re-using observed infPeriods
+sim1 <- simulate(fit, data = hagelloch)
+plot(sim1)
 
+## check if we find similar parameters in the simulated epidemic
+fitsim1 <- update(fit, data = sim1)
+cbind(base = coef(fit), new = coef(fitsim1))
 
 if (surveillance.options("allExamples"))
 {
+  ## simulate only 10 days, using random infPeriods ~ Exp(0.1)
+  sim2 <- simulate(fit, data = hagelloch, seed = 2, end = 10,
+    infPeriod = function(ids) rexp(length(ids), rate = 0.1))
+  plot(sim2)
+
   ## simulate from a different model with manually specified parameters
-  set.seed(1)
+  set.seed(321)
   simepi <- simEpidata(~ cox(AGE), data = hagelloch,
       beta = c(0.1), h0 = -4, alpha = c(household = 0.05),
       f = list(household = function(u) u == 0),
       infPeriod = function(ids) rexp(length(ids), rate=1/8))
-  summary(simepi)
   plot(simepi)
   intensityplot(simepi)
 
   ## see if we correctly estimate the parameters
-  fitsim <- twinSIR(~ cox(AGE) + household, data = hagelloch)
-  cbind(true = c(0.05, -4, 0.1), est = coef(fitsim), confint(fitsim))
+  fitsimepi <- twinSIR(~ cox(AGE) + household, data = hagelloch)
+  cbind(true = c(0.05, -4, 0.1), est = coef(fitsimepi), confint(fitsimepi))
 }
 }
 
