@@ -285,10 +285,7 @@ Sebastian Meyer
 }
 
 \seealso{
-The \code{\link{hagelloch}} data for a \dQuote{real} \code{"epidata"} object.
-The code for the conversion from the simple data frame to the SIR event
-history using \code{as.epidata.data.frame} is given in
-\code{example(hagelloch)}.
+The \code{\link{hagelloch}} data as an example.
 
 The \code{\link[=plot.epidata]{plot}} and the
 \code{\link[=summary.epidata]{summary}} method for class \code{"epidata"}.
@@ -334,7 +331,8 @@ head(as.data.frame(myEpi))  # "epidata" has event history format
 summary(myEpi)              # see 'summary.epidata'
 plot(myEpi)                 # see 'plot.epidata' and also 'animate.epidata'
 
-## add distance indicators and covariates for a "twinSIR" model
+## add distance- and covariate-based weights for the force of infection
+## in a twinSIR model, see vignette("twinSIR") for a description
 myEpi <- update(myEpi,
     f = list(
         household    = function(u) u == 0,
