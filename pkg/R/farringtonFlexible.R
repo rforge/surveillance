@@ -80,12 +80,8 @@ farringtonFlexible <- function(sts, control = list(
         epochStr <- "none"
     }
 
-    # Fetch population (if it exists)
-    if (!is.null(population(sts))) {
-        population <- population(sts)
-    } else {
-        population <- rep(1,length(observed))
-    }
+    # Fetch population
+    population <- population(sts)
 
     ######################################################################
     # Fix missing control options
