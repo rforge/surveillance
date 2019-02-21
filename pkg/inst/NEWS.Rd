@@ -109,22 +109,23 @@
     \item The \code{control} argument list of \code{algo.farrington()}
     as stated in the formal function definition was incomplete
     (\code{plot} was missing) and partially out of sync with the default
-    values that were actually set inside the function (\code{alpha=0.05}
-    and \code{b=5}). This has been fixed. Results of
+    values that were actually set inside the function (\code{b=5} and
+    \code{alpha=0.05}). This has been fixed. Results of
     \code{algo.farrington()} would only be affected if the function was
     called without any \code{control} options (which is hardly
     possible). So this can be regarded as a documentation error.
     The formal \code{control} list of the \code{farrington()}
     wrapper function has been adjusted accordingly.
 
-    \item The \code{control} argument list of \code{farringtonFlexible()}
-    as stated in the formal function definition was partially out of
-    sync with the default values that were actually set inside the
-    function: \code{alpha=0.05}, \code{b=5}, and
-    \code{pastWeeksNotIncluded=w}. This has been fixed. Results of
-    \code{farringtonFlexible()} would only be affected if the function
-    was called without any \code{control} options (which is hardly
-    possible). So this can be regarded as a documentation error.
+    \item The \code{control} argument lists of \code{farringtonFlexible()}
+    and \code{bodaDelay()} as stated in the formal function definitions
+    were partially out of sync with respect to the following default
+    values that were actually set inside these functions: \code{b=5}
+    (not 3), \code{alpha=0.05} (not 0.01), \code{pastWeeksNotIncluded=w}
+    (not 26), and, for \code{bodaDelay()} only, \code{delay=FALSE} (not
+    \code{TRUE}). This has been fixed. Results would only be affected if
+    the functions were called without any \code{control} options (which
+    is hardly possible). So this can be regarded as a documentation error.
   }
 }
 
