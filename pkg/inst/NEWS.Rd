@@ -105,6 +105,16 @@
 
     \item \code{animate} for \code{"epidata"} failed if
     \code{time.spacing} was an integer value.
+
+    \item The \code{control} argument list of \code{algo.farrington()}
+    as stated in the formal function definition was incomplete
+    (\code{plot} was missing) and partially out of sync with the default
+    values that were actually set inside the function (\code{alpha=0.05}
+    and \code{b=5}). This has been fixed. Results of
+    \code{algo.farrington()} would only be affected if the function was
+    called without any \code{control} options (which is hardly
+    possible). The formal \code{control} list of the \code{farrington()}
+    wrapper function has been adjusted accordingly.
   }
 }
 

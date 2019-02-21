@@ -15,7 +15,7 @@ wrap.algo <- function(sts, algo, control,
                       control.hook=function(k, control) return(control),
                       verbose=TRUE,...) {
   stopifnot(is.vector(control[["range"]], mode = "numeric"))
-  
+
   #Number of time series
   nAreas <- ncol(sts@observed)
 
@@ -55,7 +55,7 @@ wrap.algo <- function(sts, algo, control,
 }
 
 #Farrington wrapper
-farrington <- function(sts, control=list(range=NULL, b=3, w=3, reweight=TRUE, verbose=FALSE,alpha=0.01),...) {
+farrington <- function(sts, control=list(range=NULL, b=5, w=3, reweight=TRUE, verbose=FALSE, alpha=0.05),...) {
   wrap.algo(sts,algo="algo.farrington",control=control,...)
 }
 

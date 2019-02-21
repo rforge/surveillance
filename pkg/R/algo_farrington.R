@@ -294,7 +294,11 @@ refvalIdxByDate <- function(t0, b, w, epochStr, epochs) {
 ### code chunk number 6: algo_farrington.Rnw:571-769
 ###################################################
 
-algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, reweight=TRUE, verbose=FALSE,alpha=0.01,trend=TRUE,limit54=c(5,4),powertrans="2/3",fitFun=c("algo.farrington.fitGLM.fast","algo.farrington.fitGLM","algo.farrington.fitGLM.populationOffset"))) {
+algo.farrington <- function(disProgObj, control=list(
+  range=NULL, b=5, w=3, reweight=TRUE, verbose=FALSE, plot=FALSE,
+  alpha=0.05, trend=TRUE, limit54=c(5,4), powertrans="2/3",
+  fitFun="algo.farrington.fitGLM.fast")
+  ) {
   #Fetch observed
   observed <- disProgObj$observed
   freq <- disProgObj$freq
@@ -307,25 +311,16 @@ algo.farrington <- function(disProgObj, control=list(range=NULL, b=3, w=3, rewei
   }
 
   ######################################################################
-  # Fix missing control options
+  # Initialize and check control options
   ######################################################################
+  defaultControl <- eval(formals()$control)
+  control <- modifyList(defaultControl, control, keep.null = TRUE)
   if (is.null(control$range)) {
     control$range <- (freq*control$b - control$w):length(observed)
   }
-  if (is.null(control$b))        {control$b=5}
-  if (is.null(control$w))        {control$w=3}
-  if (is.null(control$reweight)) {control$reweight=TRUE}
-  if (is.null(control$verbose))  {control$verbose=FALSE}
-  if (is.null(control$alpha))    {control$alpha=0.05}
-  if (is.null(control$trend))    {control$trend=TRUE}
-  if (is.null(control$plot))     {control$plot=FALSE}
-  if (is.null(control$limit54))  {control$limit54=c(5,4)}
-  if (is.null(control$powertrans)){control$powertrans="2/3"}
-  if (is.null(control$fitFun))   {
-    control$fitFun="algo.farrington.fitGLM.fast"
-  } else {
-    control$fitFun <- match.arg(control$fitFun, c("algo.farrington.fitGLM.fast","algo.farrington.fitGLM","algo.farrington.fitGLM.populationOffset"))
-  }
+  control$fitFun <- match.arg(control$fitFun,
+    c("algo.farrington.fitGLM.fast", "algo.farrington.fitGLM",
+      "algo.farrington.fitGLM.populationOffset"))
 
   #Use special Date class mechanism to find reference months/weeks/days
   if (is.null(disProgObj[["epochAsDate",exact=TRUE]])) {
