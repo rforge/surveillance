@@ -2,7 +2,7 @@
 \alias{algo.farrington}
 \encoding{latin1}
 
-\title{Surveillance for Count Time Series Using the Farrington method}
+\title{Surveillance for Count Time Series Using the Classic Farrington Method}
 \description{
   The function takes \code{range} values of the surveillance time
   series \code{disProgObj} and for each time point uses a GLM to
