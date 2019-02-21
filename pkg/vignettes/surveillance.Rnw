@@ -368,7 +368,7 @@ could be if at least one of the outbreak weeks is correctly
 identified, see e.g.\ \citet{hutwagner2005}.
 
 To compute various performance scores the function
-\verb+algo.quality+ can be used on a \verb+SurvRes+ object.
+\verb+algo.quality+ can be used on a \verb+survRes+ object.
 
 <<>>=
 print(algo.quality(k1.b660))
