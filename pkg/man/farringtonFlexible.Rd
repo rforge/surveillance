@@ -26,7 +26,7 @@ farringtonFlexible(sts, control = list(
     thresholdMethod = "delta"))
 }
 \arguments{
-\item{sts}{object of class sts (including the \code{observed} and the \code{state} time series)}
+\item{sts}{object of class \code{\linkS4class{sts}} (including the \code{observed} and the \code{state} time series)}
 \item{control}{Control object given as a \code{list} containing the following components:
     \describe{
     \item{\code{range}}{Specifies the index of all timepoints which
