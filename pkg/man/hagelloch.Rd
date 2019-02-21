@@ -11,6 +11,8 @@
   German city of Hagelloch (near T\enc{ü}{ue}bingen) 1861. The data were
   originally collected by Dr. Albert Pfeilsticker (1863) and augmented and
   re-analysed by Dr. Heike Oesterle (1992).
+  This dataset is used to illustrate the \code{twinSIR} model class in
+  \code{vignette("twinSIR")}.
 }
 
 \usage{
@@ -19,12 +21,14 @@ data("hagelloch")
 
 \format{
   Loading \code{data("hagelloch")} gives two objects:
-  \code{hagelloch} and \code{hagelloch.df}. The former is an
-  \code{"\link{epidata}"} object for use with \code{\link{twinSIR}}
-  containing the entire SIR event history of the outbreak in the
-  population of 188 children.
+  \code{hagelloch} and \code{hagelloch.df}.
   The latter is the original \code{data.frame} of 188 rows
-  with individual information for each infected child. 
+  with individual information for each infected child.
+  \code{hagelloch} has been generated from \code{hagelloch.df}
+  via \code{\link{as.epidata}} (see the Examples below) to obtain an
+  \code{"epidata"} object for use with \code{\link{twinSIR}}.
+  It contains the entire SIR event history of the outbreak
+  (but not all of the covariates).
 
   The covariate information in \code{hagelloch.df} is as follows:
   
@@ -78,23 +82,21 @@ data("hagelloch")
   the above covariates to save space. Apart from the usual
   \code{"epidata"} event columns, \code{hagelloch} contains a number of
   extra variables representing distance- and covariate-based weights for
-  the force of infection. These have been computed by specifying \code{f}
-  and \code{w} arguments in \code{\link{as.epidata}} at conversion (see
-  the Examples below):
+  the force of infection:
   \describe{
     \item{household:}{the number of currently infectious children in the same
-      household (including the child itself if it is currently
-      infectious), corresponding to \code{function(u) u == 0} in \code{f}.}
+      household (including the child itself if it is currently infectious).}
     \item{nothousehold:}{the number of currently infectious children
-      outside the household, corresponding to \code{function(u) u > 0}
-      in \code{f}.}
+      outside the household.}
     \item{c1, c2:}{the number of children infectious during the respective
       time block and being members of class 1 and 2, respectively; but
       the value is 0 if the individual of the row is not herself a
-      member of the respective class. See the Examples below for
-      the corresponding function definitions in \code{w}.}
+      member of the respective class.}
   }
-
+  Such epidemic covariates can been computed by specifying suitable
+  \code{f} and \code{w} arguments in \code{\link{as.epidata}} at
+  conversion (see the code below), or at a later step via the
+  \code{\link[=update.epidata]{update}}-method for \code{"epidata"}.
 }
 
 \source{
@@ -106,11 +108,24 @@ data("hagelloch")
 
 \examples{
 data("hagelloch")
-
 head(hagelloch.df)   # original data documented in Oesterle (1992)
 head(as.data.frame(hagelloch))   # "epidata" event history format
 
-## see help("as.epidata") for how 'hagelloch' was created from 'hagelloch.df'
+## How the "epidata" 'hagelloch' was created from 'hagelloch.df'
+stopifnot(all.equal(hagelloch,
+  as.epidata(
+    hagelloch.df, t0 = 0, tI.col = "tI", tR.col = "tR",
+    id.col = "PN", coords.cols = c("x.loc", "y.loc"),
+    f = list(
+        household    = function(u) u == 0,
+        nothousehold = function(u) u > 0
+    ),
+    w = list(
+        c1 = function (CL.i, CL.j) CL.i == "1st class" & CL.j == CL.i,
+        c2 = function (CL.i, CL.j) CL.i == "2nd class" & CL.j == CL.i
+    ),
+    keep.cols = c("SEX", "AGE", "CL"))
+))
 
 
 ### Basic plots produced from hagelloch.df
@@ -153,4 +168,10 @@ plot(s)
   5(2):249-261
 }
 
-\seealso{\code{\link{twinSIR}}, \code{\link{epidata}}}
+\seealso{
+  data class: \code{\link{epidata}}
+  
+  point process model: \code{\link{twinSIR}}
+  
+  illustration with \code{hagelloch}: \code{vignette("twinSIR")}
+}
