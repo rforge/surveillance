@@ -467,7 +467,8 @@ have the same length up to rounding.}
 
 Moreover, it was shown in \citet{Noufaily2012} that it is better to exclude the last 26 weeks before $t_0$ from the baseline
 in order to avoid reducing sensitivity when an outbreak has started recently before $t_0$. In the \code{farringtonFlexible} function, one controls this by specifying \code{pastWeeksNotIncluded}, which is
-the number of last timepoints before $t_0$ that are not to be used. The default value is 26.
+the number of last timepoints before $t_0$ that are not to be used.
+The (historical) default is to use \code{pastWeeksNotIncluded = w}.
 
 Lastly, in the new implementation a population offset can be included in the GLM by setting \code{populationBool} to \code{TRUE} and supplying the possibly time-varying population size in the \code{population} slot of the \code{sts} object, but this will not be discussed further here.
 

@@ -54,12 +54,25 @@
 ################################################################################
 
 farringtonFlexible <- function(sts, control = list(
-    range = NULL, b = 3, w = 3, reweight = TRUE, weightsThreshold = 2.58,
-    verbose = FALSE, glmWarnings = TRUE, alpha = 0.01, trend = TRUE,
-    pThresholdTrend = 0.05, limit54=c(5,4), powertrans="2/3",
-    fitFun="algo.farrington.fitGLM.flexible", populationOffset = FALSE,
-    noPeriods = 1, pastWeeksNotIncluded = 26, thresholdMethod = "delta"))
-{
+    range = NULL,             # range of time points to be monitored
+    b = 5,                    # how many years to go back in time?
+    w = 3,                    # half-window length
+    reweight = TRUE,          # reweighting past outbreaks?
+    weightsThreshold = 2.58,  # with which threshold?
+    verbose = FALSE,          # printing information?
+    glmWarnings = TRUE,       # printing warning from glm.fit?
+    alpha = 0.05,             # approximate (two-sided) (1-alpha)% prediction interval
+    trend = TRUE,             # include a time trend when possible?
+    pThresholdTrend = 0.05,   # which pvalue for the time trend is significant?
+    limit54 = c(5,4),         # ignore if <5 reports during the past 4 weeks
+    powertrans = "2/3",       # power transformation for the data
+    fitFun = "algo.farrington.fitGLM.flexible", # which function to use?
+    populationOffset = FALSE, # use a population offset in the model?
+    noPeriods = 1,            # how many periods between windows around reference weeks?
+    pastWeeksNotIncluded = w, # how many past weeks not to take into account?
+    thresholdMethod = "delta" # which method for calculating the threshold?
+    )) {
+
     ######################################################################
     # Use special Date class mechanism to find reference months/weeks/days
     ######################################################################
@@ -86,100 +99,42 @@ farringtonFlexible <- function(sts, control = list(
     ######################################################################
     # Fix missing control options
     ######################################################################
-    # How many years to go back in time?
-    if (is.null(control[["b",exact=TRUE]])) { control$b = 5 }
 
-    # Half-window length
-    if (is.null(control[["w", exact = TRUE]])) { control$w = 3 }
+    defaultControl <- local({
+        ## temporary assign 'w' to resolve 'pastWeeksNotIncluded'
+        if (is.null(w <- control$w)) # w is unspecified in the call
+            w <- eval(formals()$control$w)
+        eval(formals()$control)
+    })
+    control <- modifyList(defaultControl, control, keep.null = TRUE)
 
-    # Range of time points to be evaluated
-    if (is.null(control[["range", exact=TRUE]])) {
-        control$range <- (freq*(control$b)+control$w +1):dim(observed)[1]
+    if (is.null(control$range)) {
+        control$range <- (freq*control$b + control$w + 1):nrow(observed)
+        ## NOTE: this default is different from algo.farrington()
     }
-
-
-
-    # Reweighting past outbreaks?
-    if (is.null(control[["reweight",exact=TRUE]])) {control$reweight=TRUE}
-    # With which threshold?
-    if (is.null(control[["weightsThreshold",exact=TRUE]])) {
-        control$weightsThreshold=2.58
-    }
-
-    # Printing information?
-    if (is.null(control[["verbose",exact=TRUE]]))    {control$verbose=FALSE}
-
-    # Printing warning from glm.fit?
-    if (is.null(control[["glmWarnings",exact=TRUE]]))    {control$glmWarnings=TRUE}
-
-    # An approximate (two-sided) (1 - alpha)% prediction interval is calculated
-    if (is.null(control[["alpha",exact=TRUE]]))        {control$alpha=0.05}
-
-    # Include a time trend when possible?
-    if (is.null(control[["trend",exact=TRUE]]))        {control$trend=TRUE}
-
-    # Which pvalue for the time trend to be significant?
-    if (is.null(control[["pThresholdTrend",exact=TRUE]])){
-        control$pThresholdTrend=0.05}
-
-
-    # No alarm is sounded
-    #    if fewer than cases = 5 reports were received in the past period = 4
-    #    weeks. limit54=c(cases,period) is a vector allowing the user to change
-    #    these numbers
-    if (is.null(control[["limit54",exact=TRUE]]))    {control$limit54=c(5,4)}
-
-    # Power transformation to apply to the data.
-    if (is.null(control[["powertrans",exact=TRUE]])){control$powertrans="2/3"}
-
-    # How many noPeriods between windows around reference weeks?
-    if (is.null(control[["noPeriods",exact=TRUE]])){control$noPeriods=1}
 
     # Use factors in the model? Depends on noPeriods, no input from the user.
-    if (control$noPeriods!=1) {
-        control$factorsBool=TRUE
-    } else {
-        control$factorsBool=FALSE
-    }
+    control$factorsBool <- control$noPeriods != 1
 
-    # Use a population offset in the model?
-    if (is.null(control[["populationOffset",exact=TRUE]])) {
-        control$populationOffset=FALSE
-    }
+    # there is only one fitFun at the moment
+    control$fitFun <- match.arg(control$fitFun,
+        c("algo.farrington.fitGLM.flexible"))
 
-    # How many past weeks not to take into account?
-    if (is.null(control[["pastWeeksNotIncluded",exact=TRUE]])) {
-        control$pastWeeksNotIncluded=control$w
-    }
-
-    # Which function to use?
-    # Only one possibility at the moment
-    if (is.null(control[["fitFun",exact=TRUE]])) {
-        control$fitFun="algo.farrington.fitGLM.flexible"
-    } else {
-        control$fitFun <- match.arg(control$fitFun, c(
-            "algo.farrington.fitGLM.flexible"))
-    }
-
-    # Which method for calculating the threshold?
-	# Extracting the method
-
-    if (is.null(control[["thresholdMethod",exact=TRUE]])) { control$thresholdMethod="delta"}
-    thresholdMethod<- match.arg(control$thresholdMethod, c("delta","nbPlugin","muan"),several.ok=FALSE)
+    # extract the threshold method
+    thresholdMethod <- match.arg(control$thresholdMethod,
+        c("delta", "nbPlugin", "muan"))
 
     # Adapt the argument for the glm function
-    control$typePred <- switch(thresholdMethod, "delta"="response","nbPlugin"="link","muan"="link")
-
+    control$typePred <- switch(thresholdMethod, "delta" = "response",
+                               "nbPlugin" = "link", "muan" = "link")
 
     # Which threshold function?
     control$thresholdFunction <- switch(thresholdMethod,
-	                                     "delta"="algo.farrington.threshold.farrington",
-										 "nbPlugin"="algo.farrington.threshold.noufaily",
-										 "muan"="algo.farrington.threshold.noufaily")
+        "delta" = "algo.farrington.threshold.farrington",
+        "nbPlugin" = "algo.farrington.threshold.noufaily",
+        "muan" = "algo.farrington.threshold.noufaily")
 
-    ######################################################################
-    # Check options
-    ######################################################################
+    # check options
     if (!((control$limit54[1] >= 0) && (control$limit54[2] > 0))) {
         stop("The limit54 arguments are out of bounds: cases >= 0 and period > 0.")
     }

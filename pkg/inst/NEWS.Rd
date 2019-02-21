@@ -113,8 +113,18 @@
     and \code{b=5}). This has been fixed. Results of
     \code{algo.farrington()} would only be affected if the function was
     called without any \code{control} options (which is hardly
-    possible). The formal \code{control} list of the \code{farrington()}
+    possible). So this can be regarded as a documentation error.
+    The formal \code{control} list of the \code{farrington()}
     wrapper function has been adjusted accordingly.
+
+    \item The \code{control} argument list of \code{farringtonFlexible()}
+    as stated in the formal function definition was partially out of
+    sync with the default values that were actually set inside the
+    function: \code{alpha=0.05}, \code{b=5}, and
+    \code{pastWeeksNotIncluded=w}. This has been fixed. Results of
+    \code{farringtonFlexible()} would only be affected if the function
+    was called without any \code{control} options (which is hardly
+    possible). So this can be regarded as a documentation error.
   }
 }
 

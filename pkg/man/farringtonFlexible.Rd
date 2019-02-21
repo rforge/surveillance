@@ -2,7 +2,7 @@
 \alias{farringtonFlexible}
 \encoding{latin1}
 
-\title{Surveillance for an univariate count data time series using the improved Farrington method described in Noufaily et al. (2012).}
+\title{Surveillance for Univariate Count Time Series Using an Improved Farrington Method}
 \description{
 %
   The function takes \code{range} values of the surveillance time
@@ -15,14 +15,14 @@
 }
 \usage{
 farringtonFlexible(sts, control = list(
-    range = NULL, b = 3, w = 3,
+    range = NULL, b = 5, w = 3,
     reweight = TRUE, weightsThreshold = 2.58,
     verbose = FALSE, glmWarnings = TRUE,
-    alpha = 0.01, trend = TRUE, pThresholdTrend = 0.05,
+    alpha = 0.05, trend = TRUE, pThresholdTrend = 0.05,
     limit54 = c(5,4), powertrans = "2/3",
     fitFun = "algo.farrington.fitGLM.flexible",
     populationOffset = FALSE,
-    noPeriods = 1, pastWeeksNotIncluded = 26,
+    noPeriods = 1, pastWeeksNotIncluded = w,
     thresholdMethod = "delta"))
 }
 \arguments{
@@ -72,7 +72,10 @@ farringtonFlexible(sts, control = list(
     \item{\code{noPeriods}}{Number of levels in the factor allowing to use more baseline. If
     equal to 1 no factor variable is created, the set of reference values is defined as in
     Farrington et al (1996).}
-     \item{\code{pastWeeksNotIncluded}}{Number of past weeks to ignore in the calculation.}
+    \item{\code{pastWeeksNotIncluded}}{Number of past weeks to ignore in the calculation.
+      The (historical) default is to use the value of \code{control$w}.
+      Setting \code{pastWeeksNotIncluded=26} might be preferable
+      (Noufaily et al., 2012).}
     \item{\code{thresholdMethod}}{Method to be used to derive the upperbound.
     Options are \code{"delta"} for the method described in Farrington et al. (1996),
     \code{"Noufaily"} for the method described in Noufaily et al. (2012),
