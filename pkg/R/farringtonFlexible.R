@@ -100,11 +100,12 @@ farringtonFlexible <- function(sts, control = list(
     # Fix missing control options
     ######################################################################
 
+    defaultControl <- formals()$control  # list call (unevaluated)
+    ## temporary assign 'w' to resolve default for 'pastWeeksNotIncluded'
     defaultControl <- local({
-        ## temporary assign 'w' to resolve 'pastWeeksNotIncluded'
         if (is.null(w <- control$w)) # w is unspecified in the call
-            w <- eval(formals()$control$w)
-        eval(formals()$control)
+            w <- eval(defaultControl$w)
+        eval(defaultControl)
     })
     control <- modifyList(defaultControl, control, keep.null = TRUE)
 
