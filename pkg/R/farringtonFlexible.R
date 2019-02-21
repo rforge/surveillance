@@ -53,27 +53,18 @@
 # MAIN FUNCTION
 ################################################################################
 
-farringtonFlexible <- function(sts, control = list(range = NULL, b = 3, w = 3,
-													reweight = TRUE,
-													weightsThreshold = 2.58,
-													verbose = FALSE,glmWarnings = TRUE,
-													alpha = 0.01, trend = TRUE,
-													pThresholdTrend = 0.05, limit54=c(5,4),
-													powertrans="2/3",
-													fitFun="algo.farrington.fitGLM.flexible",
-													populationOffset = FALSE,
-													noPeriods = 1, pastWeeksNotIncluded = 26,
-													thresholdMethod = "delta")) {
-
+farringtonFlexible <- function(sts, control = list(
+    range = NULL, b = 3, w = 3, reweight = TRUE, weightsThreshold = 2.58,
+    verbose = FALSE, glmWarnings = TRUE, alpha = 0.01, trend = TRUE,
+    pThresholdTrend = 0.05, limit54=c(5,4), powertrans="2/3",
+    fitFun="algo.farrington.fitGLM.flexible", populationOffset = FALSE,
+    noPeriods = 1, pastWeeksNotIncluded = 26, thresholdMethod = "delta"))
+{
     ######################################################################
     # Use special Date class mechanism to find reference months/weeks/days
     ######################################################################
 
-    if (is.null( sts@epochAsDate)) {
-        epochAsDate <- FALSE
-    } else {
-        epochAsDate <-    sts@epochAsDate
-    }
+    epochAsDate <- sts@epochAsDate
 
     ######################################################################
     # Fetch observed and population
