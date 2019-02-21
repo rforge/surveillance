@@ -28,7 +28,7 @@
     The corresponding \code{plot} method (\code{type="ri"}) gained an
     argument \code{exp}: if set to \code{TRUE} random effects are
     \code{exp}-transformed and thus show multiplicative effects.
-    [These changes are based on feedback by Tim Pollington.]
+    [based on feedback by Tim Pollington]
   }
 }
 
@@ -49,29 +49,11 @@
 
 \subsection{BUG FIXES}{
   \itemize{
-    \item For \code{farringtonFlexible()} with multivariate time series,
-    only the last unit had stored the additional control items
-    (exceedence scores, p-values, ...), all others were 0.
-    [reported by Johannes Bracher]
-    
     \item Using negative indices to exclude time points from an
     \code{"sts"} object (e.g., \code{x[-1,]}) is now supported and
     equivalent to the corresponding subset expression of retained
     indexes (\code{x[2:nrow(x),]}) in resetting the \code{start} and
     \code{epoch} slots. [reported by Johannes Bracher]
-
-    \item The supplementary p-values returned by \code{farringtonFlexible()}
-    were wrong for the default approach, where \code{thresholdMethod="delta"}
-    (i.e., the original Farrington method) and a power transformation
-    was applied to the data (\code{powertrans != "none"}).
-    [reported by Lore Merdrignac]
-
-    \item \code{epidataCS2sts()} no longer transfers the
-    \code{stgrid$BLOCK} indices to the \code{epoch} slot of the
-    resulting \code{"sts"} object (to avoid \code{epoch[1] != 1}
-    scenarios).
-
-    \item \code{sts_creation()} hard-coded \code{start = c(2006, 1)}.
 
     \item For weekly \code{"sts"} data with \code{epochAsDate=TRUE},
     the \code{as.data.frame()} method computed \code{freq} by
@@ -83,8 +65,7 @@
     \code{tidy.sts()} output corresponded to the ISO week-based year.
     It now gives the calendar year.
 
-    \item In \code{vignette("monitoringCounts")}: several
-    inconsistencies between code and output have been fixed.
+    \item \code{sts_creation()} hard-coded \code{start = c(2006, 1)}.
 
     \item \code{aggregate()}ing an \code{"sts"} object over time now
     recomputes fractions from the cumulated population values if and
@@ -92,19 +73,17 @@
     population fractions. The same rule holds when subsetting units of
     an \code{"sts"} object. The \code{aggregate}-method previously
     failed to recompute fractions in some cases.
+    
+    \item For \code{farringtonFlexible()} with multivariate time series,
+    only the last unit had stored the additional control items
+    (exceedence scores, p-values, ...), all others were 0.
+    [reported by Johannes Bracher]
 
-    \item \code{pairedbinCUSUM()} did not properly subset the \code{sts}
-    object if a \code{range} was specified and forgot to store the
-    \code{control} arguments in the result.
-
-    \item \code{wrap.algo()} now aborts if the monitored range is
-    not supplied as a numeric vector.
-
-    \item The \code{ranef()} matrix extracted from fitted \code{"hhh4"}
-    models could have wrong column names.
-
-    \item \code{animate} for \code{"epidata"} failed if
-    \code{time.spacing} was an integer value.
+    \item The supplementary p-values returned by \code{farringtonFlexible()}
+    were wrong for the default approach, where \code{thresholdMethod="delta"}
+    (i.e., the original Farrington method) and a power transformation
+    was applied to the data (\code{powertrans != "none"}).
+    [reported by Lore Merdrignac]
 
     \item The \code{control} argument list of \code{algo.farrington()}
     as stated in the formal function definition was incomplete
@@ -126,6 +105,24 @@
     \code{TRUE}). This has been fixed. Results would only be affected if
     the functions were called without any \code{control} options (which
     is hardly possible). So this can be regarded as a documentation error.
+
+    \item \code{pairedbinCUSUM()} did not properly subset the \code{sts}
+    object if a \code{range} was specified, and forgot to store the
+    \code{control} arguments in the result.
+
+    \item \code{wrap.algo()} now aborts if the monitored range is
+    not supplied as a numeric vector.
+
+    \item In \code{vignette("monitoringCounts")}: several
+    inconsistencies between code and output have been fixed.
+
+    \item \code{epidataCS2sts()} no longer transfers the
+    \code{stgrid$BLOCK} indices to the \code{epoch} slot of the
+    resulting \code{"sts"} object (to avoid \code{epoch[1] != 1}
+    scenarios).
+
+    \item The \code{ranef()} matrix extracted from fitted \code{"hhh4"}
+    models could have wrong column names.
   }
 }
 
