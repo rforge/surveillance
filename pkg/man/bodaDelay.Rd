@@ -78,7 +78,7 @@ for (week in 43:45){
   inWeeks <- with(isoWeekYear(epoch(stsC)),
                   ISOYear == 2011 & ISOWeek >= 40 & ISOWeek <= 48)
   
-  rangeTest <- inWeeks
+  rangeTest <- which(inWeeks)
   alpha <- 0.07
 
   # Control slot for Noufaily method          
