@@ -860,7 +860,7 @@ seasonality and a trend. This model will be refitted after each alarm, but first
 and the data from 2011 as data to be monitored or \code{phase2}. The threshold \texttt{c.ARL} was chosen to be 4 as we found with the same approach as \citet{hoehle-mazick-2010} that it made the probability of a false alarm within one year
 smaller than 0.1. Figure~\ref{fig:glrnb}~shows the results of this monitoring.
 
-<<glrnb>>=
+<<glrnb, results=hide>>=
 phase1 <- which(isoWeekYear(epoch(salmNewportGermany))$ISOYear < 2011)
 phase2 <- in2011
 control <- list(range = phase2, c.ARL = 4, theta = log(2), ret = "cases",
