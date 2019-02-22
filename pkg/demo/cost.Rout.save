@@ -1,13 +1,11 @@
 
-R version 3.4.4 (2018-03-15) -- "Someone to Lean On"
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
 Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
-
-  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -30,7 +28,7 @@ Type 'q()' to quit R.
 > library("surveillance")
 Loading required package: sp
 Loading required package: xtable
-This is surveillance 1.16.0. For overview type ‘help(surveillance)’.
+This is surveillance 1.17.0. For overview type ‘help(surveillance)’.
 > options(width=70)
 > options("prompt"="R> ")
 R> set.seed(1234)
@@ -377,7 +375,7 @@ R> par(mar=c(0,0,0,0))
 R> shp <- system.file("shapes/berlin.shp",package="surveillance")
 R> ha <- disProg2sts(ha, map=maptools::readShapePoly(shp,IDvar="SNAME"))
 Warning message:
-use rgdal::readOGR or sf::st_read 
+readShapePoly is deprecated; use rgdal::readOGR or sf::st_read 
 R> plot(ha,type=observed ~ 1 | unit)
 R> 
 R> dev.off()
@@ -415,6 +413,6 @@ R>
 R> 
 R> ## finally switch back to original working directory
 R> message("Note: selected figures have been saved in ", getwd(), "/figs")
-Note: selected figures have been saved in /tmp/RtmplJgpIm/figs
+Note: selected figures have been saved in /tmp/RtmpjJvjwZ/figs
 R> setwd(OWD)
 R> 
