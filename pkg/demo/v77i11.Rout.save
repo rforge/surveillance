@@ -1,13 +1,11 @@
 
-R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
-
-  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -43,7 +41,7 @@ Type 'q()' to quit R.
 > library("surveillance")  # you should also have installed the suggested packages
 Loading required package: sp
 Loading required package: xtable
-This is surveillance 1.16.0. For overview type ‘help(surveillance)’.
+This is surveillance 1.17.0. For overview type ‘help(surveillance)’.
 > 
 > ## 3.2. Data structure: 'epidataCS'
 > data("imdepi", package = "surveillance")
@@ -101,7 +99,7 @@ Observation period: 0 - 2557
 Observation window (bounding box): [4031.295, 4672.253] x [2684.102, 3549.931] 
 Spatio-temporal grid (not shown): 84 time blocks x 413 tiles 
 Types of events: "B" "C"
-Overall number of events: 636 
+Overall number of events: 636
 
            coordinates       time  tile type eps.t eps.s    sex   agegrp BLOCK
 1 (4112.188, 3202.792)  0.2116949 05554    B    30   200   male   [3,19)     1
@@ -123,7 +121,7 @@ Overall number of events: 636
 Observation period: 0 - 2557 
 Observation window (bounding box): [4031.295, 4672.253] x [2684.102, 3549.931] 
 Spatio-temporal grid (not shown): 84 time blocks x 413 tiles 
-Overall number of events: 636 (2 types) 
+Overall number of events: 636 (2 types)
 
 Summary of event marks and number of potential sources:
       time                tile     type        eps.t        eps.s    
@@ -272,8 +270,8 @@ Done.
 +              label = "tab:imdfit_Gaussian"),
 +       sanitize.text.function = NULL, sanitize.colnames.function = NULL,
 +       sanitize.rownames.function = function(x) paste0("\\code{", x, "}"))
-% latex table generated in R 3.4.3 by xtable 1.8-2 package
-% Tue Jan 23 12:16:25 2018
+% latex table generated in R 3.5.2 by xtable 1.8-3 package
+% Fri Feb 22 09:39:20 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -432,7 +430,7 @@ Note: added the 'tau' component to object 'imdfit_powerlaw' for future use.
 > imdsims <- simulate(imdfit_powerlaw, nsim = 30, seed = 1, t0 = 1826, T = 2555,
 +   data = imdepi_untied_infeps, tiles = districtsD)
 
-Time at beginning of simulation: 2018-01-23 12:16:52 
+Time at beginning of simulation: 2019-02-22 09:39:45 
 Simulation 1 / 30 ...
 -------------------------------------------------------------------------------
 
@@ -459,8 +457,8 @@ Preparing simulated events for "epidataCS" ...
 Done.
 
 -------------------------------------------------------------------------------
-Runtime of first simulation: 2.928 seconds
-Estimated finishing time: 2018-01-23 12:18:20 
+Runtime of first simulation: 3.185 seconds
+Estimated finishing time: 2019-02-22 09:41:21 
 
 Simulation  2 / 30 ...	simulated 187 events up to time 2555 
 Simulation  3 / 30 ...	simulated 192 events up to time 2555 
@@ -492,7 +490,7 @@ Simulation 28 / 30 ...	simulated 174 events up to time 2555
 Simulation 29 / 30 ...	simulated 158 events up to time 2555 
 Simulation 30 / 30 ...	simulated 155 events up to time 2555 
 
-Done (2018-01-23 12:18:39).
+Done (2019-02-22 09:41:49).
 > 
 > table(imdsims[[1]]$events$source > 0, exclude = NULL)
 
@@ -951,8 +949,6 @@ Number of time points:  103
 +     measlesFit_powerlaw$loglikelihood,
 +     -sum(scores(oneStepAhead(measlesFit_powerlaw, tp = 1, type = "final"),
 +                 which = "logs", individual = TRUE))))
-Note: surveillance 1.16.0 no longer reverses the time points by default.
-  Set the 'reverse' argument explicitly to avoid this message.
 > 
 > SCORES <- c("logs", "rps", "dss", "ses")
 > measlesScores1 <- lapply(measlesPreds1, scores, which = SCORES, individual = TRUE,
@@ -973,24 +969,24 @@ One-step-ahead prediction @ t = 68 ...
 One-step-ahead prediction @ t = 69 ...
 One-step-ahead prediction @ t = 70 ...
 One-step-ahead prediction @ t = 71 ...
-One-step-ahead prediction @ t = 73 ...
 One-step-ahead prediction @ t = 72 ...
-One-step-ahead prediction @ t = 75 ...
+One-step-ahead prediction @ t = 73 ...
 One-step-ahead prediction @ t = 74 ...
-One-step-ahead prediction @ t = 77 ...
+One-step-ahead prediction @ t = 75 ...
 One-step-ahead prediction @ t = 76 ...
+One-step-ahead prediction @ t = 77 ...
 One-step-ahead prediction @ t = 65 ...
 One-step-ahead prediction @ t = 66 ...
 One-step-ahead prediction @ t = 67 ...
 One-step-ahead prediction @ t = 68 ...
-One-step-ahead prediction @ t = 69 ...
 One-step-ahead prediction @ t = 70 ...
-One-step-ahead prediction @ t = 71 ...
+One-step-ahead prediction @ t = 69 ...
 One-step-ahead prediction @ t = 72 ...
-One-step-ahead prediction @ t = 73 ...
+One-step-ahead prediction @ t = 71 ...
 One-step-ahead prediction @ t = 74 ...
-One-step-ahead prediction @ t = 75 ...
+One-step-ahead prediction @ t = 73 ...
 One-step-ahead prediction @ t = 76 ...
+One-step-ahead prediction @ t = 75 ...
 One-step-ahead prediction @ t = 77 ...
 One-step-ahead prediction @ t = 65 ...
 One-step-ahead prediction @ t = 66 ...
