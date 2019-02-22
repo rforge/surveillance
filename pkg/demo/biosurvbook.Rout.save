@@ -1,13 +1,11 @@
 
-R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
-Copyright (C) 2016 The R Foundation for Statistical Computing
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
-
-  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -37,8 +35,7 @@ Type 'q()' to quit R.
 > library("surveillance")
 Loading required package: sp
 Loading required package: xtable
-Loading required package: polyCub
-This is surveillance 1.13.0. For overview type ‘help(surveillance)’.
+This is surveillance 1.17.0. For overview type ‘help(surveillance)’.
 > 
 > #Load Danish mortality data (see book chapter for CSV reading")
 > data("momo")
@@ -85,7 +82,7 @@ Running  algo.farrington  on area  1  out of  1
 > text(nrow(s.far)+2,tail(observed(s.far),n=1),expression(hat(mu)[t[0]]))
 > 
 > 
-> alarmDates <- epoch(s.far[alarms(s.far) == 1,])
+> alarmDates <- epoch(s.far)[alarms(s.far) == 1]
 > 
 > 
 > par(mar=c(4,4,2,2))
@@ -136,7 +133,7 @@ Waiting for profiling to be done...
 Running  algo.glrnb  on area  1  out of  1 
 > 
 > 
-> alarmDates <- epoch(s.nb[alarms(s.nb) == 1,])
+> alarmDates <- epoch(s.nb)[alarms(s.nb) == 1]
 > 
 > 
 > plot(s.nb,dx.upperbound=0,legend.opts=NULL,ylab="No. of deaths",main="",ylim=c(0,max(observed(s.nb))*1.1),xlab="time (weeks)",col=c("darkgray",NA,1),lwd=c(1,1,2),lty=c(1,1,1),alarm.symbol=list(pch=24,col=1, cex=1))
@@ -170,8 +167,8 @@ Running  algo.glrnb  on area  1  out of  1
 > 
 > #Determine run-length using 1000 Monte Carlo samples
 > g.grid <- seq(1,8,by=0.5)
-> pMC <- sapply(g.grid, function(g) { 
-+   mean(replicate(nSims, simone.TAleq65(momo[,"[75,85)"],g))) 
+> pMC <- sapply(g.grid, function(g) {
++   mean(replicate(nSims, simone.TAleq65(momo[,"[75,85)"],g)))
 + })
 Running  algo.glrnb  on area  1  out of  1 
 Running  algo.glrnb  on area  1  out of  1 
@@ -1363,7 +1360,7 @@ Running  algo.farrington  on area  1  out of  1
 > kappa <- 1.2
 > s.nb.01 <- glrnb(momo[,"[0,1)"], control=list(range=phase2,alpha=1/m.01$theta,mu0=mu0.far,c.ARL=2.1,theta=log(kappa),ret="cases"))
 Running  algo.glrnb  on area  1  out of  1 
-> alarmDates <- epoch(s.nb.01[alarms(s.nb.01) == 1,])
+> alarmDates <- epoch(s.nb.01)[alarms(s.nb.01) == 1]
 > 
 > mu1 <- kappa*mu0.far
 > #Show as usual
