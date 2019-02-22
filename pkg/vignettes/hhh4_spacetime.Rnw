@@ -776,7 +776,7 @@ head(ranef(measlesFit_ri, tomatrix = TRUE), n = 3)
 @
 The \code{exp}-transformed deviations correspond to district-specific
 multiplicative effects on the model components, which can be visualized
-via the plot \code{type = "ri"}
+via the plot \code{type = "ri"} as follows
 (Figure~\ref{fig:measlesFit_ri_map}):
 <<measlesFit_ri_map, out.width="0.31\\linewidth", fig.width=3.5, fig.height=3.7, fig.pos="htb", fig.cap="Estimated multiplicative effects on the three components.", fig.subcap=c("Autoregressive", "Spatio-temporal", "Endemic")>>=
 for (comp in c("ar", "ne", "end")) {
@@ -798,13 +798,13 @@ exp(ranef(measlesFit_ri, intercept = TRUE)["03403", "ar.ri(iid)"])
 However, this district seems to import more cases from other districts than explained by its
 population (Figure~\ref{fig:measlesFit_ri_map2}).
 In Figure~\ref{fig:measlesFit_ri_map3}, the two districts without any reported
-measles cases (03401 and 03405) appear in strong cyan, which means that they
+measles cases (03401 and 03405) appear in cyan, which means that they
 exhibit a relatively low endemic incidence after adjusting for the
 population and susceptible proportion.
 Such districts could be suspected of a larger amount of underreporting.
 
-We can plot the fitted values (Figure~\ref{fig:measlesFitted_ri})
-and compare the plot
+We plot the new model fit (Figure~\ref{fig:measlesFitted_ri})
+for comparison
 with the initial fit shown in Figure~\ref{fig:measlesFitted_basic}:
 <<measlesFitted_ri, out.width="\\linewidth", fig.pos="htb", fig.cap="Fitted components in the random effects model \\code{measlesFit\\_ri} for the five districts with more than 50 cases as well as summed over all districts. Compare to Figure~\\ref{fig:measlesFitted_basic}.">>=
 par(mfrow = c(2,3), mar = c(3, 5, 2, 1), las = 1)
