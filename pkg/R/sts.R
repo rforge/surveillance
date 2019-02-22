@@ -46,6 +46,9 @@ sts <- function (observed,
     } # else "populationFrac" is a possible element of ...
 
     if (inherits(epoch, "Date")) {
+        ## FIXME: guess missing start value similar to linelist2sts
+        ## if (missing(start) && frequency == 52)
+        ##     slots$start <- unlist(isoWeekYear(epoch[1L]), use.names = FALSE)
         slots$epoch <- as.integer(epoch)
         slots$epochAsDate <- TRUE
     }
