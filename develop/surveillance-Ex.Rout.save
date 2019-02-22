@@ -1,5 +1,5 @@
 
-R version 3.5.1 (2018-07-02) -- "Feather Spray"
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
 Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -33,7 +33,7 @@ Type 'q()' to quit R.
 > library('surveillance')
 Loading required package: sp
 Loading required package: xtable
-This is surveillance 1.16.2. For overview type ‘help(surveillance)’.
+This is surveillance 1.17.0. For overview type ‘help(surveillance)’.
 > 
 > base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
 > base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
@@ -1852,8 +1852,8 @@ bayes(5,5,1) 6  3  192 0  1         0.9846154 0.01538462 0
 > 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: algo.farrington
-> ### Title: Surveillance for a count data time series using the Farrington
-> ###   method.
+> ### Title: Surveillance for Count Time Series Using the Classic Farrington
+> ###   Method
 > ### Aliases: algo.farrington
 > ### Keywords: classif
 > 
@@ -3070,7 +3070,7 @@ Convergence criterion @ iteration i= 3 :  0.002865503
 > ##D   #Load the campylobacteriosis data for Germany
 > ##D   data("campyDE")
 > ##D   #Make an sts object from the data.frame
-> ##D   cam.sts <-  sts(epoch=as.numeric(campyDE$date), epochAsDate=TRUE,
+> ##D   cam.sts <-  sts(epoch=campyDE$date,
 > ##D                   observed=campyDE$case, state=campyDE$state)
 > ##D 
 > ##D   #Define monitoring period
@@ -3112,17 +3112,16 @@ Convergence criterion @ iteration i= 3 :  0.002865503
 > ##D salm.Normal <- list()
 > ##D salmDelayAsym <- list()
 > ##D for (week in 43:45){
-> ##D   listWeeks <- as.Date(row.names(stsNewport@control$reportingTriangle$n), origin="1970-01-01")
+> ##D   listWeeks <- as.Date(row.names(stsNewport@control$reportingTriangle$n))
 > ##D   dateObs <- listWeeks[isoWeekYear(listWeeks)$ISOYear==2011 &
 > ##D                        isoWeekYear(listWeeks)$ISOWeek==week]
 > ##D   stsC <- sts_observation(stsNewport,
 > ##D                           dateObservation=dateObs,
 > ##D                           cut=TRUE)
-> ##D   inWeeks <- which(formatDate(epoch(stsC), "%G") == 2011 & 
-> ##D                      isoWeekYear(as.Date(epoch(stsC)))$ISOWeek>=40 & 
-> ##D                      isoWeekYear(as.Date(epoch(stsC)))$ISOWeek<=48)
+> ##D   inWeeks <- with(isoWeekYear(epoch(stsC)),
+> ##D                   ISOYear == 2011 & ISOWeek >= 40 & ISOWeek <= 48)
 > ##D   
-> ##D   rangeTest <- inWeeks
+> ##D   rangeTest <- which(inWeeks)
 > ##D   alpha <- 0.07
 > ##D 
 > ##D   # Control slot for Noufaily method          
@@ -3229,21 +3228,20 @@ z = 1.5197, n = 6, p-value = 0.1286
 > 
 > ### ** Examples
 > 
->   #Load the data
->   data("campyDE")
+> # Load the data
+> data("campyDE")
 > 
->   #O104 period is W21-W30 in 2011
->   stopifnot(all(campyDE$O104period == (
-+       (campyDE$date >= as.Date("2011-05-23")) &
-+       (campyDE$date < as.Date("2011-07-31"))
-+   )))
+> # O104 period is W21-W30 in 2011
+> stopifnot(all(campyDE$O104period == (
++   (campyDE$date >= as.Date("2011-05-23")) &
++   (campyDE$date < as.Date("2011-07-31"))
++ )))
 > 
->   #Make an sts object from the data.frame
->   cam.sts <- sts(epoch=as.numeric(campyDE$date), epochAsDate=TRUE,
-+                  observed=campyDE$case, state=campyDE$state)
+> # Make an sts object from the data.frame
+> cam.sts <- sts(epoch=campyDE$date, observed=campyDE$case, state=campyDE$state)
 > 
->   #Plot the result
->   plot(cam.sts)
+> # Plot the result
+> plot(cam.sts)
 > 
 > 
 > 
@@ -3349,7 +3347,7 @@ Loading required package: gamlss.dist
 Loading required package: MASS
 Loading required package: nlme
 Loading required package: parallel
- **********   GAMLSS Version 5.1-0  ********** 
+ **********   GAMLSS Version 5.1-2  ********** 
 For more on GAMLSS look at http://www.gamlss.org/
 Type gamlssNews() to see new features/changes/bug fixes.
 
@@ -3390,9 +3388,71 @@ detaching ‘package:gamlss’, ‘package:parallel’, ‘package:nlme’,
 > 
 > ### ** Examples
 > 
-> ## load the twinSIR() fit
-> data("foofit")
-> checkResidualProcess(foofit)
+> data("hagelloch")
+> fit <- twinSIR(~ household, data = hagelloch)  # a simplistic model
+Initialized 1 log-baseline interval:  0.00000 92.54524
+Initial parameter vector:  1 0
+iter   10 value 743.984462
+final  value 743.982888 
+converged
+> ## extract the "residual process", i.e., the fitted cumulative intensities
+> residuals(fit)
+         1          3          4          5          7          8          9 
+  4.031158  27.042831  27.638822  30.095005  42.051194  44.154779  46.030802 
+        11         14         15         16         18         22         23 
+ 49.182641  58.266402  58.645863  65.048869  67.504758  72.977398  74.674381 
+        24         25         26         27         28         29         30 
+ 75.336797  75.769966  76.077561  77.227846  77.496387  77.507949  77.544024 
+        31         32         33         35         36         37         38 
+ 78.035440  78.104106  78.573872  78.858727  79.876980  80.846380  80.923944 
+        39         40         41         42         43         44         45 
+ 81.712401  81.733724  82.583505  82.871304  82.958654  84.140272  84.429417 
+        46         47         48         49         50         51         52 
+ 84.690093  85.060039  85.338711  85.981152  86.626602  86.780303  86.965311 
+        53         54         55         56         57         58         60 
+ 87.992945  90.410389  90.416706  90.775526  91.200548  92.955839  94.871037 
+        61         62         63         64         65         66         67 
+ 96.968904  99.670095 100.926117 102.021744 103.287609 104.341868 105.523148 
+        69         70         73         74         75         76         77 
+107.145096 108.529876 112.289608 113.311245 117.224099 118.375307 121.486300 
+        78         79         80         81         82         85         86 
+122.856988 124.311569 127.121769 127.364139 129.179696 135.191650 135.453672 
+        87         94         95         96         98        101        106 
+136.657985 141.606852 143.025873 143.279986 143.726610 144.997675 146.629707 
+       108        109        111        112        113        116        118 
+147.181193 147.314831 147.891725 147.984778 148.058743 148.721498 148.804293 
+       120        121        123        126        127        130        131 
+148.949450 149.669590 151.342507 151.973880 152.447386 153.419171 153.488947 
+       132        133        134        136        137        138        139 
+154.130356 154.170345 154.328129 154.502914 154.599121 154.688216 154.987190 
+       141        143        145        146        147        148        150 
+155.180006 155.416561 155.550191 155.997096 156.061130 156.319166 157.236373 
+       153        158        159        160        161        163        164 
+157.299975 157.830867 158.000706 158.238933 158.538252 158.691152 158.992490 
+       165        166        167        168        169        171        172 
+159.024519 159.161869 159.382423 160.596174 161.388129 162.266883 162.508720 
+       173        174        177        179        181        182        184 
+162.591937 162.626881 163.483004 164.693898 165.016535 165.108537 165.266781 
+       185        186        187        188        190        191        192 
+165.318878 165.701988 165.798480 165.824016 166.035657 166.066290 166.097318 
+       193        195        196        197        198        199        200 
+166.145510 166.518504 166.681095 166.740476 167.263706 168.516478 168.693015 
+       201        203        205        207        208        209        211 
+168.727198 168.837872 168.990164 169.269174 169.485386 169.863358 170.268372 
+       213        214        215        216        217        218        219 
+170.536628 170.867126 171.150342 172.247151 172.435640 172.896928 173.040921 
+       220        221        222        223        224        225        226 
+173.135638 173.139426 173.427026 173.667438 173.752606 174.010942 174.437769 
+       228        229        230        231        235        237        238 
+175.609010 176.009533 176.079930 176.355717 176.992695 177.536957 177.880080 
+       241        242        243        244        265        276        279 
+179.041471 179.284750 179.286131 179.500507 182.524994 182.858705 183.012782 
+       304        308        333        334        336        342        343 
+184.688972 184.800878 185.544008 185.606463 185.666766 185.818292 185.863958 
+       345        350        357        358        374 
+185.931602 186.098753 186.296775 186.320814 187.000050 
+> ## assess goodness of fit based on these residuals
+> checkResidualProcess(fit)  # could be better
 > 
 > 
 > 
@@ -3429,34 +3489,6 @@ dispersion
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("coeflist", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("correct53to52-deprecated")
-> ### * correct53to52-deprecated
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: correct53to52-deprecated
-> ### Title: Data Correction from 53 to 52 weeks
-> ### Aliases: correct53to52
-> ### Keywords: utilities
-> 
-> ### ** Examples
-> 
-> ## Not run: 
-> ##D #This calls correct53to52 automatically
-> ##D obj <- readData("k1",week53to52=TRUE)
-> ##D correct53to52(obj) # first entry is the first week of the year
-> ##D 
-> ##D obj <- readData("n1",week53to52=FALSE)
-> ##D correct53to52(obj, firstweek = 5) # now it's assumed that the fifth
-> ##D                                   # entry is the first week of the year
-> ## End(Not run)
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("correct53to52-deprecated", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("create.disProg")
 > ### * create.disProg
@@ -3716,30 +3748,6 @@ GPC Polygon
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("earsC", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-> nameEx("enlargeData-deprecated")
-> ### * enlargeData-deprecated
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: enlargeData-deprecated
-> ### Title: Data Enlargement
-> ### Aliases: enlargeData
-> ### Keywords: utilities
-> 
-> ### ** Examples
-> 
-> ## Not run: 
-> ##D data("k1")
-> ##D enlargeData(k1) # enlarge once with part 1:156
-> ##D enlargeData(k1, 33:36, 10) # enlarge 10 times with part 33:36
-> ## End(Not run)
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("enlargeData-deprecated", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
 > nameEx("epidata")
 > ### * epidata
 > 
@@ -3754,298 +3762,108 @@ GPC Polygon
 > 
 > ### ** Examples
 > 
-> # see help("hagelloch") for an example with a real data set
+> data("hagelloch")   # see help("hagelloch") for a description
+> head(hagelloch.df)
+  PN    NAME FN HN AGE    SEX        PRO        ERU        CL DEAD IFTO SI
+1  1 Mueller 41 61   7 female 1861-11-21 1861-11-25 1st class <NA>   45 10
+2  2 Mueller 41 61   6 female 1861-11-23 1861-11-27 1st class <NA>   45 12
+3  3 Mueller 41 61   4 female 1861-11-28 1861-12-02 preschool <NA>  172  9
+4  4 Seibold 61 62  13   male 1861-11-27 1861-11-28 2nd class <NA>  180 10
+5  5  Motzer 42 63   8 female 1861-11-22 1861-11-27 1st class <NA>   45 11
+6  6  Motzer 42 63  12   male 1861-11-26 1861-11-29 2nd class <NA>  180  9
+                 C PR CA NI GE TD   TM x.loc y.loc     tPRO     tERU tDEAD
+1  no complicatons  4  4  3  1 NA   NA 142.5 100.0 22.71242 26.22541    NA
+2  no complicatons  4  4  3  1  3 40.3 142.5 100.0 24.21169 28.79112    NA
+3  no complicatons  4  4  3  2  1 40.5 142.5 100.0 29.59102 33.69121    NA
+4  no complicatons  1  1  1  1  3 40.7 165.0 102.5 28.11698 29.02866    NA
+5  no complicatons  5  3  2  1 NA   NA 145.0 120.0 23.05953 28.41510    NA
+6 bronchopneumonia  3  3  2  1  2 40.7 145.0 120.0 27.95444 30.23918    NA
+        tR       tI
+1 29.22541 21.71242
+2 31.79112 23.21169
+3 36.69121 28.59102
+4 32.02866 27.11698
+5 31.41510 22.05953
+6 33.23918 26.95444
 > 
-> # here is an artificial event history
-> data("foodata")
-> str(foodata)
-'data.frame':	17800 obs. of  10 variables:
- $ ID      : num  1 1 1 1 1 1 1 1 1 1 ...
- $ x       : num  1.26 1.26 1.26 1.26 1.26 ...
- $ y       : num  0.782 0.782 0.782 0.782 0.782 ...
- $ start   : num  0 0.697 0.77 1.605 1.729 ...
- $ stop    : num  0.697 0.77 1.605 1.729 2.171 ...
- $ atrisk  : num  1 1 1 1 1 1 1 1 1 1 ...
- $ z1      : num  0 0 0 0 0 0 0 0 0 0 ...
- $ z2      : num  0 0 0 0 0 0 0 0 0 0 ...
- $ infected: num  0 0 0 0 0 0 0 0 0 0 ...
- $ removed : num  0 0 0 0 0 0 0 0 0 0 ...
+> ## convert the original data frame to an "epidata" event history
+> myEpi <- as.epidata(hagelloch.df, t0 = 0,
++                     tI.col = "tI", tR.col = "tR", id.col = "PN",
++                     coords.cols = c("x.loc", "y.loc"),
++                     keep.cols = c("SEX", "AGE", "CL"))
+> ## Don't show: 
+> ## test consistency with default method
+> evHist <- as.data.frame(myEpi)[,-1]
+> myEpi2 <- as.epidata(
++     evHist, id.col = 1, start.col = "start", stop.col = "stop",
++     atRiskY.col = "atRiskY", event.col = "event", Revent.col = "Revent",
++     coords.cols = c("x.loc", "y.loc")
++ )
+> stopifnot(identical(myEpi, myEpi2))
+> ## End(Don't show)
 > 
-> # convert the data to an object of class "epidata",
-> # also generating some epidemic covariates
-> myEpidata <- as.epidata(foodata,
-+   id.col = 1, start.col = "start", stop.col = "stop",
-+   atRiskY.col = "atrisk", event.col = "infected", Revent.col = "removed",
-+   coords.cols = c("x","y"),
-+   f = list(B1 = function(u) u <= 1, B2 = function(u) u > 1))
-> 
-> # this is how data("fooepidata") has been generated
-> data("fooepidata")
-> stopifnot(all.equal(myEpidata, fooepidata))
-> 
-> # add covariate-based weight for the force of infection, e.g.,
-> # to model an increased force if i and j have the same value in z1
-> myEpidata2 <- update(fooepidata,
-+                      w = list(samez1 = function(z1.i, z1.j) z1.i == z1.j))
-> 
-> str(fooepidata)
-Classes ‘epidata’ and 'data.frame':	17800 obs. of  13 variables:
+> str(myEpi)
+Classes ‘epidata’ and 'data.frame':	70500 obs. of  12 variables:
  $ BLOCK  : int  1 1 1 1 1 1 1 1 1 1 ...
- $ id     : Factor w/ 100 levels "1","2","3","4",..: 1 2 3 4 5 6 7 8 9 10 ...
+ $ id     : Factor w/ 188 levels "1","2","3","4",..: 1 2 3 4 5 6 7 8 9 10 ...
  $ start  : num  0 0 0 0 0 0 0 0 0 0 ...
- $ stop   : num  0.697 0.697 0.697 0.697 0.697 ...
+ $ stop   : num  1.14 1.14 1.14 1.14 1.14 ...
  $ atRiskY: num  1 1 1 1 1 1 1 1 1 1 ...
  $ event  : num  0 0 0 0 0 0 0 0 0 0 ...
  $ Revent : num  0 0 0 0 0 0 0 0 0 0 ...
- $ x      : num  1.263 -0.326 1.33 1.272 0.415 ...
- $ y      : num  0.7819 -0.7768 -0.616 0.0466 -1.1304 ...
- $ z1     : num  0 1 0 1 1 1 1 0 1 0 ...
- $ z2     : num  0 0.693 1.099 1.386 1.609 ...
- $ B1     : num  0 0 0 0 0 0 0 0 0 0 ...
- $ B2     : num  0 0 0 0 0 0 0 0 0 0 ...
- - attr(*, "eventTimes")= num  0.697 0.77 1.605 1.729 2.171 ...
- - attr(*, "timeRange")= num  0 100
+ $ x.loc  : num  142 142 142 165 145 ...
+ $ y.loc  : num  100 100 100 102 120 ...
+ $ SEX    : Factor w/ 2 levels "male","female": 2 2 2 1 2 1 1 1 1 2 ...
+ $ AGE    : num  7 6 4 13 8 12 6 10 13 7 ...
+ $ CL     : Factor w/ 3 levels "preschool","1st class",..: 2 2 1 3 2 3 1 2 3 2 ...
+ - attr(*, "eventTimes")= num  1.14 7.47 7.63 8.25 11.29 ...
+ - attr(*, "timeRange")= num  0 92.5
  - attr(*, "coords.cols")= int  8 9
- - attr(*, "f")=List of 2
-  ..$ B1:function (u)  
-  .. ..- attr(*, "srcref")= 'srcref' int  5 17 5 34 17 34 5 5
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x99e48d0> 
-  ..$ B2:function (u)  
-  .. ..- attr(*, "srcref")= 'srcref' int  5 42 5 58 42 58 5 5
-  .. .. ..- attr(*, "srcfile")=Classes 'srcfilecopy', 'srcfile' <environment: 0x99e48d0> 
+ - attr(*, "f")= list()
  - attr(*, "w")= list()
-> subset(fooepidata, BLOCK == 1)
-
-History of an epidemic
-Number of individuals: 100 
-Time range: 0 -- 0.697068158420057 
-Number of infections: 1 
-
-      BLOCK  id start      stop atRiskY event Revent            x            y
-1         1   1     0 0.6970682       1     0      0  1.262954285  0.781859185
-246       1   2     0 0.6970682       1     0      0 -0.326233361 -0.776776622
-369       1   3     0 0.6970682       1     0      0  1.329799263 -0.615989908
-612       1   4     0 0.6970682       1     0      0  1.272429321  0.046580303
-760       1   5     0 0.6970682       1     0      0  0.414641434 -1.130385778
-991       1   6     0 0.6970682       1     0      0 -1.539950042  0.576718782
-1126      1   7     0 0.6970682       1     0      0 -0.928567035 -1.280749432
-1345      1   8     0 0.6970682       1     0      0 -0.294720447  1.625447303
-1593      1   9     0 0.6970682       1     0      0 -0.005767173 -0.500696596
-1766      1  10     0 0.6970682       1     0      0  2.404653389  1.678297208
-1904      1  11     0 0.6970682       1     0      0  0.763593461 -0.412519887
-2117      1  12     0 0.6970682       1     0      0 -0.799009249 -0.972286836
-2296      1  13     0 0.6970682       1     0      0 -1.147657009  0.025382868
-2431      1  14     0 0.6970682       1     0      0 -0.289461574  0.027475337
-2653      1  15     0 0.6970682       1     0      0 -0.299215118 -1.680182722
-2837      1  16     0 0.6970682       1     0      0 -0.411510833  1.053750863
-3025      1  17     0 0.6970682       1     0      0  0.252223448 -1.119599105
-3194      1  18     0 0.6970682       1     0      0 -0.891921127  0.335617210
-3382      1  19     0 0.6970682       1     0      0  0.435683299  0.494795767
-3517      1  20     0 0.6970682       1     0      0 -1.237538422  0.138052709
-3598      1  21     0 0.6970682       1     0      0 -0.224267885 -0.118792026
-3872      1  22     0 0.6970682       1     0      0  0.377395646  0.197684262
-4035      1  23     0 0.6970682       1     0      0  0.133336361 -1.068692711
-4197      1  24     0 0.6970682       1     0      0  0.804189510 -0.803213217
-4360      1  25     0 0.6970682       1     0      0 -0.057106774 -1.113765136
-4495      1  26     0 0.6970682       1     0      0  0.503607972  1.580091684
-4670      1  27     0 0.6970682       1     0      0  1.085769362  1.497818761
-4813      1  28     0 0.6970682       1     0      0 -0.690953840  0.262645459
-5160      1  29     0 0.6970682       1     0      0 -1.284599354 -1.232901200
-5335      1  30     0 0.6970682       1     0      0  0.046726172 -0.003723534
-5473      1  31     0 0.6970682       1     0      0 -0.235706556  1.511672283
-5672      1  32     0 0.6970682       1     0      0 -0.542888255 -0.475698284
-5811      1  33     0 0.6970682       1     0      0 -0.433310317  0.797916438
-5931      1  34     0 0.6970682       1     0      0 -0.649471647 -0.974002561
-6206      1  35     0 0.6970682       1     0      0  0.726750747  0.689372698
-6385      1  36     0 0.6970682       1     0      0  1.151911754 -0.955839103
-6494      1  37     0 0.6970682       1     0      0  0.992160365 -1.231707058
-6709      1  38     0 0.6970682       1     0      0 -0.429513109 -0.956891881
-6884      1  39     0 0.6970682       1     0      0  1.238304101 -0.869782874
-7086      1  40     0 0.6970682       1     0      0 -0.279346282 -0.910680682
-7141      1  41     0 0.6970682       1     0      0  1.757903090  0.741276305
-7414      1  42     0 0.6970682       1     0      0  0.560746091  0.068511533
-7565      1  43     0 0.6970682       1     0      0 -0.452783973 -0.323750755
-7714      1  44     0 0.6970682       1     0      0 -0.832043296 -1.086503047
-7848      1  45     0 0.6970682       1     0      0 -1.166570547 -1.015928947
-8035      1  46     0 0.6970682       1     0      0 -1.065590580 -0.767790185
-8213      1  47     0 0.6970682       1     0      0 -1.563782051 -1.119720061
-8385      1  48     0 0.6970682       1     0      0  1.156536997 -0.448174237
-8622      1  49     0 0.6970682       1     0      0  0.832047129  0.471736374
-8867      1  50     0 0.6970682       1     0      0 -0.227328691 -1.180490683
-9018      1  51     0 0.6970682       1     0      0  0.266137362  1.470256997
-9165      1  52     0 0.6970682       1     0      0 -0.376702719 -1.311420592
-9354      1  53     0 0.6970682       1     0      0  2.441364629 -0.096524923
-9474      1  54     0 0.6970682       1     0      0 -0.795339117  2.369719908
-9733      1  55     0 0.6970682       1     0      0 -0.054877474  0.890626476
-9936      1  56     0 0.6970682       1     0      0  0.250141323 -0.252183161
-10142     1  57     0 0.6970682       1     0      0  0.618243294 -0.865763755
-10293     1  58     0 0.6970682       1     1      0 -0.172623503  0.582586000
-10482     1  59     0 0.6970682       1     0      0 -2.223900274 -0.012529347
-10628     1  60     0 0.6970682       1     0      0 -1.263614385 -0.374854762
-10723     1  61     0 0.6970682       1     0      0  0.358728896  0.317885735
-10928     1  62     0 0.6970682       1     0      0 -0.011045478 -0.488805635
-11091     1  63     0 0.6970682       1     0      0 -0.940649163  2.658658027
-11309     1  64     0 0.6970682       1     0      0 -0.115825322  1.680278205
-11459     1  65     0 0.6970682       1     0      0 -0.814968709  0.779584009
-11672     1  66     0 0.6970682       1     0      0  0.242263481  0.713240520
-11794     1  67     0 0.6970682       1     0      0 -1.425098395 -0.542881937
-11944     1  68     0 0.6970682       1     0      0  0.365941123  0.885778374
-12125     1  69     0 0.6970682       1     0      0  0.248412649 -0.348594685
-12365     1  70     0 0.6970682       1     0      0  0.065288182 -1.008054578
-12544     1  71     0 0.6970682       1     0      0  0.019156392  1.883182542
-12747     1  72     0 0.6970682       1     0      0  0.257338377 -0.928971079
-12868     1  73     0 0.6970682       1     0      0 -0.649010078 -0.294196454
-13017     1  74     0 0.6970682       1     0      0 -0.119168762 -0.614950271
-13208     1  75     0 0.6970682       1     0      0  0.664135700 -0.947075792
-13438     1  76     0 0.6970682       1     0      0  1.100969102  0.598975150
-13683     1  77     0 0.6970682       1     0      0  0.143771481 -1.523614882
-13845     1  78     0 0.6970682       1     0      0 -0.117753598 -0.206189002
-13997     1  79     0 0.6970682       1     0      0 -0.912068367 -0.574295414
-14171     1  80     0 0.6970682       1     0      0 -1.437586241 -1.390166037
-14266     1  81     0 0.6970682       1     0      0 -0.797089525 -0.070417383
-14499     1  82     0 0.6970682       1     0      0  1.254083106 -0.430879530
-14662     1  83     0 0.6970682       1     0      0  0.772142186 -0.592225373
-14837     1  84     0 0.6970682       1     0      0 -0.219515627  0.981116160
-14985     1  85     0 0.6970682       1     0      0 -0.424810283  0.532409357
-15176     1  86     0 0.6970682       1     0      0 -0.418980099 -0.090456124
-15324     1  87     0 0.6970682       1     0      0  0.996986861  0.156490492
-15498     1  88     0 0.6970682       1     0      0 -0.275778029 -0.737311691
-15773     1  89     0 0.6970682       1     0      0  1.256018817 -0.201341206
-15896     1  90     0 0.6970682       1     0      0  0.646674390  1.102176595
-16056     1  91     0 0.6970682       1     0      0  1.299312303 -0.016748256
-16261     1  92     0 0.6970682       1     0      0 -0.873262112  0.161788634
-16384     1  93     0 0.6970682       1     0      0  0.008370960  2.024761390
-16627     1  94     0 0.6970682       1     0      0 -0.880871723 -0.703694254
-16763     1  95     0 0.6970682       1     0      0  0.596259017  0.960792384
-17021     1  96     0 0.6970682       1     0      0  0.119717641  1.790485054
-17120     1  97     0 0.6970682       1     0      0 -0.282173877 -1.064165163
-17387     1  98     0 0.6970682       1     0      0  1.455988401  0.017636546
-17470     1  99     0 0.6970682       1     0      0  0.229019591 -0.389908629
-17672     1 100     0 0.6970682       1     0      0  0.996543929 -0.490832752
-      z1        z2 B1 B2
-1      0 0.0000000  0  0
-246    1 0.6931472  0  0
-369    0 1.0986123  0  0
-612    1 1.3862944  0  0
-760    1 1.6094379  0  0
-991    1 1.7917595  0  0
-1126   1 1.9459101  0  0
-1345   0 2.0794415  0  0
-1593   1 2.1972246  0  0
-1766   0 2.3025851  0  0
-1904   1 2.3978953  0  0
-2117   1 2.4849066  0  0
-2296   0 2.5649494  0  0
-2431   1 2.6390573  0  0
-2653   1 2.7080502  0  0
-2837   1 2.7725887  0  0
-3025   0 2.8332133  0  0
-3194   0 2.8903718  0  0
-3382   0 2.9444390  0  0
-3517   1 2.9957323  0  0
-3598   1 3.0445224  0  0
-3872   0 3.0910425  0  0
-4035   1 3.1354942  0  0
-4197   1 3.1780538  0  0
-4360   0 3.2188758  0  0
-4495   0 3.2580965  0  0
-4670   0 3.2958369  0  0
-4813   0 3.3322045  0  0
-5160   1 3.3672958  0  0
-5335   1 3.4011974  0  0
-5473   1 3.4339872  0  0
-5672   1 3.4657359  0  0
-5811   0 3.4965076  0  0
-5931   0 3.5263605  0  0
-6206   1 3.5553481  0  0
-6385   0 3.5835189  0  0
-6494   1 3.6109179  0  0
-6709   1 3.6375862  0  0
-6884   0 3.6635616  0  0
-7086   0 3.6888795  0  0
-7141   1 3.7135721  0  0
-7414   0 3.7376696  0  0
-7565   0 3.7612001  0  0
-7714   1 3.7841896  0  0
-7848   1 3.8066625  0  0
-8035   0 3.8286414  0  0
-8213   0 3.8501476  0  0
-8385   0 3.8712010  0  0
-8622   1 3.8918203  0  0
-8867   0 3.9120230  0  0
-9018   0 3.9318256  0  0
-9165   1 3.9512437  0  0
-9354   0 3.9702919  0  0
-9474   0 3.9889840  0  0
-9733   0 4.0073332  0  0
-9936   0 4.0253517  0  0
-10142  1 4.0430513  0  0
-10293  1 4.0604430  0  0
-10482  1 4.0775374  0  0
-10628  1 4.0943446  0  0
-10723  0 4.1108739  0  0
-10928  0 4.1271344  0  0
-11091  0 4.1431347  0  0
-11309  0 4.1588831  0  0
-11459  0 4.1743873  0  0
-11672  0 4.1896547  0  0
-11794  1 4.2046926  0  0
-11944  1 4.2195077  0  0
-12125  0 4.2341065  0  0
-12365  0 4.2484952  0  0
-12544  1 4.2626799  0  0
-12747  0 4.2766661  0  0
-12868  1 4.2904594  0  0
-13017  1 4.3040651  0  0
-13208  0 4.3174881  0  0
-13438  0 4.3307333  0  0
-13683  0 4.3438054  0  0
-13845  1 4.3567088  0  0
-13997  0 4.3694479  0  0
-14171  0 4.3820266  0  0
-14266  1 4.3944492  0  0
-14499  1 4.4067192  0  0
-14662  0 4.4188406  0  0
-14837  1 4.4308168  0  0
-14985  1 4.4426513  0  0
-15176  1 4.4543473  0  0
-15324  1 4.4659081  0  0
-15498  0 4.4773368  0  0
-15773  0 4.4886364  0  0
-15896  1 4.4998097  0  0
-16056  0 4.5108595  0  0
-16261  0 4.5217886  0  0
-16384  1 4.5325995  0  0
-16627  0 4.5432948  0  0
-16763  0 4.5538769  0  0
-17021  0 4.5643482  0  0
-17120  0 4.5747110  0  0
-17387  0 4.5849675  0  0
-17470  1 4.5951199  0  0
-17672  1 4.6051702  0  0
-
-> 
-> summary(fooepidata)          # see 'summary.epidata'
+> head(as.data.frame(myEpi))  # "epidata" has event history format
+  BLOCK id start     stop atRiskY event Revent x.loc y.loc    SEX AGE        CL
+1     1  1     0 1.136356       1     0      0 142.5 100.0 female   7 1st class
+2     1  2     0 1.136356       1     0      0 142.5 100.0 female   6 1st class
+3     1  3     0 1.136356       1     0      0 142.5 100.0 female   4 preschool
+4     1  4     0 1.136356       1     0      0 165.0 102.5   male  13 2nd class
+5     1  5     0 1.136356       1     0      0 145.0 120.0 female   8 1st class
+6     1  6     0 1.136356       1     0      0 145.0 120.0   male  12 2nd class
+> summary(myEpi)              # see 'summary.epidata'
 
 AN SIR EPIDEMIC
-  Time range: 0 -- 100 
-  Number of individuals: 100 
-  0 initially infected individuals
-  12 never infected individuals:
-    "1" "3" "16" "24" "26" "30" "36" "38" "45" "63" "64" "95"
-  Size of the epidemic: 88 
+  Time range: 0 -- 92.5452383686788 
+  Number of individuals: 188 
+  1 initially infected individuals:
+    "184"
+  0 never infected individuals
+  Size of the epidemic: 187 
 
-$ counters ('data.frame', 177 x 6 ): evolution of the epidemic:
-          time type id nSusceptible nInfectious nRemoved
-1    0.0000000                  100           0        0
-2    0.6970682    I 58           99           1        0
-3    0.7699401    I 54           98           2        0
-        [....]                                          
-176 41.3670732    R 20           12           1       87
-177 42.2322719    R 37           12           0       88
+$ counters ('data.frame', 376 x 6 ): evolution of the epidemic:
+         time type  id nSusceptible nInfectious nRemoved
+1    0.000000                   187           1        0
+2    1.136356    I 173          186           2        0
+3    7.197762    R 173          186           1        1
+       [....]                                           
+375 85.688298    I 141            0           1      187
+376 92.545238    R 141            0           0      188
 
-> plot(fooepidata)             # see 'plot.epidata' and also 'animate.epidata'
-> stateplot(fooepidata, "15")  # see 'stateplot'
+> plot(myEpi)                 # see 'plot.epidata' and also 'animate.epidata'
+> 
+> ## add distance- and covariate-based weights for the force of infection
+> ## in a twinSIR model, see vignette("twinSIR") for a description
+> myEpi <- update(myEpi,
++     f = list(
++         household    = function(u) u == 0,
++         nothousehold = function(u) u > 0
++     ),
++     w = list(
++         c1 = function (CL.i, CL.j) CL.i == "1st class" & CL.j == CL.i,
++         c2 = function (CL.i, CL.j) CL.i == "2nd class" & CL.j == CL.i
++     )
++ )
+> ## this is now identical to the prepared hagelloch "epidata"
+> stopifnot(all.equal(myEpi, hagelloch))
 > 
 > 
 > 
@@ -4413,8 +4231,10 @@ Data attributes:
 > plot(imdsts, type = observed ~ time)
 > par(opar)
 > 
-> ## plot number of cases by district
-> plot(imdsts, type = observed ~ unit)
+> if (surveillance.options("allExamples")) {
++     ## plot number of cases by district
++     plot(imdsts, type = observed ~ unit)
++ }
 > 
 > 
 > ## also test conversion to an SIS event history ("epidata") of the "tiles"
@@ -4727,32 +4547,33 @@ Summary of event marks and number of potential sources:
 > 
 > ### ** Examples
 > 
-> data("fooepidata")
-> (s <- summary(fooepidata))
+> data("hagelloch")
+> (s <- summary(hagelloch))
 
 AN SIR EPIDEMIC
-  Time range: 0 -- 100 
-  Number of individuals: 100 
-  0 initially infected individuals
-  12 never infected individuals:
-    "1" "3" "16" "24" "26" "30" "36" "38" "45" "63" "64" "95"
-  Size of the epidemic: 88 
+  Time range: 0 -- 92.5452383686788 
+  Number of individuals: 188 
+  1 initially infected individuals:
+    "184"
+  0 never infected individuals
+  Size of the epidemic: 187 
 
-$ counters ('data.frame', 177 x 6 ): evolution of the epidemic:
-          time type id nSusceptible nInfectious nRemoved
-1    0.0000000                  100           0        0
-2    0.6970682    I 58           99           1        0
-3    0.7699401    I 54           98           2        0
-        [....]                                          
-176 41.3670732    R 20           12           1       87
-177 42.2322719    R 37           12           0       88
+$ counters ('data.frame', 376 x 6 ): evolution of the epidemic:
+         time type  id nSusceptible nInfectious nRemoved
+1    0.000000                   187           1        0
+2    1.136356    I 173          186           2        0
+3    7.197762    R 173          186           1        1
+       [....]                                           
+375 85.688298    I 141            0           1      187
+376 92.545238    R 141            0           0      188
 
 > 
 > # plot the ordering of the events only
-> animate(s, sleep=0.01)   # or: animate(fooepidata)
+> animate(s)   # or: animate(hagelloch)
 > 
 > # with timer (animate only up to t=10)
-> animate(s, time.spacing=0.1, end=10, sleep=0.01)
+> animate(s, time.spacing=0.1, end=10, sleep=0.01,
++         legend.opts=list(x="topleft"))
 > 
 > # Such an animation can be saved in various ways using tools of
 > # the animation package, e.g., saveHTML()
@@ -4760,7 +4581,8 @@ $ counters ('data.frame', 177 x 6 ): evolution of the epidemic:
 +   oldwd <- setwd(tempdir())  # to not clutter up the current working dir
 +   saveHTML({
 +     par(bg="white")  # default "transparent" is grey in some browsers
-+     animate(s, time.spacing=1, sleep=0, generate.snapshots="epiani")
++     animate(s, time.spacing=1, sleep=0, legend.opts=list(x="topleft"),
++             generate.snapshots="epiani")
 +   }, use.dev=FALSE, img.name="epiani", ani.width=600, interval=0.5)
 +   setwd(oldwd)
 + }
@@ -4784,318 +4606,34 @@ $ counters ('data.frame', 177 x 6 ): evolution of the epidemic:
 > 
 > ### ** Examples
 > 
-> data("fooepidata")
-> subset(fooepidata, start < 25 & stop > 25, select = 1:7)
+> data("hagelloch")
+> subset(hagelloch, start < 25 & stop > 25 & id %in% 9:13, select = 1:7)
 Note: converted class "epidata" to simple "data.frame"
-      BLOCK  id    start     stop atRiskY event Revent
-142     168   1 13.54951 32.33665       1     0      0
-303     168   2 13.54951 32.33665       0     0      0
-454     168   3 13.54951 32.33665       1     0      0
-550     168   4 13.54951 32.33665       0     0      0
-751     168   5 13.54951 32.33665       0     0      0
-914     168   6 13.54951 32.33665       0     0      0
-1119    168   7 13.54951 32.33665       0     0      0
-1309    168   8 13.54951 32.33665       0     0      0
-1497    168   9 13.54951 32.33665       0     0      0
-1645    168  10 13.54951 32.33665       0     0      0
-1810    168  11 13.54951 32.33665       0     0      0
-1985    168  12 13.54951 32.33665       0     0      0
-2176    168  13 13.54951 32.33665       0     0      0
-2407    168  14 13.54951 32.33665       0     0      0
-2515    168  15 13.54951 32.33665       0     0      0
-2799    168  16 13.54951 32.33665       1     0      0
-2923    168  17 13.54951 32.33665       0     0      0
-3124    168  18 13.54951 32.33665       0     0      0
-3233    168  19 13.54951 32.33665       0     0      0
-3479    168  20 13.54951 32.33665       1     0      0
-3642    168  21 13.54951 32.33665       0     0      0
-3776    168  22 13.54951 32.33665       0     0      0
-4009    168  23 13.54951 32.33665       0     0      0
-4131    168  24 13.54951 32.33665       1     0      0
-4346    168  25 13.54951 32.33665       0     0      0
-4459    168  26 13.54951 32.33665       1     0      0
-4714    168  27 13.54951 32.33665       0     0      0
-4820    168  28 13.54951 32.33665       1     0      0
-5014    168  29 13.54951 32.33665       0     0      0
-5174    168  30 13.54951 32.33665       1     0      0
-5389    168  31 13.54951 32.33665       1     1      0
-5566    168  32 13.54951 32.33665       0     0      0
-5839    168  33 13.54951 32.33665       1     0      0
-5962    168  34 13.54951 32.33665       0     0      0
-6074    168  35 13.54951 32.33665       0     0      0
-6340    168  36 13.54951 32.33665       1     0      0
-6543    168  37 13.54951 32.33665       1     0      0
-6594    168  38 13.54951 32.33665       1     0      0
-6858    168  39 13.54951 32.33665       0     0      0
-7103    168  40 13.54951 32.33665       0     0      0
-7185    168  41 13.54951 32.33665       0     0      0
-7427    168  42 13.54951 32.33665       0     0      0
-7617    168  43 13.54951 32.33665       0     0      0
-7766    168  44 13.54951 32.33665       0     0      0
-7904    168  45 13.54951 32.33665       1     0      0
-8040    168  46 13.54951 32.33665       0     0      0
-8285    168  47 13.54951 32.33665       0     0      0
-8419    168  48 13.54951 32.33665       0     0      0
-8567    168  49 13.54951 32.33665       0     0      0
-8769    168  50 13.54951 32.33665       0     0      0
-8973    168  51 13.54951 32.33665       0     0      0
-9087    168  52 13.54951 32.33665       0     0      0
-9287    168  53 13.54951 32.33665       0     0      0
-9519    168  54 13.54951 32.33665       0     0      0
-9667    168  55 13.54951 32.33665       0     0      0
-9829    168  56 13.54951 32.33665       0     0      0
-10003   168  57 13.54951 32.33665       0     0      0
-10194   168  58 13.54951 32.33665       0     0      0
-10357   168  59 13.54951 32.33665       0     0      0
-10680   168  60 13.54951 32.33665       0     0      0
-10808   168  61 13.54951 32.33665       0     0      0
-11010   168  62 13.54951 32.33665       0     0      0
-11196   168  63 13.54951 32.33665       1     0      0
-11334   168  64 13.54951 32.33665       1     0      0
-11511   168  65 13.54951 32.33665       0     0      0
-11647   168  66 13.54951 32.33665       0     0      0
-11840   168  67 13.54951 32.33665       0     0      0
-11988   168  68 13.54951 32.33665       0     0      0
-12164   168  69 13.54951 32.33665       0     0      0
-12352   168  70 13.54951 32.33665       0     0      0
-12500   168  71 13.54951 32.33665       0     0      0
-12662   168  72 13.54951 32.33665       0     0      0
-12822   168  73 13.54951 32.33665       0     0      0
-13089   168  74 13.54951 32.33665       0     0      0
-13222   168  75 13.54951 32.33665       0     0      0
-13384   168  76 13.54951 32.33665       0     0      0
-13601   168  77 13.54951 32.33665       0     0      0
-13790   168  78 13.54951 32.33665       0     0      0
-13938   168  79 13.54951 32.33665       0     0      0
-14216   168  80 13.54951 32.33665       0     0      0
-14311   168  81 13.54951 32.33665       0     0      0
-14553   168  82 13.54951 32.33665       0     0      0
-14675   168  83 13.54951 32.33665       0     0      0
-14866   168  84 13.54951 32.33665       0     0      0
-15028   168  85 13.54951 32.33665       0     0      0
-15231   168  86 13.54951 32.33665       0     0      0
-15437   168  87 13.54951 32.33665       0     0      0
-15612   168  88 13.54951 32.33665       0     0      0
-15774   168  89 13.54951 32.33665       0     0      0
-15909   168  90 13.54951 32.33665       0     0      0
-16045   168  91 13.54951 32.33665       0     0      0
-16247   168  92 13.54951 32.33665       0     0      0
-16382   168  93 13.54951 32.33665       0     0      0
-16589   168  94 13.54951 32.33665       0     0      0
-16806   168  95 13.54951 32.33665       1     0      0
-16968   168  96 13.54951 32.33665       0     0      0
-17171   168  97 13.54951 32.33665       0     0      0
-17292   168  98 13.54951 32.33665       0     0      0
-17494   168  99 13.54951 32.33665       0     0      0
-17675   168 100 13.54951 32.33665       0     0      0
-> nrow(fooepidata)
-[1] 17800
-> moreStopsEpi <- intersperse(fooepidata, c(25,75))
+      BLOCK id    start     stop atRiskY event Revent
+12417    67  9 24.89708 25.04317       1     0      0
+12418    67 10 24.89708 25.04317       0     0      0
+12419    67 11 24.89708 25.04317       1     1      0
+12420    67 12 24.89708 25.04317       0     0      0
+12421    67 13 24.89708 25.04317       1     0      0
+> # there is no "stop" time at 25, but we can add this extra stop
+> nrow(hagelloch)
+[1] 70500
+> moreStopsEpi <- intersperse(hagelloch, stoptimes = 25)
 > nrow(moreStopsEpi)
-[1] 18000
-> subset(moreStopsEpi, stop == 25 | start == 25, select = 1:7)
+[1] 70688
+> subset(moreStopsEpi, (stop == 25 | start == 25) & id %in% 9:13, select = 1:7)
 Note: converted class "epidata" to simple "data.frame"
-      BLOCK  id    start     stop atRiskY event Revent
-16701   168   1 13.54951 25.00000       1     0      0
-16702   168   2 13.54951 25.00000       0     0      0
-16703   168   3 13.54951 25.00000       1     0      0
-16704   168   4 13.54951 25.00000       0     0      0
-16705   168   5 13.54951 25.00000       0     0      0
-16706   168   6 13.54951 25.00000       0     0      0
-16707   168   7 13.54951 25.00000       0     0      0
-16708   168   8 13.54951 25.00000       0     0      0
-16709   168   9 13.54951 25.00000       0     0      0
-16710   168  10 13.54951 25.00000       0     0      0
-16711   168  11 13.54951 25.00000       0     0      0
-16712   168  12 13.54951 25.00000       0     0      0
-16713   168  13 13.54951 25.00000       0     0      0
-16714   168  14 13.54951 25.00000       0     0      0
-16715   168  15 13.54951 25.00000       0     0      0
-16716   168  16 13.54951 25.00000       1     0      0
-16717   168  17 13.54951 25.00000       0     0      0
-16718   168  18 13.54951 25.00000       0     0      0
-16719   168  19 13.54951 25.00000       0     0      0
-16720   168  20 13.54951 25.00000       1     0      0
-16721   168  21 13.54951 25.00000       0     0      0
-16722   168  22 13.54951 25.00000       0     0      0
-16723   168  23 13.54951 25.00000       0     0      0
-16724   168  24 13.54951 25.00000       1     0      0
-16725   168  25 13.54951 25.00000       0     0      0
-16726   168  26 13.54951 25.00000       1     0      0
-16727   168  27 13.54951 25.00000       0     0      0
-16728   168  28 13.54951 25.00000       1     0      0
-16729   168  29 13.54951 25.00000       0     0      0
-16730   168  30 13.54951 25.00000       1     0      0
-16731   168  31 13.54951 25.00000       1     0      0
-16732   168  32 13.54951 25.00000       0     0      0
-16733   168  33 13.54951 25.00000       1     0      0
-16734   168  34 13.54951 25.00000       0     0      0
-16735   168  35 13.54951 25.00000       0     0      0
-16736   168  36 13.54951 25.00000       1     0      0
-16737   168  37 13.54951 25.00000       1     0      0
-16738   168  38 13.54951 25.00000       1     0      0
-16739   168  39 13.54951 25.00000       0     0      0
-16740   168  40 13.54951 25.00000       0     0      0
-16741   168  41 13.54951 25.00000       0     0      0
-16742   168  42 13.54951 25.00000       0     0      0
-16743   168  43 13.54951 25.00000       0     0      0
-16744   168  44 13.54951 25.00000       0     0      0
-16745   168  45 13.54951 25.00000       1     0      0
-16746   168  46 13.54951 25.00000       0     0      0
-16747   168  47 13.54951 25.00000       0     0      0
-16748   168  48 13.54951 25.00000       0     0      0
-16749   168  49 13.54951 25.00000       0     0      0
-16750   168  50 13.54951 25.00000       0     0      0
-16751   168  51 13.54951 25.00000       0     0      0
-16752   168  52 13.54951 25.00000       0     0      0
-16753   168  53 13.54951 25.00000       0     0      0
-16754   168  54 13.54951 25.00000       0     0      0
-16755   168  55 13.54951 25.00000       0     0      0
-16756   168  56 13.54951 25.00000       0     0      0
-16757   168  57 13.54951 25.00000       0     0      0
-16758   168  58 13.54951 25.00000       0     0      0
-16759   168  59 13.54951 25.00000       0     0      0
-16760   168  60 13.54951 25.00000       0     0      0
-16761   168  61 13.54951 25.00000       0     0      0
-16762   168  62 13.54951 25.00000       0     0      0
-16763   168  63 13.54951 25.00000       1     0      0
-16764   168  64 13.54951 25.00000       1     0      0
-16765   168  65 13.54951 25.00000       0     0      0
-16766   168  66 13.54951 25.00000       0     0      0
-16767   168  67 13.54951 25.00000       0     0      0
-16768   168  68 13.54951 25.00000       0     0      0
-16769   168  69 13.54951 25.00000       0     0      0
-16770   168  70 13.54951 25.00000       0     0      0
-16771   168  71 13.54951 25.00000       0     0      0
-16772   168  72 13.54951 25.00000       0     0      0
-16773   168  73 13.54951 25.00000       0     0      0
-16774   168  74 13.54951 25.00000       0     0      0
-16775   168  75 13.54951 25.00000       0     0      0
-16776   168  76 13.54951 25.00000       0     0      0
-16777   168  77 13.54951 25.00000       0     0      0
-16778   168  78 13.54951 25.00000       0     0      0
-16779   168  79 13.54951 25.00000       0     0      0
-16780   168  80 13.54951 25.00000       0     0      0
-16781   168  81 13.54951 25.00000       0     0      0
-16782   168  82 13.54951 25.00000       0     0      0
-16783   168  83 13.54951 25.00000       0     0      0
-16784   168  84 13.54951 25.00000       0     0      0
-16785   168  85 13.54951 25.00000       0     0      0
-16786   168  86 13.54951 25.00000       0     0      0
-16787   168  87 13.54951 25.00000       0     0      0
-16788   168  88 13.54951 25.00000       0     0      0
-16789   168  89 13.54951 25.00000       0     0      0
-16790   168  90 13.54951 25.00000       0     0      0
-16791   168  91 13.54951 25.00000       0     0      0
-16792   168  92 13.54951 25.00000       0     0      0
-16793   168  93 13.54951 25.00000       0     0      0
-16794   168  94 13.54951 25.00000       0     0      0
-16795   168  95 13.54951 25.00000       1     0      0
-16796   168  96 13.54951 25.00000       0     0      0
-16797   168  97 13.54951 25.00000       0     0      0
-16798   168  98 13.54951 25.00000       0     0      0
-16799   168  99 13.54951 25.00000       0     0      0
-16800   168 100 13.54951 25.00000       0     0      0
-16801   169   1 25.00000 32.33665       1     0      0
-16802   169   2 25.00000 32.33665       0     0      0
-16803   169   3 25.00000 32.33665       1     0      0
-16804   169   4 25.00000 32.33665       0     0      0
-16805   169   5 25.00000 32.33665       0     0      0
-16806   169   6 25.00000 32.33665       0     0      0
-16807   169   7 25.00000 32.33665       0     0      0
-16808   169   8 25.00000 32.33665       0     0      0
-16809   169   9 25.00000 32.33665       0     0      0
-16810   169  10 25.00000 32.33665       0     0      0
-16811   169  11 25.00000 32.33665       0     0      0
-16812   169  12 25.00000 32.33665       0     0      0
-16813   169  13 25.00000 32.33665       0     0      0
-16814   169  14 25.00000 32.33665       0     0      0
-16815   169  15 25.00000 32.33665       0     0      0
-16816   169  16 25.00000 32.33665       1     0      0
-16817   169  17 25.00000 32.33665       0     0      0
-16818   169  18 25.00000 32.33665       0     0      0
-16819   169  19 25.00000 32.33665       0     0      0
-16820   169  20 25.00000 32.33665       1     0      0
-16821   169  21 25.00000 32.33665       0     0      0
-16822   169  22 25.00000 32.33665       0     0      0
-16823   169  23 25.00000 32.33665       0     0      0
-16824   169  24 25.00000 32.33665       1     0      0
-16825   169  25 25.00000 32.33665       0     0      0
-16826   169  26 25.00000 32.33665       1     0      0
-16827   169  27 25.00000 32.33665       0     0      0
-16828   169  28 25.00000 32.33665       1     0      0
-16829   169  29 25.00000 32.33665       0     0      0
-16830   169  30 25.00000 32.33665       1     0      0
-16831   169  31 25.00000 32.33665       1     1      0
-16832   169  32 25.00000 32.33665       0     0      0
-16833   169  33 25.00000 32.33665       1     0      0
-16834   169  34 25.00000 32.33665       0     0      0
-16835   169  35 25.00000 32.33665       0     0      0
-16836   169  36 25.00000 32.33665       1     0      0
-16837   169  37 25.00000 32.33665       1     0      0
-16838   169  38 25.00000 32.33665       1     0      0
-16839   169  39 25.00000 32.33665       0     0      0
-16840   169  40 25.00000 32.33665       0     0      0
-16841   169  41 25.00000 32.33665       0     0      0
-16842   169  42 25.00000 32.33665       0     0      0
-16843   169  43 25.00000 32.33665       0     0      0
-16844   169  44 25.00000 32.33665       0     0      0
-16845   169  45 25.00000 32.33665       1     0      0
-16846   169  46 25.00000 32.33665       0     0      0
-16847   169  47 25.00000 32.33665       0     0      0
-16848   169  48 25.00000 32.33665       0     0      0
-16849   169  49 25.00000 32.33665       0     0      0
-16850   169  50 25.00000 32.33665       0     0      0
-16851   169  51 25.00000 32.33665       0     0      0
-16852   169  52 25.00000 32.33665       0     0      0
-16853   169  53 25.00000 32.33665       0     0      0
-16854   169  54 25.00000 32.33665       0     0      0
-16855   169  55 25.00000 32.33665       0     0      0
-16856   169  56 25.00000 32.33665       0     0      0
-16857   169  57 25.00000 32.33665       0     0      0
-16858   169  58 25.00000 32.33665       0     0      0
-16859   169  59 25.00000 32.33665       0     0      0
-16860   169  60 25.00000 32.33665       0     0      0
-16861   169  61 25.00000 32.33665       0     0      0
-16862   169  62 25.00000 32.33665       0     0      0
-16863   169  63 25.00000 32.33665       1     0      0
-16864   169  64 25.00000 32.33665       1     0      0
-16865   169  65 25.00000 32.33665       0     0      0
-16866   169  66 25.00000 32.33665       0     0      0
-16867   169  67 25.00000 32.33665       0     0      0
-16868   169  68 25.00000 32.33665       0     0      0
-16869   169  69 25.00000 32.33665       0     0      0
-16870   169  70 25.00000 32.33665       0     0      0
-16871   169  71 25.00000 32.33665       0     0      0
-16872   169  72 25.00000 32.33665       0     0      0
-16873   169  73 25.00000 32.33665       0     0      0
-16874   169  74 25.00000 32.33665       0     0      0
-16875   169  75 25.00000 32.33665       0     0      0
-16876   169  76 25.00000 32.33665       0     0      0
-16877   169  77 25.00000 32.33665       0     0      0
-16878   169  78 25.00000 32.33665       0     0      0
-16879   169  79 25.00000 32.33665       0     0      0
-16880   169  80 25.00000 32.33665       0     0      0
-16881   169  81 25.00000 32.33665       0     0      0
-16882   169  82 25.00000 32.33665       0     0      0
-16883   169  83 25.00000 32.33665       0     0      0
-16884   169  84 25.00000 32.33665       0     0      0
-16885   169  85 25.00000 32.33665       0     0      0
-16886   169  86 25.00000 32.33665       0     0      0
-16887   169  87 25.00000 32.33665       0     0      0
-16888   169  88 25.00000 32.33665       0     0      0
-16889   169  89 25.00000 32.33665       0     0      0
-16890   169  90 25.00000 32.33665       0     0      0
-16891   169  91 25.00000 32.33665       0     0      0
-16892   169  92 25.00000 32.33665       0     0      0
-16893   169  93 25.00000 32.33665       0     0      0
-16894   169  94 25.00000 32.33665       0     0      0
-16895   169  95 25.00000 32.33665       1     0      0
-16896   169  96 25.00000 32.33665       0     0      0
-16897   169  97 25.00000 32.33665       0     0      0
-16898   169  98 25.00000 32.33665       0     0      0
-16899   169  99 25.00000 32.33665       0     0      0
-16900   169 100 25.00000 32.33665       0     0      0
+      BLOCK id    start     stop atRiskY event Revent
+12417    67  9 24.89708 25.00000       1     0      0
+12418    67 10 24.89708 25.00000       0     0      0
+12419    67 11 24.89708 25.00000       1     0      0
+12420    67 12 24.89708 25.00000       0     0      0
+12421    67 13 24.89708 25.00000       1     0      0
+12605    68  9 25.00000 25.04317       1     0      0
+12606    68 10 25.00000 25.04317       0     0      0
+12607    68 11 25.00000 25.04317       1     1      0
+12608    68 12 25.00000 25.04317       0     0      0
+12609    68 13 25.00000 25.04317       1     0      0
 > 
 > 
 > 
@@ -5115,25 +4653,37 @@ Note: converted class "epidata" to simple "data.frame"
 > 
 > ### ** Examples
 > 
-> data("fooepidata")
-> s <- summary(fooepidata)
+> data("hagelloch")
+> (s <- summary(hagelloch))
+
+AN SIR EPIDEMIC
+  Time range: 0 -- 92.5452383686788 
+  Number of individuals: 188 
+  1 initially infected individuals:
+    "184"
+  0 never infected individuals
+  Size of the epidemic: 187 
+
+$ counters ('data.frame', 376 x 6 ): evolution of the epidemic:
+         time type  id nSusceptible nInfectious nRemoved
+1    0.000000                   187           1        0
+2    1.136356    I 173          186           2        0
+3    7.197762    R 173          186           1        1
+       [....]                                           
+375 85.688298    I 141            0           1      187
+376 92.545238    R 141            0           0      188
+
+> 
+> # rudimentary stateplot
+> stateplot(s, id = "187")
 > 
 > # evolution of the epidemic
-> par(las = 1)
 > plot(s)
-> 
-> # stateplot
-> stateplot(s, id = "15", main = "Some individual event paths")
-> stateplot(s, id = "1", add = TRUE, col = 2)
-> stateplot(s, id = "20", add = TRUE, col = 3)
-> legend("topright", legend = c(15, 1, 20), title = "id", lty = 1, col = 1:3,
-+        inset = 0.1)
 > 
 > 
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("epidata_plot", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
 > cleanEx()
 > nameEx("epidata_summary")
 > ### * epidata_summary
@@ -5148,26 +4698,26 @@ Note: converted class "epidata" to simple "data.frame"
 > 
 > ### ** Examples
 > 
-> data("fooepidata")
-> s <- summary(fooepidata)
+> data("hagelloch")
+> s <- summary(hagelloch)
 > s          # uses the print method for summary.epidata
 
 AN SIR EPIDEMIC
-  Time range: 0 -- 100 
-  Number of individuals: 100 
-  0 initially infected individuals
-  12 never infected individuals:
-    "1" "3" "16" "24" "26" "30" "36" "38" "45" "63" "64" "95"
-  Size of the epidemic: 88 
+  Time range: 0 -- 92.5452383686788 
+  Number of individuals: 188 
+  1 initially infected individuals:
+    "184"
+  0 never infected individuals
+  Size of the epidemic: 187 
 
-$ counters ('data.frame', 177 x 6 ): evolution of the epidemic:
-          time type id nSusceptible nInfectious nRemoved
-1    0.0000000                  100           0        0
-2    0.6970682    I 58           99           1        0
-3    0.7699401    I 54           98           2        0
-        [....]                                          
-176 41.3670732    R 20           12           1       87
-177 42.2322719    R 37           12           0       88
+$ counters ('data.frame', 376 x 6 ): evolution of the epidemic:
+         time type  id nSusceptible nInfectious nRemoved
+1    0.000000                   187           1        0
+2    1.136356    I 173          186           2        0
+3    7.197762    R 173          186           1        1
+       [....]                                           
+375 85.688298    I 141            0           1      187
+376 92.545238    R 141            0           0      188
 
 > names(s)   # components of the list 's'
 [1] "type"              "size"              "initiallyInfected"
@@ -5179,13 +4729,13 @@ $ counters ('data.frame', 177 x 6 ): evolution of the epidemic:
 > 
 > # events by id
 > head(s$byID)
-  id   time.I    time.R
-1  1       NA        NA
-2  2 3.842095  6.842095
-3  3       NA        NA
-4  4 7.123860 10.123860
-5  5 3.386883  6.386883
-6  6 5.922495  8.922495
+  id   time.I   time.R
+1  1 21.71242 29.22541
+2  2 23.21169 31.79112
+3  3 28.59102 36.69121
+4  4 27.11698 32.02866
+5  5 22.05953 31.41510
+6  6 26.95444 33.23918
 > 
 > 
 > 
@@ -5235,8 +4785,8 @@ Loading required namespace: fanplot
 > 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: farringtonFlexible
-> ### Title: Surveillance for an univariate count data time series using the
-> ###   improved Farrington method described in Noufaily et al. (2012).
+> ### Title: Surveillance for Univariate Count Time Series Using an Improved
+> ###   Farrington Method
 > ### Aliases: farringtonFlexible
 > ### Keywords: classif classif
 > 
@@ -5361,6 +4911,27 @@ $h
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("fluBYBW", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("formatDate")
+> ### * formatDate
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: formatDate
+> ### Title: Convert Dates to Character (Including Quarter Strings)
+> ### Aliases: formatDate
+> ### Keywords: chron
+> 
+> ### ** Examples
+> 
+> formatDate(Sys.Date(), "%G/%OQ/%q")
+[1] "2019/I/53"
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("formatDate", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("formatPval")
 > ### * formatPval
@@ -5553,7 +5124,6 @@ chwi   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA
 > ### ** Examples
 > 
 > data("hagelloch")
-> 
 > head(hagelloch.df)   # original data documented in Oesterle (1992)
   PN    NAME FN HN AGE    SEX        PRO        ERU        CL DEAD IFTO SI
 1  1 Mueller 41 61   7 female 1861-11-21 1861-11-25 1st class <NA>   45 10
@@ -5576,7 +5146,7 @@ chwi   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA
 4 32.02866 27.11698
 5 31.41510 22.05953
 6 33.23918 26.95444
-> head(as.data.frame(hagelloch))   # derived "epidata" object
+> head(as.data.frame(hagelloch))   # "epidata" event history format
   BLOCK id start     stop atRiskY event Revent x.loc y.loc    SEX AGE        CL
 1     1  1     0 1.136356       1     0      0 142.5 100.0 female   7 1st class
 2     1  2     0 1.136356       1     0      0 142.5 100.0 female   6 1st class
@@ -5592,9 +5162,7 @@ chwi   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA
 5         0            1  0  0
 6         0            1  0  1
 > 
-> 
-> ### How the "epidata" 'hagelloch' was created from 'hagelloch.df'
-> 
+> ## How the "epidata" 'hagelloch' was created from 'hagelloch.df'
 > stopifnot(all.equal(hagelloch,
 +   as.epidata(
 +     hagelloch.df, t0 = 0, tI.col = "tI", tR.col = "tR",
@@ -5623,7 +5191,7 @@ chwi   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA
 > hist(as.numeric(hagelloch.df$tI), xlab="Time (days)", ylab="Cases", main="")
 > 
 > 
-> ### SIR model information for population & individuals
+> ### "epidata" summary and plot methods
 > 
 > (s <- summary(hagelloch))
 
@@ -5644,12 +5212,20 @@ $ counters ('data.frame', 376 x 6 ): evolution of the epidemic:
 375 85.688298    I 141            0           1      187
 376 92.545238    R 141            0           0      188
 
-> plot(s, col=c("green","red","darkgray"))
-> stateplot(s, id=c("187"))
+> head(s$byID)
+  id   time.I   time.R
+1  1 21.71242 29.22541
+2  2 23.21169 31.79112
+3  3 28.59102 36.69121
+4  4 27.11698 32.02866
+5  5 22.05953 31.41510
+6  6 26.95444 33.23918
+> plot(s)
 > 
 > ## Not run: 
 > ##D   # Show a dynamic illustration of the spread of the infection
-> ##D   animate(hagelloch,time.spacing=0.1,legend.opts=list(x="topleft"),sleep=1/100)
+> ##D   animate(hagelloch, time.spacing=0.1, sleep=1/100,
+> ##D           legend.opts=list(x="topleft"))
 > ## End(Not run)
 > 
 > 
@@ -6048,20 +5624,22 @@ Number of time points:  103
 > ##D set.seed(1)  # because random intercepts are initialized randomly
 > ##D fluFit <- hhh4(fluBYBW, fluModel)
 > ##D 
-> ##D summary(fluFit, idx2Exp=TRUE, amplitudeShift=TRUE)
+> ##D summary(fluFit, idx2Exp = TRUE, amplitudeShift = TRUE)
+> ##D 
+> ##D plot(fluFit, type = "fitted", total = TRUE)
 > ##D 
 > ##D plot(fluFit, type = "season")
+> ##D range(plot(fluFit, type = "maxEV"))
 > ##D 
-> ##D plot(fluFit, type = "neweights", xlab = "adjacency order")
+> ##D plot(fluFit, type = "maps", prop = TRUE)
 > ##D 
 > ##D gridExtra::grid.arrange(
 > ##D     grobs = lapply(c("ar", "ne", "end"), function (comp)
 > ##D         plot(fluFit, type = "ri", component = comp, main = comp,
-> ##D              at = seq(-2.6, 2.6, length.out = 15),
-> ##D              col.regions = cm.colors(14))),
+> ##D              exp = TRUE, sub = "multiplicative effect")),
 > ##D     nrow = 1, ncol = 3)
 > ##D 
-> ##D range(plot(fluFit, type = "maxEV"))
+> ##D plot(fluFit, type = "neweights", xlab = "adjacency order")
 > ## End(Not run)
 > 
 > 
@@ -6182,7 +5760,8 @@ Number of Fisher Scoring iterations: 1
 > 
 > data("measlesWeserEms")
 > 
-> ## data contains neighbourhood orders as required for parametric weights
+> ## data contains adjaceny orders as required for parametric weights
+> plot(measlesWeserEms, type = observed ~ unit, labels = TRUE)
 > neighbourhood(measlesWeserEms)[1:6,1:6]
       03401 03402 03403 03404 03405 03451
 03401     0     4     2     4     3     2
@@ -6198,9 +5777,8 @@ Number of Fisher Scoring iterations: 1
 > ## in a hhh4 model with seasonality and random intercepts in the endemic part
 > measlesModel <- list(
 +     ar = list(f = ~ 1),
-+     ne = list(f = ~ 1, weights = W_powerlaw(maxlag=5, normalize=TRUE, log=FALSE)),
-+     end = list(f = addSeason2formula(~-1 + ri(), S=1, period=52),
-+                offset = population(measlesWeserEms)),
++     ne = list(f = ~ 1, weights = W_powerlaw(maxlag=5)),
++     end = list(f = addSeason2formula(~-1 + ri(), S=1, period=52)),
 +     family = "NegBin1")
 > 
 > ## fit the model
@@ -6212,34 +5790,59 @@ Call:
 hhh4(stsObj = measlesWeserEms, control = measlesModel)
 
 Random effects:
-            Var    Corr
-end.ri(iid) 1.6457     
+            Var   Corr
+end.ri(iid) 1.876     
 
 Fixed effects:
                         Estimate  Std. Error
-ar.1                    -0.50997   0.11822  
-ne.1                    -3.14970   0.41400  
-end.sin(2 * pi * t/52)   0.99221   0.15686  
-end.cos(2 * pi * t/52)  -0.74099   0.16576  
-end.ri(iid)             -0.06946   0.35526  
-neweights.d              5.71489   4.29952  
-overdisp                 1.43005   0.20453  
+ar.1                    -0.5067    0.1182   
+ne.1                    -3.1333    0.4117   
+end.sin(2 * pi * t/52)   0.9853    0.1571   
+end.cos(2 * pi * t/52)  -0.7411    0.1664   
+end.ri(iid)             -3.0210    0.3735   
+neweights.d              5.6189    4.0822   
+overdisp                 1.4316    0.2047   
 
-Penalized log-likelihood:  -909.89 
-Marginal log-likelihood:   -32.49 
+Penalized log-likelihood:  -910.22 
+Marginal log-likelihood:   -33.61 
 
 Number of units:        17 
 Number of time points:  103 
 
+> coefW(measlesFit)
+      d 
+5.61886 
 > 
 > ## plot the spatio-temporal weights o_ji^-d / sum_k o_jk^-d
-> ## as a function of neighbourhood order
-> plot(measlesFit, type="neweights")
-> ## Due to normalization, same distance does not necessarily mean same weight.
-> ## There is no evidence for a power law of spatial interaction in this
-> ## small observation region with only 17 districts.
-> ## A possible simpler model is first-order dependence, i.e., using
-> ## 'weights = neighbourhood(measlesWeserEms) == 1' in the 'ne' component.
+> ## as a function of adjacency order
+> plot(measlesFit, type = "neweights", xlab = "adjacency order")
+> ## normalization => same distance does not necessarily mean same weight.
+> ## to extract the whole weight matrix W: getNEweights(measlesFit)
+> 
+> ## visualize contributions of the three model components
+> ## to the overall number of infections (aggregated over all districts)
+> plot(measlesFit, total = TRUE)
+> ## little contribution from neighbouring districts
+> 
+> ## simpler model with autoregressive effects captured by the ne component
+> measlesModel2 <- list(
++     ne = list(f = ~ 1, weights = W_powerlaw(maxlag=5, from0=TRUE)),
++     end = list(f = addSeason2formula(~-1 + ri(), S=1, period=52)),
++     family = "NegBin1")
+> measlesFit2 <- hhh4(measlesWeserEms, measlesModel2)
+> ## omitting the separate AR component simplifies model extensions/selection
+> ## and interpretation of covariate effects (only two predictors left)
+> 
+> plot(measlesFit2, type = "neweights", exclude = NULL, xlab = "adjacency order")
+> ## strong decay, again mostly within-district transmission
+> ## (one could also try a purely autoregressive model)
+> plot(measlesFit2, total = TRUE,
++      legend.args = list(legend = c("epidemic", "endemic")))
+> ## almost the same RMSE as with separate AR and NE effects
+> sqrt(mean(residuals(measlesFit, "response")^2))
+[1] 2.16342
+> sqrt(mean(residuals(measlesFit2, "response")^2))
+[1] 2.160085
 > 
 > 
 > 
@@ -6275,12 +5878,15 @@ Number of time points:  103
 > ## fitted values for a single unit
 > plot(measlesFit, units=2)
 > 
+> ## sum fitted components over all units
+> plot(measlesFit, total=TRUE)
+> 
 > ## 'xaxis' option for a nicely formatted time axis
 > ## default tick locations and labels:
-> plot(measlesFit, units=2, xaxis=list(epochsAsDate=TRUE, line=1))
+> plot(measlesFit, total=TRUE, xaxis=list(epochsAsDate=TRUE, line=1))
 > ## an alternative with monthly ticks:
 > oopts <- surveillance.options(stsTickFactors = c("%m"=0.75, "%Y" = 1.5))
-> plot(measlesFit, units=2, xaxis=list(epochsAsDate=TRUE,
+> plot(measlesFit, total=TRUE, xaxis=list(epochsAsDate=TRUE,
 +     xaxis.tickFreq=list("%m"=atChange, "%Y"=atChange),
 +     xaxis.labelFreq=list("%Y"=atMedian), xaxis.labelFormat="%Y"))
 > surveillance.options(oopts)
@@ -6313,8 +5919,63 @@ Number of time points:  103
 +          main=c("Total","Endemic","Within district","From other districts"))
 Loading required namespace: gridExtra
 > 
-> ## random intercepts of the endemic component
-> plot(measlesFit, type="ri", component="end", labels=list(font=3, labels="GEN"))
+> ## estimated random intercepts of the endemic component
+> fixef(measlesFit)["end.ri(iid)"]     # global intercept (log-scale)
+end.ri(iid) 
+  0.1573899 
+> ranef(measlesFit, tomatrix = TRUE)   # zero-mean deviations
+      end.ri(iid)
+03401 -1.62676960
+03402  2.51836562
+03403  0.14647720
+03404 -1.08237223
+03405 -1.69306962
+03451 -0.36634070
+03452  1.25061075
+03453  0.52707599
+03454  0.42850743
+03455 -0.96092621
+03456 -1.17919647
+03457  1.91801746
+03458 -0.13066704
+03459 -0.09661706
+03460 -0.54758073
+03461  0.87493143
+03462  0.01955377
+> ranef(measlesFit, intercept = TRUE)  # sum of the above
+      end.ri(iid)
+03401 -1.46937971
+03402  2.67575551
+03403  0.30386709
+03404 -0.92498235
+03405 -1.53567973
+03451 -0.20895081
+03452  1.40800064
+03453  0.68446588
+03454  0.58589731
+03455 -0.80353633
+03456 -1.02180658
+03457  2.07540734
+03458  0.02672285
+03459  0.06077283
+03460 -0.39019084
+03461  1.03232131
+03462  0.17694365
+> exp(ranef(measlesFit))               # multiplicative effects
+end.ri(iid).03401 end.ri(iid).03402 end.ri(iid).03403 end.ri(iid).03404 
+        0.1965635        12.4083002         1.1577485         0.3387909 
+end.ri(iid).03405 end.ri(iid).03451 end.ri(iid).03452 end.ri(iid).03453 
+        0.1839540         0.6932666         3.4924754         1.6939719 
+end.ri(iid).03454 end.ri(iid).03455 end.ri(iid).03456 end.ri(iid).03457 
+        1.5349648         0.3825384         0.3075257         6.8074490 
+end.ri(iid).03458 end.ri(iid).03459 end.ri(iid).03460 end.ri(iid).03461 
+        0.8775099         0.9079036         0.5783473         2.3987108 
+end.ri(iid).03462 
+        1.0197462 
+> plot(measlesFit, type="ri", component="end",
++      main="deviations around the endemic intercept (log-scale)")
+> plot(measlesFit, type="ri", component="end", exp=TRUE,
++      main="multiplicative effects", labels=list(font=3, labels="GEN"))
 > 
 > ## neighbourhood weights as a function of neighbourhood order
 > plot(measlesFit, type="neweights")  # boring, model has no "ne" component
@@ -6329,9 +5990,6 @@ Loading required namespace: gridExtra
 > 
 > ## plot completely decomposed mean structure (useless without 'ne' component)
 > plot(measlesFit, units=bigunits, col=rainbow(measlesFit$nUnit), decompose=TRUE)
-> 
-> ## sum fitted components over all units
-> plot(measlesFit, total=TRUE)
 > 
 > 
 > 
@@ -6666,8 +6324,6 @@ attr(,"class")
 > 
 > ## compute scores of the one-step-ahead predictions
 > (sc <- scores(pred))
-Note: surveillance 1.16.0 no longer reverses the time points by default.
-  Set the 'reverse' argument explicitly to avoid this message.
         logs       rps      dss        ses
 308 1.776080 0.5848567 1.355074 0.36821935
 309 1.516732 0.4287197 1.413625 0.30771949
@@ -6730,8 +6386,6 @@ Note: surveillance 1.16.0 no longer reverses the time points by default.
 +     scFitted,
 +     scores(oneStepAhead(result, nrow(salmonella)-5, type="final", verbose=FALSE)),
 +     check.attributes = FALSE))
-Note: surveillance 1.16.0 no longer reverses the time points by default.
-  Set the 'reverse' argument explicitly to avoid this message.
 > ## End(Don't show)
 > 
 > 
@@ -6830,7 +6484,7 @@ z = 0.56669, n = 52, p-value = 0.5709
 > demoscript <- system.file(file.path("demo", "fluBYBW.R"),
 +                           package = "surveillance")
 > demoscript
-[1] "/home/smeyer/Projekte/surveillance/surveillance.Rcheck/surveillance/demo/fluBYBW.R"
+[1] "/home/smeyer/Downloads/surveillance/surveillance.Rcheck/surveillance/demo/fluBYBW.R"
 > #file.show(demoscript)
 > 
 > 
@@ -7235,7 +6889,7 @@ Loading required package: spatstat.data
 Loading required package: nlme
 Loading required package: rpart
 
-spatstat 1.56-0       (nickname: ‘Bondi Tram’) 
+spatstat 1.58-2       (nickname: ‘Not Even Wrong’) 
 For an introduction to spatstat, type ‘beginner’ 
 
 > plot(letterR)
@@ -7257,15 +6911,23 @@ detaching ‘package:spatstat’, ‘package:rpart’, ‘package:nlme’,
 > 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: isoWeekYear
-> ### Title: Find ISO week and ISO year of a vector of Date objects on
-> ###   Windows
-> ### Aliases: isoWeekYear formatDate
+> ### Title: Find ISO Week and Year of Date Objects
+> ### Aliases: isoWeekYear
 > ### Keywords: chron
 > 
 > ### ** Examples
 > 
 > dates <- as.Date(c("2002-12-31","2003-01-01","2003-01-06"))
 > isoWeekYear(dates)
+$ISOYear
+[1] 2003 2003 2003
+
+$ISOWeek
+[1] 1 1 2
+
+> 
+> ## the same using numeric inputs:
+> isoWeekYear(Y = c(2002, 2003, 2003), M = c(12, 1, 1), D = c(31, 1, 6))
 $ISOYear
 [1] 2003 2003 2003
 
@@ -7320,8 +6982,8 @@ dt      <= 50  > 50
 > 
 > ## contingency table in LaTeX
 > toLatex(knoxtest)
-% latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Tue Jul 24 12:41:32 2018
+% latex table generated in R 3.5.2 by xtable 1.8-3 package
+% Fri Feb 22 14:27:48 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{r|rr|r}
@@ -7431,8 +7093,8 @@ $\sum$ & 6817 & 49463 & 56280 \\
 > 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: linelist2sts
-> ### Title: Convert individual case information based on dates into an
-> ###   aggregated time series of counts
+> ### Title: Convert Dates of Individual Case Reports into a Time Series of
+> ###   Counts
 > ### Aliases: linelist2sts
 > ### Keywords: models optimize
 > 
@@ -7497,7 +7159,7 @@ $\sum$ & 6817 & 49463 & 56280 \\
 $ar
 $ar$f
 ~1
-<environment: 0xe13dcc0>
+<environment: 0x172ca110>
 
 $ar$offset
 [1] 1
@@ -7506,7 +7168,7 @@ $ar$offset
 $ne
 $ne$f
 ~1
-<environment: 0xe13dcc0>
+<environment: 0x172ca110>
 
 $ne$offset
 [1] 1
@@ -7563,28 +7225,6 @@ List of 5
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("makeControl", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("makePlot-deprecated")
-> ### * makePlot-deprecated
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: makePlot-deprecated
-> ### Title: Plot Generation
-> ### Aliases: makePlot
-> ### Keywords: misc
-> 
-> ### ** Examples
-> 
-> ## Not run: 
-> ##D makePlot("./", "k1", "rki2", "RKI 2", "Kryptosporidiose")
-> ## End(Not run)
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("makePlot-deprecated", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("measles.weser")
 > ### * measles.weser
@@ -7733,16 +7373,17 @@ head of neighbourhood:
 +                               1,2,
 +                               4,5), 4, 2, byrow=TRUE))
 > multiplicity(foo)
-[1] 2 1 2 1
+1 2 3 4 
+2 1 2 1 
 > 
 > # the following function determines the multiplicities in a matrix
 > # or data frame and returns unique rows with appended multiplicity
 > countunique <- function(x) unique(cbind(x, count=multiplicity(x)))
 > countunique(coordinates(foo))
-     coords.x1 coords.x2 count
-[1,]         1         2     2
-[2,]         2         3     1
-[3,]         4         5     1
+  coords.x1 coords.x2 count
+1         1         2     2
+2         2         3     1
+4         4         5     1
 > 
 > 
 > 
@@ -8491,52 +8132,6 @@ detaching ‘package:parallel’
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("print.algoQV", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-> nameEx("residualsCT")
-> ### * residualsCT
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: residualsCT
-> ### Title: Extract Cox-Snell-like Residuals of a Fitted Point Process
-> ### Aliases: residuals.twinSIR residuals.twinstim residuals.simEpidataCS
-> ### Keywords: methods
-> 
-> ### ** Examples
-> 
-> ## Load the twinSIR() fit
-> data("foofit")
-> residuals(foofit)
-        1         2         3         4         5         6         7         8 
- 1.076644  1.253374  3.594026  4.073080  6.240291  6.630745  7.186498  7.631221 
-        9        10        11        12        13        14        15        16 
- 8.869625  9.018927  9.789121 14.231189 15.265848 15.918646 16.504488 16.949297 
-       17        18        19        22        23        24        25        26 
-17.585975 18.146586 18.205400 24.103207 26.287429 27.233645 27.553385 27.754031 
-       27        28        29        30        31        32        33        34 
-28.051120 28.789930 29.819847 30.878766 32.144779 32.688035 33.637454 34.140309 
-       35        36        37        39        40        41        42        44 
-34.553407 35.949469 36.477573 37.282382 37.584965 38.342179 38.603178 40.001118 
-       45        46        48        49        54        55        56        57 
-40.454504 41.140823 44.883565 45.664347 50.500536 50.688771 50.738720 50.753388 
-       58        59        60        61        63        66        67        68 
-50.948306 51.645123 52.427062 52.797876 52.957894 55.692275 57.709872 58.139795 
-       69        70        71        72        73        74        75        76 
-58.390499 58.643991 58.921439 59.123861 59.958108 60.293534 60.789965 61.155007 
-       78        79        81        85        89        90        91        92 
-61.386562 62.041723 63.255217 64.371764 65.532730 66.146161 66.434131 66.609255 
-       93        94        95        97       102       104       110       116 
-67.554613 67.726598 69.041975 71.081822 72.183212 72.335054 74.613551 76.119425 
-      122       157       163       168       169       171       173       174 
-77.150577 84.133512 84.676861 85.728040 86.083965 86.450336 86.820099 86.933632 
-> ## these residuals are, e.g., used by checkResidualProcess()
-> checkResidualProcess(foofit)
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("residualsCT", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
 > nameEx("runifdisc")
 > ### * runifdisc
 > 
@@ -8653,16 +8248,31 @@ detaching ‘package:parallel’
 > 
 > ### ** Examples
 > 
-> # Plotting of simulated data
+> set.seed(123)
 > disProgObj <- sim.pointSource(p = 0.99, r = 0.5, length = 208,
 +                               A = 1, alpha = 1, beta = 0, phi = 0,
 +                               frequency = 1, state = NULL, K = 2)
-> # plot the simulated disease with the defined outbreaks
 > plot(disProgObj)
 > 
+> ## with predefined state chain
 > state <- rep(c(0,0,0,0,0,0,0,0,1,1), 20)
 > disProgObj <- sim.pointSource(state = state, K = 1.2)
 > plot(disProgObj)
+> 
+> ## simulate epidemic, send to RKI 1 system, plot, and compute quality values
+> testSim <- function (..., K = 0, range = 200:400) {
++   disProgObj <- sim.pointSource(..., K = K)
++   survResults <- algo.call(disProgObj,
++     control = list(list(funcName = "rki1", range = range)))
++   plot(survResults[[1]], "RKI 1", "Simulation")
++   algo.compare(survResults)
++ }
+> testSim(K = 2)
+           TP FP TN  FN sens spec dist mlag
+rki(6,6,0) 1  6  194 0  1    0.97 0.03 0   
+> testSim(r = 0.5, K = 5)  # larger and more frequent outbreaks
+           TP FP TN  FN sens spec      dist       mlag
+rki(6,6,0) 5  7  189 0  1    0.9642857 0.03571429 0   
 > 
 > 
 > 
@@ -8870,17 +8480,28 @@ Note: range of maximum neighbour order by region is 3-5
 > plot(z.sts)
 > 
 > ## conversion of "sts" objects to the quasi-standard "xts" class
-> if (requireNamespace("xts")) {
-+     z.xts <- as.xts.sts(z.sts)
+> if (require("xts")) {
++     z.xts <- as.xts(z.sts)
 +     plot(z.xts)
 + }
-Loading required namespace: xts
+Loading required package: xts
+Loading required package: zoo
+
+Attaching package: ‘zoo’
+
+The following objects are masked from ‘package:base’:
+
+    as.Date, as.Date.numeric
+
 > 
 > 
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("sts-class", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
+
+detaching ‘package:xts’, ‘package:zoo’
+
 > nameEx("stsAggregate")
 > ### * stsAggregate
 > 
@@ -8894,13 +8515,18 @@ Loading required namespace: xts
 > 
 > ### ** Examples
 > 
->   data("ha.sts")
->   dim(ha.sts)
+> data("ha.sts")
+> dim(ha.sts)
 [1] 290  12
->   dim(aggregate(ha.sts,by="unit"))
+> dim(aggregate(ha.sts, by = "unit"))
 [1] 290   1
->   dim(aggregate(ha.sts,nfreq=13))
+> dim(aggregate(ha.sts, nfreq = 13))
 [1] 73 12
+> ## Don't show: 
+> ## population(ha.sts) are trivial fractions, aggregate() should keep them
+> stopifnot(population(aggregate(ha.sts)) == 1/ncol(ha.sts))
+> ## failed in surveillance <= 1.16.2
+> ## End(Don't show)
 > 
 > 
 > 
@@ -8935,8 +8561,8 @@ Loading required namespace: xts
 > flush(stderr()); flush(stdout())
 > 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: [,sts-methods
-> ### Title: Extraction and Subsetting of '"sts"' Objects
+> ### Name: [,sts-method
+> ### Title: Subsetting '"sts"' Objects
 > ### Aliases: [,sts-method [,sts,ANY,ANY,ANY-method
 > ### Keywords: methods array
 > 
@@ -9006,7 +8632,7 @@ detaching ‘package:animation’
 > 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: sts_creation
-> ### Title: Function for simulating a time series
+> ### Title: Simulate Count Time Series with Outbreaks
 > ### Aliases: sts_creation
 > 
 > ### ** Examples
@@ -9023,15 +8649,15 @@ detaching ‘package:animation’
 > # Dates
 > firstDate <- "2006-01-01"
 > lengthT=350
-> dates <- as.Date(firstDate,origin='1970-01-01') + 7 * 0:(lengthT - 1)
+> dates <- as.Date(firstDate) + 7 * 0:(lengthT - 1)
 > # Maximal delay in weeks
 > D=10
 > # Dates and sizes of the outbreaks
-> datesOutbreak <- c(as.Date("2008-03-30"),as.Date("2011-09-25",origin="1970-01-01"))
+> datesOutbreak <- as.Date(c("2008-03-30","2011-09-25"))
 > sizesOutbreak <- c(2,5)
 > # Delay distribution
 > data("salmAllOnset")
-> in2011 <- which(formatDate(epoch(salmAllOnset), "%G") == 2011)
+> in2011 <- which(isoWeekYear(epoch(salmAllOnset))$ISOYear == 2011)
 > rT2011 <- salmAllOnset@control$reportingTriangle$n[in2011,]
 > densityDelay <- apply(rT2011,2,sum, na.rm=TRUE)/sum(rT2011, na.rm=TRUE)
 > # alpha for the upperbound
@@ -9073,9 +8699,9 @@ Loading required namespace: ggplot2
 > 
 > ## weekly incidence: population(measlesDE) gives population fractions,
 > ## which we need to multiply by the total population
-> if (surveillance.options("allExamples") && requireNamespace("ggplot2")) {
+> if (surveillance.options("allExamples") && require("ggplot2")) {
 +     autoplot.sts(measlesDE, population = 1000000/82314906) +
-+         ylab("Weekly incidence [per 1 000 000 inhabitants]")
++         ylab("Weekly incidence [per 1'000'000 inhabitants]")
 + }
 > 
 > 
@@ -9090,7 +8716,7 @@ Loading required namespace: ggplot2
 > 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: sts_observation
-> ### Title: Function for creating a sts-object with a given observation date
+> ### Title: Create an 'sts' object with a given observation date
 > ### Aliases: sts_observation
 > 
 > ### ** Examples
@@ -9169,7 +8795,8 @@ Loading required namespace: ggplot2
 > # plot cumulative incidence (per 100000 inhabitants), with region labels
 > plot(measlesWeserEms, type=observed~unit,
 +      population=measlesWeserEms@map$POPULATION / 100000,
-+      labels=list(labels="GEN", cex=0.7, font=3))
++      labels=list(labels="GEN", cex=0.7, font=3),
++      sub="cumulative incidence (per 100'000 inhabitants)")
 > 
 > # counts in the first week of the second year only (+ display overall)
 > plot(measlesWeserEms, type=observed~unit, tps=53, total.args=list())
@@ -9299,8 +8926,17 @@ chwi   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA
 > data("measlesDE")
 > plot(measlesDE, units=1:2, as.one=TRUE, legend.opts=list(cex=0.8))
 > ## more sophisticated plots are offered by package "xts"
-> if (requireNamespace("xts"))
-+     plot(as.xts.sts(measlesDE))
+> if (require("xts"))
++     plot(as.xts(measlesDE))
+Loading required package: xts
+Loading required package: zoo
+
+Attaching package: ‘zoo’
+
+The following objects are masked from ‘package:base’:
+
+    as.Date, as.Date.numeric
+
 > 
 > ## Use ISO8601 date formatting (see ?strptime) and no legend
 > data("salmNewport")
@@ -9326,6 +8962,9 @@ chwi   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("stsplot_time", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
+
+detaching ‘package:xts’, ‘package:zoo’
+
 > nameEx("surveillance-package")
 > ### * surveillance-package
 > 
@@ -9424,54 +9063,6 @@ $gpclib
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("surveillance.options", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-> nameEx("test-deprecated")
-> ### * test-deprecated
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: test-deprecated
-> ### Title: Print xtable for several diseases and the summary
-> ### Aliases: test
-> ### Keywords: misc
-> 
-> ### ** Examples
-> 
-> ## Not run: 
-> ##D test(
-> ##D     c("m1", "m2", "m3", "m4", "m5", "q1_nrwh", "q2",
-> ##D       "s1", "s2", "s3", "k1", "n1", "n2", "h1_nrwrp")
-> ##D     )
-> ## End(Not run)
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("test-deprecated", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("testSim-deprecated")
-> ### * testSim-deprecated
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: testSim-deprecated
-> ### Title: Print xtable for a Simulated Disease and the Summary
-> ### Aliases: testSim
-> ### Keywords: misc
-> 
-> ### ** Examples
-> 
-> ## Not run: 
-> ##D testSim(K = 2)
-> ##D testSim(r = 0.5, K = 5)
-> ## End(Not run)
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("testSim-deprecated", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
 > nameEx("toLatex.sts")
 > ### * toLatex.sts
 > 
@@ -9500,8 +9091,8 @@ $gpclib
 +                 thresholdMethod="delta",alpha=0.1)
 > salm <- farringtonFlexible(salm,control=control)
 > print(toLatex(salm))
-% latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Tue Jul 24 12:41:43 2018
+% latex table generated in R 3.5.2 by xtable 1.8-3 package
+% Fri Feb 22 14:27:59 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrlr}
@@ -9585,268 +9176,183 @@ $gpclib
 > 
 > ### ** Examples
 > 
-> # see vignette("twinSIR") for an example with a real data set
-> 
-> # here is an artificial event history
-> data("fooepidata")
-> summary(fooepidata)
+> data("hagelloch")
+> summary(hagelloch)
 
 AN SIR EPIDEMIC
-  Time range: 0 -- 100 
-  Number of individuals: 100 
-  0 initially infected individuals
-  12 never infected individuals:
-    "1" "3" "16" "24" "26" "30" "36" "38" "45" "63" "64" "95"
-  Size of the epidemic: 88 
+  Time range: 0 -- 92.5452383686788 
+  Number of individuals: 188 
+  1 initially infected individuals:
+    "184"
+  0 never infected individuals
+  Size of the epidemic: 187 
 
-$ counters ('data.frame', 177 x 6 ): evolution of the epidemic:
-          time type id nSusceptible nInfectious nRemoved
-1    0.0000000                  100           0        0
-2    0.6970682    I 58           99           1        0
-3    0.7699401    I 54           98           2        0
-        [....]                                          
-176 41.3670732    R 20           12           1       87
-177 42.2322719    R 37           12           0       88
+$ counters ('data.frame', 376 x 6 ): evolution of the epidemic:
+         time type  id nSusceptible nInfectious nRemoved
+1    0.000000                   187           1        0
+2    1.136356    I 173          186           2        0
+3    7.197762    R 173          186           1        1
+       [....]                                           
+375 85.688298    I 141            0           1      187
+376 92.545238    R 141            0           0      188
 
 > 
-> # fit an overall constant baseline hazard rate
-> fit1 <- twinSIR(~ B1 + B2 + cox(z2), data = fooepidata)
-Initialized 1 log-baseline interval:  0 100
-Initial parameter vector:  1 1 0 0
-iter   10 value 247.916273
-iter   20 value 238.468675
-iter   30 value 232.208272
-final  value 232.179473 
+> # simple model with an overall constant baseline hazard rate
+> fit1 <- twinSIR(~ household + cox(AGE), data = hagelloch)
+Initialized 1 log-baseline interval:  0.00000 92.54524
+Initial parameter vector:  1 0 0
+iter   10 value 746.690987
+final  value 742.374283 
 converged
 > fit1
 
 Call:
-twinSIR(formula = ~B1 + B2 + cox(z2), data = fooepidata)
+twinSIR(formula = ~household + cox(AGE), data = hagelloch)
 
 Coefficients:
-              B1                B2  cox(logbaseline)           cox(z2)  
-        0.023779          0.002985         -7.332007          0.813875  
+       household  cox(logbaseline)          cox(AGE)  
+         0.05377          -4.41141           0.04684  
 
-Log-likelihood: -232.2
+Log-likelihood: -742.4
 
-> summary(fit1)
+> summary(fit1)   # see also help("summary.twinSIR")
 
 Call:
-twinSIR(formula = ~B1 + B2 + cox(z2), data = fooepidata)
+twinSIR(formula = ~household + cox(AGE), data = hagelloch)
 
 Coefficients:
                   Estimate Std. Error z value Pr(>|z|)    
-B1                0.023779   0.004249   5.596 2.20e-08 ***
-B2                0.002985   0.001101   2.711  0.00672 ** 
-cox(logbaseline) -7.332007   1.296039  -5.657 1.54e-08 ***
-cox(z2)           0.813875   0.363063   2.242  0.02498 *  
+household         0.053769   0.006223   8.641   <2e-16 ***
+cox(logbaseline) -4.411414   0.250644 -17.600   <2e-16 ***
+cox(AGE)          0.046838   0.029218   1.603    0.109    
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Total number of infections:  88 
+Total number of infections:  187 
 
-One-sided AIC: 470.03
-Log-likelihood: -232.2
-Number of log-likelihood evaluations: 55 
+One-sided AIC: 1489.7
+Log-likelihood: -742.4
+Number of log-likelihood evaluations: 23 
 
-> 
-> # fit1 is what is used as data("foofit") in other examples
-> data("foofit")
-> stopifnot(all.equal(fit1, foofit))
+> plot(fit1)      # see also help("plot.twinSIR")
+> checkResidualProcess(fit1)   # could be better
 > 
 > # fit a piecewise constant baseline hazard rate with 3 intervals using 
 > # _un_penalized ML and estimated coefs from fit1 as starting values 
-> fit2 <- twinSIR(~ B1 + B2 + cox(z2), data = fooepidata, nIntervals = 3,
-+     optim.args = list(par=c(coef(fit1)[1:2],rep(coef(fit1)[3],3),coef(fit1)[4])))
-Initialized 3 log-baseline intervals:  0.000000 4.385426 5.941276 100.000000
-Initial parameter vector:  0.0237785679554649 0.00298455729472475 -7.33200680713878 -7.33200680713878 -7.33200680713878 0.813875042951003
-iter   10 value 232.123292
-iter   20 value 231.871154
-iter   30 value 231.870831
-iter   40 value 231.869922
-iter   50 value 231.867545
-iter   60 value 231.860616
-iter   70 value 231.805164
-iter   80 value 231.771696
-final  value 231.770329 
+> fit2 <- twinSIR(~ household, data = hagelloch, nIntervals = 3,
++                 optim.args = list(par = coef(fit1)[c(1,2,2,2)]))
+Initialized 3 log-baseline intervals:  0.00000 26.95444 33.51139 92.54524
+Initial parameter vector:  0.0537688129156112 -4.41141359759098 -4.41141359759098 -4.41141359759098
+iter   10 value 674.375995
+iter   20 value 668.543216
+final  value 668.543216 
 converged
-> fit2
-
-Call:
-twinSIR(formula = ~B1 + B2 + cox(z2), data = fooepidata, nIntervals = 3, 
-    optim.args = list(par = c(coef(fit1)[1:2], rep(coef(fit1)[3], 
-        3), coef(fit1)[4])))
-
-Coefficients:
-                B1                  B2  cox(logbaseline.1)  cox(logbaseline.2)  
-          0.023814            0.002734           -8.379401           -6.800822  
-cox(logbaseline.3)             cox(z2)  
-         -7.208334            1.051440  
-
-Log-likelihood: -231.8
-
 > summary(fit2)
 
 Call:
-twinSIR(formula = ~B1 + B2 + cox(z2), data = fooepidata, nIntervals = 3, 
-    optim.args = list(par = c(coef(fit1)[1:2], rep(coef(fit1)[3], 
-        3), coef(fit1)[4])))
+twinSIR(formula = ~household, data = hagelloch, nIntervals = 3, 
+    optim.args = list(par = coef(fit1)[c(1, 2, 2, 2)]))
 
 Coefficients:
                     Estimate Std. Error z value Pr(>|z|)    
-B1                  0.023814   0.004299   5.540 3.03e-08 ***
-B2                  0.002734   0.001183   2.310  0.02087 *  
-cox(logbaseline.1) -8.379401   9.098272  -0.921  0.35706    
-cox(logbaseline.2) -6.800822   9.537360  -0.713  0.47580    
-cox(logbaseline.3) -7.208334   2.395632  -3.009  0.00262 ** 
-cox(z2)             1.051440   2.202221   0.477  0.63304    
+household           0.026564   0.005578   4.762 1.92e-06 ***
+cox(logbaseline.1) -4.731305   0.165790 -28.538  < 2e-16 ***
+cox(logbaseline.2) -2.648247   0.173018 -15.306  < 2e-16 ***
+cox(logbaseline.3) -1.563954   0.147733 -10.586  < 2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Baseline intervals:
-                  logbaseline.1        logbaseline.2      
-Time interval     (0.000000;4.385426]  (4.385426;5.941276]
-Number of events  30                   29                 
-                  logbaseline.3        
-Time interval     (5.941276;100.000000]
-Number of events  29                   
+                  logbaseline.1       logbaseline.2        logbaseline.3      
+Time interval     (0.00000;26.95444]  (26.95444;33.51139]  (33.51139;92.54524]
+Number of events  63                  62                   62                 
 
-One-sided AIC: 473.23
-Log-likelihood: -231.8
-Number of log-likelihood evaluations: 105 
+One-sided AIC: 1344.1
+Log-likelihood: -668.5
+Number of log-likelihood evaluations: 30 
 
 > 
-> # fit a piecewise constant baseline hazard rate with 9 intervals
-> # using _penalized_ ML and estimated coefs from fit1 as starting values 
-> fit3 <- twinSIR(~ B1 + B2 + cox(z2), data = fooepidata, nIntervals = 9,
-+     lambda.smooth = 0.1, penalty = 1, optim.args = list(
-+         par=c(coef(fit1)[1:2], rep(coef(fit1)[3],9), coef(fit1)[4])))
-Initialized 9 log-baseline intervals:  0.000000 2.559235 3.842095 4.385426 4.789778 5.423487 5.941276 6.438586 7.413572 100.000000
+> # fit a piecewise constant baseline hazard rate with 7 intervals
+> # using _penalized_ ML
+> fit3 <- twinSIR(~ household, data = hagelloch, nIntervals = 7,
++                 lambda.smooth = 0.1, penalty = 1)
+Initialized 7 log-baseline intervals:  0.00000 21.71242 24.76697 30.20108 31.87247 33.77988 35.98953 92.54524
 Note: non-equidistant knots. Using penalization matrix correcting for distance between knots.
 
-Initial parameter vector:  0.0237785679554649 0.00298455729472475 -7.33200680713878 -7.33200680713878 -7.33200680713878 -7.33200680713878 -7.33200680713878 -7.33200680713878 -7.33200680713878 -7.33200680713878 -7.33200680713878 0.813875042951003
-iter   10 value 232.022243
-iter   20 value 232.017526
-iter   30 value 232.010104
-iter   40 value 232.001661
-iter   50 value 232.001423
-iter   60 value 231.996517
-iter   70 value 231.976910
-iter   80 value 231.976852
-iter   90 value 231.972202
-iter  100 value 231.971581
-iter  110 value 231.970496
-iter  120 value 231.970212
-iter  130 value 231.969898
-iter  140 value 231.967515
-iter  150 value 231.933280
-iter  160 value 231.930476
-iter  170 value 231.929712
-iter  180 value 231.929494
-iter  190 value 231.929306
-iter  200 value 231.927710
-iter  210 value 231.927372
-iter  220 value 231.926516
-final  value 231.923679 
+Initial parameter vector:  1 0 0 0 0 0 0 0
+iter   10 value 637.321579
+iter   20 value 631.642234
+final  value 631.639327 
 converged
-> fit3
-
-Call:
-twinSIR(formula = ~B1 + B2 + cox(z2), data = fooepidata, nIntervals = 9, 
-    lambda.smooth = 0.1, penalty = 1, optim.args = list(par = c(coef(fit1)[1:2], 
-        rep(coef(fit1)[3], 9), coef(fit1)[4])))
-
-Coefficients:
-                B1                  B2  cox(logbaseline.1)  cox(logbaseline.2)  
-          0.023772            0.002838           -7.761395           -7.972398  
-cox(logbaseline.3)  cox(logbaseline.4)  cox(logbaseline.5)  cox(logbaseline.6)  
-         -7.355687           -7.231847           -7.196315           -7.189759  
-cox(logbaseline.7)  cox(logbaseline.8)  cox(logbaseline.9)             cox(z2)  
-         -7.168984           -7.183457           -7.168788            0.937192  
-
-Log-likelihood: -231.9
-
 > summary(fit3)
 
 Call:
-twinSIR(formula = ~B1 + B2 + cox(z2), data = fooepidata, nIntervals = 9, 
-    lambda.smooth = 0.1, penalty = 1, optim.args = list(par = c(coef(fit1)[1:2], 
-        rep(coef(fit1)[3], 9), coef(fit1)[4])))
+twinSIR(formula = ~household, data = hagelloch, nIntervals = 7, 
+    lambda.smooth = 0.1, penalty = 1)
 
 Coefficients:
                     Estimate Std. Error z value Pr(>|z|)    
-B1                  0.023772   0.004293   5.537 3.08e-08 ***
-B2                  0.002838   0.001139   2.493 0.012675 *  
-cox(logbaseline.1) -7.761395   2.741424  -2.831 0.004638 ** 
-cox(logbaseline.2) -7.972398   2.695020  -2.958 0.003094 ** 
-cox(logbaseline.3) -7.355687   2.540577  -2.895 0.003788 ** 
-cox(logbaseline.4) -7.231847   2.429229  -2.977 0.002911 ** 
-cox(logbaseline.5) -7.196315   2.319922  -3.102 0.001922 ** 
-cox(logbaseline.6) -7.189759   2.133423  -3.370 0.000752 ***
-cox(logbaseline.7) -7.168984   1.966008  -3.646 0.000266 ***
-cox(logbaseline.8) -7.183457   1.788725  -4.016 5.92e-05 ***
-cox(logbaseline.9) -7.168788   1.369942  -5.233 1.67e-07 ***
-cox(z2)             0.937192   0.666328   1.407 0.159575    
+household           0.021791   0.005277   4.129 3.64e-05 ***
+cox(logbaseline.1) -5.535069   0.265941 -20.813  < 2e-16 ***
+cox(logbaseline.2) -2.938868   0.212663 -13.819  < 2e-16 ***
+cox(logbaseline.3) -3.592069   0.278963 -12.877  < 2e-16 ***
+cox(logbaseline.4) -1.950706   0.220394  -8.851  < 2e-16 ***
+cox(logbaseline.5) -1.683555   0.208982  -8.056 7.88e-16 ***
+cox(logbaseline.6) -1.313648   0.207552  -6.329 2.46e-10 ***
+cox(logbaseline.7) -1.942733   0.233674  -8.314  < 2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Baseline intervals:
-                  logbaseline.1        logbaseline.2        logbaseline.3      
-Time interval     (0.000000;2.559235]  (2.559235;3.842095]  (3.842095;4.385426]
-Number of events  10                   10                   10                 
+                  logbaseline.1       logbaseline.2        logbaseline.3      
+Time interval     (0.00000;21.71242]  (21.71242;24.76697]  (24.76697;30.20108]
+Number of events  27                  27                   27                 
                   logbaseline.4        logbaseline.5        logbaseline.6      
-Time interval     (4.385426;4.789778]  (4.789778;5.423487]  (5.423487;5.941276]
-Number of events  10                   9                    10                 
-                  logbaseline.7        logbaseline.8      
-Time interval     (5.941276;6.438586]  (6.438586;7.413572]
-Number of events  10                   10                 
-                  logbaseline.9        
-Time interval     (7.413572;100.000000]
-Number of events  9                    
+Time interval     (30.20108;31.87247]  (31.87247;33.77988]  (33.77988;35.98953]
+Number of events  26                   27                   27                 
+                  logbaseline.7      
+Time interval     (35.98953;92.54524]
+Number of events  26                 
 
-One-sided AIC: 485.53
-Log-likelihood: -231.9
-Number of log-likelihood evaluations: 276 
+One-sided AIC: 1278.3
+Log-likelihood: -631.6
+Number of log-likelihood evaluations: 30 
 
+> checkResidualProcess(fit3)
 > 
 > # plot the estimated log-baseline levels
-> plot(x=fit2$intervals, y=coef(fit2)[c(3,3:5)], type="S", xlim=c(0,10))
-> lines(x=fit3$intervals, y=coef(fit3)[c(3,3:11)], type="S", col=2)
-> legend("right", legend=c("unpenalized 3", "penalized 9"), lty=1, col=1:2, bty="n")
+> plot(x=fit2$intervals, y=coef(fit2)[c(2,2:4)], type="S", ylim=c(-6, -1))
+> lines(x=fit3$intervals, y=coef(fit3)[c(2,2:8)], type="S", col=2)
+> legend("right", legend=c("unpenalized 3", "penalized 7"), lty=1, col=1:2, bty="n")
 > 
-> ## -> see help('plot.twinSIR') for intensity plots
 > 
 > ## special use case: fit the model to a subset of the events only,
 > ## while preserving epidemic contributions from the remainder
 > ## (maybe some buffer area nodes)
-> fit_subset <- twinSIR(~ B1 + B2 + cox(z2), data = fooepidata, subset = z1 == 1)
-Initialized 1 log-baseline interval:  0 100
-Initial parameter vector:  1 1 0 0
-iter   10 value 117.450211
-iter   20 value 116.947423
-iter   30 value 110.678422
-final  value 110.630530 
+> fit_subset <- twinSIR(~ household, data = hagelloch, subset = CL=="preschool")
+Initialized 1 log-baseline interval:  0.00000 92.54524
+Initial parameter vector:  1 0
+iter   10 value 361.527866
+final  value 361.485659 
 converged
 > summary(fit_subset)
 
 Call:
-twinSIR(formula = ~B1 + B2 + cox(z2), data = fooepidata, subset = z1 == 
-    1)
+twinSIR(formula = ~household, data = hagelloch, subset = CL == 
+    "preschool")
 
 Coefficients:
                   Estimate Std. Error z value Pr(>|z|)    
-B1                0.017264   0.005578   3.095  0.00197 ** 
-B2                0.004376   0.001908   2.294  0.02180 *  
-cox(logbaseline) -6.607772   1.317598  -5.015  5.3e-07 ***
-cox(z2)           0.596553   0.422752   1.411  0.15821    
+household         0.048221   0.007387   6.528 6.69e-11 ***
+cox(logbaseline) -4.359000   0.184937 -23.570  < 2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Total number of infections:  42 
+Total number of infections:  90 
 
-One-sided AIC: 226.86
-Log-likelihood: -110.6
-Number of log-likelihood evaluations: 54 
+One-sided AIC: 725.97
+Log-likelihood: -361.5
+Number of log-likelihood evaluations: 17 
 
 > 
 > ## Don't show: 
@@ -9874,49 +9380,53 @@ Number of log-likelihood evaluations: 54
 > 
 > ### ** Examples
 > 
-> data("fooepidata")
-> data("foofit")
+> data("hagelloch")
+> plot(hagelloch)
 > 
-> # an overview of the evolution of the epidemic
-> plot(fooepidata)
+> # a simplistic twinSIR model
+> fit <- twinSIR(~ household, data = hagelloch)
+Initialized 1 log-baseline interval:  0.00000 92.54524
+Initial parameter vector:  1 0
+iter   10 value 743.984462
+final  value 743.982888 
+converged
 > 
 > # overall total intensity
-> plot(foofit, which="total")
+> plot(fit, which = "total")
 > 
 > # overall epidemic proportion
-> epi <- plot(foofit, which="epidemic")
-> 
-> # look at returned values
+> epi <- plot(fit, which = "epidemic", ylim = c(0, 1))
 > head(epi)
           stop epidemic proportion
-[1,] 0.6970682           0.0000000
-[2,] 0.7699401           0.3704827
-[3,] 1.6053307           0.4611106
-[4,] 1.7288765           0.6154583
-[5,] 2.1710012           0.7004377
-[6,] 2.2370900           0.7538214
-> 
-> # add the inverse overall endemic proportion = 1 - epidemic proportion
-> ende <- plot(foofit, which="endemic", add=TRUE, col=2)
-> legend("right", legend="endemic proportion \n(= 1 - epidemic proportion)",
-+        lty=1, col=2, bty="n")
+[1,]  1.136356           0.1058473
+[2,]  7.197762           0.1327105
+[3,]  7.470164           0.1063558
+[4,]  7.627762           0.1702113
+[5,]  8.253432           0.2049618
+[6,] 10.983840           0.2166022
+> # add overall endemic proportion = 1 - epidemic proportion
+> ende <- plot(fit, which = "endemic", add = TRUE, col = 2)
+> legend("topleft", legend = "endemic proportion", lty = 1, col = 2, bty = "n")
 > 
 > # individual intensities
-> tmp <- plot(foofit, which="total", aggregate=FALSE, col=rgb(0,0,0,alpha=0.1),
-+     main=expression("Individual infection intensities " *
-+                     lambda[i](t) == Y[i](t) %.% (e[i](t) + h[i](t))))
+> tmp <- plot(fit, which = "total", aggregate = FALSE,
++     col = rgb(0, 0, 0, alpha = 0.1),
++     main = expression("Individual infection intensities " *
++         lambda[i](t) == Y[i](t) %.% (e[i](t) + h[i](t))))
 > # return value: matrix of individual intensity paths
 > str(tmp)
- num [1:178, 1:101] 0.697 0.77 1.605 1.729 2.171 ...
+ num [1:375, 1:189] 1.14 7.2 7.47 7.63 8.25 ...
  - attr(*, "dimnames")=List of 2
   ..$ : NULL
-  ..$ : chr [1:101] "stop" "1" "2" "3" ...
+  ..$ : chr [1:189] "stop" "1" "2" "3" ...
 > 
 > # plot intensity path only for individuals 3 and 99
-> matplot(x=tmp[,1], y=tmp[,1+c(3,99)], type="S", ylab="Force of infection",
-+         xlab="time", main=expression("Paths of the infection intensities " *
-+                                   lambda[3](t) * " and " * lambda[99](t)))
-> legend("topright", legend=paste("Individual", c(3,99)), col=c(1,2), lty=c(1,2))
+> matplot(x = tmp[,1], y = tmp[,1+c(3,99)], type = "S",
++         ylab = "Force of infection", xlab = "time",
++         main = expression("Paths of the infection intensities " *
++                           lambda[3](t) * " and " * lambda[99](t)))
+> legend("topright", legend = paste("Individual", c(3,99)),
++        col = 1:2, lty = 1:2)
 > 
 > 
 > 
@@ -9937,96 +9447,95 @@ Number of log-likelihood evaluations: 54
 > 
 > ### ** Examples
 > 
-> data("foofit")
+> data("hagelloch")
 > 
-> foofit
+> # a simplistic twinSIR model
+> fit <- twinSIR(~ household + cox(AGE), data = hagelloch)
+Initialized 1 log-baseline interval:  0.00000 92.54524
+Initial parameter vector:  1 0 0
+iter   10 value 746.690987
+final  value 742.374283 
+converged
+> 
+> coef(fit)
+       household cox(logbaseline)         cox(AGE) 
+      0.05376881      -4.41141360       0.04683819 
+> vcov(fit)
+                     household cox(logbaseline)      cox(AGE)
+household         3.872037e-05    -0.0001702059  4.018241e-06
+cox(logbaseline) -1.702059e-04     0.0628226611 -6.508888e-03
+cox(AGE)          4.018241e-06    -0.0065088877  8.536951e-04
+> logLik(fit)
+'log Lik.' -742.3743 (df=3)
+> 
+> summary(fit, correlation = TRUE, symbolic.cor = TRUE)
 
 Call:
-twinSIR(formula = ~B1 + B2 + cox(z2), data = fooepidata)
-
-Coefficients:
-              B1                B2  cox(logbaseline)           cox(z2)  
-        0.023779          0.002985         -7.332007          0.813875  
-
-Log-likelihood: -232.2
-
-> 
-> coef(foofit)
-              B1               B2 cox(logbaseline)          cox(z2) 
-     0.023778568      0.002984557     -7.332006807      0.813875043 
-> vcov(foofit)
-                            B1            B2 cox(logbaseline)       cox(z2)
-B1                1.805806e-05 -2.335436e-06     0.0001854010 -9.428329e-05
-B2               -2.335436e-06  1.212361e-06    -0.0001128573  9.377469e-07
-cox(logbaseline)  1.854010e-04 -1.128573e-04     1.6797161235 -4.313640e-01
-cox(z2)          -9.428329e-05  9.377469e-07    -0.4313640178  1.318150e-01
-> logLik(foofit)
-'log Lik.' -232.1795 (df=4)
-> 
-> summary(foofit, correlation = TRUE, symbolic.cor = TRUE)
-
-Call:
-twinSIR(formula = ~B1 + B2 + cox(z2), data = fooepidata)
+twinSIR(formula = ~household + cox(AGE), data = hagelloch)
 
 Coefficients:
                   Estimate Std. Error z value Pr(>|z|)    
-B1                0.023779   0.004249   5.596 2.20e-08 ***
-B2                0.002985   0.001101   2.711  0.00672 ** 
-cox(logbaseline) -7.332007   1.296039  -5.657 1.54e-08 ***
-cox(z2)           0.813875   0.363063   2.242  0.02498 *  
+household         0.053769   0.006223   8.641   <2e-16 ***
+cox(logbaseline) -4.411414   0.250644 -17.600   <2e-16 ***
+cox(AGE)          0.046838   0.029218   1.603    0.109    
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Total number of infections:  88 
+Total number of infections:  187 
 
-One-sided AIC: 470.03
-Log-likelihood: -232.2
-Number of log-likelihood evaluations: 55 
+One-sided AIC: 1489.7
+Log-likelihood: -742.4
+Number of log-likelihood evaluations: 23 
 
 Correlation of Coefficients:
-                        
-B1               1      
-B2               . 1    
-cox(logbaseline)     1  
-cox(z2)              * 1
+                      
+household        1    
+cox(logbaseline)   1  
+cox(AGE)           + 1
 ---
 Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘B’ 1
 
 > 
 > # AIC or OSAIC
-> AIC(foofit)
-[1] 470.0262
+> AIC(fit)
+[1] 1489.749
 attr(,"exact")
 [1] TRUE
 attr(,"type")
 [1] "One-sided AIC"
-> AIC(foofit, one.sided = FALSE)
-[1] 472.3589
+> AIC(fit, one.sided = FALSE)
+[1] 1490.749
 attr(,"type")
 [1] "Standard AIC"
 attr(,"exact")
 [1] TRUE
-> extractAIC(foofit)
+> extractAIC(fit)
      edf      AIC 
-  4.0000 470.0262 
+   3.000 1489.749 
 attr(,"type")
 [1] "One-sided AIC"
 attr(,"exact")
 [1] TRUE
-> extractAIC(foofit, one.sided = FALSE)
+> extractAIC(fit, one.sided = FALSE)
      edf      AIC 
-  4.0000 472.3589 
+   3.000 1490.749 
 attr(,"type")
 [1] "Standard AIC"
 attr(,"exact")
 [1] TRUE
 > 
-> # just as a stupid example for the use of AIC with multiple fits
-> foofit2 <- foofit
-> AIC(foofit, foofit2)   # 2nd column should actually be named "OSAIC" here
-        df      AIC
-foofit   4 470.0262
-foofit2  4 470.0262
+> # comparing models via AIC
+> fit2 <- update(fit, nIntervals = 2)
+Initialized 2 log-baseline intervals:  0.00000 31.21372 92.54524
+Initial parameter vector:  1 0 0 0
+iter   10 value 714.623228
+iter   20 value 661.345112
+final  value 661.345112 
+converged
+> AIC(fit, fit2)   # the 2nd column should be named "OSAIC" here
+     df      AIC
+fit   3 1489.749
+fit2  4 1329.357
 > 
 > 
 > 
@@ -10046,14 +9555,28 @@ foofit2  4 470.0262
 > 
 > ### ** Examples
 > 
-> if (surveillance.options("allExamples")) {
-+   data("foofit")
-+   prof <- profile(foofit, list(c(1,NA,NA,5), c(3,NA,NA,0), c(4, 0.5, 1.1, 10)))
-+   prof
-+ 
-+   ## there is also a plot-method for "profile.twinSIR"
-+   plot(prof)
-+ }
+> data("hagelloch")
+> fit <- twinSIR(~ household, data = hagelloch)
+Initialized 1 log-baseline interval:  0.00000 92.54524
+Initial parameter vector:  1 0
+iter   10 value 743.984462
+final  value 743.982888 
+converged
+> gridsize <- if (interactive()) 35 else 5  # for fast tests
+> prof <- profile(fit, list(c(1, NA, NA, gridsize)))
+Evaluating the profile log-likelihood on a grid ...
+i=  1 / 1 
+	j=  1 / 5 
+	j=  2 / 5 
+	j=  3 / 5 
+	j=  4 / 5 
+	j=  5 / 5 
+Computing profile likelihood-based confidence intervals ...
+1 / 1 
+> prof$ci.hl
+          idx     hl.low      hl.up   wald.low    wald.up        mle
+household   1 0.04214442 0.06657017 0.04143094 0.06585112 0.05364103
+> plot(prof)
 > 
 > 
 > 
@@ -10107,69 +9630,74 @@ foofit2  4 470.0262
 > plot(epi)
 > 
 > 
-> ## load data of an artificial epidemic
-> data("fooepidata")
-> summary(fooepidata)
+> ## load the 1861 Hagelloch measles epidemic
+> data("hagelloch")
+> summary(hagelloch)
 
 AN SIR EPIDEMIC
-  Time range: 0 -- 100 
-  Number of individuals: 100 
-  0 initially infected individuals
-  12 never infected individuals:
-    "1" "3" "16" "24" "26" "30" "36" "38" "45" "63" "64" "95"
-  Size of the epidemic: 88 
+  Time range: 0 -- 92.5452383686788 
+  Number of individuals: 188 
+  1 initially infected individuals:
+    "184"
+  0 never infected individuals
+  Size of the epidemic: 187 
 
-$ counters ('data.frame', 177 x 6 ): evolution of the epidemic:
-          time type id nSusceptible nInfectious nRemoved
-1    0.0000000                  100           0        0
-2    0.6970682    I 58           99           1        0
-3    0.7699401    I 54           98           2        0
-        [....]                                          
-176 41.3670732    R 20           12           1       87
-177 42.2322719    R 37           12           0       88
+$ counters ('data.frame', 376 x 6 ): evolution of the epidemic:
+         time type  id nSusceptible nInfectious nRemoved
+1    0.000000                   187           1        0
+2    1.136356    I 173          186           2        0
+3    7.197762    R 173          186           1        1
+       [....]                                           
+375 85.688298    I 141            0           1      187
+376 92.545238    R 141            0           0      188
 
-> plot(fooepidata)
+> plot(hagelloch)
+> 
+> ## fit a simplistic twinSIR model
+> fit <- twinSIR(~ household, data = hagelloch)
+Initialized 1 log-baseline interval:  0.00000 92.54524
+Initial parameter vector:  1 0
+iter   10 value 743.984462
+final  value 743.982888 
+converged
+> 
+> ## simulate a new epidemic from the above model
+> ## with simulation period = observation period, re-using observed infPeriods
+> sim1 <- simulate(fit, data = hagelloch)
+> plot(sim1)
+> 
+> ## check if we find similar parameters in the simulated epidemic
+> fitsim1 <- update(fit, data = sim1)
+Initialized 1 log-baseline interval:  0.00000 92.54524
+Initial parameter vector:  1 0
+iter   10 value 676.138374
+final  value 676.138368 
+converged
+> cbind(base = coef(fit), new = coef(fitsim1))
+                        base         new
+household         0.05364103  0.05698464
+cox(logbaseline) -4.07676005 -4.18792084
 > 
 > if (surveillance.options("allExamples"))
 + {
-+   ## simulate a new evolution of the epidemic
-+   set.seed(1)
-+   simepi <- simEpidata(cbind(start, stop) ~ cox(z1) + cox(z1):cox(z2),
-+       data = fooepidata, 
-+       beta = c(1,0.5), h0 = -7, alpha = c(B2 = 0.01, B1 = 0.005),
-+       f = list(B1 = function(u) u <= 1, B2 = function(u) u > 1),
-+       infPeriod = function(ids) rexp(length(ids), rate=0.2), trace = FALSE)
-+   summary(simepi)
++   ## simulate only 10 days, using random infPeriods ~ Exp(0.1)
++   sim2 <- simulate(fit, data = hagelloch, seed = 2, end = 10,
++     infPeriod = function(ids) rexp(length(ids), rate = 0.1))
++   plot(sim2)
++ 
++   ## simulate from a different model with manually specified parameters
++   set.seed(321)
++   simepi <- simEpidata(~ cox(AGE), data = hagelloch,
++       beta = c(0.1), h0 = -4, alpha = c(household = 0.05),
++       f = list(household = function(u) u == 0),
++       infPeriod = function(ids) rexp(length(ids), rate=1/8))
 +   plot(simepi)
 +   intensityplot(simepi)
++ 
++   ## see if we correctly estimate the parameters
++   fitsimepi <- twinSIR(~ cox(AGE) + household, data = hagelloch)
++   cbind(true = c(0.05, -4, 0.1), est = coef(fitsimepi), confint(fitsimepi))
 + }
-> 
-> ## load a model fitted to the 'fooepidata' epidemic
-> data("foofit")
-> foofit
-
-Call:
-twinSIR(formula = ~B1 + B2 + cox(z2), data = fooepidata)
-
-Coefficients:
-              B1                B2  cox(logbaseline)           cox(z2)  
-        0.023779          0.002985         -7.332007          0.813875  
-
-Log-likelihood: -232.2
-
-> 
-> ## simulate a new epidemic using the model and parameter estimates of 'foofit'
-> ## and set simulation period = observation period
-> # a) with observed infPeriods (i.e. fixed length 3 days):
-> simfitepi1 <- simulate(foofit, data=fooepidata)
-> plot(simfitepi1)
-> # b) with new infPeriods (simuluated from the Exp(0.3) distribution):
-> simfitepi2 <- simulate(foofit, data=fooepidata,
-+                        infPeriod=function(ids) rexp(length(ids), rate=0.3))
-> plot(simfitepi2)
-> intensityplot(simfitepi2, which="total", aggregate=FALSE,
-+               col=rgb(0,0,0,alpha=0.1))
-Note: the (true) baseline hazard is only evaluated at the beginning of the time intervals
 > 
 > 
 > 
@@ -10362,22 +9890,22 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
  & Estimate & Std. Error & $z$ value & $P(|Z|>|z|)$ \\
 \hline
 \hline 
-% latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Tue Jul 24 12:41:45 2018
+% latex table generated in R 3.5.2 by xtable 1.8-3 package
+% Fri Feb 22 14:28:06 2019
  \texttt{h.(Intercept)} & $-20.481$ & $0.053$ & $-389.0$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{h.I(start/365-3.5)} & $-0.041$ & $0.022$ & $-1.9$ & $0.06$ \\ 
   \texttt{h.sin(2*pi*start/365)} & $0.242$ & $0.064$ & $3.8$ & $2\cdot{}10^{-04}$ \\ 
   \texttt{h.cos(2*pi*start/365)} & $0.350$ & $0.064$ & $5.4$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
-% latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Tue Jul 24 12:41:45 2018
+% latex table generated in R 3.5.2 by xtable 1.8-3 package
+% Fri Feb 22 14:28:06 2019
  \texttt{e.(Intercept)} & $-16.90$ & $0.26$ & $-64$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
 \end{tabular}
 > # or, to report rate ratios
 > xtable(s)
-% latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Tue Jul 24 12:41:45 2018
+% latex table generated in R 3.5.2 by xtable 1.8-3 package
+% Fri Feb 22 14:28:06 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -10712,8 +10240,8 @@ $g
 function (t, logvals, types) 
 heights(logvals)[(types - 1) * nallknots + .bincode(t, allknotsInf, 
     right = FALSE)]
-<bytecode: 0x15c48610>
-<environment: 0x11f9a5a8>
+<bytecode: 0x16d6a9c8>
+<environment: 0x16d482b8>
 
 $G
 function (t, logvals, types) 
@@ -10723,7 +10251,7 @@ function (t, logvals, types)
         sum(typeheights(logvals, type) * diff.default(knots2t))
     }, t, types, SIMPLIFY = TRUE, USE.NAMES = FALSE)
 }
-<environment: 0x11f9a5a8>
+<environment: 0x16d482b8>
 
 $deriv
 function (t, logvals, types) 
@@ -10739,8 +10267,8 @@ function (t, logvals, types)
     dim(res) <- c(L, npars)
     res
 }
-<bytecode: 0xcbe28b0>
-<environment: 0x11f9a5a8>
+<bytecode: 0x16d6bbb8>
+<environment: 0x16d482b8>
 
 $Deriv
 function (t, logvals, types) 
@@ -10759,7 +10287,7 @@ function (t, logvals, types)
     dim(res) <- c(L, npars)
     res
 }
-<environment: 0x11f9a5a8>
+<environment: 0x16d482b8>
 
 $npars
 [1] 4
@@ -11266,16 +10794,16 @@ function (s, logvals, types = NULL)
     sLength <- sqrt(.rowSums(s^2, length(s)/2, 2L))
     c(1, exp(logvals), 0)[.bincode(sLength, allknots, right = FALSE)]
 }
-<bytecode: 0x10e2df50>
-<environment: 0x13f1f578>
+<bytecode: 0x10131940>
+<environment: 0x16795f20>
 
 $F
 function (polydomain, f, logvals, type = NULL, npoly = 256) 
 {
     sum(c(1, exp(logvals)) * ringAreas(polydomain, npoly = npoly))
 }
-<bytecode: 0x10e2ea08>
-<environment: 0x13f1f578>
+<bytecode: 0x167a1158>
+<environment: 0x16795f20>
 
 $Fcircle
 function (r, logvals, type = NULL) 
@@ -11283,8 +10811,8 @@ function (r, logvals, type = NULL)
     sum(c(1, exp(logvals)) * pi * diff(pmin.int(allknotsPos, 
         r)^2))
 }
-<bytecode: 0x10e2ef48>
-<environment: 0x13f1f578>
+<bytecode: 0x167a1708>
+<environment: 0x16795f20>
 
 $deriv
 function (s, logvals, types = NULL) 
@@ -11298,8 +10826,8 @@ function (s, logvals, types = NULL)
     dim(deriv) <- c(L, nknots)
     deriv
 }
-<bytecode: 0x10e6e5a8>
-<environment: 0x13f1f578>
+<bytecode: 0x167a2070>
+<environment: 0x16795f20>
 
 $Deriv
 function (polydomain, deriv, logvals, type = NULL, npoly = 256) 
@@ -11307,8 +10835,8 @@ function (polydomain, deriv, logvals, type = NULL, npoly = 256)
     ringAreas <- ringAreas(polydomain, npoly = npoly)
     exp(logvals) * ringAreas[-1L]
 }
-<bytecode: 0xfd70cf0>
-<environment: 0x13f1f578>
+<bytecode: 0x16797d28>
+<environment: 0x16795f20>
 
 $simulate
 function (n, logvals, type = NULL, ub) 
@@ -11320,8 +10848,8 @@ function (n, logvals, type = NULL, ub)
         prob = heights * diff.default(c(0, knots2upper^2)))
     runifdisc(n, knots2upper[rings], c(0, knots2upper)[rings])
 }
-<bytecode: 0xfd71348>
-<environment: 0x13f1f578>
+<bytecode: 0x16798498>
+<environment: 0x16795f20>
 
 $npars
 [1] 3
@@ -11587,15 +11115,15 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
  & Estimate & Std. Error & $z$ value & $P(|Z|>|z|)$ \\
 \hline
 \hline 
-% latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Tue Jul 24 12:41:48 2018
+% latex table generated in R 3.5.2 by xtable 1.8-3 package
+% Fri Feb 22 14:28:08 2019
  \texttt{h.(Intercept)} & $-20.52869$ & $0.04724$ & $-434.597$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{h.I(start/365-3.5)} & $-0.04574$ & $0.02212$ & $-2.068$ & $0.03863$ \\ 
   \texttt{h.sin(2*pi*start/365)} & $0.21728$ & $0.06467$ & $3.360$ & $0.00078$ \\ 
   \texttt{h.cos(2*pi*start/365)} & $0.31810$ & $0.06380$ & $4.986$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
-% latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Tue Jul 24 12:41:48 2018
+% latex table generated in R 3.5.2 by xtable 1.8-3 package
+% Fri Feb 22 14:28:08 2019
  \texttt{e.(Intercept)} & $-12.51659$ & $0.32326$ & $-38.720$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{e.typeC} & $-0.90832$ & $0.26742$ & $-3.397$ & $0.000682$ \\ 
   \texttt{e.agegrp[3,19)} & $0.70612$ & $0.32706$ & $2.159$ & $0.030852$ \\ 
@@ -11606,8 +11134,8 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
 > 
 > # or using the xtable-method (which produces rate ratios)
 > xtable(s)
-% latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Tue Jul 24 12:41:48 2018
+% latex table generated in R 3.5.2 by xtable 1.8-3 package
+% Fri Feb 22 14:28:08 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -11848,7 +11376,7 @@ Data attributes:
 +                    tiles=districtsD, newcoef=c("e.typeC"=-1),
 +                    t0=31, T=61, simplify=TRUE)
 
-Time at beginning of simulation: 2018-07-24 12:41:50 
+Time at beginning of simulation: 2019-02-22 14:28:10 
 Simulation 1 / 2 ...
 -------------------------------------------------------------------------------
 
@@ -11873,12 +11401,12 @@ Preparing simulated events for "epidataCS" ...
 Done.
 
 -------------------------------------------------------------------------------
-Runtime of first simulation: 0.157 seconds
-Estimated finishing time: 2018-07-24 12:41:50 
+Runtime of first simulation: 0.154 seconds
+Estimated finishing time: 2019-02-22 14:28:10 
 
 Simulation 2 / 2 ...	simulated 13 events up to time 61 
 
-Done (2018-07-24 12:41:50).
+Done (2019-02-22 14:28:11).
 > ## Don't show: 
 >     ## check construction and selection from "simEpidataCSlist"
 >     local({
@@ -12276,8 +11804,8 @@ FALSE  TRUE
 > 
 > # Compute the quality values in a nice formatted way
 > xtable(algo.quality(survResObj))
-% latex table generated in R 3.5.1 by xtable 1.8-2 package
-% Tue Jul 24 12:41:53 2018
+% latex table generated in R 3.5.2 by xtable 1.8-3 package
+% Fri Feb 22 14:28:13 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrrrrr}
@@ -12339,7 +11867,7 @@ FALSE  TRUE
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  43.113 0.82 44.583 0.106 0.106 
+Time elapsed:  48.595 1.263 49.829 0.102 0.149 
 > grDevices::dev.off()
 null device 
           1 
