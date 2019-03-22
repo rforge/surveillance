@@ -8,7 +8,7 @@
 ### Czado, C., Gneiting, T. & Held, L. (2009)
 ### Biometrics 65:1254-1261
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2013-2015,2017 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2013-2015,2017,2019 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -25,9 +25,24 @@
 pit.default <- function (x, pdistr, J=10, relative=TRUE, ..., plot = list())
 {
     PxPxm1 <- pitPxPxm1(x, pdistr, ...)
+    Px <- PxPxm1[1L,]
+    Pxm1 <- PxPxm1[2L,]
+    if (any(Px == Pxm1)) {
+        ## This means the predictive probability of an observed x is zero.
+        ## Our predictive model is really bad if that happens.
+        warning("predictive distribution has 0 probability for observed 'x'")
+    }
+
     breaks <- (0:J)/J
-    Fbar_seq <- vapply(X = breaks, FUN = pit1, FUN.VALUE = 0,
-                       Px = PxPxm1[1L,], Pxm1 = PxPxm1[2L,], USE.NAMES = FALSE)
+    
+    ## calculate \bar{F}(u) for scalar u
+    Fbar1 <- function (u, Px, Pxm1)
+    {
+        F_u <- punif(u, Pxm1, Px)  # also works for Pxm1 == Px => F_u = u >= Pxm1
+        mean(F_u)
+    }
+    Fbar_seq <- vapply(X = breaks, FUN = Fbar1, FUN.VALUE = 0,
+                       Px = Px, Pxm1 = Pxm1, USE.NAMES = FALSE)
     scale <- if (relative) J else 1
     f_j <- scale * diff.default(Fbar_seq)
     
@@ -66,23 +81,6 @@ pitPxPxm1 <- function (x, pdistr, ...)
                   deparse.level = 0)
         }
     }
-}
-
-## calculate \bar{F}(u) for scalar u
-pit1 <- function (u, Px, Pxm1)
-{
-    if (u <= 0) return(0) else if (u >= 1) return(1)
-    F_u <- (u-Pxm1) / (Px-Pxm1)
-    ## If Px=Pxm1, this means that predict. prob. of observed x is exactly zero.
-    ## We get NaN for F_u. Our predictive model is bad if that happens.
-    ## We could assign either 0 or 1 to express that and issue a warning.
-    if (any(is.nan(F_u))) {
-        warning("predictive distribution has 0 probability for observed 'x'")
-        F_u[is.nan(F_u)] <- 0
-    }
-    F_u[F_u < 0] <- 0
-    F_u[F_u > 1] <- 1
-    mean(F_u)
 }
 
 
