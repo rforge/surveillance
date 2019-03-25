@@ -17,7 +17,7 @@
 ## x - observed count data
 ## pdistr - predictive CDF or a list of such predictive CDF's,
 ##          one for each data point x. If evaluated at x=-1 it must return 0
-## J - number of bins 
+## J - number of bins
 ## ... - additional arguments for pdistr(), recycled to the length of x.
 ##       Ignored if pdistr is a list.
 ## plot - a list of arguments for plot.histogram (otherwise no plot is produced)
@@ -34,7 +34,7 @@ pit.default <- function (x, pdistr, J=10, relative=TRUE, ..., plot = list())
     }
 
     breaks <- (0:J)/J
-    
+
     ## calculate \bar{F}(u) for scalar u
     Fbar1 <- function (u, Px, Pxm1)
     {
@@ -45,7 +45,7 @@ pit.default <- function (x, pdistr, J=10, relative=TRUE, ..., plot = list())
                        Px = Px, Pxm1 = Pxm1, USE.NAMES = FALSE)
     scale <- if (relative) J else 1
     f_j <- scale * diff.default(Fbar_seq)
-    
+
     res <- list(breaks = breaks, counts = f_j, density = f_j,
                 mids = breaks[-(J+1)] + 1/J/2, xname = "PIT", equidist = TRUE)
     class(res) <- c("pit", "histogram")
@@ -88,13 +88,13 @@ pitPxPxm1 <- function (x, pdistr, ...)
 
 plot.pit <- function (x, main = "", ylab = NULL, ...)
 {
-    relative <- !isTRUE(all.equal(1, sum(x$density)))
+    relative <- isTRUE(all.equal(1, sum(x$density)))
     if (is.null(ylab))
         ylab <- if (relative) "Relative Frequency" else "Density"
     ## call plot.histogram
     NextMethod("plot", main = main, ylab = ylab, ...)
     ## add reference line
-    abline(h = if (relative) 1 else 1/length(x$mids), lty = 2, col = "grey")
+    abline(h = if (relative) 1/length(x$mids) else 1, lty = 2, col = "grey")
     invisible(x)
 }
 

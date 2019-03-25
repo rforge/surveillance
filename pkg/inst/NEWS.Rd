@@ -8,6 +8,18 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.17.0.9000 (UNRELEASED)}{
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item \code{pit()}'s default \code{ylab} was wrong (default are
+    densities not relative frequencies).
+  }
+}
+
+}
+
+
 \section{Changes in surveillance version 1.17.0 (2019-02-22)}{
 
 \subsection{NEW FEATURES}{
