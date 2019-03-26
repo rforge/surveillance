@@ -347,6 +347,11 @@ mysims <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
         stopifnot(all.equal(mysim_single, mysim_from_list,
                             check.attributes = FALSE))
     })
+    ## check equivalence of Lambdag from simulation and residuals via twinstim
+    stopifnot(all.equal(
+        residuals(mysims[[1]]),
+        surveillance:::residuals.twinstim(surveillance:::as.twinstim.simEpidataCS(mysims[[1]]))
+    ))
 }
 
 ## extract the second realization -> object of class simEpidataCS
