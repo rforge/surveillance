@@ -192,12 +192,10 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 #======================================================================
 
 #Open
-14/10/2014 incorporate more showsim.* function from power-law paper
-           as plot-methods for arrays of simulated counts returned by
-           simulate.hhh4(..., simplify=TRUE)
 17/11/2014 add checkNeighbourhood(..., strict=TRUE) for integer check
 18/10/2017 plotHHH4_season: add options for groups and confidence intervals (from hhh4contacts)
 26/11/2018 illustrate oneStepAhead and simulate beyond sts (with missing observed)
+26/03/2019 maybe incorporate HIDDA.forecasting::dhhh4sims(), with scores
 
 #Done
 20/02/2019 clarify ranef description in vignette("hhh4_spacetime")
