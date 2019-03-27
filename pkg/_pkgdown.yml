@@ -1,4 +1,4 @@
-destination: "../www/"
+destination: "../www-pkgdown/"
 
 template:
   params:
