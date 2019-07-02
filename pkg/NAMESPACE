@@ -328,7 +328,7 @@ export(simEpidataCS)
 export(siaf,
        siaf.constant, siaf.step,
        siaf.gaussian,
-       siaf.powerlaw, siaf.powerlawL, siaf.student)
+       siaf.powerlaw, siaf.powerlaw1, siaf.powerlawL, siaf.student)
 export(tiaf,
        tiaf.constant, tiaf.step,
        tiaf.exponential)

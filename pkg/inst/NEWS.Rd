@@ -10,6 +10,14 @@
 
 \section{Changes in surveillance version 1.17.0.9000 (UNRELEASED)}{
 
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item New one-parameter power-law kernel \code{siaf.powerlaw1()}
+    with fixed \code{sigma = 1}. Useful if \code{sigma} is difficult to
+    estimate with \code{siaf.powerlaw()}.
+  }
+}
+
 \subsection{BUG FIXES}{
   \itemize{
     \item \code{pit()}'s default \code{ylab} was wrong (default are

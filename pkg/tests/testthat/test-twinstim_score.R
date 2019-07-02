@@ -38,6 +38,13 @@ test_that("score vector agrees with numerical approximation", {
 ## numfi <- -numDeriv::hessian(func = model$ll, x = theta)
 ## anafi <- model$fi(theta)
 
+test_that("one-parameter power law agrees with more general implementation", {
+    m0 <- update.default(model, siaf = siaf.powerlaw(), tiaf = NULL, subset = time < 30)
+    m1 <- update.default(m0, siaf = siaf.powerlaw1(sigma = exp(2)))
+    expect_equal(m0$ll(theta), m1$ll(c(head(theta, -2), -1)))
+    expect_equal(m0$sc(theta)[-6], m1$sc(c(head(theta, -2), -1)))
+})
+
 
 ### now check with identity link for the epidemic predictor
 

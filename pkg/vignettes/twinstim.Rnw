@@ -913,6 +913,9 @@ The estimated power-law parameters $(\hat\sigma, \hat d)$ are:
 exp(cbind("Estimate" = coef(imdfit_powerlaw)[c("e.siaf.1", "e.siaf.2")],
           confint(imdfit_powerlaw, parm = c("e.siaf.1", "e.siaf.2"))))
 @
+Sometimes $\sigma$ is difficult to estimate. In this case, the
+one-parameter version \code{siaf.powerlaw1} can be used to estimate a
+power-law decay with fixed $\sigma = 1$.
 
 Table~\ref{tab:iafs} also lists the step function kernel as an alternative, which is
 particularly useful for two reasons. First, it is a more flexible approach since it
