@@ -48,7 +48,10 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
       \item a list as returned by \code{\link{siaf}} or by a
       predefined interaction function such as
       \code{\link{siaf.gaussian}} as in Meyer et al. (2012) or
-      \code{\link{siaf.powerlaw}} as in Meyer and Held (2014)
+      \code{\link{siaf.powerlaw}} as in Meyer and Held (2014).
+      The latter requires unique event locations, possibly after random
+      tie-breaking (\code{\link{untie}}) or imputation of
+      interval-censored locations.
       \item a numeric vector corresponding to the knots of a step
       function, i.e. the same as \code{\link{siaf.step}(knots)}
     }
