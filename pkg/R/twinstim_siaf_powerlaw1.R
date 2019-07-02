@@ -6,8 +6,8 @@
 ### 1-parameter power-law kernel f(s) = (1 + ||s||)^-d, i.e., sigma = 1
 ###
 ### Copyright (C) 2019 Sebastian Meyer
-### $Revision: 1988 $
-### $Date: 2017-10-06 11:04:19 +0200 (Fr, 06. Okt 2017) $
+### $Revision$
+### $Date$
 ################################################################################
 
 
