@@ -12,7 +12,8 @@
 #======================================================================
 
 #Open
-
+26/06/2019 rename or remove hcl.colors due to new grDevices::hcl.colors
+02/07/2019 replace deprecated expect_that() syntax with shortcuts
 
 #Done
 15/02/2019 remove deprecated functions
