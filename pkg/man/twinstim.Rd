@@ -471,7 +471,7 @@ if (surveillance.options("allExamples"))
 }
 
 \dontrun{
-  ## NB: in contrast to using nlminb() optim's BFGS would miss the
+  ## NB: in contrast to nlminb(), optim's BFGS would miss the
   ##     likelihood maximum wrt the epidemic intercept
   m0_BFGS <- update(m_noepi, epidemic=~1, optim.args = list(method="BFGS"))
   format(cbind(nlminb=coef(m0), BFGS=coef(m0_BFGS)), digits=3, scientific=FALSE)
