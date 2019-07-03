@@ -273,12 +273,13 @@ plotComponentPolygons <- function (x, y, col = 1:6, border = col, add = FALSE)
 
 plotHHH4_maps <- function (x,
     which = c("mean", "endemic", "epi.own", "epi.neighbours"),
-    prop = FALSE, main = which, zmax = NULL,
-    col.regions = hcl.colors(10),
+    prop = FALSE, main = which, zmax = NULL, col.regions = NULL,
     labels = FALSE, sp.layout = NULL, ...,
     map = x$stsObj@map, meanHHH = NULL)
 {
     which <- match.arg(which, several.ok = TRUE)
+    if (is.null(col.regions))
+        col.regions <- .hcl.colors(10)
 
     ## extract district-specific mean components
     if (is.null(meanHHH)) {

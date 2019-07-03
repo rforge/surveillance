@@ -25,6 +25,14 @@
   }
 }
 
+\subsection{DEPRECATED AND DEFUNCT}{
+  \itemize{
+    \item \code{hcl.colors()}, exported since 1.14.0, has been renamed
+    \code{.hcl.colors()} and is now internal again, to avoid a name
+    clash with \R's own such function introduced in \R 3.6.0.
+  }
+}
+
 }
 
 

@@ -8,7 +8,7 @@
 ### a copy of which is available at http://www.r-project.org/Licenses/.
 ################################################################################
 
-hcl.colors <- function (ncolors=100, use.color=TRUE)
+.hcl.colors <- function (ncolors=100, use.color=TRUE)
 {
     GYR <- if (requireNamespace("colorspace", quietly=TRUE)) {
         ## the Zeil-ice colors

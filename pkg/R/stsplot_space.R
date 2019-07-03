@@ -63,10 +63,8 @@ stsplot_space <- function (x, tps = NULL, map = x@map, population = NULL,
     ## default color palette
     if (is.null(col.regions)) {
         separate0 <- is.null(population) && at[1] == 0 && at[2] <= 1
-        col.regions <- c(
-            if (separate0) "white",
-            hcl.colors(ncolors=length(at)-1-separate0,
-                       use.color=TRUE))
+        col.regions <- c(if (separate0) "white",
+                         .hcl.colors(length(at)-1-separate0))
     }
     ## colorkey settings
     if (!missing(colorkey) && is.list(colorkey))
