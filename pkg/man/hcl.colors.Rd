@@ -6,9 +6,9 @@
 \description{
   If package \pkg{colorspace} is available, its
   \link[colorspace]{heat_hcl} function is used to generate a color
-  palette. Otherwise, the function simply calls
-  \code{\link{heat.colors}} (or \code{\link{grey.colors}} if
-  \code{use.color=FALSE}).
+  palette. Otherwise, the function uses the Heat 2 palette from
+  R's own \code{hcl.colors} (in R >= 3.6.0) or falls back to
+  basic \code{\link{heat.colors}}.
 }
 \usage{
 hcl.colors(ncolors = 100, use.color = TRUE)
@@ -20,10 +20,6 @@ hcl.colors(ncolors = 100, use.color = TRUE)
 }
 \value{
   A character vector of \code{ncolors} colors.
-}
-\seealso{
-  \code{\link[colorspace]{heat_hcl}} in package \pkg{colorspace},
-  or \code{\link{heat.colors}} in the base package \pkg{grDevices}.
 }
 
 \examples{
