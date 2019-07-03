@@ -18,7 +18,7 @@ theta <- c("h.(Intercept)" = -20,
            "e.siaf.1" = 2, "e.tiaf.1" = -1)
 
 test_that("likelihood is still the same", {
-    expect_that(model$ll(theta), equals(-9579.65468598488))
+    expect_equal(model$ll(theta), -9579.65468598488)
 })
 
 test_that("score vector agrees with numerical approximation", {
@@ -29,7 +29,7 @@ test_that("score vector agrees with numerical approximation", {
           -21.4444934196989, -5.43080160401029, -15.085241575699,
           -20.1708323190602)
     }
-    expect_that(model$sc(theta), equals(numsc))
+    expect_equal(model$sc(theta), numsc)
 })
 
 ## Note: twinstim() uses an estimate of the _expected_ Fisher information,
@@ -54,7 +54,7 @@ theta2 <- theta2i <- theta[1:4]
 theta2i["e.(Intercept)"] <- exp(theta2["e.(Intercept)"])
 
 test_that("likelihoods with log-link and identity link are the same", {
-    expect_that(model2$ll(theta2), equals(model2i$ll(theta2i)))
+    expect_equal(model2i$ll(theta2i), model2$ll(theta2))
 })
 
 test_that("identity link score vector agrees with numerical approximation", {
@@ -64,5 +64,5 @@ test_that("identity link score vector agrees with numerical approximation", {
         c(-679.706275919901, -91.0659401491325, -114.082117122738,
           -1532144485.45524)
     }
-    expect_that(model2i$sc(theta2i), equals(numsc))
+    expect_equal(model2i$sc(theta2i), numsc)
 })
