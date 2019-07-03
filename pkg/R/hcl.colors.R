@@ -18,6 +18,7 @@
     } else if (use.color) {
         if (getRversion() >= "3.6.0") {
             grDevices::hcl.colors(n = ncolors, palette = "Heat 2")
+            ## this is the same as colorspace::heat_hcl(ncolors)
         } else {
             heat.colors(ncolors)
         }
