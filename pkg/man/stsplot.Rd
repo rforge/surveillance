@@ -2,7 +2,9 @@
 \docType{methods}
 \alias{plot,sts,missing-method}
 \alias{plot,stsNC,missing-method}
-\alias{stsplot} % for convenience
+% and for convenience:
+\alias{plot.sts}
+\alias{stsplot}
 
 \title{Plot-Methods for Surveillance Time-Series Objects}
 \description{
