@@ -27,8 +27,7 @@
 \alias{epochInYear,sts-method}
 \alias{year}
 \alias{year,sts-method}
-% constructor and conversion methods
-\alias{initialize,sts-method}
+% conversion methods
 \alias{as.data.frame,sts-method}
 \alias{coerce,sts,ts-method}
 \alias{coerce,ts,sts-method}
@@ -155,8 +154,6 @@ sts(observed, start = c(2000, 1), frequency = 52,
       returned object is of class \code{Date}.}
     \item{epochInYear}{\code{signature(x = "sts")}: Returns the epoch
       number within the year of the \code{epoch} slot.}
-    \item{initialize}{\code{signature(x="sts")}: the internal function
-      \code{init.sts} is called, which assigns all slots.  }
     \item{[}{subsetting \code{"sts"} objects, see \code{\link{[,sts-method}}.}
     \item{aggregate}{\code{signature(x="sts")}: see
       \code{\link{aggregate,sts-method}}}
