@@ -194,6 +194,7 @@ if(getRversion() >= "3.6.0") {  # delayed registration
 
 # generics for sts class defined in sts.R
 exportMethods("[", plot)
+S3method(toLatex, sts)    # S3-method for an S4 class, see ?Methods_for_S3
 exportMethods(toLatex)
 exportMethods(dim, dimnames, epochInYear, year)
 exportMethods(aggregate)
@@ -211,7 +212,7 @@ export(stsplot_space)
 export(stsplot_time, stsplot_time1, stsplot_alarm)
 export(addFormattedXAxis, atChange, at2ndChange, atMedian) #for time axis formatting
 export(stsplot_spacetime) # old implementation of (animated) map
-S3method(animate, sts)    # S3-method for an S4 class, see ?Methods
+S3method(animate, sts)    # S3-method for an S4 class, see ?Methods_for_S3
 export(autoplot.sts)
 if(getRversion() >= "3.6.0") {  # delayed registration
     S3method(ggplot2::autoplot, sts)
