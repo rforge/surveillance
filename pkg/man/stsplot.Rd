@@ -42,7 +42,7 @@
     }
     
     \item{\code{observed ~ time}}{The observations in \code{x} are
-      first \code{\link[=aggregate,sts-method]{aggregated}} over units
+      first \code{\link[=aggregate.sts]{aggregated}} over units
       and the resulting univariate time-series is plotted via the
       function \code{\link{stsplot_time}}.}
     
