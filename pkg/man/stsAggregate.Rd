@@ -1,5 +1,6 @@
 \name{aggregate-methods}
 \docType{methods}
+\alias{aggregate.sts}
 \alias{aggregate,sts-method}
 
 \title{Aggregate an \code{"sts"} Object Over Time or Across Units}

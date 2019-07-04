@@ -191,15 +191,18 @@ export(as.xts.sts)
 if(getRversion() >= "3.6.0") {  # delayed registration
     S3method(xts::as.xts, sts)
 }
-
-# generics for sts class defined in sts.R
-exportMethods("[", plot)
-S3method(toLatex, sts)    # S3-method for an S4 class, see ?Methods_for_S3
-exportMethods(toLatex)
-exportMethods(dim, dimnames, epochInYear, year)
-exportMethods(aggregate)
+S3method(as.data.frame, sts) # see ?Methods_for_S3
 exportMethods(as.data.frame)
 export(tidy.sts)
+
+# more S4 generics, some with an equivalent S3-method, see ?Methods_for_S3
+exportMethods(dim, dimnames, year, epochInYear, "[")
+S3method(plot, sts)
+exportMethods(plot)
+S3method(toLatex, sts)
+exportMethods(toLatex)
+S3method(aggregate, sts)
+exportMethods(aggregate)
 
 # methods for accessing/replacing slots of an sts object (cf. AllGeneric.R)
 exportMethods(epoch,observed,alarms,upperbound,population,control,multinomialTS,neighbourhood)

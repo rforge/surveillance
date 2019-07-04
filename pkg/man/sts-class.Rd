@@ -28,6 +28,7 @@
 \alias{epochInYear}
 \alias{epochInYear,sts-method}
 % conversion methods
+\alias{as.data.frame.sts}
 \alias{as.data.frame,sts-method}
 \alias{as.ts.sts}
 \alias{coerce,sts,ts-method}
