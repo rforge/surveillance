@@ -192,7 +192,7 @@ sts(observed, start = c(2000, 1), frequency = 52,
   \subsection{Transformation methods}{
   \describe{
     \item{aggregate}{\code{signature(x = "sts")}:
-      see \code{\link{aggregate,sts-method}}.}
+      see \code{\link{aggregate.sts}}.}
 
     \item{as.data.frame}{\code{signature(x = "sts")}:
       the default \code{as.data.frame} call will collect the following
@@ -223,7 +223,7 @@ sts(observed, start = c(2000, 1), frequency = 52,
     \item{plot}{\code{signature(x = "sts", y = "missing")}:
       entry point to a collection of plot variants.
       The \code{type} of plot is specified using a formula,
-      see \code{\link{stsplot}} for details.}
+      see \code{\link{plot.sts}} for details.}
     \item{autoplot}{a \CRANpkg{ggplot2} variant of the standard
       time-series-type plot, see \code{\link{autoplot.sts}}.}
     \item{animate}{see \code{\link{animate.sts}}.}
