@@ -1,4 +1,5 @@
 \name{toLatex.sts}
+\docType{methods}
 \alias{toLatex.sts}
 \alias{toLatex,sts-method}
 
