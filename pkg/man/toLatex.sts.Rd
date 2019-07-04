@@ -11,9 +11,9 @@ character vector with LaTeX markup.
 
 \usage{
 \S4method{toLatex}{sts}(object, caption = "",label=" ", columnLabels = NULL,
-                        subset = NULL, 
-                        alarmPrefix = "\\\\textbf{\\\\textcolor{red}{",
-                        alarmSuffix = "}}", ubColumnLabel = "UB", ...)
+        subset = NULL, 
+        alarmPrefix = "\\\\textbf{\\\\textcolor{red}{",
+        alarmSuffix = "}}", ubColumnLabel = "UB", ...)
 }
 
 \arguments{
@@ -49,7 +49,7 @@ control <- list(range=(260:312),
                 pThresholdTrend=0.05,trend=TRUE,
                 thresholdMethod="delta",alpha=0.1)
 salm <- farringtonFlexible(salm,control=control)
-print(toLatex(salm))
+toLatex(salm)
 }
 
 \author{Dirk Schumacher}
