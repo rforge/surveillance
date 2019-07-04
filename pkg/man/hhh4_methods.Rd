@@ -97,6 +97,8 @@ see \code{vignette("hhh4_spacetime")}.
     are to be given confidence intervals. If missing, all parameters
     are considered.}
   \item{level}{the confidence level required.}
+  \item{type}{the type of residuals which should be returned. The
+    alternatives are \code{"deviance"} (default) and \code{"response"}.}
 }
 
 \value{
