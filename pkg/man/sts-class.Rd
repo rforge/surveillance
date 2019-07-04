@@ -185,7 +185,7 @@ sts(observed, start = c(2000, 1), frequency = 52,
 
     \item{[}{\code{signature(x = "sts")}:
       subset rows (time points) and/or columns (units),
-      see \code{\link{[,sts-method}}.}
+      see \code{help("\link{[,sts-method}")}.}
   }
   }
 
