@@ -41,7 +41,8 @@ simpleR0(object, eta = coef(object)[["e.(Intercept)"]],
     
     For the \code{twinstim} method, \code{newevents} must at least
     contain the following columns:
-    the \code{time} of the events, the factor variable \code{type}, the
+    the event \code{time} (only for \code{trimmed = TRUE}),
+    the factor variable \code{type}, the
     interaction ranges \code{eps.t} and \code{eps.s}, as well as columns
     for the marks used in the epidemic component of the fitted \code{"twinstim"}
     \code{object} as stored in \code{formula(object)$epidemic}.

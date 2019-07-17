@@ -6,7 +6,7 @@
 ### Methods for objects of class "twinstim", specifically:
 ### vcov, logLik, print, summary, plot, R0, residuals, update, terms, all.equal
 ###
-### Copyright (C) 2009-2018 Sebastian Meyer
+### Copyright (C) 2009-2019 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -378,20 +378,22 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, newcoef = NULL, ...)
     } else {
         ## use newevents
         stopifnot(is.data.frame(newevents))
-        if (!"time" %in% names(newevents)) {
-            stop("missing event \"time\" column in 'newevents'")
-        }
         if (any(!c("eps.s", "eps.t") %in% names(newevents))) {
             stop("missing \"eps.s\" or \"eps.t\" columns in 'newevents'")
         }
         stopifnot(is.factor(newevents[["type"]]))
 
         ## subset newevents to timeRange
-        .N <- nrow(newevents)
-        newevents <- subset(newevents, time + eps.t > t0 & time <= T)
-        if (nrow(newevents) < .N) {
-            message("subsetted 'newevents' to only include events infectious ",
-                    "during 'object$timeRange'")
+        if (trimmed) {
+            if (!"time" %in% names(newevents)) {
+                stop("missing event \"time\" column in 'newevents'")
+            }
+            .N <- nrow(newevents)
+            newevents <- subset(newevents, time + eps.t > t0 & time <= T)
+            if (nrow(newevents) < .N) {
+                message("subsetted 'newevents' to only include events infectious ",
+                        "during 'object$timeRange'")
+            }
         }
 
         ## extract columns
