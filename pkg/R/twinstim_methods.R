@@ -375,17 +375,23 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, newcoef = NULL, ...)
             gammapred <- modelenv$gammapred
             names(gammapred) <- names(object$R0) # for names of the result
         }
-    } else {
-        ## use newevents
+    } else { # use newevents
         stopifnot(is.data.frame(newevents))
-        if (any(!c("eps.s", "eps.t") %in% names(newevents))) {
+        newevents$type <- factor(newevents[["type"]], levels = typeNames)
+        if (anyNA(newevents$type)) {
+            stop("unknown event type in 'newevents'; must be one of: ",
+                 paste0("\"", typeNames, "\"", collapse = ", "))
+        }
+        eps.t <- newevents[["eps.t"]]
+        eps.s <- newevents[["eps.s"]]
+        if (is.null(eps.s) || is.null(eps.t)) {
             stop("missing \"eps.s\" or \"eps.t\" columns in 'newevents'")
         }
-        stopifnot(is.factor(newevents[["type"]]))
 
         ## subset newevents to timeRange
         if (trimmed) {
-            if (!"time" %in% names(newevents)) {
+            eventTimes <- newevents[["time"]]
+            if (is.null(eventTimes)) {
                 stop("missing event \"time\" column in 'newevents'")
             }
             .N <- nrow(newevents)
@@ -395,12 +401,6 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, newcoef = NULL, ...)
                         "during 'object$timeRange'")
             }
         }
-
-        ## extract columns
-        newevents$type <- factor(newevents[["type"]], levels = typeNames)
-        eventTimes <- newevents[["time"]]
-        eps.t <- newevents[["eps.t"]]
-        eps.s <- newevents[["eps.s"]]
 
         ## calculate gammapred for newevents
         epidemic <- terms(form$epidemic, data = newevents, keep.order = TRUE)
