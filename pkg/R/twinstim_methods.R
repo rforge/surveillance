@@ -377,15 +377,24 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, newcoef = NULL, ...)
         }
     } else { # use newevents
         stopifnot(is.data.frame(newevents))
-        newevents$type <- factor(newevents[["type"]], levels = typeNames)
-        if (anyNA(newevents$type)) {
-            stop("unknown event type in 'newevents'; must be one of: ",
-                 paste0("\"", typeNames, "\"", collapse = ", "))
-        }
         eps.t <- newevents[["eps.t"]]
         eps.s <- newevents[["eps.s"]]
         if (is.null(eps.s) || is.null(eps.t)) {
             stop("missing \"eps.s\" or \"eps.t\" columns in 'newevents'")
+        }
+        if (is.null(newevents[["type"]])) {
+            if (nTypes == 1) {
+                newevents$type <- factor(rep.int(typeNames, nrow(newevents)),
+                                         levels = typeNames)
+            } else {
+                stop("missing event \"type\" column in 'newevents'")
+            }
+        } else {
+            newevents$type <- factor(newevents$type, levels = typeNames)
+            if (anyNA(newevents$type)) {
+                stop("unknown event type in 'newevents'; must be one of: ",
+                     paste0("\"", typeNames, "\"", collapse = ", "))
+            }
         }
 
         ## subset newevents to timeRange
