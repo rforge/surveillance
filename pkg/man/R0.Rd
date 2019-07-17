@@ -44,8 +44,9 @@ simpleR0(object, eta = coef(object)[["e.(Intercept)"]],
     the event \code{time} (only for \code{trimmed = TRUE}),
     the factor variable \code{type}, the
     interaction ranges \code{eps.t} and \code{eps.s}, as well as columns
-    for the marks used in the epidemic component of the fitted \code{"twinstim"}
-    \code{object} as stored in \code{formula(object)$epidemic}.
+    for the marks and \code{stgrid} variables used in the epidemic
+    component of the fitted \code{"twinstim"} \code{object} as stored in
+    \code{formula(object)$epidemic}.
     The coding of the variables must of course be the same as used for
     fitting. For \code{trimmed} R0 values, \code{newevents} must additionally
     contain the components \code{.influenceRegion} and, if using the
