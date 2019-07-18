@@ -112,6 +112,12 @@
 #Bug reports
 ############
 
+18/07/2019 add "xlevels" to the twinstim result and use it in R0.twinstim
+           (and maybe elsewhere) to compute gammapred for 'newevents'.
+           See predict.lm(). The following example currently fails:
+           myfit <- update(imdepifit, epidemic = ~ . + factor(start > 100))
+           R0(myfit, newevents=cbind(marks(imdepi)[1,], start = 1), trimmed=FALSE)
+
 #Fixed
 29/07/2010>> Summary/print fuer twinstim Objekte, die mit do.call
              erzeugt worden sind scheint nicht zu funktionieren.
