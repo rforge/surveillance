@@ -6,7 +6,7 @@
 ### Maximum Likelihood inference for the two-component spatio-temporal intensity
 ### model described in Meyer et al (2012), DOI: 10.1111/j.1541-0420.2011.01684.x
 ###
-### Copyright (C) 2009-2018 Sebastian Meyer
+### Copyright (C) 2009-2019 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -191,6 +191,7 @@ twinstim <- function (
     ### Generate model matrix
 
     mme <- model.matrix(epidemic, mfe)
+    xlevels_epidemic <- .getXlevels(epidemic, mfe)
     q <- ncol(mme)
     hase <- q > 0L
 
@@ -279,6 +280,7 @@ twinstim <- function (
                              # endemic = ~1 (see PR#14066)
                              drop.unused.levels = FALSE)
     mmhEvents <- model.matrix(endemic, mfhEvents)
+    xlevels_endemic <- .getXlevels(endemic, mfhEvents)
     # exclude intercept from endemic model matrix below, will be treated separately
     if (nbeta0 > 0) mmhEvents <- mmhEvents[,-1,drop=FALSE]
     #stopifnot(nrow(mmhEvents) == Nin)
@@ -1389,6 +1391,10 @@ twinstim <- function (
     fit$timeRange <- c(t0, T)           # for simulate.twinstim's defaults
     fit$formula <- list(endemic = endemic, epidemic = epidemic,
                         siaf = siaf, tiaf = tiaf)
+    fit["xlevels"] <- list(
+        if (length(xlevels_endemic) + length(xlevels_epidemic) > 0) {
+            list(endemic = xlevels_endemic, epidemic = xlevels_epidemic)
+        } else NULL)
     fit["control.siaf"] <- list(control.siaf)    # might be NULL
 
 

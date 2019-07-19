@@ -414,12 +414,8 @@ R0.twinstim <- function (object, newevents, trimmed = TRUE, newcoef = NULL, ...)
         ## calculate gammapred for newevents
         epidemic <- terms(form$epidemic, data = newevents, keep.order = TRUE)
         mfe <- model.frame(epidemic, data = newevents,
-                           na.action = na.pass, drop.unused.levels = FALSE)
-        ## FIXME: model.frame needs 'xlev' (factor levels from fitting), see predict.lm
-        ## if the 'epidemic' formula contains factor(...) terms the levels will
-        ## be derived from 'newevents' so will likely be incomplete and we might see
-        ## Error in `contrasts<-`(`*tmp*`, value = contr.funs[1 + isOF[nn]]) :
-        ##   contrasts can be applied only to factors with 2 or more levels
+                           na.action = na.pass, drop.unused.levels = FALSE,
+                           xlev = object$xlevels$epidemic)  # sync factor levels
         mme <- model.matrix(epidemic, mfe)
         gamma <- coefs[sum(npars[1:2]) + seq_len(npars["q"])]
         if (ncol(mme) != length(gamma)) {

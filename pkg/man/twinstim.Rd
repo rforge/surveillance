@@ -334,6 +334,7 @@ twinstim(endemic, epidemic, siaf, tiaf, qmatrix = data$qmatrix, data,
   \item{formula}{a list containing the four main parts of the model
     specification: \code{endemic}, \code{epidemic}, \code{siaf}, and
     \code{tiaf}.}
+  \item{xlevels}{a record of the levels of the factors used in fitting.}
   \item{control.siaf}{see the \dQuote{Arguments} section above.}
   \item{optim.args}{input optimizer arguments used to determine the MLE.}
   \item{functions}{if \code{model=TRUE} this is a \code{list} with

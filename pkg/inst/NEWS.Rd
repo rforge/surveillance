@@ -22,6 +22,11 @@
   \itemize{
     \item \code{pit()}'s default \code{ylab} was wrong (default are
     densities not relative frequencies).
+
+    \item \code{R0()} for \code{"twinstim"} fits with specified
+    \code{newevents} now handles levels of epidemic factor variables
+    automatically via the new \code{xlevels} attribute stored in the
+    fitted model.
   }
 }
 
