@@ -1,6 +1,6 @@
 ################################################################################
 ### Author: Sebastian Meyer [seb *.* meyer *a*t* fau *.* de]
-### Time-stamp: <[imdepifit.R] 2017-10-05 17:17 (CEST) by SM>
+### Time-stamp: <[imdepifit.R] 2019-07-19 17:07 (CEST) by SM>
 ### Project: reproduce data(imdepifit)
 ################################################################################
 
@@ -26,6 +26,6 @@ rbind(imdepifit$runtime, myimdepifit$runtime)
 if (FALSE) # store updated fit in data-folder
 {
     imdepifit <- myimdepifit
-    save(imdepifit, file="~/Projekte/surveillance/pkg/data/imdepifit.RData")
+    save(imdepifit, file="~/Projekte/surveillance/pkg/data/imdepifit.RData", version = 2)
     tools::resaveRdaFiles("~/Projekte/surveillance/pkg/data/imdepifit.RData")
 }
