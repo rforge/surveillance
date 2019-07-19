@@ -537,10 +537,10 @@ simpleR0 <- function (object, eta = coef(object)[["e.(Intercept)"]],
 
     ## integral of siaf over a disc of radius eps.s
     Fcircle <- getFcircle(siaf, object$control.siaf$F)
-    siafInt <- Fcircle(eps.s, coeflist$siaf)
+    siafInt <- unname(Fcircle(eps.s, coeflist$siaf))
 
     ## integral of tiaf over a period of length eps.t
-    tiafInt <- tiaf$G(eps.t, coeflist$tiaf) - tiaf$G(0, coeflist$tiaf)
+    tiafInt <- unname(tiaf$G(eps.t, coeflist$tiaf) - tiaf$G(0, coeflist$tiaf))
 
     ## calculate basic R0
     (if (.epilink(object) == "log") exp(eta) else eta) * siafInt * tiafInt

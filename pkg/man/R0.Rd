@@ -156,7 +156,7 @@ setting2 <- data.frame(agegrp = "[3,19)", type = "C", eps.s = Inf, eps.t = 14)
 newevents <- rbind("ref" = refevent, "event2" = setting2)
 (R0_examples <- R0(imdepifit, newevents = newevents, trimmed = FALSE))
 stopifnot(all.equal(R0_examples[["ref"]],
-                    simpleR0(imdepifit), check.attributes = FALSE))
+                    simpleR0(imdepifit)))
 
 
 ### compute a Monte Carlo confidence interval
