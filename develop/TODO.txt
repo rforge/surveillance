@@ -112,11 +112,6 @@
 #Bug reports
 ############
 
-18/07/2019 add "xlevels" to the twinstim result and use it in R0.twinstim
-           (and maybe elsewhere) to compute gammapred for 'newevents'.
-           See predict.lm(). The following example currently fails:
-           myfit <- update(imdepifit, epidemic = ~ . + factor(start > 100))
-           R0(myfit, newevents=cbind(marks(imdepi)[1,], start = 1), trimmed=FALSE)
 
 #Fixed
 29/07/2010>> Summary/print fuer twinstim Objekte, die mit do.call
@@ -140,6 +135,8 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 20/06/2017 ensure that isTRUE(all.equal(residuals(mysim2),
            surveillance:::residuals.twinstim(surveillance:::as.twinstim.simEpidataCS(mysim2))))
 06/10/2017 don't set siaf/tiaf functions in the global environment (possible masking)
+18/07/2019 add "xlevels" to the twinstim result and use it in R0.twinstim
+           (and maybe elsewhere) to compute gammapred for 'newevents'.
 
 
 ##########
