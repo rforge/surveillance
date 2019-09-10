@@ -635,7 +635,7 @@ interpretControl <- function (control, stsObj)
       } else names(initial.d))
   }
 
-  ## determine all NA's (FIXME: why do we need this? Why include is.na(Y)?)
+  ## determine all NA's
   isNA <- is.na(Y)
   if (ar$inModel)
       isNA <- isNA | is.na(offsets[[1L]])
