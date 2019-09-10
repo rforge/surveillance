@@ -144,7 +144,7 @@ xx/07/2012 R0 on an object containing agegrp as a factor variable
 ##########
 
 - type-specific iso-kernels (need example or test code)
-
+- add 'tiles' as optional component of "epidataCS"
 - as.epidataCS: "events" could be provided as an object of class ppx (which
   would include the window "W") or of class STIDF, then transform appropriately
   (but don't change "epidataCS" class definition).
