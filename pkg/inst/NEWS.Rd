@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.17.0.9000 (UNRELEASED)}{
+\section{Changes in surveillance version 1.17.1 (2019-09-11)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -27,6 +27,11 @@
     \code{newevents} now handles levels of epidemic factor variables
     automatically via the new \code{xlevels} attribute stored in the
     fitted model.
+
+    \item Some S3 methods for the \code{"sts"} class are now formally
+    registered and identical to the established S4 methods.
+    
+    \item Minor additions and fixes in the package documentation.
   }
 }
 
