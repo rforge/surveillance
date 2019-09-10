@@ -816,8 +816,6 @@ meanHHH <- function(theta, model, subset=model$subset, total.only=FALSE)
   idxFE <- model$indexFE
   idxRE <- model$indexRE
 
-  #isNA <- model$isNA
-
   toMatrix <- function (x, r=model$nTime, c=model$nUnits)
       matrix(x, r, c, byrow=TRUE)
 
@@ -827,9 +825,6 @@ meanHHH <- function(theta, model, subset=model$subset, total.only=FALSE)
   computePartMean <- function (component)
   {
     pred <- nullMatrix <- toMatrix(0)
-    #is.na(pred) <- isNA # set missing values in observed Y to NA
-                         # -> FIXME: why? seems to be awkward... and
-                         # incompatible with simulation for t=1 (given y.start)
 
     if(!any(comp==component)) { # component not in model -> return 0-matrix
         zeroes <- pred[subset,,drop=FALSE]
@@ -930,7 +925,6 @@ penLogLik <- function(theta, sd.corr, model, attributes=FALSE)
   ## unpack model
   subset <- model$subset
   Y <- model$response[subset,,drop=FALSE]
-  #isNA <- model$isNA[subset,,drop=FALSE]
   dimPsi <- model$nOverdisp
   dimRE <- model$nRE
 
