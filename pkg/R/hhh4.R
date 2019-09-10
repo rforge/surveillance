@@ -6,7 +6,7 @@
 ### hhh4 is an extended version of algo.hhh for the sts-class
 ### The function allows the incorporation of random effects and covariates.
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2012-2016 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2016,2019 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -1387,7 +1387,6 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
                      cbind(matrix(0,dimPsi,dimFE+dimd),hessian.Psi.RE),
                      cbind(matrix(0,dimRE,dimFE+dimd+dimPsi),hessian.RE.RE))
 
-    hessian[lower.tri(hessian)] <- 0    # FIXME: should already be the case!
     diagHessian <- diag(hessian)
     fisher <- -(hessian + t(hessian))
     diag(fisher) <- -diagHessian
