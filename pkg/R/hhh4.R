@@ -1251,7 +1251,8 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         Z.j <- term["Z.intercept",j][[1]]
         "%mj%" <- get(term["mult",j][[1]])
         hessian.FE.RE[idxFE==i,idxRE==j] <<- colSums(didj %mj% Z.j)
-        hessian.FE.RE[idxFE==j,idxRE==i] <<- colSums(didj %m% Z.i)
+        if (j != i)  # otherwise redundant (duplicate)
+          hessian.FE.RE[idxFE==j,idxRE==i] <<- colSums(didj %m% Z.i)
 
         if(length(Z.j)==1 & length(Z.i)==1){
           Z <- Z.i*Z.j
