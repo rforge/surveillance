@@ -1254,7 +1254,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
         if (j != i)  # otherwise redundant (duplicate)
           hessian.FE.RE[idxFE==j,idxRE==i] <<- colSums(didj %m% Z.i)
 
-        if(length(Z.j)==1 & length(Z.i)==1){
+        if(length(Z.j)==1 & length(Z.i)==1){ # both iid
           Z <- Z.i*Z.j
           hessian.RE.RE[which(idxRE==i),idxRE==j] <<- diag(colSums( didj %m% Z))
         } else if(length(Z.j)==1 & length(Z.i)>1){         #*
@@ -1269,7 +1269,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
             Z <- Z.i[,k]*Z.j
             hessian.RE.RE[which(idxRE==i)[k],idxRE==j] <<- colSums( didj %mj% Z)
           }
-        } else {
+        } else { # both CAR
           for(k in seq_len(ncol(Z.j))){
             Z <- Z.i*Z.j[,k]
             hessian.RE.RE[which(idxRE==i)[k],idxRE==j] <<- colSums( didj %m% Z)
@@ -1382,6 +1382,7 @@ penFisher <- function(theta, sd.corr, model, attributes=FALSE)
                      cbind(matrix(0,dimPsi,dimFE+dimd),hessian.Psi.RE),
                      cbind(matrix(0,dimRE,dimFE+dimd+dimPsi),hessian.RE.RE))
 
+    hessian[lower.tri(hessian)] <- 0  # CAR blocks in hessian.RE.RE were fully filled
     diagHessian <- diag(hessian)
     fisher <- -(hessian + t(hessian))
     diag(fisher) <- -diagHessian
