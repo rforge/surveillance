@@ -10,13 +10,15 @@
 ###
 ### Changes to the original replication script are marked with a "##M" comment.
 ###
-### Copyright (C) 2017-2018 Sebastian Meyer, Leonhard Held, Michael Hoehle
+### Copyright (C) 2017-2019 Sebastian Meyer, Leonhard Held, Michael Hoehle
 ###
 ### This file is part of the R package "surveillance",
 ### free software under the terms of the GNU General Public License, version 2,
 ### a copy of which is available at http://www.r-project.org/Licenses/.
 ################################################################################
 
+##M use old RNGversion to reproduce published results also with R >= 3.6.0
+RNGversion("3.3.3")
 
 ################################################################################
 ## Section 3: Spatio-temporal point pattern of infective events
