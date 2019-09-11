@@ -1,6 +1,6 @@
 ################################################################################
 ### Demo of hhh4() modelling of influenza in Southern Germany - data("fluBYBW")
-### to reproduce results of Paul & Held (2011). The reference is:
+### based on
 ###
 ### Paul, M. and Held, L. (2011): Predictive assessment of a non-linear random
 ### effects model for multivariate time series of infectious disease counts.
