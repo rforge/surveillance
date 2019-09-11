@@ -15,11 +15,7 @@
 ### a copy of which is available at http://www.r-project.org/Licenses/.
 ################################################################################
 
-## use old RNGversion to reproduce published results also with R >= 3.6.0
-## (the random seed affects the initial values for ri() terms)
-RNGversion("2.10.0")
-set.seed(1)
-
+set.seed(1)  # for reproducibility (affects initial values for ri() terms)
 library("surveillance")
 
 ## Weekly counts of influenza in 140 districts of Bavaria and Baden-Wuerttemberg
