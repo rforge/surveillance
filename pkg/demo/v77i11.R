@@ -17,8 +17,8 @@
 ### a copy of which is available at http://www.r-project.org/Licenses/.
 ################################################################################
 
-##M use old RNGversion to reproduce published results also with R >= 3.6.0
-RNGversion("3.3.3")
+##M use old RNGversion to reproduce published simulation results in Section 3.4
+RNGversion("3.3.3")  # sampling has changed in R 3.6.0
 
 ################################################################################
 ## Section 3: Spatio-temporal point pattern of infective events
