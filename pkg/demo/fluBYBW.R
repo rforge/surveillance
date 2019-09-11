@@ -1,15 +1,25 @@
 ################################################################################
 ### Demo of hhh4() modelling of influenza in Southern Germany - data("fluBYBW")
+### to reproduce results of Paul & Held (2011). The reference is:
+###
+### Paul, M. and Held, L. (2011): Predictive assessment of a non-linear random
+### effects model for multivariate time series of infectious disease counts.
+### Statistics in Medicine, 30, 1118-1136.
+###
 ### RUNNING THE WHOLE SCRIPT TAKES ~20 MINUTES!
 ###
-### Copyright (C) 2009-2012 Michaela Paul, 2012-2013,2016-2018 Sebastian Meyer
+### Copyright (C) 2009-2012 Michaela Paul, 2012-2013,2016-2019 Sebastian Meyer
 ###
 ### This file is part of the R package "surveillance",
 ### free software under the terms of the GNU General Public License, version 2,
 ### a copy of which is available at http://www.r-project.org/Licenses/.
 ################################################################################
 
-set.seed(1)  # for reproducibility (affects initial values for ri() terms)
+## use old RNGversion to reproduce published results also with R >= 3.6.0
+## (the random seed affects the initial values for ri() terms)
+RNGversion("2.10.0")
+set.seed(1)
+
 library("surveillance")
 
 ## Weekly counts of influenza in 140 districts of Bavaria and Baden-Wuerttemberg
