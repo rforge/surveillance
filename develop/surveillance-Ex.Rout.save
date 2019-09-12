@@ -1,11 +1,13 @@
 
-R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -33,7 +35,7 @@ Type 'q()' to quit R.
 > library('surveillance')
 Loading required package: sp
 Loading required package: xtable
-This is surveillance 1.17.0. For overview type ‘help(surveillance)’.
+This is surveillance 1.17.1. For overview type ‘help(surveillance)’.
 > 
 > base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
 > base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
@@ -214,10 +216,15 @@ $C
 0.03029 0.05551 0.07063 0.09543 0.14309 0.14309 
 
 > 
-> ## untrimmed R0 for a specific event
-> R0(imdepifit, newevents=marks(imdepi)[1,], trimmed=FALSE)
-        1 
-0.3548947 
+> ## untrimmed R0 for specific event settings
+> refevent <- data.frame(agegrp = "[0,3)", type = "B", eps.s = Inf, eps.t = 30)
+> setting2 <- data.frame(agegrp = "[3,19)", type = "C", eps.s = Inf, eps.t = 14)
+> newevents <- rbind("ref" = refevent, "event2" = setting2)
+> (R0_examples <- R0(imdepifit, newevents = newevents, trimmed = FALSE))
+       ref     event2 
+0.17516101 0.06677711 
+> stopifnot(all.equal(R0_examples[["ref"]],
++                     simpleR0(imdepifit)))
 > 
 > 
 > ### compute a Monte Carlo confidence interval
@@ -2212,7 +2219,7 @@ Matrix with  5  initial values
 
 size of grid:  5 
 convergences:  5 
-time needed (in seconds) 0.124 
+time needed (in seconds) 0.082 
 
 values of log-likelihood:
 -1685 
@@ -2860,36 +2867,32 @@ rki(4,0,2) 12  6 585  0 1.00 0.9898477 0.010152284    0
 > sts.bp <- backprojNP(Ysts, incu.pmf=inc.pmf,
 +     control=modifyList(bpnp.control,list(eq3a.method="C")), ylim=c(0,max(X,Y)))
 Back-projecting with k= 0  to get lambda estimate.
-Convergence criterion @ iteration i= 1 :  1.851508 
-Convergence criterion @ iteration i= 2 :  0.205996 
-Convergence criterion @ iteration i= 3 :  0.09022028 
-Convergence criterion @ iteration i= 4 :  0.04952968 
-Convergence criterion @ iteration i= 5 :  0.03031011 
-Convergence criterion @ iteration i= 6 :  0.02015801 
-Convergence criterion @ iteration i= 7 :  0.0146736 
-Convergence criterion @ iteration i= 8 :  0.01180863 
-Convergence criterion @ iteration i= 9 :  0.01038083 
-Convergence criterion @ iteration i= 10 :  0.009666964 
-Convergence criterion @ iteration i= 11 :  0.009266002 
-Convergence criterion @ iteration i= 12 :  0.008983364 
-Convergence criterion @ iteration i= 13 :  0.008734973 
-Convergence criterion @ iteration i= 14 :  0.008488926 
-Convergence criterion @ iteration i= 15 :  0.008236045 
-Convergence criterion @ iteration i= 16 :  0.007976278 
-Convergence criterion @ iteration i= 17 :  0.007712691 
-Convergence criterion @ iteration i= 18 :  0.00744894 
-Convergence criterion @ iteration i= 19 :  0.007188293 
-Convergence criterion @ iteration i= 20 :  0.00693333 
-Convergence criterion @ iteration i= 21 :  0.006685927 
-Convergence criterion @ iteration i= 22 :  0.006447344 
-Convergence criterion @ iteration i= 23 :  0.006218347 
-Convergence criterion @ iteration i= 24 :  0.005999319 
-Convergence criterion @ iteration i= 25 :  0.005790357 
-Convergence criterion @ iteration i= 26 :  0.005591357 
-Convergence criterion @ iteration i= 27 :  0.005402072 
-Convergence criterion @ iteration i= 28 :  0.005222159 
-Convergence criterion @ iteration i= 29 :  0.005051219 
-Convergence criterion @ iteration i= 30 :  0.004888817 
+Convergence criterion @ iteration i= 1 :  1.842964 
+Convergence criterion @ iteration i= 2 :  0.2031237 
+Convergence criterion @ iteration i= 3 :  0.08834012 
+Convergence criterion @ iteration i= 4 :  0.0478789 
+Convergence criterion @ iteration i= 5 :  0.02859904 
+Convergence criterion @ iteration i= 6 :  0.01823245 
+Convergence criterion @ iteration i= 7 :  0.01249007 
+Convergence criterion @ iteration i= 8 :  0.009456387 
+Convergence criterion @ iteration i= 9 :  0.008026149 
+Convergence criterion @ iteration i= 10 :  0.007439062 
+Convergence criterion @ iteration i= 11 :  0.007216644 
+Convergence criterion @ iteration i= 12 :  0.007115377 
+Convergence criterion @ iteration i= 13 :  0.007032734 
+Convergence criterion @ iteration i= 14 :  0.00693317 
+Convergence criterion @ iteration i= 15 :  0.006809 
+Convergence criterion @ iteration i= 16 :  0.006662864 
+Convergence criterion @ iteration i= 17 :  0.00650042 
+Convergence criterion @ iteration i= 18 :  0.006327482 
+Convergence criterion @ iteration i= 19 :  0.006149032 
+Convergence criterion @ iteration i= 20 :  0.005968994 
+Convergence criterion @ iteration i= 21 :  0.0057903 
+Convergence criterion @ iteration i= 22 :  0.005615049 
+Convergence criterion @ iteration i= 23 :  0.005444682 
+Convergence criterion @ iteration i= 24 :  0.005280132 
+Convergence criterion @ iteration i= 25 :  0.005121957 
+Convergence criterion @ iteration i= 26 :  0.004970437 
 No bootstrap CIs calculated as requested.
 > 
 > #Show result
@@ -2919,102 +2922,98 @@ No bootstrap CIs calculated as requested.
 > ## End(Not run)
 > sts.bp2 <- backprojNP(Ysts, incu.pmf=inc.pmf, control=bpnp.control2)
 Back-projecting with k= 2  to get lambda estimate.
-Convergence criterion @ iteration i= 1 :  1.839047 
-Convergence criterion @ iteration i= 2 :  0.1970894 
-Convergence criterion @ iteration i= 3 :  0.08187198 
-Convergence criterion @ iteration i= 4 :  0.04198236 
-Convergence criterion @ iteration i= 5 :  0.02350189 
-Convergence criterion @ iteration i= 6 :  0.01380316 
-Convergence criterion @ iteration i= 7 :  0.008388223 
-Convergence criterion @ iteration i= 8 :  0.005268381 
-Convergence criterion @ iteration i= 9 :  0.00344037 
+Convergence criterion @ iteration i= 1 :  1.831091 
+Convergence criterion @ iteration i= 2 :  0.1947594 
+Convergence criterion @ iteration i= 3 :  0.08059626 
+Convergence criterion @ iteration i= 4 :  0.04101743 
+Convergence criterion @ iteration i= 5 :  0.02263035 
+Convergence criterion @ iteration i= 6 :  0.01295074 
+Convergence criterion @ iteration i= 7 :  0.007533817 
+Convergence criterion @ iteration i= 8 :  0.004415311 
 Back-projecting with k= 0  to get lambda estimate for parametric bootstrap.
-Convergence criterion @ iteration i= 1 :  1.851508 
-Convergence criterion @ iteration i= 2 :  0.205996 
-Convergence criterion @ iteration i= 3 :  0.09022028 
-Convergence criterion @ iteration i= 4 :  0.04952968 
-Convergence criterion @ iteration i= 5 :  0.03031011 
-Convergence criterion @ iteration i= 6 :  0.02015801 
-Convergence criterion @ iteration i= 7 :  0.0146736 
-Convergence criterion @ iteration i= 8 :  0.01180863 
-Convergence criterion @ iteration i= 9 :  0.01038083 
-Convergence criterion @ iteration i= 10 :  0.009666964 
-Convergence criterion @ iteration i= 11 :  0.009266002 
-Convergence criterion @ iteration i= 12 :  0.008983364 
-Convergence criterion @ iteration i= 13 :  0.008734973 
-Convergence criterion @ iteration i= 14 :  0.008488926 
-Convergence criterion @ iteration i= 15 :  0.008236045 
-Convergence criterion @ iteration i= 16 :  0.007976278 
-Convergence criterion @ iteration i= 17 :  0.007712691 
-Convergence criterion @ iteration i= 18 :  0.00744894 
-Convergence criterion @ iteration i= 19 :  0.007188293 
-Convergence criterion @ iteration i= 20 :  0.00693333 
-Convergence criterion @ iteration i= 21 :  0.006685927 
-Convergence criterion @ iteration i= 22 :  0.006447344 
-Convergence criterion @ iteration i= 23 :  0.006218347 
-Convergence criterion @ iteration i= 24 :  0.005999319 
-Convergence criterion @ iteration i= 25 :  0.005790357 
-Convergence criterion @ iteration i= 26 :  0.005591357 
-Convergence criterion @ iteration i= 27 :  0.005402072 
-Convergence criterion @ iteration i= 28 :  0.005222159 
-Convergence criterion @ iteration i= 29 :  0.005051219 
-Convergence criterion @ iteration i= 30 :  0.004888817 
+Convergence criterion @ iteration i= 1 :  1.842964 
+Convergence criterion @ iteration i= 2 :  0.2031237 
+Convergence criterion @ iteration i= 3 :  0.08834012 
+Convergence criterion @ iteration i= 4 :  0.0478789 
+Convergence criterion @ iteration i= 5 :  0.02859904 
+Convergence criterion @ iteration i= 6 :  0.01823245 
+Convergence criterion @ iteration i= 7 :  0.01249007 
+Convergence criterion @ iteration i= 8 :  0.009456387 
+Convergence criterion @ iteration i= 9 :  0.008026149 
+Convergence criterion @ iteration i= 10 :  0.007439062 
+Convergence criterion @ iteration i= 11 :  0.007216644 
+Convergence criterion @ iteration i= 12 :  0.007115377 
+Convergence criterion @ iteration i= 13 :  0.007032734 
+Convergence criterion @ iteration i= 14 :  0.00693317 
+Convergence criterion @ iteration i= 15 :  0.006809 
+Convergence criterion @ iteration i= 16 :  0.006662864 
+Convergence criterion @ iteration i= 17 :  0.00650042 
+Convergence criterion @ iteration i= 18 :  0.006327482 
+Convergence criterion @ iteration i= 19 :  0.006149032 
+Convergence criterion @ iteration i= 20 :  0.005968994 
+Convergence criterion @ iteration i= 21 :  0.0057903 
+Convergence criterion @ iteration i= 22 :  0.005615049 
+Convergence criterion @ iteration i= 23 :  0.005444682 
+Convergence criterion @ iteration i= 24 :  0.005280132 
+Convergence criterion @ iteration i= 25 :  0.005121957 
+Convergence criterion @ iteration i= 26 :  0.004970437 
 Bootstrap sample  1 / 10 
-Convergence criterion @ iteration i= 1 :  0.01756501 
-Convergence criterion @ iteration i= 2 :  0.008330218 
-Convergence criterion @ iteration i= 3 :  0.007006636 
-Convergence criterion @ iteration i= 4 :  0.005813966 
-Convergence criterion @ iteration i= 5 :  0.004705749 
+Convergence criterion @ iteration i= 1 :  0.03069816 
+Convergence criterion @ iteration i= 2 :  0.01448365 
+Convergence criterion @ iteration i= 3 :  0.01138973 
+Convergence criterion @ iteration i= 4 :  0.0088825 
+Convergence criterion @ iteration i= 5 :  0.006899077 
+Convergence criterion @ iteration i= 6 :  0.005350269 
+Convergence criterion @ iteration i= 7 :  0.00414878 
 Bootstrap sample  2 / 10 
-Convergence criterion @ iteration i= 1 :  0.05544324 
-Convergence criterion @ iteration i= 2 :  0.01559713 
-Convergence criterion @ iteration i= 3 :  0.01016591 
-Convergence criterion @ iteration i= 4 :  0.006969591 
-Convergence criterion @ iteration i= 5 :  0.004917456 
+Convergence criterion @ iteration i= 1 :  0.03761089 
+Convergence criterion @ iteration i= 2 :  0.01421946 
+Convergence criterion @ iteration i= 3 :  0.008715432 
+Convergence criterion @ iteration i= 4 :  0.006536467 
+Convergence criterion @ iteration i= 5 :  0.005151208 
+Convergence criterion @ iteration i= 6 :  0.004055925 
 Bootstrap sample  3 / 10 
-Convergence criterion @ iteration i= 1 :  0.01930672 
-Convergence criterion @ iteration i= 2 :  0.01428916 
-Convergence criterion @ iteration i= 3 :  0.01040377 
-Convergence criterion @ iteration i= 4 :  0.007618025 
-Convergence criterion @ iteration i= 5 :  0.005598231 
-Convergence criterion @ iteration i= 6 :  0.004124053 
+Convergence criterion @ iteration i= 1 :  0.01791799 
+Convergence criterion @ iteration i= 2 :  0.01313083 
+Convergence criterion @ iteration i= 3 :  0.009596378 
+Convergence criterion @ iteration i= 4 :  0.00706357 
+Convergence criterion @ iteration i= 5 :  0.005222114 
+Convergence criterion @ iteration i= 6 :  0.003873547 
 Bootstrap sample  4 / 10 
-Convergence criterion @ iteration i= 1 :  0.03882168 
-Convergence criterion @ iteration i= 2 :  0.005560051 
-Convergence criterion @ iteration i= 3 :  0.004315298 
+Convergence criterion @ iteration i= 1 :  0.0296806 
+Convergence criterion @ iteration i= 2 :  0.01124356 
+Convergence criterion @ iteration i= 3 :  0.005261372 
+Convergence criterion @ iteration i= 4 :  0.002724633 
 Bootstrap sample  5 / 10 
-Convergence criterion @ iteration i= 1 :  0.04192817 
-Convergence criterion @ iteration i= 2 :  0.008354272 
-Convergence criterion @ iteration i= 3 :  0.005848102 
-Convergence criterion @ iteration i= 4 :  0.004251936 
+Convergence criterion @ iteration i= 1 :  0.03421202 
+Convergence criterion @ iteration i= 2 :  0.006127767 
+Convergence criterion @ iteration i= 3 :  0.004646345 
 Bootstrap sample  6 / 10 
-Convergence criterion @ iteration i= 1 :  0.03693695 
-Convergence criterion @ iteration i= 2 :  0.01385693 
-Convergence criterion @ iteration i= 3 :  0.008060154 
-Convergence criterion @ iteration i= 4 :  0.005143599 
-Convergence criterion @ iteration i= 5 :  0.003503485 
+Convergence criterion @ iteration i= 1 :  0.03489537 
+Convergence criterion @ iteration i= 2 :  0.01741871 
+Convergence criterion @ iteration i= 3 :  0.01067975 
+Convergence criterion @ iteration i= 4 :  0.007128054 
+Convergence criterion @ iteration i= 5 :  0.005032651 
+Convergence criterion @ iteration i= 6 :  0.003672013 
 Bootstrap sample  7 / 10 
-Convergence criterion @ iteration i= 1 :  0.04158382 
-Convergence criterion @ iteration i= 2 :  0.02396257 
-Convergence criterion @ iteration i= 3 :  0.01532019 
-Convergence criterion @ iteration i= 4 :  0.01044355 
-Convergence criterion @ iteration i= 5 :  0.007405998 
-Convergence criterion @ iteration i= 6 :  0.005372137 
-Convergence criterion @ iteration i= 7 :  0.003945825 
+Convergence criterion @ iteration i= 1 :  0.02609449 
+Convergence criterion @ iteration i= 2 :  0.009216108 
+Convergence criterion @ iteration i= 3 :  0.004010391 
 Bootstrap sample  8 / 10 
-Convergence criterion @ iteration i= 1 :  0.05128974 
-Convergence criterion @ iteration i= 2 :  0.01661354 
-Convergence criterion @ iteration i= 3 :  0.008474029 
-Convergence criterion @ iteration i= 4 :  0.004882991 
+Convergence criterion @ iteration i= 1 :  0.03679822 
+Convergence criterion @ iteration i= 2 :  0.02276645 
+Convergence criterion @ iteration i= 3 :  0.01503013 
+Convergence criterion @ iteration i= 4 :  0.01015091 
+Convergence criterion @ iteration i= 5 :  0.006962184 
+Convergence criterion @ iteration i= 6 :  0.004831525 
 Bootstrap sample  9 / 10 
-Convergence criterion @ iteration i= 1 :  0.02857895 
-Convergence criterion @ iteration i= 2 :  0.008913999 
-Convergence criterion @ iteration i= 3 :  0.005596763 
-Convergence criterion @ iteration i= 4 :  0.003883363 
+Convergence criterion @ iteration i= 1 :  0.06670921 
+Convergence criterion @ iteration i= 2 :  0.003465956 
 Bootstrap sample  10 / 10 
-Convergence criterion @ iteration i= 1 :  0.03052118 
-Convergence criterion @ iteration i= 2 :  0.00741832 
-Convergence criterion @ iteration i= 3 :  0.002865503 
+Convergence criterion @ iteration i= 1 :  0.03320252 
+Convergence criterion @ iteration i= 2 :  0.01363987 
+Convergence criterion @ iteration i= 3 :  0.007134633 
+Convergence criterion @ iteration i= 4 :  0.004155202 
 > 
 > ######################################################################
 > # Plot the result. This is currently a manual routine.
@@ -3343,11 +3342,18 @@ z = 1.5197, n = 6, p-value = 0.1286
 Loading required package: gamlss
 Loading required package: splines
 Loading required package: gamlss.data
+
+Attaching package: ‘gamlss.data’
+
+The following object is masked from ‘package:datasets’:
+
+    sleep
+
 Loading required package: gamlss.dist
 Loading required package: MASS
 Loading required package: nlme
 Loading required package: parallel
- **********   GAMLSS Version 5.1-2  ********** 
+ **********   GAMLSS Version 5.1-4  ********** 
 For more on GAMLSS look at http://www.gamlss.org/
 Type gamlssNews() to see new features/changes/bug fixes.
 
@@ -3864,6 +3870,15 @@ $ counters ('data.frame', 376 x 6 ): evolution of the epidemic:
 + )
 > ## this is now identical to the prepared hagelloch "epidata"
 > stopifnot(all.equal(myEpi, hagelloch))
+> 
+> ## Don't show: 
+> ## test with precomputed distance matrix D
+> myEpi3 <- suppressWarnings( # from overwriting existing f columns
++     update(hagelloch, f = attr(hagelloch, "f"),
++            D = as.matrix(dist(hagelloch.df[c("x.loc", "y.loc")])))
++ )
+> stopifnot(identical(hagelloch, myEpi3))
+> ## End(Don't show)
 > 
 > 
 > 
@@ -4391,8 +4406,8 @@ Overall number of events: 636
 4   (4202.635, 2879.698)  7.1169826 08212    B    30   200 female   [3,19)
 5   (4128.335, 3223.314) 22.0595327 05554    C    30   200   male   [3,19)
 6   (4089.915, 3178.005) 24.9544435 05170    C    30   200   male   [3,19)
-571 (4412.411, 2785.336) 31.4718945 09179    C    30   200   male   [3,19)
-525 (4552.314, 3275.169) 35.1075810 11000    C    30   200   male [19,Inf)
+271 (4047.116, 3112.675) 31.4718945 05370    B    30   200 female   [3,19)
+242 (4107.549, 3092.563) 35.1075810 05315    B    30   200   male [19,Inf)
     BLOCK start popdensity
 1       1     0   260.8612
 2       1     0   519.3570
@@ -4400,8 +4415,8 @@ Overall number of events: 636
 4       1     0  1665.6117
 5       1     0   260.8612
 6       1     0   454.7456
-571     2    31   462.6432
-525     2    31  3834.0946
+271     2    31   408.9903
+242     2    31  2456.7998
 [....]
 > ## the first 6 events are kept (as are all row.names),
 > ## the time labels of the remaining events are shuffled
@@ -4926,7 +4941,7 @@ $h
 > ### ** Examples
 > 
 > formatDate(Sys.Date(), "%G/%OQ/%q")
-[1] "2019/I/53"
+[1] "2019/III/74"
 > 
 > 
 > 
@@ -5241,12 +5256,12 @@ $ counters ('data.frame', 376 x 6 ): evolution of the epidemic:
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: hcl.colors
 > ### Title: HCL-based Heat Colors from the 'colorspace' Package
-> ### Aliases: hcl.colors
-> ### Keywords: color dplot
+> ### Aliases: .hcl.colors
+> ### Keywords: color dplot internal
 > 
 > ### ** Examples
 > 
-> barplot(rep(1,10), col = hcl.colors(10), axes = FALSE)
+> barplot(rep(1,10), col = surveillance:::.hcl.colors(10), axes = FALSE)
 > 
 > 
 > 
@@ -6166,20 +6181,82 @@ Max.    181.00 1690.00 596.00
 +                   ar = list(f = ~1), family = "NegBin1", subset = 2:678)
 > salmFit <- hhh4(salmAllOnset, salmModel)
 > 
-> ## simulate the next 20 weeks ahead
+> ## simulate the next 20 weeks ahead (with very small 'nsim' for speed)
 > salmSims <- simulate(salmFit, nsim = 500, seed = 3, subset = 678 + seq_len(20),
 +                      y.start = observed(salmAllOnset)[678,])
+> if (requireNamespace("fanplot"))
++     plot(salmSims, "fan")
 > 
-> ## calculate the RPS at each time point
-> scores(salmSims, which = "rps")
- [1] 44.652300 41.615368  9.001204 24.887444 14.269080 31.087064 56.776224
- [8] 18.132608 16.652632 18.897472 56.820728 23.824868 20.494280 18.469088
-[15] 19.905304 21.880828 34.970124 29.534468 32.378336 23.988568
 > 
-> ## produce a PIT histogram based on the empirical distribution function
-> ## of the simulated counts as the forecast distribution at each time point
-> pit(x = observed(attr(salmSims, "stsObserved")),
-+     pdistr = apply(salmSims, 1:2, ecdf))
+> ### calculate scores at each time point
+> 
+> ## using empirical distribution of simulated counts as forecast distribution
+> scores(salmSims, which = c("rps", "logs", "dss"))
+            rps     logs       dss
+ [1,] 44.652300 6.214608 12.360009
+ [2,] 41.615368 4.605170 10.151219
+ [3,]  9.001204 4.605170  7.341208
+ [4,] 24.887444 6.214608  8.327968
+ [5,] 14.269080 5.115996  7.937095
+ [6,] 31.087064 4.422849  8.773099
+ [7,] 56.776224      Inf 10.060180
+ [8,] 18.132608 6.214608  8.453401
+ [9,] 16.652632 5.521461  8.458259
+[10,] 18.897472      Inf  8.643125
+[11,] 56.820728      Inf  9.840239
+[12,] 23.824868 4.828314  8.918505
+[13,] 20.494280 4.605170  9.086949
+[14,] 18.469088 5.115996  8.911161
+[15,] 19.905304 4.605170  9.024052
+[16,] 21.880828 5.521461  9.135292
+[17,] 34.970124 5.115996  9.317830
+[18,] 29.534468 6.214608  9.226855
+[19,] 32.378336      Inf  9.301393
+[20,] 23.988568 5.115996  9.564189
+> ## observed count sometimes not covered by simulations -> infinite log-score
+> ## => for a more detailed forecast, either considerably increase 'nsim', or:
+> 
+> ## 1. use continuous density() of simulated counts as forecast distribution
+> fi <- apply(salmSims, 1, function (x) approxfun(density(x)))
+> logs_kde <- mapply(function (f, y) -log(f(y)),
++                    f = fi, y = observed(attr(salmSims,"stsObserved")))
+> cbind("empirical" = scores(salmSims, "logs"), "density" = logs_kde)
+    empirical  density
+679  6.214608 6.659049
+680  4.605170 5.821944
+681  4.605170 4.602234
+682  6.214608 5.210892
+683  5.115996 4.990551
+684  4.422849 5.483517
+685       Inf 6.063348
+686  6.214608 5.239930
+687  5.521461 5.268759
+688       Inf 5.312466
+689       Inf 6.083345
+690  4.828314 5.471725
+691  4.605170 5.189581
+692  5.115996 5.267835
+693  4.605170 5.374848
+694  5.521461 5.437915
+695  5.115996 5.795522
+696  6.214608 5.679130
+697       Inf 5.841814
+698  5.115996 5.250713
+> ## a similar KDE approach is implemented in scoringRules::logs_sample()
+> 
+> ## 2. average conditional predictive NegBin's of simulated trajectories,
+> ##    currently only implemented in HIDDA.forecasting::dhhh4sims()
+> 
+> 
+> ## Not run: 
+> ##D ### produce a PIT histogram
+> ##D 
+> ##D ## using empirical distribution of simulated counts as forecast distribition
+> ##D pit(x = observed(attr(salmSims, "stsObserved")),
+> ##D     pdistr = apply(salmSims, 1:2, ecdf))
+> ##D ## long-term forecast is badly calibrated (lower tail is unused, see fan above)
+> ##D ## we also get a warning for the same reason as infinite log-scores
+> ## End(Not run)
 > 
 > 
 > 
@@ -6889,9 +6966,11 @@ Loading required package: spatstat.data
 Loading required package: nlme
 Loading required package: rpart
 
-spatstat 1.58-2       (nickname: ‘Not Even Wrong’) 
+spatstat 1.60-1       (nickname: ‘Swinging Sixties’) 
 For an introduction to spatstat, type ‘beginner’ 
 
+
+Note: spatstat version 1.60-1 is out of date by more than 11 weeks; a newer version should be available.
 > plot(letterR)
 > plot(intersectPolyCircle(letterR, c(3,2), 1), add=TRUE, col=2, lwd=3)
 > 
@@ -6982,8 +7061,8 @@ dt      <= 50  > 50
 > 
 > ## contingency table in LaTeX
 > toLatex(knoxtest)
-% latex table generated in R 3.5.2 by xtable 1.8-3 package
-% Fri Feb 22 14:27:48 2019
+% latex table generated in R 3.6.1 by xtable 1.8-4 package
+% Thu Sep 12 14:32:17 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{r|rr|r}
@@ -7159,7 +7238,7 @@ $\sum$ & 6817 & 49463 & 56280 \\
 $ar
 $ar$f
 ~1
-<environment: 0x172ca110>
+<environment: 0x1632dcc0>
 
 $ar$offset
 [1] 1
@@ -7168,7 +7247,7 @@ $ar$offset
 $ne
 $ne$f
 ~1
-<environment: 0x172ca110>
+<environment: 0x1632dcc0>
 
 $ne$offset
 [1] 1
@@ -7412,12 +7491,12 @@ head of neighbourhood:
 > adjmat <- adjmat + t(adjmat)
 > adjmat
      [,1] [,2] [,3] [,4] [,5] [,6]
-[1,]    0    0    0    1    1    0
-[2,]    0    0    1    1    1    1
-[3,]    0    1    0    0    0    0
-[4,]    1    1    0    0    1    0
-[5,]    1    1    0    1    0    1
-[6,]    0    1    0    0    1    0
+[1,]    0    0    1    0    0    1
+[2,]    0    0    0    0    0    1
+[3,]    1    0    0    1    0    0
+[4,]    0    0    1    0    0    0
+[5,]    0    0    0    0    0    0
+[6,]    1    1    0    0    0    0
 > 
 > ## determine neighbourhood order matrix
 > if (requireNamespace("spdep")) {
@@ -7425,14 +7504,14 @@ head of neighbourhood:
 +     nbmat
 + }
 Loading required namespace: spdep
-Note: range of maximum neighbour order by region is 2-3
+Note: range of maximum neighbour order by region is 0-4
      [,1] [,2] [,3] [,4] [,5] [,6]
-[1,]    0    2    3    1    1    2
-[2,]    2    0    1    1    1    1
-[3,]    3    1    0    2    2    2
-[4,]    1    1    2    0    1    2
-[5,]    1    1    2    1    0    1
-[6,]    2    1    2    2    1    0
+[1,]    0    2    1    2    0    1
+[2,]    2    0    3    4    0    1
+[3,]    1    3    0    1    0    2
+[4,]    2    4    1    0    0    3
+[5,]    0    0    0    0    0    0
+[6,]    1    1    2    3    0    0
 > 
 > 
 > 
@@ -7855,7 +7934,7 @@ $pVal.t
 > ## Reproduce Figure 1
 > op <- par(mfrow = c(1,3))
 > for (i in seq_along(pdistrs)) {
-+     pit(x, pdistr = pdistrs[[i]], J = 10, relative = TRUE,
++     pit(x, pdistr = pdistrs[[i]], J = 10,
 +         plot = list(ylim = c(0,2.75), main = names(pdistrs)[i]))
 +     box()
 + }
@@ -8343,7 +8422,7 @@ Note: dropped type(s) "C"
 	Diggle et al (1995) K-function test for space-time clustering
 
 data:  imdepiB
-U = 613960, B = 9, p-value = 0.1
+U = 613963, B = 9, p-value = 0.2
 
 > 
 > 
@@ -8418,13 +8497,32 @@ detaching ‘package:splancs’
 > ###   observed,sts-method observed<-,sts-method population,sts-method
 > ###   population<-,sts-method multinomialTS,sts-method
 > ###   multinomialTS<-,sts-method neighbourhood,sts-method
-> ###   neighbourhood<-,sts-method dim,sts-method dimnames,sts-method
-> ###   epochInYear epochInYear,sts-method year year,sts-method
-> ###   initialize,sts-method as.data.frame,sts-method coerce,sts,ts-method
+> ###   neighbourhood<-,sts-method dim,sts-method dimnames,sts-method year
+> ###   year,sts-method epochInYear epochInYear,sts-method as.data.frame.sts
+> ###   as.data.frame,sts-method as.ts.sts coerce,sts,ts-method
 > ###   coerce,ts,sts-method as.xts.sts
-> ### Keywords: classes
+> ### Keywords: classes methods
 > 
 > ### ** Examples
+> 
+> showClass("sts")
+Class "sts" [package "surveillance"]
+
+Slots:
+                                                                      
+Name:            epoch            freq           start        observed
+Class:         numeric         numeric         numeric          matrix
+                                                                      
+Name:            state           alarm      upperbound   neighbourhood
+Class:          matrix          matrix          matrix          matrix
+                                                                      
+Name:   populationFrac             map         control     epochAsDate
+Class:          matrix SpatialPolygons            list         logical
+                      
+Name:    multinomialTS
+Class:         logical
+
+Known Subclasses: "stsBP", "stsNC"
 > 
 > ## A typical dataset with weekly counts of measles from several districts
 > data("measlesWeserEms")
@@ -8510,7 +8608,7 @@ detaching ‘package:xts’, ‘package:zoo’
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: aggregate-methods
 > ### Title: Aggregate an '"sts"' Object Over Time or Across Units
-> ### Aliases: aggregate,sts,ANY,ANY-method aggregate,sts-method
+> ### Aliases: aggregate.sts aggregate,sts-method
 > ### Keywords: methods
 > 
 > ### ** Examples
@@ -8561,10 +8659,10 @@ detaching ‘package:xts’, ‘package:zoo’
 > flush(stderr()); flush(stdout())
 > 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: [,sts-method
+> ### Name: stsXtrct
 > ### Title: Subsetting '"sts"' Objects
 > ### Aliases: [,sts-method [,sts,ANY,ANY,ANY-method
-> ### Keywords: methods array
+> ### Keywords: methods
 > 
 > ### ** Examples
 > 
@@ -9090,9 +9188,9 @@ $gpclib
 +                 pThresholdTrend=0.05,trend=TRUE,
 +                 thresholdMethod="delta",alpha=0.1)
 > salm <- farringtonFlexible(salm,control=control)
-> print(toLatex(salm))
-% latex table generated in R 3.5.2 by xtable 1.8-3 package
-% Fri Feb 22 14:27:59 2019
+> toLatex(salm)
+% latex table generated in R 3.6.1 by xtable 1.8-4 package
+% Thu Sep 12 14:32:35 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrlr}
@@ -9622,9 +9720,9 @@ household   1 0.04214442 0.06657017 0.04143094 0.06585112 0.05364103
 1  1        NA 0.100000
 2  2        NA 0.200000
 3  3        NA 0.300000
-4  4 1.2907858 2.134243
-5  5 0.6224240 1.199034
-6  6 0.7014351 2.030490
+4  4 2.6032827 3.446740
+5  5 1.0517081 1.628318
+6  6 0.2709287 1.599984
 > 
 > ## Plot the numbers of susceptible, infectious and removed individuals
 > plot(epi)
@@ -9890,22 +9988,22 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
  & Estimate & Std. Error & $z$ value & $P(|Z|>|z|)$ \\
 \hline
 \hline 
-% latex table generated in R 3.5.2 by xtable 1.8-3 package
-% Fri Feb 22 14:28:06 2019
+% latex table generated in R 3.6.1 by xtable 1.8-4 package
+% Thu Sep 12 14:32:40 2019
  \texttt{h.(Intercept)} & $-20.481$ & $0.053$ & $-389.0$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{h.I(start/365-3.5)} & $-0.041$ & $0.022$ & $-1.9$ & $0.06$ \\ 
   \texttt{h.sin(2*pi*start/365)} & $0.242$ & $0.064$ & $3.8$ & $2\cdot{}10^{-04}$ \\ 
   \texttt{h.cos(2*pi*start/365)} & $0.350$ & $0.064$ & $5.4$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
-% latex table generated in R 3.5.2 by xtable 1.8-3 package
-% Fri Feb 22 14:28:06 2019
+% latex table generated in R 3.6.1 by xtable 1.8-4 package
+% Thu Sep 12 14:32:40 2019
  \texttt{e.(Intercept)} & $-16.90$ & $0.26$ & $-64$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
 \end{tabular}
 > # or, to report rate ratios
 > xtable(s)
-% latex table generated in R 3.5.2 by xtable 1.8-3 package
-% Fri Feb 22 14:28:06 2019
+% latex table generated in R 3.6.1 by xtable 1.8-4 package
+% Thu Sep 12 14:32:40 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -9949,7 +10047,7 @@ e.(Intercept)             -17.41647557 -16.377836153
 + }
 > 
 > ## Not run: 
-> ##D   ## NB: in contrast to using nlminb() optim's BFGS would miss the
+> ##D   ## NB: in contrast to nlminb(), optim's BFGS would miss the
 > ##D   ##     likelihood maximum wrt the epidemic intercept
 > ##D   m0_BFGS <- update(m_noepi, epidemic=~1, optim.args = list(method="BFGS"))
 > ##D   format(cbind(nlminb=coef(m0), BFGS=coef(m0_BFGS)), digits=3, scientific=FALSE)
@@ -10170,9 +10268,9 @@ Endemic/Epidemic log-likelihoods, LRT statistic, and simple R0:
 l0 = -4979 | l1 = -4926 | D = 105.8 | simpleR0 = 0.27
 
 Results from B=3 permutations of time:
-l0 = -4979 | l1 = -4947 | D = 64.0 | simpleR0 = 0.22
-l0 = -4979 | l1 = -4944 | D = 68.7 | simpleR0 = 0.22
-l0 = -4980 | l1 = -4940 | D = 78.7 | simpleR0 = 0.24
+l0 = -4979 | l1 = -4941 | D = 77.0 | simpleR0 = 0.23
+l0 = -4980 | l1 = -4942 | D = 76.1 | simpleR0 = 0.22
+l0 = -4979 | l1 = -4942 | D = 74.9 | simpleR0 = 0.23
 > et
 
 	Monte Carlo Permutation Test for Space-Time Interaction
@@ -10186,19 +10284,19 @@ simpleR0 = 0.26632, B = 3, p-value = 0.25
 > 
 > summary(coef(et, which = "m1"))
  h.(Intercept)    h.I(start/365 - 3.5) h.sin(2 * pi * start/365)
- Min.   :-20.55   Min.   :-0.04559     Min.   :0.2144           
- 1st Qu.:-20.54   1st Qu.:-0.04529     1st Qu.:0.2231           
- Median :-20.54   Median :-0.04500     Median :0.2318           
- Mean   :-20.53   Mean   :-0.04288     Mean   :0.2345           
- 3rd Qu.:-20.53   3rd Qu.:-0.04153     3rd Qu.:0.2445           
- Max.   :-20.52   Max.   :-0.03807     Max.   :0.2572           
+ Min.   :-20.56   Min.   :-0.04745     Min.   :0.2259           
+ 1st Qu.:-20.54   1st Qu.:-0.03753     1st Qu.:0.2486           
+ Median :-20.53   Median :-0.02761     Median :0.2714           
+ Mean   :-20.54   Mean   :-0.03213     Mean   :0.2564           
+ 3rd Qu.:-20.53   3rd Qu.:-0.02447     3rd Qu.:0.2716           
+ Max.   :-20.53   Max.   :-0.02133     Max.   :0.2718           
  h.cos(2 * pi * start/365) e.(Intercept)      
- Min.   :0.3848            Min.   :9.155e-07  
- 1st Qu.:0.4185            1st Qu.:9.307e-07  
- Median :0.4522            Median :9.460e-07  
- Mean   :0.4410            Mean   :9.597e-07  
- 3rd Qu.:0.4691            3rd Qu.:9.818e-07  
- Max.   :0.4859            Max.   :1.018e-06  
+ Min.   :0.4238            Min.   :9.438e-07  
+ 1st Qu.:0.4382            1st Qu.:9.511e-07  
+ Median :0.4526            Median :9.584e-07  
+ Mean   :0.4564            Mean   :9.595e-07  
+ 3rd Qu.:0.4728            3rd Qu.:9.674e-07  
+ Max.   :0.4930            Max.   :9.764e-07  
 > 
 > 
 > 
@@ -10214,7 +10312,8 @@ simpleR0 = 0.26632, B = 3, p-value = 0.25
 > ### Name: twinstim_iaf
 > ### Title: Temporal and Spatial Interaction Functions for 'twinstim'
 > ### Aliases: siaf.constant siaf.step siaf.gaussian siaf.powerlaw
-> ###   siaf.powerlawL siaf.student tiaf.constant tiaf.step tiaf.exponential
+> ###   siaf.powerlaw1 siaf.powerlawL siaf.student tiaf.constant tiaf.step
+> ###   tiaf.exponential
 > ### Keywords: models utilities
 > 
 > ### ** Examples
@@ -10240,8 +10339,8 @@ $g
 function (t, logvals, types) 
 heights(logvals)[(types - 1) * nallknots + .bincode(t, allknotsInf, 
     right = FALSE)]
-<bytecode: 0x16d6a9c8>
-<environment: 0x16d482b8>
+<bytecode: 0x1620f3a8>
+<environment: 0x16207e00>
 
 $G
 function (t, logvals, types) 
@@ -10251,7 +10350,7 @@ function (t, logvals, types)
         sum(typeheights(logvals, type) * diff.default(knots2t))
     }, t, types, SIMPLIFY = TRUE, USE.NAMES = FALSE)
 }
-<environment: 0x16d482b8>
+<environment: 0x16207e00>
 
 $deriv
 function (t, logvals, types) 
@@ -10267,8 +10366,8 @@ function (t, logvals, types)
     dim(res) <- c(L, npars)
     res
 }
-<bytecode: 0x16d6bbb8>
-<environment: 0x16d482b8>
+<bytecode: 0x1620c768>
+<environment: 0x16207e00>
 
 $Deriv
 function (t, logvals, types) 
@@ -10287,7 +10386,7 @@ function (t, logvals, types)
     dim(res) <- c(L, npars)
     res
 }
-<environment: 0x16d482b8>
+<environment: 0x16207e00>
 
 $npars
 [1] 4
@@ -10605,6 +10704,94 @@ $validpars
 NULL
 
 > 
+> # Power-law kernel with fixed sigma = 1
+> siaf.powerlaw1()
+$f
+function (s, logd, types = NULL, sigma = 1) 
+{
+    d <- exp(logd)
+    sLength <- sqrt(.rowSums(s^2, nrow(s), 2L))
+    (sLength + sigma)^-d
+}
+<environment: base>
+
+$F
+function (polydomain, f, logd, type = NULL, logsigma = 0, ...) 
+{
+    logpars <- c(logsigma, logd)
+    siaf_polyCub_iso(polydomain$bdry, "intrfr.powerlaw", logpars, 
+        list(...))
+}
+<environment: namespace:surveillance>
+
+$Fcircle
+function (r, logd, type = NULL, sigma = 1) 
+{
+    d <- exp(logd)
+    fofr <- (r + sigma)^-d
+    fof0 <- sigma^-d
+    basevolume <- if (is.infinite(r)) 
+        0
+    else pi * r^2 * fofr
+    Ifinvsq <- function(z) {
+        if (d == 1) {
+            -1/z - 2 * sigma * log(z) + sigma^2 * z
+        }
+        else if (d == 2) {
+            log(z) - 4 * sigma * sqrt(z) + sigma^2 * z
+        }
+        else {
+            z^(1 - 2/d) * d/(d - 2) - z^(1 - 1/d) * 2 * sigma * 
+                d/(d - 1) + sigma^2 * z
+        }
+    }
+    intfinvsq <- Ifinvsq(fof0) - Ifinvsq(fofr)
+    basevolume + pi * intfinvsq
+}
+<environment: base>
+
+$deriv
+function (s, logd, types = NULL, sigma = 1) 
+{
+    d <- exp(logd)
+    sLength <- sqrt(.rowSums(s^2, nrow(s), 2L))
+    tmp <- -d * log(sLength + sigma)
+    matrix(tmp * exp(tmp))
+}
+<environment: base>
+
+$Deriv
+function (polydomain, deriv, logd, type = NULL, logsigma = 0, 
+    ...) 
+{
+    logpars <- c(logsigma, logd)
+    siaf_polyCub_iso(polydomain$bdry, "intrfr.powerlaw.dlogd", 
+        logpars, list(...))
+}
+<environment: namespace:surveillance>
+
+$simulate
+function (n, logd, type, ub, logsigma = 0) 
+{
+    siafpars <- c(logsigma, logd)
+    stopifnot(is.finite(ub))
+    normconst <- intrfr.powerlaw(ub, siafpars, type)
+    CDF <- function(q) intrfr.powerlaw(q, siafpars, type)/normconst
+    QF <- function(p) uniroot(function(q) CDF(q) - p, lower = 0, 
+        upper = ub)$root
+    r <- vapply(X = runif(n), FUN = QF, FUN.VALUE = 0, USE.NAMES = FALSE)
+    theta <- runif(n, 0, 2 * pi)
+    r * cbind(cos(theta), sin(theta))
+}
+<environment: namespace:surveillance>
+
+$npars
+[1] 1
+
+$validpars
+NULL
+
+> 
 > # "lagged" power-law
 > siaf.powerlawL()
 $f
@@ -10794,16 +10981,16 @@ function (s, logvals, types = NULL)
     sLength <- sqrt(.rowSums(s^2, length(s)/2, 2L))
     c(1, exp(logvals), 0)[.bincode(sLength, allknots, right = FALSE)]
 }
-<bytecode: 0x10131940>
-<environment: 0x16795f20>
+<bytecode: 0xff84d98>
+<environment: 0xff7e0b0>
 
 $F
 function (polydomain, f, logvals, type = NULL, npoly = 256) 
 {
     sum(c(1, exp(logvals)) * ringAreas(polydomain, npoly = npoly))
 }
-<bytecode: 0x167a1158>
-<environment: 0x16795f20>
+<bytecode: 0xff819e8>
+<environment: 0xff7e0b0>
 
 $Fcircle
 function (r, logvals, type = NULL) 
@@ -10811,8 +10998,8 @@ function (r, logvals, type = NULL)
     sum(c(1, exp(logvals)) * pi * diff(pmin.int(allknotsPos, 
         r)^2))
 }
-<bytecode: 0x167a1708>
-<environment: 0x16795f20>
+<bytecode: 0xff81f28>
+<environment: 0xff7e0b0>
 
 $deriv
 function (s, logvals, types = NULL) 
@@ -10826,8 +11013,8 @@ function (s, logvals, types = NULL)
     dim(deriv) <- c(L, nknots)
     deriv
 }
-<bytecode: 0x167a2070>
-<environment: 0x16795f20>
+<bytecode: 0xff82698>
+<environment: 0xff7e0b0>
 
 $Deriv
 function (polydomain, deriv, logvals, type = NULL, npoly = 256) 
@@ -10835,8 +11022,8 @@ function (polydomain, deriv, logvals, type = NULL, npoly = 256)
     ringAreas <- ringAreas(polydomain, npoly = npoly)
     exp(logvals) * ringAreas[-1L]
 }
-<bytecode: 0x16797d28>
-<environment: 0x16795f20>
+<bytecode: 0xff7ffd0>
+<environment: 0xff7e0b0>
 
 $simulate
 function (n, logvals, type = NULL, ub) 
@@ -10848,8 +11035,8 @@ function (n, logvals, type = NULL, ub)
         prob = heights * diff.default(c(0, knots2upper^2)))
     runifdisc(n, knots2upper[rings], c(0, knots2upper)[rings])
 }
-<bytecode: 0x16798498>
-<environment: 0x16795f20>
+<bytecode: 0xff80628>
+<environment: 0xff7e0b0>
 
 $npars
 [1] 3
@@ -11091,7 +11278,7 @@ AIC:  18968
 Log-likelihood: -9475
 Number of log-likelihood evaluations: 14
 Number of score function evaluations: 14
-Runtime: 9.165 seconds
+Runtime: 6.488 seconds
 
 Correlation of Coefficients:
                                            
@@ -11115,15 +11302,15 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
  & Estimate & Std. Error & $z$ value & $P(|Z|>|z|)$ \\
 \hline
 \hline 
-% latex table generated in R 3.5.2 by xtable 1.8-3 package
-% Fri Feb 22 14:28:08 2019
+% latex table generated in R 3.6.1 by xtable 1.8-4 package
+% Thu Sep 12 14:32:44 2019
  \texttt{h.(Intercept)} & $-20.52869$ & $0.04724$ & $-434.597$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{h.I(start/365-3.5)} & $-0.04574$ & $0.02212$ & $-2.068$ & $0.03863$ \\ 
   \texttt{h.sin(2*pi*start/365)} & $0.21728$ & $0.06467$ & $3.360$ & $0.00078$ \\ 
   \texttt{h.cos(2*pi*start/365)} & $0.31810$ & $0.06380$ & $4.986$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
-% latex table generated in R 3.5.2 by xtable 1.8-3 package
-% Fri Feb 22 14:28:08 2019
+% latex table generated in R 3.6.1 by xtable 1.8-4 package
+% Thu Sep 12 14:32:44 2019
  \texttt{e.(Intercept)} & $-12.51659$ & $0.32326$ & $-38.720$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{e.typeC} & $-0.90832$ & $0.26742$ & $-3.397$ & $0.000682$ \\ 
   \texttt{e.agegrp[3,19)} & $0.70612$ & $0.32706$ & $2.159$ & $0.030852$ \\ 
@@ -11134,8 +11321,8 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
 > 
 > # or using the xtable-method (which produces rate ratios)
 > xtable(s)
-% latex table generated in R 3.5.2 by xtable 1.8-3 package
-% Fri Feb 22 14:28:08 2019
+% latex table generated in R 3.6.1 by xtable 1.8-4 package
+% Thu Sep 12 14:32:44 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -11314,8 +11501,8 @@ attr(,"package")
 Object of class SpatialPointsDataFrame
 Coordinates:
        min      max
-x 4043.711 4661.449
-y 2708.785 3522.018
+x 4047.462 4656.604
+y 2702.047 3522.018
 Is projected: TRUE 
 proj4string :
 [+init=epsg:3035 +units=km +proj=laea +lat_0=52 +lon_0=10 +x_0=4321000
@@ -11323,8 +11510,8 @@ proj4string :
 Number of points: 630
 Data attributes:
       time                tile     type   
- Min.   :   0.9178   11000  : 27   B:324  
- 1st Qu.: 478.0623   02000  : 14   C:306  
+ Min.   :   0.9178   11000  : 27   B:322  
+ 1st Qu.: 478.0623   02000  : 14   C:308  
  Median :1161.0357   03241  :  9          
  Mean   :1204.4420   09162  :  9          
  3rd Qu.:1853.1891   05112  :  7          
@@ -11376,7 +11563,7 @@ Data attributes:
 +                    tiles=districtsD, newcoef=c("e.typeC"=-1),
 +                    t0=31, T=61, simplify=TRUE)
 
-Time at beginning of simulation: 2019-02-22 14:28:10 
+Time at beginning of simulation: 2019-09-12 14:32:46 
 Simulation 1 / 2 ...
 -------------------------------------------------------------------------------
 
@@ -11395,18 +11582,18 @@ h.cos(2 * pi * start/365)             e.(Intercept)                   e.typeC
                0.70611556               -0.24083969                2.76773501 
 
 Simulating (starting from t=31) ...
-Simulation has ended @t = 61 with 3 simulated events.
+Simulation has ended @t = 61 with 15 simulated events.
 
 Preparing simulated events for "epidataCS" ...
 Done.
 
 -------------------------------------------------------------------------------
-Runtime of first simulation: 0.154 seconds
-Estimated finishing time: 2019-02-22 14:28:10 
+Runtime of first simulation: 0.367 seconds
+Estimated finishing time: 2019-09-12 14:32:47 
 
-Simulation 2 / 2 ...	simulated 13 events up to time 61 
+Simulation 2 / 2 ...	simulated 10 events up to time 61 
 
-Done (2019-02-22 14:28:11).
+Done (2019-09-12 14:32:47).
 > ## Don't show: 
 >     ## check construction and selection from "simEpidataCSlist"
 >     local({
@@ -11432,10 +11619,17 @@ h.cos(2 * pi * start/365)             e.(Intercept)                   e.typeC
                0.70611556               -0.24083969                2.76773501 
 
 Simulating (starting from t=31) ...
-Simulation has ended @t = 61 with 3 simulated events.
+Simulation has ended @t = 61 with 15 simulated events.
 
 Preparing simulated events for "epidataCS" ...
 Done.
+>     ## check equivalence of Lambdag from simulation and residuals via twinstim
+>     stopifnot(all.equal(
++         residuals(mysims[[1]]),
++         surveillance:::residuals.twinstim(surveillance:::as.twinstim.simEpidataCS(mysims[[1]]))
++     ))
+'surveillance:::as.twinstim.simEpidataCSmysims[[1]]' was fit with disabled 'cumCIF' -> calculate it now ...
+Note: added the 'tau' component to object 'surveillance:::as.twinstim.simEpidataCS(mysims[[1]])' for future use.
 > ## End(Don't show)
 > 
 > ## extract the second realization -> object of class simEpidataCS
@@ -11453,33 +11647,33 @@ Simplified list of 2 simulated epidemics of class "simEpidataCS" (not printed)
 Observation period: 31 - 61 
 Observation window (bounding box): [4031.295, 4672.253] x [2684.102, 3549.931] 
 Spatio-temporal grid (not shown): 2 time blocks x 413 tiles 
-Overall number of events: 17 (2 types, prehistory: 4)
+Overall number of events: 14 (2 types, prehistory: 4)
 
 Summary of event marks and number of potential sources:
-      time             tile    type       eps.t        eps.s         sex    
- Min.   : 5.591   08212  : 2   B:13   Min.   :30   Min.   :200   female:11  
- 1st Qu.:32.513   03155  : 1   C: 4   1st Qu.:30   1st Qu.:200   male  : 6  
- Median :42.720   03357  : 1          Median :30   Median :200              
- Mean   :39.858   05112  : 1          Mean   :30   Mean   :200              
- 3rd Qu.:53.319   05170  : 1          3rd Qu.:30   3rd Qu.:200              
- Max.   :60.854   05513  : 1          Max.   :30   Max.   :200              
-                  (Other):10                                                
-      agegrp      source          lambda.h        lambda.e    
- [0,3)   :2   Min.   : 0.000   Min.   :0e+00   Min.   :0e+00  
- [3,19)  :9   1st Qu.: 0.000   1st Qu.:0e+00   1st Qu.:0e+00  
- [19,Inf):6   Median : 0.000   Median :1e-06   Median :0e+00  
-              Mean   : 1.846   Mean   :2e-06   Mean   :1e-06  
-              3rd Qu.: 2.000   3rd Qu.:3e-06   3rd Qu.:1e-06  
-              Max.   :11.000   Max.   :5e-06   Max.   :6e-06  
-              NA's   :4        NA's   :4       NA's   :4      
-    Lambdag              x              y          |.sources|    
- Min.   : 0.5546   Min.   :4090   Min.   :2765   Min.   :0.0000  
- 1st Qu.: 4.0248   1st Qu.:4160   1st Qu.:2880   1st Qu.:0.0000  
- Median : 4.8282   Median :4227   Median :2993   Median :1.0000  
- Mean   : 6.3318   Mean   :4250   Mean   :3038   Mean   :0.9412  
- 3rd Qu.: 9.3568   3rd Qu.:4325   3rd Qu.:3178   3rd Qu.:1.0000  
- Max.   :11.8169   Max.   :4445   Max.   :3345   Max.   :4.0000  
- NA's   :4                                                       
+      time             tile   type      eps.t        eps.s         sex   
+ Min.   : 5.591   01056  :1   B:8   Min.   :30   Min.   :200   female:9  
+ 1st Qu.:26.630   03454  :1   C:6   1st Qu.:30   1st Qu.:200   male  :5  
+ Median :42.623   03462  :1         Median :30   Median :200             
+ Mean   :39.266   05170  :1         Mean   :30   Mean   :200             
+ 3rd Qu.:54.131   05513  :1         3rd Qu.:30   3rd Qu.:200             
+ Max.   :59.125   05554  :1         Max.   :30   Max.   :200             
+                  (Other):8                                              
+      agegrp      source     lambda.h        lambda.e        Lambdag       
+ [0,3)   :1   Min.   :0   Min.   :0e+00   Min.   :0e+00   Min.   : 0.2408  
+ [3,19)  :7   1st Qu.:0   1st Qu.:0e+00   1st Qu.:0e+00   1st Qu.: 4.0860  
+ [19,Inf):6   Median :0   Median :1e-06   Median :0e+00   Median : 6.9403  
+              Mean   :0   Mean   :2e-06   Mean   :0e+00   Mean   : 6.6192  
+              3rd Qu.:0   3rd Qu.:2e-06   3rd Qu.:0e+00   3rd Qu.: 9.8084  
+              Max.   :0   Max.   :6e-06   Max.   :2e-06   Max.   :10.4196  
+              NA's   :4   NA's   :4       NA's   :4       NA's   :4        
+       x              y          |.sources|    
+ Min.   :4090   Min.   :2729   Min.   :0.0000  
+ 1st Qu.:4133   1st Qu.:2889   1st Qu.:0.0000  
+ Median :4209   Median :3081   Median :0.0000  
+ Mean   :4215   Mean   :3076   Mean   :0.5714  
+ 3rd Qu.:4270   3rd Qu.:3228   3rd Qu.:1.0000  
+ Max.   :4412   Max.   :3415   Max.   :2.0000  
+                                               
 > plot(mysim2, aggregate="space")
 > 
 > ## plot both epidemics using the plot-method for simEpidataCSlist's
@@ -11804,8 +11998,8 @@ FALSE  TRUE
 > 
 > # Compute the quality values in a nice formatted way
 > xtable(algo.quality(survResObj))
-% latex table generated in R 3.5.2 by xtable 1.8-3 package
-% Fri Feb 22 14:28:13 2019
+% latex table generated in R 3.6.1 by xtable 1.8-4 package
+% Thu Sep 12 14:32:50 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrrrrr}
@@ -11867,7 +12061,7 @@ FALSE  TRUE
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  48.595 1.263 49.829 0.102 0.149 
+Time elapsed:  65.333 0.788 66.641 0.086 0.104 
 > grDevices::dev.off()
 null device 
           1 
