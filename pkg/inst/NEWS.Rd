@@ -8,6 +8,21 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.17.1.9000 (UNRELEASED)}{
+
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item For multivariate time series, \code{sts()} now checks for
+    mismatches in column names of supplied matrices (\code{observed},
+    \code{population}, \code{neighbourhood}, ...). This is to catch
+    input where the units (columns) are ordered differently in
+    different slots, which would flaw subsequent analyses.
+  }
+}
+
+}
+
+
 \section{Changes in surveillance version 1.17.1 (2019-09-13)}{
 
 \subsection{NEW FEATURES}{
