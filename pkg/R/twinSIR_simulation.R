@@ -24,6 +24,7 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
     remPeriod = function(ids) rep(Inf, length(ids)),
     end = Inf, trace = FALSE, .allocate = NULL)
 {
+    stopifnot(inherits(formula, "formula"), is.data.frame(data))
     cl <- match.call()
 
     #######################
@@ -33,13 +34,14 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
     ### Build up model.frame
     mfnames <- c("", "formula", "data", "subset")
     mf <- cl[match(mfnames, names(cl), nomatch = 0L)]
+    if (!"subset" %in% names(mf)) { # subset can be missing
+        ## need explicit argument to avoid partial matching with coords.cols
+        mf["subset"] <- list(NULL)
+    }
     mf$na.action <- as.name("na.fail")
     mf$drop.unused.levels <- FALSE
     mf$xlev <- list()
-    data <- eval(mf$data, parent.frame())
-    if (!inherits(data, "data.frame")) {
-        stop("'data' must inherit from class \"data.frame\"")
-    }
+    ## additional columns for the model frame
     if (inherits(data, "epidata")) {
         id.col <- "id"
         I0.col <- "atRiskY"   # but we need !atRiskY (will be considered below)
