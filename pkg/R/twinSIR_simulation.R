@@ -5,7 +5,7 @@
 ###
 ### Simulate from a "twinSIR" model as described in Hoehle (2009)
 ###
-### Copyright (C) 2009 Michael Hoehle, 2009, 2012, 2014 Sebastian Meyer
+### Copyright (C) 2009 Michael Hoehle, 2009, 2012, 2014, 2019 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -67,7 +67,7 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
     }
     mf$id <- as.name(id.col)
     for(coords.col in coords.cols) {
-        eval(call("$<-", quote(mf), coords.col, quote(as.name(coords.col))))
+        mf[[coords.col]] <- as.name(coords.col)
     }
     special <- c("cox")
     Terms <- terms(formula, specials = special, data = data,
