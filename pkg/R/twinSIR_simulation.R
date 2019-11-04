@@ -25,7 +25,7 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
     end = Inf, trace = FALSE, .allocate = NULL)
 {
     cl <- match.call()
-    
+
     #######################
     ### Check arguments ###
     #######################
@@ -54,7 +54,7 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
             if (is.numeric(colidx)) {
                 tmp <- names(data)[colidx]
                 if (any(is.na(tmp))) {
-                    stop("'", colarg, " = ", deparse(cl[[colarg]]), "': ", 
+                    stop("'", colarg, " = ", deparse(cl[[colarg]]), "': ",
                          "column index must be in [1; ", ncol(data),
                          "=ncol(data)]")
                 }
@@ -84,7 +84,7 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
         stop("nothing to do: no individuals in 'data'")
     }
     idsInteger <- seq_len(nObs)
-    
+
     ### Check start/stop consistency (response)
     .startstop <- model.response(mf)
     if (NCOL(.startstop) != 2L || !is.numeric(.startstop)) {
@@ -100,7 +100,7 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
     if (any(timeIntervals[-1L,1L] != timeIntervals[-nBlocks,2L])) {
         stop("inconsistent start/stop times: time intervals not consecutive")
     }
-    
+
     ### Check .allocate
     if (is.null(.allocate)) {
         .allocate <- max(500, ceiling(nBlocks/100)*100)
@@ -109,38 +109,38 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
             stop("'.allocate' must be >= ", nBlocks)
         }
     }
-    
+
     ### Check that all blocks are complete (all id's present)
     .blockidx <- match(.startstop[,1L], timeIntervals[,1L])
     if (any(table(.blockidx) != nObs)) {
         stop("all time intervals must be present for all id's")
     }
-    
+
     ### Define a vector containing the time points where covariates change
     # unique 'start' time points (=> includes beginning of observation period)
     externalChangePoints <- as.vector(timeIntervals[,1L])
-    
+
     ### SORT THE MODEL.FRAME BY BLOCK AND ID !!!
     mf <- mf[order(.blockidx, mf[["(id)"]]),]
-    
+
     ### Extract the coordinates
     coords <- as.matrix(mf[idsInteger, tail(1:ncol(mf),length(coords.cols))])
     colnames(coords) <- coords.cols
     rownames(coords) <- ids
-    
+
     ### Extract the endemic part Z of the design matrix (no intercept)
     des <- read.design(mf, Terms)
     Z <- des$Z
     nPredCox <- ncol(Z)   # number of endemic (cox) predictor terms
-    
+
     ### Only include basic endemic variables in the event history output
     basicCoxNames <- rownames(attr(Terms,"factors"))[attr(Terms,"specials")$cox]
     basicVarNames <- sub("cox\\(([^)]+)\\)", "\\1", basicCoxNames)
     nBasicVars <- length(basicCoxNames)
     # this is necessary if some variables in 'formula' do not have main effects
     extraBasicVars <- as.matrix(mf[setdiff(basicCoxNames, colnames(Z))])
-    
-    ### Build up 3-dim array [id x time x var] of endemic terms 
+
+    ### Build up 3-dim array [id x time x var] of endemic terms
     coxArray <- array(cbind(Z, extraBasicVars),
         dim = c(nObs, nBlocks, ncol(Z) + ncol(extraBasicVars)),
         dimnames = list(ids, NULL, c(colnames(Z), colnames(extraBasicVars))))
@@ -196,7 +196,7 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
         stop("argument 'infPeriod' is missing (with no default)")
     }
     infPeriod <- match.fun(infPeriod)
-    
+
     ### Parse the generator function for the removal periods
     remPeriod <- match.fun(remPeriod)
 
@@ -225,7 +225,7 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
     if (!isScalar(h0$exact(0))) {
         stop("'h0$exact' must return a scalar")
     }
-    
+
     ### Define function which decides if to reject a proposal during simulation
     exactEqualsUpper <- identical(h0$exact, h0$upper)
     mustReject <- if (exactEqualsUpper) {
@@ -243,13 +243,13 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
     ###################
     ### Preparation ###
     ###################
-    
+
     ### Initialize set of infected and susceptible individuals
     infected <- which(
         mf[idsInteger,"(I0)"] == as.numeric(!inherits(data, "epidata"))
     ) # in case of "epidata", mf$(I0) equals data$atRiskY => infected = I0==0
     susceptibles <- which(! idsInteger %in% infected)
-    
+
     ### Initialize tables of planned R-events and S-events
     Revents <- if (length(infected) > 0) {
         cbind(infected, infPeriod(ids[infected]))
@@ -270,7 +270,7 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
         predCox <- numeric(nObs)   # zeros
     }
 
-    ### 'lambdaCalc' is the main expression for the calculation of the intensity 
+    ### 'lambdaCalc' is the main expression for the calculation of the intensity
     ### values IMMEDIATELY AFTER the current time 'ct'.
     ### It will be evaluated during the while-loop below.
     lambdaCalc <- expression(
@@ -309,7 +309,7 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
     # the following initializations are for R CMD check only ("visible binding")
     lambdaS <- numeric(length(susceptibles))
     lambdaStarMax <- lambdaStar <- numeric(1L)
-    
+
     # At current time (ct) we have:
     # lambdaS is a _vector of length the current number of susceptibles_
     #     containing the intensity of infection for each susceptible individual.
@@ -317,12 +317,12 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
     # lambdaStarMax is the upper bound for lambdaStar regarding baseline.
     # 'susceptible' and 'infected' are the corresponding sets of individuals
     #     immediately AFTER the last event
-    # in theory, if a covariate changes in point t, then the intensity changes 
+    # in theory, if a covariate changes in point t, then the intensity changes
     # at t+0 only. intensities are left-continuous functions. time interval of
-    # constant intensity is (start;stop]. but in the implementation we need at 
-    # time ct the value of the log-baseline at ct+0, especially for 
+    # constant intensity is (start;stop]. but in the implementation we need at
+    # time ct the value of the log-baseline at ct+0, especially for
     # ct %in% h0ChangePoints, thus h0$upper should be a stepfun with right=FALSE
-    
+
     ### Create a history object alongside the simulation
     epiCovars0 <- matrix(0, nrow = nObs, ncol = nPredEpi,
                          dimnames = list(NULL, c(names(f), names(w))))
@@ -382,7 +382,7 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
     #######################################################################
     ### MAIN PART: sequential simulation of infection and removal times ###
     #######################################################################
-    
+
     ### Some indicators
     ct <- timeIntervals[1L,1L] # = externalChangePoints[1]   # current time
     block <- 1
@@ -441,13 +441,13 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
             eval(addNextEvent)
             break
         }
-        
+
         ## Stop if lambdaStarMax too big meaning T == 0 (=> concurrent events)
         if (T == 0) {
             hadNumericalProblemsInf <- TRUE
             break
         }
-        
+
         ## Stop at all costs if end of simulation time [0; end) has been reached
         if (isTRUE(min(ct+T, nextChangePoint) >= end)) {
         # ">=" because we don't want an event at "end"
@@ -502,19 +502,19 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
             Revents <- rbind(Revents, c(victim, ct + infPeriod(ids[victim])))
             susceptibles <- susceptibles[-victimSindex]
             infected <- c(infected, victim)
-            
+
             # Add to history
             nextEvent[victim,6L] <- 1
             eval(addNextEvent)
         }
-    
+
     }
 
 
     ##############
     ### Return ###
     ##############
-    
+
     if (hadNumericalProblemsInf) {
         warning("simulation ended due to an infinite overall infection rate")
     }
@@ -522,7 +522,7 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
         warning("occasionally, the overall infection rate was numerically ",
                 "equal to 0 although there were individuals at risk")
     }
-    
+
     if (trace > 0L) {
       cat("Converting the event history into a data.frame (\"epidata\") ...\n")
     }
@@ -563,7 +563,7 @@ simulate.twinSIR <- function (object, nsim = 1, seed = 1,
     px <- ncol(object$model$X)
     pz <- ncol(object$model$Z)
     nh0 <- attr(object$terms, "intercept") * length(object$nEvents)
-    
+
     f <- object$model$f  # contains only the f's used in the model formula
     w <- object$model$w  # contains only the w's used in the model formula
     if (any(missingf <- !names(f) %in% colnames(object$model$X))) {
@@ -593,7 +593,7 @@ simulate.twinSIR <- function (object, nsim = 1, seed = 1,
                              right = FALSE)
               list(exact = .h0, upper = .h0)
           }
-    
+
     if (!inherits(data, "epidata")) {
         stop("invalid 'data' argument: use function 'twinSIR' with ",
              "'keep.data = TRUE'")
