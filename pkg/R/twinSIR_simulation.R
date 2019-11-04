@@ -63,10 +63,10 @@ simEpidata <- function (formula, data, id.col, I0.col, coords.cols,
                 assign(colarg, tmp, inherits = FALSE)
             }
         }
-        mf$I0 <- if (is.null(I0.col)) {
-                     substitute(rep(0, N), list(N=nrow(data)))
-                 } else as.name(I0.col)
     }
+    mf$I0 <- if (is.null(I0.col)) {
+                 substitute(rep(0, N), list(N=nrow(data)))
+             } else as.name(I0.col)
     mf$id <- as.name(id.col)
     for(coords.col in coords.cols) {
         mf[[coords.col]] <- as.name(coords.col)

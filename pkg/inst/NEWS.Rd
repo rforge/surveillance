@@ -20,6 +20,16 @@
   }
 }
 
+\subsection{BUG FIXES}{
+  \itemize{
+    \item \code{simulate.twinSIR()} ignored the \code{atRiskY} indicator
+    of the underlying \code{"epidata"}, so always assumed a completely
+    susceptible population. Initially infectious individuals are now
+    inherited. For the previous behaviour, adjust the supplied
+    \code{data} via \code{data$atRiskY <- 1}.
+  }
+}
+
 }
 
 
