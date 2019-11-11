@@ -35,7 +35,7 @@ Type 'q()' to quit R.
 > library('surveillance')
 Loading required package: sp
 Loading required package: xtable
-This is surveillance 1.17.1. For overview type ‘help(surveillance)’.
+This is surveillance 1.17.2. For overview type ‘help(surveillance)’.
 > 
 > base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
 > base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
@@ -2219,7 +2219,7 @@ Matrix with  5  initial values
 
 size of grid:  5 
 convergences:  5 
-time needed (in seconds) 0.074 
+time needed (in seconds) 0.076 
 
 values of log-likelihood:
 -1685 
@@ -3353,7 +3353,7 @@ Loading required package: gamlss.dist
 Loading required package: MASS
 Loading required package: nlme
 Loading required package: parallel
- **********   GAMLSS Version 5.1-4  ********** 
+ **********   GAMLSS Version 5.1-5  ********** 
 For more on GAMLSS look at http://www.gamlss.org/
 Type gamlssNews() to see new features/changes/bug fixes.
 
@@ -4941,7 +4941,7 @@ $h
 > ### ** Examples
 > 
 > formatDate(Sys.Date(), "%G/%OQ/%q")
-[1] "2019/III/75"
+[1] "2019/IV/42"
 > 
 > 
 > 
@@ -6966,11 +6966,9 @@ Loading required package: spatstat.data
 Loading required package: nlme
 Loading required package: rpart
 
-spatstat 1.60-1       (nickname: ‘Swinging Sixties’) 
+spatstat 1.61-0       (nickname: ‘Puppy zoomies’) 
 For an introduction to spatstat, type ‘beginner’ 
 
-
-Note: spatstat version 1.60-1 is out of date by more than 11 weeks; a newer version should be available.
 > plot(letterR)
 > plot(intersectPolyCircle(letterR, c(3,2), 1), add=TRUE, col=2, lwd=3)
 > 
@@ -7062,7 +7060,7 @@ dt      <= 50  > 50
 > ## contingency table in LaTeX
 > toLatex(knoxtest)
 % latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Fri Sep 13 14:35:12 2019
+% Mon Nov 11 18:04:52 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{r|rr|r}
@@ -7238,7 +7236,7 @@ $\sum$ & 6817 & 49463 & 56280 \\
 $ar
 $ar$f
 ~1
-<environment: 0x158942f8>
+<environment: 0x1722e668>
 
 $ar$offset
 [1] 1
@@ -7247,7 +7245,7 @@ $ar$offset
 $ne
 $ne$f
 ~1
-<environment: 0x158942f8>
+<environment: 0x1722e668>
 
 $ne$offset
 [1] 1
@@ -9190,7 +9188,7 @@ $gpclib
 > salm <- farringtonFlexible(salm,control=control)
 > toLatex(salm)
 % latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Fri Sep 13 14:35:30 2019
+% Mon Nov 11 18:05:10 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrlr}
@@ -9768,13 +9766,13 @@ converged
 > fitsim1 <- update(fit, data = sim1)
 Initialized 1 log-baseline interval:  0.00000 92.54524
 Initial parameter vector:  1 0
-iter   10 value 676.138374
-final  value 676.138368 
+iter   10 value 654.682147
+final  value 654.682146 
 converged
 > cbind(base = coef(fit), new = coef(fitsim1))
                         base         new
-household         0.05364103  0.05698464
-cox(logbaseline) -4.07676005 -4.18792084
+household         0.05364103  0.05617818
+cox(logbaseline) -4.07676005 -4.10337393
 > 
 > if (surveillance.options("allExamples"))
 + {
@@ -9793,7 +9791,7 @@ cox(logbaseline) -4.07676005 -4.18792084
 +   intensityplot(simepi)
 + 
 +   ## see if we correctly estimate the parameters
-+   fitsimepi <- twinSIR(~ cox(AGE) + household, data = hagelloch)
++   fitsimepi <- twinSIR(~ cox(AGE) + household, data = simepi)
 +   cbind(true = c(0.05, -4, 0.1), est = coef(fitsimepi), confint(fitsimepi))
 + }
 > 
@@ -9989,21 +9987,21 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
 \hline
 \hline 
 % latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Fri Sep 13 14:35:37 2019
+% Mon Nov 11 18:05:16 2019
  \texttt{h.(Intercept)} & $-20.481$ & $0.053$ & $-389.0$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{h.I(start/365-3.5)} & $-0.041$ & $0.022$ & $-1.9$ & $0.06$ \\ 
   \texttt{h.sin(2*pi*start/365)} & $0.242$ & $0.064$ & $3.8$ & $2\cdot{}10^{-04}$ \\ 
   \texttt{h.cos(2*pi*start/365)} & $0.350$ & $0.064$ & $5.4$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
 % latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Fri Sep 13 14:35:37 2019
+% Mon Nov 11 18:05:16 2019
  \texttt{e.(Intercept)} & $-16.90$ & $0.26$ & $-64$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
 \end{tabular}
 > # or, to report rate ratios
 > xtable(s)
 % latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Fri Sep 13 14:35:37 2019
+% Mon Nov 11 18:05:16 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -10339,8 +10337,8 @@ $g
 function (t, logvals, types) 
 heights(logvals)[(types - 1) * nallknots + .bincode(t, allknotsInf, 
     right = FALSE)]
-<bytecode: 0x1a1d9e58>
-<environment: 0x139927c0>
+<bytecode: 0x1183d398>
+<environment: 0x11835df0>
 
 $G
 function (t, logvals, types) 
@@ -10350,7 +10348,7 @@ function (t, logvals, types)
         sum(typeheights(logvals, type) * diff.default(knots2t))
     }, t, types, SIMPLIFY = TRUE, USE.NAMES = FALSE)
 }
-<environment: 0x139927c0>
+<environment: 0x11835df0>
 
 $deriv
 function (t, logvals, types) 
@@ -10366,8 +10364,8 @@ function (t, logvals, types)
     dim(res) <- c(L, npars)
     res
 }
-<bytecode: 0x15fb27c0>
-<environment: 0x139927c0>
+<bytecode: 0x1183a758>
+<environment: 0x11835df0>
 
 $Deriv
 function (t, logvals, types) 
@@ -10386,7 +10384,7 @@ function (t, logvals, types)
     dim(res) <- c(L, npars)
     res
 }
-<environment: 0x139927c0>
+<environment: 0x11835df0>
 
 $npars
 [1] 4
@@ -10981,16 +10979,16 @@ function (s, logvals, types = NULL)
     sLength <- sqrt(.rowSums(s^2, length(s)/2, 2L))
     c(1, exp(logvals), 0)[.bincode(sLength, allknots, right = FALSE)]
 }
-<bytecode: 0x13964ea0>
-<environment: 0x140b7b68>
+<bytecode: 0x1433e068>
+<environment: 0x14337380>
 
 $F
 function (polydomain, f, logvals, type = NULL, npoly = 256) 
 {
     sum(c(1, exp(logvals)) * ringAreas(polydomain, npoly = npoly))
 }
-<bytecode: 0x13965920>
-<environment: 0x140b7b68>
+<bytecode: 0x1433acb8>
+<environment: 0x14337380>
 
 $Fcircle
 function (r, logvals, type = NULL) 
@@ -10998,8 +10996,8 @@ function (r, logvals, type = NULL)
     sum(c(1, exp(logvals)) * pi * diff(pmin.int(allknotsPos, 
         r)^2))
 }
-<bytecode: 0x13965e60>
-<environment: 0x140b7b68>
+<bytecode: 0x1433b1f8>
+<environment: 0x14337380>
 
 $deriv
 function (s, logvals, types = NULL) 
@@ -11013,8 +11011,8 @@ function (s, logvals, types = NULL)
     dim(deriv) <- c(L, nknots)
     deriv
 }
-<bytecode: 0x140bc160>
-<environment: 0x140b7b68>
+<bytecode: 0x1433b968>
+<environment: 0x14337380>
 
 $Deriv
 function (polydomain, deriv, logvals, type = NULL, npoly = 256) 
@@ -11022,8 +11020,8 @@ function (polydomain, deriv, logvals, type = NULL, npoly = 256)
     ringAreas <- ringAreas(polydomain, npoly = npoly)
     exp(logvals) * ringAreas[-1L]
 }
-<bytecode: 0x140bd8c8>
-<environment: 0x140b7b68>
+<bytecode: 0x143392a0>
+<environment: 0x14337380>
 
 $simulate
 function (n, logvals, type = NULL, ub) 
@@ -11035,8 +11033,8 @@ function (n, logvals, type = NULL, ub)
         prob = heights * diff.default(c(0, knots2upper^2)))
     runifdisc(n, knots2upper[rings], c(0, knots2upper)[rings])
 }
-<bytecode: 0x140b62b0>
-<environment: 0x140b7b68>
+<bytecode: 0x143398f8>
+<environment: 0x14337380>
 
 $npars
 [1] 3
@@ -11303,14 +11301,14 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
 \hline
 \hline 
 % latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Fri Sep 13 14:35:39 2019
+% Mon Nov 11 18:05:19 2019
  \texttt{h.(Intercept)} & $-20.52869$ & $0.04724$ & $-434.597$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{h.I(start/365-3.5)} & $-0.04574$ & $0.02212$ & $-2.068$ & $0.03863$ \\ 
   \texttt{h.sin(2*pi*start/365)} & $0.21728$ & $0.06467$ & $3.360$ & $0.00078$ \\ 
   \texttt{h.cos(2*pi*start/365)} & $0.31810$ & $0.06380$ & $4.986$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
 % latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Fri Sep 13 14:35:39 2019
+% Mon Nov 11 18:05:19 2019
  \texttt{e.(Intercept)} & $-12.51659$ & $0.32326$ & $-38.720$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{e.typeC} & $-0.90832$ & $0.26742$ & $-3.397$ & $0.000682$ \\ 
   \texttt{e.agegrp[3,19)} & $0.70612$ & $0.32706$ & $2.159$ & $0.030852$ \\ 
@@ -11322,7 +11320,7 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
 > # or using the xtable-method (which produces rate ratios)
 > xtable(s)
 % latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Fri Sep 13 14:35:39 2019
+% Mon Nov 11 18:05:19 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -11563,7 +11561,7 @@ Data attributes:
 +                    tiles=districtsD, newcoef=c("e.typeC"=-1),
 +                    t0=31, T=61, simplify=TRUE)
 
-Time at beginning of simulation: 2019-09-13 14:35:42 
+Time at beginning of simulation: 2019-11-11 18:05:21 
 Simulation 1 / 2 ...
 -------------------------------------------------------------------------------
 
@@ -11588,12 +11586,12 @@ Preparing simulated events for "epidataCS" ...
 Done.
 
 -------------------------------------------------------------------------------
-Runtime of first simulation: 0.363 seconds
-Estimated finishing time: 2019-09-13 14:35:43 
+Runtime of first simulation: 0.354 seconds
+Estimated finishing time: 2019-11-11 18:05:22 
 
 Simulation 2 / 2 ...	simulated 10 events up to time 61 
 
-Done (2019-09-13 14:35:43).
+Done (2019-11-11 18:05:22).
 > ## Don't show: 
 >     ## check construction and selection from "simEpidataCSlist"
 >     local({
@@ -11999,7 +11997,7 @@ FALSE  TRUE
 > # Compute the quality values in a nice formatted way
 > xtable(algo.quality(survResObj))
 % latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Fri Sep 13 14:35:46 2019
+% Mon Nov 11 18:05:26 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrrrrr}
@@ -12061,7 +12059,7 @@ FALSE  TRUE
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  65.484 0.807 66.948 0.081 0.111 
+Time elapsed:  64.738 0.884 66.361 0.064 0.123 
 > grDevices::dev.off()
 null device 
           1 
