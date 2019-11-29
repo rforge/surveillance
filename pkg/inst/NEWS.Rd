@@ -8,6 +8,18 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.17.2.9000 (UNRELEASED)}{
+
+\subsection{BUG FIXES}{
+  \itemize{
+    \item The \code{head()}-method for \code{"epidataCS"} objects did
+    not work with a negative \code{n} argument.
+  }
+}
+
+}
+
+
 \section{Changes in surveillance version 1.17.2 (2019-11-11)}{
 
 \subsection{MINOR CHANGES}{
