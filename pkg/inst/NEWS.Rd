@@ -8,12 +8,14 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.17.2.9000 (UNRELEASED)}{
+\section{Changes in surveillance version 1.17.3 (2019-12-16)}{
 
 \subsection{BUG FIXES}{
   \itemize{
     \item The \code{head()}-method for \code{"epidataCS"} objects did
     not work with a negative \code{n} argument.
+
+    \item Fix for \code{"matrix"} changes in R-devel.
   }
 }
 
