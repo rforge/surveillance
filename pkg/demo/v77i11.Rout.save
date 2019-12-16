@@ -1,5 +1,5 @@
 
-R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -48,7 +48,7 @@ In RNGkind("Mersenne-Twister", "Inversion", "Rounding") :
 > library("surveillance")  # you should also have installed the suggested packages
 Loading required package: sp
 Loading required package: xtable
-This is surveillance 1.17.1. For overview type ‘help(surveillance)’.
+This is surveillance 1.17.3. For overview type ‘help(surveillance)’.
 > 
 > ## 3.2. Data structure: 'epidataCS'
 > data("imdepi", package = "surveillance")
@@ -277,8 +277,8 @@ Done.
 +              label = "tab:imdfit_Gaussian"),
 +       sanitize.text.function = NULL, sanitize.colnames.function = NULL,
 +       sanitize.rownames.function = function(x) paste0("\\code{", x, "}"))
-% latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Wed Sep 11 15:23:01 2019
+% latex table generated in R 3.6.2 by xtable 1.8-4 package
+% Mon Dec 16 12:22:14 2019
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -437,7 +437,7 @@ Note: added the 'tau' component to object 'imdfit_powerlaw' for future use.
 > imdsims <- simulate(imdfit_powerlaw, nsim = 30, seed = 1, t0 = 1826, T = 2555,
 +   data = imdepi_untied_infeps, tiles = districtsD)
 
-Time at beginning of simulation: 2019-09-11 15:23:27 
+Time at beginning of simulation: 2019-12-16 12:22:41 
 Simulation 1 / 30 ...
 -------------------------------------------------------------------------------
 
@@ -464,8 +464,8 @@ Preparing simulated events for "epidataCS" ...
 Done.
 
 -------------------------------------------------------------------------------
-Runtime of first simulation: 2.724 seconds
-Estimated finishing time: 2019-09-11 15:24:49 
+Runtime of first simulation: 2.609 seconds
+Estimated finishing time: 2019-12-16 12:23:59 
 
 Simulation  2 / 30 ...	simulated 187 events up to time 2555 
 Simulation  3 / 30 ...	simulated 192 events up to time 2555 
@@ -497,7 +497,7 @@ Simulation 28 / 30 ...	simulated 174 events up to time 2555
 Simulation 29 / 30 ...	simulated 158 events up to time 2555 
 Simulation 30 / 30 ...	simulated 155 events up to time 2555 
 
-Done (2019-09-11 15:25:14).
+Done (2019-12-16 12:24:21).
 > 
 > table(imdsims[[1]]$events$source > 0, exclude = NULL)
 
@@ -618,10 +618,11 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 
 Total number of infections:  187 
 
-One-sided AIC: 1244.9	(simulated penalty weights)
+One-sided AIC: 1244.8	(simulated penalty weights)
 Log-likelihood: -619.4
 Number of log-likelihood evaluations: 119 
 
+> ##M Note: OSAIC is 1244.9 (with quadprog <= 1.5-7) or 1244.8 (with 1.5-8)
 > 
 > exp(confint(hagellochFit, parm = "cox(logbaseline)"))
                         2.5 %      97.5 %
@@ -723,8 +724,9 @@ converged
 > AIC(hagellochFit, hagellochFit_fstep)
 Computing OSAIC weights for 4 epidemic covariates based on 1000 simulations ...
                    df      AIC
-hagellochFit        5 1244.784
-hagellochFit_fstep  7 1245.887
+hagellochFit        5 1244.656
+hagellochFit_fstep  7 1245.708
+> ##M Note: OSAIC values slightly changed (abs. diff. < 0.2) with quadprog 1.5-8
 > 
 > ################################################################################
 > ## Section 5. Areal time series of counts
@@ -986,8 +988,8 @@ One-step-ahead prediction @ t = 65 ...
 One-step-ahead prediction @ t = 66 ...
 One-step-ahead prediction @ t = 67 ...
 One-step-ahead prediction @ t = 68 ...
-One-step-ahead prediction @ t = 70 ...
 One-step-ahead prediction @ t = 69 ...
+One-step-ahead prediction @ t = 70 ...
 One-step-ahead prediction @ t = 71 ...
 One-step-ahead prediction @ t = 72 ...
 One-step-ahead prediction @ t = 73 ...
