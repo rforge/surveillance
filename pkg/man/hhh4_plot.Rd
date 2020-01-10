@@ -334,9 +334,11 @@ plot(measlesFit, type="maxEV")  # not very exciting
 ## fitted mean components/proportions by district, averaged over time
 if (requireNamespace("gridExtra")) {
     plot(measlesFit, type="maps", labels=list(cex=0.6),
-         main=c("Total","Endemic","Within district","From other districts"))
+         which=c("mean", "endemic", "epi.own"),
+         main=c("total", "endemic", "autoregressive"))
     plot(measlesFit, type="maps", labels=list(cex=0.6),
-         which=c("endemic", "epi.own"), prop=TRUE, zmax=NA)
+         which=c("endemic", "epi.own"), prop=TRUE, zmax=NA,
+         main=c("endemic proportion", "autoregressive proportion"))
 }
 
 ## estimated random intercepts of the endemic component
