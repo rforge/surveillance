@@ -5,7 +5,7 @@
 ###
 ### Plot-method(s) for fitted hhh4() models
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2012-2019 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2020 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -329,9 +329,15 @@ plotHHH4_maps <- function (x,
     ## produce maps
     grobs <- mapply(
         FUN = function (zcol, main, zmax)
+        if (is.na(zmax)) { # automatic color breaks over range of values
+            spplot(map, zcol = zcol, main = main,
+                   cuts = length(col.regions) - 1L,
+                   col.regions = col.regions, sp.layout = sp.layout, ...)
+        } else { # breakpoints from 0 to zmax
             spplot(map, zcol = zcol, main = main,
                    at = seq(0, zmax, length.out = length(col.regions) + 1L),
-                   col.regions = col.regions, sp.layout = sp.layout, ...),
+                   col.regions = col.regions, sp.layout = sp.layout, ...)
+        },
         zcol = names(comps), main = main, zmax = zmax,
         SIMPLIFY = FALSE, USE.NAMES = FALSE)
     if (length(grobs) == 1L) {

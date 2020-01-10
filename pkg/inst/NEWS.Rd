@@ -8,6 +8,19 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.17.3.9000 (UNRELEASED)}{
+
+\subsection{NEW FEATURES}{
+  \itemize{
+    \item The \code{plot}-type \code{"maps"} for \code{"hhh4"} fits,
+    \code{plotHHH4_maps()}, now allows for map-specific color keys
+    via \code{zmax = NA} (useful for \code{prop = TRUE}).
+  }
+}
+
+}
+
+
 \section{Changes in surveillance version 1.17.3 (2019-12-16)}{
 
 \subsection{BUG FIXES}{
