@@ -12,6 +12,11 @@
 
 \subsection{NEW FEATURES}{
   \itemize{
+    \item New spatial interaction function for \code{twinstim()}:
+    \code{siaf.exponential()} implements the exponential kernel
+    \eqn{f(x) = \exp(-x/\sigma)}, which is a useful alternative
+    if the two-parameter power-law kernel is not identifiable.
+    
     \item The \code{plot}-type \code{"maps"} for \code{"hhh4"} fits,
     \code{plotHHH4_maps()}, now allows for map-specific color keys
     via \code{zmax = NA} (useful for \code{prop = TRUE}).
