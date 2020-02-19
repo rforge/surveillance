@@ -6,7 +6,7 @@
 ### Data structure "epidata" representing the SIR event history of a fixed
 ### geo-referenced population (e.g., farms, households) for twinSIR() analysis
 ###
-### Copyright (C) 2008-2010, 2012, 2014-2018 Sebastian Meyer
+### Copyright (C) 2008-2010, 2012, 2014-2018, 2020 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -733,7 +733,8 @@ summary.epidata <- function (object, ...)
     ###            evolution of numbers of susceptibles, infectious and removed
     counters <- eventTable[order(eventTable[["time"]]),c("time", "type", "id")]
     init <- data.frame(time = attr(object, "timeRange")[1L],
-                       type = NA_character_, id = NA_character_,
+                       type = factor(NA_character_, levels(counters$type)),
+                       id = factor(NA_character_, levels(counters$id)),
                        nSusceptible = n, nInfectious = m, nRemoved = 0L)
     cumulatedReSusceptibility <- cumsum(counters[["type"]] == "S")
     cumulatedInfections <- cumsum(counters[["type"]] == "I")
