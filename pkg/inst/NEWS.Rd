@@ -23,6 +23,14 @@
   }
 }
 
+\subsection{BUG FIXES}{
+  \itemize{
+    \item The \code{nowcast()}-function now also works for
+  \code{method="bayes.trunc.ddcp"} method when the number of breakpoints
+  is greater than 1. 
+  }
+}
+
 }
 
 
