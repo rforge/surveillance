@@ -8,7 +8,7 @@
 sinCos2amplitudeShift <- function(params){
   # number of sin+cos terms
   lengthParams <- length(params)
-  if(lengthParams %% 1 !=0)
+  if(lengthParams %% 2 != 0)
     stop("wrong number of params")
   index.sin <- seq(1,lengthParams,by=2)
 
@@ -25,7 +25,7 @@ sinCos2amplitudeShift <- function(params){
 
 amplitudeShift2sinCos <- function(params){
     lengthParams <- length(params)
-    if (lengthParams%%1 != 0)
+    if (lengthParams %% 2 != 0)
         stop("wrong number of params")
     index.A <- seq(1, lengthParams, by = 2)
     one <- function(i = 1, params) {
@@ -47,7 +47,7 @@ amplitudeShift2sinCos <- function(params){
 jacobianAmplitudeShift <- function(params){
   # number of sin+cos terms
   lengthParams <- length(params)
-  if(lengthParams %% 1 !=0)
+  if(lengthParams %% 2 != 0)
     stop("wrong number of params")
   index.sin <- seq(1,lengthParams,by=2)
   # function to compute jacobian of the transformation sinCos2AmplitudeShift()
