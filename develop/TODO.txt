@@ -12,7 +12,7 @@
 #======================================================================
 
 #Open
-25/11/2019 remove deprecated algo.hhh() and associated methods (for "ah")
+25/11/2019 remove ancient simHHH (export simHHH4 instead?)
 
 #Done
 15/02/2019 remove deprecated functions
