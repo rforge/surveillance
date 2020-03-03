@@ -236,14 +236,15 @@ Since this triggering process is independent of the event's parentage and of oth
 events, the expected number $\mu_j$ of events triggered by event $j$
 can be obtained by integrating the triggering rate over
 the observed interaction domain:
-\begin{gather} \label{eqn:R0:twinstim}
+\begin{equation} \label{eqn:R0:twinstim}
   \mu_j = \eta_j \cdot
   \left[ \int_0^{\min(T-t_j,\tau_j)} g(t) \,dt \right] \cdot
   \left[ \int_{\bm{R}_j} f(\norm{\bm{s}}) \,d\bm{s} \right] \:,
-\shortintertext{where}
-  \label{eqn:twinstim:IR}
+\end{equation}
+where
+\begin{equation} \label{eqn:twinstim:IR}
   \bm{R}_j = (b(\bm{s}_j,\delta_j) \cap \bm{W}) - \bm{s}_j
-\end{gather}
+\end{equation}
 is event $j$'s influence region centered at $\bm{s}_j$, and
 $b(\bm{s}_j, \delta_j)$ denotes the disc centered at $\bm{s}_j$ with radius $\delta_j$.
 Note that the above model-based reproduction number $\mu_j$ is event-specific
