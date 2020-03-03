@@ -683,6 +683,7 @@ Figure~\ref{fig:measlesFit_neweights1} for the power-law model:
 library("lattice")
 trellis.par.set("reference.line", list(lwd=3, col="gray"))
 trellis.par.set("fontsize", list(text=14))
+set.seed(20200303)
 plot(measlesFit_powerlaw, type = "neweights", plotter = stripplot,
   panel = function (...) {panel.stripplot(...); panel.average(...)},
   jitter.data = TRUE, xlab = expression(o[ji]), ylab = expression(w[ji]))
