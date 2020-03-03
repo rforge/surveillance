@@ -26,8 +26,14 @@
 \subsection{BUG FIXES}{
   \itemize{
     \item The \code{nowcast()}-function now also works for
-  \code{method="bayes.trunc.ddcp"} method when the number of breakpoints
-  is greater than 1. 
+    \code{method="bayes.trunc.ddcp"} method when the number of breakpoints
+    is greater than 1.
+
+    \item The \code{amplitudeShift} transformation for sine-cosine
+    coefficient pairs in the \code{summary} of multivariate
+    \code{"hhh4"} models was incorrect in the rare case that the model
+    used unit-specific seasonal terms (\code{addSeason2formula} with
+    \code{length(S) > 1}).
   }
 }
 
