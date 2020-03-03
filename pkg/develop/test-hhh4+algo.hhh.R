@@ -1,9 +1,11 @@
+library("testthat")
 context("Comparison of hhh4() and algo.hhh() for 'influMen' example")
 
 ## influenza/meningococcal data, also illustrated in vignette("hhh4")
-data("influMen")
+data("influMen", package = "surveillance")
 
 ## fit with old algo.hhh()
+source("algo_hhh.R")
 hhhfit <- algo.hhh(influMen,
                    list(lambda=c(1,1), neighbours=c(NA,0),
                         linear=FALSE, nseason=c(3,1), negbin="multiple"),
@@ -12,6 +14,7 @@ test_that("algo.hhh() converges for 'influMen' example",
           expect_true(hhhfit$convergence))
 
 ## fit with new hhh4()
+library("surveillance")
 hhh4fit <- hhh4(disProg2sts(influMen),
                 list(ar=list(f=~0+fe(1, which=c(TRUE, TRUE)), lag=1),
                      ne=list(f=~0+fe(1, which=c(FALSE,TRUE)), lag=0,

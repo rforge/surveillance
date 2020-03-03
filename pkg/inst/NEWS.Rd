@@ -31,6 +31,14 @@
   }
 }
 
+\subsection{DEPRECATED AND DEFUNCT}{
+  \itemize{
+    \item The original \code{algo.hhh()} implementation of the HHH
+    model has been removed from the package. The function \code{hhh4()}
+    provides an improved and much extended implementation since 2012.
+  }
+}
+
 }
 
 

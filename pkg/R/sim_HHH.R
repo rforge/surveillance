@@ -1,6 +1,3 @@
-###################################################
-### chunk number 1: 
-###################################################
 ############################################
 # Simulates multivariate count data based on the model described in Held et.al (2005)
 # Note: trend is omitted
@@ -137,43 +134,3 @@ simHHH.default <- function(model=NULL,control=list(coefs=list(alpha=1, gamma=0, 
 simHHH <- function(model,control,length){
   UseMethod("simHHH")
 }
-
-################################
-# simulates data using the estimated parameter values of a model fitted with algo.hhh
-# Note: NO trend
-simHHH.ah <- function(model,control=model$control, length){
-  #hoehle: removed this to make simHHH.ah consistent with simHHH.default
-  # control <- model$control
-
-  #number of areas
-  nAreas <- ncol(model$disProgObj$observed)
-  #number of seasons
-  S <- control$nseason
-
-  cntrl <- list(lambda=NULL,phi=NULL,gamma=NULL,delta=NULL,
-                 psi=NULL,period=model$control$period)
-
- #extract coefficients
- coefs <- coef(model)
-  if(control$neighbours)
-    cntrl$phi <- coefs["phi"]
-  if(control$negbin)
-    cntrl$psi <- coefs["psi"]
-  if(control$lambda)
-    cntrl$lambda <- coefs["lambda"]
-
-  if(S > 0){
-    cntrl$gamma <- coefs[paste("gamma",1:S,sep="")]
-    cntrl$delta <- coefs[paste("delta",1:S,sep="")]
-  }
-
-  cntrl$alpha <- coefs[paste("alpha",1:nAreas,sep="")]
-
-   result <- simHHH(length,control=list(coefs=cntrl,
-                                  neighbourhood=model$disProgObj$neighbourhood,
-                                  populationFrac=model$disProgObj$populationFrac
-                                  ))
-   return(result)
-}
-
-

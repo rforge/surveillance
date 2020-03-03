@@ -1,7 +1,6 @@
 \name{simHHH}
 \alias{simHHH}
 \alias{simHHH.default}
-\alias{simHHH.ah}
 \encoding{latin1}
 
 \title{Simulates data based on the model proposed by Held et. al (2005)}
@@ -14,8 +13,6 @@
        lambda = 0, phi = NULL, psi = NULL, period = 52),
        neighbourhood = NULL, population = NULL, start = NULL),
        length)
-
-\method{simHHH}{ah}(model, control = model$control, length)
 }
 \arguments{
         \item{control}{list with
