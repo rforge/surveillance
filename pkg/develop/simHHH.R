@@ -38,9 +38,9 @@ plot(data.pois$data,legend=F,xaxis.years=F)
 # Simulates multivariate count data based on the model described in Held et.al (2005)
 # Note: trend is omitted
 ######################################
-simHHH.default <- function(control=list(coefs=list(alpha, gamma=0, delta=0, lambda=0,
+simHHH.default <- function(model=NULL,control=list(coefs=list(alpha=1, gamma=0, delta=0, lambda=0,
                                          phi=NULL,psi=NULL,period=52),
-                           neighbourhood=NULL,population=NULL,state=NULL,K=0),
+                           neighbourhood=NULL,population=NULL,start=NULL),
                            length){
 
    #################################################
@@ -95,13 +95,7 @@ simHHH.default <- function(control=list(coefs=list(alpha, gamma=0, delta=0, lamb
    } else {
      #assumption: n_i,t = n_i
      pop <-control$population[1,]
-     control$population <- matrix(pop,ncol=nAreas,nrow=length)
-   }
-
-   #should there be outbreaks (as given in state)
-   if(is.null(control$state)){
-     control$state <-as.matrix(rep(0,length))
-     control$K <- 0
+     control$population <- matrix(pop,ncol=nAreas,nrow=length,byrow=TRUE)
    }
 
    #determine number of seasons
@@ -124,6 +118,10 @@ simHHH.default <- function(control=list(coefs=list(alpha, gamma=0, delta=0, lamb
    if(is.null(control$coefs$phi)){
      control$coefs$phi <- 0
    }
+   if(!is.null(control$start)){
+     if(length(control$start)!=nAreas)
+       stop("wrong dimension of start\n")
+   }
 
    # simulate from Poisson or NegBin model
    if(is.null(control$coefs$psi)){
@@ -136,17 +134,20 @@ simHHH.default <- function(control=list(coefs=list(alpha, gamma=0, delta=0, lamb
     season <- model.frame(formula=formulaSeason(S=S,period=control$coefs$period),
                            data=data.frame("t"=1:length))
     #rearrange the sinus and cosinus parts
-    season[,c(seq(1,2*S,by=2),seq(2,2*S,by=2))]
+    season <- season[,c(seq(1,2*S,by=2),seq(2,2*S,by=2))]
     # this computes \sum_{s=1}^S [gamma_s*sin(omega_s*t) + delta_s*cos(omega_s*t) ]
     season<- as.matrix(season)%*%c(control$coefs$gamma,control$coefs$delta)
 
    # compute endemic part: nu_t =  exp( alpha_i + season_t )
-    nu<-exp(sapply(1:nAreas,function(i) control$coefs$alpha[i]+season))#+control$K*control$state)
+    nu<-exp(sapply(1:nAreas,function(i) control$coefs$alpha[i]+season))
 
     # initialize matrices for the mean mu_i,t and the simulated data x_i,t
-    # x_i,0 is set to zero
+    # x_i,0 is set to the mean of n_it*\nu_it
     mu <- matrix(0,ncol=nAreas,nrow=length)
     x <- matrix(0,ncol=nAreas,nrow=length+1)
+
+    x[1,] <- ifelse(is.null(control$start),colMeans(control$population*nu),start)
+    #print(x[1,])
 
     if(control$coefs$lambda == 0 && control$coefs$phi ==0){
       mu <- control$population*nu
@@ -155,26 +156,25 @@ simHHH.default <- function(control=list(coefs=list(alpha, gamma=0, delta=0, lamb
       # simulate data
       for(t in 1:length){
         #mu_i,t = lambda*x_i,t-1 +phi*\sum_j~i x_j,t-1
-        mu[t,] <- control$coefs$lambda *x[t,] + control$coefs$phi*sumN(x[t,],control$neighbourhood) + control$population[t,]*nu[t,] *exp(control$K*control$state[t,])
+        mu[t,] <- control$coefs$lambda *x[t,] + control$coefs$phi*sumN(x[t,],control$neighbourhood) + control$population[t,]*nu[t,]
         x[t+1,] <- rdistr(nAreas,mu[t,])
       }
     }
     #remove first time point
-    dp <- create.disProg(week=1:length,observed=x[-1,],state=control$state,
+    dp <- create.disProg(week=1:length,observed=x[-1,],state=rep(0,length),
                          neighbourhood=control$neighbourhood, populationFrac=control$population)
     return(list(data=dp,mean=mu,endemic=control$population*nu,coefs=control$coefs))
 }
 
 ##################
-simHHH <- function(...){
+simHHH <- function(model,control,length){
   UseMethod("simHHH")
 }
 
 ################################
 # simulates data using the estimated parameter values of a model fitted with algo.hhh
 # Note: NO trend
-simHHH.ah <- function(model,length){
-  control <- model$control
+simHHH.ah <- function(model,control=model$control, length){
   #number of areas
   nAreas <- ncol(model$disProgObj$observed)
   #number of seasons
@@ -196,10 +196,8 @@ simHHH.ah <- function(model,length){
     cntrl$gamma <- coefs[paste("gamma",1:S,sep="")]
     cntrl$delta <- coefs[paste("delta",1:S,sep="")]
   }
-  if(nAreas > 1){
-    cntrl$alpha <- coefs[paste("alpha",1:nAreas,sep="")]
-  } else
-    cntrl$alpha <- coefs["alpha1"]
+
+  cntrl$alpha <- coefs[paste("alpha",1:nAreas,sep="")]
 
    result <- simHHH(length,control=list(coefs=cntrl,
                                   neighbourhood=model$disProgObj$neighbourhood,

@@ -12,9 +12,9 @@
 #======================================================================
 
 #Open
-25/11/2019 remove ancient simHHH (export simHHH4 instead?)
 
 #Done
+17/03/2020 remove ancient algo.hhh and simHHH implementations
 15/02/2019 remove deprecated functions
 12/02/2019 format.Date(x, "%V") and "%G" work on Windows since R 3.1.0,
            so the isoWeekYear() helper function is no longer necessary
@@ -194,6 +194,7 @@ xx/07/2012 (sebastian): Documentation of functions in Rd files; also update refe
 18/10/2017 plotHHH4_season: add options for groups and confidence intervals (from hhh4contacts)
 26/11/2018 illustrate oneStepAhead and simulate beyond sts (with missing observed)
 26/03/2019 maybe incorporate HIDDA.forecasting::dhhh4sims(), with scores
+17/03/2020 return means from simHHH4 and export similar to old simHHH
 
 #Done
 20/02/2019 clarify ranef description in vignette("hhh4_spacetime")

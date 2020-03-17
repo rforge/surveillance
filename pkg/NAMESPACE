@@ -413,12 +413,6 @@ S3method("[[", simEpidataCSlist)
 S3method(plot, simEpidataCSlist)
 
 
-### algo.hhh-specific
-
-export(simHHH, simHHH.default)
-S3method(simHHH, default)
-
-
 ### hhh4-specific
 
 ## main functions
