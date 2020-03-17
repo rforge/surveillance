@@ -94,7 +94,6 @@
 #Open
 05/04/2011 R0 calculations as for twinstim:
            how can we derive R0 in a twinSIR model? (-> Michael)
-20/02/2019 remove obsolete data(fooepidata) and data(foofit)
 
 #Done
 20/02/2019 replace foodata analysis by hagelloch data in examples
