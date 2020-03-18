@@ -8,13 +8,13 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.17.3.9000 (UNRELEASED)}{
+\section{Changes in surveillance version 1.18.0 (2020-03-18)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
     \item New spatial interaction function for \code{twinstim()}:
     \code{siaf.exponential()} implements the exponential kernel
-    \eqn{f(x) = \exp(-x/\sigma)}, which is a useful alternative
+    \eqn{f(x) = exp(-x/\sigma)}, which is a useful alternative
     if the two-parameter power-law kernel is not identifiable.
     
     \item The \code{plot}-type \code{"maps"} for \code{"hhh4"} fits,
