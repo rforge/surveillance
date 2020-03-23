@@ -1,8 +1,11 @@
 Model,Disease,Species,Location,Period,Journal,Year,DOI/URL
+hhh4,campylobacteriosis,human,Switzerland,2008-2012,Epidemiology and Infection,2015,10.1017/S0950268814002738
+hhh4,dengue,human,"Guangdong, China",2014,Scientific Reports,2016,10.1038/srep33755
 twinstim,psychiatric hospital admissions,human,"Zurich, Switzerland",2007-2012,Spatial and Spatio-temporal Epidemiology,2016,10.1016/j.sste.2016.03.002
 twinstim,ranavirus,frog,UK,1992-2010,Proceedings of the Royal Society of London B: Biological Sciences,2016,10.1098/rspb.2016.0952
 hhh4,cutaneous leishmaniasis,human,Afghanistan,2003-2009,International Journal of Environmental Research and Public Health,2017,10.3390/ijerph14030309
 twinstim,anti-refugee violence,human,Germany,2014-2015,Dissertation,2017,https://nbn-resolving.org/urn:nbn:de:gbv:8-diss-209323
+hhh4,"hand, foot and mouth disease",human,China,2009-2011,"Journal of the Royal Statistical Society, Series C (Applied Statistics)",2018,10.1111/rssc.12284
 hhh4,dengue,human,"Guangdong, China",2014-2018,BMC Infectious Diseases,2019,10.1186/s12879-019-4015-2
 hhh4,invasive pneumococcal disease,human,England,2009-2017,PLOS Medicine,2019,10.1371/journal.pmed.1002829
 hhh4,measles,human,Cameroon,2012,Annals of Epidemiology,2019,10.1016/j.annepidem.2019.10.007
