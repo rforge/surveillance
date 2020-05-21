@@ -390,7 +390,7 @@ nowcast <- function(now, when, data, dEventCol="dHospital",dReportCol="dReport",
   n.x <- rep(0,times=D+1)
   N.x <- rep(0,times=D+1)
   for (x in 0:D) {
-    for (t in max(0,T-m):(T-x)) { #hoehle: Lawless definition is max(0,T-x-x)
+    for (t in max(0,T-m):(T-x)) { #hoehle: Lawless definition is max(0,T-m-x)
       #cat("x=",x,"\tt=",t,":\n")
       n.x[x+1] <- n.x[x+1] + n[t+1,x+1]
       for (y in 0:x) {
