@@ -36,10 +36,10 @@
 #  * Function should work for weekly and monthly data as well
 ######################################################################
 
-nowcast <- function(now, when, data, dEventCol="dHospital",dReportCol="dReport",
+nowcast <- function(now, when, data, dEventCol="dHospital", dReportCol="dReport",
         method=c("bayes.notrunc","bayes.notrunc.bnb","lawless","bayes.trunc","unif","bayes.trunc.ddcp"),
         aggregate.by="1 day",
-        D=15, m=NULL,
+        D=15, m=NULL, m.interpretation=c("hoehle_anderheiden2014", "lawless1994"),
         control=list(
             dRange=NULL,alpha=0.05,nSamples=1e3,
             N.tInf.prior=c("poisgamma","pois","unif"),
@@ -111,6 +111,16 @@ nowcast <- function(now, when, data, dEventCol="dHospital",dReportCol="dReport",
           monnb(d2) - monnb(d1) #count the number of full months
       }
   }
+
+  ## Check the value of the m interpretation
+  m.interpretation <- match.arg(m.interpretation, c("hoehle_anderheiden2014", "lawless1994"))
+  if (!is.null(m) & (method == "lawless") & (m.interpretation != "lawless1994")) {
+    warning("Selected method is Lawless (1994), but the interpretation of m is a horizontal cut in the reporting triangle (as in Hoehle and an der Heiden (2014)) and not as in Lawless (1994).")
+  }
+  if (!is.null(m) & (method != "lawless") & (m.interpretation == "lawless1994")) {
+    stop("The selected nowcasting method only works with m.interpretation = 'hoehle_anderheiden2014'")
+  }
+  
 
   ######################################################################
   #If there is a specification of dateRange set dMin and dMax accordingly
@@ -389,8 +399,17 @@ nowcast <- function(now, when, data, dEventCol="dHospital",dReportCol="dReport",
   #Note the different moving window definition as in the Lawless article.
   n.x <- rep(0,times=D+1)
   N.x <- rep(0,times=D+1)
+
+  ##Compute n.x and N.x
   for (x in 0:D) {
-    for (t in max(0,T-m):(T-x)) { #hoehle: Lawless definition is max(0,T-m-x)
+    ##Define time of occurrence sliding window index set (see documentation)
+    if (m.interpretation == "hoehle_anderheiden2014") {
+      toc_index_set <- max(0,T-m):(T-x)
+    } else { #hoehle: Lawless definition is max(0,T-m-x)
+      toc_index_set <- max(0,T-m-x):(T-x)
+    }
+    ## Count
+    for (t in toc_index_set) { 
       #cat("x=",x,"\tt=",t,":\n")
       n.x[x+1] <- n.x[x+1] + n[t+1,x+1]
       for (y in 0:x) {
@@ -444,14 +463,14 @@ nowcast <- function(now, when, data, dEventCol="dHospital",dReportCol="dReport",
     #F <- NULL ; for (d in 0:D) { i <- d+seq_len(D-d) ; F[d+1] <- prod(1-g.hat[i+1]) }
     #plot(0:D,F)
 
-    #Compute weights Wt.hat as in eqn. (2.13). Use T1=Inf.
-    #Note: Wt.hat estimates F_t(T-t).
+    #Compute weights Wt.hat as in eqn. (2.13) of Lawless (1994). Use T1=Inf.
+    #Note: Wt.hat estimates F_t(T-t). 
     T1 <- Inf
     What.t <- sapply(0:T, function(t) {
       if (t<T-D) {
         1
       } else {
-        x = T-t + seq_len(min(T1-t,D)-(T-t)) #(2.13) with modifications. knifflig
+        x = T-t + seq_len(min(T1-t,D)-(T-t)) #(2.13) with modifications. knifflig. 
         prod(1-g.hat[x+1])
       }
     })
@@ -462,7 +481,7 @@ nowcast <- function(now, when, data, dEventCol="dHospital",dReportCol="dReport",
     #Do the prediction as in (2.12)
     Nhat.tT1 <- N.tT / What.t
 
-    #V.Wt as in (2.15)
+    #V.Wt as in (2.15). Note: only depends implicitly on m through N.x.
     Vhat.Wt <- sapply(0:T, function(t) {
       if (t<T-D) {
         0
@@ -471,7 +490,7 @@ nowcast <- function(now, when, data, dEventCol="dHospital",dReportCol="dReport",
         What.t[t+1]^2 * sum( g.hat[x+1]/(N.x[x+1]*(1-g.hat[x+1])),na.rm=TRUE)
       }
     })
-    #(2.16)
+    #(2.16). 
     Vhat.Zt <- sapply(0:T, function(t) {
       if (t<T-D) {
         0
@@ -501,7 +520,6 @@ nowcast <- function(now, when, data, dEventCol="dHospital",dReportCol="dReport",
         CDF <- c(0,ltruncpnorm(N.tInf.support, mean=Nhat.tT1[i], sd=sqrt(Vhat.Zt[i]),at=N.tT[i]))
         PMFs[,i] <- diff(CDF)
       } else {
-        #@hoehle: previous bug: c(1,rep(0,control$N.tInf.max)) ##all mass concentrated in zero, but it should be: Nhat.tT1
         PMFs[,i] <- (N.tInf.support == Nhat.tT1[i])*1
       }
     }
