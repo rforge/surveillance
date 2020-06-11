@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.18.0 (2020-03-18)}{
+\section{Changes in surveillance version 1.18.0 (2020-05-02)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -20,6 +20,17 @@
     \item The \code{plot}-type \code{"maps"} for \code{"hhh4"} fits,
     \code{plotHHH4_maps()}, now allows for map-specific color keys
     via \code{zmax = NA} (useful for \code{prop = TRUE}).
+
+    \item The \code{nowcast()} function with
+    \code{method="bayes.trunc.ddcp"} now adds support for negative
+    binomial response distribution instead of Poisson. Furthermore,
+    additional components of the design matrix for the discrete time
+    survival model can be provided, which allows the inclusion of, e.g.,
+    day of the week effects. Finally, the order of
+    the polynomial created by the change-points in the discrete time
+    survival model can now be specified. For further details see the
+    work of Guenther et al. (2020) about nowcasting the Covid-19
+    outbreak in Bavaria, Germany.
   }
 }
 
