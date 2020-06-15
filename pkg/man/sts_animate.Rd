@@ -50,7 +50,7 @@
   }
   \item{timeplot}{
     if a list (of arguments for the internal function
-    \code{stsplot_timeSimple}) and package \pkg{gridExtra} is available,
+    \code{stsplot_timeSimple}) and package \CRANpkg{gridExtra} is available,
     a time series chart of the counts along
     the selected time points \code{tps} will be plotted below the map.
     The argument \code{height} gives the relative height of the time
@@ -82,11 +82,10 @@
 }
 
 \value{
-  (invisibly) a list of the \code{length(tps)} sequential plot objects
-  of class \code{"\code{\link[gtable]{gtable}}"}
-  (if the the \code{timeplot} is active) or of class
-  \code{"\code{\link[lattice:trellis.object]{trellis}"}
-  (otherwise).
+  (invisibly) a list of the \code{length(tps)} sequential plot objects.
+  These are of class \code{"gtable"} (from \CRANpkg{gtable})
+  if the \code{timeplot} is included, otherwise of class
+  \code{"\code{\link[lattice:trellis.object]{trellis}"}.
 }
 
 \references{
