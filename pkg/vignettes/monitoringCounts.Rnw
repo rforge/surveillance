@@ -480,7 +480,7 @@ The upperbound of the prediction interval is then calculated
 based on this distribution. First we have that
 $$ \Var(y_{t_0}-\hat{\mu}_{t_0}) = \Var(\hat{y}_{t_0}) + \Var(\hat{\mu}_{t_0})=\phi\mu_0+\Var(\hat{\mu}_{t_0}) $$
  with $\Var(\hat{y}_{t_0})$ being the variance of an observation and $\Var(\hat{\mu}_{t_0})$ being the variance of the estimate. The threshold, defined as the upperbound of a one-sided $(1-\alpha)\cdot 100\%$ prediction interval, is then
-$$U_{t_0} = \hat{\mu}_0 + z_{1-\alpha}\widehat{\Var}(y_{t_0}-\hat{\mu}_{t_0})\cdot$$
+$$U_{t_0} = \hat{\mu}_0 + z_{1-\alpha}\sqrt{\widehat{\Var}(y_{t_0}-\hat{\mu}_{t_0})}$$.
 
 This method can be used by setting the control option \code{thresholdMethod} equal to "\code{delta}".
  However, a weakness

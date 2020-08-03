@@ -25,8 +25,17 @@
   }
 }
 
+\subsection{BUG FIXES}{
+  \itemize{
+    \item Bug fix in the \code{farringtonFlexible()}-function, which for
+    the argument \code{thresholdMethod=="nbPlugin"} and
+    \code{thresholdMethod=="muan"} unfortunately computed the limit as
+    an \code{(1-alpha/2)} prediction interval instead of the documented
+    \eqn{(1-alpha)} prediction interval. The default method \code{"delta"}
+    worked as expected. 
+  }
 }
-
+}
 
 \section{Changes in surveillance version 1.18.0 (2020-05-02)}{
 

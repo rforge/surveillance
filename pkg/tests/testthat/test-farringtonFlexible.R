@@ -296,27 +296,27 @@ test_that("some results we know are found",{
   expect_true(lala[1]>=0)
 
   # Here we calculated some examples
-  expect_equal(abs(as.numeric(lala)-c(7, 26, 0.8597797, 0.3850080))<rep(1e-6,4),rep(TRUE,4))
+  expect_equal(abs(as.numeric(lala)-c(8.0000000, 24.0000000, 0.8597797, 0.4193982))<rep(1e-6,4),rep(TRUE,4))
   phi <- 1.0
   method <- "muan"
   lala <- algo.farrington.threshold.noufaily(
     predFit, predSeFit, phi, skewness.transform, alpha, y, method
   )
-  expect_equal(abs(as.numeric(lala)-c(8, 24, 0.9093099, 0.4193982))<rep(1e-6,4),rep(TRUE,4))
+  expect_equal(abs(as.numeric(lala)-c(9.0000000, 22.0000000, 0.9093099, 0.4605347))<rep(1e-6,4),rep(TRUE,4))
 
   phi <- 1.5
   method <- "nbPlugin"
   lala <- algo.farrington.threshold.noufaily(
     predFit, predSeFit, phi, skewness.transform, alpha, y, method
   )
-  expect_equal(abs(as.numeric(lala)-c(1, 11, 0.03763657, 1))<rep(1e-6,4),rep(TRUE,4))
+  expect_equal(abs(as.numeric(lala)-c( 1.00000000, 10.00000000, 0.03763657,  1.11918153))<rep(1e-6,4),rep(TRUE,4))
 
   phi <- 1.0
   method <- "nbPlugin"
   lala <- algo.farrington.threshold.noufaily(
     predFit, predSeFit, phi, skewness.transform, alpha, y, method
   )
-  expect_equal(abs(as.numeric(lala)-c(1, 10, 0.01369527, 1.11918153))<rep(1e-6,4),rep(TRUE,4))
+  expect_equal(abs(as.numeric(lala)-c(2.00000000, 9.00000000, 0.01369527, 1.27061541))<rep(1e-6,4),rep(TRUE,4))
 })
 ################################################################################
 # END OF THRESHOLD FUNCTION NOUFAILY TESTS
