@@ -24,20 +24,23 @@
 
 \usage{
 nowcast(now, when, data, dEventCol="dHospital", dReportCol="dReport",
-        method=c("bayes.notrunc","bayes.notrunc.bnb","lawless","bayes.trunc","unif","bayes.trunc.ddcp"),
+        method=c("bayes.notrunc", "bayes.notrunc.bnb", "lawless",
+                 "bayes.trunc", "unif", "bayes.trunc.ddcp"),
         aggregate.by="1 day",
-        D=15, m=NULL, m.interpretation=c("hoehle_anderheiden2014", "lawless1994"),
+        D=15,
+        m=NULL, m.interpretation=c("hoehle_anderheiden2014", "lawless1994"),
         control=list(
-            dRange=NULL,alpha=0.05,nSamples=1e3,
+            dRange=NULL, alpha=0.05, nSamples=1e3,
             N.tInf.prior=c("poisgamma","pois","unif"),
             N.tInf.max=300, gd.prior.kappa=0.1,
             ddcp=list(ddChangepoint=NULL,
-                      cp_order = c("zero","one"),
+                      cp_order=c("zero","one"),
                       Wextra=NULL,
                       logLambda=c("iidLogGa","tps","rw1","rw2"),
                       responseDistr=c("poisson", "negbin"),
-                      mcmc=c(burnin=2500,sample=10000,thin=1, adapt=1000, store.samples=FALSE)),
-            score=FALSE,predPMF=FALSE))
+                      mcmc=c(burnin=2500, sample=10000, thin=1, adapt=1000,
+                             store.samples=FALSE)),
+            score=FALSE, predPMF=FALSE))
 }
 
 \arguments{
@@ -176,14 +179,14 @@ nowcast(now, when, data, dEventCol="dHospital", dReportCol="dReport",
   discrete time survival model.}
 	  \item{\code{eta.prec}}{A precision matrix for the regression
   effects in the discrete time survival model.}
-	  \item{\code{mcmc}}{A names vector of length 4 containing
-	    burn-in, number of samples and thinning for the three MCMC chains
-	    which are ran. The values are passed on to
-  \code{\link[runjags]{run.jags}}. The fourth argument \code{store.samples}
+	  \item{\code{mcmc}}{A named vector of length 5 containing
+	    burn-in (default: 2500), number of samples (10000),
+            thinning (1) and adaptation (1000) for the
+            three MCMC chains which are ran. The values are passed on to
+  \code{\link[runjags]{run.jags}}. The fifth argument \code{store.samples}
   denotes if the output of the JAGS sampling should be included as part of the
   returned \code{stsNC} object. Warning: If \code{TRUE} (Default: \code{FALSE})
-  the size of the returned object might increase substantially.
-	    Default: \code{c(burnin=2500,sample=10000,thin=1, store.samples=FALSE)}.}
+  the size of the returned object might increase substantially.}
 	}
       }
       \item{score}{Compute scoring rules. Default: \code{FALSE}. The
