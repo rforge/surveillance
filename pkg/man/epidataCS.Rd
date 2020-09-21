@@ -292,8 +292,8 @@ getSourceDists(object, dimension = c("space", "time"))
   the more detailed the polygons of \code{W} are the longer it will
   take to fit a \code{\link{twinstim}}. You are advised to
   sacrifice some shape details for speed by reducing the polygon
-  complexity, for example via \code{\link[rmapshaper]{ms_simplify}} from
-  the \CRANpkg{rmapshaper} package.
+  complexity, for example via the \command{mapshaper} JavaScript library
+  wrapped by the R package \CRANpkg{rmapshaper}.
   Alternative tools are provided by the packages \CRANpkg{maptools}
   (\code{\link[maptools]{thinnedSpatialPoly}}) and \CRANpkg{spatstat}
   (\code{\link[spatstat]{simplify.owin}}).

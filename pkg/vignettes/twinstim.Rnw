@@ -1,6 +1,6 @@
 %\VignetteIndexEntry{twinstim: An endemic-epidemic modeling framework for spatio-temporal point patterns}
 %\VignetteEngine{knitr::knitr}
-%\VignetteDepends{surveillance, lattice, polyclip, memoise, maptools, spdep, colorspace, scales, rmapshaper}
+%\VignetteDepends{surveillance, lattice, polyclip, memoise, maptools, spdep, colorspace, scales}
 
 <<setup, cache = FALSE, include = FALSE, purl = FALSE>>=
 ## purl=FALSE => not included in the tangle'd R script
@@ -1166,7 +1166,7 @@ and otherwise corresponds to the row index of the infective source.
 Rbib0 <- knitr::write_bib(
     c("memoise", "sp", "rgdal", "polyclip",
       ## spatstat, # non-standard author entries
-      "maptools", "animation", "rmapshaper", "xtable"),
+      "maptools", "animation", "xtable"),
     file = NULL, tweak = FALSE, prefix = "R:")
 ## package spatstat yields a bad automatic bib entry
 Rbib1 <- sapply(c("spatstat"), function (pkg) {

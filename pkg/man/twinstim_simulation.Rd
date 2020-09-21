@@ -280,8 +280,8 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   The more detailed the polygons in \code{tiles} are the slower is
   the algorithm. You are advised to sacrifice some shape
   details for speed by reducing the polygon complexity,
-  for example via \code{\link[rmapshaper]{ms_simplify}} from
-  the \CRANpkg{rmapshaper} package.
+  for example via the \command{mapshaper} JavaScript library wrapped by
+  the R package \CRANpkg{rmapshaper}.
   Alternative tools are provided by the packages \CRANpkg{maptools}
   (\code{\link[maptools]{thinnedSpatialPoly}}) and \CRANpkg{spatstat}
   (\code{\link[spatstat]{simplify.owin}}).
@@ -293,11 +293,6 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   represent a digitized line or its caricature.
   \emph{Cartographica: The International Journal for Geographic
   Information and Geovisualization}, \bold{10}, 112-122
-
-  Harrower, M. and Bloch, M. (2006):
-  MapShaper.org: A Map Generalization Web Service.
-  \emph{IEEE Computer Graphics and Applications}, \bold{26}(4), 22-27.
-  \doi{10.1109/MCG.2006.85}
 
   Meyer, S., Elias, J. and H\enc{ö}{oe}hle, M. (2012):
   A space-time conditional intensity model for invasive meningococcal
