@@ -2,7 +2,7 @@
 ### Endemic-epidemic modelling for univariate or multivariate
 ### time series of infectious disease counts (data class "sts")
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2012-2016,2019 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2016,2019-2020 Sebastian Meyer
 ###
 ### This file is part of the R package "surveillance",
 ### free software under the terms of the GNU General Public License, version 2,
@@ -395,8 +395,6 @@ fe <- function(x,          # covariate
     stop("initial values for '",deparse(substitute(x)),"' must be of length ",dim.fe)
   }
 
-  summ <- if (unitSpecific) "colSums" else "sum"
-
   name <- deparse(substitute(x))
   if (unitSpecific)
       name <- paste(name, colnames(stsObj)[which], sep=".")
@@ -415,7 +413,6 @@ fe <- function(x,          # covariate
                 unitSpecific=unitSpecific,
                 random=FALSE,
                 corr=FALSE,
-                summ=summ,
                 mult=mult
                 )
   return(result)
@@ -488,7 +485,6 @@ ri <- function(type=c("iid","car"),
                 unitSpecific=FALSE,
                 random=TRUE,
                 corr=corr,
-                summ="colSums",
                 mult=mult
                 )
   return(result)
@@ -1040,13 +1036,15 @@ penScore <- function(theta, sd.corr, model)
       if(is.matrix(Xit)){
         Xit <- Xit[subset,,drop=FALSE]
       }
-      summ <- get(term["summ",i][[1]])
       dTheta <- derivHHH(mean.comp[[comp]]*Xit)
       dTheta[isNA] <- 0   # dTheta must not contain NA's (set NA's to 0)
 
       if(term["unitSpecific",i][[1]]){
         which <- term["which",i][[1]]
-        dTheta <- summ(dTheta)[ which ]
+        dimi <- sum(which)
+        if(dimi < model$nUnits)
+          dTheta <- dTheta[,which,drop=FALSE]
+        dTheta <- .colSums(dTheta, length(subset), dimi)
         grad.fe <- c(grad.fe,dTheta)
 
       } else if(term["random",i][[1]]){
@@ -1056,7 +1054,7 @@ penScore <- function(theta, sd.corr, model)
         grad.re <- c(grad.re, dRTheta)
         grad.fe <- c(grad.fe, sum(dTheta))
       } else{
-        grad.fe <- c(grad.fe, summ(dTheta))
+        grad.fe <- c(grad.fe, sum(dTheta))
       }
     }
 
