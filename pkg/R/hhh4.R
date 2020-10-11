@@ -816,6 +816,10 @@ meanHHH <- function(theta, model, subset=model$subset, total.only=FALSE)
   toMatrix <- function (x, r=model$nTime, c=model$nUnits)
       matrix(x, r, c, byrow=TRUE)
 
+  unitNames <- dimnames(model$response)[[2L]]
+  setColnames <- if (is.null(unitNames)) identity else
+    function(x) "dimnames<-"(x, list(NULL, unitNames))
+
   ## go through groups of parameters and compute predictor of each component,
   ## i.e. lambda_it, phi_it, nu_it, EXCLUDING the multiplicative offset terms,
   ## as well as the resulting component mean (=exppred * offset)
@@ -824,7 +828,7 @@ meanHHH <- function(theta, model, subset=model$subset, total.only=FALSE)
     pred <- nullMatrix <- toMatrix(0)
 
     if(!any(comp==component)) { # component not in model -> return 0-matrix
-        zeroes <- pred[subset,,drop=FALSE]
+        zeroes <- setColnames(pred[subset,,drop=FALSE])
         return(list(exppred = zeroes, mean = zeroes))
     }
 
@@ -846,7 +850,7 @@ meanHHH <- function(theta, model, subset=model$subset, total.only=FALSE)
       pred <- pred + X*fe + Z.re
     }
 
-    exppred <- exp(pred[subset,,drop=FALSE])
+    exppred <- setColnames(exp(pred[subset,,drop=FALSE]))
     offset <- offsets[[component]]
     if (length(offset) > 1) offset <- offset[subset,,drop=FALSE]
     ##<- no subsetting if offset is scalar (time- and unit-independent)

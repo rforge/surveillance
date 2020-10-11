@@ -32,7 +32,10 @@
     \code{thresholdMethod=="muan"} unfortunately computed the limit as
     an \code{(1-alpha/2)} prediction interval instead of the documented
     \eqn{(1-alpha)} prediction interval. The default method \code{"delta"}
-    worked as expected. 
+    worked as expected.
+
+    \item In multivariate \code{hhh4()} models without AR component,
+    the matrix of fitted values could lack column names.
   }
 }
 }
