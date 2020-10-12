@@ -34,7 +34,7 @@
     \eqn{(1-alpha)} prediction interval. The default method \code{"delta"}
     worked as expected.
 
-    \item In multivariate \code{hhh4()} models without AR component,
+    \item In \code{hhh4()} models without AR component,
     the matrix of fitted values could lack column names.
   }
 }
