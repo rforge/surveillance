@@ -5,7 +5,7 @@
 ###
 ### Helper functions for neighbourhood weight matrices in hhh4()
 ###
-### Copyright (C) 2012-2016 Sebastian Meyer
+### Copyright (C) 2012-2016,2020 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -24,24 +24,28 @@ checkNeighbourhood <- function (neighbourhood)
 
 
 ### calculate the weighted sum of counts of adjacent (or all other) regions
-### i.e. the nTime x nUnit matrix with elements ne_ti = sum_j w_jit * y_jt
+### i.e. the nTime x nUnit matrix with elements (ti): sum_j w_jit * y_j(t-lag)
 ## W is either a nUnits x nUnits matrix of time-constant weights w_ji
-## or a nUnits x nUnits x nTime array of time-varying weights
+## or a nUnits x nUnits x nTime array of time-varying weights w_jit
 
 weightedSumNE <- function (observed, weights, lag)
 {
   dimY <- dim(observed)
   nTime <- dimY[1L]
   nUnits <- dimY[2L]
-  tY <- t(observed)                     # -> nUnits x nTime
 
-  res <- apply(weights, 2L, function (wi)
-               ## if dim(weights)==2 (time-constant weights), length(wi)=nUnits,
-               ## if dim(weights)==3, wi is a matrix of size nUnits x nTime
-               .colSums(tY * wi, nUnits, nTime, na.rm=TRUE))
-
-  rbind(matrix(NA_real_, lag, nUnits),
-        res[seq_len(nTime-lag),,drop=FALSE])
+  if (length(dim(weights)) == 2L) { # fast track for time-constant weights
+      if (any(isNA <- is.na(observed)))
+          observed[isNA] <- 0  # keep original na.rm = TRUE behaviour (for now)
+      rbind(matrix(NA_real_, lag, nUnits),
+            observed[seq_len(nTime-lag),,drop=FALSE] %*% weights)
+  } else {
+      tYlagged <- t(observed[seq_len(nTime-lag),,drop=FALSE])
+      apply(weights[,,(lag+1L):nTime,drop=FALSE], 2L, function (wi)
+          ## wi and tYlagged are matrices of size nUnits x (nTime-lag)
+          c(rep(NA_real_, lag),
+            .colSums(tYlagged * wi, nUnits, nTime-lag, na.rm=TRUE)))
+  }
 }
 
 

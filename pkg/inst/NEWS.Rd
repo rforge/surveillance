@@ -36,6 +36,13 @@
 
     \item In \code{hhh4()} models without AR component,
     the matrix of fitted values could lack column names.
+
+    \item Experimental time-varying neighbourhood weights in
+    \code{hhh4()} were indexed differently in model fitting and in the
+    \code{simulate()} method (undocumented behaviour). Both now use the
+    latter variant, where the mean at time \eqn{t} uses products of
+    weights at time \eqn{t} and observed counts at time \eqn{t-1}.
+    [reported by Johannes Bracher]
   }
 }
 }
