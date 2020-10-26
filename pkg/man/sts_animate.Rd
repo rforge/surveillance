@@ -22,7 +22,7 @@
 \usage{
 \method{animate}{sts}(object, tps = NULL, cumulative = FALSE,
         population = NULL, at = 10, ...,
-        timeplot = list(height = 0.3, fill = FALSE),
+        timeplot = list(pos = 1, size = 0.3, fill = TRUE),
         sleep = 0.5, verbose = interactive(), draw = TRUE)
 }
 
@@ -49,17 +49,21 @@
     arguments for \code{\link{stsplot_space}}.
   }
   \item{timeplot}{
-    if a list (of arguments for the internal function
-    \code{stsplot_timeSimple}) and package \CRANpkg{gridExtra} is available,
+    if a list and package \CRANpkg{gridExtra} is available,
     a time series chart of the counts along
-    the selected time points \code{tps} will be plotted below the map.
-    The argument \code{height} gives the relative height of the time
-    series plot (default: 0.3), the logical value \code{fill} indicates
-    whether to make the panel as big as possible (default: FALSE),
-    the arguments \code{inactive} and
-    \code{active} are lists of graphical parameters (e.g., \code{col})
-    determining the appearance of the bars (e.g., default color is grey
-    when inactive and black when active),
+    the selected time points \code{tps} will be plotted next to the map.
+    The list elements determine both the positioning of this plot
+    (\code{pos}, \code{size}, and \code{fill}) and its appearance.
+    The default \code{pos=1} and \code{size=0.3} arguments put the time
+    series plot below the map, using 30\% of the total plot height.
+    The logical value \code{fill} indicates whether to make the panel as
+    big as possible (default: TRUE). An alternative to \code{fill=FALSE}
+    is to manually specify an \code{aspect} (ratio) value in \code{timeplot}.
+    Other list elements are arguments for the internal (and currently
+    undocumented) function \code{stsplot_timeSimple}. For example,
+    \code{inactive} and \code{active} are lists of graphical parameters
+    (e.g., \code{col}) determining the appearance of the bars (e.g.,
+    default color is grey when inactive and black when active),
     and the boolean \code{as.Date} determines whether dates should be
     put on the x-axis (instead of the \code{tps} indexes).
   }

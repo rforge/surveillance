@@ -22,6 +22,9 @@
     survival model can now be specified. For further details see the
     work of Guenther et al. (2020) about nowcasting the Covid-19
     outbreak in Bavaria, Germany.
+
+    \item \code{animate.sts()} can position the \code{timeplot} on
+    other sides of the map.
   }
 }
 

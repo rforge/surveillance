@@ -5,7 +5,7 @@
 ###
 ### Animated map (and time series chart) of an sts-object (or matrix of counts)
 ###
-### Copyright (C) 2013-2016,2018 Sebastian Meyer
+### Copyright (C) 2013-2016,2018,2020 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -18,7 +18,7 @@
 
 animate.sts <- function (object, tps = NULL, cumulative = FALSE,
                          population = NULL, at = 10, ...,
-                         timeplot = list(height = 0.3, fill = FALSE),
+                         timeplot = list(pos = 1, size = 0.3, fill = TRUE),
                          sleep = 0.5, verbose = interactive(), draw = TRUE)
 {
     if (draw && dev.interactive())
@@ -38,10 +38,18 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
     ## style of the additional temporal plot
     if (is.list(timeplot)) {
         timeplot <- modifyList(eval(formals()$timeplot), timeplot)
-        timeplot_height <- timeplot$height
+        if (!is.null(timeplot[["height"]])) { # surveillance <= 1.18.0
+            timeplot$pos <- 1
+            timeplot$size <- timeplot$height
+            timeplot$height <- NULL
+        }
+        stopifnot(timeplot$pos %in% 1:4,
+                  timeplot$size > 0, timeplot$size < 1)
+        ## disentangle arguments not for stsplot_timeSimple()
+        timeplot_pos <- timeplot$pos
+        timeplot_size <- timeplot$size
         timeplot_fill <- timeplot$fill
-        timeplot$height <- timeplot$fill <- NULL  # not for stsplot_timeSimple()
-        stopifnot(timeplot_height > 0, timeplot_height < 1)
+        timeplot$pos <- timeplot$size <- timeplot$fill <- NULL
     }
 
     if (verbose)
@@ -56,21 +64,18 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
             lt <- do.call("stsplot_timeSimple", c(
                 list(x=object, tps=tps, highlight=cti),
                 timeplot))
-            if (!timeplot_fill) {
+            if (!isTRUE(timeplot_fill)) { # see ?trellis.object
                 lt$aspect.fill <- FALSE
-                lt$aspect.ratio <- timeplot_height * ls$aspect.ratio
+                lt$aspect.ratio <- ls$aspect.ratio *
+                    if (timeplot_pos %in% c(1,3))
+                         timeplot_size / (1-timeplot_size)
+                    else (1-timeplot_size) / timeplot_size
             }
-            grobs[[i]] <- gridExtra::arrangeGrob(
-                ls, lt, heights=c(1-timeplot_height, timeplot_height))
-            ## alternative using package "gtable":
-            ## drawDetails.lattice <- function (x, recording = FALSE)
-            ##     plot(x$p, newpage = FALSE)
-            ## heights <- c(1-timeplot_height, timeplot_height)
-            ## gt <- gtable::gtable(widths = grid::unit(1, units = "null"),
-            ##                      heights = grid::unit(heights, units = "null"))
-            ## gt <- gtable::gtable_add_grob(gt, list(grid::grob(p = ls, cl = "lattice"),
-            ##                                        grid::grob(p = lt, cl = "lattice")),
-            ##                               t = 1:2, l = 1)
+            grobs[[i]] <- switch(timeplot_pos,
+                gridExtra::arrangeGrob(ls, lt, heights=c(1-timeplot_size, timeplot_size)),
+                gridExtra::arrangeGrob(lt, ls, widths=c(timeplot_size, 1-timeplot_size)),
+                gridExtra::arrangeGrob(lt, ls, heights=c(timeplot_size, 1-timeplot_size)),
+                gridExtra::arrangeGrob(ls, lt, widths=c(1-timeplot_size, timeplot_size)))
             if (draw) {
                 grid::grid.newpage()
                 grid::grid.draw(grobs[[i]])
