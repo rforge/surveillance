@@ -69,7 +69,9 @@ sts(observed, start = c(2000, 1), frequency = 52,
   \item{start,frequency}{basic characteristics of the time series data
     just like for simple \code{"\link{ts}"} objects. The (historical)
     default values correspond to weekly data starting in the first week
-    of 2000.}
+    of 2000. The \code{epoch} and \code{epochInYear} methods use the ISO
+    8601 specification when converting between week numbers and dates,
+    see \code{\link{isoWeekYear}}.}
   \item{epoch}{observation times, either as an integer sequence (default)
     or as a \code{Date} vector (in which case \code{epochAsDate} is
     automatically set to \code{TRUE}).}

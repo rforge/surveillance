@@ -46,9 +46,17 @@
     latter variant, where the mean at time \eqn{t} uses products of
     weights at time \eqn{t} and observed counts at time \eqn{t-1}.
     [reported by Johannes Bracher]
+
+    \item For weekly \code{sts} indexed via \code{start} and \code{freq=52},
+    \code{epoch(sts, as.Date=TRUE)} now interprets the \code{start} week
+    according to ISO 8601. For example, \code{start = c(2020, 5)}
+    corresponds to 2020-01-27, not 2020-02-03.
+    This affects \code{as.xts.sts()} and the time plot in
+    \code{animate.sts()}.
   }
 }
 }
+
 
 \section{Changes in surveillance version 1.18.0 (2020-05-02)}{
 
