@@ -5,7 +5,7 @@
 ###
 ### Snapshot map (spplot) of an sts-object or matrix of counts
 ###
-### Copyright (C) 2013-2014,2016,2017 Sebastian Meyer
+### Copyright (C) 2013-2014,2016,2017,2020 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -138,17 +138,23 @@ parse_population_argument <- function (population, x)
 }
 
 checkat <- function (at, data, counts = TRUE) { # for non-transformed "data"
-    data_range <- range(data, na.rm = TRUE)
     if (isScalar(at))
         at <- list(n=at)
-    at <- if (is.list(at)) {
+    if (is.list(at)) {
         at <- modifyList(list(n=10, data=data, counts=counts), at)
         do.call("getPrettyIntervals", at)
-    } else sort(at)
-    if (any(data >= max(at) | data < min(at), na.rm=TRUE))
-        stop("'at' (right-open!) does not cover the data (range: ",
-             paste0(format(data_range), collapse=" - "), ")")
-    structure(at, checked=TRUE)
+    } else { # manual breaks
+        stopifnot(is.vector(at, mode = "numeric"), !anyNA(at))
+        at <- sort(at)
+        r <- range(data, na.rm = TRUE)
+        c(if (r[1L] < at[1L]) 0,
+          at,
+          if (r[2L] >= at[length(at)]) {
+              ## round up max to 1 significant digit (including 0.1 to 0.2)
+              .decs <- 10^floor(log10(r[2L]))
+              ceiling(r[2L]/.decs + sqrt(.Machine$double.eps))*.decs
+          })
+    }
 }
 
 getPrettyIntervals <- function (nInt, data, trafo=scales::sqrt_trans(), counts=TRUE, ...) {

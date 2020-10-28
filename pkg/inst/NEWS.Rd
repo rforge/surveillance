@@ -53,6 +53,9 @@
     corresponds to 2020-01-27, not 2020-02-03.
     This affects \code{as.xts.sts()} and the time plot in
     \code{animate.sts()}.
+
+    \item \code{stsplot_space()} automatically extends manual color
+    breaks (\code{at}), if the intervals do not cover the data range.
   }
 }
 }
