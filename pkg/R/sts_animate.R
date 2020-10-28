@@ -95,7 +95,7 @@ animate.sts <- function (object, tps = NULL, cumulative = FALSE,
 ### additional time plot below the map
 
 stsplot_timeSimple <- function (x, tps = NULL, highlight = integer(0),
-                                inactive = list(col="gray", lwd=1),
+                                inactive = list(col="gray", lwd=2),
                                 active = list(col=1, lwd=4),
                                 as.Date = x@epochAsDate, ...)
 {
@@ -126,7 +126,8 @@ stsplot_timeSimple <- function (x, tps = NULL, highlight = integer(0),
     )
     xyplot.args <- modifyList(
         c(list(x = rowSums(observed, na.rm = TRUE) ~ epoch,
-               type = "h", ylab = "", xlab = "",
+               type = "h", grid = "h", ylab = "", xlab = "",
+               ylim = c(0, NA), scales = list(x = list(tck = c(1, 0))),
                par.settings = par_no_top_padding),
           styleargs),
         list(...))
