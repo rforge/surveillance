@@ -176,12 +176,15 @@ getPrettyIntervals <- function (nInt, data, trafo=scales::sqrt_trans(), counts=T
     at
 }
 
-stsTime2text <- function (stsObj, tps=TRUE, fmt=if(stsObj@freq==1) "%i" else "%i/%i")
+stsTime2text <- function (stsObj, tps=TRUE, fmt=NULL)
 {
+    if (is.null(fmt))
+        fmt <- switch(as.character(stsObj@freq),
+                      "1" = "%i", "52" = "%i-W%02i", "%i/%i")
     sprintf(fmt, year(stsObj)[tps], epochInYear(stsObj)[tps])
 }
 
-stsTimeRange2text <- function (stsObj, tps, fmt=if(stsObj@freq==1) "%i" else "%i/%i", sep=" - ")
+stsTimeRange2text <- function (stsObj, tps, fmt=NULL, sep=" to ")
 {
     tpsRangeYW <- stsTime2text(stsObj, tps=range(tps), fmt=fmt)
     paste0(unique(tpsRangeYW), collapse=sep)
