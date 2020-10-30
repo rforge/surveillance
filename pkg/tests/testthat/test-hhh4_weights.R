@@ -1,4 +1,4 @@
-context("Neighbourhood weights in hhh4()")
+### Neighbourhood weights in hhh4()
 
 observed <- cbind(c(1,2,4), c(1,2,4))
 

@@ -1,4 +1,4 @@
-context("hhh4() with epidemic offsets")
+### hhh4() with epidemic offsets
 
 data("measlesWeserEms")
 measles2 <- measlesWeserEms[,c("03457","03454")]

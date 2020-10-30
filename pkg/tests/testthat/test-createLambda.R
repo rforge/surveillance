@@ -1,5 +1,3 @@
-context("Create next-generation matrix Lambda from a \"hhh4\" model")
-
 data("measlesWeserEms")
 
 ## a simple endemic model

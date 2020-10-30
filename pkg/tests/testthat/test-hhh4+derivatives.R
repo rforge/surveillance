@@ -1,4 +1,4 @@
-context("Fixed effects hhh4() model fit and involved analytical derivatives")
+### Fixed effects hhh4() model fit and involved analytical derivatives
 
 data("measlesWeserEms")
 measlesModel <- list(

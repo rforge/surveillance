@@ -1,5 +1,3 @@
-context("S4 class definition of \"sts\" and its extensions")
-
 test_that("\"sts\" prototype is a valid object",
           expect_true(validObject(new("sts"))))
 

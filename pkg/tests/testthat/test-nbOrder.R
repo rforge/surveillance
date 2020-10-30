@@ -1,5 +1,3 @@
-context("Neighbourhood order")
-
 ## generate random adjancency matrix
 ## radjmat <- function (n) {
 ##     adjmat <- matrix(0L, n, n, dimnames=list(letters[1:n],letters[1:n]))

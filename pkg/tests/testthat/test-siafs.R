@@ -1,4 +1,4 @@
-context("Spatial interaction functions")
+### Spatial interaction functions for twinstim()
 
 
 ### test bundle

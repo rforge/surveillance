@@ -1,4 +1,4 @@
-context("Temporal interaction functions")
+### Temporal interaction functions for twinstim()
 
 test_that("Step kernel of a single type agrees with numerical approximations",
      {

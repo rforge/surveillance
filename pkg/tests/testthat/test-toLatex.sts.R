@@ -1,5 +1,3 @@
-context("toLatex-method for the sts-class")
-
 data("ha.sts")
 data("salmonella.agona")
 

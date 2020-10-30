@@ -1,5 +1,3 @@
-context("Determine list of potential sources in \"epidataCS\"")
-
 data("imdepi")
 
 test_that("determineSourcesC() yields same result as old implementation", {
