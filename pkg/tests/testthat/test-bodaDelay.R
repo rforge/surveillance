@@ -150,10 +150,16 @@ test_that("the fitGLM function gives the right class of output",{
 ###
 
 test_that("We get the right formula",{
-  expect_equal(formulaGLMDelay(timeBool=TRUE,factorsBool=FALSE),"response ~ 1+wtime")
-  expect_equal(formulaGLMDelay(timeBool=FALSE,factorsBool=FALSE),"response ~ 1")
-  expect_equal(formulaGLMDelay(timeBool=TRUE,factorsBool=FALSE),"response ~ 1+wtime")
-  expect_equal(formulaGLMDelay(timeBool=TRUE,factorsBool=TRUE),"response ~ 1+wtime+as.factor(seasgroups)")
-  expect_equal(formulaGLMDelay(timeBool=TRUE,factorsBool=TRUE,delay=TRUE),"response ~ 1+wtime+as.factor(seasgroups)+as.factor(delay)")
-  expect_equal(formulaGLMDelay(timeBool=TRUE,factorsBool=FALSE,outbreak=TRUE),"response ~ 1+wtime+f(outbreakOrNot,model='linear', prec.linear = 1)")
+  expect_identical(formulaGLMDelay(timeBool=TRUE,factorsBool=FALSE),
+                   "response ~ 1+wtime")
+  expect_identical(formulaGLMDelay(timeBool=FALSE,factorsBool=FALSE),
+                   "response ~ 1")
+  expect_identical(formulaGLMDelay(timeBool=TRUE,factorsBool=FALSE),
+                   "response ~ 1+wtime")
+  expect_identical(formulaGLMDelay(timeBool=TRUE,factorsBool=TRUE),
+                   "response ~ 1+wtime+as.factor(seasgroups)")
+  expect_identical(formulaGLMDelay(timeBool=TRUE,factorsBool=TRUE,delay=TRUE),
+                   "response ~ 1+wtime+as.factor(seasgroups)+as.factor(delay)")
+  expect_identical(formulaGLMDelay(timeBool=TRUE,factorsBool=FALSE,outbreak=TRUE),
+                   "response ~ 1+wtime+f(outbreakOrNot,model='linear', prec.linear = 1)")
 })
