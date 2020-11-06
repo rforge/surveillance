@@ -58,13 +58,13 @@ test_that(" residuals should not be zero",{
 ###
 
 test_that("We get the right formula",{
-  expect_identical(formulaGLM(populationOffset=FALSE,timeBool=TRUE,factorsBool=FALSE),
+  expect_identical(surveillance:::formulaGLM(populationOffset=FALSE,timeBool=TRUE,factorsBool=FALSE),
                    "response ~ 1+wtime")
-  expect_identical(formulaGLM(populationOffset=FALSE,timeBool=FALSE,factorsBool=FALSE),
+  expect_identical(surveillance:::formulaGLM(populationOffset=FALSE,timeBool=FALSE,factorsBool=FALSE),
                    "response ~ 1")
-  expect_identical(formulaGLM(populationOffset=TRUE,timeBool=TRUE,factorsBool=FALSE),
+  expect_identical(surveillance:::formulaGLM(populationOffset=TRUE,timeBool=TRUE,factorsBool=FALSE),
                    "response ~ 1+wtime+offset(log(population))")
-  expect_identical(formulaGLM(populationOffset=TRUE,timeBool=TRUE,factorsBool=TRUE),
+  expect_identical(surveillance:::formulaGLM(populationOffset=TRUE,timeBool=TRUE,factorsBool=TRUE),
                    "response ~ 1+wtime+offset(log(population))+seasgroups")
 })
 
@@ -80,7 +80,7 @@ test_that("We get the expected timepoints with weekly data",{
   freq <- 52
   epochAsDate <- TRUE
   epochStr <- "week"
-  lala <- algo.farrington.referencetimepoints(dayToConsider,b=b,freq=freq,epochAsDate,epochStr)
+  lala <- surveillance:::algo.farrington.referencetimepoints(dayToConsider,b=b,freq=freq,epochAsDate,epochStr)
   # Do we get the same day as dayToConsider?
   expect_equal(as.numeric(format(lala, "%w")),rep(4,4))
   # Actually for this example I know the dates one should get
@@ -93,7 +93,7 @@ test_that("We get the expected timepoints with monthly data",{
   freq <- 12
   epochAsDate <- FALSE
   epochStr <- "month"
-  lala <- algo.farrington.referencetimepoints(dayToConsider,b=b,freq=freq,epochAsDate,epochStr)
+  lala <- surveillance:::algo.farrington.referencetimepoints(dayToConsider,b=b,freq=freq,epochAsDate,epochStr)
   expect_equal(lala,c(48,36,24,12))
 })
 test_that("one gets a warning if too many years back",{
@@ -102,7 +102,7 @@ test_that("one gets a warning if too many years back",{
   freq <- 12
   epochAsDate <- FALSE
   epochStr <- "month"
-  expect_warning(algo.farrington.referencetimepoints(dayToConsider,b=8,freq=freq,epochAsDate,epochStr), "Some reference")
+  expect_warning(surveillance:::algo.farrington.referencetimepoints(dayToConsider,b=8,freq=freq,epochAsDate,epochStr), "Some reference")
 
   # apply code
    control1 <-  list(range=250,noPeriods=10,populationOffset=FALSE,
@@ -137,7 +137,7 @@ arguments <- list(dataGLM=dataGLM,
                    factorsBool=TRUE,reweight=TRUE,
                    weightsThreshold=0.5,glmWarnings=control$glmWarnings,
 				   control=control)
-model <- do.call(algo.farrington.fitGLM.flexible, args=arguments)
+model <- do.call(surveillance:::algo.farrington.fitGLM.flexible, args=arguments)
 
 test_that("The fit glm function gives the right class of output?",{
   expect_identical(class(model),c("glm","lm"))
@@ -163,7 +163,7 @@ test_that("reweighting was done",{
 test_that("there are no weights if very high threshold",{
   arguments$reweight <- TRUE
   arguments$weightsThreshold <- 100000
-  model <- do.call(algo.farrington.fitGLM.flexible, args=arguments)
+  model <- do.call(surveillance:::algo.farrington.fitGLM.flexible, args=arguments)
   expect_true(all(model$weights==1))
 })
 
@@ -187,15 +187,13 @@ epochAsDate <- TRUE
 
 # p=1
 p <- 1
-lala <- blocks(referenceTimePoints,vectorOfDates,freq,dayToConsider,b,w,p,
-epochAsDate)
+lala <- surveillance:::blocks(referenceTimePoints,vectorOfDates,freq,dayToConsider,b,w,p,epochAsDate)
 test_that("the reference window has the right length",{
   expect_equal(length(vectorOfDates[is.na(lala)==FALSE&lala==p]),w+1+b*(2*w+1))
 
   # p>1
   p <- 8
-  lala <- blocks(referenceTimePoints,vectorOfDates,freq,dayToConsider,b,w,p,
-  epochAsDate)
+  lala <- surveillance:::blocks(referenceTimePoints,vectorOfDates,freq,dayToConsider,b,w,p,epochAsDate)
   # reference windows
   expect_equal(length(vectorOfDates[is.na(lala)==FALSE&lala==p]),w+1+b*(2*w+1))
 })
@@ -207,8 +205,7 @@ test_that("there are as many levels as expected",{
 
 })
 p <- 8
-lala <- blocks(referenceTimePoints,vectorOfDates,freq,dayToConsider,b,w,p,
-               epochAsDate)
+lala <- surveillance:::blocks(referenceTimePoints,vectorOfDates,freq,dayToConsider,b,w,p,epochAsDate)
 lili <- as.factor(lala[is.na(lala)==FALSE])
 lolo <- lili[lili!=p]
 test_that("periods of roughly the same length each year",{
@@ -230,14 +227,14 @@ method <- "delta"
 phi <- 1
 
 test_that("the function recognizes wrong exponents",{
-  expect_error(algo.farrington.threshold.farrington(
+  expect_error(surveillance:::algo.farrington.threshold.farrington(
     predFit, predSeFit, phi, skewness.transform, alpha, y, method
   ), "proper exponent")
 })
 
 test_that("some results we know are found",{
   skewness.transform <- "none"
-  lala <- algo.farrington.threshold.farrington(
+  lala <- surveillance:::algo.farrington.threshold.farrington(
       predFit, predSeFit, phi, skewness.transform, alpha, y, method
   )
   # Should always be ok
@@ -252,14 +249,14 @@ test_that("some results we know are found",{
 
   # Here we calculated some examples
   skewness.transform <- "1/2"
-  lala <- algo.farrington.threshold.farrington(
+  lala <- surveillance:::algo.farrington.threshold.farrington(
     predFit, predSeFit, phi, skewness.transform, alpha, y, method
   )
   expect_equal(as.numeric(lala), c(1.9891097, 9.3744842, 0.1189986, 0.6857951),
                tolerance = 1e-6, scale = 1)
 
   skewness.transform <- "2/3"
-  lala <- algo.farrington.threshold.farrington(
+  lala <- surveillance:::algo.farrington.threshold.farrington(
     predFit, predSeFit, phi, skewness.transform, alpha, y, method
   )
   expect_equal(as.numeric(lala), c(1.8084477, 9.1154825, 0.1094727, 0.7289546),
@@ -279,7 +276,7 @@ alpha <- 0.05
 y <- 11
 phi <- 1.5
 method <- "muan"
-lala <- algo.farrington.threshold.noufaily(
+lala <- surveillance:::algo.farrington.threshold.noufaily(
   predFit, predSeFit, phi, skewness.transform, alpha, y, method
 )
 test_that("some results we know are found",{
@@ -295,7 +292,7 @@ test_that("some results we know are found",{
 
   phi <- 1.0
   method <- "muan"
-  lala <- algo.farrington.threshold.noufaily(
+  lala <- surveillance:::algo.farrington.threshold.noufaily(
     predFit, predSeFit, phi, skewness.transform, alpha, y, method
   )
   expect_equal(as.numeric(lala), c(9.0000000, 22.0000000, 0.9093099, 0.4605347),
@@ -303,7 +300,7 @@ test_that("some results we know are found",{
 
   phi <- 1.5
   method <- "nbPlugin"
-  lala <- algo.farrington.threshold.noufaily(
+  lala <- surveillance:::algo.farrington.threshold.noufaily(
     predFit, predSeFit, phi, skewness.transform, alpha, y, method
   )
   expect_equal(as.numeric(lala), c(1.00000000, 10.00000000, 0.03763657,  1.11918153),
@@ -311,7 +308,7 @@ test_that("some results we know are found",{
 
   phi <- 1.0
   method <- "nbPlugin"
-  lala <- algo.farrington.threshold.noufaily(
+  lala <- surveillance:::algo.farrington.threshold.noufaily(
     predFit, predSeFit, phi, skewness.transform, alpha, y, method
   )
   expect_equal(as.numeric(lala), c(2.00000000, 9.00000000, 0.01369527, 1.27061541),
@@ -338,7 +335,7 @@ verbose <- FALSE
 pastWeeksNotIncluded <- w
 k <- 1200
 
-lala <- algo.farrington.data.glm(dayToConsider, b, freq,
+lala <- surveillance:::algo.farrington.data.glm(dayToConsider, b, freq,
                                  epochAsDate,epochStr,
                                  vectorOfDates,w,noPeriods,
                                  observed,population,
@@ -361,7 +358,7 @@ test_that("the factor variable has the right number of levels",{
 })
 
 observed[1150] <- NA
-lala <- algo.farrington.data.glm(dayToConsider, b, freq,
+lala <- surveillance:::algo.farrington.data.glm(dayToConsider, b, freq,
                                  epochAsDate,epochStr,
                                  vectorOfDates,w,noPeriods,
                                  observed,population,
@@ -394,7 +391,7 @@ diffDates <- 7
 populationNow <- 10
 
 test_that("the output has the needed variables",{
-  finalModel <- algo.farrington.glm(dataGLM,timeTrend,populationOffset,factorsBool,
+  finalModel <- surveillance:::algo.farrington.glm(dataGLM,timeTrend,populationOffset,factorsBool,
                                     reweight,weightsThreshold,pThresholdTrend,b,
                                     noPeriods,typePred,fitFun,glmWarnings,epochAsDate,
                                     dayToConsider,diffDates,populationNow,verbose=FALSE)
@@ -404,7 +401,7 @@ test_that("the output has the needed variables",{
 test_that("no time trend in no time trend",{
   pThresholdTrend <- 1
   b <- 2
-  finalModel <- algo.farrington.glm(dataGLM,timeTrend,populationOffset,factorsBool,
+  finalModel <- surveillance:::algo.farrington.glm(dataGLM,timeTrend,populationOffset,factorsBool,
                                     reweight,weightsThreshold,pThresholdTrend,b,
                                     noPeriods,typePred,fitFun,glmWarnings,epochAsDate,
                                     dayToConsider,diffDates,populationNow,verbose=FALSE)

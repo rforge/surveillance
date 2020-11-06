@@ -57,7 +57,7 @@ dayToConsider <- vectorOfDates[rangeTest[1]]
 observed <- salmAllOnset@observed
 population <- salmAllOnset@populationFrac
 
-dataGLM <- bodaDelay.data.glm(dayToConsider=dayToConsider,
+dataGLM <- surveillance:::bodaDelay.data.glm(dayToConsider=dayToConsider,
                               b=b, freq=freq,
                               epochAsDate=epochAsDate,
                               epochStr=epochStr,
@@ -69,7 +69,7 @@ dataGLM <- bodaDelay.data.glm(dayToConsider=dayToConsider,
                               reportingTriangle=reportingTriangle,
                               delay=delay)
 delay <- FALSE
-dataGLMNoDelay <- bodaDelay.data.glm(dayToConsider=dayToConsider,
+dataGLMNoDelay <- surveillance:::bodaDelay.data.glm(dayToConsider=dayToConsider,
                                   b=b, freq=freq,
                                   epochAsDate=epochAsDate,
                                   epochStr=epochStr,
@@ -132,14 +132,14 @@ argumentsGLM <- list(dataGLM=dataGLM,reportingTriangle=reportingTriangle,
 
 if(surveillance.options("allExamples") && require("INLA")) { # needs to be attached
   argumentsGLM$inferenceMethod <- "INLA"
-  model <- do.call(bodaDelay.fitGLM, args=argumentsGLM)
+  model <- do.call(surveillance:::bodaDelay.fitGLM, args=argumentsGLM)
   test_that("the fitGLM function gives the right class of output",{
     expect_equal(class(model),"inla")
   })
 }
 
 argumentsGLM$inferenceMethod <- "asym"
-model <- do.call(bodaDelay.fitGLM, args=argumentsGLM)
+model <- do.call(surveillance:::bodaDelay.fitGLM, args=argumentsGLM)
 test_that("the fitGLM function gives the right class of output",{
   expect_equal(class(model), c("negbin", "glm", "lm"))
 })
