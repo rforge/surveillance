@@ -157,14 +157,16 @@ checkat <- function (at, data, counts = TRUE) { # for non-transformed "data"
     }
 }
 
-getPrettyIntervals <- function (nInt, data, trafo=scales::sqrt_trans(), counts=TRUE, ...) {
+getPrettyIntervals <- function (nInt, data, trafo=NULL, counts=TRUE, ...) {
     maxcount <- max(data, na.rm=TRUE)
     if (counts && maxcount < nInt) { # no aggregation of counts necessary
         at <- 0:ceiling(maxcount+sqrt(.Machine$double.eps)) # max(at) > maxcount
     } else {
-        at <- if (requireNamespace("scales", quietly=TRUE)) {
+        at <- if (is.null(trafo)) { # equivalent to trafo=scales::sqrt_trans()
+            pretty(sqrt(data), n=nInt+1, ...)^2
+        } else {
             scales::trans_breaks(trafo$trans, trafo$inv, n=nInt+1, ...)(data)
-        } else pretty(sqrt(data), n=nInt+1, ...)^2
+        }
         ## { # alternative: quantile-based scale (esp. for incidence plots)
         ##     quantile(data, probs=seq(0,1,length.out=nInt+1), na.rm=TRUE)
         ## }
