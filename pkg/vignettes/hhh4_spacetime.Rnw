@@ -303,8 +303,7 @@ The overall time-series plot in Figure~\ref{fig:measlesWeserEms1} reveals strong
 seasonality in the data with slightly different patterns in the two years.
 The spatial plot in Figure~\ref{fig:measlesWeserEms2} is a tweaked \code{spplot}
 (package \CRANpkg{sp}) with colors from \CRANpkg{colorspace} \citep{R:colorspace} using
-$\sqrt{}$-equidistant cut points handled by package \CRANpkg{scales}
-\citep{R:scales}.
+$\sqrt{}$-equidistant cut points.
 
 The default plot \code{type} is \code{observed ~ time | unit} and displays
 the district-specific time series. Here we show the output of the
@@ -780,6 +779,7 @@ The \code{exp}-transformed deviations correspond to district-specific
 multiplicative effects on the model components, which can be visualized
 via the plot \code{type = "ri"} as follows
 (Figure~\ref{fig:measlesFit_ri_map}):
+% exp=TRUE relies on 'scales::log_breaks'
 <<measlesFit_ri_map, out.width="0.31\\linewidth", fig.width=3.5, fig.height=3.7, fig.pos="htb", fig.cap="Estimated multiplicative effects on the three components.", fig.subcap=c("Autoregressive", "Spatio-temporal", "Endemic")>>=
 for (comp in c("ar", "ne", "end")) {
   print(plot(measlesFit_ri, type = "ri", component = comp, exp = TRUE,
@@ -1107,7 +1107,7 @@ for further examples.
 ## create automatic references for R packages
 .Rbibfile <- file("hhh4_spacetime-R.bib", "w", encoding = "latin1")
 knitr::write_bib(
-    c("MASS", "Matrix", "spdep", "colorspace", "scales", "gridExtra", "lattice", "sp", "animation", "fanplot", "hhh4contacts"),
+    c("MASS", "Matrix", "spdep", "colorspace", "gridExtra", "lattice", "sp", "animation", "fanplot", "hhh4contacts"),
     file = .Rbibfile, tweak = FALSE, prefix = "R:")
 close(.Rbibfile)
 @
