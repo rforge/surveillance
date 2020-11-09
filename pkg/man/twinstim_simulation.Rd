@@ -386,7 +386,7 @@ plot(c(0,90), c(0,35), type="n", xlab="Time [days]",
 plotcsums(csums_observed, col=c(2,4), lwd=3)
 legend("topleft", legend=levels(imdepi$events$type), col=c(2,4), lwd=1)
 invisible(lapply(csums_simulated, plotcsums,
-                 col=scales::alpha(c(2,4), alpha=0.5)))
+                 col=adjustcolor(c(2,4), alpha=0.5)))
 }
 
 
