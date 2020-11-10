@@ -14,7 +14,10 @@ test_that <- function (desc, code) {
 
 ## expect_is wrapper (as long as there is no tinytest::expect_inherits)
 expect_is <- function (current, class, info = NA_character_) {
-    tinytest::expect_true(inherits(current, class), info = info)
+    ## find captured expectation function from tinytest::run_test_file
+    expect_true <- get("expect_true", parent.frame(), inherits = TRUE)
+    ## with tinytest::expect_true(), these tests would silently be ignored!
+    expect_true(inherits(current, class), info = info)
 }
 
 ## variant of tinytest::test_package() for non-installed tests;
@@ -24,11 +27,11 @@ expect_is <- function (current, class, info = NA_character_) {
                            verbose = 1, ...)
 {
     library(pkgname, character.only = TRUE)
-    
+
     ## run test files and collect results
     out <- tinytest::run_test_dir(testdir, at_home = at_home,
                                   verbose = verbose, ...)
-    
+
     ## throw an error if any test fails
     i_fail <- vapply(out, function (x) !is.na(x) && !x, TRUE)
     if (any(i_fail) && !interactive()) {
@@ -39,7 +42,7 @@ expect_is <- function (current, class, info = NA_character_) {
         print(out)
         stop("test failure", call. = FALSE)
     }
-    
+
     out
 }
 
