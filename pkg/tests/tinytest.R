@@ -34,13 +34,10 @@ expect_is <- function (current, class, info = NA_character_) {
 
     ## throw an error if any test fails
     i_fail <- vapply(out, function (x) !is.na(x) && !x, TRUE)
-    if (any(i_fail) && !interactive()) {
-        ## msg <- paste0(vapply(out[i_fail], format, "", type = "long"), collapse = "\n")
-        ## Such an error msg could become very long and would be truncated,
-        ## so we simply print the summary and stop().
-        ## R CMD check will show the last few lines of output.
-        print(out)
-        stop("test failure", call. = FALSE)
+    if (any(i_fail) && !interactive()) { # print all failing tests and stop
+        writeLines(vapply(out[i_fail], format, "", type="long"))
+        ## R CMD check will show the last few lines in the log
+        stop(sum(i_fail), " out of ", length(out), " tests failed", call.=FALSE)
     }
 
     out
