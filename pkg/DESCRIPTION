@@ -1,7 +1,7 @@
 Package: surveillance
 Title: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena
 Version: 1.18.0.9000
-Date: 2020-11-09
+Date: 2020-11-25
 Authors@R: c(MH = person("Michael", "Höhle",
                   email = "hoehle@math.su.se",
                   role = c("aut", "ths"),
@@ -48,7 +48,7 @@ Suggests: parallel, grid, gridExtra (>= 2.0.0), lattice, colorspace, scales, ani
         quadprog,
         memoise, polyclip, rgeos, gpclib, maptools, intervals,
         spdep, numDeriv, maxLik, gsl, fanplot, hhh4contacts,
-        testthat (>= 0.11.0), tinytest, coda, splancs, gamlss,
+        tinytest (> 1.2.3), coda, splancs, gamlss,
         INLA (>= 0.0-1458166556), runjags, MGLM (>= 0.1.0), knitr
 Enhances: xts, ggplot2
 Description: Statistical methods for the modeling and monitoring of time series

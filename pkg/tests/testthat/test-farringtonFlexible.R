@@ -459,8 +459,8 @@ test_that("The code does not produce any error",{
   farringtonFlexible(seriesSTSObject, control = algoControl)
 
   results1 <- farringtonFlexible(seriesSTSObject, control = algoControl)
-  expect_is(results1, "sts")
+  expect_inherits(results1, "sts")
   seriesSTSObject@observed[680:690] <- NA
   results2 <- farringtonFlexible(seriesSTSObject, control = algoControl)
-  expect_is(results2, "sts")
+  expect_inherits(results2, "sts")
 })

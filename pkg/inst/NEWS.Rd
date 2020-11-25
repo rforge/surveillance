@@ -58,6 +58,21 @@
     breaks (\code{at}), if the intervals do not cover the data range.
   }
 }
+
+\subsection{PACKAGE INFRASTRUCTURE}{
+  \itemize{
+    \item Removed unused \pkg{rmapshaper} from "Suggests" and moved
+    \pkg{xts} to "Enhances" (used only for \code{as.xts.sts}).
+    
+    \item Switched testing framework from (nowadays heavy)
+    \pkg{testthat} to \CRANpkg{tinytest}. Together with moving
+    \pkg{ggplot2} to "Enhances" (used only for \code{autoplot.sts}) ---
+    and only then --- this switch further reduces the total number of
+    required packages for a complete check (i.e., installing with
+    \code{dependencies = TRUE}) in a \emph{factory-fresh} R environment
+    from 119 to 94.
+  }
+}
 }
 
 

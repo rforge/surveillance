@@ -11,9 +11,9 @@ test_that("earsC returns a sts object", {
 
   res3 <- earsC(stsObj, control = list(range = 20:208, method = "C3", sigma = 0.5))
 
-  expect_is(res1, "sts")
-  expect_is(res2, "sts")
-  expect_is(res3, "sts")
+  expect_inherits(res1, "sts")
+  expect_inherits(res2, "sts")
+  expect_inherits(res3, "sts")
 
   data("salmNewport")
   in2011 <- which(isoWeekYear(epoch(salmNewport))$ISOYear == 2011)
@@ -21,7 +21,7 @@ test_that("earsC returns a sts object", {
   control <- list(range = in2011, method = "C1", alpha = 0.05)
   surv <- earsC(salmNewportGermany, control = control)
 
-  expect_is(surv, "sts")
+  expect_inherits(surv, "sts")
   expect_true(max(surv@upperbound[1:4] -
                   c(3.278854, 3.278854, 3.436517, 3.855617)) < 0.000001)
 })
