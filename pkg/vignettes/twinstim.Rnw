@@ -621,9 +621,9 @@ layout.scalebar(imdepi$W, scale = 100, labels = c("0", "100 km"), plot = TRUE)
 @
 
 \pagebreak[1]
-The time-series plot (Figure~\ref{fig:imdepi_plot1}) shows the monthly aggregated number of cases by finetype in
+The time-series plot (Figure~\ref{fig:imdepi_plot-1}) shows the monthly aggregated number of cases by finetype in
 a stacked histogram as well as each type's cumulative number over time.
-The spatial plot (Figure~\ref{fig:imdepi_plot2}) shows the observation window \code{W} with the locations of all
+The spatial plot (Figure~\ref{fig:imdepi_plot-2}) shows the observation window \code{W} with the locations of all
 cases (by type), where the areas of the points are proportional to the number of
 cases at the respective location.
 Additional shading by the population is possible and exemplified in

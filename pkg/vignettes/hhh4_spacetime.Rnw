@@ -299,9 +299,9 @@ plot(measlesWeserEms, type = observed ~ unit,
   sp.layout = layout.scalebar(measlesWeserEms@map, corner = c(0.05, 0.05),
     scale = 50, labels = c("0", "50 km"), height = 0.03))
 @
-The overall time-series plot in Figure~\ref{fig:measlesWeserEms1} reveals strong
+The overall time-series plot in Figure~\ref{fig:measlesWeserEms-1} reveals strong
 seasonality in the data with slightly different patterns in the two years.
-The spatial plot in Figure~\ref{fig:measlesWeserEms2} is a tweaked \code{spplot}
+The spatial plot in Figure~\ref{fig:measlesWeserEms-2} is a tweaked \code{spplot}
 (package \CRANpkg{sp}) with colors from \CRANpkg{colorspace} \citep{R:colorspace} using
 $\sqrt{}$-equidistant cut points.
 
@@ -673,11 +673,11 @@ measlesFit_np2 <- update(measlesFit_nepop,
   ne = list(weights = W_np(maxlag = 2)))
 @
 
-Figure~\ref{fig:measlesFit_neweights2} shows both the power-law model
+Figure~\ref{fig:measlesFit_neweights-2} shows both the power-law model
 $o^{-\hat{d}}$ and the second-order model. %, where $e^{\hat{\omega}_2}$ is
 Alternatively, the plot \code{type = "neweights"} for \class{hhh4} fits
 can produce a \code{stripplot} \citep{R:lattice} of $w_{ji}$ against $o_{ji}$ as shown in
-Figure~\ref{fig:measlesFit_neweights1} for the power-law model:
+Figure~\ref{fig:measlesFit_neweights-1} for the power-law model:
 <<measlesFit_neweights, fig.width=5, fig.height=3.5, fig.cap="Estimated weights as a function of adjacency order.", out.width="0.47\\linewidth", fig.subcap=c("Normalized power-law weights.", "Non-normalized weights with 95\\% CIs."), echo=c(1,5)>>=
 library("lattice")
 trellis.par.set("reference.line", list(lwd=3, col="gray"))
@@ -736,7 +736,7 @@ Our measles data even contain two districts
 without any reported cases, while the district with the
 smallest population (03402, SK Emden) had the second-largest number of cases
 reported and the highest overall incidence
-(see Figures~\ref{fig:measlesWeserEms2} and~\ref{fig:measlesWeserEms15}).
+(see Figures~\ref{fig:measlesWeserEms-2} and~\ref{fig:measlesWeserEms15}).
 Hence, allowing for district-specific intercepts in the endemic or epidemic
 components is expected to improve the model fit.
 For independent random effects
@@ -787,7 +787,7 @@ for (comp in c("ar", "ne", "end")) {
 }
 @
 
-For the autoregressive component in Figure~\ref{fig:measlesFit_ri_map1}, we see
+For the autoregressive component in Figure~\ref{fig:measlesFit_ri_map-1}, we see
 a pronounced heterogeneity between the three western districts in pink and the
 remaining districts. These three districts have been affected by large local
 outbreaks and are also the ones with the highest overall numbers of cases.
@@ -798,8 +798,8 @@ can be extracted using the \code{intercept} argument as
 exp(ranef(measlesFit_ri, intercept = TRUE)["03403", "ar.ri(iid)"])
 @
 However, this district seems to import more cases from other districts than explained by its
-population (Figure~\ref{fig:measlesFit_ri_map2}).
-In Figure~\ref{fig:measlesFit_ri_map3}, the two districts without any reported
+population (Figure~\ref{fig:measlesFit_ri_map-2}).
+In Figure~\ref{fig:measlesFit_ri_map-3}, the two districts without any reported
 measles cases (03401 and 03405) appear in cyan, which means that they
 exhibit a relatively low endemic incidence after adjusting for the
 population and susceptible proportion.
@@ -972,7 +972,7 @@ predictions. However, the right-hand decay in all histograms suggests that all
 models tend to predict higher counts than observed. This is most likely related
 to the seasonal shift between the years 2001 and 2002. In 2001, the peak of the
 epidemic was in the second quarter, while it already occurred in the first
-quarter in 2002 (cp.\ Figure~\ref{fig:measlesWeserEms1}).
+quarter in 2002 (cp.\ Figure~\ref{fig:measlesWeserEms-1}).
 
 
 \subsection{Further modeling options}
