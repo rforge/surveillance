@@ -7,7 +7,7 @@
 ### class "twinstim". The function basically uses Ogata's modified thinning
 ### algorithm (cf. Daley & Vere-Jones, 2003, Algorithm 7.5.V.).
 ###
-### Copyright (C) 2010-2018 Sebastian Meyer
+### Copyright (C) 2010-2018,2021 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -764,9 +764,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                 .upperRange <- min(sourceEpss, maxExtentOfW)
                 .eventType <- sample(typeNames[qmatrix[sourceType,]], 1L)
                 .eventTypeCode <- match(.eventType, typeNames)
-                eventLocationIR <- if (constantsiaf) {
-                    as.matrix(coords.ppp(runifpoint(1L, win=sourceIR)))
-                } else {
+
                     eventInsideIR <- FALSE
                     ntries <- 0L
                     while(!eventInsideIR) {
@@ -782,8 +780,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                                                      eventLocationIR[,2],
                                                      sourceIR)
                     }
-                    eventLocationIR
-                }
+
                 .eventLocation <- sourceCoords + eventLocationIR
                 whichTile <- over(SpatialPoints(.eventLocation,
                                                 proj4string=tiles@proj4string),

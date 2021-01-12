@@ -10,6 +10,16 @@
 
 \section{Changes in surveillance version 1.18.0.9000 (UNRELEASED)}{
 
+\subsection{SIGNIFICANT CHANGES}{
+  \itemize{
+    \item \code{simEpidataCS()} (and thus \code{simulate.twinstim()})
+    uses a slightly more efficient location sampler for models with
+    \code{siaf = siaf.constant()}.
+    Simulation results will differ from previous package versions even
+    if the same random \code{seed} is used.
+  }
+}
+
 \subsection{NEW FEATURES}{
   \itemize{
     \item The \code{nowcast()} function with
