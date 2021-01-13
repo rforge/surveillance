@@ -86,7 +86,6 @@ importFrom(spatstat.geom, multiplicity)
 export(multiplicity)                    # we define a Spatial-method
 
 importFrom(polyCub, polyCub, .polyCub.iso, polyCub.SV, polyCub.midpoint, xylist)
-importMethodsFrom(polyCub, coerce)
 
 importFrom(MASS, kde2d, truehist)
 
