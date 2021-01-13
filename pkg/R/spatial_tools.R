@@ -5,7 +5,7 @@
 ###
 ### Auxiliary functions for operations on spatial data
 ###
-### Copyright (C) 2009-2015,2018 Sebastian Meyer
+### Copyright (C) 2009-2015,2018,2021 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -18,7 +18,7 @@ discpoly <- function (center, radius, npoly = 64,
                       hole = FALSE)
 {
     class <- match.arg(class)
-    if (class == "owin") { # use spatstat::disc
+    if (class == "owin") { # use spatstat.geom::disc
         res <- disc(radius=radius, centre=center, mask=FALSE, npoly=npoly)
         if (hole) {
             res$bdry[[1]]$x <- rev(res$bdry[[1]]$x)
@@ -89,6 +89,13 @@ unionSpatialPolygons <- function (SpP,
     W@proj4string <- SpP@proj4string
     W
 }
+
+
+### internal implementation of as(W, "owin") from polyCub
+### to avoid upgrade problems with polyCub <= 0.7.1 referring to old spatstat
+### and to avoid calling as(W, "owin") from maptools (depends on load order)
+
+SpP2owin <- function (W, ...) owin(poly = xylist(W), ...)
 
 
 ### Compute distance from points to a polygonal boundary

@@ -101,7 +101,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                          W = W, keep.data = FALSE)
 
     ## Transform W to class "owin"
-    Wowin <- as(W, "owin")
+    Wowin <- SpP2owin(W)
     maxExtentOfW <- diameter.owin(Wowin)
 
 

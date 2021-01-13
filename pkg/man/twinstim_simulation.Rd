@@ -283,8 +283,8 @@ simEpidataCS(endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
   for example via the \command{mapshaper} JavaScript library wrapped by
   the R package \CRANpkg{rmapshaper}.
   Alternative tools are provided by the packages \CRANpkg{maptools}
-  (\code{\link[maptools]{thinnedSpatialPoly}}) and \CRANpkg{spatstat}
-  (\code{\link[spatstat]{simplify.owin}}).
+  (\code{\link[maptools]{thinnedSpatialPoly}}) and \CRANpkg{spatstat.geom}
+  (\code{\link[spatstat.geom]{simplify.owin}}).
 }
 
 \references{

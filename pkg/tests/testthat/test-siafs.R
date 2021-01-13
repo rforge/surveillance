@@ -1,5 +1,9 @@
 ### Spatial interaction functions for twinstim()
 
+## spatstat is no longer suggested, so is unavailable during R CMD check
+if (packageVersion("polyCub") <= "0.7.1")
+    exit_file("need polyCub > 0.7.1 to run these tests")
+
 
 ### test bundle
 

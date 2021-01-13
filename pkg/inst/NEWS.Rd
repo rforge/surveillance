@@ -82,6 +82,9 @@
     required packages for a complete check (i.e., installing with
     \code{dependencies = TRUE}) in a \emph{factory-fresh} R environment
     from 119 to 94.
+
+    \item \CRANpkg{spatstat} was split into multiple packages, of which
+    we only need to import \CRANpkg{spatstat.geom}.
   }
 }
 }

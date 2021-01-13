@@ -76,13 +76,13 @@ export(fixef, ranef)  # we define corresponding methods for "hhh4" models
 
 ### twinstim-specific
 
-importFrom(spatstat, area.owin, as.im.function, diameter,
+importFrom(spatstat.geom, area.owin, as.im.function, diameter,
                      diameter.owin, disc, edges, inside.owin, intersect.owin,
-                     is.polygonal, as.polygonal, bdist.points, ppp,
+                     is.polygonal, as.polygonal, bdist.points, owin, ppp,
                      shift.owin, spatstat.options, vertices)
-importFrom(spatstat, marks)
+importFrom(spatstat.geom, marks)
 export(marks)                           # we define an epidataCS-method
-importFrom(spatstat, multiplicity)
+importFrom(spatstat.geom, multiplicity)
 export(multiplicity)                    # we define a Spatial-method
 
 importFrom(polyCub, polyCub, .polyCub.iso, polyCub.SV, polyCub.midpoint, xylist)
