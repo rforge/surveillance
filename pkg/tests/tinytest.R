@@ -1,9 +1,9 @@
 ### "lazy" transition from "testthat" to "tinytest"
-### Copyright (C) 2020 Sebastian Meyer
+### Copyright (C) 2020-2021 Sebastian Meyer
 
 if (!requireNamespace("tinytest", quietly = TRUE)
-    || packageVersion("tinytest") < "1.2.3.8") {
-    message("this test suite requires package 'tinytest' (> 1.2.3)")
+    || packageVersion("tinytest") < "1.2.4") {
+    message("this test suite requires package 'tinytest' (>= 1.2.4)")
     q("no")
 }
 
