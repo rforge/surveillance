@@ -288,7 +288,8 @@ nc.control.ddcp <- modifyList(nc.control,
                          ddcp=list(ddChangepoint=as.Date(c("2011-05-23")),
                              logLambda="tps",
                              tau.gamma=1,
-                             mcmc=c(burnin=1000,sample=1000,thin=1))))
+                             mcmc=c(burnin=1000,sample=1000,thin=1,
+                                    adapt=1000,store.samples=FALSE))))
 
 nc.ddcp <- nowcast(now=t.repTriangle,when=when,
                dEventCol="dHosp",dReportCol="dReport",
