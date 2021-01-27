@@ -252,9 +252,10 @@ pred
 quantile(pred)
 confint(pred)
 
-## simple plot of the 95% one-week-ahead prediction interval
+## simple plot of the 80% one-week-ahead prediction interval
 ## and point forecasts
-plot(pred, probs = c(2.5,97.5)/100, means.args = list())
+if (requireNamespace("fanplot"))
+    plot(pred, probs = c(.1,.9), means.args = list())
 
 \dontshow{
 ## test equivalence of parallelized version

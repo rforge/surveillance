@@ -348,6 +348,7 @@ ranef(measlesFit, intercept = TRUE)  # sum of the above
 exp(ranef(measlesFit))               # multiplicative effects
 plot(measlesFit, type="ri", component="end",
      main="deviations around the endemic intercept (log-scale)")
+if (requireNamespace("scales")) # needed for logarithmic color breaks
 plot(measlesFit, type="ri", component="end", exp=TRUE,
      main="multiplicative effects", labels=list(font=3, labels="GEN"))
 
