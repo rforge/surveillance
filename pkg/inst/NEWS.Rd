@@ -38,6 +38,13 @@
   }
 }
 
+\subsection{MINOR CHANGES}{
+  \itemize{
+    \item The default \code{main} title for \code{stsplot_space()} now
+    uses the ISO year-week format for weekly \code{"sts"} data.
+  }
+}
+
 \subsection{BUG FIXES}{
   \itemize{
     \item Bug fix in the \code{farringtonFlexible()}-function, which for
