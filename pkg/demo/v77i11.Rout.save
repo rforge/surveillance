@@ -1,6 +1,6 @@
 
-R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
-Copyright (C) 2019 The R Foundation for Statistical Computing
+R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
+Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -48,7 +48,7 @@ In RNGkind("Mersenne-Twister", "Inversion", "Rounding") :
 > library("surveillance")  # you should also have installed the suggested packages
 Loading required package: sp
 Loading required package: xtable
-This is surveillance 1.17.3. For overview type ‘help(surveillance)’.
+This is surveillance 1.19.0. For overview type ‘help(surveillance)’.
 > 
 > ## 3.2. Data structure: 'epidataCS'
 > data("imdepi", package = "surveillance")
@@ -277,8 +277,8 @@ Done.
 +              label = "tab:imdfit_Gaussian"),
 +       sanitize.text.function = NULL, sanitize.colnames.function = NULL,
 +       sanitize.rownames.function = function(x) paste0("\\code{", x, "}"))
-% latex table generated in R 3.6.2 by xtable 1.8-4 package
-% Mon Dec 16 12:22:14 2019
+% latex table generated in R 4.0.3 by xtable 1.8-4 package
+% Tue Jan 26 20:09:49 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -437,7 +437,7 @@ Note: added the 'tau' component to object 'imdfit_powerlaw' for future use.
 > imdsims <- simulate(imdfit_powerlaw, nsim = 30, seed = 1, t0 = 1826, T = 2555,
 +   data = imdepi_untied_infeps, tiles = districtsD)
 
-Time at beginning of simulation: 2019-12-16 12:22:41 
+Time at beginning of simulation: 2021-01-26 20:10:16 
 Simulation 1 / 30 ...
 -------------------------------------------------------------------------------
 
@@ -464,8 +464,8 @@ Preparing simulated events for "epidataCS" ...
 Done.
 
 -------------------------------------------------------------------------------
-Runtime of first simulation: 2.609 seconds
-Estimated finishing time: 2019-12-16 12:23:59 
+Runtime of first simulation: 4.393 seconds
+Estimated finishing time: 2021-01-26 20:12:28 
 
 Simulation  2 / 30 ...	simulated 187 events up to time 2555 
 Simulation  3 / 30 ...	simulated 192 events up to time 2555 
@@ -497,7 +497,7 @@ Simulation 28 / 30 ...	simulated 174 events up to time 2555
 Simulation 29 / 30 ...	simulated 158 events up to time 2555 
 Simulation 30 / 30 ...	simulated 155 events up to time 2555 
 
-Done (2019-12-16 12:24:21).
+Done (2021-01-26 20:13:06).
 > 
 > table(imdsims[[1]]$events$source > 0, exclude = NULL)
 
@@ -571,7 +571,7 @@ FALSE  TRUE  <NA>
 4         0            1  0  1
 5         0            1  0  0
 Warning message:
-In `[.epidata`(x, seq_len(n), , drop = FALSE) :
+In `[.epidata`(x, 1:5, , drop = FALSE) :
   dropped class "epidata": subsetting blocks not allowed
 > 
 > par(mar = c(5, 5, 1, 1))
@@ -893,7 +893,7 @@ measlesFit_np2      10 1880.963
 +   end = list(f = update(formula(measlesFit_powerlaw)$end, ~. + ri() - 1)),
 +   ar  = list(f = update(formula(measlesFit_powerlaw)$ar,  ~. + ri() - 1)),
 +   ne  = list(f = update(formula(measlesFit_powerlaw)$ne,  ~. + ri() - 1)))
-[1] "iteration limit reached without convergence (10)"
+[1] "false convergence (8)"
 Update of variance parameters in iteration  5  unreliable
 > summary(measlesFit_ri, amplitudeShift = TRUE, maxEV = TRUE)
 
@@ -994,8 +994,8 @@ One-step-ahead prediction @ t = 71 ...
 One-step-ahead prediction @ t = 72 ...
 One-step-ahead prediction @ t = 73 ...
 One-step-ahead prediction @ t = 74 ...
-One-step-ahead prediction @ t = 76 ...
 One-step-ahead prediction @ t = 75 ...
+One-step-ahead prediction @ t = 76 ...
 One-step-ahead prediction @ t = 77 ...
 One-step-ahead prediction @ t = 65 ...
 One-step-ahead prediction @ t = 66 ...
