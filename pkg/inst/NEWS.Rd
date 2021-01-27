@@ -30,6 +30,9 @@
 
 \subsection{MINOR CHANGES}{
   \itemize{
+    \item The weighted sum in the \code{ne}ighbourhood component of
+    \code{hhh4()} models is computed more efficiently.
+    
     \item \code{simEpidataCS()} (and thus \code{simulate.twinstim()})
     uses a slightly more efficient location sampler for models with
     \code{siaf = siaf.constant()}.
