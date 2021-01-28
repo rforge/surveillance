@@ -222,10 +222,10 @@ nowcast(now, when, data, dEventCol="dHospital", dReportCol="dReport",
   during the STEC O104:H4 Outbreak in Germany, 2011, Biometrics,
   70(4):993-1002. \doi{10.1111/biom.12194}.\cr
   A preprint is available as
-  \url{http://people.su.se/~mhh/pubs/hoehle_anderheiden2014-preprint.pdf}.
+  \url{https://staff.math.su.se/hoehle/pubs/hoehle_anderheiden2014-preprint.pdf}.
 
-  {Günther}{Guenther}, F. and Bender, A. and Katz, K., and
-  {Küchenhoff}{Kuechenhoff}, H. and {Höhle}{Hoehle}, M. (2020)
+  \enc{Günther}{Guenther}, F. and Bender, A. and Katz, K., and
+  \enc{Küchenhoff}{Kuechenhoff}, H. and \enc{Höhle}{Hoehle}, M. (2020)
   Nowcasting the COVID-19 Pandemic in Bavaria, 
   Preprint available as \url{https://www.stablab.stat.uni-muenchen.de/_assets/docs/nowcasting_covid19_bavaria.pdf}.
 }

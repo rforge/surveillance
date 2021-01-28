@@ -72,7 +72,7 @@
   Kr\"{a}ftriket\\
   106 91 Stockholm, Sweden\\
   E-mail: \email{hoehle@math.su.se}\\
-  URL: \url{http://www.math.su.se/~hoehle/}
+  URL: \url{https://www.math.su.se/~hoehle/}
 }
 
 
