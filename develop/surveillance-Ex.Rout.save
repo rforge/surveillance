@@ -1,5 +1,5 @@
 
-R version 3.6.3 (2020-02-29) -- "Holding the Windsock"
+R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
 Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -35,7 +35,7 @@ Type 'q()' to quit R.
 > library('surveillance')
 Loading required package: sp
 Loading required package: xtable
-This is surveillance 1.18.0. For overview type ‘help(surveillance)’.
+This is surveillance 1.19.0. For overview type ‘help(surveillance)’.
 > 
 > base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
 > base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
@@ -48,7 +48,7 @@ This is surveillance 1.18.0. For overview type ‘help(surveillance)’.
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: LRCUSUM.runlength
 > ### Title: Run length computation of a CUSUM detector
-> ### Aliases: LRCUSUM.runlength outcomeFunStandard LLR.fun
+> ### Aliases: LRCUSUM.runlength
 > ### Keywords: regression
 > 
 > ### ** Examples
@@ -3030,8 +3030,8 @@ Loading required package: gamlss.dist
 Loading required package: MASS
 Loading required package: nlme
 Loading required package: parallel
- **********   GAMLSS Version 5.1-6  ********** 
-For more on GAMLSS look at http://www.gamlss.org/
+ **********   GAMLSS Version 5.2-0  ********** 
+For more on GAMLSS look at https://www.gamlss.com/
 Type gamlssNews() to see new features/changes/bug fixes.
 
 GAMLSS-RS iteration 1: Global Deviance = 1206.79 
@@ -3460,9 +3460,9 @@ Classes ‘epidata’ and 'data.frame':	70500 obs. of  12 variables:
  $ SEX    : Factor w/ 2 levels "male","female": 2 2 2 1 2 1 1 1 1 2 ...
  $ AGE    : num  7 6 4 13 8 12 6 10 13 7 ...
  $ CL     : Factor w/ 3 levels "preschool","1st class",..: 2 2 1 3 2 3 1 2 3 2 ...
- - attr(*, "eventTimes")= num  1.14 7.47 7.63 8.25 11.29 ...
- - attr(*, "timeRange")= num  0 92.5
- - attr(*, "coords.cols")= int  8 9
+ - attr(*, "eventTimes")= num [1:187] 1.14 7.47 7.63 8.25 11.29 ...
+ - attr(*, "timeRange")= num [1:2] 0 92.5
+ - attr(*, "coords.cols")= int [1:2] 8 9
  - attr(*, "f")= list()
  - attr(*, "w")= list()
 > head(as.data.frame(myEpi))  # "epidata" has event history format
@@ -4579,7 +4579,7 @@ $h
 > ### ** Examples
 > 
 > formatDate(Sys.Date(), "%G/%OQ/%q")
-[1] "2020/I/79"
+[1] "2021/I/28"
 > 
 > 
 > 
@@ -5637,8 +5637,10 @@ end.ri(iid).03462
         1.0197462 
 > plot(measlesFit, type="ri", component="end",
 +      main="deviations around the endemic intercept (log-scale)")
-> plot(measlesFit, type="ri", component="end", exp=TRUE,
+> if (requireNamespace("scales")) # needed for logarithmic color breaks
++ plot(measlesFit, type="ri", component="end", exp=TRUE,
 +      main="multiplicative effects", labels=list(font=3, labels="GEN"))
+Loading required namespace: scales
 > 
 > ## neighbourhood weights as a function of neighbourhood order
 > plot(measlesFit, type="neweights")  # boring, model has no "ne" component
@@ -6028,9 +6030,10 @@ attr(,"class")
 311     0      6
 312     0      4
 > 
-> ## simple plot of the 95% one-week-ahead prediction interval
+> ## simple plot of the 80% one-week-ahead prediction interval
 > ## and point forecasts
-> plot(pred, probs = c(2.5,97.5)/100, means.args = list())
+> if (requireNamespace("fanplot"))
++     plot(pred, probs = c(.1,.9), means.args = list())
 > 
 > ## Don't show: 
 > ## test equivalence of parallelized version
@@ -6609,14 +6612,9 @@ List of 14
 > 
 > ### ** Examples
 > 
-> library("spatstat")
+> library("spatstat.geom")
 Loading required package: spatstat.data
-Loading required package: nlme
-Loading required package: rpart
-
-spatstat 1.63-3       (nickname: ‘Wet paint’) 
-For an introduction to spatstat, type ‘beginner’ 
-
+spatstat.geom 1.65-5
 > plot(letterR)
 > plot(intersectPolyCircle(letterR, c(3,2), 1), add=TRUE, col=2, lwd=3)
 > 
@@ -6626,8 +6624,7 @@ For an introduction to spatstat, type ‘beginner’
 > base::cat("intersectPolyCircle", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 
-detaching ‘package:spatstat’, ‘package:rpart’, ‘package:nlme’,
-  ‘package:spatstat.data’
+detaching ‘package:spatstat.geom’, ‘package:spatstat.data’
 
 > nameEx("isoWeekYear")
 > ### * isoWeekYear
@@ -6707,8 +6704,8 @@ dt      <= 50  > 50
 > 
 > ## contingency table in LaTeX
 > toLatex(knoxtest)
-% latex table generated in R 3.6.3 by xtable 1.8-4 package
-% Thu Mar 19 15:35:55 2020
+% latex table generated in R 4.0.3 by xtable 1.8-4 package
+% Thu Jan 28 18:30:38 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{r|rr|r}
@@ -6884,7 +6881,7 @@ $\sum$ & 6817 & 49463 & 56280 \\
 $ar
 $ar$f
 ~1
-<environment: 0x11417b30>
+<environment: 0x11f0d478>
 
 $ar$offset
 [1] 1
@@ -6893,7 +6890,7 @@ $ar$offset
 $ne
 $ne$f
 ~1
-<environment: 0x11417b30>
+<environment: 0x11f0d478>
 
 $ne$offset
 [1] 1
@@ -7391,7 +7388,8 @@ bayes.trunc...
 > ##D                          ddcp=list(ddChangepoint=as.Date(c("2011-05-23")),
 > ##D                              logLambda="tps",
 > ##D                              tau.gamma=1,
-> ##D                              mcmc=c(burnin=1000,sample=1000,thin=1))))
+> ##D                              mcmc=c(burnin=1000,sample=1000,thin=1,
+> ##D                                     adapt=1000,store.samples=FALSE))))
 > ##D 
 > ##D nc.ddcp <- nowcast(now=t.repTriangle,when=when,
 > ##D                dEventCol="dHosp",dReportCol="dReport",
@@ -8224,28 +8222,18 @@ Note: range of maximum neighbour order by region is 3-5
 > plot(z.sts)
 > 
 > ## conversion of "sts" objects to the quasi-standard "xts" class
-> if (require("xts")) {
-+     z.xts <- as.xts(z.sts)
+> if (requireNamespace("xts")) {
++     z.xts <- as.xts.sts(z.sts)
 +     plot(z.xts)
 + }
-Loading required package: xts
-Loading required package: zoo
-
-Attaching package: ‘zoo’
-
-The following objects are masked from ‘package:base’:
-
-    as.Date, as.Date.numeric
-
+Loading required namespace: xts
+Failed with error:  ‘there is no package called ‘xts’’
 > 
 > 
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("sts-class", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-
-detaching ‘package:xts’, ‘package:zoo’
-
 > nameEx("stsAggregate")
 > ### * stsAggregate
 > 
@@ -8440,6 +8428,7 @@ detaching ‘package:animation’
 +     autoplot.sts(measlesDE)
 + }
 Loading required namespace: ggplot2
+Failed with error:  ‘there is no package called ‘ggplot2’’
 > 
 > ## weekly incidence: population(measlesDE) gives population fractions,
 > ## which we need to multiply by the total population
@@ -8531,19 +8520,23 @@ Loading required namespace: ggplot2
 > data("measlesWeserEms")
 > 
 > # default plot: total region-specific counts over all weeks
-> plot(measlesWeserEms, type=observed~unit)
+> plot(measlesWeserEms, type = observed~unit)
+> stsplot_space(measlesWeserEms)  # the same
 > 
 > # compare with old implementation
-> plot(measlesWeserEms, type=observed~1|unit)
+> plot(measlesWeserEms, type = observed~1|unit)
 > 
-> # plot cumulative incidence (per 100000 inhabitants), with region labels
+> # cumulative incidence (per 100000 inhabitants), with region labels
 > plot(measlesWeserEms, type=observed~unit,
 +      population=measlesWeserEms@map$POPULATION / 100000,
 +      labels=list(labels="GEN", cex=0.7, font=3),
 +      sub="cumulative incidence (per 100'000 inhabitants)")
 > 
-> # counts in the first week of the second year only (+ display overall)
-> plot(measlesWeserEms, type=observed~unit, tps=53, total.args=list())
+> # incidence in a particular week, manual color breaks, display total
+> plot(measlesWeserEms, type=observed~unit, tps=62,
++      population=measlesWeserEms@map$POPULATION / 100000,
++      at=c(0, 1, 5),
++      total.args=list(x=0, label="Overall incidence: "))
 > 
 > # if we had only observed a subset of the regions
 > plot(measlesWeserEms[,5:11], type = observed~unit,
@@ -8670,17 +8663,10 @@ chwi   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA
 > data("measlesDE")
 > plot(measlesDE, units=1:2, as.one=TRUE, legend.opts=list(cex=0.8))
 > ## more sophisticated plots are offered by package "xts"
-> if (require("xts"))
-+     plot(as.xts(measlesDE))
-Loading required package: xts
-Loading required package: zoo
-
-Attaching package: ‘zoo’
-
-The following objects are masked from ‘package:base’:
-
-    as.Date, as.Date.numeric
-
+> if (requireNamespace("xts"))
++     plot(as.xts.sts(measlesDE))
+Loading required namespace: xts
+Failed with error:  ‘there is no package called ‘xts’’
 > 
 > ## Use ISO8601 date formatting (see ?strptime) and no legend
 > data("salmNewport")
@@ -8706,9 +8692,6 @@ The following objects are masked from ‘package:base’:
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("stsplot_time", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-
-detaching ‘package:xts’, ‘package:zoo’
-
 > nameEx("surveillance-package")
 > ### * surveillance-package
 > 
@@ -8835,8 +8818,8 @@ $gpclib
 +                 thresholdMethod="delta",alpha=0.1)
 > salm <- farringtonFlexible(salm,control=control)
 > toLatex(salm)
-% latex table generated in R 3.6.3 by xtable 1.8-4 package
-% Thu Mar 19 15:36:17 2020
+% latex table generated in R 4.0.3 by xtable 1.8-4 package
+% Thu Jan 28 18:30:56 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrlr}
@@ -9634,22 +9617,22 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
  & Estimate & Std. Error & $z$ value & $P(|Z|>|z|)$ \\
 \hline
 \hline 
-% latex table generated in R 3.6.3 by xtable 1.8-4 package
-% Thu Mar 19 15:36:24 2020
+% latex table generated in R 4.0.3 by xtable 1.8-4 package
+% Thu Jan 28 18:31:02 2021
  \texttt{h.(Intercept)} & $-20.481$ & $0.053$ & $-389.0$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{h.I(start/365-3.5)} & $-0.041$ & $0.022$ & $-1.9$ & $0.06$ \\ 
   \texttt{h.sin(2*pi*start/365)} & $0.242$ & $0.064$ & $3.8$ & $2\cdot{}10^{-04}$ \\ 
   \texttt{h.cos(2*pi*start/365)} & $0.350$ & $0.064$ & $5.4$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
-% latex table generated in R 3.6.3 by xtable 1.8-4 package
-% Thu Mar 19 15:36:24 2020
+% latex table generated in R 4.0.3 by xtable 1.8-4 package
+% Thu Jan 28 18:31:02 2021
  \texttt{e.(Intercept)} & $-16.90$ & $0.26$ & $-64$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
 \end{tabular}
 > # or, to report rate ratios
 > xtable(s)
-% latex table generated in R 3.6.3 by xtable 1.8-4 package
-% Thu Mar 19 15:36:24 2020
+% latex table generated in R 4.0.3 by xtable 1.8-4 package
+% Thu Jan 28 18:31:02 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -9985,8 +9968,8 @@ $g
 function (t, logvals, types) 
 heights(logvals)[(types - 1) * nallknots + .bincode(t, allknotsInf, 
     right = FALSE)]
-<bytecode: 0x1c31f7a0>
-<environment: 0x19d95e70>
+<bytecode: 0x1ae338b0>
+<environment: 0x1ae2c110>
 
 $G
 function (t, logvals, types) 
@@ -9996,7 +9979,7 @@ function (t, logvals, types)
         sum(typeheights(logvals, type) * diff.default(knots2t))
     }, t, types, SIMPLIFY = TRUE, USE.NAMES = FALSE)
 }
-<environment: 0x19d95e70>
+<environment: 0x1ae2c110>
 
 $deriv
 function (t, logvals, types) 
@@ -10012,8 +9995,8 @@ function (t, logvals, types)
     dim(res) <- c(L, npars)
     res
 }
-<bytecode: 0x1c318d20>
-<environment: 0x19d95e70>
+<bytecode: 0x1ae30c70>
+<environment: 0x1ae2c110>
 
 $Deriv
 function (t, logvals, types) 
@@ -10032,7 +10015,7 @@ function (t, logvals, types)
     dim(res) <- c(L, npars)
     res
 }
-<environment: 0x19d95e70>
+<environment: 0x1ae2c110>
 
 $npars
 [1] 4
@@ -10698,16 +10681,16 @@ function (s, logvals, types = NULL)
     sLength <- sqrt(.rowSums(s^2, length(s)/2, 2L))
     c(1, exp(logvals), 0)[.bincode(sLength, allknots, right = FALSE)]
 }
-<bytecode: 0x180a9998>
-<environment: 0x180a6958>
+<bytecode: 0x1ac19d70>
+<environment: 0x1ac10d80>
 
 $F
 function (polydomain, f, logvals, type = NULL, npoly = 256) 
 {
     sum(c(1, exp(logvals)) * ringAreas(polydomain, npoly = npoly))
 }
-<bytecode: 0x180aa418>
-<environment: 0x180a6958>
+<bytecode: 0x1ac14840>
+<environment: 0x1ac10d80>
 
 $Fcircle
 function (r, logvals, type = NULL) 
@@ -10715,8 +10698,8 @@ function (r, logvals, type = NULL)
     sum(c(1, exp(logvals)) * pi * diff(pmin.int(allknotsPos, 
         r)^2))
 }
-<bytecode: 0x180a6b28>
-<environment: 0x180a6958>
+<bytecode: 0x1ac14d80>
+<environment: 0x1ac10d80>
 
 $deriv
 function (s, logvals, types = NULL) 
@@ -10730,8 +10713,8 @@ function (s, logvals, types = NULL)
     dim(deriv) <- c(L, nknots)
     deriv
 }
-<bytecode: 0x180a7298>
-<environment: 0x180a6958>
+<bytecode: 0x1ac154f0>
+<environment: 0x1ac10d80>
 
 $Deriv
 function (polydomain, deriv, logvals, type = NULL, npoly = 256) 
@@ -10739,8 +10722,8 @@ function (polydomain, deriv, logvals, type = NULL, npoly = 256)
     ringAreas <- ringAreas(polydomain, npoly = npoly)
     exp(logvals) * ringAreas[-1L]
 }
-<bytecode: 0x180a8878>
-<environment: 0x180a6958>
+<bytecode: 0x1ac12ca0>
+<environment: 0x1ac10d80>
 
 $simulate
 function (n, logvals, type = NULL, ub) 
@@ -10752,8 +10735,8 @@ function (n, logvals, type = NULL, ub)
         prob = heights * diff.default(c(0, knots2upper^2)))
     runifdisc(n, knots2upper[rings], c(0, knots2upper)[rings])
 }
-<bytecode: 0x180a50a0>
-<environment: 0x180a6958>
+<bytecode: 0x1ac132f8>
+<environment: 0x1ac10d80>
 
 $npars
 [1] 3
@@ -11019,15 +11002,15 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
  & Estimate & Std. Error & $z$ value & $P(|Z|>|z|)$ \\
 \hline
 \hline 
-% latex table generated in R 3.6.3 by xtable 1.8-4 package
-% Thu Mar 19 15:36:27 2020
+% latex table generated in R 4.0.3 by xtable 1.8-4 package
+% Thu Jan 28 18:31:05 2021
  \texttt{h.(Intercept)} & $-20.52869$ & $0.04724$ & $-434.597$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{h.I(start/365-3.5)} & $-0.04574$ & $0.02212$ & $-2.068$ & $0.03863$ \\ 
   \texttt{h.sin(2*pi*start/365)} & $0.21728$ & $0.06467$ & $3.360$ & $0.00078$ \\ 
   \texttt{h.cos(2*pi*start/365)} & $0.31810$ & $0.06380$ & $4.986$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
-% latex table generated in R 3.6.3 by xtable 1.8-4 package
-% Thu Mar 19 15:36:27 2020
+% latex table generated in R 4.0.3 by xtable 1.8-4 package
+% Thu Jan 28 18:31:05 2021
  \texttt{e.(Intercept)} & $-12.51659$ & $0.32326$ & $-38.720$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{e.typeC} & $-0.90832$ & $0.26742$ & $-3.397$ & $0.000682$ \\ 
   \texttt{e.agegrp[3,19)} & $0.70612$ & $0.32706$ & $2.159$ & $0.030852$ \\ 
@@ -11038,8 +11021,8 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
 > 
 > # or using the xtable-method (which produces rate ratios)
 > xtable(s)
-% latex table generated in R 3.6.3 by xtable 1.8-4 package
-% Thu Mar 19 15:36:27 2020
+% latex table generated in R 4.0.3 by xtable 1.8-4 package
+% Thu Jan 28 18:31:05 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -11280,7 +11263,7 @@ Data attributes:
 +                    tiles=districtsD, newcoef=c("e.typeC"=-1),
 +                    t0=31, T=61, simplify=TRUE)
 
-Time at beginning of simulation: 2020-03-19 15:36:31 
+Time at beginning of simulation: 2021-01-28 18:31:09 
 Simulation 1 / 2 ...
 -------------------------------------------------------------------------------
 
@@ -11305,12 +11288,12 @@ Preparing simulated events for "epidataCS" ...
 Done.
 
 -------------------------------------------------------------------------------
-Runtime of first simulation: 0.39 seconds
-Estimated finishing time: 2020-03-19 15:36:31 
+Runtime of first simulation: 0.427 seconds
+Estimated finishing time: 2021-01-28 18:31:09 
 
 Simulation 2 / 2 ...	simulated 10 events up to time 61 
 
-Done (2020-03-19 15:36:31).
+Done (2021-01-28 18:31:09).
 > ## Don't show: 
 >     ## check construction and selection from "simEpidataCSlist"
 >     local({
@@ -11426,7 +11409,7 @@ Note: ignoring events of the prehistory (before "stgrid")
 + plotcsums(csums_observed, col=c(2,4), lwd=3)
 + legend("topleft", legend=levels(imdepi$events$type), col=c(2,4), lwd=1)
 + invisible(lapply(csums_simulated, plotcsums,
-+                  col=scales::alpha(c(2,4), alpha=0.5)))
++                  col=adjustcolor(c(2,4), alpha=0.5)))
 + }
 > 
 > 
@@ -11715,8 +11698,8 @@ FALSE  TRUE
 > 
 > # Compute the quality values in a nice formatted way
 > xtable(algo.quality(survResObj))
-% latex table generated in R 3.6.3 by xtable 1.8-4 package
-% Thu Mar 19 15:36:35 2020
+% latex table generated in R 4.0.3 by xtable 1.8-4 package
+% Thu Jan 28 18:31:13 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrrrrr}
@@ -11778,7 +11761,7 @@ FALSE  TRUE
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  72.289 0.953 73.971 0.08 0.083 
+Time elapsed:  66.133 0.796 67.248 0.092 0.077 
 > grDevices::dev.off()
 null device 
           1 
