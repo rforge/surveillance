@@ -99,7 +99,7 @@
 }
 
 
-\section{Changes in surveillance version 1.18.0 (2020-05-02)}{
+\section{Changes in surveillance version 1.18.0 (2020-03-18)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
