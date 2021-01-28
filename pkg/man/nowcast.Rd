@@ -218,16 +218,17 @@ nowcast(now, when, data, dEventCol="dHospital", dReportCol="dReport",
 }
 
 \references{
-  \enc{Höhle}{Hoehle} M and an der Heiden M (2014), Bayesian Nowcasting
-  during the STEC O104:H4 Outbreak in Germany, 2011, Biometrics,
+  \enc{Höhle}{Hoehle}, M. and an der Heiden, M. (2014): Bayesian nowcasting
+  during the STEC O104:H4 outbreak in Germany, 2011. \emph{Biometrics}
   70(4):993-1002. \doi{10.1111/biom.12194}.\cr
   A preprint is available as
   \url{https://staff.math.su.se/hoehle/pubs/hoehle_anderheiden2014-preprint.pdf}.
 
-  \enc{Günther}{Guenther}, F. and Bender, A. and Katz, K., and
-  \enc{Küchenhoff}{Kuechenhoff}, H. and \enc{Höhle}{Hoehle}, M. (2020)
-  Nowcasting the COVID-19 Pandemic in Bavaria, 
-  Preprint available as \url{https://www.stablab.stat.uni-muenchen.de/_assets/docs/nowcasting_covid19_bavaria.pdf}.
+  \enc{Günther}{Guenther}, F. and Bender, A. and Katz, K. and
+  \enc{Küchenhoff}{Kuechenhoff}, H. and \enc{Höhle}{Hoehle}, M. (2020):
+  Nowcasting the COVID-19 pandemic in Bavaria.
+  \emph{Biometrical Journal}. \doi{10.1002/bimj.202000112}\cr
+  Preprint available at \doi{10.1101/2020.06.26.20140210}.
 }
 
 
