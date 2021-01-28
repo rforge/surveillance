@@ -89,8 +89,11 @@
     \code{dependencies = TRUE}) in a \emph{factory-fresh} R environment
     from 119 to 94.
 
-    \item \CRANpkg{spatstat} was split into multiple packages, of which
-    we only need to import \CRANpkg{spatstat.geom}.
+    \item \CRANpkg{spatstat} was split into several sub-packages, of which
+    we only need to import \CRANpkg{spatstat.geom}. This new package
+    requires \code{R >= 3.5.0}, though.
+
+    \item \pkg{surveillance} now requires \code{R >= 3.6.0}.
   }
 }
 }
