@@ -328,16 +328,17 @@ plot(districtsD)
 plot(stateD, add=TRUE, border=2, lwd=2)
 # 'stateD' was obtained as 'rgeos::gUnaryUnion(districtsD)'
 
-## simulate 2 realizations (during a VERY short period -- for speed)
+## simulate 2 realizations (over a short period, for speed)
 ## considering events from data(imdepi) before t=31 as prehistory
 mysims <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
                    tiles=districtsD, newcoef=c("e.typeC"=-1),
-                   t0=31, T=61, simplify=TRUE)
+                   t0=31, T=if (interactive()) 180 else 45, # for CRAN
+                   simplify=TRUE)
 \dontshow{
     ## check construction and selection from "simEpidataCSlist"
     local({
         mysim_from_list <- mysims[[1]]
-        mysim_single <- eval("[[<-"(attr(mysims, "call"), "nsim", 1))
+        capture.output(mysim_single <- eval("[[<-"(attr(mysims, "call"), "nsim", 1)))
         mysim_from_list$runtime <- mysim_single$runtime <- NULL
         stopifnot(all.equal(mysim_single, mysim_from_list,
                             check.attributes = FALSE))
@@ -345,19 +346,18 @@ mysims <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
     ## check equivalence of Lambdag from simulation and residuals via twinstim
     stopifnot(all.equal(
         residuals(mysims[[1]]),
-        surveillance:::residuals.twinstim(surveillance:::as.twinstim.simEpidataCS(mysims[[1]]))
+        suppressMessages(surveillance:::residuals.twinstim(surveillance:::as.twinstim.simEpidataCS(mysims[[1]])))
     ))
 }
 
-## extract the second realization -> object of class simEpidataCS
+## plot both simulations using the plot-method for simEpidataCSlist's
 mysims
+plot(mysims, aggregate="time")
+
+## extract the second realization -> object of class simEpidataCS
 mysim2 <- mysims[[2]]
 summary(mysim2)
 plot(mysim2, aggregate="space")
-
-## plot both epidemics using the plot-method for simEpidataCSlist's
-plot(mysims, aggregate="time", by=NULL)
-
 
 if (surveillance.options("allExamples")) {
 ### compare the observed _cumulative_ number of cases during the
