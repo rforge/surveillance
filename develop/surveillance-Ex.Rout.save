@@ -4579,7 +4579,7 @@ $h
 > ### ** Examples
 > 
 > formatDate(Sys.Date(), "%G/%OQ/%q")
-[1] "2021/I/28"
+[1] "2021/I/29"
 > 
 > 
 > 
@@ -5482,25 +5482,26 @@ Number of time points:  103
 > plot(measlesFit, total = TRUE)
 > ## little contribution from neighbouring districts
 > 
-> ## simpler model with autoregressive effects captured by the ne component
-> measlesModel2 <- list(
+> 
+> if (surveillance.options("allExamples")) {
++ ## simpler model with autoregressive effects captured by the ne component
++ measlesModel2 <- list(
 +     ne = list(f = ~ 1, weights = W_powerlaw(maxlag=5, from0=TRUE)),
 +     end = list(f = addSeason2formula(~-1 + ri(), S=1, period=52)),
 +     family = "NegBin1")
-> measlesFit2 <- hhh4(measlesWeserEms, measlesModel2)
-> ## omitting the separate AR component simplifies model extensions/selection
-> ## and interpretation of covariate effects (only two predictors left)
-> 
-> plot(measlesFit2, type = "neweights", exclude = NULL, xlab = "adjacency order")
-> ## strong decay, again mostly within-district transmission
-> ## (one could also try a purely autoregressive model)
-> plot(measlesFit2, total = TRUE,
++ measlesFit2 <- hhh4(measlesWeserEms, measlesModel2)
++ ## omitting the separate AR component simplifies model extensions/selection
++ ## and interpretation of covariate effects (only two predictors left)
++ 
++ plot(measlesFit2, type = "neweights", exclude = NULL, xlab = "adjacency order")
++ ## strong decay, again mostly within-district transmission
++ ## (one could also try a purely autoregressive model)
++ plot(measlesFit2, total = TRUE,
 +      legend.args = list(legend = c("epidemic", "endemic")))
-> ## almost the same RMSE as with separate AR and NE effects
-> sqrt(mean(residuals(measlesFit, "response")^2))
-[1] 2.16342
-> sqrt(mean(residuals(measlesFit2, "response")^2))
-[1] 2.160085
++ ## almost the same RMSE as with separate AR and NE effects
++ c(rmse1 = sqrt(mean(residuals(measlesFit, "response")^2)),
++   rmse2 = sqrt(mean(residuals(measlesFit2, "response")^2)))
++ }
 > 
 > 
 > 
@@ -5573,9 +5574,6 @@ Number of time points:  103
 > 
 > ## fitted mean components/proportions by district, averaged over time
 > if (requireNamespace("gridExtra")) {
-+     plot(measlesFit, type="maps", labels=list(cex=0.6),
-+          which=c("mean", "endemic", "epi.own"),
-+          main=c("total", "endemic", "autoregressive"))
 +     plot(measlesFit, type="maps", labels=list(cex=0.6),
 +          which=c("endemic", "epi.own"), prop=TRUE, zmax=NA,
 +          main=c("endemic proportion", "autoregressive proportion"))
@@ -5652,9 +5650,6 @@ Loading required namespace: scales
 +      legend=5, legend.args=list(x="top"), xlab="Time (weekly)",
 +      hide0s=TRUE, ylim=c(0,max(observed(measlesWeserEms)[,bigunits])),
 +      start=c(2002,1), end=c(2002,26), par.settings=list(xaxs="i"))
-> 
-> ## plot completely decomposed mean structure (useless without 'ne' component)
-> plot(measlesFit, units=bigunits, col=rainbow(measlesFit$nUnit), decompose=TRUE)
 > 
 > 
 > 
@@ -6160,16 +6155,12 @@ z = 0.049572, n = 5, p-value = 0.9605
 > 
 > data("measlesWeserEms")
 > 
-> ## fit a hhh4 model with random effects in the endemic component
+> ## simple hhh4 model with random effects in the endemic component
 > measlesModel <- list(
 +     end = list(f = addSeason2formula(~0 + ri(type="iid"))),
 +     ar = list(f = ~1),
-+     ne = list(f = ~1, weights = W_powerlaw(maxlag = 5)),
 +     family = "NegBin1")
 > measlesFit <- hhh4(measlesWeserEms, control = measlesModel)
-> 
-> ## plot fitted mean components
-> plot(measlesFit, units = NULL)
 > 
 > ## assess overall (in-sample) calibration of the model, i.e.,
 > ## if the observed counts are from the fitted NegBin distribution
@@ -6178,21 +6169,21 @@ z = 0.049572, n = 5, p-value = 0.9605
 	Calibration Test for Count Data (based on DSS)
 
 data:  measlesFit
-z = 2.9553, n = 1751, p-value = 0.003124
+z = 3.118, n = 1751, p-value = 0.001821
 
-> calibrationTest(measlesFit, which = "rps")  # p = 0.8267
+> calibrationTest(measlesFit, which = "rps")  # p = 0.9322
 
 	Calibration Test for Count Data (based on RPS)
 
 data:  measlesFit
-z = -0.21894, n = 1751, p-value = 0.8267
+z = -0.085113, n = 1751, p-value = 0.9322
 
-> calibrationTest(measlesFit, which = "logs") # p = 0.636
+> calibrationTest(measlesFit, which = "logs") # p = 0.7238
 
 	Calibration Test for Count Data (based on LOGS)
 
 data:  measlesFit
-z = -0.47331, n = 1751, p-value = 0.636
+z = -0.35334, n = 1751, p-value = 0.7238
 
 > 
 > ## to assess calibration in the second year for a specific district
@@ -6201,7 +6192,7 @@ z = -0.47331, n = 1751, p-value = 0.636
 	Calibration Test for Count Data (based on RPS)
 
 data:  measlesFit
-z = 0.56669, n = 52, p-value = 0.5709
+z = 0.27416, n = 52, p-value = 0.784
 
 > pit(measlesFit, subset = 53:104, units = "03452")
 > 
@@ -6705,7 +6696,7 @@ dt      <= 50  > 50
 > ## contingency table in LaTeX
 > toLatex(knoxtest)
 % latex table generated in R 4.0.3 by xtable 1.8-4 package
-% Thu Jan 28 18:30:38 2021
+% Fri Jan 29 17:39:55 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{r|rr|r}
@@ -6881,7 +6872,7 @@ $\sum$ & 6817 & 49463 & 56280 \\
 $ar
 $ar$f
 ~1
-<environment: 0x11f0d478>
+<environment: 0x16e3fa58>
 
 $ar$offset
 [1] 1
@@ -6890,7 +6881,7 @@ $ar$offset
 $ne
 $ne$f
 ~1
-<environment: 0x11f0d478>
+<environment: 0x16e3fa58>
 
 $ne$offset
 [1] 1
@@ -8819,7 +8810,7 @@ $gpclib
 > salm <- farringtonFlexible(salm,control=control)
 > toLatex(salm)
 % latex table generated in R 4.0.3 by xtable 1.8-4 package
-% Thu Jan 28 18:30:56 2021
+% Fri Jan 29 17:40:13 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrlr}
@@ -9618,21 +9609,21 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
 \hline
 \hline 
 % latex table generated in R 4.0.3 by xtable 1.8-4 package
-% Thu Jan 28 18:31:02 2021
+% Fri Jan 29 17:40:19 2021
  \texttt{h.(Intercept)} & $-20.481$ & $0.053$ & $-389.0$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{h.I(start/365-3.5)} & $-0.041$ & $0.022$ & $-1.9$ & $0.06$ \\ 
   \texttt{h.sin(2*pi*start/365)} & $0.242$ & $0.064$ & $3.8$ & $2\cdot{}10^{-04}$ \\ 
   \texttt{h.cos(2*pi*start/365)} & $0.350$ & $0.064$ & $5.4$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
 % latex table generated in R 4.0.3 by xtable 1.8-4 package
-% Thu Jan 28 18:31:02 2021
+% Fri Jan 29 17:40:19 2021
  \texttt{e.(Intercept)} & $-16.90$ & $0.26$ & $-64$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
 \end{tabular}
 > # or, to report rate ratios
 > xtable(s)
 % latex table generated in R 4.0.3 by xtable 1.8-4 package
-% Thu Jan 28 18:31:02 2021
+% Fri Jan 29 17:40:19 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -9968,8 +9959,8 @@ $g
 function (t, logvals, types) 
 heights(logvals)[(types - 1) * nallknots + .bincode(t, allknotsInf, 
     right = FALSE)]
-<bytecode: 0x1ae338b0>
-<environment: 0x1ae2c110>
+<bytecode: 0x1d07c9a8>
+<environment: 0x1d06b8f8>
 
 $G
 function (t, logvals, types) 
@@ -9979,7 +9970,7 @@ function (t, logvals, types)
         sum(typeheights(logvals, type) * diff.default(knots2t))
     }, t, types, SIMPLIFY = TRUE, USE.NAMES = FALSE)
 }
-<environment: 0x1ae2c110>
+<environment: 0x1d06b8f8>
 
 $deriv
 function (t, logvals, types) 
@@ -9995,8 +9986,8 @@ function (t, logvals, types)
     dim(res) <- c(L, npars)
     res
 }
-<bytecode: 0x1ae30c70>
-<environment: 0x1ae2c110>
+<bytecode: 0x1d070388>
+<environment: 0x1d06b8f8>
 
 $Deriv
 function (t, logvals, types) 
@@ -10015,7 +10006,7 @@ function (t, logvals, types)
     dim(res) <- c(L, npars)
     res
 }
-<environment: 0x1ae2c110>
+<environment: 0x1d06b8f8>
 
 $npars
 [1] 4
@@ -10681,16 +10672,16 @@ function (s, logvals, types = NULL)
     sLength <- sqrt(.rowSums(s^2, length(s)/2, 2L))
     c(1, exp(logvals), 0)[.bincode(sLength, allknots, right = FALSE)]
 }
-<bytecode: 0x1ac19d70>
-<environment: 0x1ac10d80>
+<bytecode: 0x1961f3d0>
+<environment: 0x1963ee40>
 
 $F
 function (polydomain, f, logvals, type = NULL, npoly = 256) 
 {
     sum(c(1, exp(logvals)) * ringAreas(polydomain, npoly = npoly))
 }
-<bytecode: 0x1ac14840>
-<environment: 0x1ac10d80>
+<bytecode: 0x1961fe50>
+<environment: 0x1963ee40>
 
 $Fcircle
 function (r, logvals, type = NULL) 
@@ -10698,8 +10689,8 @@ function (r, logvals, type = NULL)
     sum(c(1, exp(logvals)) * pi * diff(pmin.int(allknotsPos, 
         r)^2))
 }
-<bytecode: 0x1ac14d80>
-<environment: 0x1ac10d80>
+<bytecode: 0x19620390>
+<environment: 0x1963ee40>
 
 $deriv
 function (s, logvals, types = NULL) 
@@ -10713,8 +10704,8 @@ function (s, logvals, types = NULL)
     dim(deriv) <- c(L, nknots)
     deriv
 }
-<bytecode: 0x1ac154f0>
-<environment: 0x1ac10d80>
+<bytecode: 0x196435c0>
+<environment: 0x1963ee40>
 
 $Deriv
 function (polydomain, deriv, logvals, type = NULL, npoly = 256) 
@@ -10722,8 +10713,8 @@ function (polydomain, deriv, logvals, type = NULL, npoly = 256)
     ringAreas <- ringAreas(polydomain, npoly = npoly)
     exp(logvals) * ringAreas[-1L]
 }
-<bytecode: 0x1ac12ca0>
-<environment: 0x1ac10d80>
+<bytecode: 0x19644ba0>
+<environment: 0x1963ee40>
 
 $simulate
 function (n, logvals, type = NULL, ub) 
@@ -10735,8 +10726,8 @@ function (n, logvals, type = NULL, ub)
         prob = heights * diff.default(c(0, knots2upper^2)))
     runifdisc(n, knots2upper[rings], c(0, knots2upper)[rings])
 }
-<bytecode: 0x1ac132f8>
-<environment: 0x1ac10d80>
+<bytecode: 0x196451f8>
+<environment: 0x1963ee40>
 
 $npars
 [1] 3
@@ -11003,14 +10994,14 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
 \hline
 \hline 
 % latex table generated in R 4.0.3 by xtable 1.8-4 package
-% Thu Jan 28 18:31:05 2021
+% Fri Jan 29 17:40:23 2021
  \texttt{h.(Intercept)} & $-20.52869$ & $0.04724$ & $-434.597$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{h.I(start/365-3.5)} & $-0.04574$ & $0.02212$ & $-2.068$ & $0.03863$ \\ 
   \texttt{h.sin(2*pi*start/365)} & $0.21728$ & $0.06467$ & $3.360$ & $0.00078$ \\ 
   \texttt{h.cos(2*pi*start/365)} & $0.31810$ & $0.06380$ & $4.986$ & $<1\cdot{}10^{-04}$ \\ 
   \hline 
 % latex table generated in R 4.0.3 by xtable 1.8-4 package
-% Thu Jan 28 18:31:05 2021
+% Fri Jan 29 17:40:23 2021
  \texttt{e.(Intercept)} & $-12.51659$ & $0.32326$ & $-38.720$ & $<1\cdot{}10^{-04}$ \\ 
   \texttt{e.typeC} & $-0.90832$ & $0.26742$ & $-3.397$ & $0.000682$ \\ 
   \texttt{e.agegrp[3,19)} & $0.70612$ & $0.32706$ & $2.159$ & $0.030852$ \\ 
@@ -11022,7 +11013,7 @@ Corr. codes:  0 ‘ ’ 0.3 ‘.’ 0.6 ‘,’ 0.8 ‘+’ 0.9 ‘*’ 0.95 ‘
 > # or using the xtable-method (which produces rate ratios)
 > xtable(s)
 % latex table generated in R 4.0.3 by xtable 1.8-4 package
-% Thu Jan 28 18:31:05 2021
+% Fri Jan 29 17:40:23 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
@@ -11257,13 +11248,14 @@ Data attributes:
 > plot(stateD, add=TRUE, border=2, lwd=2)
 > # 'stateD' was obtained as 'rgeos::gUnaryUnion(districtsD)'
 > 
-> ## simulate 2 realizations (during a VERY short period -- for speed)
+> ## simulate 2 realizations (over a short period, for speed)
 > ## considering events from data(imdepi) before t=31 as prehistory
 > mysims <- simulate(imdepifit, nsim=2, seed=1, data=imdepi,
 +                    tiles=districtsD, newcoef=c("e.typeC"=-1),
-+                    t0=31, T=61, simplify=TRUE)
++                    t0=31, T=if (interactive()) 180 else 45, # for CRAN
++                    simplify=TRUE)
 
-Time at beginning of simulation: 2021-01-28 18:31:09 
+Time at beginning of simulation: 2021-01-29 17:40:25 
 Simulation 1 / 2 ...
 -------------------------------------------------------------------------------
 
@@ -11282,105 +11274,82 @@ h.cos(2 * pi * start/365)             e.(Intercept)                   e.typeC
                0.70611556               -0.24083969                2.76773501 
 
 Simulating (starting from t=31) ...
-Simulation has ended @t = 61 with 15 simulated events.
+Simulation has ended @t = 45 with 3 simulated events.
 
 Preparing simulated events for "epidataCS" ...
 Done.
 
 -------------------------------------------------------------------------------
-Runtime of first simulation: 0.427 seconds
-Estimated finishing time: 2021-01-28 18:31:09 
+Runtime of first simulation: 0.141 seconds
+Estimated finishing time: 2021-01-29 17:40:25 
 
-Simulation 2 / 2 ...	simulated 10 events up to time 61 
+Simulation 2 / 2 ...	simulated 5 events up to time 45 
 
-Done (2021-01-28 18:31:09).
+Done (2021-01-29 17:40:26).
 > ## Don't show: 
 >     ## check construction and selection from "simEpidataCSlist"
 >     local({
 +         mysim_from_list <- mysims[[1]]
-+         mysim_single <- eval("[[<-"(attr(mysims, "call"), "nsim", 1))
++         capture.output(mysim_single <- eval("[[<-"(attr(mysims, "call"), "nsim", 1)))
 +         mysim_from_list$runtime <- mysim_single$runtime <- NULL
 +         stopifnot(all.equal(mysim_single, mysim_from_list,
 +                             check.attributes = FALSE))
 +     })
-
-Checking the supplied arguments ...
-
-Simulating a marked spatio-temporal point pattern with 
-	- 2 event types 
-	- 4 events in the prehistory
-	- 9 coefficients:
-
-            h.(Intercept)      h.I(start/365 - 3.5) h.sin(2 * pi * start/365) 
-             -20.52869499               -0.04574093                0.21728211 
-h.cos(2 * pi * start/365)             e.(Intercept)                   e.typeC 
-               0.31810266              -12.51659414               -1.00000000 
-           e.agegrp[3,19)          e.agegrp[19,Inf)                  e.siaf.1 
-               0.70611556               -0.24083969                2.76773501 
-
-Simulating (starting from t=31) ...
-Simulation has ended @t = 61 with 15 simulated events.
-
-Preparing simulated events for "epidataCS" ...
-Done.
 >     ## check equivalence of Lambdag from simulation and residuals via twinstim
 >     stopifnot(all.equal(
 +         residuals(mysims[[1]]),
-+         surveillance:::residuals.twinstim(surveillance:::as.twinstim.simEpidataCS(mysims[[1]]))
++         suppressMessages(surveillance:::residuals.twinstim(surveillance:::as.twinstim.simEpidataCS(mysims[[1]])))
 +     ))
-'surveillance:::as.twinstim.simEpidataCSmysims[[1]]' was fit with disabled 'cumCIF' -> calculate it now ...
-Note: added the 'tau' component to object 'surveillance:::as.twinstim.simEpidataCS(mysims[[1]])' for future use.
 > ## End(Don't show)
 > 
-> ## extract the second realization -> object of class simEpidataCS
+> ## plot both simulations using the plot-method for simEpidataCSlist's
 > mysims
 
 Call:
 simulate.twinstim(object = imdepifit, nsim = 2, seed = 1, data = imdepi, 
-    tiles = districtsD, newcoef = c(e.typeC = -1), t0 = 31, T = 61, 
+    tiles = districtsD, newcoef = c(e.typeC = -1), t0 = 31, T = if (interactive()) 180 else 45, 
     simplify = TRUE)
 
 Simplified list of 2 simulated epidemics of class "simEpidataCS" (not printed)
 
+> plot(mysims, aggregate="time")
+Note: ignoring events of the prehistory (before "stgrid")
+Note: ignoring events of the prehistory (before "stgrid")
+> 
+> ## extract the second realization -> object of class simEpidataCS
 > mysim2 <- mysims[[2]]
 > summary(mysim2)
-Observation period: 31 - 61 
+Observation period: 31 - 45 
 Observation window (bounding box): [4031.295, 4672.253] x [2684.102, 3549.931] 
-Spatio-temporal grid (not shown): 2 time blocks x 413 tiles 
-Overall number of events: 14 (2 types, prehistory: 4)
+Spatio-temporal grid (not shown): 1 time block, x 413 tiles 
+Overall number of events: 9 (2 types, prehistory: 4)
 
 Summary of event marks and number of potential sources:
       time             tile   type      eps.t        eps.s         sex   
- Min.   : 5.591   01056  :1   B:8   Min.   :30   Min.   :200   female:9  
- 1st Qu.:26.630   03454  :1   C:6   1st Qu.:30   1st Qu.:200   male  :5  
- Median :42.623   03462  :1         Median :30   Median :200             
- Mean   :39.266   05170  :1         Mean   :30   Mean   :200             
- 3rd Qu.:54.131   05513  :1         3rd Qu.:30   3rd Qu.:200             
- Max.   :59.125   05554  :1         Max.   :30   Max.   :200             
-                  (Other):8                                              
-      agegrp      source     lambda.h        lambda.e        Lambdag       
- [0,3)   :1   Min.   :0   Min.   :0e+00   Min.   :0e+00   Min.   : 0.2408  
- [3,19)  :7   1st Qu.:0   1st Qu.:0e+00   1st Qu.:0e+00   1st Qu.: 4.0860  
- [19,Inf):6   Median :0   Median :1e-06   Median :0e+00   Median : 6.9403  
-              Mean   :0   Mean   :2e-06   Mean   :0e+00   Mean   : 6.6192  
-              3rd Qu.:0   3rd Qu.:2e-06   3rd Qu.:0e+00   3rd Qu.: 9.8084  
-              Max.   :0   Max.   :6e-06   Max.   :2e-06   Max.   :10.4196  
-              NA's   :4   NA's   :4       NA's   :4       NA's   :4        
+ Min.   : 5.591   01053  :1   B:4   Min.   :30   Min.   :200   female:2  
+ 1st Qu.:22.060   03454  :1   C:5   1st Qu.:30   1st Qu.:200   male  :7  
+ Median :32.453   05113  :1         Median :30   Median :200             
+ Mean   :26.805   05170  :1         Mean   :30   Mean   :200             
+ 3rd Qu.:35.257   05314  :1         3rd Qu.:30   3rd Qu.:200             
+ Max.   :43.459   05554  :1         Max.   :30   Max.   :200             
+                  (Other):3                                              
+      agegrp      source     lambda.h        lambda.e    Lambdag      
+ [0,3)   :2   Min.   :0   Min.   :0e+00   Min.   :0   Min.   :0.5326  
+ [3,19)  :5   1st Qu.:0   1st Qu.:0e+00   1st Qu.:0   1st Qu.:0.9549  
+ [19,Inf):2   Median :0   Median :0e+00   Median :0   Median :1.5766  
+              Mean   :0   Mean   :2e-06   Mean   :0   Mean   :1.9560  
+              3rd Qu.:0   3rd Qu.:5e-06   3rd Qu.:0   3rd Qu.:2.1333  
+              Max.   :0   Max.   :6e-06   Max.   :0   Max.   :4.5828  
+              NA's   :4   NA's   :4       NA's   :4   NA's   :4       
        x              y          |.sources|    
- Min.   :4090   Min.   :2729   Min.   :0.0000  
- 1st Qu.:4133   1st Qu.:2889   1st Qu.:0.0000  
- Median :4209   Median :3081   Median :0.0000  
- Mean   :4215   Mean   :3076   Mean   :0.5714  
- 3rd Qu.:4270   3rd Qu.:3228   3rd Qu.:1.0000  
- Max.   :4412   Max.   :3415   Max.   :2.0000  
+ Min.   :4090   Min.   :2742   Min.   :0.0000  
+ 1st Qu.:4115   1st Qu.:2916   1st Qu.:0.0000  
+ Median :4134   Median :3143   Median :0.0000  
+ Mean   :4224   Mean   :3092   Mean   :0.4444  
+ 3rd Qu.:4360   3rd Qu.:3223   3rd Qu.:0.0000  
+ Max.   :4463   Max.   :3370   Max.   :2.0000  
                                                
 > plot(mysim2, aggregate="space")
-> 
-> ## plot both epidemics using the plot-method for simEpidataCSlist's
-> plot(mysims, aggregate="time", by=NULL)
-Note: ignoring events of the prehistory (before "stgrid")
-Note: ignoring events of the prehistory (before "stgrid")
-> 
 > 
 > if (surveillance.options("allExamples")) {
 + ### compare the observed _cumulative_ number of cases during the
@@ -11699,7 +11668,7 @@ FALSE  TRUE
 > # Compute the quality values in a nice formatted way
 > xtable(algo.quality(survResObj))
 % latex table generated in R 4.0.3 by xtable 1.8-4 package
-% Thu Jan 28 18:31:13 2021
+% Fri Jan 29 17:40:29 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrrrrr}
@@ -11761,7 +11730,7 @@ FALSE  TRUE
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  66.133 0.796 67.248 0.092 0.077 
+Time elapsed:  63.782 0.898 64.967 0.078 0.095 
 > grDevices::dev.off()
 null device 
           1 
