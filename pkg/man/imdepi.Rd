@@ -109,9 +109,9 @@ data("imdepi")
 
 \source{
   IMD case reports: German Reference Centre for Meningococci
-  (\url{http://www.meningococcus.de/})
   at the Department of Hygiene and Microbiology,
-  Julius-Maximilians-Universit\enc{ä}{ae}t W\enc{ü}{ue}rzburg, Germany.
+  Julius-Maximilians-Universit\enc{ä}{ae}t W\enc{ü}{ue}rzburg, Germany
+  (\url{https://www.hygiene.uni-wuerzburg.de/meningococcus/}).
   Thanks to Dr. Johannes Elias and Prof. Dr. Ulrich Vogel for providing
   the data.
 
