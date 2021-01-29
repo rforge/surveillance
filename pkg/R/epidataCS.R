@@ -412,12 +412,13 @@ check_tiles <- function (tiles, levels,
     tileIDs <- row.names(tiles)
 
     ## check completeness of tiles
-    if (any(missingtiles <- !levels %in% tileIDs))
-        stop(sum(missingtiles), " regions are missing in 'tiles', ",
-             "check 'row.names(tiles)'")
-
-    ## re-order: first 'levels', then any extra tiles
-    tiles <- tiles[c(levels, setdiff(tileIDs, levels)),]
+    if (!identical(tileIDs, levels)) {
+        if (any(missingtiles <- !levels %in% tileIDs))
+            stop(sum(missingtiles), " regions are missing in 'tiles', ",
+                 "check 'row.names(tiles)'")
+        ## order tiles by levels and drop any extra tiles
+        tiles <- tiles[levels, ]
+    }
 
     ## drop data (also for suitable over-method in check_tiles_events)
     .tiles <- as(tiles, "SpatialPolygons")
@@ -428,7 +429,7 @@ check_tiles <- function (tiles, levels,
     }
 
     ## check areas
-    areas.tiles <- areaSpatialPolygons(tiles[levels,], byid = TRUE)
+    areas.tiles <- areaSpatialPolygons(tiles, byid = TRUE)
     if (!is.null(areas.stgrid)) {
         check_tiles_areas(areas.tiles, areas.stgrid, tolerance=tolerance)
     }

@@ -791,12 +791,8 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                             ") not in 'tiles'")
                     stop("'tiles' must cover all of 'W'")
                 }
-                .eventTile <- row.names(tiles)[whichTile]
-                .eventTile <- factor(.eventTile, levels=tileLevels)
-                if (is.na(.eventTile))
-                    stop("tile \"", row.names(tiles)[whichTile],
-                         "\" of simulated event is no level of stgrid$tile",
-                         "\n-> verify row.names(tiles)")
+                .eventTile <- factor(row.names(tiles)[whichTile],
+                                     levels = tileLevels)
             }
             .eventType <- factor(.eventType, levels=typeNames)
 
