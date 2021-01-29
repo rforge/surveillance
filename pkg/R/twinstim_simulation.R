@@ -86,10 +86,9 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         stgrid <- check_stgrid(stgrid[grep("^BLOCK$", names(stgrid), invert=TRUE)])
     }
 
-    W <- if (is.null(W)) {
-        cat("Building 'W' as the union of 'tiles' ...\n")
-    	unionSpatialPolygons(tiles)
-    } else check_W(W)  # does as(W, "SpatialPolygons")
+    if (!is.null(W)) {
+        W <- check_W(W)  # does as(W, "SpatialPolygons")
+    }
 
     if (!.skipChecks) {
         cat("Checking 'tiles' ...\n")
@@ -99,6 +98,11 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
     tiles <- check_tiles(tiles, tileLevels,
                          areas.stgrid = stgrid[["area"]][seq_along(tileLevels)],
                          W = W, keep.data = FALSE)
+
+    if (is.null(W)) {
+        cat("Building 'W' as the union of 'tiles' ...\n")
+        W <- unionSpatialPolygons(tiles)
+    }
 
     ## Transform W to class "owin"
     Wowin <- SpP2owin(W)
