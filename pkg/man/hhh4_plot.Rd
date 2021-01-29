@@ -334,9 +334,6 @@ plot(measlesFit, type="maxEV")  # not very exciting
 ## fitted mean components/proportions by district, averaged over time
 if (requireNamespace("gridExtra")) {
     plot(measlesFit, type="maps", labels=list(cex=0.6),
-         which=c("mean", "endemic", "epi.own"),
-         main=c("total", "endemic", "autoregressive"))
-    plot(measlesFit, type="maps", labels=list(cex=0.6),
          which=c("endemic", "epi.own"), prop=TRUE, zmax=NA,
          main=c("endemic proportion", "autoregressive proportion"))
 }
@@ -362,9 +359,6 @@ plot(measlesFit, units=bigunits,
      legend=5, legend.args=list(x="top"), xlab="Time (weekly)",
      hide0s=TRUE, ylim=c(0,max(observed(measlesWeserEms)[,bigunits])),
      start=c(2002,1), end=c(2002,26), par.settings=list(xaxs="i"))
-
-## plot completely decomposed mean structure (useless without 'ne' component)
-plot(measlesFit, units=bigunits, col=rainbow(measlesFit$nUnit), decompose=TRUE)
 }
 
 \keyword{hplot}
