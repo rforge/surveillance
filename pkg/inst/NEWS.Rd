@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.19.0 (2021-01-28)}{
+\section{Changes in surveillance version 1.19.0 (2021-01-29)}{
 
 \subsection{NEW FEATURES}{
   \itemize{
@@ -73,6 +73,10 @@
 
     \item \code{stsplot_space()} automatically extends manual color
     breaks (\code{at}), if the intervals do not cover the data range.
+
+    \item \code{simEndemicEvents()} and thus
+    \code{epitest(..., method="simulate")} are no longer slowed down by
+    intermediate \code{CRS()} computations.
   }
 }
 
