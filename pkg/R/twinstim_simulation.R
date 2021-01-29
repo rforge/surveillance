@@ -1053,6 +1053,10 @@ simEndemicEvents <- function (object, tiles)
         row.names = NULL, check.rows = FALSE, check.names = FALSE
     )
 
+    ## empty CRS to avoid spending 3/4 of this function's runtime in rebuild_CRS()
+    proj4string <- tiles@proj4string
+    tiles@proj4string <- new("CRS")
+
     ## sample coordinates from tiles
     nByTile <- tapply(X = nGrid, INDEX = lambdaGrid["tile"], FUN = sum)
     xyByTile <- sapply(
@@ -1070,7 +1074,7 @@ simEndemicEvents <- function (object, tiles)
     events <- SpatialPointsDataFrame(
         coords = do.call("rbind", xyByTile),
         data = events[order(events$tile),],
-        proj4string = tiles@proj4string,
+        proj4string = proj4string,
         match.ID = FALSE)
 
     ## order by time
