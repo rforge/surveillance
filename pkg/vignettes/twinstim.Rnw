@@ -1,6 +1,6 @@
 %\VignetteIndexEntry{twinstim: An endemic-epidemic modeling framework for spatio-temporal point patterns}
 %\VignetteEngine{knitr::knitr}
-%\VignetteDepends{surveillance, lattice, polyclip, memoise, maptools, spdep, colorspace}
+%\VignetteDepends{surveillance, grid, animation, polyclip, memoise, maptools, spdep, colorspace}
 
 <<setup, cache = FALSE, include = FALSE, purl = FALSE>>=
 ## purl=FALSE => not included in the tangle'd R script
