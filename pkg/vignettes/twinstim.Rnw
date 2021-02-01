@@ -1168,6 +1168,7 @@ Rbib <- knitr::write_bib(
     c("memoise", "sp", "polyclip",
       "maptools", "animation", "xtable"),
     file = NULL, tweak = FALSE, prefix = "R:")
+## write_bib() to file does enc2utf8() -> fails for ISO8859-15 session charset
 writeLines(unlist(Rbib, use.names = FALSE), .Rbibfile)
 close(.Rbibfile)
 @
