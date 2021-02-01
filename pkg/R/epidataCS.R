@@ -205,8 +205,7 @@ check_events <- function (events, dropTypes = TRUE, verbose = TRUE)
 
     # check suitability of Euclidean geometry
     if (identical(FALSE, is.projected(events))) { # is.projected may return NA
-        warning("\"epidataCS\" expects planar coordinates; ",
-                "see 'spTransform' in package \"rgdal\"")
+        warning("\"epidataCS\" expects planar coordinates; see 'spTransform'")
     }
 
     # Check existence of type column
