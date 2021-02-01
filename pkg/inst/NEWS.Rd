@@ -8,6 +8,13 @@
 \encoding{latin1}
 
 
+\section{Changes in surveillance version 1.19.0.9000 (UNRELEASED)}{
+
+
+
+}
+
+
 \section{Changes in surveillance version 1.19.0 (2021-01-29)}{
 
 \subsection{NEW FEATURES}{
