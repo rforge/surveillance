@@ -10,7 +10,15 @@
 
 \section{Changes in surveillance version 1.19.0.9000 (UNRELEASED)}{
 
-
+\subsection{BUG FIXES}{
+  \itemize{
+    \item The \code{CRS}s in \code{data(imdepi)} have been updated via
+    \code{sp}'s \code{rebuild_CRS()} to avoid warnings when \pkg{rgdal}
+    is loaded with new PROJ and GDAL libraries.
+    For the same reason, \code{simEpidataCS()} now internally resets the
+    CRS, which also reduces its runtime by about 25\%.
+  }
+}
 
 }
 
