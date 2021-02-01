@@ -471,7 +471,7 @@ options(oopt)
 The associated event coordinates are residence postcode centroids, projected in
 the \emph{European Terrestrial Reference System 1989} (in kilometer units)
 to enable Euclidean geometry.
-See the \code{spTransform}-methods in package \CRANpkg{rgdal} \citep{R:rgdal}
+See the \code{spTransform}-methods
 for how to project latitude and longitude coordinates
 into a planar coordinate reference system (CRS).
 The data frame associated with these spatial coordinates ($\bm{s}_i$) contains a
@@ -1165,7 +1165,7 @@ and otherwise corresponds to the row index of the infective source.
 ## create automatic references for R packages
 .Rbibfile <- file("twinstim-R.bib", "w", encoding = "latin1")
 knitr::write_bib(
-    c("memoise", "sp", "rgdal", "polyclip",
+    c("memoise", "sp", "polyclip",
       "maptools", "animation", "xtable"),
     file = .Rbibfile, tweak = FALSE, prefix = "R:")
 close(.Rbibfile)
