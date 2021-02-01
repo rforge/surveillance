@@ -104,6 +104,11 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
         W <- unionSpatialPolygons(tiles)
     }
 
+    ## empty CRS to avoid costly intermediate CRS checks (and rgdal warnings)
+    if (!missing(events) && !is.null(events))
+        stopifnot(identicalCRS(tiles, events))
+    tiles@proj4string <- events@proj4string <- new("CRS")
+
     ## Transform W to class "owin"
     Wowin <- SpP2owin(W)
     maxExtentOfW <- diameter.owin(Wowin)
@@ -786,9 +791,7 @@ simEpidataCS <- function (endemic, epidemic, siaf, tiaf, qmatrix, rmarks,
                     }
 
                 .eventLocation <- sourceCoords + eventLocationIR
-                whichTile <- over(SpatialPoints(.eventLocation,
-                                                proj4string=tiles@proj4string),
-                                  tiles)
+                whichTile <- over(SpatialPoints(.eventLocation), tiles)
                 if (is.na(whichTile)) {
                     warning("event generated at (",
                             paste(.eventLocation, collapse=","),
