@@ -1164,10 +1164,11 @@ and otherwise corresponds to the row index of the infective source.
 <<Rbib, include = FALSE, purl = FALSE>>=
 ## create automatic references for R packages
 .Rbibfile <- file("twinstim-R.bib", "w", encoding = "latin1")
-knitr::write_bib(
+Rbib <- knitr::write_bib(
     c("memoise", "sp", "polyclip",
       "maptools", "animation", "xtable"),
-    file = .Rbibfile, tweak = FALSE, prefix = "R:")
+    file = NULL, tweak = FALSE, prefix = "R:")
+writeLines(unlist(Rbib, use.names = FALSE), .Rbibfile)
 close(.Rbibfile)
 @
 
