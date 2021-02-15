@@ -18,6 +18,9 @@
     is loaded with new PROJ and GDAL libraries.
     For the same reason, \code{simEpidataCS()} now internally resets the
     CRS, which also reduces its runtime by about 25\%.
+
+    \item Fix encoding error in \code{vignette("twinstim")} for CRAN's
+    non-UTF8 Linux test machine.
   }
 }
 
