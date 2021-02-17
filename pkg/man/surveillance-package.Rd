@@ -72,8 +72,9 @@
 %% Author information is dynamically extracted from the DESCRIPTION file
 \author{
   \Sexpr[stage=build]{
-    authors <- unname(eval(parse(text=tools:::.read_description("DESCRIPTION")["Authors@R"])))
-    paste0(format(authors[grep("aut", authors$role)], include = c("given", "family")), collapse = ", ")
+    aar <- unname(eval(parse(text=tools:::.read_description("DESCRIPTION")["Authors@R"])))
+    authors <- aar[grep("aut", aar$role)]
+    paste0(format(authors, include = c("given", "family")), collapse = ", ")
   }
 
   Maintainer: \packageMaintainer{surveillance}
@@ -84,15 +85,17 @@
 \section{Acknowledgements}{
   Substantial contributions of code by:
   \Sexpr[stage=build]{
-    authors <- unname(eval(parse(text=tools:::.read_description("DESCRIPTION")["Authors@R"])))
-    contributors <- authors[grepl("ctb", authors$role) & !sapply(authors$family, is.null)]
+    contributors <- aar[grepl("ctb", aar$role) & !sapply(aar$family, is.null)]
     paste0(format(contributors, include = c("given", "family")), collapse = ", ")
   }.
 
   Furthermore, the authors would like to thank the following people
   for ideas, discussions, testing and feedback:
   \Sexpr[stage=build]{
-    thanks <- readLines(list.files(pattern="THANKS", recursive=TRUE), encoding="latin1")
+    get_inst_file <- function (file) { # support `R CMD Rd2pdf .` in sources
+      if(dir.exists("inst")) file.path("inst", file) else file
+    }
+    thanks <- readLines(get_inst_file("THANKS"), encoding="latin1")
     paste0(grep("^(#|[[:blank:]]*$)", thanks, invert=TRUE, value=TRUE), collapse = ", ")
   }.
 }
@@ -104,7 +107,7 @@
 
   \Sexpr[stage=build,results=rd]{
     paste0("\\\itemize{\n", paste0("\\\item ", tools::toRd(
-      readCitationFile(list.files(pattern="CITATION", recursive=TRUE), list(Encoding="latin1"))
+      readCitationFile(get_inst_file("CITATION"), list(Encoding="latin1"))
     ), collapse = "\n\n"), "\n}")
   }
 
