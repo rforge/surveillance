@@ -122,7 +122,7 @@ NEWS_generated_from_HTML.md: NEWS.html
 
 www: 
 	cd pkg; $R --slave --no-save --no-restore -e \
-	  "pkgdown::build_site(examples = FALSE, document = FALSE, lazy = TRUE)"
+	  "pkgdown::build_site(examples = FALSE, lazy = TRUE)"
 
 
 clean:
