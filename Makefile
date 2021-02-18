@@ -23,7 +23,6 @@
 ##    7 Jun 2015 (SM): added rule to create the NEWS.html as on CRAN
 ##   12 Jun 2015 (SM): added rule to check with allExamples
 ##   17 Mar 2016 (SM): check-allExamples with --run-dontrun and --extra-arch
-##    6 Jun 2016 (SM): Rcpp attributes require an additional build step
 ##   21 Jun 2017 (SM): account for R code with roxygen documentation
 ##   12 Jul 2017 (SM): "quick" vs. CRAN-versions of build and check rules
 ##   13 Sep 2018 (SM): drop roxygen (no longer supports latin1 packages)
@@ -42,14 +41,10 @@ VERSION := $(shell $R --vanilla --slave -e 'cat(read.dcf("pkg/DESCRIPTION", fiel
 
 ## build the package
 BUILD_COMPACT_VIGNETTES := no
-build: Rcpp ${SYSDATA}
+build: ${SYSDATA}
 	$R CMD build --no-resave-data --compact-vignettes=${BUILD_COMPACT_VIGNETTES} pkg
 build-cran: BUILD_COMPACT_VIGNETTES := both
 build-cran: build
-
-## run Rcpp::compileAttributes
-Rcpp:
-	$R --no-restore --no-save --slave -e "Rcpp::compileAttributes('pkg')"
 
 ## Save internal datasets from pkg/sysdata/ into pkg/R/sysdata.rda
 ${SYSDATA}: pkg/sysdata/sysdata.R pkg/sysdata/REFERENCES
@@ -131,4 +126,4 @@ clean:
 	make -C pkg/vignettes clean
 	rm -f pkg/*/.Rhistory
 
-.PHONY: build build-cran Rcpp check check-cran check-allExamples install checkUsage manual www clean
+.PHONY: build build-cran check check-cran check-allExamples install checkUsage manual www clean
