@@ -1,6 +1,5 @@
-### Load C code
-
-useDynLib(surveillance)
+## refer to all C routines by their name prefixed by C_
+useDynLib(surveillance, .registration = TRUE, .fixes = "C_")
 
 importFrom(Rcpp, evalCpp) # see vignette("Rcpp-package", package="Rcpp")
 ## although Rcpp is only used on C-level we need to "ensure that Rcpp is loaded

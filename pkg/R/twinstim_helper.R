@@ -57,7 +57,7 @@ determineSources <- function (eventTimes, eps.t,
     }
 
     ## call C++ function
-    .Call("determineSourcesC", PACKAGE = "surveillance",
+    .Call(C_determineSources,
           eventTimes, rep_len(eps.t, N),
           eventCoords, rep_len(eps.s, N),
           as.integer(eventTypes), qmatrix)

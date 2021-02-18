@@ -21,7 +21,7 @@ NumericVector distsN1(NumericVector x, NumericVector y, double x0, double y0)
 }
 
 
-RcppExport SEXP determineSourcesC(
+RcppExport SEXP determineSources(
     SEXP eventTimesSEXP, SEXP eps_tSEXP,
     SEXP eventCoordsSEXP, SEXP eps_sSEXP,
     SEXP eventTypesSEXP, SEXP qmatrixSEXP

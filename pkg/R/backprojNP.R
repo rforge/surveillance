@@ -61,8 +61,10 @@ em.step.becker <- function(lambda.old, Y, dincu, pincu, k, incu.pmf, eq3a.method
       phi.new[t] <- naninf2zero(lambda.old[t]/pincu(T-t)) * sum3a
     }
   } else {
-    phi.new <- .Call("eq3a",lambda.old=as.numeric(lambda.old),Y=as.numeric(Y),incu.pmf=as.numeric(incu.pmf),PACKAGE="surveillance")
-    #phi.new <- eq3a(lambda.old, Y, incu.pmf)
+    phi.new <- .Call(C_eq3a,
+                     lambda.old = as.numeric(lambda.old),
+                     Y = as.numeric(Y),
+                     incu.pmf = as.numeric(incu.pmf))
   }
 
 
