@@ -2,7 +2,7 @@
 ### Endemic-epidemic modelling for univariate or multivariate
 ### time series of infectious disease counts (data class "sts")
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2012-2016,2019-2020 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2016,2019-2021 Sebastian Meyer
 ###
 ### This file is part of the R package "surveillance",
 ### free software under the terms of the GNU General Public License, version 2,
@@ -2143,12 +2143,11 @@ fitHHH <- function(theta, sd.corr, model,
         "Optimization converged" else "Optimization DID NOT CONVERGE", "\n\n")
   }
 
-  ll <- penLogLik(theta=theta,sd.corr=sd.corr,model=model)
-  fisher <- penFisher(theta=theta,sd.corr=sd.corr,model=model)
+  ll     <- penLogLik(theta, sd.corr, model)
+  fisher <- penFisher(theta, sd.corr, model, attributes = TRUE)
   dimnames(fisher) <- list(names(theta), names(theta))
-  margll <- marLogLik(sd.corr=sd.corr, theta=theta, model=model)
-  fisher.var <- marFisher(sd.corr=sd.corr, theta=theta, model=model,
-                          fisher.unpen=fisher.unpen)
+  margll     <- marLogLik(sd.corr, theta, model, attr(fisher, "fisher"))
+  fisher.var <- marFisher(sd.corr, theta, model, attr(fisher, "fisher"))
   dimnames(fisher.var) <- list(names(sd.corr), names(sd.corr))
 
   list(theta=theta, sd.corr=sd.corr,
