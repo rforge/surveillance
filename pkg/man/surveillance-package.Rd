@@ -72,7 +72,9 @@
 %% Author information is dynamically extracted from the DESCRIPTION file
 \author{
   \Sexpr[stage=build]{
-    aar <- unname(eval(parse(text=tools:::.read_description("DESCRIPTION")["Authors@R"])))
+    pkgdir <- tools:::Rd_macros_package_dir()  # support R CMD Rd2pdf pkg
+    desc <- tools:::.read_description(file.path(pkgdir, "DESCRIPTION"))
+    aar <- unname(eval(parse(text=desc["Authors@R"])))
     authors <- aar[grep("aut", aar$role)]
     paste0(format(authors, include = c("given", "family")), collapse = ", ")
   }
@@ -92,10 +94,12 @@
   Furthermore, the authors would like to thank the following people
   for ideas, discussions, testing and feedback:
   \Sexpr[stage=build]{
-    get_inst_file <- function (file) { # support `R CMD Rd2pdf .` in sources
-      if(dir.exists("inst")) file.path("inst", file) else file
+    find_inst_file <- function (file) { # support R CMD Rd2pdf in source package
+      if(dir.exists(file.path(pkgdir, "inst")))
+        file.path(pkgdir, "inst", file) else
+        file.path(pkgdir, file)
     }
-    thanks <- readLines(get_inst_file("THANKS"), encoding="latin1")
+    thanks <- readLines(find_inst_file("THANKS"), encoding="latin1")
     paste0(grep("^(#|[[:blank:]]*$)", thanks, invert=TRUE, value=TRUE), collapse = ", ")
   }.
 }
@@ -107,7 +111,7 @@
 
   \Sexpr[stage=build,results=rd]{
     paste0("\\\itemize{\n", paste0("\\\item ", tools::toRd(
-      readCitationFile(get_inst_file("CITATION"), list(Encoding="latin1"))
+      readCitationFile(find_inst_file("CITATION"), list(Encoding="latin1"))
     ), collapse = "\n\n"), "\n}")
   }
 
