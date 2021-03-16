@@ -75,6 +75,10 @@ export(fixef, ranef)  # we define corresponding methods for "hhh4" models
 
 ### twinstim-specific
 
+import(spatstat)  # new umbrella package spatstat 2.0-0 included here to
+                  # avoid nasty collisions with spatstat < 2 lying around
+                  # FIXME: remove this when the spatstat transition has settled
+
 importFrom(spatstat.geom, area.owin, as.im.function, diameter,
                      diameter.owin, disc, edges, inside.owin, intersect.owin,
                      is.polygonal, as.polygonal, bdist.points, owin, ppp,
