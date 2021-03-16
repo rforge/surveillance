@@ -8,7 +8,7 @@
 \encoding{latin1}
 
 
-\section{Changes in surveillance version 1.19.0.9000 (UNRELEASED)}{
+\section{Changes in surveillance version 1.19.1 (2021-03-16)}{
 
 \subsection{BUG FIXES}{
   \itemize{
@@ -26,7 +26,7 @@
 
     \item This version of \pkg{surveillance} (formally) requires the new
     \CRANpkg{spatstat} umbrella package to avoid collisions of old
-    \pkg{spatstat} and new sub-packages (we only use
+    \pkg{spatstat} and its new sub-packages (we only use
     \CRANpkg{spatstat.geom}).
     The \pkg{spatstat} dependence will be dropped in the future.
   }
