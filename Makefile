@@ -108,12 +108,8 @@ checkUsage: install
 manual:	
 	$R CMD Rd2pdf --batch --force --output=manual.pdf pkg
 
-NEWS.html: pkg/inst/NEWS.Rd
-	$R --vanilla --slave -e 'tools::Rd2HTML("$<", out = "$@", stylesheet = "http://cran.r-project.org/web/CRAN_web.css")'
-	[ `uname -s` = "Darwin" ] && open "$@" || xdg-open "$@"
-
-NEWS_generated_from_HTML.md: NEWS.html
-	pandoc -f html-native_spans -t markdown -o "$@" "$<"
+NEWS.html: pkg/NEWS.md
+	pandoc -f markdown -t html -s --metadata title="News for Package 'surveillance'" --css=https://cran.R-project.org/web/CRAN_web.css -o "$@" "$<"
 
 www: 
 	cd pkg; $R --slave --no-save --no-restore -e \
