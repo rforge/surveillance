@@ -10,3 +10,18 @@ template:
 
 news:
   cran_dates: false
+
+home:
+  strip_header: true
+  links:
+  - text: "Browse source code on GitHub mirror"
+    href: https://github.com/r-forge/surveillance/tree/master/pkg
+
+authors:
+  Sebastian Meyer:
+    href: "http://www.imbe.med.uni-erlangen.de/cms/sebastian_meyer.html"
+  Michael Höhle:
+    href: "https://www.math.su.se/~hoehle"
+  footer:
+    roles: [cre]
+    text: "Maintained by"
