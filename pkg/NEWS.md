@@ -20,6 +20,7 @@
     [**spatstat.geom**](https://CRAN.R-project.org/package=spatstat.geom)).
     The **spatstat** dependence will be dropped in the future.
 
+
 # surveillance 1.19.0 (2021-01-29)
 
 ## NEW FEATURES
@@ -105,6 +106,7 @@
 
 -   **surveillance** now requires `R >= 3.6.0`.
 
+
 # surveillance 1.18.0 (2020-03-18)
 
 ## NEW FEATURES
@@ -136,6 +138,7 @@
     model has been removed from the package. The function `hhh4()`
     provides an improved and much extended implementation since 2012.
 
+
 # surveillance 1.17.3 (2019-12-16)
 
 ## BUG FIXES
@@ -144,6 +147,7 @@
     not work with a negative `n` argument.
 
 -   Fix for `"matrix"` changes in R-devel.
+
 
 # surveillance 1.17.2 (2019-11-11)
 
@@ -162,6 +166,7 @@
     susceptible population. Initially infectious individuals are now
     inherited. For the previous behaviour, adjust the supplied
     `data` via `data$atRiskY <- 1`.
+
 
 # surveillance 1.17.1 (2019-09-13)
 
@@ -191,6 +196,7 @@
 -   `hcl.colors()`, exported since 1.14.0, has been renamed
     `.hcl.colors()` and is now internal again, to avoid a name
     clash with R's own such function introduced in R 3.6.0.
+
 
 # surveillance 1.17.0 (2019-02-22)
 
@@ -318,6 +324,7 @@
     `readData()` (the raw txt files have been removed as well),
     `correct53to52()`, `enlargeData()`, `toFileDisProg()`.
 
+
 # surveillance 1.16.2 (2018-07-24)
 
 ## MINOR CHANGES
@@ -345,6 +352,7 @@
 -   The color key in `fanplot()` is no longer distorted by
     `log="y"`.
 
+
 # surveillance 1.16.1 (2018-05-28)
 
 ## BUG FIXES
@@ -367,6 +375,7 @@
     `readData()`, `toFileDisProg()`, `correct53to52()`,
     `enlargeData()`, `compMatrix.writeTable()`,
     `test()`, `testSim()`, `makePlot()`.
+
 
 # surveillance 1.16.0 (2018-01-24)
 
@@ -432,6 +441,7 @@
 -   The `all.equal()` methods for `"hhh4"` and
     `"twinstim"` objects now first check for the correct classes.
 
+
 # surveillance 1.15.0 (2017-10-06)
 
 ## NEW FEATURES
@@ -492,6 +502,7 @@
     `siaf.powerlaw()` or `tiaf.exponential()`, no longer live in
     the global environment as this risks using masked base functions.
 
+
 # surveillance 1.14.0 (2017-06-29)
 
 ## DOCUMENTATION
@@ -548,6 +559,7 @@
     `simulate.twinstim(..., simplify = TRUE)` was missing the
     elements `bbox` and `control.siaf`.
 
+
 # surveillance 1.13.1 (2017-04-28)
 
 ## DOCUMENTATION
@@ -584,6 +596,7 @@
     `getMaxEV_season()` was wrong for models with asymmetric
     neighbourhood weights. [spotted by Johannes Bracher]\
     Dominant eigenvalues (`"maxEV"`) were not affected by this bug.
+
 
 # surveillance 1.13.0 (2016-12-20)
 
@@ -646,6 +659,7 @@
 -   `plot.hhh4simslist()` ignored its `par.settings`
     argument if `groups=NULL` (default).
 
+
 # surveillance 1.12.2 (2016-11-14)
 
 ## NEW FEATURES
@@ -683,6 +697,7 @@
 -   `vignette("monitoringCounts")`: fixed `boda`-related
     code and cache to obtain same results as in corresponding JSS paper.
 
+
 # surveillance 1.12.1 (2016-05-18)
 
 ## DOCUMENTATION
@@ -719,6 +734,7 @@
 -   Attaching package [**nlme**](https://CRAN.R-project.org/package=nlme) after **surveillance** no
     longer masks `"hhh4"`'s `ranef`-method. (We now import the
     `fixef` and `ranef` generics from **nlme**.)
+
 
 # surveillance 1.12.0 (2016-04-02)
 
@@ -801,6 +817,7 @@
 -   The experimental `profile`-method for `"twinstim"`
     objects did not work if embedded `twinstim()` fits issued warnings.
 
+
 # surveillance 1.11.0 (2016-02-08)
 
 ## NEW FEATURES
@@ -854,6 +871,7 @@
     This seems to happen if forking is used (`mclapply`) with
     insufficient memory. Incomplete replications are now ignored with a
     warning.
+
 
 # surveillance 1.10-0 (2015-11-04)
 
@@ -997,6 +1015,7 @@
     SI-type data (and, more generally, for all data which ended with an
     I-event in the last time block). [spotted by George Wood]
 
+
 # surveillance 1.9-1 (2015-06-12)
 
 -   This is a quick patch release to make the test suite run
@@ -1005,6 +1024,7 @@
 -   The new `hhh4()` option to scale neighbourhood weights
     did not work for parametric weights with more than one parameter
     if `normalize=FALSE`.
+
 
 # surveillance 1.9-0 (2015-06-09)
 
@@ -1145,6 +1165,7 @@
     the new fit. It does so now iff the weight function
     `ne$weights` is left unchanged.
 
+
 # surveillance 1.8-3 (2015-01-05)
 
 -   Accommodate a new note given by R-devel checks, and set the new
@@ -1152,6 +1173,7 @@
 
 -   Made `linelist2sts()` work for quarters by adding extra
     `"%q"` formatting in `formatDate()`.
+
 
 # surveillance 1.8-2 (2014-12-16)
 
@@ -1188,6 +1210,7 @@
 -   In `stsplot_space()`, extra (unobserved) regions of the
     `map` are no longer dropped but shown with a dashed border by
     default.
+
 
 # surveillance 1.8-1 (2014-10-29)
 
@@ -1362,6 +1385,7 @@
 
 -   The trivial (identity) call
     `aggregate(stsObj, nfreq=stsObj@freq)` did not work.
+
 
 # surveillance 1.8-0 (2014-06-16)
 
@@ -1649,6 +1673,7 @@
 -   `twinstim()` did not work without an endemic offset if
     `is.null(optim.args$par)`.
 
+
 # surveillance 1.7-0 (2013-11-19)
 
 ## SYNOPSIS
@@ -1712,6 +1737,7 @@
 
 -   The `plot`-method for `hhh4()`-fits allows for
     region selection by name.
+
 
 # surveillance 1.6-0 (2013-09-03)
 
@@ -1890,6 +1916,7 @@
     weights due to an error in the internal `checkWeightsArray()`
     function.
 
+
 # surveillance 1.5-4 (2013-04-21)
 
 ## SYNOPSIS
@@ -1904,6 +1931,7 @@
 -   New pre-defined spatial interaction function
     `siaf.powerlawL()`, which implements a _L_agged power-law
     kernel, i.e. accounts for uniform short-range dispersal.
+
 
 # surveillance 1.5-2 (2013-03-15)
 
@@ -1978,6 +2006,7 @@
 -   New argument `timevar` for `addSeason2formula()`,
     which now also works for long formulae.
 
+
 # surveillance 1.5-1 (2012-12-14)
 
 ## SYNOPSIS
@@ -1985,6 +2014,7 @@
 -   The **surveillance** package is again backward-compatible
     with R version 2.14.0, which is now declared as the minimum
     required version.
+
 
 # surveillance 1.5-0 (2012-12-12)
 
@@ -2140,6 +2170,7 @@
 -   Some additional tiny bug fixes, see the subversion log on
     R-Forge for details.
 
+
 # surveillance 1.4-2 (2012-08-17)
 
 ## SYNOPSIS
@@ -2254,6 +2285,7 @@
 -   Argument `cex.fun` of `intensityplot.twinstim()` now
     defaults to the `sqrt` function (as in `plot.epidataCS()`.
 
+
 # surveillance 1.4 (2012-07-26)
 
 ## SYNOPSIS
@@ -2326,6 +2358,7 @@
 -   `twinSIR`'s `intensityPlot` is now a method of the
     new S3-generic function `intensityplot`.
 
+
 # surveillance 1.3 (2011-04-25)
 
 ## SYNOPSIS
@@ -2364,6 +2397,7 @@
     (`backprojNP()`) and
     now-casting (`nowcast()`) based on `"sts"` objects.
 
+
 # surveillance 1.2-2
 
 -   Replaced the deprecated getSpPPolygonsLabptSlots method with calls
@@ -2381,6 +2415,7 @@
 
 -   Fixed bug in stcd which added one to the calculated index of idxFA and idxCC.
     Thanks to Thais Rotsen Correa for pointing this out.
+
 
 # surveillance 1.2-1 (2010-06-10)
 
@@ -2404,6 +2439,7 @@
     `control$fitFun = "algo.farrington.fitGLM"` provides the old (and slow)
     behaviour.
 
+
 # surveillance 1.1-6 (2010-05-25)
 
 -   A few minor bug fixes
@@ -2411,6 +2447,7 @@
 -   Small improvements in the C-implementation of the `twins()`
     function by Daniel Saban&eacute;s Bov&eacute; fixing the segmentation fault
     issue on 64-bit architectures.
+
 
 # surveillance 1.1-2 (2009-10-15)
 
@@ -2455,6 +2492,7 @@
 -   Renamed the functions obsinyear to epochInYear, which now also
     handles objects of class Date.
 
+
 # surveillance 1.0-2 (2009-03-06)
 
 -   Negative Binomial CUSUM or the more general NegBin likelihood ratio
@@ -2463,6 +2501,7 @@
     before an alarm.
 
 -   Time varying proportion binomial CUSUM.
+
 
 # surveillance 0.9-10
 
@@ -2489,10 +2528,12 @@
     model for counts of infectious diseases, Biostatistics, 7, pp.
     422--437 is now available as algo.twins.
 
+
 # surveillance 0.9-9 (2008-01-21)
 
 -   Fixed a few small problems
     which gave warnings in the CRAN distribution
+
 
 # surveillance 0.9-8 (2008-01-19)
 
