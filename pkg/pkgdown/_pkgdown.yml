@@ -7,3 +7,6 @@ template:
     twitter:
       creator: "@bastistician"
       card: summary
+
+news:
+  cran_dates: false
