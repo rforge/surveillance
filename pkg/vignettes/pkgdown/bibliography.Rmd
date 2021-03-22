@@ -1,0 +1,8 @@
+---
+title: Bibliography
+---
+
+```{r, echo = FALSE, results = "asis"}
+##writeLines(paste("-", format(surveillance:::REFERENCES, "citation", bibtex = FALSE)), sep = "\n\n")
+writeLines(format(surveillance:::REFERENCES, "html"), sep = "\n\n")
+```

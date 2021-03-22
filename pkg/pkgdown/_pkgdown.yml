@@ -8,11 +8,24 @@ template:
       creator: "@bastistician"
       card: summary
 
+navbar:
+  structure:
+    left: [overview, reference, news, events, bibliography]
+  components:
+    overview:
+      text: Overview
+      href: articles/pkgdown/overview.html
+    events:
+      text: Events
+      href: articles/pkgdown/events.html
+    bibliography:
+      text: Bibliography
+      href: articles/pkgdown/bibliography.html
+
 news:
   cran_dates: false
 
 home:
-  strip_header: true
   links:
   - text: "Browse source code on GitHub mirror"
     href: https://github.com/r-forge/surveillance/tree/master/pkg
