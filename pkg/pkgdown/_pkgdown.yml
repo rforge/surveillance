@@ -1,0 +1,9 @@
+url: https://surveillance.R-forge.R-project.org/
+destination: "../www-pkgdown/"
+
+template:
+  bootstrap: 4
+  opengraph:
+    twitter:
+      creator: "@bastistician"
+      card: summary

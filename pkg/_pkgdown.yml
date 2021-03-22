@@ -1,5 +1,0 @@
-destination: "../www-pkgdown/"
-
-template:
-  params:
-    bootswatch: "flatly"
