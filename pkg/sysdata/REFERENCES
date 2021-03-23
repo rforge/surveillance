@@ -133,6 +133,19 @@ bibentry(
     doi = "10.1007/s00180-007-0074-8"
 )
 
+bibentry(
+    bibtype = "Article",
+    header = "For glrnb() and glrpois(), the appropriate citation is:",
+    title = "Count data regression charts for the monitoring of surveillance time series",
+    author = authors[c("MH", "MP")],
+    journal = "Computational Statistics & Data Analysis",
+    year = "2008",
+    volume = "52",
+    number = "9",
+    pages = "4357--4368",
+    doi = "10.1016/j.csda.2008.02.015"
+)
+
 
 ############
 ### boda ###
@@ -140,15 +153,28 @@ bibentry(
 
 bibentry(
     bibtype = "Article",
-    header = "If boda() is used, cite:",
+    header = "If boda() is used, please cite:",
     author = c(person("Juliane", "Manitz"), authors["MH"]),
-    title = "Bayesian outbreak detection algorithm for monitoring reported cases of campylobacteriosis in Germany",
+    title = "Bayesian outbreak detection algorithm for monitoring reported cases of campylobacteriosis in {Germany}",
     journal = "Biometrical Journal",
     year = "2013",
     volume = "55",
     number = "4",
     pages = "509--526",
     doi = "10.1002/bimj.201200141"
+)
+
+bibentry(
+    bibtype = "Article",
+    header = "If bodaDelay() is used, please cite:",
+    author = append(authors[c("MS", "DS", "MH")], person("Klaus", "Stark"), after = 2),
+    title = "Bayesian outbreak detection in the presence of reporting delays",
+    journal = "Biometrical Journal",
+    year = "2015",
+    volume = "57",
+    number = "6",
+    pages = "1051--1067",
+    doi = "10.1002/bimj.201400159"
 )
 
 
@@ -159,7 +185,7 @@ bibentry(
 bibentry(
     bibtype = "Article",
     header = "For the nowcast()ing functionality, the appropriate citation is:",
-    title = "Bayesian Nowcasting during the STEC O104:H4 Outbreak in Germany, 2011", 
+    title = "Bayesian nowcasting during the {STEC} {O104:H4} outbreak in {Germany}, 2011", 
     author = c(authors["MH"],person("Matthias", "an der Heiden")),
     journal = "Biometrics",
     year = "2014",
