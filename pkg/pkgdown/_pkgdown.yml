@@ -38,3 +38,105 @@ authors:
   footer:
     roles: [cre]
     text: "Maintained by"
+
+reference:
+- contents:
+  - surveillance-package
+- title: Data class "sts"
+- contents:
+  - matches("sts")
+  - -ha
+  - -matches("epidataCS")
+  - -matches("disProg")
+- subtitle: Old data class "disProg"
+- contents:
+  - matches("disProg")
+- title: Prospective outbreak detection
+- contents:
+  - matches("algo")
+  - plot.survRes
+  - -algo.twins
+  - boda
+  - matches("CUSUM")
+  - arlCusum
+  - find.kh
+  - findH
+  - findK
+  - earsC
+  - farringtonFlexible
+  - stcd
+  - sim.pointSource
+  - sim.seasonalNoise
+  - refvalIdxByDate
+- title: Modeling reporting delays
+- contents:
+  - backprojNP
+  - nowcast
+  - bodaDelay
+- title: "hhh4: endemic-epidemic time series of counts"
+- contents:
+  - matches("hhh4")
+  - -all.equal
+  - addSeason2formula
+  - calibrationTest
+  - scores
+  - makeControl
+- title: "twinstim: endemic-epidemic spatio-temporal point process"
+- contents:
+  - matches("epidataCS")
+  - matches("twinstim")
+  - -all.equal
+  - knox
+  - stK
+  - R0
+  - untie
+  - checkResidualProcess
+- title: "twinSIR: multivariate temporal point process"
+- contents:
+  - matches("epidata")
+  - -matches("epidataCS")
+  - matches("twinSIR")
+  - checkResidualProcess
+- title: Datasets
+- contents:
+  - has_keyword("datasets")
+  - -fooepidata
+- title: Utilities
+- subtitle: Plotting
+- contents:
+  - animate
+  - intensityplot
+  - ks.plot.unif
+  - fanplot
+  - addFormattedXAxis
+  - layout.labels
+  - pit
+  - magic.dim
+- subtitle: Spatial utilities
+- contents:
+  - matches("poly")
+  - unionSpatialPolygons
+  - marks
+  - starts_with("multiplicity")
+  - nbOrder
+  - zetaweights
+- subtitle: Other utilities
+- contents:
+  - all.equal
+  - formatDate
+  - formatPval
+  - bestCombination
+  - primeFactors
+  - clapply
+  - plapply
+  - coeflist
+  - isoWeekYear
+  - permutationTest
+  - surveillance.options
+  - ranef
+  - anscombe.residuals
+- title: Deprecated functions
+- contents:
+  - matches("deprecated")
+  - algo.twins
+  - plot.atwins
