@@ -48,6 +48,9 @@ reference:
   - -ha
   - -matches("epidataCS")
   - -matches("disProg")
+  - -stsNewport
+  - -sts_observation
+  - -sts_creation
 - subtitle: Old data class "disProg"
 - contents:
   - matches("disProg")
@@ -67,12 +70,14 @@ reference:
   - stcd
   - sim.pointSource
   - sim.seasonalNoise
+  - sts_creation
   - refvalIdxByDate
 - title: Modeling reporting delays
 - contents:
   - backprojNP
   - nowcast
   - bodaDelay
+  - sts_observation
 - title: "hhh4: endemic-epidemic time series of counts"
 - contents:
   - matches("hhh4")
