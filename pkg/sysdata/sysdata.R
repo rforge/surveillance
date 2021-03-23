@@ -26,10 +26,10 @@ REFERENCES <- readCitationFile(
 )
 
 ## a simple polygonal "owin" (with hole) for testing, obtained as
-## spatstat::owin(poly = rapply(
-##     spatstat::shift.owin(spatstat.data::letterR, -c(3,2))$bdry,
+## spatstat.geom::owin(poly = rapply(
+##     spatstat.geom::shift.owin(spatstat.data::letterR, -c(3,2))$bdry,
 ##     round, digits = 1, how = "replace"))
-LETTERR <- spatstat::owin(poly = list(
+LETTERR <- spatstat.geom::owin(poly = list(
     list(x = c(0.9, 0.8, 0.7, 0.5, 0.4, 0.5, 0.7, 0.8, 0.8, 0.7, 0.7, 0.5,
                0.3, -1, -1, -0.3, -0.3, -0.1, 0, 0.3, 0.9),
          y = c(-1.3, -1, -0.7, -0.3, -0.2, -0.1, 0.1, 0.3, 0.5, 0.8, 1,
@@ -41,7 +41,7 @@ LETTERR <- spatstat::owin(poly = list(
 
 ### Save to sysdata.rda
 
-save(list=ls(), file="sysdata.rda")
+save(list=ls(), file="sysdata.rda", version=2)
 
 ## try to improve compression
 tools::resaveRdaFiles("sysdata.rda")
