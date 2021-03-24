@@ -117,7 +117,7 @@ communicable diseases in Germany</a> describes use of the package as backbone fo
 <li><a href="http://arxiv.org/abs/1411.1292">Monitoring Count Time Series in R: Aberration Detection in Public Health Surveillance</a></li>
 </ul>
 </li>
-  <li>2013/04/23 <a href="StockholmR-Hoehle_4.pdf">Talk</a> at the  Stockholm R useR group (StockholmR) on <a href="http://www.meetup.com/StockholmR/events/105738342/">Making R packages (and) Shiny</a>.</li>
+  <li>2013/04/23 <a href="slides/StockholmR-Hoehle_4.pdf">Talk</a> at the  Stockholm R useR group (StockholmR) on <a href="http://www.meetup.com/StockholmR/events/105738342/">Making R packages (and) Shiny</a>.</li>
 </ul>
 
 <hr />
@@ -323,10 +323,10 @@ surveillance of infectious diseases</a> held at the Department of
 Statistics, Universidade Federal de Minas Gerais (UFMG), Belo
 Horizonte, Brazil, Nov 27-28, 2008.
 </li>
-      <li><a href="hoehle-surveillance.pdf">Invited talk</a> held at
+      <li><a href="slides/hoehle-surveillance.pdf">Invited talk</a> held at
 the 2008 ESCAIDE satellite workshop on <ii>Computer supported outbreak
-detection and signal management</ii> (<a href="hoehle-surveillance.R">R-File</a>,
-        <a href="ha.csv">Data</a> from SurvStat@RKI)
+detection and signal management</ii> (<a href="slides/hoehle-surveillance.R">R-File</a>,
+        <a href="slides/ha.csv">Data</a> from SurvStat@RKI)
       </li>
       <li>Application of the package in veterinary public health
 surveillance is described in <a
