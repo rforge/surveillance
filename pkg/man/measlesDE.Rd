@@ -8,7 +8,7 @@
 }
 \usage{data(measlesDE)}
 \format{
-  An \code{sts} object containing \eqn{156\times 16}{156 x 16}
+  An \code{"\linkS4class{sts}"} object containing \eqn{156\times 16}{156 x 16}
   observations starting from week 1 in 2005.
   
   The \code{population} slot contains the population fractions
