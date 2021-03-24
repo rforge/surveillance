@@ -22,6 +22,12 @@ navbar:
       text: Bibliography
       href: articles/pkgdown/bibliography.html
 
+footer:
+  right:
+    structure: [pkgdown, rforge]
+    components:
+      rforge: Hosted on [![R-Forge](https://r-forge.r-project.org/themes/rforge/imagesrf/logo.png){ height=18px }](https://R-forge.R-project.org/projects/surveillance/)
+
 news:
   cran_dates: false
 
