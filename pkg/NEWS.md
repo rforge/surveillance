@@ -24,6 +24,9 @@
     a `"Date"` vector. The standard plots may give nicer x-axis annotation
     if indexed by dates. See the `xaxis.*` arguments of `stsplot_time()`.
 
+-   `tidy.sts()` (and thus `autoplot.sts()`) failed for date-indexed
+    `"sts"` objects with non-standard frequencies. [spotted by Junyi Lu]
+
 
 # surveillance 1.19.0 (2021-01-29)
 
