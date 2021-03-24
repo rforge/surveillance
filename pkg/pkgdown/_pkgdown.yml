@@ -1,5 +1,5 @@
-url: https://surveillance.R-forge.R-project.org/
-destination: "../www-pkgdown/"
+url: https://surveillance.R-forge.R-project.org/pkgdown/
+destination: "../www/pkgdown"
 
 template:
   bootstrap: 4

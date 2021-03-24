@@ -1,13 +1,16 @@
 ## Modeling and Monitoring Epidemic Phenomena
 
+<!-- `algo.glrnb()`: -->
+<!-- : ![](man/figures/survlr.png) -->
+
 `algo.farrington()` + `algo.glrnb()` + `nowcast()`:
-: ![](../www/detectandnowcast.png)
+: ![](man/figures/detectandnowcast.png)
 
 `backprojNP()`:
-: ![](../www/backproj.png)
+: ![](man/figures/backproj.png)
 
 `twinSIR()`:
-: ![](../www/mpbb-intensity.png)
+: ![](man/figures/mpbb-intensity.png)
 
 `twinstim()`:
-: ![](../www/imdepifit.png)
+: ![](man/figures/imdepifit.png)
