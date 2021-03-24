@@ -111,9 +111,13 @@ manual:
 NEWS.html: pkg/NEWS.md
 	pandoc -f markdown -t html -s --metadata title="News for Package 'surveillance'" --css=https://cran.R-project.org/web/CRAN_web.css -o "$@" "$<"
 
-www: 
-	cd pkg; $R --slave --no-save --no-restore -e \
-	  "pkgdown::build_site(examples = FALSE, lazy = TRUE)"
+www:
+	cd pkg; $R --no-echo --no-save --no-restore -e \
+	  "pkgdown::build_site(examples = FALSE, lazy = TRUE, devel = TRUE)"
+
+www-clean:
+	cd pkg; $R --no-echo --no-save --no-restore -e \
+	  "pkgdown::clean_site(); pkgdown::build_site(examples = FALSE)"
 
 
 clean:
