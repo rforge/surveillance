@@ -1,4 +1,4 @@
-# surveillance 1.19.1 (2021-03-16)
+# surveillance 1.19.1 (2021-03-25)
 
 ## BUG FIXES
 
@@ -19,6 +19,10 @@
     **spatstat** and its new sub-packages (we only use
     [**spatstat.geom**](https://CRAN.R-project.org/package=spatstat.geom)).
     The **spatstat** dependence will be dropped in the future.
+
+-   The `epoch<-` replacement method for `"sts"` objects now accepts
+    a `"Date"` vector. The standard plots may give nicer x-axis annotation
+    if indexed by dates. See the `xaxis.*` arguments of `stsplot_time()`.
 
 
 # surveillance 1.19.0 (2021-01-29)
