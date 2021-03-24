@@ -122,7 +122,7 @@
 }
 
 \seealso{
-  \url{http://surveillance.R-forge.R-project.org/}
+  \url{https://surveillance.R-forge.R-project.org/}
 }
 
 \keyword{ package }
