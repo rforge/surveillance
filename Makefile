@@ -33,23 +33,20 @@
 ## e.g., 'make check R=R-devel'
 R := R
 
-## sysdata file
-SYSDATA := pkg/R/sysdata.rda
-
 ## package version
 VERSION := $(shell $R --vanilla --slave -e 'cat(read.dcf("pkg/DESCRIPTION", fields="Version"))')
 
 ## build the package
 BUILD_COMPACT_VIGNETTES := no
-build: ${SYSDATA}
+build:
 	$R CMD build --no-resave-data --compact-vignettes=${BUILD_COMPACT_VIGNETTES} pkg
 build-cran: BUILD_COMPACT_VIGNETTES := both
 build-cran: build
 
 ## Save internal datasets from pkg/sysdata/ into pkg/R/sysdata.rda
-${SYSDATA}: pkg/sysdata/sysdata.R pkg/sysdata/REFERENCES
+sysdata:
 	cd pkg/sysdata; $R CMD BATCH --vanilla --no-timing sysdata.R
-	mv pkg/sysdata/sysdata.rda $@
+	mv pkg/sysdata/sysdata.rda pkg/R/sysdata.rda
 
 
 ## auxiliary functions ("canned recipes") for check rules
@@ -126,4 +123,4 @@ clean:
 	make -C pkg/vignettes clean
 	rm -f pkg/*/.Rhistory
 
-.PHONY: build build-cran check check-cran check-allExamples install checkUsage manual www clean
+.PHONY: build build-cran sysdata check check-cran check-allExamples install checkUsage manual www clean
