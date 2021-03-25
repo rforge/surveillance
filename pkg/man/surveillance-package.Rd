@@ -1,6 +1,5 @@
 %\RdOpts{stage=build}
-% Note @R-3.0.2 and @R-3.4.2: Setting \RdOpts{stage=build} globally
-% does not work as expected, so we have to specify it in each \Sexpr
+% Not yet: in R 2.12.0 - 4.0.5, \RdOpts{} had no effect (PR#18073)
 
 \encoding{latin1}
 \name{surveillance-package}
