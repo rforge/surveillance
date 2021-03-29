@@ -60,6 +60,15 @@ for the complete list of algorithms.
 
 - Adjusting for occurred-but-not-yet-reported events: `nowcast()`, `bodaDelay()`
 
+#### Applications
+
+These methods have also been used for COVID-19 surveillance, for example:
+
+- [*Analysis of the early COVID-19 epidemic curve in Germany by regression models
+  with change points*](https://doi.org/10.1017/S0950268821000558)
+
+- [*Nowcasting the COVID-19 pandemic in Bavaria*](https://doi.org/10.1002/bimj.202000112)
+
 
 ## Spatio-temporal endemic-epidemic modeling
 
@@ -71,7 +80,7 @@ are also described in corresponding package vignettes:
 `twinstim()`
 : to analyze a *spatio-temporal point pattern* of infective events
 : described in [`vignette("twinstim", package = "surveillance")`](https://CRAN.R-project.org/package=surveillance/vignettes/twinstim.pdf)
-: associated data class [`"epidataCS"`](../../reference/epidataCS.html)
+: associated data class: [`"epidataCS"`](../../reference/epidataCS.html)
   holds the observed events (with covariates) and exogenous covariates on a
   space-time grid (for the endemic component)
 : features a model-based `epitest()` for space-time interaction
@@ -81,7 +90,7 @@ are also described in corresponding package vignettes:
   *(SIR) event history of a fixed population*
 : described in
   [`vignette("twinSIR", package = "surveillance")`](https://CRAN.R-project.org/package=surveillance/vignettes/twinSIR.pdf)
-: associated data class [`"epidata"`](../../reference/epidata.html)
+: associated data class: [`"epidata"`](../../reference/epidata.html)
 
 `hhh4()`
 : to analyze (multivariate) *time series of infectious disease counts*
@@ -90,7 +99,23 @@ are also described in corresponding package vignettes:
   for areal time series, and more generally in
   [`vignette("hhh4", package = "surveillance")`](https://CRAN.R-project.org/package=surveillance/vignettes/hhh4.pdf),
   including the univariate case
-: associated data class [`"sts"`](../../reference/sts-class.html)
+: associated data class: [`"sts"`](../../reference/sts-class.html)
+
+
+#### Applications
+
+These endemic-epidemic modelling frameworks have proven useful in a wide range
+of applications. We loosely maintain a list of publications:
+<details>
+  <summary>
+  (click to expand)
+  </summary>
+
+```{r, echo = FALSE, results = "asis"}
+refs_EE <- read.csv("../../../www/applications_EE.csv")
+knitr::kable(subset(refs_EE, select = -Species))
+```
+</details>
 
 
 ## Installation
