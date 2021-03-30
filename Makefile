@@ -116,6 +116,9 @@ www-clean:
 	cd pkg; $R --no-echo --no-save --no-restore -e \
 	  "pkgdown::clean_site(); pkgdown::build_site(examples = FALSE)"
 
+www-applications:
+	cd www; $R --no-echo --no-save --no-restore -e \
+	  "rmarkdown::render('applications_EE.Rmd')"
 
 clean:
 	make -C pkg/demo clean

@@ -1,0 +1,17 @@
+---
+title: Applications of endemic-epidemic modelling
+subtitle: >
+  The endemic-epidemic modelling frameworks implemented in the R package
+  [**surveillance**](https://surveillance.R-forge.R-project.org/)
+  have proven useful in a wide range of applications.
+---
+
+```{r, echo = FALSE, results = "asis"}
+refs_EE <- read.csv("applications_EE.csv")
+refs_EE <- subset(refs_EE, select = -Species)
+##knitr::kable(refs_EE)
+refs_EE$URL <- pkgdown::rd2html(paste0("\\url{", refs_EE$URL, "}"))
+DT::datatable(refs_EE[nrow(refs_EE):1,],  # anti-chronologically
+              rownames = FALSE,
+              escape = seq_len(ncol(refs_EE)-1))
+```
