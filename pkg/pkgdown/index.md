@@ -9,6 +9,10 @@
 `backprojNP()`:
 : ![](man/figures/backproj.png)
 
+`hhh4()`:
+: ![](man/figures/noroBE_hhh4_components.png)
+<!-- taken from `vignette("BNV", package = "HIDDA.forecasting")` -->
+
 `twinSIR()`:
 : ![](man/figures/mpbb-intensity.png)
 
