@@ -23,7 +23,7 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc" data-headroom data-tolerance="5" data-offset="100">
+<body data-spy="scroll" data-target="#toc" data-headroom>
     
 
       <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
@@ -59,7 +59,7 @@
 </nav><div class="container template-article">
 <script src="overview_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
-    <div class="page-header pb-2 mt-4 mb-2 border-bottom toc-ignore">
+    <img src="" class="pkg-logo" alt=""><div class="page-header pb-2 mt-4 mb-2 border-bottom toc-ignore">
       <h1 class="display-4" data-toc-skip>
 <code>surveillance</code>: Temporal and Spatio-Temporal Modeling and Monitoring of Epidemic Phenomena</h1>
             
@@ -76,7 +76,7 @@
 <h2 class="hasAnchor">
 <a href="#data-class-sts" class="anchor"></a>Data class <code>"sts"</code>
 </h2>
-<p>The S4 class <code>"sts"</code> (surveillance time series), created via <code><a href="../../reference/sts-class.html">sts()</a></code> or <code><a href="../../reference/linelist2sts.html">linelist2sts()</a></code>, represents (multivariate) time series of counts. For areal time series, the class can also capture population fractions, a map and weight matrix. The <code>"sts"</code> class supersedes the <a href="../../reference/create.disProg.html"><code>"disProg"</code></a> class.</p>
+<p>The S4 class <code>"sts"</code> (surveillance time series), created via <code><a href="../../reference/sts-class.html">sts()</a></code> or <code><a href="../../reference/linelist2sts.html">linelist2sts()</a></code>, represents (multivariate) time series of counts. For areal time series, the class can also capture population fractions, a map, and a weight matrix. The <code>"sts"</code> class supersedes the <a href="../../reference/create.disProg.html"><code>"disProg"</code></a> class.</p>
 <p>For evaluation purposes, the package contains several <a href="../../reference/index.html#section-datasets">datasets</a> drawn from the <a href="https://survstat.rki.de/" class="external-link">SurvStat@RKI</a> database maintained by the Robert Koch Institute in Germany.</p>
 </div>
 <div id="prospective-outbreak-detection" class="section level2">
@@ -97,6 +97,15 @@ A Markov Chain approximation for computing the run-length distribution of the pr
 <li><p>Backprojection methods: <code><a href="../../reference/backprojNP.html">backprojNP()</a></code></p></li>
 <li><p>Adjusting for occurred-but-not-yet-reported events: <code><a href="../../reference/nowcast.html">nowcast()</a></code>, <code><a href="../../reference/bodaDelay.html">bodaDelay()</a></code></p></li>
 </ul>
+<div id="applications" class="section level5">
+<h5 class="hasAnchor">
+<a href="#applications" class="anchor"></a>Applications</h5>
+<p>These methods have also been used for COVID-19 surveillance, for example:</p>
+<ul>
+<li><p><a href="https://doi.org/10.1017/S0950268821000558" class="external-link"><em>Analysis of the early COVID-19 epidemic curve in Germany by regression models with change points</em></a></p></li>
+<li><p><a href="https://doi.org/10.1002/bimj.202000112" class="external-link"><em>Nowcasting the COVID-19 pandemic in Bavaria</em></a></p></li>
+</ul>
+</div>
 </div>
 <div id="spatio-temporal-endemic-epidemic-modeling" class="section level2">
 <h2 class="hasAnchor">
@@ -108,7 +117,7 @@ A Markov Chain approximation for computing the run-length distribution of the pr
 </dd>
 <dd>described in <a href="https://CRAN.R-project.org/package=surveillance/vignettes/twinstim.pdf" class="external-link"><code>vignette("twinstim", package = "surveillance")</code></a>
 </dd>
-<dd>associated data class <a href="../../reference/epidataCS.html"><code>"epidataCS"</code></a> holds the observed events (with covariates) and exogenous covariates on a space-time grid (for the endemic component)
+<dd>associated data class: <a href="../../reference/epidataCS.html"><code>"epidataCS"</code></a> holds the observed events (with covariates) and exogenous covariates on a space-time grid (for the endemic component)
 </dd>
 <dd>features a model-based <code><a href="../../reference/twinstim_epitest.html">epitest()</a></code> for space-time interaction
 </dd>
@@ -117,16 +126,225 @@ A Markov Chain approximation for computing the run-length distribution of the pr
 </dd>
 <dd>described in <a href="https://CRAN.R-project.org/package=surveillance/vignettes/twinSIR.pdf" class="external-link"><code>vignette("twinSIR", package = "surveillance")</code></a>
 </dd>
-<dd>associated data class <a href="../../reference/epidata.html"><code>"epidata"</code></a>
+<dd>associated data class: <a href="../../reference/epidata.html"><code>"epidata"</code></a>
 </dd>
 <dt><code><a href="../../reference/hhh4.html">hhh4()</a></code></dt>
 <dd>to analyze (multivariate) <em>time series of infectious disease counts</em>
 </dd>
 <dd>described in <a href="https://CRAN.R-project.org/package=surveillance/vignettes/hhh4_spacetime.pdf" class="external-link"><code>vignette("hhh4_spacetime", package = "surveillance")</code></a> for areal time series, and more generally in <a href="https://CRAN.R-project.org/package=surveillance/vignettes/hhh4.pdf" class="external-link"><code>vignette("hhh4", package = "surveillance")</code></a>, including the univariate case
 </dd>
-<dd>associated data class <a href="../../reference/sts-class.html"><code>"sts"</code></a>
+<dd>associated data class: <a href="../../reference/sts-class.html"><code>"sts"</code></a>
 </dd>
 </dl>
+<div id="applications-1" class="section level5">
+<h5 class="hasAnchor">
+<a href="#applications-1" class="anchor"></a>Applications</h5>
+These endemic-epidemic modelling frameworks have proven useful in a wide range of applications. We loosely maintain a list of publications:
+<details><summary>
+(click to expand)
+</summary><table class="table">
+<colgroup>
+<col width="4%">
+<col width="15%">
+<col width="12%">
+<col width="4%">
+<col width="34%">
+<col width="2%">
+<col width="26%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Model</th>
+<th align="left">Disease</th>
+<th align="left">Location</th>
+<th align="left">Period</th>
+<th align="left">Journal</th>
+<th align="right">Year</th>
+<th align="left">URL</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">hhh4</td>
+<td align="left">campylobacteriosis</td>
+<td align="left">Switzerland</td>
+<td align="left">2008-2012</td>
+<td align="left">Epidemiology and Infection</td>
+<td align="right">2015</td>
+<td align="left"><a href="https://doi.org/10.1017/S0950268814002738" class="external-link uri">https://doi.org/10.1017/S0950268814002738</a></td>
+</tr>
+<tr class="even">
+<td align="left">hhh4</td>
+<td align="left">dengue</td>
+<td align="left">Guangdong, China</td>
+<td align="left">2014</td>
+<td align="left">Scientific Reports</td>
+<td align="right">2016</td>
+<td align="left"><a href="https://doi.org/10.1038/srep33755" class="external-link uri">https://doi.org/10.1038/srep33755</a></td>
+</tr>
+<tr class="odd">
+<td align="left">twinstim</td>
+<td align="left">psychiatric hospital admissions</td>
+<td align="left">Zurich, Switzerland</td>
+<td align="left">2007-2012</td>
+<td align="left">Spatial and Spatio-temporal Epidemiology</td>
+<td align="right">2016</td>
+<td align="left"><a href="https://doi.org/10.1016/j.sste.2016.03.002" class="external-link uri">https://doi.org/10.1016/j.sste.2016.03.002</a></td>
+</tr>
+<tr class="even">
+<td align="left">twinstim</td>
+<td align="left">ranavirus</td>
+<td align="left">UK</td>
+<td align="left">1992-2010</td>
+<td align="left">Proceedings of the Royal Society of London B: Biological Sciences</td>
+<td align="right">2016</td>
+<td align="left"><a href="https://doi.org/10.1098/rspb.2016.0952" class="external-link uri">https://doi.org/10.1098/rspb.2016.0952</a></td>
+</tr>
+<tr class="odd">
+<td align="left">hhh4</td>
+<td align="left">cutaneous leishmaniasis</td>
+<td align="left">Afghanistan</td>
+<td align="left">2003-2009</td>
+<td align="left">International Journal of Environmental Research and Public Health</td>
+<td align="right">2017</td>
+<td align="left"><a href="https://doi.org/10.3390/ijerph14030309" class="external-link uri">https://doi.org/10.3390/ijerph14030309</a></td>
+</tr>
+<tr class="even">
+<td align="left">twinstim</td>
+<td align="left">anti-refugee violence</td>
+<td align="left">Germany</td>
+<td align="left">2014-2015</td>
+<td align="left">Dissertation</td>
+<td align="right">2017</td>
+<td align="left"><a href="https://nbn-resolving.org/urn:nbn:de:gbv:8-diss-209323" class="external-link uri">https://nbn-resolving.org/urn:nbn:de:gbv:8-diss-209323</a></td>
+</tr>
+<tr class="odd">
+<td align="left">hhh4</td>
+<td align="left">hand, foot and mouth disease</td>
+<td align="left">China</td>
+<td align="left">2009-2011</td>
+<td align="left">Journal of the Royal Statistical Society, Series C (Applied Statistics)</td>
+<td align="right">2018</td>
+<td align="left"><a href="https://doi.org/10.1111/rssc.12284" class="external-link uri">https://doi.org/10.1111/rssc.12284</a></td>
+</tr>
+<tr class="even">
+<td align="left">hhh4</td>
+<td align="left">dengue</td>
+<td align="left">Guangdong, China</td>
+<td align="left">2014-2018</td>
+<td align="left">BMC Infectious Diseases</td>
+<td align="right">2019</td>
+<td align="left"><a href="https://doi.org/10.1186/s12879-019-4015-2" class="external-link uri">https://doi.org/10.1186/s12879-019-4015-2</a></td>
+</tr>
+<tr class="odd">
+<td align="left">hhh4</td>
+<td align="left">invasive pneumococcal disease</td>
+<td align="left">England</td>
+<td align="left">2009-2017</td>
+<td align="left">PLOS Medicine</td>
+<td align="right">2019</td>
+<td align="left"><a href="https://doi.org/10.1371/journal.pmed.1002829" class="external-link uri">https://doi.org/10.1371/journal.pmed.1002829</a></td>
+</tr>
+<tr class="even">
+<td align="left">hhh4</td>
+<td align="left">measles</td>
+<td align="left">Cameroon</td>
+<td align="left">2012</td>
+<td align="left">Annals of Epidemiology</td>
+<td align="right">2019</td>
+<td align="left"><a href="https://doi.org/10.1016/j.annepidem.2019.10.007" class="external-link uri">https://doi.org/10.1016/j.annepidem.2019.10.007</a></td>
+</tr>
+<tr class="odd">
+<td align="left">hhh4</td>
+<td align="left">endemic diseases on swime farms</td>
+<td align="left">Northeastern Spain</td>
+<td align="left">2012-2018</td>
+<td align="left">Frontiers in Veterinary Science</td>
+<td align="right">2020</td>
+<td align="left"><a href="https://doi.org/10.3389/fvets.2020.00068" class="external-link uri">https://doi.org/10.3389/fvets.2020.00068</a></td>
+</tr>
+<tr class="even">
+<td align="left">twinstim</td>
+<td align="left">crimes</td>
+<td align="left">Islington, London, UK</td>
+<td align="left">2016</td>
+<td align="left">Dissertation</td>
+<td align="right">2020</td>
+<td align="left"><a href="https://discovery.ucl.ac.uk/id/eprint/10089829" class="external-link uri">https://discovery.ucl.ac.uk/id/eprint/10089829</a></td>
+</tr>
+<tr class="odd">
+<td align="left">hhh4</td>
+<td align="left">visceral leishmaniasis</td>
+<td align="left">Bihar &amp; Jharkhand, India</td>
+<td align="left">2013-2018</td>
+<td align="left">PLOS Neglected Tropical Diseases</td>
+<td align="right">2020</td>
+<td align="left"><a href="https://doi.org/10.1371/journal.pntd.0008422" class="external-link uri">https://doi.org/10.1371/journal.pntd.0008422</a></td>
+</tr>
+<tr class="even">
+<td align="left">hhh4</td>
+<td align="left">COVID-19</td>
+<td align="left">Italy</td>
+<td align="left">2020</td>
+<td align="left">Nonlinear Dynamics</td>
+<td align="right">2020</td>
+<td align="left"><a href="https://doi.org/10.1007/s11071-020-05853-7" class="external-link uri">https://doi.org/10.1007/s11071-020-05853-7</a></td>
+</tr>
+<tr class="odd">
+<td align="left">hhh4</td>
+<td align="left">SFTS</td>
+<td align="left">Zhejiang, China</td>
+<td align="left">2011-2018</td>
+<td align="left">PLOS Neglected Tropical Diseases</td>
+<td align="right">2020</td>
+<td align="left"><a href="https://doi.org/10.1371/journal.pntd.0008186" class="external-link uri">https://doi.org/10.1371/journal.pntd.0008186</a></td>
+</tr>
+<tr class="even">
+<td align="left">twinstim</td>
+<td align="left">far-right radicalization</td>
+<td align="left">USA</td>
+<td align="left">2005-2017</td>
+<td align="left">arXiv</td>
+<td align="right">2020</td>
+<td align="left"><a href="https://arxiv.org/abs/2004.04265" class="external-link uri">https://arxiv.org/abs/2004.04265</a></td>
+</tr>
+<tr class="odd">
+<td align="left">hhh4</td>
+<td align="left">COVID-19</td>
+<td align="left">England</td>
+<td align="left">2020</td>
+<td align="left">medRxiv</td>
+<td align="right">2020</td>
+<td align="left"><a href="https://doi.org/10.1101/2020.05.15.20102715" class="external-link uri">https://doi.org/10.1101/2020.05.15.20102715</a></td>
+</tr>
+<tr class="even">
+<td align="left">hhh4</td>
+<td align="left">COVID-19</td>
+<td align="left">Germany</td>
+<td align="left">2020</td>
+<td align="left">CESifo Working Papers</td>
+<td align="right">2020</td>
+<td align="left"><a href="https://www.cesifo.org/DocDL/cesifo1_wp8446.pdf" class="external-link uri">https://www.cesifo.org/DocDL/cesifo1_wp8446.pdf</a></td>
+</tr>
+<tr class="odd">
+<td align="left">hhh4</td>
+<td align="left">pertussis</td>
+<td align="left">Lancashire and South Wales</td>
+<td align="left">1940-1969</td>
+<td align="left">Social Science &amp; Medicine</td>
+<td align="right">2020</td>
+<td align="left"><a href="https://doi.org/10.1016/j.socscimed.2020.113295" class="external-link uri">https://doi.org/10.1016/j.socscimed.2020.113295</a></td>
+</tr>
+<tr class="even">
+<td align="left">hhh4</td>
+<td align="left">COVID-19</td>
+<td align="left">Africa (country-level)</td>
+<td align="left">2020</td>
+<td align="left">medRxiv</td>
+<td align="right">2020</td>
+<td align="left"><a href="https://doi.org/10.1101/2020.11.13.20231241" class="external-link uri">https://doi.org/10.1101/2020.11.13.20231241</a></td>
+</tr>
+</tbody>
+</table></details>
+</div>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
@@ -186,7 +404,7 @@ A Markov Chain approximation for computing the run-length distribution of the pr
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001. Hosted on <a href="https://R-forge.R-project.org/projects/surveillance/" class="external-link external-link"><img src="https://r-forge.r-project.org/themes/rforge/imagesrf/logo.png" height="18" alt="R-Forge"></a></p>
 </div>
 
       </footer>

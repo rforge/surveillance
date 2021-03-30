@@ -24,7 +24,7 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc" data-headroom data-tolerance="5" data-offset="100">
+<body data-spy="scroll" data-target="#toc" data-headroom>
     
 
       <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
@@ -60,7 +60,7 @@
 </nav><div class="container template-reference-topic">
 <div class="row">
   <div class="col-md-9 contents">
-    <div class="page-header pb-2 mt-4 mb-2 border-bottom toc-ignore">
+    <img src="" class="pkg-logo" alt=""><div class="page-header pb-2 mt-4 mb-2 border-bottom toc-ignore">
     <h1 class="display-4">Measles in the 16 states of Germany</h1>
     
     <div class="d-none name"><code>measlesDE.Rd</code></div>
@@ -77,7 +77,7 @@
     <h2 class="hasAnchor" id="format">
 <a class="anchor" href="#format"></a>Format</h2>
 
-    <p>An <code>sts</code> object containing \(156\times 16\)
+    <p>An <code>"<a href="sts-class.html">sts</a>"</code> object containing \(156\times 16\)
   observations starting from week 1 in 2005.</p>  
 <p>The <code>population</code> slot contains the population fractions
   of each state at 31.12.2006, obtained from the Federal Statistical
@@ -95,14 +95,25 @@
     <h2 class="hasAnchor" id="references">
 <a class="anchor" href="#references"></a>References</h2>
 
-    <p>Herzog, S.A., Paul, M. and Held, L. (2011) Heterogeneity in vaccination
-    coverage explains the size and occurrence of measles epidemics in
-    German surveillance data. Epidemiology and Infection, <b>139</b>, 505--515.</p>
+    <p>Herzog, S. A., Paul, M. and Held, L. (2011):
+  Heterogeneity in vaccination coverage explains the size and
+  occurrence of measles epidemics in German surveillance data.
+  <em>Epidemiology and Infection</em>, <b>139</b>, 505-515.
+  doi: <a href="https://doi.org/10.1017/S0950268810001664">10.1017/S0950268810001664</a></p>
 
     <h2 class="hasAnchor" id="examples">
 <a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">measlesDE</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">measlesDE</span><span class="op">)</span>    
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">measlesDE</span><span class="op">)</span>
+
+<span class="co">## aggregate to bi-weekly intervals</span>
+<span class="va">measles2w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/aggregate.html">aggregate</a></span><span class="op">(</span><span class="va">measlesDE</span>, nfreq <span class="op">=</span> <span class="fl">26</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">measles2w</span>, type <span class="op">=</span> <span class="va">observed</span> <span class="op">~</span> <span class="va">time</span><span class="op">)</span>
+
+<span class="co">## use a date index for nicer x-axis plotting</span>
+<span class="fu"><a href="stsSlots.html">epoch</a></span><span class="op">(</span><span class="va">measles2w</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span><span class="op">(</span><span class="st">"2005-01-03"</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"2 weeks"</span>,
+                        length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">measles2w</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">measles2w</span>, type <span class="op">=</span> <span class="va">observed</span> <span class="op">~</span> <span class="va">time</span><span class="op">)</span>
 </code></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -122,7 +133,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001. Hosted on <a href="https://R-forge.R-project.org/projects/surveillance/" class="external-link"><img src="https://r-forge.r-project.org/themes/rforge/imagesrf/logo.png" height="18" alt="R-Forge"></a></p>
 </div>
 
       </footer>

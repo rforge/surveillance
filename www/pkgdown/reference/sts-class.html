@@ -33,7 +33,7 @@ This is a lightweight S4 class to implement (multivariate) time
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc" data-headroom data-tolerance="5" data-offset="100">
+<body data-spy="scroll" data-target="#toc" data-headroom>
     
 
       <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
@@ -69,7 +69,7 @@ This is a lightweight S4 class to implement (multivariate) time
 </nav><div class="container template-reference-topic">
 <div class="row">
   <div class="col-md-9 contents">
-    <div class="page-header pb-2 mt-4 mb-2 border-bottom toc-ignore">
+    <img src="" class="pkg-logo" alt=""><div class="page-header pb-2 mt-4 mb-2 border-bottom toc-ignore">
     <h1 class="display-4">Class <code>"sts"</code> -- surveillance time series</h1>
     
     <div class="d-none name"><code>sts-class.Rd</code></div>
@@ -221,7 +221,7 @@ This is a lightweight S4 class to implement (multivariate) time
       by dates (<code>epochAsDate</code> = TRUE), the returned vector is of
       class <code>Date</code>, otherwise numeric (usually the integer
       sequence <code>1:nrow(x)</code>).<br>
-      By explicitly requesting <code><a href="stsSlot-generics.html">epoch(x, as.Date = TRUE)</a></code>, dates
+      By explicitly requesting <code><a href="stsSlots.html">epoch(x, as.Date = TRUE)</a></code>, dates
       can also be extracted if the <code>sts</code> object is not internally
       indexed by dates but has a standard frequency of 12 (monthly) or
       52 (weekly). The transformation is based on <code>start</code> and
@@ -288,7 +288,7 @@ This is a lightweight S4 class to implement (multivariate) time
 <dl>
 <dt>aggregate</dt>
 <dd><p><code>signature(x = "sts")</code>:
-      see <code><a href="aggregate-methods.html">aggregate.sts</a></code>.</p></dd>
+      see <code><a href="stsAggregate.html">aggregate.sts</a></code>.</p></dd>
 
     <dt>as.data.frame</dt>
 <dd><p><code>signature(x = "sts")</code>:
@@ -296,11 +296,11 @@ This is a lightweight S4 class to implement (multivariate) time
       slots into a data frame: <code>observed</code>, <code>epoch</code>,
       <code>state</code>, <code>alarm</code>, <code>upperbound</code>, and
       <code>populationFrac</code>. Additional columns will be created for
-      <code>freq</code> (potentially varying by year if <code>x@epochAsDate</code>
-      is <code>TRUE</code>) and <code>epochInPeriod</code> (the epoch fraction
-      within the current year).<br>
+      <code>freq</code> (potentially varying by year for weekly or daily data
+      if <code>x@epochAsDate</code> is <code>TRUE</code>) and
+      <code>epochInPeriod</code> (the epoch fraction within the current year).<br>
       Calling the <code>as.data.frame</code> method with the argument
-      <code>tidy = TRUE</code> will return <code><a href="tidy.sts.html">tidy.sts</a>(x)</code>,
+      <code>tidy = TRUE</code> will return <code><a href="sts_tidy.html">tidy.sts</a>(x)</code>,
       which reshapes multivariate <code>sts</code> objects to the
       “long” format (one row per epoch and observational unit).
       The tidy format is particularly useful for standard regression
@@ -354,10 +354,10 @@ This is a lightweight S4 class to implement (multivariate) time
 <span class="va">measlesWeserEms</span>
 
 <span class="co">## reconstruct data("measlesWeserEms") from its components</span>
-<span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="stsSlot-generics.html">observed</a></span><span class="op">(</span><span class="va">measlesWeserEms</span><span class="op">)</span>
+<span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="stsSlots.html">observed</a></span><span class="op">(</span><span class="va">measlesWeserEms</span><span class="op">)</span>
 <span class="va">map</span> <span class="op">&lt;-</span> <span class="va">measlesWeserEms</span><span class="op">@</span><span class="va">map</span>
-<span class="va">populationFrac</span> <span class="op">&lt;-</span> <span class="fu"><a href="stsSlot-generics.html">population</a></span><span class="op">(</span><span class="va">measlesWeserEms</span><span class="op">)</span>
-<span class="va">weserems_nbOrder</span> <span class="op">&lt;-</span> <span class="fu"><a href="stsSlot-generics.html">neighbourhood</a></span><span class="op">(</span><span class="va">measlesWeserEms</span><span class="op">)</span>
+<span class="va">populationFrac</span> <span class="op">&lt;-</span> <span class="fu"><a href="stsSlots.html">population</a></span><span class="op">(</span><span class="va">measlesWeserEms</span><span class="op">)</span>
+<span class="va">weserems_nbOrder</span> <span class="op">&lt;-</span> <span class="fu"><a href="stsSlots.html">neighbourhood</a></span><span class="op">(</span><span class="va">measlesWeserEms</span><span class="op">)</span>
 <span class="co">## orders of adjacency can also be determined from the map</span>
 <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html">requireNamespace</a></span><span class="op">(</span><span class="st">"spdep"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
     <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html">identical</a></span><span class="op">(</span><span class="va">weserems_nbOrder</span>,
@@ -397,7 +397,7 @@ This is a lightweight S4 class to implement (multivariate) time
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001. Hosted on <a href="https://R-forge.R-project.org/projects/surveillance/" class="external-link"><img src="https://r-forge.r-project.org/themes/rforge/imagesrf/logo.png" height="18" alt="R-Forge"></a></p>
 </div>
 
       </footer>

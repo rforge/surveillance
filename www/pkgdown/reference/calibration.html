@@ -29,7 +29,7 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc" data-headroom data-tolerance="5" data-offset="100">
+<body data-spy="scroll" data-target="#toc" data-headroom>
     
 
       <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
@@ -65,7 +65,7 @@
 </nav><div class="container template-reference-topic">
 <div class="row">
   <div class="col-md-9 contents">
-    <div class="page-header pb-2 mt-4 mb-2 border-bottom toc-ignore">
+    <img src="" class="pkg-logo" alt=""><div class="page-header pb-2 mt-4 mb-2 border-bottom toc-ignore">
     <h1 class="display-4">Calibration Tests for Poisson or Negative Binomial Predictions</h1>
     
     <div class="d-none name"><code>calibration.Rd</code></div>
@@ -81,10 +81,10 @@
   ranked probability score (<code>"rps"</code>).</p>
     </div>
 
-    <pre class="usage"><code class="sourceCode R"><span class="fu">calibrationTest</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
+    <pre class="usage"><code class="sourceCode R"><span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S3 method for default</span>
-<span class="fu">calibrationTest</span><span class="op">(</span><span class="va">x</span>, <span class="va">mu</span>, size <span class="op">=</span> <span class="cn">NULL</span>,
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">mu</span>, size <span class="op">=</span> <span class="cn">NULL</span>,
                 which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"dss"</span>, <span class="st">"logs"</span>, <span class="st">"rps"</span><span class="op">)</span>,
                 tolerance <span class="op">=</span> <span class="fl">1e-4</span>, method <span class="op">=</span> <span class="fl">2</span>, <span class="va">...</span><span class="op">)</span></code></pre>
 
@@ -158,10 +158,10 @@
 <span class="va">size</span> <span class="op">&lt;-</span> <span class="fl">0.1</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/NegBinomial.html">rnbinom</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">mu</span><span class="op">)</span>, mu <span class="op">=</span> <span class="va">mu</span>, size <span class="op">=</span> <span class="va">size</span><span class="op">)</span>
-<span class="fu">calibrationTest</span><span class="op">(</span><span class="va">y</span>, mu <span class="op">=</span> <span class="va">mu</span>, size <span class="op">=</span> <span class="va">size</span><span class="op">)</span> <span class="co"># p = 0.99</span>
-<span class="fu">calibrationTest</span><span class="op">(</span><span class="va">y</span>, mu <span class="op">=</span> <span class="va">mu</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="co"># p = 4.3e-05</span>
-<span class="fu">calibrationTest</span><span class="op">(</span><span class="va">y</span>, mu <span class="op">=</span> <span class="fl">1</span>, size <span class="op">=</span> <span class="va">size</span><span class="op">)</span> <span class="co"># p = 0.6959</span>
-<span class="fu">calibrationTest</span><span class="op">(</span><span class="va">y</span>, mu <span class="op">=</span> <span class="fl">1</span>, size <span class="op">=</span> <span class="va">size</span>, which <span class="op">=</span> <span class="st">"rps"</span><span class="op">)</span> <span class="co"># p = 0.1286</span>
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">y</span>, mu <span class="op">=</span> <span class="va">mu</span>, size <span class="op">=</span> <span class="va">size</span><span class="op">)</span> <span class="co"># p = 0.99</span>
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">y</span>, mu <span class="op">=</span> <span class="va">mu</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="co"># p = 4.3e-05</span>
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">y</span>, mu <span class="op">=</span> <span class="fl">1</span>, size <span class="op">=</span> <span class="va">size</span><span class="op">)</span> <span class="co"># p = 0.6959</span>
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">y</span>, mu <span class="op">=</span> <span class="fl">1</span>, size <span class="op">=</span> <span class="va">size</span>, which <span class="op">=</span> <span class="st">"rps"</span><span class="op">)</span> <span class="co"># p = 0.1286</span>
 </code></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -181,7 +181,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001. Hosted on <a href="https://R-forge.R-project.org/projects/surveillance/" class="external-link"><img src="https://r-forge.r-project.org/themes/rforge/imagesrf/logo.png" height="18" alt="R-Forge"></a></p>
 </div>
 
       </footer>

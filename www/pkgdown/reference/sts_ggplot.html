@@ -16,7 +16,9 @@
 <script src="../pkgdown.js"></script><meta property="og:title" content="Time-Series Plots for " sts objects using ggplot2 sts_ggplot>
 <meta property="og:description" content='A simple ggplot2 variant of stsplot_time,
   based on a &amp;#8220;tidy&amp;#8221; version of the "sts" object via
-  tidy.sts.'>
+  tidy.sts.
+  It uses a date axis and thus only works for time series indexed by
+  dates or with a standard frequency (daily, weekly, or monthly).'>
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@bastistician">
 <meta name="twitter:site" content="@bastistician">
@@ -25,7 +27,7 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc" data-headroom data-tolerance="5" data-offset="100">
+<body data-spy="scroll" data-target="#toc" data-headroom>
     
 
       <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
@@ -61,7 +63,7 @@
 </nav><div class="container template-reference-topic">
 <div class="row">
   <div class="col-md-9 contents">
-    <div class="page-header pb-2 mt-4 mb-2 border-bottom toc-ignore">
+    <img src="" class="pkg-logo" alt=""><div class="page-header pb-2 mt-4 mb-2 border-bottom toc-ignore">
     <h1 class="display-4">Time-Series Plots for <code>"sts"</code> Objects Using <span class="pkg">ggplot2</span>
 </h1>
     
@@ -71,7 +73,9 @@
     <div class="ref-description">
     <p>A simple <a href="https://CRAN.R-project.org/package=ggplot2"><span class="pkg">ggplot2</span></a> variant of <code><a href="stsplot_time.html">stsplot_time</a></code>,
   based on a “tidy” version of the <code>"sts"</code> object via
-  <code><a href="tidy.sts.html">tidy.sts</a></code>.</p>
+  <code><a href="sts_tidy.html">tidy.sts</a></code>.
+  It uses a date axis and thus only works for time series indexed by
+  dates or with a standard frequency (daily, weekly, or monthly).</p>
     </div>
 
     <pre class="usage"><code class="sourceCode R"><span class="fu">autoplot.sts</span><span class="op">(</span><span class="va">object</span>, population <span class="op">=</span> <span class="cn">FALSE</span>, units <span class="op">=</span> <span class="cn">NULL</span>,
@@ -82,13 +86,13 @@
 <dt class="col-sm-3" id="ref-arguments name">object</dt>
       <dd class="col-sm-9" id="ref-arguments desc"><p>an object of class <code>"<a href="sts-class.html">sts</a>"</code>.</p></dd>
     <dt class="col-sm-3" id="ref-arguments name">population</dt>
-      <dd class="col-sm-9" id="ref-arguments desc"><p>logical indicating whether <code><a href="stsSlot-generics.html">observed(object)</a></code>
-    should be divided by <code><a href="stsSlot-generics.html">population(object)</a></code>.
+      <dd class="col-sm-9" id="ref-arguments desc"><p>logical indicating whether <code><a href="stsSlots.html">observed(object)</a></code>
+    should be divided by <code><a href="stsSlots.html">population(object)</a></code>.
     The <code>population</code> argument can also be a scalar,
-    which is used to scale the denominator <code><a href="stsSlot-generics.html">population(object)</a></code>,
-    i.e., <code><a href="stsSlot-generics.html">observed(object)</a></code> is divided by
+    which is used to scale the denominator <code><a href="stsSlots.html">population(object)</a></code>,
+    i.e., <code><a href="stsSlots.html">observed(object)</a></code> is divided by
     <code>population(object) / population</code>.
-    For instance, if <code><a href="stsSlot-generics.html">population(object)</a></code> contains raw population
+    For instance, if <code><a href="stsSlots.html">population(object)</a></code> contains raw population
     numbers, <code>population = 1000</code> could be used to plot the
     incidence per 1000 inhabitants.</p></dd>
     <dt class="col-sm-3" id="ref-arguments name">units</dt>
@@ -157,7 +161,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001. Hosted on <a href="https://R-forge.R-project.org/projects/surveillance/" class="external-link"><img src="https://r-forge.r-project.org/themes/rforge/imagesrf/logo.png" height="18" alt="R-Forge"></a></p>
 </div>
 
       </footer>

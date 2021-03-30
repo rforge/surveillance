@@ -34,7 +34,7 @@ Scores, calibration tests and PIT histograms can also be
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc" data-headroom data-tolerance="5" data-offset="100">
+<body data-spy="scroll" data-target="#toc" data-headroom>
     
 
       <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
@@ -70,7 +70,7 @@ Scores, calibration tests and PIT histograms can also be
 </nav><div class="container template-reference-topic">
 <div class="row">
   <div class="col-md-9 contents">
-    <div class="page-header pb-2 mt-4 mb-2 border-bottom toc-ignore">
+    <img src="" class="pkg-logo" alt=""><div class="page-header pb-2 mt-4 mb-2 border-bottom toc-ignore">
     <h1 class="display-4">Predictive Model Assessment for <code>hhh4</code> Models</h1>
     
     <div class="d-none name"><code>hhh4_validation.Rd</code></div>
@@ -84,7 +84,7 @@ Scores, calibration tests and PIT histograms can also be
   The associated <code><a href="scores.html">scores</a></code>-method computes a number of (strictly) proper
   scoring rules based on such one-step-ahead predictions;
   see Paul and Held (2011) for details.
-  There are also <code><a href="calibrationTest.html">calibrationTest</a></code> and <code><a href="pit.html">pit</a></code>
+  There are also <code><a href="calibration.html">calibrationTest</a></code> and <code><a href="pit.html">pit</a></code>
   methods for <code>oneStepAhead</code> predictions.</p>  
 <p>Scores, calibration tests and PIT histograms can also be
   computed for the fitted values of an <code>hhh4</code> model
@@ -108,7 +108,7 @@ Scores, calibration tests and PIT histograms can also be
 <span class="fu"><a href="scores.html">scores</a></span><span class="op">(</span><span class="va">x</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"logs"</span>, <span class="st">"rps"</span>, <span class="st">"dss"</span>, <span class="st">"ses"</span><span class="op">)</span>,
        units <span class="op">=</span> <span class="cn">NULL</span>, sign <span class="op">=</span> <span class="cn">FALSE</span>, individual <span class="op">=</span> <span class="cn">FALSE</span>, reverse <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
 <span class="co"># S3 method for oneStepAhead</span>
-<span class="fu"><a href="calibrationTest.html">calibrationTest</a></span><span class="op">(</span><span class="va">x</span>, units <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">x</span>, units <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
 <span class="co"># S3 method for oneStepAhead</span>
 <span class="fu"><a href="pit.html">pit</a></span><span class="op">(</span><span class="va">x</span>, units <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
 
@@ -117,7 +117,7 @@ Scores, calibration tests and PIT histograms can also be
 <span class="fu"><a href="scores.html">scores</a></span><span class="op">(</span><span class="va">x</span>, which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"logs"</span>, <span class="st">"rps"</span>, <span class="st">"dss"</span>, <span class="st">"ses"</span><span class="op">)</span>,
        subset <span class="op">=</span> <span class="va">x</span><span class="op">$</span><span class="va">control</span><span class="op">$</span><span class="va">subset</span>, units <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">nUnit</span><span class="op">)</span>, sign <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
 <span class="co"># S3 method for hhh4</span>
-<span class="fu"><a href="calibrationTest.html">calibrationTest</a></span><span class="op">(</span><span class="va">x</span>,
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">x</span>,
                 subset <span class="op">=</span> <span class="va">x</span><span class="op">$</span><span class="va">control</span><span class="op">$</span><span class="va">subset</span>, units <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">nUnit</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span>
 <span class="co"># S3 method for hhh4</span>
 <span class="fu"><a href="pit.html">pit</a></span><span class="op">(</span><span class="va">x</span>, subset <span class="op">=</span> <span class="va">x</span><span class="op">$</span><span class="va">control</span><span class="op">$</span><span class="va">subset</span>, units <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">nUnit</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></code></pre>
@@ -236,7 +236,7 @@ Scores, calibration tests and PIT histograms can also be
     <code>observed.args</code>, and <code>key.args</code> can be used to modify the
     plotting style.<br>
     For the <code>calibrationTest</code>-method, further arguments are passed
-    to <code><a href="calibrationTest.html">calibrationTest.default</a></code>, e.g., <code>which</code> to
+    to <code><a href="calibration.html">calibrationTest.default</a></code>, e.g., <code>which</code> to
     select a scoring rule.<br>
     For the <code>pit</code>-methods, further arguments are passed to
     <code><a href="pit.html">pit.default</a></code>.</p></dd>
@@ -291,7 +291,7 @@ Otherwise, the result is a matrix with nrow(pred) rows and
 first dimension is dropped in both cases.
 
 
-The <a href="calibrationTest.html">calibrationTest</a>- and <a href="pit.html">pit</a>-methods are
+The <a href="calibration.html">calibrationTest</a>- and <a href="pit.html">pit</a>-methods are
 just convenient wrappers around the respective default methods.
 
     <h2 class="hasAnchor" id="references">
@@ -376,15 +376,15 @@ just convenient wrappers around the respective default methods.
 
 
 <span class="co">## test if the one-step-ahead predictions are calibrated</span>
-<span class="fu"><a href="calibrationTest.html">calibrationTest</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span>  <span class="co"># p = 0.8746</span>
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span>  <span class="co"># p = 0.8746</span>
 
 <span class="co">## the above uses the calibrationTest-method for "oneStepAhead" predictions,</span>
 <span class="co">## which is a simple wrapper around the default method:</span>
-<span class="fu"><a href="calibrationTest.html">calibrationTest</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">observed</span>, mu <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">pred</span>, size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">psi</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">observed</span>, mu <span class="op">=</span> <span class="va">pred</span><span class="op">$</span><span class="va">pred</span>, size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">psi</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">## we can also test calibration of the fitted values</span>
 <span class="co">## using the calibrationTest-method for "hhh4" fits</span>
-<span class="fu"><a href="calibrationTest.html">calibrationTest</a></span><span class="op">(</span><span class="va">result</span>, subset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">salmonella</span><span class="op">)</span><span class="op">-</span><span class="op">(</span><span class="fl">4</span><span class="op">:</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">result</span>, subset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">salmonella</span><span class="op">)</span><span class="op">-</span><span class="op">(</span><span class="fl">4</span><span class="op">:</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span>
 
 
 <span class="co">## plot a (non-randomized) PIT histogram for the predictions</span>
@@ -409,12 +409,12 @@ just convenient wrappers around the respective default methods.
 
 <span class="co">## assess overall (in-sample) calibration of the model, i.e.,</span>
 <span class="co">## if the observed counts are from the fitted NegBin distribution</span>
-<span class="fu"><a href="calibrationTest.html">calibrationTest</a></span><span class="op">(</span><span class="va">measlesFit</span><span class="op">)</span> <span class="co"># default is DSS (not suitable for low counts)</span>
-<span class="fu"><a href="calibrationTest.html">calibrationTest</a></span><span class="op">(</span><span class="va">measlesFit</span>, which <span class="op">=</span> <span class="st">"rps"</span><span class="op">)</span>  <span class="co"># p = 0.9322</span>
-<span class="fu"><a href="calibrationTest.html">calibrationTest</a></span><span class="op">(</span><span class="va">measlesFit</span>, which <span class="op">=</span> <span class="st">"logs"</span><span class="op">)</span> <span class="co"># p = 0.7238</span>
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">measlesFit</span><span class="op">)</span> <span class="co"># default is DSS (not suitable for low counts)</span>
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">measlesFit</span>, which <span class="op">=</span> <span class="st">"rps"</span><span class="op">)</span>  <span class="co"># p = 0.9322</span>
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">measlesFit</span>, which <span class="op">=</span> <span class="st">"logs"</span><span class="op">)</span> <span class="co"># p = 0.7238</span>
 
 <span class="co">## to assess calibration in the second year for a specific district</span>
-<span class="fu"><a href="calibrationTest.html">calibrationTest</a></span><span class="op">(</span><span class="va">measlesFit</span>, subset <span class="op">=</span> <span class="fl">53</span><span class="op">:</span><span class="fl">104</span>, units <span class="op">=</span> <span class="st">"03452"</span>, which <span class="op">=</span> <span class="st">"rps"</span><span class="op">)</span>
+<span class="fu"><a href="calibration.html">calibrationTest</a></span><span class="op">(</span><span class="va">measlesFit</span>, subset <span class="op">=</span> <span class="fl">53</span><span class="op">:</span><span class="fl">104</span>, units <span class="op">=</span> <span class="st">"03452"</span>, which <span class="op">=</span> <span class="st">"rps"</span><span class="op">)</span>
 <span class="fu"><a href="pit.html">pit</a></span><span class="op">(</span><span class="va">measlesFit</span>, subset <span class="op">=</span> <span class="fl">53</span><span class="op">:</span><span class="fl">104</span>, units <span class="op">=</span> <span class="st">"03452"</span><span class="op">)</span>
 
 
@@ -444,7 +444,7 @@ just convenient wrappers around the respective default methods.
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001. Hosted on <a href="https://R-forge.R-project.org/projects/surveillance/" class="external-link"><img src="https://r-forge.r-project.org/themes/rforge/imagesrf/logo.png" height="18" alt="R-Forge"></a></p>
 </div>
 
       </footer>

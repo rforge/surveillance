@@ -22,7 +22,7 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc" data-headroom data-tolerance="5" data-offset="100">
+<body data-spy="scroll" data-target="#toc" data-headroom>
     
 
       <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
@@ -58,15 +58,22 @@
 </nav><div class="container template-news">
 <div class="row">
   <div class="col-md-9 contents">
-    <div class="pb-2 mt-4 mb-2 border-bottom">
+    <img src="" class="pkg-logo" alt=""><div class="page-header pb-2 mt-4 mb-2 border-bottom toc-ignore">
       <h1 class="display-4" data-toc-skip>Changelog <small></small>
 </h1>
       
     </div>
 
-    <div id="surveillance-1191-2021-03-16" class="section level1">
+    <div id="surveillance-1191-2021-03-30" class="section level1">
 <h1 class="pb-2 mt-4 mb-2 border-bottom" data-toc-text="1.19.1">
-<a href="#surveillance-1191-2021-03-16" class="anchor"></a>surveillance 1.19.1 (2021-03-16)</h1>
+<a href="#surveillance-1191-2021-03-30" class="anchor"></a>surveillance 1.19.1 (2021-03-30)</h1>
+<div id="documentation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#documentation" class="anchor"></a>DOCUMENTATION</h2>
+<ul>
+<li>The project website at <a href="https://surveillance.R-Forge.R-project.org/" class="external-link uri">https://surveillance.R-Forge.R-project.org/</a> has been overhauled using <a href="https://pkgdown.r-lib.org/" class="external-link"><strong>pkgdown</strong></a>.</li>
+</ul>
+</div>
 <div id="bug-fixes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bug-fixes" class="anchor"></a>BUG FIXES</h2>
@@ -75,6 +82,8 @@
 <li><p><code><a href="../reference/twinstim_simulation.html">simEpidataCS()</a></code> now internally resets the CRS (temporary), which avoids spurious warnings and also reduces its runtime by about 25%.</p></li>
 <li><p>Fix encoding error in <code>vignette("twinstim")</code> for CRAN’s non-UTF8 Linux test machine.</p></li>
 <li><p>This version of <strong>surveillance</strong> (formally) requires the new <a href="https://CRAN.R-project.org/package=spatstat" class="external-link"><strong>spatstat</strong></a> umbrella package to avoid collisions of old <strong>spatstat</strong> and its new sub-packages (we only use <a href="https://CRAN.R-project.org/package=spatstat.geom" class="external-link"><strong>spatstat.geom</strong></a>). The <strong>spatstat</strong> dependence will be dropped in the future.</p></li>
+<li><p>The <code>epoch&lt;-</code> replacement method for <code>"sts"</code> objects now accepts a <code>"Date"</code> vector. The standard plots may give nicer x-axis annotation if indexed by dates. See the <code>xaxis.*</code> arguments of <code><a href="../reference/stsplot_time.html">stsplot_time()</a></code>.</p></li>
+<li><p><code><a href="../reference/sts_tidy.html">tidy.sts()</a></code> (and thus <code><a href="../reference/sts_ggplot.html">autoplot.sts()</a></code>) failed for date-indexed <code>"sts"</code> objects with non-standard frequencies. [spotted by Junyi Lu]</p></li>
 </ul>
 </div>
 </div>
@@ -105,7 +114,7 @@
 <li><p>Bug fix in the <code><a href="../reference/farringtonFlexible.html">farringtonFlexible()</a></code>-function, which for the argument <code>thresholdMethod=="nbPlugin"</code> and <code>thresholdMethod=="muan"</code> unfortunately computed the limit as an <code>(1-alpha/2)</code> prediction interval instead of the documented <code>(1-alpha)</code> prediction interval. This affects four threshold values in Table 2 of <code>vignette("monitoringCounts")</code>. The default method <code>"delta"</code> worked as expected.</p></li>
 <li><p>In <code><a href="../reference/hhh4.html">hhh4()</a></code> models without AR component, the matrix of fitted values could lack column names.</p></li>
 <li><p>Experimental time-varying neighbourhood weights in <code><a href="../reference/hhh4.html">hhh4()</a></code> were indexed differently in model fitting and in the <code><a href="https://rdrr.io/r/stats/simulate.html" class="external-link">simulate()</a></code> method (undocumented behaviour). Both now use the latter variant, where the mean at time <em>t</em> uses products of weights at time <em>t</em> and observed counts at time <em>t-1</em>. [reported by Johannes Bracher]</p></li>
-<li><p>For weekly <code>sts</code> indexed via <code>start</code> and <code>freq=52</code>, <code><a href="../reference/stsSlot-generics.html">epoch(sts, as.Date=TRUE)</a></code> now interprets the <code>start</code> week according to ISO 8601. For example, <code>start = c(2020, 5)</code> corresponds to 2020-01-27, not 2020-02-03. This affects <code><a href="../reference/sts-class.html">as.xts.sts()</a></code> and the time plot in <code><a href="../reference/sts_animate.html">animate.sts()</a></code>.</p></li>
+<li><p>For weekly <code>sts</code> indexed via <code>start</code> and <code>freq=52</code>, <code><a href="../reference/stsSlots.html">epoch(sts, as.Date=TRUE)</a></code> now interprets the <code>start</code> week according to ISO 8601. For example, <code>start = c(2020, 5)</code> corresponds to 2020-01-27, not 2020-02-03. This affects <code><a href="../reference/sts-class.html">as.xts.sts()</a></code> and the time plot in <code><a href="../reference/sts_animate.html">animate.sts()</a></code>.</p></li>
 <li><p><code><a href="../reference/stsplot_space.html">stsplot_space()</a></code> automatically extends manual color breaks (<code>at</code>), if the intervals do not cover the data range.</p></li>
 <li><p><code><a href="../reference/twinstim_simEndemicEvents.html">simEndemicEvents()</a></code> and thus <code><a href="../reference/twinstim_epitest.html">epitest(..., method="simulate")</a></code> are no longer slowed down by intermediate <code>CRS()</code> computations.</p></li>
 </ul>
@@ -129,7 +138,7 @@
 <a href="#new-features-1" class="anchor"></a>NEW FEATURES</h2>
 <ul>
 <li><p>New spatial interaction function for <code><a href="../reference/twinstim.html">twinstim()</a></code>: <code><a href="../reference/twinstim_iaf.html">siaf.exponential()</a></code> implements the exponential kernel <em>f(x) = exp(-x/σ)</em>, which is a useful alternative if the two-parameter power-law kernel is not identifiable.</p></li>
-<li><p>The <code>plot</code>-type <code>"maps"</code> for <code>"hhh4"</code> fits, <code><a href="../reference/plot.hhh4.html">plotHHH4_maps()</a></code>, now allows for map-specific color keys via <code>zmax = NA</code> (useful for <code>prop = TRUE</code>).</p></li>
+<li><p>The <code>plot</code>-type <code>"maps"</code> for <code>"hhh4"</code> fits, <code><a href="../reference/hhh4_plot.html">plotHHH4_maps()</a></code>, now allows for map-specific color keys via <code>zmax = NA</code> (useful for <code>prop = TRUE</code>).</p></li>
 </ul>
 </div>
 <div id="bug-fixes-2" class="section level2">
@@ -225,7 +234,7 @@
 <a href="#minor-changes-2" class="anchor"></a>MINOR CHANGES</h2>
 <ul>
 <li><p><code><a href="../reference/hhh4_W.html">W_np()</a></code>’s argument <code>to0</code> has been renamed to <code>truncate</code>. The old name still works but is deprecated.</p></li>
-<li><p><code><a href="../reference/plot.hhh4.html">plotHHH4_ri()</a></code> now uses <code><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">cm.colors(100)</a></code> as <code>col.regions</code>, and 0-centered color breaks by default.</p></li>
+<li><p><code><a href="../reference/hhh4_plot.html">plotHHH4_ri()</a></code> now uses <code><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">cm.colors(100)</a></code> as <code>col.regions</code>, and 0-centered color breaks by default.</p></li>
 <li><p>The help pages of <code><a href="../reference/twinSIR.html">twinSIR()</a></code> and related functions now give examples based on <code><a href="https://rdrr.io/r/utils/data.html" class="external-link">data("hagelloch")</a></code> instead of using the toy dataset <code><a href="https://rdrr.io/r/utils/data.html" class="external-link">data("fooepidata")</a></code>. The latter is now obsolete and will be removed in future versions of the package.</p></li>
 <li><p>The elements of the <code>control</code> list stored in the result of <code><a href="../reference/algo.farrington.html">algo.farrington()</a></code> are now consistently ordered as in the default <code>control</code> argument.</p></li>
 </ul>
@@ -236,7 +245,7 @@
 <ul>
 <li><p>Using negative indices to exclude time points from an <code>"sts"</code> object (e.g., <code>x[-1,]</code>) is now supported and equivalent to the corresponding subset expression of retained indexes (<code>x[2:nrow(x),]</code>) in resetting the <code>start</code> and <code>epoch</code> slots. [reported by Johannes Bracher]</p></li>
 <li><p>For weekly <code>"sts"</code> data with <code>epochAsDate=TRUE</code>, the <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> method computed <code>freq</code> by <code>"%Y"</code>-year instead of by <code>"%G"</code>-year, which was inconsistent with the <code>epochInPeriod</code> variable.</p></li>
-<li><p>For <em>non</em>-weekly <code>"sts"</code> data with <code>epochAsDate=TRUE</code>, <code><a href="../reference/sts-class.html">year()</a></code> as well as the <code>year</code> column of the <code><a href="../reference/tidy.sts.html">tidy.sts()</a></code> output corresponded to the ISO week-based year. It now gives the calendar year.</p></li>
+<li><p>For <em>non</em>-weekly <code>"sts"</code> data with <code>epochAsDate=TRUE</code>, <code><a href="../reference/sts-class.html">year()</a></code> as well as the <code>year</code> column of the <code><a href="../reference/sts_tidy.html">tidy.sts()</a></code> output corresponded to the ISO week-based year. It now gives the calendar year.</p></li>
 <li><p><code><a href="../reference/sts_creation.html">sts_creation()</a></code> hard-coded <code>start = c(2006, 1)</code>.</p></li>
 <li><p><code><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">aggregate()</a></code>ing an <code>"sts"</code> object over time now recomputes fractions from the cumulated population values if and only if this is no <code>multinomialTS</code> and already contains population fractions. The same rule holds when subsetting units of an <code>"sts"</code> object. The <code>aggregate</code>-method previously failed to recompute fractions in some cases.</p></li>
 <li><p>For <code><a href="../reference/farringtonFlexible.html">farringtonFlexible()</a></code> with multivariate time series, only the last unit had stored the additional control items (exceedence scores, p-values, …), all others were 0. [reported by Johannes Bracher]</p></li>
@@ -306,11 +315,11 @@
 <h2 class="hasAnchor">
 <a href="#new-features-4" class="anchor"></a>NEW FEATURES</h2>
 <ul>
-<li><p>The <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> method for <code>"sts"</code> objects gained a <code>tidy</code> argument, which enables conversion to the long data format and is also available as function <code><a href="../reference/tidy.sts.html">tidy.sts()</a></code>.</p></li>
+<li><p>The <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> method for <code>"sts"</code> objects gained a <code>tidy</code> argument, which enables conversion to the long data format and is also available as function <code><a href="../reference/sts_tidy.html">tidy.sts()</a></code>.</p></li>
 <li><p>A <a href="https://CRAN.R-project.org/package=ggplot2" class="external-link"><strong>ggplot2</strong></a> variant of <code><a href="../reference/stsplot_time.html">stsplot_time()</a></code> is now available via <code><a href="../reference/sts_ggplot.html">autoplot.sts()</a></code>.</p></li>
 <li><p><code><a href="../reference/epidata.html">as.epidata.data.frame()</a></code> gained an argument <code>max.time</code> to specify the end of the observation period (which by default coincides with the last observed event).</p></li>
 <li><p>The now exported function <code><a href="../reference/fanplot.html">fanplot()</a></code> wraps <a href="https://CRAN.R-project.org/package=fanplot" class="external-link"><strong>fanplot</strong></a><code>::fan()</code>. It is used by <code><a href="../reference/hhh4_validation.html">plot.oneStepAhead()</a></code> and <code><a href="../reference/hhh4_simulate_plot.html">plot.hhh4sims()</a></code>, which now have an option to add the point forecasts to the fan as well.</p></li>
-<li><p><code><a href="../reference/plot.hhh4.html">plotHHH4_fitted()</a></code> (and <code><a href="../reference/plot.hhh4.html">plotHHH4_fitted1()</a></code>) gained an option <code>total</code> to sum the fitted components over all units.</p></li>
+<li><p><code><a href="../reference/hhh4_plot.html">plotHHH4_fitted()</a></code> (and <code><a href="../reference/hhh4_plot.html">plotHHH4_fitted1()</a></code>) gained an option <code>total</code> to sum the fitted components over all units.</p></li>
 </ul>
 </div>
 <div id="significant-changes" class="section level2">
@@ -382,9 +391,9 @@
     <div id="surveillance-1140-2017-06-29" class="section level1">
 <h1 class="pb-2 mt-4 mb-2 border-bottom" data-toc-text="1.14.0">
 <a href="#surveillance-1140-2017-06-29" class="anchor"></a>surveillance 1.14.0 (2017-06-29)</h1>
-<div id="documentation" class="section level2">
+<div id="documentation-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#documentation" class="anchor"></a>DOCUMENTATION</h2>
+<a href="#documentation-1" class="anchor"></a>DOCUMENTATION</h2>
 <ul>
 <li>The replication code from Meyer et al. (2017, JSS) is now included as <code><a href="https://rdrr.io/r/utils/demo.html" class="external-link">demo("v77i11")</a></code>. It exemplifies the spatio-temporal endemic-epidemic modelling frameworks <code>twinstim</code>, <code>twinSIR</code>, and <code>hhh4</code> (see also the corresponding vignettes).</li>
 </ul>
@@ -422,9 +431,9 @@
     <div id="surveillance-1131-2017-04-28" class="section level1">
 <h1 class="pb-2 mt-4 mb-2 border-bottom" data-toc-text="1.13.1">
 <a href="#surveillance-1131-2017-04-28" class="anchor"></a>surveillance 1.13.1 (2017-04-28)</h1>
-<div id="documentation-1" class="section level2">
+<div id="documentation-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#documentation-1" class="anchor"></a>DOCUMENTATION</h2>
+<a href="#documentation-2" class="anchor"></a>DOCUMENTATION</h2>
 <ul>
 <li>The paper on “Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package <strong>surveillance</strong>” (by Sebastian Meyer, Leonhard Held, and Michael Höhle) will appear in the upcoming volume of the <em>Journal of Statistical Software</em>. The main sections 3 to 5 of the paper are contained in the package as <code>vignette("twinstim")</code>, <code>vignette("twinSIR")</code>, and <code>vignette("hhh4_spacetime")</code>, respectively.</li>
 </ul>
@@ -433,7 +442,7 @@
 <h2 class="hasAnchor">
 <a href="#new-features-7" class="anchor"></a>NEW FEATURES</h2>
 <ul>
-<li><p>The <code><a href="../reference/calibrationTest.html">calibrationTest()</a></code> and <code><a href="../reference/pit.html">pit()</a></code> methods for <code>"oneStepAhead"</code> forecasts gained an argument <code>units</code> to allow for unit-specific assessments.</p></li>
+<li><p>The <code><a href="../reference/calibration.html">calibrationTest()</a></code> and <code><a href="../reference/pit.html">pit()</a></code> methods for <code>"oneStepAhead"</code> forecasts gained an argument <code>units</code> to allow for unit-specific assessments.</p></li>
 <li><p>A default <code>scores</code>-method is now available to compute a set of proper scoring rules for Poisson or NegBin predictions.</p></li>
 <li><p>New plot <code>type = "fan"</code> for simulations from <code>"hhh4"</code> models to produce a fan chart using the <a href="https://CRAN.R-project.org/package=fanplot" class="external-link"><strong>fanplot</strong></a> package.</p></li>
 </ul>
@@ -450,7 +459,7 @@
 <h2 class="hasAnchor">
 <a href="#bug-fixes-12" class="anchor"></a>BUG FIXES</h2>
 <ul>
-<li>The <code>"Lambda.const"</code> matrix returned by <code><a href="../reference/plot.hhh4.html">getMaxEV_season()</a></code> was wrong for models with asymmetric neighbourhood weights. [spotted by Johannes Bracher]<br>
+<li>The <code>"Lambda.const"</code> matrix returned by <code><a href="../reference/hhh4_plot.html">getMaxEV_season()</a></code> was wrong for models with asymmetric neighbourhood weights. [spotted by Johannes Bracher]<br>
 Dominant eigenvalues (<code>"maxEV"</code>) were not affected by this bug.</li>
 </ul>
 </div>
@@ -519,9 +528,9 @@ Dominant eigenvalues (<code>"maxEV"</code>) were not affected by this bug.</li>
     <div id="surveillance-1121-2016-05-18" class="section level1">
 <h1 class="pb-2 mt-4 mb-2 border-bottom" data-toc-text="1.12.1">
 <a href="#surveillance-1121-2016-05-18" class="anchor"></a>surveillance 1.12.1 (2016-05-18)</h1>
-<div id="documentation-2" class="section level2">
+<div id="documentation-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#documentation-2" class="anchor"></a>DOCUMENTATION</h2>
+<a href="#documentation-3" class="anchor"></a>DOCUMENTATION</h2>
 <ul>
 <li>The new <code>vignette("monitoringCounts")</code> illustrates the monitoring of count time series in R with a particular focus on aberration detection in public health surveillance. This vignette corresponds to a recently accepted manuscript for the <em>Journal of Statistical Software</em> (Salmon, Schumacher, and Höhle, 2016).</li>
 </ul>
@@ -547,9 +556,9 @@ Dominant eigenvalues (<code>"maxEV"</code>) were not affected by this bug.</li>
     <div id="surveillance-1120-2016-04-02" class="section level1">
 <h1 class="pb-2 mt-4 mb-2 border-bottom" data-toc-text="1.12.0">
 <a href="#surveillance-1120-2016-04-02" class="anchor"></a>surveillance 1.12.0 (2016-04-02)</h1>
-<div id="documentation-3" class="section level2">
+<div id="documentation-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#documentation-3" class="anchor"></a>DOCUMENTATION</h2>
+<a href="#documentation-4" class="anchor"></a>DOCUMENTATION</h2>
 <ul>
 <li>
 <p>Several new vignettes illustrate <em>endemic-epidemic</em> modeling frameworks for spatio-temporal surveillance data:</p>
@@ -585,7 +594,7 @@ Dominant eigenvalues (<code>"maxEV"</code>) were not affected by this bug.</li>
 <h2 class="hasAnchor">
 <a href="#minor-changes-11" class="anchor"></a>MINOR CHANGES</h2>
 <ul>
-<li><p><code><a href="../reference/plot.hhh4.html">plotHHH4_season()</a></code> now by default draws a horizontal reference line at unity if the multiplicative effect of component seasonality is shown (i.e., if <code>intercept=FALSE</code>).</p></li>
+<li><p><code><a href="../reference/hhh4_plot.html">plotHHH4_season()</a></code> now by default draws a horizontal reference line at unity if the multiplicative effect of component seasonality is shown (i.e., if <code>intercept=FALSE</code>).</p></li>
 <li><p>Since <strong>surveillance</strong> 1.8-0, <code><a href="../reference/hhh4.html">hhh4()</a></code> results are of class <code>"hhh4"</code> instead of <code>"ah4"</code> (renamed). Legacy methods for the old class name <code>"ah4"</code> have been removed.</p></li>
 <li><p>The internal model preparation in <code><a href="../reference/twinstim.html">twinstim()</a></code> is more efficient (the distance matrix of the events is only computed if event sources actually need to be updated).</p></li>
 </ul>
@@ -639,11 +648,11 @@ Dominant eigenvalues (<code>"maxEV"</code>) were not affected by this bug.</li>
 <h2 class="hasAnchor">
 <a href="#new-features-12" class="anchor"></a>NEW FEATURES</h2>
 <ul>
-<li><p>Calibration tests for count data (Wei and Held, 2014, Test) are now implemented and available as <code><a href="../reference/calibrationTest.html">calibrationTest()</a></code>. In addition to a default method taking pure counts and predictive means and dispersion parameters, there are convenient methods for <code>"hhh4"</code> and <code>"oneStepAhead"</code> objects.</p></li>
+<li><p>Calibration tests for count data (Wei and Held, 2014, Test) are now implemented and available as <code><a href="../reference/calibration.html">calibrationTest()</a></code>. In addition to a default method taking pure counts and predictive means and dispersion parameters, there are convenient methods for <code>"hhh4"</code> and <code>"oneStepAhead"</code> objects.</p></li>
 <li><p>Shared overdispersion across units in negative binomial <code><a href="../reference/hhh4.html">hhh4()</a></code> time series models (by specifying a factor variable as the <code>family</code> argument).</p></li>
 <li><p><code><a href="../reference/scores.html">scores()</a></code> and <code><a href="../reference/pit.html">pit()</a></code> are now generic and have convenient methods for <code>"oneStepAhead"</code> predictions and <code>"hhh4"</code> fits.</p></li>
 <li><p>The initial values used for model updates during the <code><a href="../reference/hhh4_validation.html">oneStepAhead()</a></code> procedure can now be specified directly through the <code>which.start</code> argument (as an alternative to the previous options <code>"current"</code> and <code>"final"</code>).</p></li>
-<li><p><code><a href="../reference/plot.hhh4.html">plotHHH4_fitted()</a></code> (and <code><a href="../reference/plot.hhh4.html">plotHHH4_fitted1()</a></code>) gained an option <code>decompose</code> to plot the contributions from each single unit (and the endemic part) instead of the default endemic + AR + neighbours decomposition. Furthermore, a formatted time axis similar to <code><a href="../reference/stsplot_time.html">stsplot_time1()</a></code> can now be enabled via the new argument <code>xaxis</code>.</p></li>
+<li><p><code><a href="../reference/hhh4_plot.html">plotHHH4_fitted()</a></code> (and <code><a href="../reference/hhh4_plot.html">plotHHH4_fitted1()</a></code>) gained an option <code>decompose</code> to plot the contributions from each single unit (and the endemic part) instead of the default endemic + AR + neighbours decomposition. Furthermore, a formatted time axis similar to <code><a href="../reference/stsplot_time.html">stsplot_time1()</a></code> can now be enabled via the new argument <code>xaxis</code>.</p></li>
 <li><p>The new <code>plot</code> <code>type</code> <code>"maps"</code> for <code>"hhh4"</code> fits shows maps of the fitted mean components averaged over time.</p></li>
 <li><p>New <code>plot</code>-method for simulations from <code>"hhh4"</code> models (using <code><a href="../reference/hhh4_simulate.html">simulate.hhh4(..., simplify = TRUE)</a></code>, which now has a dedicated class: <code>"hhh4sims"</code>) to show the final size distribution or the simulated time series (possibly stratified by groups of units). There is also a new <code>scores</code>-method to compute proper scoring rules based on such simulations.</p></li>
 <li><p>The argument <code>idx2Exp</code> of <code><a href="../reference/hhh4_methods.html">coef.hhh4()</a></code> may now be conveniently set to <code>TRUE</code> to exp-transform all coefficients.</p></li>
@@ -657,9 +666,9 @@ Dominant eigenvalues (<code>"maxEV"</code>) were not affected by this bug.</li>
 <h2 class="hasAnchor">
 <a href="#minor-changes-13" class="anchor"></a>MINOR CHANGES</h2>
 <ul>
-<li><p>The first argument of <code><a href="../reference/scores.html">scores()</a></code> is now called <code>x</code> instead of <code>object</code> (for consistency with <code><a href="../reference/calibrationTest.html">calibrationTest()</a></code>).</p></li>
+<li><p>The first argument of <code><a href="../reference/scores.html">scores()</a></code> is now called <code>x</code> instead of <code>object</code> (for consistency with <code><a href="../reference/calibration.html">calibrationTest()</a></code>).</p></li>
 <li><p>The result of <code><a href="../reference/hhh4_validation.html">oneStepAhead()</a></code> now has the dedicated class attribute <code>"oneStepAhead"</code> (previously was just a list).</p></li>
-<li><p>Changed interpretation of the <code>col</code> argument of <code><a href="../reference/plot.hhh4.html">plotHHH4_fitted()</a></code> and <code><a href="../reference/plot.hhh4.html">plotHHH4_fitted1()</a></code> (moved color of “observed” to separate argument <code>pt.col</code> and reversed remaining colors). The old <code>col</code> specification as a vector of length 4 still works (catched internally) but is undocumented.</p></li>
+<li><p>Changed interpretation of the <code>col</code> argument of <code><a href="../reference/hhh4_plot.html">plotHHH4_fitted()</a></code> and <code><a href="../reference/hhh4_plot.html">plotHHH4_fitted1()</a></code> (moved color of “observed” to separate argument <code>pt.col</code> and reversed remaining colors). The old <code>col</code> specification as a vector of length 4 still works (catched internally) but is undocumented.</p></li>
 <li><p>The <code>epoch</code> slot of class <code>"sts"</code> is now initialized to <code>1:nrow(observed)</code> by default and thus no longer needs to be explicitly set when creating a <code>new("sts", ...)</code> for this standard case.</p></li>
 <li><p>Initialization of <code>new("sts", ...)</code> now supports the argument <code>frequency</code> (for consistency with <code><a href="https://rdrr.io/r/stats/ts.html" class="external-link">ts()</a></code>). Note that <code>freq</code> still works (via partial argument matching) and that the corresponding <code>"sts"</code> slot is still called <code>freq</code>.</p></li>
 <li><p>If <code><a href="https://rdrr.io/r/base/missing.html" class="external-link">missing(legend.opts)</a></code> in <code><a href="../reference/stsplot_time.html">stsplot_time1()</a></code>, the default legend will only be produced if the <code>"sts"</code> object contains information on outbreaks, alarms, or upperbounds.</p></li>
@@ -758,7 +767,7 @@ Dominant eigenvalues (<code>"maxEV"</code>) were not affected by this bug.</li>
 <li><p>An error occurred in <code><a href="../reference/twinstim.html">twinstim()</a></code> if <code>finetune=TRUE</code> or choosing <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim()</a></code> instead of the default <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code> optimizer without supplying a <code>control</code> list in <code>optim.args</code>.</p></li>
 <li><p>The <code>"time"</code> plot for <code>"epidataCS"</code> did not necessarily use the same histogram <code>breaks</code> for all strata.</p></li>
 <li><p>Specifying a step function of interaction via a numeric vector of knots did not work in <code><a href="../reference/twinstim.html">twinstim()</a></code>.</p></li>
-<li><p><code><a href="../reference/plot.hhh4.html">plot.hhh4()</a></code> did not support an unnamed <code>type</code> argument such as <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot(x, "season")</a></code>.</p></li>
+<li><p><code><a href="../reference/hhh4_plot.html">plot.hhh4()</a></code> did not support an unnamed <code>type</code> argument such as <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot(x, "season")</a></code>.</p></li>
 <li><p><code><a href="../reference/twinstim_simulation.html">simEpidataCS()</a></code> did not work if <code>t0</code> was in the last block of <code>stgrid</code> (thus it did not work for single-cell grids), and mislabeled the <code>start</code> column copied to <code>events</code> if there were no covariates in <code>stgrid</code>.</p></li>
 <li><p>Evaluating <code>intensity.twinstim()$hFUN()</code> at time points before <code>t0</code> was an error. The function now returns <code>NA_real_</code> as for time points beyond <code>T</code>.</p></li>
 <li><p>Truncated, normalized power-law weights for <code><a href="../reference/hhh4.html">hhh4()</a></code> models, i.e., <code><a href="../reference/hhh4_W.html">W_powerlaw(maxlag = M, normalize = TRUE)</a></code> with <code>M &lt; max(neighbourhood(stsObj))</code>, had wrong derivatives and thus failed to converge.</p></li>
@@ -836,8 +845,8 @@ Dominant eigenvalues (<code>"maxEV"</code>) were not affected by this bug.</li>
 <li><p>Added <code>units</code> argument to <code>stsplot_time</code> to select only a subset of the multivariate time series for plotting.</p></li>
 <li><p>The <code>untie</code>-method for class <code>"epidataCS"</code> gained an argument <code>verbose</code> which is now <code>FALSE</code> by default.</p></li>
 <li><p><code>"epidataCS"</code> objects store the <code>clipper</code> used during generation as attribute of <code>$events$.influenceRegion</code>.</p></li>
-<li><p>In <code><a href="../reference/plot.hhh4.html">plotHHH4_fitted()</a></code>, the argument <code>legend.observed</code> now defaults to <code>FALSE</code>.</p></li>
-<li><p>The default weights for the spatio-temporal component in <code>hhh4</code> models now are <code>neighbourhood(stsObj) == 1</code>. The previous default <code><a href="../reference/stsSlot-generics.html">neighbourhood(stsObj)</a></code> does not make sense for the newly supported <code>nbOrder</code> neighbourhood matrices (shortest-path distances). The new default makes no difference for (old) models with binary adjacency matrices in the neighbourhood slot of the <code>stsObj</code>.</p></li>
+<li><p>In <code><a href="../reference/hhh4_plot.html">plotHHH4_fitted()</a></code>, the argument <code>legend.observed</code> now defaults to <code>FALSE</code>.</p></li>
+<li><p>The default weights for the spatio-temporal component in <code>hhh4</code> models now are <code>neighbourhood(stsObj) == 1</code>. The previous default <code><a href="../reference/stsSlots.html">neighbourhood(stsObj)</a></code> does not make sense for the newly supported <code>nbOrder</code> neighbourhood matrices (shortest-path distances). The new default makes no difference for (old) models with binary adjacency matrices in the neighbourhood slot of the <code>stsObj</code>.</p></li>
 <li><p>The default for nonparametric weights <code><a href="../reference/hhh4_W.html">W_np()</a></code> in <code><a href="../reference/hhh4.html">hhh4()</a></code> is now to assume zero weight for neighbourhood orders above <code>maxlag</code>, i.e., <code><a href="../reference/hhh4_W.html">W_np()</a></code>’s argument <code>to0</code> now defaults to <code>TRUE</code>.</p></li>
 <li><p>Added a <code>verbose</code> argument to <code><a href="../reference/permutationTest.html">permutationTest()</a></code>, which defaults to <code>FALSE</code>. The previous behaviour corresponds to <code>verbose=TRUE</code>.</p></li>
 <li><p><code><a href="../reference/twinstim_simulation.html">simulate.twinstim()</a></code> now by default uses the original <code>data$W</code> as observation region.</p></li>
@@ -1451,7 +1460,7 @@ Dominant eigenvalues (<code>"maxEV"</code>) were not affected by this bug.</li>
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001. Hosted on <a href="https://R-forge.R-project.org/projects/surveillance/" class="external-link"><img src="https://r-forge.r-project.org/themes/rforge/imagesrf/logo.png" height="18" alt="R-Forge"></a></p>
 </div>
 
       </footer>

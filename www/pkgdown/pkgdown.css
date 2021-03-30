@@ -249,7 +249,7 @@ mark {
 
 
 /* TOC heading */
-h2[data-toc-skip] {
+h2[data-toc-skip], #pkgdown-sidebar h2[data-toc-skip] {
   font-size: x-large;
 }
 
@@ -343,6 +343,7 @@ a:hover {
 
 a.footnote-ref {
   cursor: pointer;
+}
 /* Reference index & topics ----------------------------------------------- */
 
 .ref-index th {font-weight: normal;}
@@ -364,4 +365,30 @@ table {
 
 .fab {
     font-family: "Font Awesome 5 Brands" !important;
+}
+
+/* logo homepage */
+.pkg-logo {
+  float: right;
+  width: 100px;
+  margin-left: 30px;
+  margin-top: 25px;
+}
+
+@media (max-width: 767px) {
+  .pkg-logo {
+  float: none;
+  width: 100px;
+}
+}
+
+.pb-2.mt-4.mb-2.border-bottom {
+  min-height: 129px;
+}
+
+/* tweak headroom.js to not disappear as aggressively at the top of the page */
+/* https://github.com/rstudio/quillt/blob/57ba0ce7aa850e42165a8993d4b493c44917b7a8/inst/pkgdown/assets/rmd.css#L452 */
+.headroom {
+  will-change: transform;
+  transition: transform 400ms ease;
 }
