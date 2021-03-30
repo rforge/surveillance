@@ -2,6 +2,60 @@
 title: Events
 ---
 
+## 2020
+
+- The **surveillance** package is part of the COVID-19 outbreak response.
+  For example:
+
+  - The `nowcast()` function is used to provide situational awareness,
+    both in [Bavaria](https://corona.stat.uni-muenchen.de/nowcast/)
+    and in [Berlin](https://www.berlin.de/corona/lagebericht/desktop/corona.html).
+
+  - The `hhh4()` modelling framework has been used in several
+    retrospective studies of disease dynamics in
+```{r, echo = FALSE, results = "asis"}
+refs_EE <- read.csv("../../../www/applications_EE.csv")
+knitr::combine_words(
+  with(subset(refs_EE, Model == "hhh4" & Disease == "COVID-19"),
+       sprintf("[%s](%s)", Location, URL))
+)
+```
+
+## 2019
+
+- The [*Handbook of Infectious Disease Data Analysis*](https://doi.org/10.1201/9781315222912)
+  features the **surveillance** package in several chapters of Part V
+  ("Analysis of Surveillance Data"):
+  
+  - `twinstim()` is mentioned in Chapter 20 on
+    "Applications of Point Process Methods" by Peter J. Diggle.
+
+  - The `?imdepi` data is used to illustrate prospective outbreak detection
+    methods, such as `earsC()`, `farrington()`/`farringtonFlexible()`, and
+    `stcd()`, in Chapter 21 by Benjamin Allévius and Michael Höhle
+    (see [replication code](https://github.com/BenjaK/ProspectiveDetectionChapter)).
+
+  - `bodaDelay()` is mentioned in Chapter 22 on "Underreporting and
+    Reporting Delays" by Angela Noufaily.
+  
+  - `hhh4()` is discussed and applied with a focus on
+    - spatio-temporal modelling in Chapter 23 by Jon Wakefield et al., see
+      the [replication code](https://arxiv.org/src/1711.00555v1/anc)
+      applied to the `?measlesWeserEms` data
+    - forecasting in Chapter 25 by Leonhard Held and Sebastian Meyer, see
+      the [replication code](https://hidda.github.io/forecasting/)
+      applied to count time series of
+      [ILI in Switzerland](https://hidda.github.io/forecasting/reference/CHILI.html)
+      and [norovirus gastroenteritis in Berlin](https://hidda.github.io/forecasting/articles/BNV_files/figure-html/BNV_stsplot-1.png)
+      (from `hhh4contacts::noroBE()`)
+
+- The paper
+  [*Endemic-epidemic models with discrete-time serial interval distributions for infectious disease prediction*](https://arxiv.org/abs/1901.03090)
+  describes an extension of `hhh4()` for distributed lags
+  as implemented in the
+  [**hhh4addon**](https://github.com/jbracher/hhh4addon) package by
+  Johannes Bracher.
+
 ## 2017
 
 - 2017/05/03: A standard reference describing the spatio-temporal modelling
@@ -33,13 +87,13 @@ title: Events
   describes a new global test for clustering based on the endemic-epidemic point
   process model `twinstim()`.
 
-- 2016/03/31: The paper [A system for automated outbreak detection of communicable
-  diseases in Germany](https://doi.org/10.2807/1560-7917.ES.2016.21.13.30180)
+- 2016/03/31: The paper [*A system for automated outbreak detection of communicable
+  diseases in Germany*](https://doi.org/10.2807/1560-7917.ES.2016.21.13.30180)
   describes use of the package as backbone for the German infectious
   disease monitoring system.
 
-- 2016/01/21: The paper [Bayesian nowcasting during the STEC O104:H4 outbreak in
-  Germany, 2011](https://doi.org/10.1111/biom.12194),
+- 2016/01/21: The paper [*Bayesian nowcasting during the STEC O104:H4 outbreak in
+  Germany, 2011*](https://doi.org/10.1111/biom.12194),
   which builds on the **surveillance** package, won the **Best 2014 Paper in
   Biometrics by an IBS member** award. The award will be given at the
   IBC 2016 in Victoria, Canada.
@@ -57,20 +111,20 @@ title: Events
   
 - 2015/07/01: Two talks about the **surveillance** package given at the
   [useR2015!](https://user2015.math.aau.dk) conference:
-  - [Zombie Preparedness](https://staff.math.su.se/hoehle/software/surveillance/hoehle-userR2015-web.pdf)
+  - [*Zombie Preparedness*](https://staff.math.su.se/hoehle/software/surveillance/hoehle-userR2015-web.pdf)
     by Michael H&ouml;hle
-  - [Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package
-    surveillance](https://user2015.math.aau.dk/presentations/40.pdf)
+  - [*Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package
+    surveillance*](https://user2015.math.aau.dk/presentations/40.pdf)
     by Sebastian Meyer
 
 ## 2014
 
 - 2014/11/08: Two preprints published on arXiv illustrate the newest
   package features:
-  - [Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package
-    surveillance](https://arxiv.org/abs/1411.0416)
-  - [Monitoring Count Time Series in R: Aberration Detection in Public
-    Health Surveillance](https://arxiv.org/abs/1411.1292)
+  - [*Spatio-Temporal Analysis of Epidemic Phenomena Using the R Package
+    surveillance*](https://arxiv.org/abs/1411.0416)
+  - [*Monitoring Count Time Series in R: Aberration Detection in Public
+    Health Surveillance*](https://arxiv.org/abs/1411.1292)
 
 ## 2013
 
