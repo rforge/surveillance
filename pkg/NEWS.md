@@ -1,4 +1,9 @@
-# surveillance 1.19.1 (2021-03-25)
+# surveillance 1.19.1 (2021-03-30)
+
+## DOCUMENTATION
+
+- The project website at <https://surveillance.R-Forge.R-project.org/>
+  has been overhauled using [**pkgdown**](https://pkgdown.r-lib.org/).
 
 ## BUG FIXES
 
