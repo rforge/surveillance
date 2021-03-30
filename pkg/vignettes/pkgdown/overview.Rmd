@@ -105,7 +105,8 @@ are also described in corresponding package vignettes:
 ##### Applications
 
 These endemic-epidemic modelling frameworks have proven useful in a wide range
-of applications. We loosely maintain a list of publications:
+of applications, including for COVID-19.
+We loosely maintain a list of related publications:
 <details>
   <summary>
   (click to expand)
