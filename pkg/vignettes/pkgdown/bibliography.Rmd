@@ -2,7 +2,14 @@
 title: Bibliography
 ---
 
+See [Citation and Authors](../../authors.html) for the two standard
+JSS references to cite **surveillance** in publications.
+This page gives a more comprehensive list of papers feeding **surveillance**:
+
+<ul>
 ```{r, echo = FALSE, results = "asis"}
 ##writeLines(paste("-", format(surveillance:::REFERENCES, "citation", bibtex = FALSE)), sep = "\n\n")
-writeLines(format(surveillance:::REFERENCES, "html"), sep = "\n\n")
+writeLines(paste0("<li>", format(surveillance:::REFERENCES, "html"), "</li>"),
+           sep = "\n\n")
 ```
+</ul>
