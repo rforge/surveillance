@@ -17,8 +17,8 @@ the social sciences.
 
 The S4 class `"sts"` (surveillance time series), created via `sts()` or
 `linelist2sts()`, represents (multivariate) time series of counts.
-For areal time series, the class can also capture population fractions, a map
-and weight matrix. The `"sts"` class supersedes the
+For areal time series, the class can also capture population fractions, a map,
+and a weight matrix. The `"sts"` class supersedes the
 [`"disProg"`](../../reference/create.disProg.html) class.
 
 For evaluation purposes, the package contains several
@@ -60,7 +60,7 @@ for the complete list of algorithms.
 
 - Adjusting for occurred-but-not-yet-reported events: `nowcast()`, `bodaDelay()`
 
-#### Applications
+##### Applications
 
 These methods have also been used for COVID-19 surveillance, for example:
 
@@ -102,7 +102,7 @@ are also described in corresponding package vignettes:
 : associated data class: [`"sts"`](../../reference/sts-class.html)
 
 
-#### Applications
+##### Applications
 
 These endemic-epidemic modelling frameworks have proven useful in a wide range
 of applications. We loosely maintain a list of publications:
