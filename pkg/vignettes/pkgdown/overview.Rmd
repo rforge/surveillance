@@ -106,17 +106,8 @@ are also described in corresponding package vignettes:
 
 These endemic-epidemic modelling frameworks have proven useful in a wide range
 of applications, including for COVID-19.
-We loosely maintain a list of related publications:
-<details>
-  <summary>
-  (click to expand)
-  </summary>
-
-```{r, echo = FALSE, results = "asis"}
-refs_EE <- read.csv("../../../www/applications_EE.csv")
-knitr::kable(subset(refs_EE, select = -Species))
-```
-</details>
+We loosely maintain a list of related publications at
+https://surveillance.R-forge.R-project.org/applications_EE.html.
 
 
 ## Installation
