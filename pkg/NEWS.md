@@ -1,3 +1,11 @@
+# surveillance 1.19.1.9000 (UNRELEASED)
+
+## BUG FIXES
+
+- The `print`-method for `summary.hhh4()` did not apply the `digits`
+  argument to the coefficient matrix.
+
+
 # surveillance 1.19.1 (2021-03-30)
 
 ## DOCUMENTATION

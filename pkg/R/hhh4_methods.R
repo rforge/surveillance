@@ -5,7 +5,7 @@
 ###
 ### Standard methods for hhh4-fits
 ###
-### Copyright (C) 2010-2012 Michaela Paul, 2012-2020 Sebastian Meyer
+### Copyright (C) 2010-2012 Michaela Paul, 2012-2021 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -87,7 +87,7 @@ summary.hhh4 <- function (object, maxEV = FALSE, ...)
 print.summary.hhh4 <- function (x, digits = max(3, getOption("digits")-3), ...)
 {
     ## x$convergence is always TRUE if we have a summary
-    print.hhh4(x) # also works for summary.hhh4-objects
+    print.hhh4(x, digits = digits) # also works for summary.hhh4-objects
 
     if (!is.null(x$maxEV_range))
         cat("Epidemic dominant eigenvalue: ",
