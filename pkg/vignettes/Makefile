@@ -2,7 +2,7 @@
 ## and for author-level checks of the vignette cache. It requires GNU make.
 ## Because of this and because this Makefile does nothing special to build
 ## the vignettes, it is listed in the top-level .Rbuildignore file
-## (such that standard R CMD build routines take care of the vignettes).
+## (however, it will still be used during R CMD build).
 ## In addition it defines a rule to create the PStricks-based HMM figure
 ## included in surveillance.Rnw
 ##
@@ -37,7 +37,7 @@ cleanall: clean
 
 ### create surveillance-hmm.pdf
 
-surveillance.pdf: surveillance-hmm.pdf  # additional dependency
+#surveillance.pdf: surveillance-hmm.pdf  # additional dependency
 surveillance-hmm.pdf: surveillance-hmm.tex
 	latex -interaction=batchmode $< && dvips -q ${<:.tex=.dvi} && \
 		ps2pdf -q -sOutputFile=- ${<:.tex=.ps} | pdfcrop - $@
