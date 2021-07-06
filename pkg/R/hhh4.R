@@ -2110,7 +2110,9 @@ fitHHH <- function(theta, sd.corr, model,
                   parVar$rel.tol, "\n")
 
           if(parVar$convergence!=0) {
-              if (!is.null(parVar$message)) print(parVar$message)
+              if (!is.null(parVar$message))
+                  cat("! Non-convergence message from optimizer:",
+                      parVar$message, "\n")
               cat("Update of variance parameters in iteration ", i, " unreliable\n")
           }
 
