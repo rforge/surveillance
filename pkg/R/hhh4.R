@@ -1981,7 +1981,7 @@ checkParBounds <- function (par, lower, upper)
 defaultOptimControl <- function (method = "nlminb", lower = -Inf, upper = Inf,
                                  iter.max = NULL, verbose = 0)
 {
-    if (is.null(iter.max)) iter.max <- 20 + 280*(method=="Nelder-Mead")
+    if (is.null(iter.max)) iter.max <- 20 + 480*(method=="Nelder-Mead")
     lowVerbose <- verbose %in% 0:2
     luOptimMethod <- method %in% c("Brent", "L-BFGS-B")
     defaults.nr <- list(scoreTol=1e-5, paramTol=1e-7, F.inc=0.01, stepFrac=0.5,
