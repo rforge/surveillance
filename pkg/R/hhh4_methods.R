@@ -57,8 +57,8 @@ print.hhh4 <- function (x, digits = max(3, getOption("digits")-3), ...)
 }
 .printREmat <- function (REmat, digits = 4)
 {
-    V <- round(diag(REmat), digits=digits)
-    corr <- round(attr(REmat, "correlation"), digits=digits)
+    V <- format(diag(REmat), digits=digits)
+    corr <- format(attr(REmat, "correlation"), digits=digits)
     corr[upper.tri(corr,diag=TRUE)] <- ""
     V.corr <- cbind(V, corr, deparse.level=0)
     colnames(V.corr) <- c("Var", "Corr", rep.int("", ncol(corr)-1L))
@@ -93,6 +93,7 @@ print.summary.hhh4 <- function (x, digits = max(3, getOption("digits")-3), ...)
         cat("Epidemic dominant eigenvalue: ",
             paste(sprintf("%.2f", x$maxEV_range), collapse = " -- "), "\n\n")
     if(x$dim["random"]==0){
+        ## format(x$AIC,digits=4) would often yield no decimal digits (big AIC)
         cat('Log-likelihood:  ',round(x$loglikelihood,digits=digits-2),'\n')
         cat('AIC:             ',round(x$AIC,digits=digits-2),'\n')
         cat('BIC:             ',round(x$BIC,digits=digits-2),'\n\n')
