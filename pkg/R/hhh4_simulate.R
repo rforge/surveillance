@@ -5,7 +5,7 @@
 ###
 ### Simulate from a HHH4 model
 ###
-### Copyright (C) 2012 Michaela Paul, 2013-2016,2018 Sebastian Meyer
+### Copyright (C) 2012 Michaela Paul, 2013-2016,2018,2021 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -254,10 +254,8 @@ aggregate.hhh4sims <- function (x, units = TRUE, time = FALSE, ..., drop = FALSE
             res <- apply(X = x, MARGIN = c(1L, 3L), FUN = sum)
             if (!drop) {
                 ## restore unit dimension conforming to "hhh4sims" class
-                dim(res) <- c(ax$dim[1L], 1L, ax$dim[3L])
-                dnres <- ax$dimnames
-                dnres[2L] <- list(NULL)
-                dimnames(res) <- dnres
+                dim(res) <- replace(ax$dim, 2L, 1L)
+                dimnames(res) <- replace(ax$dimnames, 2L, list(NULL))
                 ## restore attributes
                 attr(res, "initial") <- as.matrix(rowSums(ax$initial))
                 attr(res, "stsObserved") <- aggregate(ax$stsObserved, by = "unit")
@@ -267,10 +265,8 @@ aggregate.hhh4sims <- function (x, units = TRUE, time = FALSE, ..., drop = FALSE
             stopifnot(length(units) == dim(x)[2])
             groupnames <- names(split.default(seq_along(units), units))
             res <- apply(X = x, MARGIN = 3L, FUN = rowSumsBy.matrix, by = units)
-            dim(res) <- c(ax$dim[1L], length(groupnames), ax$dim[3L])
-            dnres <- ax$dimnames
-            dnres[2L] <- list(groupnames)
-            dimnames(res) <- dnres
+            dim(res) <- replace(ax$dim, 2L, length(groupnames))
+            dimnames(res) <- replace(ax$dimnames, 2L, list(groupnames))
             if (!drop) {
                 ## restore attributes
                 attr(res, "initial") <- rowSumsBy.matrix(ax$initial, units)
