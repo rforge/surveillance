@@ -1,5 +1,10 @@
 # surveillance 1.19.1.9000 (UNRELEASED)
 
+## NEW FEATURES
+
+- `plotHHH4_season()` gained a `period` argument to support harmonics
+  with periods longer than the frequency of the `"sts"` object.
+
 ## MINOR CHANGES
 
 - If the Nelder-Mead optimizer is used for the variance parameters in

@@ -56,8 +56,8 @@ plotHHH4_season(..., components = NULL, intercept = FALSE,
                 xlab = NULL, ylab = "", main = NULL,
                 par.settings = list(), matplot.args = list(),
                 legend = NULL, legend.args = list(),
-                refline.args = list(), unit = 1)
-getMaxEV_season(x)
+                refline.args = list(), unit = 1, period = NULL)
+getMaxEV_season(x, period = x$stsObj@freq)
 
 plotHHH4_maxEV(...,
                matplot.args = list(), refline.args = list(),
@@ -150,7 +150,8 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
     will be used as x-values in the plot, which is different from the
     long-standing default (\code{xaxis = NULL}) with a real time scale.}
   \item{xlim}{numeric vector of length 2 specifying the x-axis range.
-    The default (\code{NULL}) is to plot the complete time range.}
+    The default (\code{NULL}) is to plot the complete time range
+    (\code{type="fitted"}) or period (\code{type="season"}), respectively.}
   \item{ylim}{y-axis range.
     For \code{type="fitted"}, this defaults to 
     \code{c(0,max(observed(x$stsObj)[,unit]))}.
@@ -198,6 +199,10 @@ plotHHH4_neweights(x, plotter = boxplot, ...,
     drawing the reference line (\code{h=1}) in plots of seasonal effects
     (if \code{intercept=FALSE}) and of the dominant eigenvalue.
     The reference line is omitted if \code{refline.args} is not a list.}
+  \item{period}{a numeric value giving the (longest) period of the
+    harmonic terms in the model. This usually coincides with the
+    \code{freq} of the data (the default), but needs to be adjusted if
+    the model contains harmonics with a longer periodicity.}
   \item{which}{a character vector specifying the components of the mean
     for which to produce maps. By default, the overall mean and all
     three components are shown.}
@@ -326,6 +331,11 @@ surveillance.options(oopts)
 
 ## plot the multiplicative effect of seasonality
 plot(measlesFit, type="season")
+
+## alternative fit with biennial pattern, plotted jointly with original fit
+measlesFit2 <- update(measlesFit,
+    end = list(f = addSeason2formula(~0 + ri(type="iid"), S=2, period=104)))
+plotHHH4_season(measlesFit, measlesFit2, components="end", period=104)
 
 ## dominant eigenvalue of the Lambda matrix (cf. Held and Paul, 2012)
 getMaxEV(measlesFit)  # here simply constant and equal to exp(ar.1)
