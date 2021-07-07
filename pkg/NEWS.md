@@ -6,6 +6,9 @@
   `hhh4()`, it is now limited to 500 (not 300) iterations by default
   (consistent with the default in `optim()`).
 
+- Printing an `"sts"` object now omits the `neighbourhood` component if
+  that was not set (all-`NA` prototype).
+
 ## BUG FIXES
 
 - The `print`-method for `summary.hhh4()` did not apply the `digits`
