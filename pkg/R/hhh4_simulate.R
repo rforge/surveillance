@@ -215,8 +215,8 @@ checkCoefs <- function (object, coefs, reparamPsi=TRUE)
         return(xx)
 
     ## otherwise we were subsetting the array and attributes are lost
-    attr(xx, "initial") <- attr(x, "initial")
-    attr(xx, "stsObserved") <- attr(x, "stsObserved")
+    attributes(xx) <- c(attributes(xx),
+                        attributes(x)[c("initial", "stsObserved", "class")])
     subset_hhh4sims_attributes(xx, i, j)
 }
 
