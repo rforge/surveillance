@@ -6,7 +6,7 @@
 ### Plots for an array "hhh4sims" of simulated counts from an "hhh4" model,
 ### or a list thereof as produced by different "hhh4" models (same period!)
 ###
-### Copyright (C) 2013-2018,2020 Sebastian Meyer
+### Copyright (C) 2013-2018,2020-2021 Sebastian Meyer
 ### $Revision$
 ### $Date$
 ################################################################################
@@ -153,13 +153,12 @@ plot.hhh4simslist <- function (x, type = c("size", "time", "fan"), ...,
     if (ngroups == 1) {
         do.call(FUN, list(quote(x), ...))
     } else { # stratified plots by groups of units
-        invisible(sapply(
-            X = levels(groups),
+        invisible(lapply(
+            X = setNames(nm = levels(groups)),
             FUN = function (group) {
                 x_group <- x[, which(group == groups) , ] # [-method has drop=F
                 do.call(FUN, list(quote(x_group), ..., main = group))
-            },
-            simplify = FALSE, USE.NAMES = TRUE))
+            }))
     }
 }
 
