@@ -1,9 +1,16 @@
 # surveillance 1.19.1.9000 (UNRELEASED)
 
+## MINOR CHANGES
+
+- If the Nelder-Mead optimizer is used for the variance parameters in
+  `hhh4()`, it is now limited to 500 (not 300) iterations by default
+  (consistent with the default in `optim()`).
+
 ## BUG FIXES
 
 - The `print`-method for `summary.hhh4()` did not apply the `digits`
-  argument to the coefficient matrix.
+  argument to the coefficient matrix. Furthermore, printing of estimated
+  variance parameters now adheres to *significant* `digits` as documented.
 
 
 # surveillance 1.19.1 (2021-03-30)
