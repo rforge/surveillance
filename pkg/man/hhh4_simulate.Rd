@@ -100,6 +100,8 @@
   \code{object$stsObj[subset,]}, are attached for reference
   (used by the \code{plot}-methods) as an attribute \code{"stsObserved"},
   and the initial condition \code{y.start} as attribute \code{"initial"}.
+  The \code{[}-method for \code{"hhh4sims"} takes care of subsetting
+  these attributes appropriately.
 }
 
 \references{
@@ -113,6 +115,7 @@ Michaela Paul and Sebastian Meyer
 
 \seealso{
   \code{\link{plot.hhh4sims}} and \code{\link{scores.hhh4sims}}
+  and the examples therein for \code{nsim > 1}.
 }
 
 \examples{
@@ -126,11 +129,16 @@ fit <- hhh4(meningo, control = list(ar = list(f = ~ 1),
             family = "NegBin1"))
 plot(fit)
 
-# simulate from model
+# simulate from model (generates an "sts" object)
 simData <- simulate(fit, seed=1234)
 
 # plot simulated data
 plot(simData, main = "simulated data", xaxis.labelFormat=NULL)
+
+# use simplify=TRUE to return a matrix/array of simulated counts
+simCounts <- simulate(fit, seed=1234, simplify=TRUE)
+stopifnot(observed(simData) == simCounts)
+simCounts[2,]  # subset to second time point (also showing attributes)
 
 # consider a Poisson instead of a NegBin model
 coefs <- coef(fit)

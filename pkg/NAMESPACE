@@ -460,6 +460,7 @@ S3method(calibrationTest, hhh4)
 S3method(calibrationTest, oneStepAhead)
 
 ## methods for simulations from hhh4 fits
+S3method("[", hhh4sims)
 S3method(aggregate, hhh4sims)
 S3method(plot, hhh4sims)
 export(as.hhh4simslist)

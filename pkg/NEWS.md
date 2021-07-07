@@ -15,6 +15,10 @@
   argument to the coefficient matrix. Furthermore, printing of estimated
   variance parameters now adheres to *significant* `digits` as documented.
 
+- The `[`-method for the `"hhh4sims"` class was not registered and thus
+  only available internally. Array-like subsetting of simulated counts
+  now retains the class.
+
 
 # surveillance 1.19.1 (2021-03-30)
 
