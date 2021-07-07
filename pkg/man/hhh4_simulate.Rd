@@ -124,9 +124,10 @@ data(influMen)
 meningo <- disProg2sts(influMen)[,2]
 
 # fit model
-fit <- hhh4(meningo, control = list(ar = list(f = ~ 1),
-            end = list(f = addSeason2formula(S = 1, period = 52)),
-            family = "NegBin1"))
+fit <- hhh4(meningo, control = list(
+              ar = list(f = ~ 1),
+              end = list(f = addSeason2formula(~1, period = 52)),
+              family = "NegBin1"))
 plot(fit)
 
 # simulate from model (generates an "sts" object)
@@ -140,17 +141,14 @@ simCounts <- simulate(fit, seed=1234, simplify=TRUE)
 stopifnot(observed(simData) == simCounts)
 simCounts[2,]  # subset to second time point (also showing attributes)
 
-# consider a Poisson instead of a NegBin model
-coefs <- coef(fit)
-coefs["overdisp"] <- 0
-
+# simulate from a Poisson instead of a NegBin model
+# keeping all other parameters fixed at their original estimates
+coefs <- replace(coef(fit), "overdisp", 0)
 simData2 <- simulate(fit, seed=123, coefs = coefs)
 plot(simData2, main = "simulated data: Poisson model", xaxis.labelFormat = NULL)
 
-# consider a model with higher autoregressive parameter
-coefs <- coef(fit)
-coefs[1] <- log(0.5)
-
+# simulate from a model with higher autoregressive parameter
+coefs <- replace(coef(fit), "ar.1", log(0.9))
 simData3 <- simulate(fit, seed=321, coefs = coefs)
 plot(simData3, main = "simulated data: lambda = 0.5", xaxis.labelFormat = NULL)
 }
