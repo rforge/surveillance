@@ -101,7 +101,7 @@ simulate.hhh4 <- function (object, # result from a call to hhh4
         }
         simcall <- call("setObserved", simcall)
     }
-    res <- if (nsim==1) eval(simcall) else
+    res <- if (nsim==1 && !simplify) eval(simcall) else
            replicate(nsim, eval(simcall),
                      simplify=if (simplify) "array" else FALSE)
     if (simplify) {

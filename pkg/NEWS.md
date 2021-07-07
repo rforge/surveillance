@@ -9,6 +9,10 @@
 - Printing an `"sts"` object now omits the `neighbourhood` component if
   that was not set (all-`NA` prototype).
 
+- `simulate.hhh4(..., simplify = TRUE)` now consistently returns a
+  3d array (nTime x nUnit x nsim), even for `nsim = 1` (for which plotting
+  now works).
+
 ## BUG FIXES
 
 - The `print`-method for `summary.hhh4()` did not apply the `digits`

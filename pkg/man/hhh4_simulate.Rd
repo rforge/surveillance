@@ -94,8 +94,7 @@
 
   If \code{simplify=TRUE}: an object of class
   \code{"hhh4sims"}, which is an array of dimension
-  \code{c(length(subset), ncol(object$stsObj), nsim)}, where the third
-  dimension is dropped if \code{nsim=1} (yielding a matrix).
+  \code{c(length(subset), ncol(object$stsObj), nsim)}.
   The originally observed counts during the simulation period,
   \code{object$stsObj[subset,]}, are attached for reference
   (used by the \code{plot}-methods) as an attribute \code{"stsObserved"},
@@ -136,10 +135,13 @@ simData <- simulate(fit, seed=1234)
 # plot simulated data
 plot(simData, main = "simulated data", xaxis.labelFormat=NULL)
 
-# use simplify=TRUE to return a matrix/array of simulated counts
+# use simplify=TRUE to return an array of simulated counts
 simCounts <- simulate(fit, seed=1234, simplify=TRUE)
-stopifnot(observed(simData) == simCounts)
-simCounts[2,]  # subset to second time point (also showing attributes)
+dim(simCounts)  # nTime x nUnit x nsim
+\dontshow{stopifnot(observed(simData) == c(simCounts))}
+# plot the first year of simulated counts (+ initial + observed)
+plot(simCounts[1:52,,], type = "time", xaxis.labelFormat = NULL)
+# see help(plot.hhh4sims) for other plots, mainly useful for nsim > 1
 
 # simulate from a Poisson instead of a NegBin model
 # keeping all other parameters fixed at their original estimates
