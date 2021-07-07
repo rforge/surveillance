@@ -176,9 +176,10 @@ plotHHH4sims_size <- function (x, horizontal = TRUE, trafo = NULL,
     if (is.null(trafo)) #trafo <- scales::identity_trans()
         trafo <- list(name = "identity", transform = identity)
     if (isTRUE(observed)) observed <- list()
-    nsims <- sapply(X = unclass(x), # simply use the default "[["-method
-                    FUN = colSums, dims = 2, # sum over 1:2 (time x unit)
-                    simplify = TRUE, USE.NAMES = TRUE)
+    nsims <- do.call("cbind", # no simplify2array() as we need a matrix even for nsim=1
+        lapply(X = unclass(x), # simply use the default "[["-method
+               FUN = colSums, dims = 2L) # sum over 1:2 (time x unit)
+        )
     nsimstrafo <- trafo$transform(nsims)
 
     ## default boxplot arguments
